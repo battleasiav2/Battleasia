@@ -1,18 +1,3 @@
-BattleAsia API — Node.js backend
-
-Upload this entire folder to your server (e.g. /home/user/battleasia-api/).
-
-Requirements:
-  - Node.js 20+
-  - MongoDB Atlas connection string
-
-Steps after upload:
-  1. Copy hosting/env/.env.production.example to .env and fill values
-  2. npm install --omit=dev
-  3. node dist/index.js
-     OR: pm2 start ecosystem.config.cjs
-
-Health check: GET /health
-Ready check:  GET /ready
-
-For Docker/VPS full stack, use hosting/server/ instead (recommended).
+Upload this folder to your server Node.js app directory.
+Copy .env.example to .env and fill MongoDB URI + secrets.
+Run: npm install --omit=dev && node dist/index.js

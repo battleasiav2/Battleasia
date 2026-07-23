@@ -13,7 +13,7 @@ export const SHOP_IMAGE_PATHS = [
 
 export const SHOP_HERO_IMAGE = '/assets/images/shop/bac-store-hero.webp';
 
-/** Live shop domain in production; local shop app when developing on this machine. */
+/** Live shop URL — same domain /store path in production; local shop app when developing. */
 export const SHOP_EXTERNAL_URL =
   import.meta.env.VITE_BAC_SHOP_URL ||
-  (import.meta.env.DEV ? 'http://localhost:8082/user/shop' : 'https://baccoin.shop');
+  (import.meta.env.DEV ? 'http://localhost:8082/user/shop' : '/store/user/shop');

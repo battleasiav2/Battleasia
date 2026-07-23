@@ -1,0 +1,1 @@
+const e="ایپ",t="نوکری",a="صارف",o="سفر",i="انوائس",l={title:"بلاگ",caption:"حسب ضرورت کی بورڈ شارٹ کٹس۔"},p="ذیلی عنوان",r={app:"ایپ",job:t,user:a,travel:"سفر",invoice:i,blog:l,subheader:p};export{e as app,l as blog,r as default,i as invoice,t as job,p as subheader,o as travel,a as user};

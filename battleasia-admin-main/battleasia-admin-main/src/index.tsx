@@ -11,9 +11,11 @@ import { store } from './store';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
+const adminBasename = (process.env.REACT_APP_BASENAME || '').replace(/\/$/, '');
+
 root.render(
   <HelmetProvider>
-    <BrowserRouter>
+    <BrowserRouter basename={adminBasename || undefined}>
       <Suspense>
         <Provider store={store}>
           <App />

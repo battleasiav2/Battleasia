@@ -36,6 +36,7 @@ Thumbs.db
 backups/
 *.zip
 *.tar.gz
+hosting/upload/*.zip
 
 # IDE / local tools
 .cursor/

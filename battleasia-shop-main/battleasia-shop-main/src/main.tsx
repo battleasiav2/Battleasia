@@ -12,17 +12,22 @@ import { ErrorBoundary } from './routes/components';
 
 // ----------------------------------------------------------------------
 
-const router = createBrowserRouter([
-  {
-    Component: () => (
-      <App>
-        <Outlet />
-      </App>
-    ),
-    errorElement: <ErrorBoundary />,
-    children: routesSection,
-  },
-]);
+const shopBasename = (import.meta.env.VITE_BASE_PATH || '/').replace(/\/$/, '');
+
+const router = createBrowserRouter(
+  [
+    {
+      Component: () => (
+        <App>
+          <Outlet />
+        </App>
+      ),
+      errorElement: <ErrorBoundary />,
+      children: routesSection,
+    },
+  ],
+  shopBasename ? { basename: shopBasename } : undefined
+);
 
 const root = createRoot(document.getElementById('root')!);
 

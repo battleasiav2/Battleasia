@@ -1,0 +1,1 @@
+const s=["/assets/images/shop/9.webp","/assets/images/shop/1.webp","/assets/images/shop/2.webp","/assets/images/shop/3.webp","/assets/images/shop/4.webp","/assets/images/shop/5.webp","/assets/images/shop/6.webp","/assets/images/shop/7.webp","/assets/images/shop/8.webp"],e="/assets/images/shop/bac-store-hero.webp",a="https://nixbazar.com/store/user/shop";export{e as S,a,s as b};

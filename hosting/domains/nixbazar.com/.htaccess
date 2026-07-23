@@ -1,0 +1,42 @@
+# nixbazar.com — single domain (no subdomains)
+# Player FE = /   |   Shop = /store/   |   Admin = /admin/   |   API = /api/
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # --- API (Node.js on port 5050 — enable if mod_proxy allowed) ---
+  # RewriteRule ^api/(.*)$ http://127.0.0.1:5050/$1 [P,L]
+  # RewriteRule ^uploads/(.*)$ http://127.0.0.1:5050/uploads/$1 [P,L]
+  # RewriteRule ^socket.io/(.*)$ http://127.0.0.1:5050/socket.io/$1 [P,L]
+
+  # --- Admin SPA (/admin/) ---
+  RewriteCond %{REQUEST_URI} ^/admin
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^admin/ /admin/index.html [L]
+
+  # --- Shop SPA (/store/) ---
+  RewriteCond %{REQUEST_URI} ^/store
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^store/ /store/index.html [L]
+
+  # --- Player FE (root) ---
+  RewriteCond %{REQUEST_URI} !^/admin
+  RewriteCond %{REQUEST_URI} !^/store
+  RewriteCond %{REQUEST_URI} !^/api
+  RewriteCond %{REQUEST_URI} !^/uploads
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+</IfModule>

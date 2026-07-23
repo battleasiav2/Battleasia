@@ -48,7 +48,7 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
 
   return {
-  base: env.VITE_CDN_URL || '/',
+  base: env.VITE_BASE_PATH || env.VITE_CDN_URL || '/',
   plugins: [
     react(),
     chunkErrorRetryPlugin(),

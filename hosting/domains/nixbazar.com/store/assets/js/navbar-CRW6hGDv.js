@@ -1,0 +1,1 @@
+const e="تطبيق",t="وظيفة",a="مستخدم",o="السفر",i="فاتورة",l={title:"مدونة",caption:"اختصارات لوحة المفاتيح المخصصة."},p="العنوان الفرعي",r={app:e,job:t,user:a,travel:o,invoice:i,blog:l,subheader:p};export{e as app,l as blog,r as default,i as invoice,t as job,p as subheader,o as travel,a as user};
