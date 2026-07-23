@@ -1,0 +1,8 @@
+Upload all built files to the admin subdomain document root.
+
+cPanel example:
+  Create subdomain: admin.yourdomain.com
+  Upload everything from hosting/domains/admin.battleasia.net/
+
+Run build first:
+  powershell -ExecutionPolicy Bypass -File hosting/scripts/build-for-hosting.ps1

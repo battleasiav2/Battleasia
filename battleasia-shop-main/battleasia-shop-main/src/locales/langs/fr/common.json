@@ -1,0 +1,16 @@
+{
+  "demo": {
+    "lang": "France",
+    "description": "Le point de départ pour votre prochain projet est basé sur MUI. La personnalisation facile vous aide à construire des applications plus rapidement et mieux."
+  },
+  "auth": {
+    "signIn": "Se connecter",
+    "signInToAccount": "Connectez-vous à votre compte",
+    "emailAddress": "Adresse e-mail",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "6+ caractères",
+    "forgotPassword": "Mot de passe oublié?",
+    "dontHaveAccount": "Vous n'avez pas de compte?",
+    "signUp": "S'inscrire"
+  }
+}

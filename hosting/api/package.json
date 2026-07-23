@@ -1,0 +1,45 @@
+{
+  "name": "battleasia-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "seed": "tsx src/seed.ts",
+    "seed:dashboard": "tsx -e \"import { connectDb } from './src/db/connect.js'; import { seedDashboardData } from './src/seed-dashboard-data.js'; await connectDb(); await seedDashboardData(); process.exit(0);\"",
+    "seed:demo": "tsx src/run-seed-demo.ts",
+    "seed:games": "tsx src/run-seed-games.ts",
+    "reset-admin": "tsx src/reset-admin.ts",
+    "seed:feed": "tsx src/run-seed-feed.ts",
+    "optimize:images": "node scripts/optimize-images.mjs"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.6.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.3",
+    "multer": "^2.2.0",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/compression": "^1.8.1",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/multer": "^2.2.0",
+    "@types/node": "^22.10.2",
+    "sharp": "^0.35.3",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,6 @@
+
+/* Hide the inline warning banner that MUI X injects when no license key is present */
+.MuiDateRangeCalendar-root > div:first-child {
+  display: none !important;
+}
+

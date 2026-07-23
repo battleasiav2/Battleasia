@@ -1,0 +1,29 @@
+{
+  "demo": {
+    "lang": "English",
+    "description": "The starting point for your next project is based on MUI. Easy customization helps you build apps faster and better."
+  },
+  "auth": {
+    "signIn": "Sign In",
+    "signInToAccount": "Sign in to your account",
+    "emailAddress": "Email address",
+    "password": "Password",
+    "passwordPlaceholder": "6+ characters",
+    "forgotPassword": "Forgot password?",
+    "dontHaveAccount": "Don't have an account?",
+    "signUp": "Sign Up"
+  },
+  "shop": {
+    "bacShopName": "BattleAsia Coin Shop",
+    "bacDescription": "Sign in to buy BAC coins, manage your balance, and pay securely with your preferred method.",
+    "authHeroTagline": "Official Store",
+    "authHeroTitle": "Top up BAC coins instantly",
+    "authHeroSubtitle": "Secure payments, multiple currencies, and instant coin delivery after checkout.",
+    "authFeatureInstant": "Instant delivery",
+    "authFeatureSecure": "Secure checkout",
+    "authFeaturePayments": "Multi-currency",
+    "authStatCoins": "Shop coins",
+    "authStatMethods": "Pay methods",
+    "authStatDelivery": "Support"
+  }
+}

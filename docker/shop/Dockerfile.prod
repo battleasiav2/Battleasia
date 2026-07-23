@@ -1,0 +1,17 @@
+# Production multi-stage build for Shop
+FROM node:20-alpine AS build
+WORKDIR /app
+COPY battleasia-shop-main/battleasia-shop-main/package.json battleasia-shop-main/battleasia-shop-main/package-lock.json ./
+RUN npm ci
+COPY battleasia-shop-main/battleasia-shop-main/ .
+ARG VITE_SERVER_URL=
+ARG VITE_CDN_URL=
+ENV VITE_SERVER_URL=$VITE_SERVER_URL
+ENV VITE_CDN_URL=$VITE_CDN_URL
+RUN npm run build
+
+FROM nginx:1.27-alpine
+COPY docker/nginx/shop.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

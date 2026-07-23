@@ -1,0 +1,9 @@
+Upload all built files from this folder to your main domain document root.
+
+cPanel example:
+  public_html/  ← upload everything from hosting/domains/battleasia.net/
+
+After upload you should see index.html, assets/, logo/, etc. at the domain root.
+
+Run build first (from project root):
+  powershell -ExecutionPolicy Bypass -File hosting/scripts/build-for-hosting.ps1

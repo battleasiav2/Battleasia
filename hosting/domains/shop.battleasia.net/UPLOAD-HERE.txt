@@ -1,0 +1,9 @@
+Upload all built files to the shop subdomain document root.
+
+cPanel example:
+  Create subdomain: shop.yourdomain.com
+  Document root: public_html/shop  (or shop.yourdomain.com folder)
+  Upload everything from hosting/domains/shop.battleasia.net/
+
+Run build first:
+  powershell -ExecutionPolicy Bypass -File hosting/scripts/build-for-hosting.ps1

@@ -1,0 +1,100 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile.prod
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5050
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/battleasia}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@battleasia.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://battleasia.net}
+      APP_URL: ${APP_URL:-}
+      CDN_URL: ${CDN_URL:-}
+      COINGO_MOCK: "false"
+      LOG_AUTH_CODES: "false"
+    volumes:
+      - api_uploads:/app/uploads
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:5050/ready',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  mongo:
+    image: mongo:7
+    profiles: ["local-db"]
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    ports:
+      - "127.0.0.1:27017:27017"
+
+  fe:
+    build:
+      context: .
+      dockerfile: docker/fe/Dockerfile.prod
+      args:
+        VITE_SERVER_URL: ${VITE_SERVER_URL:-}
+        VITE_CDN_URL: ${VITE_CDN_URL:-}
+        VITE_BAC_SHOP_URL: ${VITE_BAC_SHOP_URL:-https://shop.battleasia.net/user/shop}
+    restart: unless-stopped
+    expose:
+      - "80"
+
+  shop:
+    build:
+      context: .
+      dockerfile: docker/shop/Dockerfile.prod
+      args:
+        VITE_SERVER_URL: ${VITE_SERVER_URL:-}
+        VITE_CDN_URL: ${VITE_CDN_URL:-}
+    restart: unless-stopped
+    expose:
+      - "80"
+
+  admin:
+    build:
+      context: .
+      dockerfile: docker/admin/Dockerfile.prod
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-}
+    restart: unless-stopped
+    expose:
+      - "80"
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/${NGINX_CONFIG:-nginx.bootstrap.conf}:/etc/nginx/conf.d/default.conf:ro
+      - certbot_www:/var/www/certbot:ro
+      - certbot_certs:/etc/letsencrypt:ro
+    depends_on:
+      - fe
+      - shop
+      - admin
+      - api
+
+  certbot:
+    image: certbot/certbot:latest
+    profiles: ["ssl"]
+    volumes:
+      - certbot_www:/var/www/certbot
+      - certbot_certs:/etc/letsencrypt
+    entrypoint: /bin/sh
+    command: -c "trap exit TERM; while :; do certbot renew --quiet; sleep 12h; done"
+
+volumes:
+  mongo_data:
+  api_uploads:
+  certbot_www:
+  certbot_certs:

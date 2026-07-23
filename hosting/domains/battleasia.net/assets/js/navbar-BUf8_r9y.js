@@ -1,0 +1,1 @@
+const e="ऐप",t="नौकरी",a="उपयोगकर्ता",o="यात्रा",i="चालान",l={title:"ब्लॉग",caption:"कस्टम कीबोर्ड शॉर्टकट।"},p="उप शीर्षक",r={app:"ऐप",job:t,user:a,travel:o,invoice:i,blog:l,subheader:p};export{e as app,l as blog,r as default,i as invoice,t as job,p as subheader,o as travel,a as user};

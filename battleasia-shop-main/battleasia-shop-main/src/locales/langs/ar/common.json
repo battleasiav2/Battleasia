@@ -1,0 +1,16 @@
+{
+  "demo": {
+    "lang": "Arabic",
+    "description": "نقطة البداية لمشروعك التالي مستندة إلى MUI. التخصيص السهل يساعدك على بناء التطبيقات بشكل أسرع وأفضل."
+  },
+  "auth": {
+    "signIn": "تسجيل الدخول",
+    "signInToAccount": "تسجيل الدخول إلى حسابك",
+    "emailAddress": "عنوان البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "passwordPlaceholder": "6+ أحرف",
+    "forgotPassword": "هل نسيت كلمة المرور؟",
+    "dontHaveAccount": "ليس لديك حساب؟",
+    "signUp": "إنشاء حساب"
+  }
+}

@@ -1,0 +1,66 @@
+services:
+  fe:
+    build:
+      context: .
+      dockerfile: docker/fe/Dockerfile
+    volumes:
+      - ./battleasia-fe-main/battleasia-fe-main:/app
+      - fe_node_modules:/app/node_modules
+    environment:
+      VITE_PORT: 8081
+      VITE_SERVER_URL: ""
+      VITE_HMR_HOST: battleasia.local
+      VITE_HMR_CLIENT_PORT: 8088
+    expose:
+      - "8081"
+
+  shop:
+    build:
+      context: .
+      dockerfile: docker/shop/Dockerfile
+    volumes:
+      - ./battleasia-shop-main/battleasia-shop-main:/app
+      - shop_node_modules:/app/node_modules
+    environment:
+      VITE_PORT: 8082
+      VITE_SERVER_URL: ""
+      VITE_HMR_HOST: shop.battleasia.local
+      VITE_HMR_CLIENT_PORT: 8088
+    expose:
+      - "8082"
+
+  admin:
+    build:
+      context: .
+      dockerfile: docker/admin/Dockerfile
+    volumes:
+      - ./battleasia-admin-main/battleasia-admin-main:/app
+      - admin_node_modules:/app/node_modules
+    environment:
+      PORT: 3000
+      HOST: 0.0.0.0
+      BROWSER: none
+      REACT_APP_API_URL: http://battleasia.local:8088
+      WDS_SOCKET_HOST: admin.battleasia.local
+      WDS_SOCKET_PORT: 8088
+      DANGEROUSLY_DISABLE_HOST_CHECK: "true"
+    expose:
+      - "3000"
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "8088:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - fe
+      - shop
+      - admin
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  fe_node_modules:
+  shop_node_modules:
+  admin_node_modules:

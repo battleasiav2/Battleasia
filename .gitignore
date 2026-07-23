@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment & secrets
+.env
+.env.local
+.env.production
+.env.*.local
+**/.env
+!**/.env.example
+!.env.production.example
+!hosting/env/.env.production.example
+
+# Build outputs (source app dist — hosting/domains keeps built uploads)
+**/dist/
+**/build/
+**/.next/
+**/out/
+**/.vite/
+**/tsconfig.app.tsbuildinfo
+
+# Keep hosting domain builds for file-manager upload
+!hosting/domains/**/*
+!hosting/api/dist/
+!hosting/api/package.json
+!hosting/api/package-lock.json
+
+# Logs & OS
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Backups & temp
+backups/
+*.zip
+*.tar.gz
+
+# IDE / local tools
+.cursor/
+terminals/
+ngrok.yml
+
+# Inspect / scratch (not part of deploy)
+_inspect-battleasia-app/
+_inspect-lanvin/
+
+# Uploads at runtime
+battleasia-api/uploads/

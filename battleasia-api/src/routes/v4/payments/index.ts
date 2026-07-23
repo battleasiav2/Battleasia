@@ -1,0 +1,18 @@
+import { Router } from 'express';
+import balanceHistoriesRoutes from './balance-histories.js';
+import paymentChannelsRoutes from './payment-channels.js';
+import businessWalletsRoutes from './business-wallets.js';
+import depositHistoryRoutes from './deposit-history.js';
+import withdrawalHistoryRoutes from './withdrawal-history.js';
+import coingoRoutes from './coingo.js';
+
+const router = Router();
+
+router.use('/balance-histories', balanceHistoriesRoutes);
+router.use('/payment-channels', paymentChannelsRoutes);
+router.use('/business-wallets', businessWalletsRoutes);
+router.use('/deposit-history', depositHistoryRoutes);
+router.use('/withdrawal-history', withdrawalHistoryRoutes);
+router.use('/coingo', coingoRoutes);
+
+export default router;

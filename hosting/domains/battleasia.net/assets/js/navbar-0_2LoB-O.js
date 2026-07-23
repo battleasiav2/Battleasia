@@ -1,0 +1,1 @@
+const e="Application",a="Emploi",i="Utilisateur",o="Voyage",t="Facture",l={title:"Blog",caption:"Raccourcis clavier personnalisés."},r="Sous-titre",s={app:e,job:a,user:i,travel:o,invoice:t,blog:l,subheader:r};export{e as app,l as blog,s as default,t as invoice,a as job,r as subheader,o as travel,i as user};

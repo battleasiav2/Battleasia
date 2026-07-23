@@ -1,0 +1,178 @@
+import { useState, useEffect } from 'react';
+
+import { Box, Grid2 as Grid, Stack, Typography } from '@mui/material';
+import { alpha } from '@mui/material/styles';
+
+import { paths } from 'src/routes/paths';
+import { useRouter } from 'src/routes/hooks';
+
+import useApi from 'src/hooks/use-api';
+
+import { useImagePreloader } from 'src/hooks';
+import { useTranslate } from 'src/locales/use-locales';
+import { UserPageShell, UserPageTitle, UserStatTile, UserEmptyState } from 'src/layouts/user';
+import { USER_COLORS } from 'src/layouts/user/user-theme';
+
+import { BattleGoldDivider } from 'src/components/battle-gold-divider';
+
+import { GameCard, PlayHeroBanner, PlayPageSkeleton } from './components';
+import { PLAY_IMAGE_PATHS, resolvePlayGameArt } from './play-constants';
+
+// Re-export for backward compatibility
+export { PLAY_IMAGE_PATHS } from './play-constants';
+
+// ----------------------------------------------------------------------
+
+const imagePaths = [PLAY_IMAGE_PATHS.heroBanner];
+
+interface IGame {
+  id: string;
+  name: string;
+  packageName: string;
+  image: string;
+  logo: string;
+  canCreateChallenge: boolean;
+  comingSoon: boolean;
+  idPrefix: string;
+  rules: string;
+}
+
+export function PlayView() {
+  const { t } = useTranslate();
+  const router = useRouter();
+  const { getGamesApi } = useApi();
+  const [games, setGames] = useState<IGame[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const { isLoaded } = useImagePreloader(imagePaths, {
+    delay: 300,
+    continueOnError: true,
+  });
+
+  const fetchGames = async () => {
+    setLoading(true);
+    try {
+      const res = await getGamesApi();
+      if (res?.data?.status) {
+        setGames(res.data.data);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGames();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleGameClick = (gameId: string | number) => {
+    router.push(paths.user.playDetail(gameId));
+  };
+
+  const handleWatchLive = () => {
+    window.open('https://www.youtube.com/@BattleAsia', '_blank');
+  };
+
+  const bannerSlides = [
+    {
+      title: t('play.battlemania'),
+      description: t('play.bannerDescription'),
+      imageUrl: PLAY_IMAGE_PATHS.heroBanner,
+    },
+    {
+      title: t('play.battlemania'),
+      description: t('play.bannerDescription'),
+      imageUrl: PLAY_IMAGE_PATHS.dashboardBg,
+    },
+  ];
+
+  const activeGames = games.filter((g) => !g.comingSoon).length;
+  const upcomingGames = games.filter((g) => g.comingSoon).length;
+  const isPageLoading = !isLoaded || loading;
+
+  return (
+    <UserPageShell>
+      <UserPageTitle
+        badge={t('play.badgeTournamentHub')}
+        title={t('play.battlemania')}
+        subtitle={t('play.bannerDescription')}
+      />
+
+      {isPageLoading ? (
+        <PlayPageSkeleton />
+      ) : (
+        <Stack spacing={{ xs: 3, md: 4 }}>
+          <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <UserStatTile label={t('play.totalGames')} value={games.length} suffix={t('play.suffixTitles')} />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <UserStatTile label={t('play.playableNow')} value={activeGames} suffix={t('play.suffixLive')} />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <UserStatTile label={t('common.comingSoon')} value={upcomingGames} suffix={t('play.suffixQueued')} />
+            </Grid>
+          </Grid>
+
+          <PlayHeroBanner slides={bannerSlides} onWatchLive={handleWatchLive} />
+
+          <Box>
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              alignItems={{ xs: 'flex-start', sm: 'center' }}
+              justifyContent="space-between"
+              spacing={1}
+              sx={{ mb: 2.5 }}
+            >
+              <Box>
+                <Typography
+                  className="font-tr"
+                  sx={{
+                    fontSize: { xs: 22, md: 28 },
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    color: USER_COLORS.textPrimary,
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  {t('play.tournament')}
+                </Typography>
+                <BattleGoldDivider variant="section" sx={{ mt: 0.75, width: 120 }} />
+              </Box>
+              <Typography sx={{ fontSize: 13, color: USER_COLORS.textMuted }}>
+                {t('play.selectTitleHint')}
+              </Typography>
+            </Stack>
+
+            {games.length === 0 ? (
+              <UserEmptyState
+                icon="solar:gamepad-bold-duotone"
+                title={t('play.noGames')}
+                description={t('play.noGamesDescription')}
+                actionLabel={t('common.refresh')}
+                onAction={fetchGames}
+              />
+            ) : (
+              <Grid container spacing={2}>
+                {games.map((game) => (
+                  <Grid key={game.id} size={{ xs: 12, sm: 6 }}>
+                    <GameCard
+                      title={game.name}
+                      subTitle={game.packageName}
+                      logo={resolvePlayGameArt(game, 'logo')}
+                      imageUrl={resolvePlayGameArt(game, 'image')}
+                      comingSoon={game.comingSoon}
+                      disabled={game.comingSoon}
+                      onClick={() => handleGameClick(game.id)}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+          </Box>
+        </Stack>
+      )}
+    </UserPageShell>
+  );
+}

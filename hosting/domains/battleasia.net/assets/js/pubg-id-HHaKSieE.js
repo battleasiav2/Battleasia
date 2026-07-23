@@ -1,0 +1,1 @@
+import{z as e}from"./form-vendor-BJWpuTHB.js";const s=e.string().trim().min(1,{message:"PUBG ID is required!"}).max(20,{message:"PUBG ID must be at most 20 characters"}).regex(/^[a-zA-Z0-9]+$/,{message:"PUBG ID must contain only letters and numbers"});export{s as p};
