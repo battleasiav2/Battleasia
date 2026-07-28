@@ -1,5 +1,7 @@
 # BattleAsia — Hostinger Deployment Guide (battleasia.gg)
 
+> **Auto-deploy workflow (Cursor → Git → Live):** see [`CURSOR-GIT-HOSTINGER-AUTO-DEPLOY.md`](./CURSOR-GIT-HOSTINGER-AUTO-DEPLOY.md)
+
 Full production setup for **3 subdomains + API on main domain path**.
 
 | Service | URL | Hostinger folder |

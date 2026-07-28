@@ -114,6 +114,13 @@ foreach ($name in $apiKeep.Keys) {
 
 Copy-Item (Join-Path $Root '.env.production.example') (Join-Path $HostingRoot 'env/.env.production.example') -Force
 
+$htaccessTpl = Join-Path $Root 'hosting/templates/battleasia.gg'
+if (Test-Path $htaccessTpl) {
+  Copy-Item (Join-Path $htaccessTpl '.htaccess') (Join-Path $mainDest '.htaccess') -Force
+  Copy-Item (Join-Path $htaccessTpl 'shop.htaccess') (Join-Path $shopDest '.htaccess') -Force
+  Copy-Item (Join-Path $htaccessTpl 'admin.htaccess') (Join-Path $adminDest '.htaccess') -Force
+}
+
 Write-Host "`nDone! Upload folders:" -ForegroundColor Green
 Write-Host "  $mainDest"
 Write-Host "  $shopDest"

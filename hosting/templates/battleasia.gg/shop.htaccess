@@ -1,0 +1,21 @@
+# BattleAsia Shop — shop.battleasia.gg
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # RewriteRule ^api/(.*)$ http://127.0.0.1:5050/$1 [P,L]
+  # RewriteRule ^uploads/(.*)$ http://127.0.0.1:5050/uploads/$1 [P,L]
+  # RewriteRule ^socket.io/(.*)$ http://127.0.0.1:5050/socket.io/$1 [P,L]
+
+  RewriteRule ^api/ - [L]
+  RewriteRule ^uploads/ - [L]
+  RewriteRule ^socket\.io/ - [L]
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
