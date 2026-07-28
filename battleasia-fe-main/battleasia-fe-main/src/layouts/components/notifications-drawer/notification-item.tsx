@@ -5,6 +5,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemButton from '@mui/material/ListItemButton';
+import { alpha } from '@mui/material/styles';
 
 import { fToNow } from 'src/utils/format-time';
 
@@ -110,7 +111,7 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
             display: 'flex',
             alignItems: 'center',
             typography: 'caption',
-            color: 'text.disabled',
+            color: alpha('#ffffff', 0.72),
           },
         },
       }}
@@ -150,8 +151,8 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
           p: 1.5,
           my: 1.5,
           borderRadius: 1.5,
-          color: 'text.secondary',
-          bgcolor: 'background.neutral',
+          color: alpha('#ffffff', 0.78),
+          bgcolor: alpha('#ffffff', 0.06),
         }}
       >
         {readerContent(

@@ -2,6 +2,7 @@ export { UserLayout } from './layout';
 
 export { UserPageShell } from './user-page-shell';
 export { UserPageTitle } from './user-page-title';
+export { UserArenaStrip, UserArenaChip } from './user-arena-strip';
 export { UserGlassCard } from './user-glass-card';
 export { UserBackButton } from './user-back-button';
 export { UserActionButton } from './user-action-button';
@@ -15,6 +16,7 @@ export {
   USER_IMAGES,
   USER_GOLD,
   USER_PAGE_BG_IMAGE,
+  getUserChipSx,
   userGlassCardSx,
   userGlassInnerSx,
   userGlassBadgeSx,
@@ -25,7 +27,14 @@ export {
   userGoldButtonSx,
   userMeshButtonSx,
   userGhostButtonSx,
+  userSuccessButtonSx,
+  userErrorButtonSx,
+  userLogoutButtonSx,
+  userWatchLiveButtonSx,
   userHeaderPillSx,
+  userFieldLabelProps,
+  userFieldSx,
+  userSelectMenuProps,
   getUserGlassTokens,
   getUserPageShellOverlays,
   getUserLayoutMainSx,

@@ -4,8 +4,8 @@
 
 | Zip | Upload to |
 |-----|-----------|
-| `nixbazar-public_html.zip` | cPanel `public_html/` → Extract |
-| `nixbazar-api.zip` | Server Node.js folder (e.g. `/home/user/battleasia-api/`) |
+| `nixbazar-public_html.zip` | **`/home/nixbazar/public_html/`** → Extract |
+| `nixbazar-api.zip` | **`/home/nixbazar/battleasia-api/`** → Extract |
 
 ## After upload — public_html
 
@@ -20,7 +20,7 @@
 2. Set `MONGODB_URI`, `JWT_SECRET`, `ADMIN_PASSWORD`
 3. SSH terminal:
    ```bash
-   cd ~/battleasia-api
+   cd /home/nixbazar/battleasia-api
    npm install --omit=dev
    node dist/index.js
    ```
@@ -28,7 +28,7 @@
 
 ## Enable /api/ on domain
 
-In `public_html/.htaccess` uncomment these lines:
+In **`/home/nixbazar/public_html/.htaccess`** uncomment these lines:
 ```apache
 RewriteRule ^api/(.*)$ http://127.0.0.1:5050/$1 [P,L]
 RewriteRule ^uploads/(.*)$ http://127.0.0.1:5050/uploads/$1 [P,L]

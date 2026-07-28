@@ -137,9 +137,19 @@ export function ResetPasswordView() {
       <Field.Text
         name="email"
         label={t('auth.emailAddress')}
-        placeholder="Example@domain.com"
+        placeholder={t('auth.emailPlaceholder')}
         disabled={codeVerified}
-        slotProps={authFieldSlotProps}
+        slotProps={{
+          ...authFieldSlotProps,
+          input: {
+            ...authFieldSlotProps.input,
+            startAdornment: (
+              <InputAdornment position="start">
+                <Iconify icon="solar:letter-bold-duotone" width={20} sx={{ color: alpha('#f59e0b', 0.85) }} />
+              </InputAdornment>
+            ),
+          },
+        }}
       />
 
       <Box sx={{ gap: 1.5, display: 'flex', flexDirection: 'column' }}>
@@ -185,6 +195,11 @@ export function ResetPasswordView() {
               ...authFieldSlotProps,
               input: {
                 ...authFieldSlotProps.input,
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: alpha('#f59e0b', 0.85) }} />
+                  </InputAdornment>
+                ),
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton onClick={showPassword.onToggle} edge="end" sx={{ color: alpha('#fff', 0.7) }}>
@@ -207,6 +222,11 @@ export function ResetPasswordView() {
               ...authFieldSlotProps,
               input: {
                 ...authFieldSlotProps.input,
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: alpha('#f59e0b', 0.85) }} />
+                  </InputAdornment>
+                ),
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton onClick={showConfirmPassword.onToggle} edge="end" sx={{ color: alpha('#fff', 0.7) }}>

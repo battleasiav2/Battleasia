@@ -39,8 +39,11 @@ axiosInstance.interceptors.response.use(
       toast.error(errorMessage);
     } else if (response && response.status === 401) {
       store.dispatch(logoutAction());
-      const errorMessage = response.data?.message || response.data || 'Unauthorized';
-      toast.error(errorMessage);
+      const errorMessage = response.data?.message || 'Please sign in to continue';
+      // Dedupe — Strict Mode / parallel requests otherwise spam identical toasts
+      toast.error(typeof errorMessage === 'string' ? errorMessage : 'Please sign in to continue', {
+        id: 'auth-unauthorized',
+      });
     } else if (response && response.status === 403) {
       // Check if email verification is required
       if (response.data?.emailVerificationRequired) {

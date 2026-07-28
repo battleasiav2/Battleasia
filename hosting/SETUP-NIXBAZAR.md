@@ -16,8 +16,8 @@ powershell -ExecutionPolicy Bypass -File hosting/scripts/build-for-nixbazar.ps1
 ```
 
 Output:
-- `hosting/domains/nixbazar.com/` → upload to **public_html**
-- `hosting/api/` → Node.js backend
+- `hosting/domains/nixbazar.com/` → upload to **`/home/nixbazar/public_html`**
+- `hosting/api/` → **`/home/nixbazar/battleasia-api`**
 
 ## Step 2 — Upload to Webuzo/cPanel
 

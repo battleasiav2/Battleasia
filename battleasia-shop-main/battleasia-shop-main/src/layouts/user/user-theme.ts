@@ -10,6 +10,7 @@ import {
   getGlassInnerSx,
   getGlassBadgeChipSx,
 } from 'src/components/battle-glass-card';
+import { getGoldDividerSx } from 'src/components/battle-gold-divider';
 
 // ----------------------------------------------------------------------
 
@@ -27,15 +28,62 @@ export const USER_COLORS = {
   pageBg: '#000000',
   textPrimary: '#ffffff',
   textBody: '#f5f5f5',
-  textMuted: alpha('#94a3b8', 0.95),
-  textSubtle: alpha('#cbd5e1', 0.78),
+  /** Secondary copy — keep high contrast on dark glass */
+  textMuted: '#c5ced9',
+  /** Supporting values / meta — brighter than muted */
+  textSubtle: '#e8eef5',
   border: alpha('#ffffff', 0.12),
   borderStrong: alpha('#ffffff', 0.18),
 } as const;
 
+export type UserChipTone = 'gold' | 'success' | 'error' | 'info' | 'neutral';
+
+/** Dark-glass chips that stay readable even when MUI dark scheme overrides filled defaults */
+export function getUserChipSx(tone: UserChipTone = 'gold'): SxProps<Theme> {
+  const tones: Record<UserChipTone, { fg: string; bg: string; border: string }> = {
+    gold: {
+      fg: USER_COLORS.gold,
+      bg: alpha(USER_COLORS.gold, 0.16),
+      border: alpha(USER_COLORS.gold, 0.45),
+    },
+    success: {
+      fg: USER_COLORS.success,
+      bg: alpha(USER_COLORS.success, 0.16),
+      border: alpha(USER_COLORS.success, 0.4),
+    },
+    error: {
+      fg: USER_COLORS.error,
+      bg: alpha(USER_COLORS.error, 0.16),
+      border: alpha(USER_COLORS.error, 0.4),
+    },
+    info: {
+      fg: USER_COLORS.info,
+      bg: alpha(USER_COLORS.info, 0.16),
+      border: alpha(USER_COLORS.info, 0.4),
+    },
+    neutral: {
+      fg: '#f1f5f9',
+      bg: alpha('#ffffff', 0.1),
+      border: alpha('#ffffff', 0.22),
+    },
+  };
+  const c = tones[tone];
+  return {
+    borderRadius: 0,
+    fontWeight: 700,
+    bgcolor: c.bg,
+    color: `${c.fg} !important`,
+    border: `1px solid ${c.border}`,
+    '& .MuiChip-label': {
+      color: `${c.fg} !important`,
+      fontWeight: 700,
+    },
+  };
+}
+
 export const USER_IMAGES = {
-  pageBg: '/assets/images/dashboard-pubg-black.png',
-  heroBanner: '/assets/images/hero-banner-pubg.png',
+  pageBg: '/assets/images/dashboard-pubg-black.webp',
+  heroBanner: '/assets/images/hero-banner-pubg.webp',
   btnBg: '/assets/images/btn-bg.webp',
   navBg: '/assets/images/nav-bg.webp',
   blackBg: '/assets/images/black_bg.webp',
@@ -59,11 +107,11 @@ export const userGlassInnerSx: SxProps<Theme> = getGlassInnerSx(getDefaultGlassT
 
 export const userGlassBadgeSx: SxProps<Theme> = getGlassBadgeChipSx(getDefaultGlassTokens());
 
-export const userGlassDialogPaperSx: SxProps<Theme> = {
-  ...getGlassShellSx(getDefaultGlassTokens()),
+export const userGlassDialogPaperSx: SxProps<Theme> = getGlassShellSx(getDefaultGlassTokens(), {
   bgcolor: alpha('#000000', 0.88),
+  backgroundColor: alpha('#000000', 0.88),
   p: 0,
-};
+});
 
 export const userPageTitleSx: SxProps<Theme> = {
   fontSize: { xs: 26, sm: 32, md: 40 },
@@ -75,65 +123,123 @@ export const userPageTitleSx: SxProps<Theme> = {
   textShadow: `0 0 40px ${alpha(USER_COLORS.gold, 0.12)}`,
 };
 
-export const userPageDividerSx: SxProps<Theme> = {
-  mt: 1,
-  width: { xs: 120, md: 180 },
-  height: 2,
-  background: `linear-gradient(90deg, transparent, ${alpha(USER_COLORS.gold, 0.95)}, transparent)`,
-  borderRadius: 1,
-};
+export const userPageDividerSx: SxProps<Theme> = getGoldDividerSx({ variant: 'title' });
 
 export const userMutedTextSx: SxProps<Theme> = {
   color: USER_COLORS.textMuted,
   lineHeight: 1.6,
 };
 
-export const userGoldButtonSx: SxProps<Theme> = {
-  background: USER_COLORS.goldGradient,
-  color: '#111111',
+/** Shared glass-gold chrome — Button #2 "Glass Gold Edge" */
+const userGlassButtonBaseSx: SxProps<Theme> = {
+  borderRadius: 0,
   fontWeight: 800,
   letterSpacing: 0.6,
   textTransform: 'uppercase',
-  borderRadius: 0,
-  boxShadow: `0 4px 16px ${alpha('#f59e0b', 0.3)}`,
+  backdropFilter: 'blur(14px)',
+  WebkitBackdropFilter: 'blur(14px)',
+  transition:
+    'background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease, transform 0.2s ease',
+  '& .MuiButton-startIcon, & .MuiButton-endIcon, & .MuiLoadingButton-loadingIndicator': {
+    color: 'inherit',
+  },
+};
+
+/** Primary CTA — dark glass + gold border + gold text */
+export const userGoldButtonSx: SxProps<Theme> = {
+  ...userGlassButtonBaseSx,
+  color: USER_COLORS.gold,
+  bgcolor: alpha('#000000', 0.52),
+  border: `1px solid ${alpha(USER_COLORS.gold, 0.58)}`,
+  boxShadow: `
+    inset 0 1px 0 ${alpha('#ffffff', 0.07)},
+    0 0 0 1px ${alpha(USER_COLORS.gold, 0.06)},
+    0 8px 28px ${alpha('#000000', 0.45)}
+  `,
   '&:hover': {
-    background: USER_COLORS.goldGradientHover,
-    backgroundColor: 'transparent',
-    boxShadow: `0 8px 24px ${alpha('#f59e0b', 0.35)}`,
+    bgcolor: alpha(USER_COLORS.gold, 0.14),
+    borderColor: USER_COLORS.gold,
+    color: USER_COLORS.goldLight,
+    backgroundColor: alpha(USER_COLORS.gold, 0.14),
+    boxShadow: `
+      inset 0 0 28px ${alpha(USER_COLORS.gold, 0.16)},
+      0 0 24px ${alpha(USER_COLORS.gold, 0.24)},
+      0 12px 36px ${alpha('#000000', 0.55)}
+    `,
+    transform: 'translateY(-1px)',
+  },
+  '&:active': {
+    transform: 'translateY(0)',
   },
   '&.Mui-disabled': {
-    background: alpha('#ffffff', 0.08),
-    color: alpha('#ffffff', 0.35),
+    bgcolor: alpha('#000000', 0.35),
+    color: alpha(USER_COLORS.gold, 0.35),
+    borderColor: alpha(USER_COLORS.gold, 0.22),
+    boxShadow: 'none',
   },
 };
 
-export const userMeshButtonSx: SxProps<Theme> = {
-  color: '#111111',
-  fontWeight: 800,
-  letterSpacing: 0.5,
-  borderRadius: 0,
-  background: `url(${USER_IMAGES.btnBg}) no-repeat center center`,
-  backgroundSize: 'cover',
-  boxShadow: `0 4px 18px ${alpha(USER_COLORS.gold, 0.28)}`,
-  '&:hover': {
-    filter: 'brightness(1.08)',
-    backgroundColor: 'transparent',
-  },
-};
+/** @deprecated Alias — same as userGoldButtonSx (Glass Gold Edge) */
+export const userMeshButtonSx: SxProps<Theme> = userGoldButtonSx;
 
+/** Secondary CTA — muted glass, gold edge on hover */
 export const userGhostButtonSx: SxProps<Theme> = {
+  ...userGlassButtonBaseSx,
   color: USER_COLORS.textSubtle,
-  border: `1px solid ${USER_COLORS.border}`,
-  borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
-  bgcolor: alpha('#000000', 0.42),
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
-  fontWeight: 600,
-  letterSpacing: 0.4,
+  fontWeight: 700,
+  letterSpacing: 0.5,
+  border: `1px solid ${alpha('#ffffff', 0.2)}`,
+  bgcolor: alpha('#000000', 0.4),
+  boxShadow: `
+    inset 0 1px 0 ${alpha('#ffffff', 0.05)},
+    0 6px 20px ${alpha('#000000', 0.35)}
+  `,
   '&:hover': {
     bgcolor: alpha(USER_COLORS.gold, 0.1),
-    borderColor: alpha(USER_COLORS.gold, 0.38),
+    borderColor: alpha(USER_COLORS.gold, 0.52),
     color: USER_COLORS.gold,
+    boxShadow: `
+      inset 0 0 20px ${alpha(USER_COLORS.gold, 0.1)},
+      0 0 16px ${alpha(USER_COLORS.gold, 0.18)},
+      0 10px 28px ${alpha('#000000', 0.45)}
+    `,
+    transform: 'translateY(-1px)',
+  },
+  '&:active': {
+    transform: 'translateY(0)',
+  },
+  '&.Mui-disabled': {
+    bgcolor: alpha('#000000', 0.28),
+    color: alpha('#ffffff', 0.28),
+    borderColor: alpha('#ffffff', 0.1),
+  },
+};
+
+/** Logout only — red glass edge (same family as gold buttons) */
+export const userLogoutButtonSx: SxProps<Theme> = {
+  ...userGlassButtonBaseSx,
+  color: USER_COLORS.error,
+  bgcolor: alpha('#000000', 0.52),
+  border: `1px solid ${alpha(USER_COLORS.error, 0.58)}`,
+  boxShadow: `
+    inset 0 1px 0 ${alpha('#ffffff', 0.05)},
+    0 0 0 1px ${alpha(USER_COLORS.error, 0.06)},
+    0 8px 28px ${alpha('#000000', 0.45)}
+  `,
+  '&:hover': {
+    bgcolor: alpha(USER_COLORS.error, 0.14),
+    borderColor: USER_COLORS.error,
+    color: '#f87171',
+    backgroundColor: alpha(USER_COLORS.error, 0.14),
+    boxShadow: `
+      inset 0 0 28px ${alpha(USER_COLORS.error, 0.16)},
+      0 0 24px ${alpha(USER_COLORS.error, 0.22)},
+      0 12px 36px ${alpha('#000000', 0.55)}
+    `,
+    transform: 'translateY(-1px)',
+  },
+  '&:active': {
+    transform: 'translateY(0)',
   },
 };
 
@@ -149,6 +255,58 @@ export const userHeaderPillSx: SxProps<Theme> = {
   backdropFilter: 'blur(12px)',
   WebkitBackdropFilter: 'blur(12px)',
 };
+
+/** Scoped typography + form colors for dark user pages (light theme defaults are black text). */
+export function getUserLayoutMainSx(): SxProps<Theme> {
+  return {
+    color: USER_COLORS.textBody,
+    [`& .MuiTypography-root`]: {
+      color: USER_COLORS.textBody,
+    },
+    [`& .MuiTypography-h1, & .MuiTypography-h2, & .MuiTypography-h3, & .MuiTypography-h4, & .MuiTypography-h5, & .MuiTypography-h6`]:
+      {
+        color: USER_COLORS.textPrimary,
+      },
+    [`& .MuiTableCell-root`]: {
+      color: USER_COLORS.textBody,
+      borderColor: USER_COLORS.border,
+    },
+    [`& .MuiTableCell-head`]: {
+      color: USER_COLORS.gold,
+      fontWeight: 700,
+    },
+    [`& .MuiInputBase-input`]: {
+      color: USER_COLORS.textPrimary,
+    },
+    [`& .MuiInputLabel-root`]: {
+      color: USER_COLORS.textMuted,
+    },
+    [`& .MuiFormHelperText-root`]: {
+      color: USER_COLORS.textMuted,
+    },
+    [`& .MuiOutlinedInput-notchedOutline`]: {
+      borderColor: USER_COLORS.border,
+    },
+    [`& .MuiTab-root`]: {
+      color: USER_COLORS.textMuted,
+    },
+    [`& .MuiTab-root.Mui-selected`]: {
+      color: USER_COLORS.gold,
+    },
+    [`& .MuiBreadcrumbs-root .MuiTypography-root`]: {
+      color: USER_COLORS.textMuted,
+    },
+    [`& .MuiListItemText-primary`]: {
+      color: USER_COLORS.textPrimary,
+    },
+    [`& .MuiListItemText-secondary`]: {
+      color: USER_COLORS.textMuted,
+    },
+    [`& .MuiDivider-root`]: {
+      borderColor: USER_COLORS.border,
+    },
+  };
+}
 
 /** Page shell background — matches homepage section pattern */
 export function getUserPageShellOverlays(): { before: SxProps<Theme>; after: SxProps<Theme> } {
@@ -171,12 +329,109 @@ export function getUserPageShellOverlays(): { before: SxProps<Theme>; after: SxP
       background: `
         radial-gradient(ellipse 90% 55% at 50% -5%, ${alpha('#f5a623', 0.09)} 0%, transparent 58%),
         radial-gradient(ellipse 50% 35% at 15% 95%, ${alpha(USER_COLORS.info, 0.06)} 0%, transparent 50%),
-        linear-gradient(180deg, ${alpha('#000000', 0.42)} 0%, ${alpha('#000000', 0.72)} 100%)
+        linear-gradient(180deg, ${alpha('#000000', 0.35)} 0%, ${alpha('#000000', 0.88)} 55%, #000000 100%)
       `,
       pointerEvents: 'none',
     },
   };
 }
+
+/** Stacked uppercase labels for arena form fields (not floating on the border). */
+export const userFieldLabelProps = {
+  shrink: true,
+} as const;
+
+export const userFieldSx: SxProps<Theme> = {
+  '& .MuiInputLabel-root': {
+    position: 'relative',
+    transform: 'none',
+    fontSize: 12,
+    fontWeight: 700,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+    color: alpha('#ffffff', 0.72),
+    mb: 0.85,
+    '&.Mui-focused': { color: USER_COLORS.gold },
+    '&.MuiInputLabel-shrink': { transform: 'none' },
+  },
+  '& .MuiOutlinedInput-root': {
+    color: USER_COLORS.textPrimary,
+    bgcolor: alpha('#000000', 0.55),
+    borderRadius: 0,
+    fontSize: { xs: 15, md: 14 },
+    minHeight: { xs: 52, md: 48 },
+    transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease',
+    '& fieldset': {
+      border: `1px solid ${alpha('#ffffff', 0.24)}`,
+    },
+    '&:hover fieldset': {
+      borderColor: alpha('#ffffff', 0.4),
+    },
+    '&.Mui-focused': {
+      bgcolor: alpha('#000000', 0.65),
+      boxShadow: `0 0 0 3px ${alpha(USER_COLORS.gold, 0.18)}`,
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: USER_COLORS.gold,
+      borderWidth: '1px',
+    },
+    '& input::placeholder, & textarea::placeholder': {
+      color: alpha('#ffffff', 0.4),
+      opacity: 1,
+    },
+    '& .MuiSelect-select': {
+      color: USER_COLORS.textPrimary,
+      display: 'flex',
+      alignItems: 'center',
+      py: 1.35,
+    },
+    '& .MuiSelect-icon': {
+      color: alpha('#ffffff', 0.65),
+    },
+  },
+  '& .MuiFormHelperText-root': {
+    ml: 0,
+    mt: 0.75,
+    fontSize: 12,
+    color: alpha('#ffffff', 0.5),
+    '&.Mui-error': { color: USER_COLORS.error },
+  },
+};
+
+/** Dark glass select menus that escape the user layout (portaled to document root). */
+export const userSelectMenuProps = {
+  PaperProps: {
+    sx: {
+      mt: 0.75,
+      maxHeight: 320,
+      borderRadius: 0,
+      bgcolor: alpha('#0a0a0a', 0.98),
+      border: `1px solid ${alpha('#ffffff', 0.14)}`,
+      backdropFilter: 'blur(14px)',
+      boxShadow: `0 16px 40px ${alpha('#000000', 0.65)}`,
+      '& .MuiMenuItem-root': {
+        color: alpha('#ffffff', 0.9),
+        fontSize: 14,
+        minHeight: 44,
+        py: 1.1,
+        px: 1.5,
+        borderRadius: 0,
+        '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.12) },
+        '&.Mui-selected': {
+          bgcolor: alpha(USER_COLORS.gold, 0.18),
+          color: '#ffffff',
+          '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.24) },
+        },
+        '&.Mui-disabled': {
+          color: alpha('#ffffff', 0.35),
+        },
+      },
+      '& .MuiList-root': {
+        py: 0.5,
+      },
+    },
+  },
+};
 
 /** @deprecated Use userPageTitleSx */
 export const userSectionTitleSx = userPageTitleSx;

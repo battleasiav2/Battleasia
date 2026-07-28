@@ -152,8 +152,10 @@ const MuiChip: Components<Theme>['MuiChip'] = {
               [`& .${chipClasses.avatar}`]: { color: theme.vars.palette.text.primary },
               '&:hover': { backgroundColor: theme.vars.palette.grey[700] },
               ...theme.applyStyles('dark', {
-                color: theme.vars.palette.grey[800],
-                '&:hover': { backgroundColor: theme.vars.palette.grey[100] },
+                // Keep light label text — dark glass UIs often override bgcolor to dark panels
+                color: theme.vars.palette.common.white,
+                backgroundColor: theme.vars.palette.grey[700],
+                '&:hover': { backgroundColor: theme.vars.palette.grey[600] },
               }),
             }),
         },

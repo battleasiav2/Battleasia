@@ -10,7 +10,6 @@ import { paths } from 'src/routes/paths';
 import { useTranslate } from 'src/locales/use-locales';
 import {
   UserPageShell,
-  UserPageTitle,
   UserGlassCard,
   UserStatTile,
   UserEmptyState,
@@ -151,13 +150,7 @@ export function ReferralDashboard({ showInviteSection = true, defaultTab = 'netw
 
   return (
     <UserPageShell>
-      {showInviteSection ? <ReferralHero title={t('referral.title')} /> : null}
-
-      <UserPageTitle
-        badge={t('referral.badgeRewardsProgram')}
-        title={t('referral.title')}
-        subtitle={t('referral.referMoreToEarn')}
-      />
+      <ReferralHero title={t('referral.title')} subtitle={t('referral.referMoreToEarn')} />
 
       <Box
         sx={{
@@ -168,21 +161,25 @@ export function ReferralDashboard({ showInviteSection = true, defaultTab = 'netw
         }}
       >
         <UserStatTile
+          icon="solar:users-group-rounded-bold"
           label={t('referral.totalReferrals')}
           value={<UserAnimatedStat value={displayStats.totalReferrals} variant="h5" fontWeight={700} />}
           loading={loading}
         />
         <UserStatTile
+          icon="solar:user-check-bold"
           label={t('myReferrals.active')}
           value={<UserAnimatedStat value={displayStats.activeReferrals} variant="h5" fontWeight={700} />}
           loading={loading}
         />
         <UserStatTile
+          icon="solar:wallet-money-bold"
           label={t('referral.earnings')}
           value={<CoinValue value={displayStats.totalEarnings} size={18} />}
           loading={loading}
         />
         <UserStatTile
+          icon="solar:sale-bold"
           label={t('referral.commission')}
           value={`${displayStats.commissionRate}%`}
           suffix={t('referral.perDeposit')}
@@ -201,11 +198,13 @@ export function ReferralDashboard({ showInviteSection = true, defaultTab = 'netw
             }}
           >
             <UserStatTile
+              icon="solar:hand-money-bold"
               label={t('referral.totalDeposits')}
               value={<CoinValue value={displayStats.totalDeposits} size={16} />}
               loading={loading}
             />
             <UserStatTile
+              icon="solar:history-bold"
               label={t('referral.commissionEvents')}
               value={<UserAnimatedStat value={displayStats.commissionEvents} variant="h5" fontWeight={700} />}
               loading={loading}

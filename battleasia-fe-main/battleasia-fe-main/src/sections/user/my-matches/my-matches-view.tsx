@@ -10,14 +10,14 @@ import { useTranslate } from 'src/locales/use-locales';
 import { useApi, useImagePreloader, useLiveSync, LIVE_SYNC_TOPICS } from 'src/hooks';
 import {
   UserPageShell,
-  UserPageTitle,
+  UserArenaStrip,
   UserStatTile,
   UserEmptyState,
+  UserAnimatedStat,
 } from 'src/layouts/user';
 
 import { CoinValue } from 'src/components/coin-value';
 import { PlayTabs } from 'src/components/play-tabs';
-import { UserAnimatedStat } from 'src/layouts/user';
 
 import { PLAY_IMAGE_PATHS } from '../play/play-constants';
 import { MyMatchCard, MyMatchesPageSkeleton } from './components';
@@ -139,10 +139,11 @@ export function MyMatchesView() {
 
   return (
     <UserPageShell>
-      <UserPageTitle
+      <UserArenaStrip
         badge={t('myMatches.badgeBattleHistory')}
         title={t('myMatches.title')}
         subtitle={t('myMatches.subtitle')}
+        imageUrl={PLAY_IMAGE_PATHS.heroBanner}
       />
 
       {showInitialSkeleton ? (

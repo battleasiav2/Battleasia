@@ -71,7 +71,7 @@ export const PhoneInput = forwardRef<HTMLDivElement, PhoneInputProps>((props, re
         () => ({
           '--popover-button-mr': '12px',
           '--popover-button-height': '22px',
-          '--popover-button-width': variant === 'standard' ? '48px' : '60px',
+          '--popover-button-width': variant === 'standard' ? '72px' : '96px',
           position: 'relative',
           ...(!disableSelect && {
             [`& .${inputBaseClasses.input}`]: {

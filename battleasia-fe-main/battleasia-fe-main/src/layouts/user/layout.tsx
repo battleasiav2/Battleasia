@@ -28,7 +28,7 @@ import { UserNavVertical } from './user-nav-vertical';
 import { AccountDrawer } from '../components/account-drawer';
 import { NotificationsDrawer } from '../components/notifications-drawer';
 import { userLayoutVars, userBattleNavColorVars } from './css-vars';
-import { USER_COLORS, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
+import { USER_COLORS, userGoldButtonSx, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
 import { LanguagePopover } from '../components/language-popover';
 import { FloatingFooterNav } from '../components/floating-footer-nav';
 import { menuItems, accountMenuItems, createMenuClickHandler } from '../menu-items-config';
@@ -177,15 +177,14 @@ export function UserLayout({
                                     key={item.href}
                                     component={RouterLink}
                                     href={item.href!}
-                                    className="font-tr"
                                     sx={{
                                         px: 1.75,
                                         py: 0.75,
                                         borderRadius: '4px',
-                                        textTransform: 'uppercase',
+                                        textTransform: 'none',
                                         fontSize: menuStyles.fontSize,
-                                        fontWeight: menuStyles.fontWeight,
-                                        letterSpacing: 0.6,
+                                        fontWeight: 600,
+                                        letterSpacing: 0.02,
                                         color: isActive ? '#111111' : menuStyles.inactiveColor,
                                         bgcolor: isActive ? USER_COLORS.gold : alpha('#000000', 0.35),
                                         border: `1px solid ${isActive ? alpha(USER_COLORS.gold, 0.6) : alpha('#ffffff', 0.1)}`,
@@ -212,11 +211,11 @@ export function UserLayout({
                                     component={item.href ? RouterLink : 'span'}
                                     href={item.href}
                                     onClick={(e: any) => handleMenuClick(e, item)}
-                                    className="font-tr"
                                     sx={{
-                                        textTransform: 'uppercase',
-                                        fontSize: { lg: 18, xl: 22 },
-                                        fontWeight: 'normal',
+                                        textTransform: 'none',
+                                        fontSize: { lg: 15, xl: 16 },
+                                        fontWeight: 600,
+                                        letterSpacing: 0.02,
                                         color: isActive ? USER_COLORS.gold : '#d9d9d8',
                                         textDecoration: 'none',
                                         cursor: 'pointer',
@@ -270,16 +269,12 @@ export function UserLayout({
                         <Button
                             component={RouterLink}
                             href={paths.auth.signIn}
-                            className="font-tr"
                             sx={{
+                                ...userGoldButtonSx,
                                 height: { xs: 32, sm: 45, md: 53 },
                                 px: { xs: 2, sm: 3, md: 6.7 },
-                                fontSize: { xs: 14, sm: 24, md: 28 },
-                                color: "#000",
-                                fontWeight: "normal",
-                                borderRadius: 0,
-                                background: "url(/assets/images/btn-bg.webp) no-repeat center center",
-                                backgroundSize: "cover",
+                                fontSize: { xs: 14, sm: 16, md: 18 },
+                                fontWeight: 600,
                                 whiteSpace: 'nowrap',
                                 minWidth: 'auto',
                             }}

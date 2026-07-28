@@ -57,20 +57,13 @@ export function NavVertical({
                 >
                     <Logo
                         sx={{
-                            width: { xs: 72, md: 88 },
-                            height: { xs: 72, md: 88 },
+                            width: { xs: 74, md: 92 },
+                            height: { xs: 74, md: 92 },
                             flexShrink: 0,
-                            alignSelf: { md: 'flex-start' },
-                            mt: { md: -0.75 },
-                            '& img': {
-                                borderRadius: '10%',
-                                width: 1,
-                                height: 1,
-                                objectFit: 'contain',
-                            },
+                            alignSelf: 'center',
                         }}
                     />
-                    <Box sx={{ minWidth: 0, pt: { md: 0.5 } }}>
+                    <Box sx={{ minWidth: 0 }}>
                         <Typography
                             className="font-tr"
                             sx={{

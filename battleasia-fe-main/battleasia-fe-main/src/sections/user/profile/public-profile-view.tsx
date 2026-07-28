@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router';
 import { useState, useEffect, useCallback } from 'react';
 
-import { Box, Grid2 as Grid, Stack } from '@mui/material';
+import { Grid2 as Grid, Stack } from '@mui/material';
 
 import { fDateTime } from 'src/utils/format-time';
 import { getImageUrl } from 'src/utils/get-image-url';
@@ -14,14 +14,14 @@ import { useTranslate } from 'src/locales/use-locales';
 import {
   UserPageShell,
   UserPageTitle,
-  UserStatTile,
   UserEmptyState,
   UserBackButton,
 } from 'src/layouts/user';
 
-import { UserAnimatedStat } from 'src/layouts/user';
-
-import { FeedList, ProfileInfo, ProfileBanner, ProfileSidebar, ProfilePageSkeleton } from './components';
+import { FeedList, ProfileInfo, ProfileBanner, ProfileSidebar, ProfilePageSkeleton, ProfileGamingStatsStrip, FollowListDialog, ProfileSocialExtras } from './components';
+import { computeProfileGamingStats, mapApiFeedToItem } from './profile-stats-utils';
+import { useMessagingHandler } from '../messages/use-messaging-settings';
+import { MessagingProviderPicker } from '../messages/components';
 
 // ----------------------------------------------------------------------
 
@@ -31,6 +31,15 @@ export function PublicProfileView() {
   const { t } = useTranslate();
   const { user, isLoggedIn } = useSelector((state) => state.auth);
   const { getUserByIdApi, followUserApi, unfollowUserApi, getUserMatchHistoryApi, getUserFeedsApi } = useApi();
+  const {
+    hasActiveMessaging,
+    startMessaging,
+    pickerOpen,
+    setPickerOpen,
+    pickerProviders,
+    pickerContext,
+    handleSelectBuiltin,
+  } = useMessagingHandler();
   const [viewingUser, setViewingUser] = useState<IPublicUser | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
@@ -41,14 +50,15 @@ export function PublicProfileView() {
   const [stats, setStats] = useState({
     gamesPlayed: 0,
     totalKills: 0,
-    amountWon: 0,
+    wins: 0,
+    winRate: 0,
   });
   const [activities, setActivities] = useState<IActivityCard[]>([]);
   const [feeds, setFeeds] = useState<IFeedItem[]>([]);
   const [feedsLoading, setFeedsLoading] = useState(false);
+  const [followListMode, setFollowListMode] = useState<'followers' | 'following' | null>(null);
 
   const isOwnProfile = isLoggedIn && userId === user?._id;
-  const isAdmin = viewingUser?.role?.name === 'admin';
 
   const fetchUserProfile = useCallback(async () => {
     if (!userId) {
@@ -90,18 +100,7 @@ export function PublicProfileView() {
       const response = await getUserMatchHistoryApi(userId);
       if (response?.data?.status && response.data.data) {
         const history: IMatchHistory[] = response.data.data;
-        const gamesPlayed = history.length;
-        const totalKills = history.reduce(
-          (sum, record) => sum + (Number(record?.kills ?? 0) || 0),
-          0
-        );
-        const amountWon = history.reduce((sum, record) => sum + (Number(record?.prizeDescription ?? 0) || 0), 0);
-
-        setStats({
-          gamesPlayed,
-          totalKills,
-          amountWon,
-        });
+        setStats(computeProfileGamingStats(history));
 
         const counts = history.reduce<
           Record<string, { count: number; record: any }>
@@ -167,30 +166,15 @@ export function PublicProfileView() {
   }, [fetchProfileStats]);
 
   const fetchUserFeeds = useCallback(async () => {
-    if (!userId || !isAdmin) return;
+    if (!userId) return;
 
     try {
       setFeedsLoading(true);
       const response = await getUserFeedsApi(userId, { page: 1, limit: 100 });
       if (response?.data?.status && response.data.data?.results) {
-        const formattedFeeds = response.data.data.results.map((feed: any) => ({
-          id: feed.id || feed._id,
-          title: feed.title,
-          description: feed.description,
-          coverUrl: feed.coverUrl || '',
-          status: feed.status || 'published',
-          totalViews: feed.totalViews || 0,
-          totalLikes: feed.totalLikes || 0,
-          totalComments: feed.totalComments || 0,
-          totalShares: feed.totalShares || 0,
-          createdAt: feed.createdAt ? new Date(feed.createdAt) : new Date(),
-          author: feed.author ? {
-            id: feed.author.id,
-            name: feed.author.name,
-            avatarUrl: feed.author.avatarUrl || '',
-          } : null,
-        }));
-        setFeeds(formattedFeeds);
+        setFeeds(response.data.data.results.map(mapApiFeedToItem));
+      } else {
+        setFeeds([]);
       }
     } catch (error) {
       console.error('Failed to fetch user feeds:', error);
@@ -198,13 +182,11 @@ export function PublicProfileView() {
     } finally {
       setFeedsLoading(false);
     }
-  }, [userId, isAdmin, getUserFeedsApi]);
+  }, [userId, getUserFeedsApi]);
 
   useEffect(() => {
-    if (isAdmin) {
-      fetchUserFeeds();
-    }
-  }, [isAdmin, fetchUserFeeds]);
+    fetchUserFeeds();
+  }, [fetchUserFeeds]);
 
   const handleFollow = useCallback(async () => {
     if (!viewingUser?._id || !isLoggedIn || followLoading) return;
@@ -279,8 +261,18 @@ export function PublicProfileView() {
         onFollow={handleFollow}
         onUnfollow={handleUnfollow}
         followLoading={followLoading}
+        profileUserId={viewingUser?._id}
+        canMessage={isLoggedIn && !isOwnProfile && hasActiveMessaging}
+        onMessage={() =>
+          startMessaging({
+            userId: viewingUser!._id,
+            username: viewingUser?.username,
+          })
+        }
         role={viewingUser?.role}
         isPremium={viewingUser?.isPremium}
+        isBlocked={Boolean(viewingUser?.isBlocked)}
+        onBlockChange={() => void fetchUserProfile()}
       />
 
       <UserPageTitle
@@ -289,34 +281,14 @@ export function PublicProfileView() {
         subtitle={t('profile.viewingProfile', { username: viewingUser?.username })}
       />
 
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
-          gap: 1.5,
-          mb: 3,
-        }}
-      >
-        <UserStatTile
-          label={t('profile.matchesPlayed')}
-          value={<UserAnimatedStat value={stats.gamesPlayed} variant="h5" fontWeight={700} />}
-          loading={statsLoading}
-        />
-        <UserStatTile
-          label={t('profile.totalKilled')}
-          value={<UserAnimatedStat value={stats.totalKills} variant="h5" fontWeight={700} />}
-          loading={statsLoading}
-        />
-        <UserStatTile
-          label={t('profile.amountWon')}
-          value={<UserAnimatedStat value={stats.amountWon} variant="h5" fontWeight={700} />}
-          loading={statsLoading}
-        />
-        <UserStatTile
-          label={t('profile.followers')}
-          value={followersCount}
-        />
-      </Box>
+      <ProfileGamingStatsStrip stats={stats} loading={statsLoading} />
+
+      <ProfileSocialExtras
+        profileUserId={viewingUser!._id}
+        isOwnProfile={isOwnProfile}
+        isLoggedIn={isLoggedIn}
+        onFollowChange={() => void fetchUserProfile()}
+      />
 
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, lg: 4 }}>
@@ -326,6 +298,8 @@ export function PublicProfileView() {
             following={followingCount}
             userId={userId}
             hideBalance
+            onFollowersClick={isLoggedIn ? () => setFollowListMode('followers') : undefined}
+            onFollowingClick={isLoggedIn ? () => setFollowListMode('following') : undefined}
           />
         </Grid>
 
@@ -337,10 +311,26 @@ export function PublicProfileView() {
               isLoggedIn={isLoggedIn}
             />
 
-            {isAdmin ? <FeedList feeds={feeds} loading={feedsLoading} /> : null}
+            <FeedList feeds={feeds} loading={feedsLoading} />
           </Stack>
         </Grid>
       </Grid>
+
+      <FollowListDialog
+        open={Boolean(followListMode)}
+        onClose={() => setFollowListMode(null)}
+        userId={viewingUser?._id || userId || ''}
+        mode={followListMode || 'followers'}
+        onFollowChange={() => void fetchUserProfile()}
+      />
+
+      <MessagingProviderPicker
+        open={pickerOpen}
+        onClose={() => setPickerOpen(false)}
+        providers={pickerProviders}
+        username={pickerContext.username}
+        onSelectBuiltin={handleSelectBuiltin}
+      />
     </UserPageShell>
   );
 }

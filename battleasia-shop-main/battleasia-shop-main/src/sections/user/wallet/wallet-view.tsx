@@ -28,16 +28,18 @@ import { useSelector, useDispatch } from 'src/store';
 import { balanceAction } from 'src/store/reducers/auth';
 import {
     UserPageShell,
-    UserPageTitle,
     UserGlassCard,
     UserActionButton,
     USER_COLORS,
     userMutedTextSx,
     userGlassDialogPaperSx,
 } from 'src/layouts/user';
-import { SHOP_FIELD_SX, SHOP_SELECT_MENU_PROPS } from '../shop/shop-styles';
+import { SHOP_FIELD_SX, SHOP_FIELD_LABEL_PROPS, SHOP_SELECT_MENU_PROPS } from '../shop/shop-styles';
 import { WalletHero } from './wallet-hero';
 import { PAYMENT_META, PAYMENT_OPTIONS } from 'src/global-config';
+import { paths } from 'src/routes/paths';
+import { RouterLink } from 'src/routes/components';
+import { useTranslate } from 'src/locales/use-locales';
 
 import { toast } from 'react-hot-toast';
 
@@ -45,6 +47,31 @@ import { Iconify } from 'src/components/iconify';
 import CoinValue from 'src/components/coin-value';
 
 // ----------------------------------------------------------------------
+
+const arenaChipSx = (tone: 'gold' | 'success' | 'error' | 'warning' | 'info' | 'muted') => {
+    const map = {
+        gold: { color: USER_COLORS.gold, border: alpha(USER_COLORS.gold, 0.4), bg: alpha(USER_COLORS.gold, 0.12) },
+        success: { color: USER_COLORS.success, border: alpha(USER_COLORS.success, 0.4), bg: alpha(USER_COLORS.success, 0.1) },
+        error: { color: USER_COLORS.error, border: alpha(USER_COLORS.error, 0.4), bg: alpha(USER_COLORS.error, 0.1) },
+        warning: { color: USER_COLORS.goldLight, border: alpha(USER_COLORS.goldLight, 0.45), bg: alpha(USER_COLORS.goldLight, 0.1) },
+        info: { color: USER_COLORS.info, border: alpha(USER_COLORS.info, 0.4), bg: alpha(USER_COLORS.info, 0.1) },
+        muted: { color: alpha('#ffffff', 0.7), border: alpha('#ffffff', 0.18), bg: alpha('#ffffff', 0.06) },
+    } as const;
+    const style = map[tone];
+    return {
+        fontWeight: 700,
+        minWidth: 80,
+        borderRadius: 0,
+        color: `${style.color} !important`,
+        border: `1px solid ${style.border}`,
+        bgcolor: style.bg,
+        '& .MuiChip-label': {
+            px: 1,
+            color: `${style.color} !important`,
+            fontWeight: 700,
+        },
+    };
+};
 
 type BalanceHistoryItem = {
     id: string;
@@ -74,6 +101,7 @@ const CURRENCY_OPTIONS = [
 ];
 
 export function WalletView() {
+    const { t } = useTranslate();
     const { user } = useSelector((state) => state.auth);
     const dispatch = useDispatch();
     const { getBalanceHistoryApi, getCurrencyRatesApi, submitWithdrawalApi, initialize, getWithdrawableAmountApi, getWithdrawalByIdApi, getDepositByIdApi } = useApi();
@@ -243,26 +271,26 @@ export function WalletView() {
     }, [getCurrencyRatesApi]);
 
     const walletData = useMemo(() => {
-        const deposits = transactions.filter((t) => t.type === 'deposit' || t.type === 'earning');
-        const withdraws = transactions.filter((t) => t.type === 'withdraw');
+        const deposits = transactions.filter((tx) => tx.type === 'deposit' || tx.type === 'earning');
+        const withdraws = transactions.filter((tx) => tx.type === 'withdraw');
 
-        const totalDeposits = deposits.reduce((sum, t) => sum + t.amount, 0);
-        const totalWithdraws = withdraws.reduce((sum, t) => sum + t.amount, 0);
+        const totalDeposits = deposits.reduce((sum, tx) => sum + tx.amount, 0);
+        const totalWithdraws = withdraws.reduce((sum, tx) => sum + tx.amount, 0);
 
         // Calculate win money (earnings from match rewards)
         const winMoney = transactions
-            .filter((t) =>
-                t.type === 'earning' ||
-                t.detail?.reason === 'match_result_update' ||
-                t.detail?.reason === 'match_winnings' ||
-                t.detail?.reason === 'match_reward'
+            .filter((tx) =>
+                tx.type === 'earning' ||
+                tx.detail?.reason === 'match_result_update' ||
+                tx.detail?.reason === 'match_winnings' ||
+                tx.detail?.reason === 'match_reward'
             )
-            .reduce((sum, t) => sum + t.amount, 0);
+            .reduce((sum, tx) => sum + tx.amount, 0);
 
         // Calculate join money (withdraws for match entry fees)
         const joinMoney = withdraws
-            .filter((t) => t.detail?.reason === 'match_entry_fee' || t.detail?.matchId)
-            .reduce((sum, t) => sum + t.amount, 0);
+            .filter((tx) => tx.detail?.reason === 'match_entry_fee' || tx.detail?.matchId)
+            .reduce((sum, tx) => sum + tx.amount, 0);
 
         return {
             totalBalance: user?.balance || 0,
@@ -438,11 +466,11 @@ export function WalletView() {
                                                     alt={`${item.code} flag`}
                                                     sx={{ width: 20, height: 14, borderRadius: 0.5, objectFit: 'cover', border:"1px silver solid" }}
                                                 />
-                                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                                <Typography variant="body2" sx={userMutedTextSx}>
                                                     {item.code}
                                                 </Typography>
                                             </Box>
-                                            <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600 }}>
+                                            <Typography variant="body2" sx={{ color: USER_COLORS.textPrimary, fontWeight: 600 }}>
                                                 {item.amount != null
                                                     ? fNumber(item.amount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                                     : '--'}
@@ -478,12 +506,12 @@ export function WalletView() {
                                 {hasPendingWithdrawal ? '0.00' : fNumber(withdrawableAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} BAC
                             </Typography>
                             {hasPendingWithdrawal && (
-                                <Typography variant="caption" sx={{ color: 'error.main', mt: 0.5, display: 'block' }}>
+                                <Typography variant="caption" sx={{ color: USER_COLORS.error, mt: 0.5, display: 'block' }}>
                                     Pending withdrawal: {fNumber(pendingWithdrawalAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} BAC
                                 </Typography>
                             )}
                             {!hasPendingWithdrawal && (
-                                <Typography variant="caption" sx={{ color: 'text.secondary', mt: 1, display: 'block', lineHeight: 1.5 }}>
+                                <Typography variant="caption" sx={{ ...userMutedTextSx, mt: 1, display: 'block', lineHeight: 1.5 }}>
                                     * Calculation: Min(Total match bets × 70% - Already withdrawn, Current balance)
                                 </Typography>
                             )}
@@ -559,65 +587,53 @@ export function WalletView() {
         });
     };
 
-    const getTransactionType = (transaction: BalanceHistoryItem): { label: string; color: 'success' | 'error' | 'warning' | 'info' | 'default' | 'primary' } => {
+    const getTransactionType = (transaction: BalanceHistoryItem): { label: string; tone: 'gold' | 'success' | 'error' | 'warning' | 'info' | 'muted' } => {
         const detail = transaction.detail || {};
         const reason = detail?.reason;
 
-        // Default: Earning for deposit/earning, Betting for withdraw
         let label = transaction.type === 'withdraw' ? 'Betting' : 'Earning';
-        let color: 'success' | 'error' | 'warning' | 'info' | 'default' | 'primary' = transaction.type === 'withdraw' ? 'info' : 'success';
+        let tone: 'gold' | 'success' | 'error' | 'warning' | 'info' | 'muted' = transaction.type === 'withdraw' ? 'info' : 'gold';
 
-        // Match entry fee (Betting)
         if (reason === 'match_entry_fee') {
             label = 'Betting';
-            color = 'info';
-        } 
-        // Match winnings and refunds (Earning)
-        else if (reason === 'match_winnings' || reason === 'match_result_update' || reason === 'match_winner_refund_return' || reason === 'match_reward') {
+            tone = 'info';
+        } else if (reason === 'match_winnings' || reason === 'match_result_update' || reason === 'match_winner_refund_return' || reason === 'match_reward') {
             label = 'Earning';
-            color = 'error';
-        } 
-        // Withdrawal approved (Withdrawal)
-        else if (reason === 'withdrawal_approved') {
+            tone = 'gold';
+        } else if (reason === 'withdrawal_approved') {
             label = 'Withdrawal';
-            color = 'warning';
-        } 
-        // Withdrawal rejection refund (Refund)
-        else if (reason === 'withdrawal_rejected_refund') {
+            tone = 'warning';
+        } else if (reason === 'withdrawal_rejected_refund') {
             label = 'Refund';
-            color = 'info';
-        }
-        // Deposit (Deposit)
-        else if (detail?.deposit_id) {
+            tone = 'info';
+        } else if (detail?.deposit_id) {
             label = 'Deposit';
-            color = 'success';
-        }
-        // Referral bonus (Referral)
-        else if (reason === 'referral_bonus') {
+            tone = 'gold';
+        } else if (reason === 'referral_bonus') {
             label = 'Referral';
-            color = 'success';
+            tone = 'gold';
         }
 
-        return { label, color };
+        return { label, tone };
     };
 
-    const getTransactionStatus = (transaction: BalanceHistoryItem): { label: string; color: 'success' | 'error' | 'warning' | 'info' | 'default' } => {
+    const getTransactionStatus = (transaction: BalanceHistoryItem): { label: string; tone: 'gold' | 'success' | 'error' | 'warning' | 'info' | 'muted' } => {
         const status = transaction.status || 'completed';
-        
+
         if (status === 'completed') {
-            return { label: 'Completed', color: 'success' };
+            return { label: 'Completed', tone: 'gold' };
         }
         if (status === 'pending') {
-            return { label: 'Pending', color: 'warning' };
+            return { label: 'Pending', tone: 'warning' };
         }
         if (status === 'processing') {
-            return { label: 'Processing', color: 'info' };
+            return { label: 'Processing', tone: 'info' };
         }
         if (status === 'rejected' || status === 'failed') {
-            return { label: 'Failed', color: 'error' };
+            return { label: 'Failed', tone: 'error' };
         }
-        
-        return { label: 'Completed', color: 'success' };
+
+        return { label: 'Completed', tone: 'gold' };
     };
 
     const renderTransactionHistory = () => {
@@ -636,11 +652,8 @@ export function WalletView() {
                         <Chip
                             label={typeInfo.label}
                             size="small"
-                            color={typeInfo.color}
-                            sx={{
-                                fontWeight: 600,
-                                minWidth: 80,
-                            }}
+                            variant="outlined"
+                            sx={arenaChipSx(typeInfo.tone)}
                         />
                     );
                 },
@@ -659,12 +672,8 @@ export function WalletView() {
                         <Chip
                             label={statusInfo.label}
                             size="small"
-                            color={statusInfo.color}
                             variant="outlined"
-                            sx={{
-                                fontWeight: 600,
-                                minWidth: 80,
-                            }}
+                            sx={arenaChipSx(statusInfo.tone)}
                         />
                     );
                 },
@@ -686,7 +695,7 @@ export function WalletView() {
                         <Typography
                             variant="body2"
                             sx={{
-                                color: params.row.type === 'withdraw' ? 'error.main' : 'success.main',
+                                color: params.row.type === 'withdraw' ? USER_COLORS.error : USER_COLORS.gold,
                                 fontWeight: 600,
                             }}
                         >
@@ -702,7 +711,7 @@ export function WalletView() {
                 renderCell: (params) => (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                         <Box component="img" src="/assets/images/currency.webp" alt="Currency" sx={{ width: 16, height: 16 }} />
-                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                        <Typography variant="body2" sx={userMutedTextSx}>
                             {fNumber(params.value)} BAC
                         </Typography>
                     </Box>
@@ -771,8 +780,20 @@ export function WalletView() {
 
     return (
         <UserPageShell>
-            <WalletHero title="Wallet" />
-            <UserPageTitle badge="Secure Vault" title="Wallet" subtitle="Manage balance, withdrawals, and transaction history." />
+            <WalletHero
+                action={
+                    <UserActionButton
+                        component={RouterLink}
+                        href={paths.user.account.withdrawal}
+                        actionVariant="gold"
+                        size="medium"
+                        startIcon={<Iconify icon="solar:card-send-bold" />}
+                        sx={{ px: 2.5 }}
+                    >
+                        {t('wallet.withdraw')}
+                    </UserActionButton>
+                }
+            />
             <Stack spacing={3}>
                 {renderBalanceCard()}
                 {renderTransactionHistory()}
@@ -788,22 +809,22 @@ export function WalletView() {
             >
                 <DialogTitle>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Iconify icon="solar:transfer-horizontal-bold" width={24} sx={{ color: 'primary.main' }} />
-                        <Typography variant="h6">Request Withdrawal</Typography>
+                        <Iconify icon="solar:transfer-horizontal-bold" width={24} sx={{ color: USER_COLORS.gold }} />
+                        <Typography variant="h6" sx={{ color: USER_COLORS.textPrimary }}>Request Withdrawal</Typography>
                     </Box>
                 </DialogTitle>
-                <DialogContent dividers>
+                <DialogContent dividers sx={{ borderColor: USER_COLORS.border }}>
                     <Stack spacing={3} sx={{ pt: 1 }}>
                         {/* Pending Withdrawal Warning */}
                         {hasPendingWithdrawal && (
                             <UserGlassCard sx={{ p: 2, bgcolor: alpha(USER_COLORS.error, 0.08), borderColor: alpha(USER_COLORS.error, 0.35) }}>
                                 <Stack direction="row" alignItems="center" spacing={1.5}>
-                                    <Iconify icon="solar:danger-triangle-bold" width={28} sx={{ color: 'error.main' }} />
+                                    <Iconify icon="solar:danger-triangle-bold" width={28} sx={{ color: USER_COLORS.error }} />
                                     <Box>
-                                        <Typography variant="subtitle2" sx={{ color: 'error.dark' }}>
+                                        <Typography variant="subtitle2" sx={{ color: USER_COLORS.error }}>
                                             Pending Withdrawal Exists
                                         </Typography>
-                                        <Typography variant="body2" sx={{ color: 'error.dark' }}>
+                                        <Typography variant="body2" sx={{ color: alpha(USER_COLORS.error, 0.85) }}>
                                             You have a pending withdrawal of {fNumber(pendingWithdrawalAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} BAC being processed. Please wait until it is completed or rejected before submitting a new request.
                                         </Typography>
                                     </Box>
@@ -814,24 +835,24 @@ export function WalletView() {
                         <UserGlassCard sx={{ p: 2, bgcolor: alpha('#000000', 0.35) }}>
                             <Stack spacing={1.5}>
                                 <Box>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                    <Typography variant="body2" sx={userMutedTextSx}>
                                         Available Balance
                                     </Typography>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <Box component="img" src="/assets/images/currency.webp" alt="Currency" sx={{ width: 24, height: 24 }} />
-                                        <Typography variant="h5" sx={{ color: 'primary.main', fontWeight: 700 }}>
+                                        <Typography variant="h5" sx={{ color: USER_COLORS.gold, fontWeight: 700 }}>
                                             {fNumber(user?.balance || 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} BAC
                                         </Typography>
                                     </Box>
                                 </Box>
-                                <Divider />
+                                <Divider sx={{ borderColor: USER_COLORS.border }} />
                                 <Box>
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                    <Typography variant="body2" sx={userMutedTextSx}>
                                         Withdrawable Amount
                                     </Typography>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <Box component="img" src="/assets/images/currency.webp" alt="Currency" sx={{ width: 24, height: 24 }} />
-                                        <Typography variant="h5" sx={{ color: hasPendingWithdrawal ? 'text.disabled' : 'warning.main', fontWeight: 700 }}>
+                                        <Typography variant="h5" sx={{ color: hasPendingWithdrawal ? USER_COLORS.textMuted : USER_COLORS.gold, fontWeight: 700 }}>
                                             {hasPendingWithdrawal ? '0.00' : fNumber(withdrawableAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} BAC
                                         </Typography>
                                     </Box>
@@ -846,6 +867,7 @@ export function WalletView() {
                             value={selectedCurrency}
                             onChange={(e) => setSelectedCurrency(e.target.value)}
                             helperText="Choose the currency for withdrawal"
+                            InputLabelProps={SHOP_FIELD_LABEL_PROPS}
                             sx={SHOP_FIELD_SX}
                             SelectProps={{ MenuProps: SHOP_SELECT_MENU_PROPS }}
                         >
@@ -878,6 +900,8 @@ export function WalletView() {
                                     ? `Exceeds withdrawable amount. Maximum: ${fNumber(withdrawableAmount)} BAC`
                                     : `Maximum: ${fNumber(withdrawableAmount)} BAC`
                             }
+                            InputLabelProps={SHOP_FIELD_LABEL_PROPS}
+                            sx={SHOP_FIELD_SX}
                             InputProps={{
                                 startAdornment: (
                                     <Box component="img" src="/assets/images/currency.webp" alt="Currency" sx={{ width: 20, height: 20, mr: 1 }} />
@@ -887,7 +911,7 @@ export function WalletView() {
 
                         {/* Calculated Currency Amount Display */}
                         {coinAmount && parseFloat(coinAmount) > 0 && (
-                            <UserGlassCard sx={{ p: 2, bgcolor: alpha(USER_COLORS.success, 0.08), borderColor: alpha(USER_COLORS.success, 0.35) }}>
+                            <UserGlassCard sx={{ p: 2, bgcolor: alpha(USER_COLORS.gold, 0.08), borderColor: alpha(USER_COLORS.gold, 0.35) }}>
                                 <Stack spacing={1}>
                                     <Typography sx={userMutedTextSx}>
                                         You will receive (approx.)
@@ -899,7 +923,7 @@ export function WalletView() {
                                             alt={`${selectedCurrency} flag`}
                                             sx={{ width: 24, height: 16, borderRadius: 0.5, objectFit: 'cover', border: '1px silver solid' }}
                                         />
-                                        <Typography sx={{ color: USER_COLORS.success, fontWeight: 700, fontSize: 20 }}>
+                                        <Typography sx={{ color: USER_COLORS.gold, fontWeight: 700, fontSize: 20 }}>
                                             {fNumber(calculatedAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {selectedCurrency}
                                         </Typography>
                                     </Box>
@@ -918,6 +942,7 @@ export function WalletView() {
                             value={paymentChannel}
                             onChange={(e) => setPaymentChannel(e.target.value)}
                             helperText="Select your preferred payment method"
+                            InputLabelProps={SHOP_FIELD_LABEL_PROPS}
                             sx={SHOP_FIELD_SX}
                             SelectProps={{ MenuProps: SHOP_SELECT_MENU_PROPS }}
                         >
@@ -939,7 +964,7 @@ export function WalletView() {
                                             <Stack spacing={0}>
                                                 <Typography variant="body2">{meta.label}</Typography>
                                                 {meta.helper && (
-                                                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                                    <Typography variant="caption" sx={userMutedTextSx}>
                                                         {meta.helper}
                                                     </Typography>
                                                 )}
@@ -960,6 +985,8 @@ export function WalletView() {
                             helperText="Enter the destination address for receiving funds"
                             multiline
                             rows={2}
+                            InputLabelProps={SHOP_FIELD_LABEL_PROPS}
+                            sx={SHOP_FIELD_SX}
                         />
                     </Stack>
                 </DialogContent>
@@ -985,7 +1012,7 @@ export function WalletView() {
                             <Stack spacing={1.5}>
                                 <Stack direction="row" alignItems="center" spacing={1}>
                                     <Box component="img" src="/assets/images/currency.webp" alt="Currency" sx={{ width: 20, height: 20 }} />
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                    <Typography variant="body2" sx={userMutedTextSx}>
                                         Withdraw Amount
                                     </Typography>
                                 </Stack>
@@ -995,7 +1022,7 @@ export function WalletView() {
                                 <Divider />
                                 <Stack direction="row" alignItems="center" spacing={1}>
                                     <Iconify icon="solar:dollar-minimalistic-bold" />
-                                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                    <Typography variant="body2" sx={userMutedTextSx}>
                                         You will receive
                                     </Typography>
                                 </Stack>
@@ -1023,7 +1050,7 @@ export function WalletView() {
                                 </Typography>
                             </Stack>
                             <Stack direction="row" justifyContent="space-between">
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                <Typography variant="body2" sx={userMutedTextSx}>
                                     Wallet Address
                                 </Typography>
                                 <Typography variant="body2" fontWeight={600} sx={{ maxWidth: '60%', textAlign: 'right', wordBreak: 'break-all' }}>
@@ -1031,7 +1058,7 @@ export function WalletView() {
                                 </Typography>
                             </Stack>
                             <Stack direction="row" justifyContent="space-between">
-                                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                <Typography variant="body2" sx={userMutedTextSx}>
                                     Exchange Rate
                                 </Typography>
                                 <Typography variant="body2" fontWeight={600}>

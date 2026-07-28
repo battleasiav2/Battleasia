@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Box, Link, Alert, Stack, IconButton, InputAdornment } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
-import { RouterLink } from 'src/routes/components';
+import { useRouter } from 'src/routes/hooks';
 
 import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
@@ -17,12 +17,16 @@ import { loginAction } from 'src/store/reducers/auth';
 
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
+import { AuthNavButtons } from 'src/components/mesh-buttons/auth-nav-buttons';
 
 import { AuthFormShell } from './auth-form-shell';
+import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
-import { authAlertSx, authFieldSlotProps, authLinkSx, authFooterTextSx } from './auth-form-styles';
+import { authAlertSx, authFieldSlotProps, authLinkSx } from './auth-form-styles';
 
 // ----------------------------------------------------------------------
+
+const MAIN_APP_URL = (import.meta.env.VITE_MAIN_APP_URL as string | undefined) || 'http://localhost:8081';
 
 export type SignInSchemaType = zod.infer<typeof SignInSchema>;
 
@@ -38,6 +42,7 @@ export const SignInSchema = zod.object({
 });
 
 export function SignInView() {
+  const router = useRouter();
   const { loginApi } = useApi();
   const { t } = useTranslate();
   const showPassword = useBoolean();
@@ -70,8 +75,15 @@ export function SignInView() {
           balance: { balance: user?.balance || 0 },
         })
       );
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      router.push(paths.user.shop);
     } catch (error: any) {
-      const feedbackMessage = error?.response?.data?.message || error?.message || 'An error occurred';
+      const feedbackMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        (typeof error === 'string' ? error : null) ||
+        'An error occurred';
       setErrorMessage(feedbackMessage);
     }
   });
@@ -89,7 +101,7 @@ export function SignInView() {
           <Field.Text
             name="email"
             label={t('auth.emailAddress')}
-            placeholder="Example@domain.com"
+            placeholder={t('auth.emailPlaceholder')}
             slotProps={{
               ...authFieldSlotProps,
               input: {
@@ -103,38 +115,55 @@ export function SignInView() {
             }}
           />
 
-          <Field.Text
-            name="password"
-            label={t('auth.password')}
-            placeholder={t('auth.passwordPlaceholder')}
-            type={showPassword.value ? 'text' : 'password'}
-            slotProps={{
-              ...authFieldSlotProps,
-              input: {
-                ...authFieldSlotProps.input,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={showPassword.onToggle} edge="end" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                      <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
+          <Box>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 0.75 }}>
+              <Link
+                href={`${MAIN_APP_URL}/auth/forgot-password`}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={authLinkSx}
+              >
+                {t('auth.forgotPassword')}
+              </Link>
+            </Box>
+            <Field.Text
+              name="password"
+              label={t('auth.password')}
+              placeholder={t('auth.passwordPlaceholder')}
+              type={showPassword.value ? 'text' : 'password'}
+              slotProps={{
+                ...authFieldSlotProps,
+                input: {
+                  ...authFieldSlotProps.input,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: '#f59e0b' }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={showPassword.onToggle} edge="end" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                        <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+          </Box>
 
           <AuthSubmitButton loading={isSubmitting} loadingIndicator={`${t('auth.signIn')}...`}>
             {t('auth.signIn')}
           </AuthSubmitButton>
 
-          <Box sx={authFooterTextSx}>
-            {t('auth.dontHaveAccount')}{' '}
-            <Link component={RouterLink} href={paths.auth.signUp} sx={authLinkSx}>
-              {t('auth.signUp')}
-            </Link>
-          </Box>
+          <AuthFooterLinks
+            prefix={t('auth.dontHaveAccount')}
+            links={[{ label: t('auth.signUp'), href: paths.auth.signUp }]}
+          />
         </Stack>
       </Form>
+
+      <AuthNavButtons homeLabel={t('auth.home')} joinLabel={t('nav.shop')} />
     </AuthFormShell>
   );
 }

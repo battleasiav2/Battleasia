@@ -1,4 +1,4 @@
-import { Box, Stack, Button, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
@@ -9,6 +9,8 @@ import {
   getGlassBadgeChipSx,
 } from 'src/components/battle-glass-card';
 import { Carousel, useCarousel, CarouselSlide, CarouselDotButtons, CarouselArrowFloatButtons } from 'src/components/carousel';
+
+import { WatchLiveButton } from 'src/components/watch-live-button';
 
 import { USER_COLORS } from 'src/layouts/user/user-theme';
 
@@ -116,27 +118,15 @@ export function PlayHeroBanner({ slides, onWatchLive }: PlayHeroBannerProps) {
                 </Typography>
 
                 <Stack direction="row" alignItems="center" spacing={1.25} flexWrap="wrap">
-                  <Button
-                    variant="contained"
-                    startIcon={<Iconify icon="solar:play-bold" />}
+                  <WatchLiveButton
                     onClick={onWatchLive}
                     sx={{
-                      background: USER_COLORS.goldGradient,
-                      color: '#111111',
                       px: 3,
                       py: 1.1,
-                      fontWeight: 800,
-                      letterSpacing: 0.6,
-                      textTransform: 'uppercase',
-                      borderRadius: 0,
-                      boxShadow: `0 6px 20px ${alpha('#f59e0b', 0.35)}`,
-                      '&:hover': {
-                        background: USER_COLORS.goldGradientHover,
-                      },
                     }}
                   >
                     Watch Live
-                  </Button>
+                  </WatchLiveButton>
 
                   <Box sx={getGlassBadgeChipSx(tokens)}>
                     <Stack direction="row" alignItems="center" spacing={0.75} sx={{ px: 0.5 }}>

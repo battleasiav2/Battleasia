@@ -36,8 +36,11 @@ export function AuthConsumer({ children }: Props) {
           console.error('Failed to initialize user data');
           return;
         }
-        dispatch(userAction(res.data.user));
-        dispatch(balanceAction(res.data.user.balance as number));
+        const user = res.data.user ?? res.data;
+        dispatch(userAction(user));
+        if (typeof user?.balance === 'number') {
+          dispatch(balanceAction(user.balance));
+        }
       }
     } catch (error) {
       console.error('Error during user initialization:', error);

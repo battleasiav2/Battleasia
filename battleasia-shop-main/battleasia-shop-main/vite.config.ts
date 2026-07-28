@@ -121,6 +121,17 @@ export default defineConfig(({ mode }) => {
   server: {
     port: PORT,
     host: true,
+    proxy: {
+      '/api': {
+        target: env.VITE_SERVER_URL || 'http://localhost:5050',
+        changeOrigin: true,
+      },
+      '/socket.io': {
+        target: env.VITE_SERVER_URL || 'http://localhost:5050',
+        changeOrigin: true,
+        ws: true,
+      },
+    },
     ...(env.VITE_HMR_CLIENT_PORT
       ? {
           hmr: {

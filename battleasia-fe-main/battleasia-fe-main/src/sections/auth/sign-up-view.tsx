@@ -202,6 +202,7 @@ export function SignUpView() {
             <Field.Text
               name="inGameUserName"
               label={t('auth.inGameUserName')}
+              placeholder={t('auth.inGameUserNamePlaceholder')}
               slotProps={{
                 ...authFieldSlotProps,
                 input: { ...authFieldSlotProps.input, startAdornment: fieldIcon('solar:user-bold-duotone') },
@@ -211,7 +212,7 @@ export function SignUpView() {
             <Field.Phone
               name="mobile"
               label={t('auth.countryCodeMobile')}
-              placeholder="1XXXXXXXXX"
+              placeholder={t('auth.mobilePlaceholder')}
               country="BD"
               countrySelectorSx={authPhoneCountrySx}
               sx={authPhoneInputSx}
@@ -221,6 +222,7 @@ export function SignUpView() {
             <Field.Text
               name="pubgId"
               label={t('auth.enterPubgId')}
+              placeholder={t('auth.pubgIdPlaceholder')}
               slotProps={{
                 ...authFieldSlotProps,
                 input: { ...authFieldSlotProps.input, startAdornment: fieldIcon('solar:gamepad-bold-duotone') },
@@ -259,7 +261,7 @@ export function SignUpView() {
             <Field.Text
               name="email"
               label={t('auth.emailAddress')}
-              placeholder="Example@domain.com"
+              placeholder={t('auth.emailPlaceholder')}
               slotProps={{
                 ...authFieldSlotProps,
                 input: { ...authFieldSlotProps.input, startAdornment: fieldIcon('solar:letter-bold-duotone') },
@@ -269,11 +271,13 @@ export function SignUpView() {
             <Field.Text
               name="password"
               label={t('auth.password')}
+              placeholder={t('auth.passwordPlaceholder')}
               type={showPassword.value ? 'text' : 'password'}
               slotProps={{
                 ...authFieldSlotProps,
                 input: {
                   ...authFieldSlotProps.input,
+                  startAdornment: fieldIcon('solar:lock-password-bold-duotone'),
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={showPassword.onToggle} edge="end" sx={{ color: alpha('#fff', 0.7) }}>
@@ -288,11 +292,13 @@ export function SignUpView() {
             <Field.Text
               name="confirmPassword"
               label={t('auth.confirmPassword')}
+              placeholder={t('auth.confirmYourPassword')}
               type={showConfirmPassword.value ? 'text' : 'password'}
               slotProps={{
                 ...authFieldSlotProps,
                 input: {
                   ...authFieldSlotProps.input,
+                  startAdornment: fieldIcon('solar:lock-password-bold-duotone'),
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={showConfirmPassword.onToggle} edge="end" sx={{ color: alpha('#fff', 0.7) }}>

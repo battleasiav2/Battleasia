@@ -4,6 +4,7 @@ import { Box, Stack, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
 import { Logo } from 'src/components/logo';
+import { AuthHomeLink } from 'src/components/mesh-buttons/auth-home-link';
 import { GlassPanelCard, getDefaultGlassTokens } from 'src/components/battle-glass-card';
 import { useTranslate } from 'src/locales/use-locales';
 
@@ -20,6 +21,7 @@ type AuthFormShellProps = {
   title: ReactNode;
   description?: ReactNode;
   children: ReactNode;
+  /** Use on sign-up — more fields need a wider card */
   wide?: boolean;
 };
 
@@ -35,19 +37,31 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
         animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) both`,
       }}
     >
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1.5 }}>
+        <AuthHomeLink label={t('auth.home')} />
+      </Box>
+
       <GlassPanelCard
         sx={{
           width: 1,
+          borderRadius: 0,
           p: wide ? { xs: 3, sm: 4, md: 4.5 } : { xs: 3.25, sm: 4.5 },
           boxShadow: `
             0 28px 60px ${alpha('#000000', 0.65)},
-            0 0 56px ${alpha('#f59e0b', 0.08)},
-            inset 0 1px 0 ${alpha('#ffffff', 0.12)}
+            0 0 40px ${alpha('#f5c518', 0.08)}
           `,
         }}
       >
         <Stack alignItems="center" spacing={1.25} sx={{ mb: 3 }}>
-          <Logo disabled sx={{ width: { xs: 120, sm: 140 }, height: 'auto', pointerEvents: 'none' }} />
+          <Logo
+            disabled
+            sx={{
+              width: { xs: 132, sm: 156 },
+              height: 'auto',
+              pointerEvents: 'none',
+              '& img': { objectFit: 'contain', width: '100%', height: 'auto' },
+            }}
+          />
           <Typography
             sx={{
               fontSize: 10,
@@ -66,8 +80,8 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
               fontWeight: 800,
               color: glassTokens.titleColor,
               textAlign: 'center',
-              fontSize: { xs: 19, sm: 22 },
-              lineHeight: 1.3,
+              fontSize: { xs: 20, sm: 24 },
+              lineHeight: 1.25,
               letterSpacing: 0.4,
             }}
           >

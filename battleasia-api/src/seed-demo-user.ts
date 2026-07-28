@@ -15,7 +15,7 @@ import { DepositHistory } from './models/DepositHistory.js';
 import { WithdrawalHistory } from './models/WithdrawalHistory.js';
 import { PaymentChannel } from './models/PaymentChannel.js';
 import { getMapBannerPath } from './utils/map-banner.js';
-import { ensureFakePlayers, FAKE_PLAYERS } from './seed-dashboard-data.js';
+import { ensureFakePlayers, FAKE_PLAYERS, DEMO_PROFILE_AVATARS, ensurePlayerProfileAvatars } from './seed-dashboard-data.js';
 
 const DEMO_EMAIL = 'nixhyip@gmail.com';
 const DEMO_PASSWORD = 'Nix@7777';
@@ -180,6 +180,7 @@ async function ensureDemoUser(playerRole: InstanceType<typeof Role>) {
       mobileNo: '1712345678',
       roleRef: playerRole._id,
       role: { type: 'player', name: 'Player', permissions: [] },
+      avatar: DEMO_PROFILE_AVATARS.nixhyip,
     });
     console.log(`  Created demo user: ${DEMO_EMAIL}`);
   } else {
@@ -188,6 +189,7 @@ async function ensureDemoUser(playerRole: InstanceType<typeof Role>) {
     user.status = true;
     user.emailVerified = true;
     user.password = passwordHash;
+    if (!user.avatar) user.avatar = DEMO_PROFILE_AVATARS.nixhyip;
     await user.save();
     console.log(`  Updated demo user: ${DEMO_EMAIL} (balance: ${DEMO_BALANCE} BAC)`);
   }
@@ -463,7 +465,11 @@ async function seedDemoReferrals(demoUser: InstanceType<typeof User>, playerRole
       gameServer: 'asia',
       roleRef: playerRole._id,
       role: { type: 'player', name: 'Player', permissions: [] },
+      avatar: DEMO_PROFILE_AVATARS.referredDemo,
     });
+  } else if (!extraReferred.avatar) {
+    extraReferred.avatar = DEMO_PROFILE_AVATARS.referredDemo;
+    await extraReferred.save();
   }
 
   const extraDup = await ReferralHistory.findOne({ referrerId: demoUser._id, referredUserId: extraReferred._id });
@@ -583,6 +589,7 @@ export async function seedDemoUser() {
   await seedDemoReferrals(demoUser, playerRole);
   await seedDemoSupport(demoUser, admin);
   await seedDemoPayments(demoUser);
+  await ensurePlayerProfileAvatars();
 
   console.log('');
   console.log('Demo login credentials:');

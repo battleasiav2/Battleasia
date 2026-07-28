@@ -35,6 +35,8 @@ import {
     userMutedTextSx,
     userGoldButtonSx,
     userGlassDialogPaperSx,
+    userSelectMenuProps,
+    getUserChipSx,
 } from 'src/layouts/user';
 
 import { getDefaultGlassTokens, getGlassInnerSx, getGlassShellSx } from 'src/components/battle-glass-card';
@@ -333,12 +335,7 @@ export function ProfileContent({ pendingAvatarFile, onAvatarSaved }: ProfileCont
                             <Chip
                                 label={isPremiumActive ? t('common.active') : t('common.inactive')}
                                 size="small"
-                                sx={{
-                                  bgcolor: isPremiumActive ? alpha(USER_COLORS.success, 0.15) : alpha('#ffffff', 0.08),
-                                  color: isPremiumActive ? USER_COLORS.success : USER_COLORS.textMuted,
-                                  border: `1px solid ${isPremiumActive ? alpha(USER_COLORS.success, 0.35) : USER_COLORS.border}`,
-                                  fontWeight: 700,
-                                }}
+                                sx={getUserChipSx(isPremiumActive ? 'success' : 'neutral')}
                             />
                         </Stack>
                         <Typography variant="body2" sx={{ ...userMutedTextSx, mb: 1.5 }}>
@@ -448,10 +445,12 @@ export function ProfileContent({ pendingAvatarFile, onAvatarSaved }: ProfileCont
                                         {...field}
                                         displayEmpty
                                         error={!!error}
+                                        MenuProps={userSelectMenuProps}
                                         sx={{
                                             color: USER_COLORS.textPrimary,
                                             bgcolor: alpha('#000000', 0.5),
-                                            borderRadius: '2px',
+                                            borderRadius: 0,
+                                            minHeight: 48,
                                             '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
                                             '& fieldset': { border: `1px solid ${alpha('#ffffff', 0.22)}` },
                                             '&:hover fieldset': { borderColor: alpha('#ffffff', 0.38) },

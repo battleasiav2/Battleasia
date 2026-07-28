@@ -1,0 +1,1 @@
+export { ReelsModerationView } from './view';

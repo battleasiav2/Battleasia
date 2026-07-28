@@ -8,7 +8,6 @@ import { useLiveSync, LIVE_SYNC_TOPICS } from 'src/hooks/use-live-sync';
 import type { ILeaderboardEntry } from 'src/types';
 import {
   UserPageShell,
-  UserPageTitle,
   UserGlassCard,
   UserStatTile,
   UserEmptyState,
@@ -108,14 +107,11 @@ export function LeaderBoardView() {
 
   return (
     <UserPageShell>
-      <LeaderboardHero title={t('leaderboard.title')} />
-
-      <UserPageTitle
-        badge={t('leaderboard.badgeGlobalRankings')}
+      <LeaderboardHero
         title={t('leaderboard.title')}
         subtitle={t('leaderboard.subtitle')}
         action={
-          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
             {periods.map((period) => (
               <UserActionButton
                 key={period.value}

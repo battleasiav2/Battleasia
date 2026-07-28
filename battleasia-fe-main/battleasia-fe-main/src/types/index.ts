@@ -69,6 +69,7 @@ export type IPublicUser = {
     following: number;
     role: IUserRole;
     isFollowing?: boolean;
+    isBlocked?: boolean;
     isOwnProfile?: boolean;
     isPremium?: boolean;
     premiumSince?: string;

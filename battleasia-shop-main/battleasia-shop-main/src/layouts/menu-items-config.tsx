@@ -42,15 +42,21 @@ export type AccountMenuItem = {
 
 export const accountMenuItems: AccountMenuItem[] = [
   {
-    label: 'Shop',
+    label: 'nav.shop',
     href: paths.user.shop,
     icon: <Iconify icon="solar:shop-bold" />,
     mobileMenu: true,
   },
   {
-    label: 'Wallet',
+    label: 'nav.wallet',
     href: paths.user.account.wallet,
     icon: <Iconify icon="solar:wallet-bold" />,
+    mobileMenu: true,
+  },
+  {
+    label: 'nav.withdrawal',
+    href: paths.user.account.withdrawal,
+    icon: <Iconify icon="solar:card-send-bold" />,
     mobileMenu: true,
   },
 ];

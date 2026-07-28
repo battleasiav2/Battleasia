@@ -7,9 +7,19 @@ Set-Location $Root
 Write-Host "==> BattleAsia hosting build" -ForegroundColor Cyan
 Write-Host "Root: $Root"
 
-$MainDomain = if ($env:MAIN_DOMAIN) { $env:MAIN_DOMAIN } else { 'https://battleasia.net' }
-$ShopDomain = if ($env:SHOP_DOMAIN) { $env:SHOP_DOMAIN } else { 'https://shop.battleasia.net' }
-$AdminDomain = if ($env:ADMIN_DOMAIN) { $env:ADMIN_DOMAIN } else { 'https://admin.battleasia.net' }
+$MainDomain = if ($env:MAIN_DOMAIN) { $env:MAIN_DOMAIN } else { 'https://battleasia.gg' }
+$ShopDomain = if ($env:SHOP_DOMAIN) { $env:SHOP_DOMAIN } else { 'https://shop.battleasia.gg' }
+$AdminDomain = if ($env:ADMIN_DOMAIN) { $env:ADMIN_DOMAIN } else { 'https://admin.battleasia.gg' }
+
+function Get-HostNameFromUrl($Url) {
+  try {
+    return ([Uri]$Url).Host
+  } catch {
+    return ($Url -replace '^https?://', '' -replace '/.*$', '')
+  }
+}
+
+$MainHost = Get-HostNameFromUrl $MainDomain
 
 function Copy-Tree($Source, $Dest, $Exclude = @()) {
   if (-not (Test-Path $Source)) {
@@ -44,6 +54,8 @@ Pop-Location
 Write-Host "`n==> Building Shop..." -ForegroundColor Yellow
 Push-Location (Join-Path $Root 'battleasia-shop-main/battleasia-shop-main')
 $env:VITE_SERVER_URL = ''
+$env:VITE_MAIN_APP_URL = $MainDomain
+$env:VITE_BASE_PATH = '/'
 $env:VITE_CDN_URL = ''
 npm run build
 Pop-Location
@@ -64,9 +76,9 @@ $shopDist = Join-Path $Root 'battleasia-shop-main/battleasia-shop-main/dist'
 $adminBuild = Join-Path $Root 'battleasia-admin-main/battleasia-admin-main/build'
 $apiRoot = Join-Path $Root 'battleasia-api'
 
-$mainDest = Join-Path $DomainsRoot 'battleasia.net'
-$shopDest = Join-Path $DomainsRoot 'shop.battleasia.net'
-$adminDest = Join-Path $DomainsRoot 'admin.battleasia.net'
+$mainDest = Join-Path $DomainsRoot $MainHost
+$shopDest = Join-Path $DomainsRoot ("shop." + $MainHost)
+$adminDest = Join-Path $DomainsRoot ("admin." + $MainHost)
 $apiDest = Join-Path $HostingRoot 'api'
 
 foreach ($pair in @(

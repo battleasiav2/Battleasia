@@ -7,6 +7,7 @@ import {
   Stack,
   Dialog,
   Avatar,
+  Button,
   TextField,
   IconButton,
   Typography,
@@ -21,7 +22,6 @@ import useApi from 'src/hooks/use-api';
 import { fDate } from 'src/utils/format-time';
 import { getImageUrl } from 'src/utils/get-image-url';
 
-import { CONFIG } from 'src/global-config';
 import { useTranslate } from 'src/locales/use-locales';
 import {
   UserPageShell,
@@ -44,8 +44,8 @@ import { paths } from 'src/routes/paths';
 import { Logo } from 'src/components/logo';
 import {
   getDefaultGlassTokens,
-  getGlassShellSx,
   getGlassBadgeChipSx,
+  getGoldTopLineShellSx,
 } from 'src/components/battle-glass-card';
 
 import { FeedDetailSkeleton } from './components';
@@ -85,6 +85,7 @@ type Comment = {
   id: string;
   content: string;
   createdAt: Date | string;
+  parentId?: string | null;
   user: {
     id: string;
     username: string;
@@ -94,7 +95,27 @@ type Comment = {
       name: string;
     } | null;
   };
+  replies?: Comment[];
 };
+
+type ReplyTarget = {
+  id: string;
+  username: string;
+};
+
+const mapApiComment = (comment: any): Comment => ({
+  id: comment.id,
+  content: comment.content,
+  createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date(),
+  parentId: comment.parentId || null,
+  user: {
+    id: comment.user?.id || '',
+    username: comment.user?.username || 'Unknown',
+    avatar: comment.user?.avatar || '',
+    role: comment.user?.role || null,
+  },
+  replies: (comment.replies || []).map(mapApiComment),
+});
 
 const feedIconButtonSx = {
   color: USER_COLORS.textMuted,
@@ -149,6 +170,7 @@ export function FeedDetailView() {
   const [newComment, setNewComment] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
   const [commentsOpen, setCommentsOpen] = useState(false);
+  const [replyTo, setReplyTo] = useState<ReplyTarget | null>(null);
   const descriptionRef = useRef<HTMLDivElement>(null);
   const emojiPopover = usePopover();
 
@@ -183,19 +205,7 @@ export function FeedDetailView() {
             setCommentLoading(true);
             const commentsResponse = await getFeedCommentsApi(id, { limit: 50 });
             if (commentsResponse?.data?.status && commentsResponse.data.data?.results) {
-              setComments(
-                commentsResponse.data.data.results.map((comment: any) => ({
-                  id: comment.id,
-                  content: comment.content,
-                  createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date(),
-                  user: {
-                    id: comment.user?.id || '',
-                    username: comment.user?.username || 'Unknown',
-                    avatar: comment.user?.avatar || '',
-                    role: comment.user?.role || null,
-                  },
-                }))
-              );
+              setComments(commentsResponse.data.data.results.map(mapApiComment));
             }
           } catch (error) {
             console.error('Failed to fetch comments:', error);
@@ -243,28 +253,28 @@ export function FeedDetailView() {
     if (!feed || !id || !newComment.trim()) return;
     try {
       setSubmittingComment(true);
-      const response = await addFeedCommentApi(id, newComment.trim());
+      const response = await addFeedCommentApi(id, newComment.trim(), replyTo?.id);
       if (response?.data?.status && response.data.data) {
-        const comment = response.data.data;
-        setComments((prev) => [
-          {
-            id: comment.id,
-            content: comment.content,
-            createdAt: comment.createdAt ? new Date(comment.createdAt) : new Date(),
-            user: {
-              id: comment.user?.id || '',
-              username: comment.user?.username || 'Unknown',
-              avatar: comment.user?.avatar || '',
-              role: comment.user?.role || null,
-            },
-          },
-          ...prev,
-        ]);
+        const mappedComment = mapApiComment(response.data.data);
+
+        if (replyTo?.id) {
+          setComments((prev) =>
+            prev.map((comment) =>
+              comment.id === replyTo.id
+                ? { ...comment, replies: [mappedComment, ...(comment.replies || [])] }
+                : comment
+            )
+          );
+        } else {
+          setComments((prev) => [mappedComment, ...prev]);
+        }
+
         setFeed({
           ...feed,
-          totalComments: comment.totalComments || feed.totalComments + 1,
+          totalComments: response.data.data.totalComments || feed.totalComments + 1,
         });
         setNewComment('');
+        setReplyTo(null);
       }
     } catch (error) {
       console.error('Failed to add comment:', error);
@@ -272,6 +282,98 @@ export function FeedDetailView() {
       setSubmittingComment(false);
     }
   };
+
+  const renderCommentAvatar = (commentUser: Comment['user']) =>
+    commentUser.role?.name === 'admin' || commentUser.role?.name === 'official' ? (
+      <Logo
+        sx={{
+          p: 0.5,
+          width: 40,
+          height: 40,
+          bgcolor: USER_COLORS.gold,
+          borderRadius: '50%',
+        }}
+      />
+    ) : (
+      <Avatar
+        src={getImageUrl(commentUser.avatar)}
+        alt={commentUser.username}
+        sx={{
+          width: 40,
+          height: 40,
+          bgcolor: alpha('#ffffff', 0.08),
+        }}
+      />
+    );
+
+  const renderCommentBody = (comment: Comment, isReply = false) => (
+    <Box
+      key={comment.id}
+      sx={{
+        py: isReply ? 1.5 : 2,
+        pl: isReply ? 5.5 : 0,
+        borderBottom: isReply ? 'none' : `1px solid ${USER_COLORS.border}`,
+        '&:last-child': {
+          borderBottom: 'none',
+        },
+      }}
+    >
+      <Stack direction="row" spacing={1.5} alignItems="flex-start">
+        {renderCommentAvatar(comment.user)}
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5, flexWrap: 'wrap' }}>
+            <Stack direction="row" alignItems="center" spacing={0.5}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 600, color: USER_COLORS.textPrimary }}>
+                {comment.user.username}
+              </Typography>
+              {(comment.user.role?.name === 'admin' || comment.user.role?.name === 'official') && (
+                <Iconify icon="solar:verified-check-bold" width={14} sx={{ color: USER_COLORS.gold }} />
+              )}
+            </Stack>
+            <Typography variant="caption" sx={{ ...userMutedTextSx, fontSize: '0.75rem' }}>
+              {fDate(comment.createdAt)}
+            </Typography>
+          </Stack>
+          <Typography
+            variant="body2"
+            sx={{
+              color: USER_COLORS.textSubtle,
+              wordBreak: 'break-word',
+              mb: 0.75,
+            }}
+          >
+            {comment.content}
+          </Typography>
+          {!isReply ? (
+            <Button
+              size="small"
+              onClick={() => setReplyTo({ id: comment.id, username: comment.user.username })}
+              sx={{
+                minWidth: 'auto',
+                px: 0.5,
+                py: 0.25,
+                fontSize: '0.75rem',
+                color: USER_COLORS.textMuted,
+                textTransform: 'none',
+                '&:hover': {
+                  bgcolor: 'transparent',
+                  color: USER_COLORS.gold,
+                },
+              }}
+            >
+              Reply
+            </Button>
+          ) : null}
+        </Box>
+      </Stack>
+
+      {comment.replies?.length ? (
+        <Stack spacing={0} sx={{ mt: 0.5 }}>
+          {comment.replies.map((reply) => renderCommentBody(reply, true))}
+        </Stack>
+      ) : null}
+    </Box>
+  );
 
   const openInNewTab = (url: string) => {
     const anchor = document.createElement('a');
@@ -461,7 +563,7 @@ export function FeedDetailView() {
         </Stack>
       ) : null}
 
-      <Box sx={getGlassShellSx(tokens, { mb: 3, p: 2 })}>
+      <Box sx={getGoldTopLineShellSx({ mb: 3, p: 2, pt: 2.5 })}>
         <Stack direction="row" spacing={2} alignItems="center" flexWrap="wrap">
           <Stack direction="row" alignItems="center" spacing={0.75}>
             <IconButton
@@ -504,7 +606,7 @@ export function FeedDetailView() {
 
       {coverUrl ? (
         <Box
-          sx={getGlassShellSx(tokens, {
+          sx={getGoldTopLineShellSx({
             width: '100%',
             mb: 3,
             p: 0,
@@ -619,100 +721,7 @@ export function FeedDetailView() {
                 </Box>
               ) : (
                 <Stack spacing={0} sx={{ px: 2, py: 2 }}>
-                  {comments.map((comment) => (
-                    <Box
-                      key={comment.id}
-                      sx={{
-                        py: 2,
-                        borderBottom: `1px solid ${USER_COLORS.border}`,
-                        '&:last-child': {
-                          borderBottom: 'none',
-                        },
-                      }}
-                    >
-                      <Stack direction="row" spacing={1.5} alignItems="flex-start">
-                        {(comment.user.role?.name === 'admin' || comment.user.role?.name === 'official') ? (
-                          <Logo
-                            sx={{
-                              p: 0.5,
-                              width: 40,
-                              height: 40,
-                              bgcolor: USER_COLORS.gold,
-                              borderRadius: '50%',
-                            }}
-                          />
-                        ) : (
-                          <Avatar
-                            src={`${CONFIG.serverUrl}${comment.user.avatar}`}
-                            alt={comment.user.username}
-                            sx={{
-                              width: 40,
-                              height: 40,
-                              bgcolor: alpha('#ffffff', 0.08),
-                            }}
-                          />
-                        )}
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5, flexWrap: 'wrap' }}>
-                            <Stack direction="row" alignItems="center" spacing={0.5}>
-                              <Typography
-                                variant="subtitle2"
-                                sx={{
-                                  fontWeight: 600,
-                                  color: USER_COLORS.textPrimary,
-                                }}
-                              >
-                                {comment.user.username}
-                              </Typography>
-                              {(comment.user.role?.name === 'admin' || comment.user.role?.name === 'official') && (
-                                <Iconify
-                                  icon="solar:verified-check-bold"
-                                  width={14}
-                                  sx={{ color: USER_COLORS.gold }}
-                                />
-                              )}
-                            </Stack>
-                            <Typography
-                              variant="caption"
-                              sx={{
-                                ...userMutedTextSx,
-                                fontSize: '0.75rem',
-                              }}
-                            >
-                              {fDate(comment.createdAt)}
-                            </Typography>
-                          </Stack>
-                          <Typography
-                            variant="body2"
-                            sx={{
-                              color: USER_COLORS.textSubtle,
-                              wordBreak: 'break-word',
-                              mb: 1,
-                            }}
-                          >
-                            {comment.content}
-                          </Typography>
-                          {/* <Button
-                            size="small"
-                            sx={{
-                              minWidth: 'auto',
-                              px: 1,
-                              py: 0.5,
-                              fontSize: '0.75rem',
-                              color: 'text.secondary',
-                              textTransform: 'none',
-                              '&:hover': {
-                                bgcolor: 'transparent',
-                                color: 'text.primary',
-                              },
-                            }}
-                          >
-                            Reply
-                          </Button> */}
-                        </Box>
-                      </Stack>
-                    </Box>
-                  ))}
+                  {comments.map((comment) => renderCommentBody(comment))}
                 </Stack>
               )}
             </DialogContent>
@@ -724,10 +733,33 @@ export function FeedDetailView() {
                 bgcolor: alpha('#000000', 0.35),
               }}
             >
-              <Box sx={{ position: 'relative' }}>
+              {replyTo ? (
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  sx={{ px: 2, pt: 1.5, pb: 0.5 }}
+                >
+                  <Typography sx={{ fontSize: 12, color: USER_COLORS.textMuted }}>
+                    Replying to <Box component="span" sx={{ color: USER_COLORS.gold, fontWeight: 700 }}>{replyTo.username}</Box>
+                  </Typography>
+                  <Button
+                    size="small"
+                    onClick={() => setReplyTo(null)}
+                    sx={{ minWidth: 'auto', color: USER_COLORS.textMuted, textTransform: 'none' }}
+                  >
+                    Cancel
+                  </Button>
+                </Stack>
+              ) : null}
+              <Box sx={{ position: 'relative', px: replyTo ? 2 : 0, pb: replyTo ? 2 : 0 }}>
                 <TextField
                   fullWidth
-                  placeholder={`Add a comment for ${feed.author?.name || 'this post'}...`}
+                  placeholder={
+                    replyTo
+                      ? `Reply to ${replyTo.username}...`
+                      : `Add a comment for ${feed.author?.name || 'this post'}...`
+                  }
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   onKeyDown={(e) => {

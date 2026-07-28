@@ -68,6 +68,9 @@ if (Test-Path (Join-Path $Root 'battleasia-api/package-lock.json')) {
   Copy-Item (Join-Path $Root 'battleasia-api/package-lock.json') (Join-Path $ApiOut 'package-lock.json') -Force
 }
 Copy-Item (Join-Path $Root 'hosting/api/ecosystem.config.cjs') (Join-Path $ApiOut 'ecosystem.config.cjs') -Force -ErrorAction SilentlyContinue
+if (Test-Path (Join-Path $Root 'hosting/api/.env')) {
+  Copy-Item (Join-Path $Root 'hosting/api/.env') (Join-Path $ApiOut '.env') -Force
+}
 Copy-Item (Join-Path $Root '.env.nixbazar.example') (Join-Path $ApiOut '.env.example') -Force
 
 Write-Host "`nDone! Upload:" -ForegroundColor Green

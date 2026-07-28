@@ -180,7 +180,21 @@ export default function CustomerSupportDetailView() {
         }
 
         if (response?.data?.status && response?.data?.data) {
-          // Message will be added via socket event, no need to add here
+          // Prefer socket; also merge from HTTP so sender sees reply immediately
+          const msg = response.data.data;
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === msg.id)) return prev;
+            return [...prev, {
+              id: msg.id,
+              body: msg.body,
+              senderId: msg.senderId,
+              senderName: msg.senderName,
+              senderAvatar: msg.senderAvatar,
+              createdAt: new Date(msg.createdAt),
+              isAdmin: msg.isAdmin,
+              attachments: msg.attachments || [],
+            }];
+          });
           toast.success('Message sent');
         }
       } catch (error: any) {
@@ -419,11 +433,19 @@ export default function CustomerSupportDetailView() {
           >
             {user.username?.charAt(0) || 'U'}
           </Avatar>
-          <Box sx={{ flex: 1 }}>
-            <Typography variant="subtitle1">{user.username || 'Unknown User'}</Typography>
-            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-              {user.email || ''}
+          <Box sx={{ flex: 1, minWidth: 0 }}>
+            <Typography variant="subtitle1" noWrap>
+              {conversation?.subject || 'Support Ticket'}
             </Typography>
+            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                {user.username || 'Unknown User'}
+                {user.email ? ` · ${user.email}` : ''}
+              </Typography>
+              {conversation?.category ? (
+                <Chip label={conversation.category} size="small" variant="outlined" />
+              ) : null}
+            </Stack>
           </Box>
           <Chip
             label={conversation?.status || 'unknown'}
@@ -443,7 +465,7 @@ export default function CustomerSupportDetailView() {
               onClick={handleCloseConversation}
               startIcon={<Iconify icon="solar:close-circle-bold" />}
             >
-              Close
+              Close Ticket
             </Button>
           )}
         </Box>

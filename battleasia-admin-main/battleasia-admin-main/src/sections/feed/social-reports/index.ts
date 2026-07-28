@@ -1,0 +1,1 @@
+export { SocialReportsView } from './view';

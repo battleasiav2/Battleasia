@@ -12,6 +12,7 @@ import ButtonBase from '@mui/material/ButtonBase';
 import IconButton from '@mui/material/IconButton';
 import ListItemText from '@mui/material/ListItemText';
 import InputAdornment from '@mui/material/InputAdornment';
+import { alpha } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
 import { FlagIcon } from 'src/components/flag-icon';
@@ -20,6 +21,8 @@ import { SearchNotFound } from 'src/components/search-not-found';
 import type { CountryListProps } from './types';
 
 // ----------------------------------------------------------------------
+
+const GOLD = '#f59e0b';
 
 export function CountryListPopover({
   sx,
@@ -97,7 +100,7 @@ export function CountryListPopover({
   );
 
   const renderList = () => (
-    <MenuList>
+    <MenuList sx={{ py: 0.5 }}>
       {dataFiltered.map((country) => (
         <MenuItem
           key={country.code}
@@ -108,18 +111,36 @@ export function CountryListPopover({
             onSearchCountry('');
             onClickCountry(country.code as Country);
           }}
+          sx={{
+            minHeight: 48,
+            py: 1.15,
+            px: 1.5,
+            borderRadius: 0,
+            gap: 1,
+            color: alpha('#ffffff', 0.9),
+            '&:hover': { bgcolor: alpha(GOLD, 0.12) },
+            '&.Mui-selected': {
+              bgcolor: alpha(GOLD, 0.18),
+              '&:hover': { bgcolor: alpha(GOLD, 0.24) },
+            },
+          }}
         >
           <FlagIcon
             code={country.code}
-            sx={{ mr: 1, width: 22, height: 22, borderRadius: '50%' }}
+            sx={{ mr: 0.5, width: 24, height: 24, borderRadius: '50%', flexShrink: 0 }}
           />
 
           <ListItemText
             primary={country.label}
             secondary={`${country.code} (+${country.phone})`}
             slotProps={{
-              primary: { noWrap: true, sx: { typography: 'body2' } },
-              secondary: { sx: { typography: 'caption' } },
+              primary: {
+                noWrap: true,
+                sx: { typography: 'body2', color: '#ffffff', fontWeight: 600 },
+              },
+              secondary: {
+                sx: { typography: 'caption', color: alpha('#ffffff', 0.5) },
+              },
             }}
           />
         </MenuItem>
@@ -146,32 +167,50 @@ export function CountryListPopover({
           paper: {
             sx: {
               width: 1,
-              height: 320,
-              maxWidth: 320,
+              height: 340,
+              maxWidth: 340,
               display: 'flex',
               flexDirection: 'column',
+              borderRadius: 0,
+              bgcolor: alpha('#0a0a0a', 0.98),
+              border: `1px solid ${alpha('#ffffff', 0.14)}`,
+              backdropFilter: 'blur(14px)',
+              boxShadow: `0 16px 40px ${alpha('#000000', 0.65)}`,
+              overflow: 'hidden',
             },
           },
         }}
       >
-        <Box sx={{ px: 1, py: 1.5 }}>
+        <Box sx={{ px: 1.5, py: 1.5, borderBottom: `1px solid ${alpha('#ffffff', 0.08)}` }}>
           <TextField
             autoFocus
             fullWidth
             value={searchCountry}
             onChange={(event) => onSearchCountry(event.target.value)}
-            placeholder="Search..."
+            placeholder="Search country..."
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                color: '#ffffff',
+                bgcolor: alpha('#000000', 0.55),
+                borderRadius: 0,
+                minHeight: 44,
+                '& fieldset': { border: `1px solid ${alpha('#ffffff', 0.24)}` },
+                '&:hover fieldset': { borderColor: alpha('#ffffff', 0.4) },
+                '&.Mui-focused fieldset': { borderColor: GOLD, borderWidth: 1 },
+                '& input::placeholder': { color: alpha('#ffffff', 0.4), opacity: 1 },
+              },
+            }}
             slotProps={{
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
+                    <Iconify icon="eva:search-fill" sx={{ color: alpha('#ffffff', 0.45) }} />
                   </InputAdornment>
                 ),
                 endAdornment: searchCountry && (
                   <InputAdornment position="end">
                     <IconButton size="small" edge="end" onClick={() => onSearchCountry('')}>
-                      <Iconify width={16} icon="mingcute:close-line" />
+                      <Iconify width={16} icon="mingcute:close-line" sx={{ color: alpha('#ffffff', 0.55) }} />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -181,7 +220,14 @@ export function CountryListPopover({
         </Box>
 
         <Box sx={{ flex: '1 1 auto', overflowX: 'hidden' }}>
-          {notFound ? <SearchNotFound query={searchCountry} sx={{ px: 2, pt: 5 }} /> : renderList()}
+          {notFound ? (
+            <SearchNotFound
+              query={searchCountry}
+              sx={{ px: 2, pt: 5, color: alpha('#ffffff', 0.7) }}
+            />
+          ) : (
+            renderList()
+          )}
         </Box>
       </Popover>
     </>

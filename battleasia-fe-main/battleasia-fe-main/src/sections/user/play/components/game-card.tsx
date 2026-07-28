@@ -1,20 +1,27 @@
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { alpha } from '@mui/material/styles';
+import { alpha, keyframes } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
-import {
-  GLASS_CARD_RADIUS,
-  GLASS_CARD_RADIUS_SM,
-  getDefaultGlassTokens,
-  getGlassShellSx,
-} from 'src/components/battle-glass-card';
 
 import { USER_COLORS } from 'src/layouts/user/user-theme';
-import { PLAY_IMAGE_PATHS } from '../play-constants';
+import { PLAY_IMAGE_PATHS, getGameGenre, getGamePlatforms } from '../play-constants';
 
 // ----------------------------------------------------------------------
+
+const GOLD = USER_COLORS.gold;
+
+const livePulse = keyframes`
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 ${alpha('#22c55e', 0.55)}; }
+  50% { opacity: 0.7; box-shadow: 0 0 0 5px ${alpha('#22c55e', 0)}; }
+`;
+
+const goldScan = keyframes`
+  0% { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
+  35% { opacity: 0.55; }
+  100% { transform: translateX(220%) skewX(-18deg); opacity: 0; }
+`;
 
 type GameCardProps = {
   title: string;
@@ -27,9 +34,10 @@ type GameCardProps = {
 };
 
 export function GameCard(props: GameCardProps) {
-  const { title, subTitle, imageUrl, logo, comingSoon, disabled, onClick } = props;
+  const { title, subTitle, imageUrl, comingSoon, disabled, onClick } = props;
   const isDisabled = disabled || comingSoon;
-  const tokens = getDefaultGlassTokens();
+  const genre = getGameGenre(subTitle);
+  const platforms = getGamePlatforms(subTitle);
 
   return (
     <Box
@@ -42,35 +50,53 @@ export function GameCard(props: GameCardProps) {
           onClick?.();
         }
       }}
-      sx={getGlassShellSx(tokens, {
+      aria-disabled={isDisabled}
+      sx={{
+        position: 'relative',
         display: 'flex',
-        flexDirection: { xs: 'column', sm: 'row' },
-        minHeight: { xs: 'auto', sm: 148 },
-        cursor: isDisabled ? 'not-allowed' : 'pointer',
-        opacity: isDisabled ? 0.72 : 1,
-        pointerEvents: isDisabled ? 'none' : 'auto',
-        p: 0,
+        flexDirection: 'column',
+        width: 1,
+        aspectRatio: '3 / 4.4',
+        borderRadius: 0,
         overflow: 'hidden',
-        transition: 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease',
+        bgcolor: '#161618',
+        border: `1px solid ${alpha('#ffffff', 0.08)}`,
+        isolation: 'isolate',
+        cursor: isDisabled ? 'not-allowed' : 'pointer',
+        opacity: isDisabled ? 0.85 : 1,
+        boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
+        transition:
+          'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, border-color 0.35s ease',
         '&:hover': isDisabled
           ? undefined
           : {
-              transform: 'translateY(-4px)',
-              boxShadow: `0 20px 48px ${alpha('#000000', 0.75)}, 0 0 32px ${alpha(USER_COLORS.gold, 0.12)}`,
-              '& .game-card-art': {
-                transform: 'scale(1.06)',
-              },
+              transform: 'translateY(-10px)',
+              borderColor: alpha(GOLD, 0.45),
+              boxShadow: `
+                0 22px 48px ${alpha('#000000', 0.7)},
+                0 0 0 1px ${alpha(GOLD, 0.2)},
+                0 0 32px ${alpha(GOLD, 0.12)}
+              `,
+              '& .game-card-art': { transform: 'scale(1.08)' },
+              '& .game-card-scan': { opacity: 1 },
+              '& .game-card-bar': { transform: 'scaleX(1)' },
+              '& .game-card-title': { color: GOLD },
+              '& .game-card-play': { opacity: 1, transform: 'translate(-50%, 0)' },
             },
-      })}
-      aria-disabled={isDisabled}
+        '&:focus-visible': {
+          outline: `2px solid ${alpha(GOLD, 0.7)}`,
+          outlineOffset: 2,
+        },
+      }}
     >
-      {/* Art panel — landscape strip */}
+      {/* Artwork */}
       <Box
         sx={{
           position: 'relative',
-          flex: { xs: '0 0 auto', sm: '0 0 42%' },
-          minHeight: { xs: 160, sm: 'auto' },
+          flex: '1 1 72%',
+          minHeight: 0,
           overflow: 'hidden',
+          bgcolor: '#0a0a0a',
         }}
       >
         <Box
@@ -78,14 +104,37 @@ export function GameCard(props: GameCardProps) {
           component="img"
           src={imageUrl || PLAY_IMAGE_PATHS.pubgCard}
           alt={title}
+          loading="lazy"
           sx={{
             width: 1,
             height: 1,
-            minHeight: { xs: 160, sm: 148 },
             objectFit: 'cover',
-            objectPosition: 'top center',
+            objectPosition: 'center top',
             display: 'block',
-            transition: 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)',
+            transition: 'transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
+            willChange: 'transform',
+          }}
+        />
+
+        <Box
+          className="game-card-scan"
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            opacity: 0,
+            pointerEvents: 'none',
+            zIndex: 2,
+            overflow: 'hidden',
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '42%',
+              height: '100%',
+              background: `linear-gradient(90deg, transparent, ${alpha(GOLD, 0.18)}, transparent)`,
+              animation: `${goldScan} 1.1s ease-in-out`,
+            },
           }}
         />
 
@@ -93,115 +142,171 @@ export function GameCard(props: GameCardProps) {
           sx={{
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(90deg, transparent 40%, ${alpha('#000000', 0.55)} 100%)`,
-            display: { xs: 'none', sm: 'block' },
+            background: `
+              linear-gradient(180deg, ${alpha('#000000', 0.15)} 0%, transparent 30%),
+              linear-gradient(180deg, transparent 45%, ${alpha('#161618', 0.75)} 82%, #161618 100%)
+            `,
+            pointerEvents: 'none',
+            zIndex: 1,
           }}
         />
 
-        {logo ? (
+        {!isDisabled ? (
+          <Stack
+            className="game-card-play"
+            direction="row"
+            alignItems="center"
+            spacing={0.6}
+            sx={{
+              position: 'absolute',
+              left: '50%',
+              bottom: 18,
+              transform: 'translate(-50%, 8px)',
+              zIndex: 3,
+              opacity: 0,
+              px: 1.25,
+              py: 0.55,
+              bgcolor: alpha('#000000', 0.7),
+              border: `1px solid ${alpha(GOLD, 0.55)}`,
+              transition: 'opacity 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
+            }}
+          >
+            <Iconify icon="solar:play-bold" width={12} sx={{ color: GOLD }} />
+            <Typography
+              sx={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: 1.2,
+                color: '#ffffff',
+                textTransform: 'uppercase',
+              }}
+            >
+              Enter Arena
+            </Typography>
+          </Stack>
+        ) : null}
+
+        {!isDisabled ? (
           <Box
             sx={{
               position: 'absolute',
-              top: 10,
-              left: 10,
-              width: 36,
-              height: 36,
-              borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
-              bgcolor: alpha('#000000', 0.55),
-              border: `1px solid ${alpha('#ffffff', 0.12)}`,
-              display: 'flex',
+              top: 0,
+              left: 0,
+              zIndex: 3,
+              display: 'inline-flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              gap: 0.55,
+              px: 0.85,
+              py: 0.45,
+              bgcolor: alpha('#000000', 0.72),
+              borderBottom: `1px solid ${alpha('#22c55e', 0.45)}`,
+              borderRight: `1px solid ${alpha('#22c55e', 0.45)}`,
             }}
           >
-            <Box component="img" src={logo} alt={title} sx={{ width: 24, height: 24, objectFit: 'contain' }} />
+            <Box
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                bgcolor: '#22c55e',
+                animation: `${livePulse} 1.6s ease-out infinite`,
+              }}
+            />
+            <Typography sx={{ fontSize: 9, fontWeight: 800, color: '#22c55e', letterSpacing: 0.6 }}>
+              LIVE
+            </Typography>
           </Box>
-        ) : null}
-
-        {comingSoon ? (
+        ) : (
           <Box
             sx={{
               position: 'absolute',
               top: 10,
               right: 10,
-              px: 1,
-              py: 0.35,
-              borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
-              bgcolor: alpha('#000000', 0.6),
-              border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
+              zIndex: 3,
+              px: 0.8,
+              py: 0.25,
+              bgcolor: alpha('#000000', 0.65),
+              border: `1px solid ${alpha(GOLD, 0.35)}`,
             }}
           >
-            <Typography sx={{ fontSize: 9, fontWeight: 800, color: USER_COLORS.gold, letterSpacing: 0.6 }}>
+            <Typography sx={{ fontSize: 9, fontWeight: 800, color: GOLD, letterSpacing: 0.5 }}>
               SOON
             </Typography>
           </Box>
-        ) : null}
+        )}
       </Box>
 
-      {/* Content panel */}
-      <Stack
-        spacing={1.25}
+      {/* Gold accent line */}
+      <Box
+        className="game-card-bar"
         sx={{
-          flex: 1,
-          p: { xs: 2, sm: 2.25 },
-          justifyContent: 'center',
-          minWidth: 0,
+          height: 2,
+          bgcolor: GOLD,
+          transform: 'scaleX(0)',
+          transformOrigin: 'left center',
+          transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+          boxShadow: `0 0 12px ${alpha(GOLD, 0.65)}`,
+        }}
+      />
+
+      {/* Clean info panel */}
+      <Stack
+        spacing={0.75}
+        sx={{
+          flexShrink: 0,
+          px: { xs: 1.5, md: 1.75 },
+          pt: 1.4,
+          pb: 1.5,
+          bgcolor: '#161618',
+          minHeight: { xs: 96, md: 104 },
+          justifyContent: 'space-between',
         }}
       >
         <Box>
           <Typography
-            className="font-tr"
             sx={{
-              fontSize: { xs: 20, sm: 22 },
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: 1.6,
+              color: GOLD,
+              textTransform: 'uppercase',
+              mb: 0.4,
+            }}
+          >
+            BATTLE ASIA
+          </Typography>
+          <Typography
+            className="game-card-title font-tr"
+            sx={{
+              fontSize: { xs: 13, sm: 14, md: 15 },
               fontWeight: 800,
-              letterSpacing: 0.4,
+              letterSpacing: 0.5,
               color: '#ffffff',
               textTransform: 'uppercase',
-              lineHeight: 1.1,
+              lineHeight: 1.2,
+              transition: 'color 0.3s ease',
             }}
           >
             {title}
           </Typography>
-          {subTitle ? (
-            <Typography
-              sx={{
-                mt: 0.5,
-                fontSize: 11,
-                fontWeight: 700,
-                letterSpacing: 0.8,
-                color: alpha(USER_COLORS.gold, 0.85),
-                textTransform: 'uppercase',
-              }}
-            >
-              {subTitle}
-            </Typography>
-          ) : null}
         </Box>
 
-        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-          <Typography sx={{ fontSize: 12, color: alpha('#ffffff', 0.5), lineHeight: 1.4 }}>
-            {isDisabled ? 'Launching soon on Battle Asia' : 'Join tournaments and win rewards'}
-          </Typography>
-
-          <Box
+        <Stack direction="row" alignItems="center" spacing={1}>
+          {platforms.map((icon) => (
+            <Iconify key={icon} icon={icon} width={15} sx={{ color: alpha('#ffffff', 0.45) }} />
+          ))}
+          <Typography
             sx={{
-              flexShrink: 0,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 0.5,
-              px: 1.25,
-              py: 0.65,
-              borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
-              bgcolor: isDisabled ? alpha('#ffffff', 0.06) : alpha(USER_COLORS.gold, 0.14),
-              border: `1px solid ${isDisabled ? alpha('#ffffff', 0.1) : alpha(USER_COLORS.gold, 0.3)}`,
-              color: isDisabled ? alpha('#ffffff', 0.45) : USER_COLORS.gold,
+              ml: 'auto !important',
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: 0.9,
+              color: alpha('#ffffff', 0.45),
+              textTransform: 'uppercase',
             }}
           >
-            <Typography sx={{ fontSize: 10, fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase' }}>
-              {isDisabled ? 'Soon' : 'Enter'}
-            </Typography>
-            {!isDisabled ? <Iconify icon="eva:arrow-ios-forward-fill" width={12} /> : null}
-          </Box>
+            {genre}
+          </Typography>
         </Stack>
       </Stack>
     </Box>

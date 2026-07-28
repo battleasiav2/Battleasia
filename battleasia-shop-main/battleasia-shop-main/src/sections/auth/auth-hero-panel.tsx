@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from '@mui/material';
-import { alpha } from '@mui/material/styles';
+import { alpha, keyframes } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
 import { GlassStatTile, getDefaultGlassTokens } from 'src/components/battle-glass-card';
@@ -7,6 +7,11 @@ import { useTranslate } from 'src/locales/use-locales';
 import { userPageDividerSx } from 'src/layouts/user/user-theme';
 
 // ----------------------------------------------------------------------
+
+const fadeUp = keyframes`
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
 
 export function AuthHeroPanel() {
   const { t } = useTranslate();
@@ -19,7 +24,16 @@ export function AuthHeroPanel() {
   ];
 
   return (
-    <Stack spacing={3} sx={{ width: 1, maxWidth: 480, px: { md: 2 } }}>
+    <Stack
+      spacing={3}
+      sx={{
+        width: 1,
+        maxWidth: 480,
+        px: { md: 2 },
+        animation: `${fadeUp} 0.7s cubic-bezier(0.22, 1, 0.36, 1) both`,
+        animationDelay: '0.12s',
+      }}
+    >
       <Box>
         <Typography
           sx={{
@@ -36,10 +50,10 @@ export function AuthHeroPanel() {
         <Typography
           className="font-tr"
           sx={{
-            fontSize: { md: 38, lg: 46 },
+            fontSize: { md: 40, lg: 48 },
             fontWeight: 800,
             color: '#ffffff',
-            lineHeight: 1.08,
+            lineHeight: 1.05,
             textShadow: '0 2px 16px rgba(0, 0, 0, 0.85)',
           }}
         >
@@ -47,10 +61,11 @@ export function AuthHeroPanel() {
         </Typography>
         <Typography
           sx={{
-            mt: 1.5,
-            fontSize: { md: 16, lg: 18 },
-            color: alpha('#ffffff', 0.88),
-            lineHeight: 1.45,
+            mt: 1.75,
+            fontSize: { md: 16, lg: 17 },
+            color: alpha('#ffffff', 0.86),
+            lineHeight: 1.5,
+            maxWidth: 420,
             textShadow: '0 1px 8px rgba(0, 0, 0, 0.8)',
           }}
         >
@@ -59,7 +74,7 @@ export function AuthHeroPanel() {
         <Box sx={{ ...userPageDividerSx, mt: 2.5, width: 200 }} />
       </Box>
 
-      <Stack direction="row" spacing={1.5} sx={{ flexWrap: 'wrap', gap: 1.5 }}>
+      <Stack direction="row" spacing={1.25} useFlexGap sx={{ flexWrap: 'wrap' }}>
         {features.map((item) => (
           <Stack
             key={item.text}
@@ -69,13 +84,13 @@ export function AuthHeroPanel() {
             sx={{
               px: 1.5,
               py: 1,
-              borderRadius: '2px',
+              borderRadius: 0,
               bgcolor: alpha('#000000', 0.45),
               border: `1px solid ${alpha('#ffffff', 0.12)}`,
               backdropFilter: 'blur(8px)',
             }}
           >
-            <Iconify icon={item.icon} width={20} sx={{ color: '#f59e0b' }} />
+            <Iconify icon={item.icon} width={18} sx={{ color: '#f59e0b' }} />
             <Typography sx={{ fontSize: 12, fontWeight: 600, color: alpha('#fff', 0.9) }}>
               {item.text}
             </Typography>
@@ -90,9 +105,9 @@ export function AuthHeroPanel() {
           gap: 1.5,
         }}
       >
-        <GlassStatTile label={t('shop.authStatCoins')} value="BAC" tokens={glassTokens} />
-        <GlassStatTile label={t('shop.authStatMethods')} value="5+" tokens={glassTokens} />
-        <GlassStatTile label={t('shop.authStatDelivery')} value="24/7" tokens={glassTokens} />
+        <GlassStatTile icon="solar:wallet-money-bold" label={t('shop.authStatCoins')} value="BAC" tokens={glassTokens} />
+        <GlassStatTile icon="solar:card-transfer-bold" label={t('shop.authStatMethods')} value="5+" tokens={glassTokens} />
+        <GlassStatTile icon="solar:clock-circle-bold" label={t('shop.authStatDelivery')} value="24/7" tokens={glassTokens} />
       </Box>
     </Stack>
   );

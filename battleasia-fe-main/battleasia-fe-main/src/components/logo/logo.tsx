@@ -3,6 +3,7 @@ import type { LinkProps } from '@mui/material/Link';
 import { memo, forwardRef } from 'react';
 import { mergeClasses } from 'minimal-shared/utils';
 
+import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import { styled } from '@mui/material/styles';
 
@@ -14,6 +15,9 @@ import { logoClasses } from './classes';
 
 // ----------------------------------------------------------------------
 
+/** Same asset as nixbazar.com — public/logo/logo.webp */
+const LOGO_SRC = `${CONFIG.assetsDir}/logo/logo.webp`;
+
 export type LogoProps = LinkProps & {
   isSingle?: boolean;
   disabled?: boolean;
@@ -22,28 +26,19 @@ export type LogoProps = LinkProps & {
 const LogoComponent = forwardRef<HTMLAnchorElement, LogoProps>((props, ref) => {
   const { className, href = '/', isSingle = true, disabled, sx, ...other } = props;
 
-  const fullLogo = (
-    <img
-      alt="Full logo"
-      src={`${CONFIG.assetsDir}/logo/logo.webp`}
-      width="100%"
-      height="100%"
-    />
-  );
-
-
   return (
     <LogoRoot
       ref={ref}
       component={RouterLink}
       href={href}
-      aria-label="Logo"
+      aria-label="BattleAsia logo"
       underline="none"
       className={mergeClasses([logoClasses.root, className])}
       sx={[
         () => ({
           width: 40,
           height: 40,
+          overflow: 'visible',
           ...(!isSingle && { width: 102, height: 36 }),
           ...(disabled && { pointerEvents: 'none' }),
         }),
@@ -51,12 +46,24 @@ const LogoComponent = forwardRef<HTMLAnchorElement, LogoProps>((props, ref) => {
       ]}
       {...other}
     >
-      {isSingle ? fullLogo : fullLogo}
+      <Box
+        component="img"
+        alt="BattleAsia"
+        src={LOGO_SRC}
+        loading="eager"
+        decoding="sync"
+        sx={{
+          width: 1,
+          height: 1,
+          objectFit: 'contain',
+          objectPosition: 'center',
+          display: 'block',
+        }}
+      />
     </LogoRoot>
   );
 });
 
-// Memoization to prevent unnecessary re-renders
 export const Logo = memo(LogoComponent);
 
 // ----------------------------------------------------------------------

@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Account Drawer — 5 Style Demos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --gold: #f5c518;
+      --gold-dim: rgba(245, 197, 24, 0.28);
+      --gold-bg: rgba(245, 197, 24, 0.1);
+      --bg: #060608;
+      --glass: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #ffffff;
+      --muted: rgba(255, 255, 255, 0.5);
+      --error: #ff5630;
+      --radius: 4px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Public Sans', system-ui, sans-serif;
+      background: #0a0a0a;
+      color: var(--text);
+      min-height: 100vh;
+      padding: 32px 20px 48px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: var(--gold);
+    }
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 36px;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 28px;
+      max-width: 1680px;
+      margin: 0 auto;
+    }
+    .panel-wrap { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .panel-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .panel-desc {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      max-width: 300px;
+      line-height: 1.45;
+    }
+    .drawer {
+      width: 300px;
+      height: 620px;
+      border-radius: 0;
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.92) 72%),
+        url('https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&q=60') center top / cover;
+      box-shadow: -12px 0 48px rgba(0,0,0,0.65);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .close-btn {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.75);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      z-index: 2;
+    }
+    .profile {
+      text-align: center;
+      padding: 56px 20px 16px;
+    }
+    .avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 24px rgba(245,197,24,0.22);
+      margin: 0 auto 10px;
+      background: linear-gradient(135deg, #1a1a1a, #333);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: var(--gold);
+      font-size: 22px;
+    }
+    .name { font-weight: 800; font-size: 15px; letter-spacing: 0.3px; }
+    .email { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .divider {
+      height: 1px;
+      margin: 14px 20px;
+      background: linear-gradient(90deg, transparent, var(--gold-dim), var(--gold), var(--gold-dim), transparent);
+      position: relative;
+    }
+    .divider::after {
+      content: '◆';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 8px;
+      color: var(--gold);
+      background: var(--bg);
+      padding: 0 6px;
+    }
+    .menu { flex: 1; padding: 0 14px 12px; overflow: hidden; }
+    .footer {
+      padding: 14px;
+      border-top: 1px solid var(--border);
+      background: rgba(0,0,0,0.35);
+      display: flex;
+      gap: 10px;
+    }
+    .logout {
+      flex: 1;
+      height: 44px;
+      border: 1px solid rgba(255,86,48,0.5);
+      background: rgba(255,86,48,0.08);
+      color: var(--error);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .support {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.06);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .icon { width: 20px; height: 20px; opacity: 0.9; }
+
+    /* Style 1 — Current Glass Cards */
+    .s1-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 14px;
+      margin-bottom: 8px;
+      border-radius: var(--radius);
+      background: var(--glass);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.78);
+    }
+    .s1-item.active { background: var(--gold-bg); border-color: var(--gold-dim); color: var(--gold); }
+    .s1-icon {
+      width: 38px; height: 38px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .s1-item.active .s1-icon { background: rgba(245,197,24,0.18); border-color: var(--gold-dim); }
+
+    /* Style 2 — Gold Rail */
+    .s2-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 12px 13px 16px;
+      margin-bottom: 4px;
+      border-left: 3px solid transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.72);
+      transition: all 0.2s;
+    }
+    .s2-item:hover, .s2-item.active {
+      border-left-color: var(--gold);
+      background: linear-gradient(90deg, rgba(245,197,24,0.12) 0%, transparent 100%);
+      color: var(--gold);
+    }
+    .s2-item.active { font-weight: 700; }
+
+    /* Style 3 — Grid Hub */
+    .s3-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .s3-tile {
+      aspect-ratio: 1.15;
+      border-radius: var(--radius);
+      background: rgba(0,0,0,0.45);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      color: rgba(255,255,255,0.8);
+      position: relative;
+      overflow: hidden;
+    }
+    .s3-tile::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold-dim), var(--gold), var(--gold-dim), transparent);
+      opacity: 0;
+    }
+    .s3-tile:hover::before, .s3-tile.active::before { opacity: 1; }
+    .s3-tile.active { border-color: var(--gold-dim); color: var(--gold); background: var(--gold-bg); }
+    .s3-account {
+      grid-column: 1 / -1;
+      aspect-ratio: auto;
+      flex-direction: row;
+      justify-content: flex-start;
+      padding: 12px 14px;
+      gap: 12px;
+    }
+
+    /* Style 4 — Top Line Cards (site glass system) */
+    .s4-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      border-radius: var(--radius);
+      background: rgba(0,0,0,0.42);
+      border: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 600;
+      overflow: hidden;
+    }
+    .s4-item::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(245,197,24,0.35) 18%, var(--gold) 50%, rgba(245,197,24,0.35) 82%, transparent);
+      box-shadow: 0 0 12px rgba(245,197,24,0.35);
+    }
+    .s4-item.active { border-color: var(--gold-dim); color: var(--gold); }
+
+    /* Style 5 — Minimal Ops */
+    .s5-list { margin-top: 6px; }
+    .s5-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.82);
+    }
+    .s5-item:last-child { border-bottom: none; }
+    .s5-item.active { color: var(--gold); }
+    .s5-item .chev { margin-left: auto; color: rgba(255,255,255,0.3); font-size: 12px; }
+    .s5-profile-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+      padding: 52px 18px 18px;
+    }
+    .s5-profile-row .avatar { margin: 0; width: 52px; height: 52px; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <h1>Account Menu — 5 Design Options</h1>
+  <p class="subtitle">Same colors, fonts &amp; menu items — only layout/style changes. Pick one to implement in the app.</p>
+
+  <div class="grid">
+    <!-- 1 Current -->
+    <div class="panel-wrap">
+      <div class="panel-label">1 · Glass Stack (Current)</div>
+      <div class="drawer">
+        <div class="close-btn">✕</div>
+        <div class="profile">
+          <div class="avatar">S</div>
+          <div class="name">SUMONBD</div>
+          <div class="email">nixhyip@gmail.com</div>
+          <div class="divider"></div>
+        </div>
+        <div class="menu">
+          <div class="s1-item active"><div class="s1-icon">👤</div> Account <span style="margin-left:auto;opacity:.4">›</span></div>
+          <div class="s1-item"><div class="s1-icon">🎮</div> Play</div>
+          <div class="s1-item"><div class="s1-icon">🛒</div> Shop</div>
+          <div class="s1-item"><div class="s1-icon">👥</div> Referral</div>
+          <div class="s1-item"><div class="s1-icon">📰</div> Feed</div>
+        </div>
+        <div class="footer"><div class="logout">LOGOUT</div><div class="support">🎧</div></div>
+      </div>
+      <p class="panel-desc">Full-width glass cards — familiar but feels generic / heavy.</p>
+    </div>
+
+    <!-- 2 Gold Rail -->
+    <div class="panel-wrap">
+      <div class="panel-label">2 · Command Rail ⭐</div>
+      <div class="drawer">
+        <div class="close-btn">✕</div>
+        <div class="profile">
+          <div class="avatar">S</div>
+          <div class="name">SUMONBD</div>
+          <div class="email">nixhyip@gmail.com</div>
+          <div class="divider"></div>
+        </div>
+        <div class="menu">
+          <div class="s2-item active">👤 &nbsp; Account <span style="margin-left:auto;opacity:.35">›</span></div>
+          <div class="s2-item">🎮 &nbsp; Play</div>
+          <div class="s2-item">🛒 &nbsp; Shop</div>
+          <div class="s2-item">👥 &nbsp; Referral</div>
+          <div class="s2-item">📰 &nbsp; Feed</div>
+        </div>
+        <div class="footer"><div class="logout">LOGOUT</div><div class="support">🎧</div></div>
+      </div>
+      <p class="panel-desc">Left gold accent bar — clean, gaming HUD feel, less boxy.</p>
+    </div>
+
+    <!-- 3 Grid Hub -->
+    <div class="panel-wrap">
+      <div class="panel-label">3 · Grid Hub</div>
+      <div class="drawer">
+        <div class="close-btn">✕</div>
+        <div class="profile" style="padding-bottom:8px">
+          <div class="avatar">S</div>
+          <div class="name">SUMONBD</div>
+          <div class="email">nixhyip@gmail.com</div>
+        </div>
+        <div class="menu">
+          <div class="s3-grid">
+            <div class="s3-tile s3-account active">👤 <span>Account ›</span></div>
+            <div class="s3-tile">🎮 <span>Play</span></div>
+            <div class="s3-tile">🛒 <span>Shop</span></div>
+            <div class="s3-tile">👥 <span>Referral</span></div>
+            <div class="s3-tile">📰 <span>Feed</span></div>
+          </div>
+        </div>
+        <div class="footer"><div class="logout">LOGOUT</div><div class="support">🎧</div></div>
+      </div>
+      <p class="panel-desc">2×2 quick-access tiles — app-launcher style, modern &amp; compact.</p>
+    </div>
+
+    <!-- 4 Top Line -->
+    <div class="panel-wrap">
+      <div class="panel-label">4 · Gold Top Line</div>
+      <div class="drawer">
+        <div class="close-btn">✕</div>
+        <div class="profile">
+          <div class="avatar">S</div>
+          <div class="name">SUMONBD</div>
+          <div class="email">nixhyip@gmail.com</div>
+          <div class="divider"></div>
+        </div>
+        <div class="menu">
+          <div class="s4-item active">👤 Account <span style="margin-left:auto;opacity:.4">›</span></div>
+          <div class="s4-item">🎮 Play</div>
+          <div class="s4-item">🛒 Shop</div>
+          <div class="s4-item">👥 Referral</div>
+          <div class="s4-item">📰 Feed</div>
+        </div>
+        <div class="footer"><div class="logout">LOGOUT</div><div class="support">🎧</div></div>
+      </div>
+      <p class="panel-desc">Matches site card system (gold top glow) — consistent with shop/play cards.</p>
+    </div>
+
+    <!-- 5 Minimal -->
+    <div class="panel-wrap">
+      <div class="panel-label">5 · Minimal Ops</div>
+      <div class="drawer">
+        <div class="close-btn">✕</div>
+        <div class="s5-profile-row">
+          <div class="avatar">S</div>
+          <div>
+            <div class="name">SUMONBD</div>
+            <div class="email">nixhyip@gmail.com</div>
+          </div>
+        </div>
+        <div class="menu s5-list">
+          <div class="s5-item active">👤 Account <span class="chev">›</span></div>
+          <div class="s5-item">🎮 Play</div>
+          <div class="s5-item">🛒 Shop</div>
+          <div class="s5-item">👥 Referral</div>
+          <div class="s5-item">📰 Feed</div>
+        </div>
+        <div class="footer"><div class="logout">LOGOUT</div><div class="support">🎧</div></div>
+      </div>
+      <p class="panel-desc">Horizontal profile + thin dividers — premium, lightweight, less clutter.</p>
+    </div>
+  </div>
+</body>
+</html>

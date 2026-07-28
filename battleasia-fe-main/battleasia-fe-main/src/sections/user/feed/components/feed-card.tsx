@@ -1,5 +1,5 @@
 import { alpha } from '@mui/material/styles';
-import { Box, Link, Stack, Avatar, Typography, IconButton } from '@mui/material';
+import { Box, Link, Stack, Avatar, Typography, IconButton, Chip } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -8,15 +8,13 @@ import { RouterLink } from 'src/routes/components';
 import { fDate } from 'src/utils/format-time';
 import { getImageUrl } from 'src/utils/get-image-url';
 
-import { USER_COLORS, userMutedTextSx } from 'src/layouts/user';
+import { USER_COLORS, getUserChipSx } from 'src/layouts/user';
 
 import { Image } from 'src/components/image';
 import { Iconify } from 'src/components/iconify';
 import { Logo } from 'src/components/logo';
 import {
-  getDefaultGlassTokens,
-  getGlassShellSx,
-  getGlassBadgeChipSx,
+  getGoldTopLineShellSx,
 } from 'src/components/battle-glass-card';
 
 import { getFeedCoverUrl, isOfficialAuthor, type FeedItem } from '../feed-types';
@@ -27,6 +25,7 @@ type FeedCardProps = {
   feed: FeedItem;
   publishedAtLabel: string;
   onLike: (e: React.MouseEvent, feedId: string) => void;
+  onSave?: (e: React.MouseEvent, feedId: string) => void;
 };
 
 const feedIconButtonSx = {
@@ -38,9 +37,8 @@ const feedIconButtonSx = {
   },
 };
 
-export function FeedCard({ feed, publishedAtLabel, onLike }: FeedCardProps) {
+export function FeedCard({ feed, publishedAtLabel, onLike, onSave }: FeedCardProps) {
   const router = useRouter();
-  const tokens = getDefaultGlassTokens();
   const coverUrl = getFeedCoverUrl(feed.coverUrl);
   const isOfficial = isOfficialAuthor(feed.author?.role?.name);
 
@@ -48,17 +46,20 @@ export function FeedCard({ feed, publishedAtLabel, onLike }: FeedCardProps) {
 
   return (
     <Box
-      sx={getGlassShellSx(tokens, {
+      sx={getGoldTopLineShellSx({
         p: 0,
         overflow: 'hidden',
         height: 1,
         display: 'flex',
         flexDirection: 'column',
         cursor: 'pointer',
-        transition: 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease',
+        transition: 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease, border-color 0.28s ease',
         '&:hover': {
           transform: 'translateY(-4px)',
-          boxShadow: `0 20px 48px ${alpha('#000000', 0.75)}, 0 0 28px ${alpha(USER_COLORS.gold, 0.1)}`,
+          borderColor: alpha(USER_COLORS.gold, 0.35),
+          boxShadow: `0 20px 48px ${alpha('#000000', 0.75)}, 0 0 28px ${alpha(USER_COLORS.gold, 0.12)}`,
+          '& .feed-card-bar': { transform: 'scaleX(1)' },
+          '& .feed-card-title': { color: USER_COLORS.gold },
         },
       })}
     >
@@ -92,17 +93,17 @@ export function FeedCard({ feed, publishedAtLabel, onLike }: FeedCardProps) {
         />
 
         <Box sx={{ position: 'absolute', top: 10, left: 10 }}>
-          <Box
+          <Chip
+            size="small"
+            label={feed.publish === 'published' ? 'LIVE' : 'DRAFT'}
             sx={{
-              ...getGlassBadgeChipSx(tokens),
-              bgcolor: alpha(USER_COLORS.info, 0.15),
-              border: `1px solid ${alpha(USER_COLORS.info, 0.35)}`,
+              ...getUserChipSx(feed.publish === 'published' ? 'success' : 'gold'),
+              height: 22,
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: 0.6,
             }}
-          >
-            <Typography sx={{ fontSize: 10, fontWeight: 800, px: 0.5, color: USER_COLORS.info }}>
-              {feed.publish === 'published' ? 'PUBLISHED' : 'DRAFT'}
-            </Typography>
-          </Box>
+          />
         </Box>
       </Box>
 
@@ -161,7 +162,7 @@ export function FeedCard({ feed, publishedAtLabel, onLike }: FeedCardProps) {
 
         <Box onClick={goToDetail} sx={{ flex: 1 }}>
           <Typography
-            className="font-tr"
+            className="feed-card-title font-tr"
             sx={{
               fontSize: 17,
               fontWeight: 800,
@@ -172,6 +173,7 @@ export function FeedCard({ feed, publishedAtLabel, onLike }: FeedCardProps) {
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
+              transition: 'color 0.25s ease',
             }}
           >
             {feed.title}
@@ -194,6 +196,18 @@ export function FeedCard({ feed, publishedAtLabel, onLike }: FeedCardProps) {
             dangerouslySetInnerHTML={{ __html: feed.description }}
           />
         </Box>
+
+        <Box
+          className="feed-card-bar"
+          sx={{
+            height: 2,
+            bgcolor: USER_COLORS.gold,
+            transform: 'scaleX(0)',
+            transformOrigin: 'left center',
+            transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
+            boxShadow: `0 0 12px ${alpha(USER_COLORS.gold, 0.45)}`,
+          }}
+        />
 
         <Stack
           direction="row"
@@ -233,6 +247,35 @@ export function FeedCard({ feed, publishedAtLabel, onLike }: FeedCardProps) {
             </Typography>
           </Stack>
 
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              const url = `${window.location.origin}${paths.user.feedDetail(feed.id)}`;
+              if (navigator.share) {
+                void navigator.share({ title: feed.title, url }).catch(() => undefined);
+              } else {
+                void navigator.clipboard.writeText(url);
+              }
+            }}
+            sx={feedIconButtonSx}
+          >
+            <Iconify icon="solar:share-outline" width={18} />
+          </IconButton>
+
+          {onSave ? (
+            <IconButton
+              size="small"
+              onClick={(e) => onSave(e, feed.id)}
+              sx={{
+                ...feedIconButtonSx,
+                color: feed.isSaved ? USER_COLORS.gold : USER_COLORS.textMuted,
+              }}
+            >
+              <Iconify icon={feed.isSaved ? 'solar:bookmark-bold' : 'solar:bookmark-outline'} width={18} />
+            </IconButton>
+          ) : null}
+
           <Box sx={{ flex: 1 }} />
 
           <Stack direction="row" alignItems="center" spacing={0.5}>
@@ -243,7 +286,7 @@ export function FeedCard({ feed, publishedAtLabel, onLike }: FeedCardProps) {
           </Stack>
         </Stack>
 
-        <Typography sx={{ fontSize: 11, color: alpha('#ffffff', 0.38) }}>
+        <Typography sx={{ fontSize: 11, color: USER_COLORS.textMuted }}>
           {publishedAtLabel} {fDate(feed.createdAt)}
         </Typography>
       </Stack>

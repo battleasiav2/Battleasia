@@ -48,8 +48,8 @@ export const getFeedCommentsApi = async (id: string, params?: { page?: number; l
   return axios.get(url);
 };
 
-export const addFeedCommentApi = async (id: string, content: string) =>
-  axios.post(`api/v2/feed/${id}/comments`, { content });
+export const addFeedCommentApi = async (id: string, content: string, parentId?: string) =>
+  axios.post(`api/v2/feed/${id}/comments`, { content, ...(parentId ? { parentId } : {}) });
 
 
 export const getUserFeedsApi = (id: string, params?: { page?: number; limit?: number }) => {

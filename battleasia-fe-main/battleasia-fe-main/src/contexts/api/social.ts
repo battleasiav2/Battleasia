@@ -67,9 +67,6 @@ export const createFeedPostApi = (data: {
   visibility?: string;
 }) => axios.post('api/v2/feed', data);
 
-export const toggleSaveFeedApi = (id: string, collectionName?: string) =>
-  axios.post(`api/v2/feed/${id}/save`, { collectionName });
-
 export const getSavedFeedsApi = (params?: { page?: number; limit?: number }) => {
   const query = new URLSearchParams();
   if (params?.page) query.append('page', String(params.page));
@@ -78,6 +75,18 @@ export const getSavedFeedsApi = (params?: { page?: number; limit?: number }) => 
   return axios.get(`api/v2/feed/saved/me${qs ? `?${qs}` : ''}`);
 };
 
+export const toggleSaveFeedApi = (id: string, collectionName?: string) =>
+  axios.post(`api/v2/feed/${id}/save`, collectionName ? { collectionName } : {});
+
+export const getMessagingSettingsApi = () => axios.get('api/v2/social/messaging-settings');
+
 export const blockUserApi = (id: string) => axios.post(`api/v2/users/${id}/block`);
 
 export const unblockUserApi = (id: string) => axios.delete(`api/v2/users/${id}/block`);
+
+export const submitSocialReportApi = (data: {
+  targetType: 'user' | 'feed' | 'reel';
+  targetId: string;
+  reason: string;
+  details?: string;
+}) => axios.post('api/v2/social/reports', data);

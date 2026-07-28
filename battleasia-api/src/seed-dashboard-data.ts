@@ -8,23 +8,30 @@ import { MatchParticipant } from './models/MatchParticipant.js';
 const TARGET_TOTAL_WINNINGS = 5_314_735.6;
 const PROCESSED_MATCH_COUNT = 125;
 
+/** FE public paths — unique profile icons for each bot player */
 export const FAKE_PLAYERS = [
-  { email: 'shadow@battleasia.local', username: 'ShadowHunter', pubgId: '5184729103', balance: 12450 },
-  { email: 'dragon@battleasia.local', username: 'DragonSlayer', pubgId: '6283910472', balance: 8920 },
-  { email: 'pubgking@battleasia.local', username: 'PUBGKing', pubgId: '7392048156', balance: 22100 },
-  { email: 'ninja@battleasia.local', username: 'NinjaWarrior', pubgId: '8401937265', balance: 5670 },
-  { email: 'sniper@battleasia.local', username: 'SniperElite', pubgId: '9510283746', balance: 15800 },
-  { email: 'bangla@battleasia.local', username: 'BanglaBoss', pubgId: '1628394057', balance: 9340 },
-  { email: 'desi@battleasia.local', username: 'DesiGamer', pubgId: '2739405168', balance: 4120 },
-  { email: 'asia@battleasia.local', username: 'AsiaChamp', pubgId: '3840516279', balance: 18750 },
-  { email: 'victor@battleasia.local', username: 'VictorRoyale', pubgId: '4951627380', balance: 10320 },
-  { email: 'killer@battleasia.local', username: 'KillerBee', pubgId: '5062738491', balance: 6780 },
-  { email: 'storm@battleasia.local', username: 'StormRider', pubgId: '6173849502', balance: 14560 },
-  { email: 'phantom@battleasia.local', username: 'PhantomX', pubgId: '7284950613', balance: 7890 },
-  { email: 'royal@battleasia.local', username: 'RoyalFlush', pubgId: '8395061724', balance: 11200 },
-  { email: 'cyber@battleasia.local', username: 'CyberWolf', pubgId: '9406172835', balance: 5340 },
-  { email: 'tiger@battleasia.local', username: 'TigerClaw', pubgId: '0517283946', balance: 19990 },
+  { email: 'shadow@battleasia.local', username: 'ShadowHunter', pubgId: '5184729103', balance: 12450, avatar: '/assets/images/mock/avatar/avatar-1.webp' },
+  { email: 'dragon@battleasia.local', username: 'DragonSlayer', pubgId: '6283910472', balance: 8920, avatar: '/assets/images/mock/avatar/avatar-2.webp' },
+  { email: 'pubgking@battleasia.local', username: 'PUBGKing', pubgId: '7392048156', balance: 22100, avatar: '/assets/images/mock/avatar/avatar-3.webp' },
+  { email: 'ninja@battleasia.local', username: 'NinjaWarrior', pubgId: '8401937265', balance: 5670, avatar: '/assets/images/mock/avatar/avatar-4.webp' },
+  { email: 'sniper@battleasia.local', username: 'SniperElite', pubgId: '9510283746', balance: 15800, avatar: '/assets/images/mock/avatar/avatar-5.webp' },
+  { email: 'bangla@battleasia.local', username: 'BanglaBoss', pubgId: '1628394057', balance: 9340, avatar: '/assets/images/mock/avatar/avatar-6.webp' },
+  { email: 'desi@battleasia.local', username: 'DesiGamer', pubgId: '2739405168', balance: 4120, avatar: '/assets/images/mock/avatar/avatar-7.webp' },
+  { email: 'asia@battleasia.local', username: 'AsiaChamp', pubgId: '3840516279', balance: 18750, avatar: '/assets/images/mock/avatar/avatar-8.webp' },
+  { email: 'victor@battleasia.local', username: 'VictorRoyale', pubgId: '4951627380', balance: 10320, avatar: '/assets/images/mock/avatar/avatar-9.webp' },
+  { email: 'killer@battleasia.local', username: 'KillerBee', pubgId: '5062738491', balance: 6780, avatar: '/assets/images/mock/avatar/avatar-10.webp' },
+  { email: 'storm@battleasia.local', username: 'StormRider', pubgId: '6173849502', balance: 14560, avatar: '/assets/images/mock/avatar/avatar-11.webp' },
+  { email: 'phantom@battleasia.local', username: 'PhantomX', pubgId: '7284950613', balance: 7890, avatar: '/assets/images/mock/avatar/avatar-12.webp' },
+  { email: 'royal@battleasia.local', username: 'RoyalFlush', pubgId: '8395061724', balance: 11200, avatar: '/assets/images/mock/avatar/avatar-13.webp' },
+  { email: 'cyber@battleasia.local', username: 'CyberWolf', pubgId: '9406172835', balance: 5340, avatar: '/assets/images/mock/avatar/avatar-14.webp' },
+  { email: 'tiger@battleasia.local', username: 'TigerClaw', pubgId: '0517283946', balance: 19990, avatar: '/assets/images/mock/avatar/avatar-15.webp' },
 ];
+
+export const DEMO_PROFILE_AVATARS = {
+  nixhyip: '/assets/images/mock/avatar/avatar-16.webp',
+  testplayer: '/assets/images/mock/avatar/avatar-17.webp',
+  referredDemo: '/assets/images/mock/avatar/avatar-18.webp',
+} as const;
 
 const MAPS = ['Erangel', 'Miramar', 'Sanhok', 'Vikendi', 'Livik'];
 
@@ -67,24 +74,121 @@ async function ensureFakePlayers(playerRole: InstanceType<typeof Role>) {
         gameServer: 'asia',
         roleRef: playerRole._id,
         role: { type: 'player', name: 'Player', permissions: [] },
+        avatar: profile.avatar,
       });
       console.log(`  Created player: ${profile.username}`);
+    } else if (!user.avatar || user.avatar !== profile.avatar) {
+      user.avatar = profile.avatar;
+      await user.save();
+      console.log(`  Updated avatar: ${profile.username}`);
     }
     players.push(user);
   }
 
   const testPlayer = await User.findOne({ email: 'player@battleasia.local' });
-  if (testPlayer) players.push(testPlayer);
+  if (testPlayer) {
+    if (!testPlayer.avatar || testPlayer.avatar !== DEMO_PROFILE_AVATARS.testplayer) {
+      testPlayer.avatar = DEMO_PROFILE_AVATARS.testplayer;
+      await testPlayer.save();
+      console.log('  Updated avatar: testplayer');
+    }
+    players.push(testPlayer);
+  }
 
   return players;
 }
 
+/** Sync bot/demo profile icons onto User + denormalized match snapshots */
+export async function ensurePlayerProfileAvatars() {
+  const [playerRole] = await Promise.all([Role.findOne({ type: 'player', name: 'Player' })]);
+  if (!playerRole) {
+    console.log('Player role missing — skip avatar sync');
+    return;
+  }
+
+  const players = await ensureFakePlayers(playerRole);
+
+  const demoUser = await User.findOne({ email: 'nixhyip@gmail.com' });
+  if (demoUser && (!demoUser.avatar || demoUser.avatar !== DEMO_PROFILE_AVATARS.nixhyip)) {
+    demoUser.avatar = DEMO_PROFILE_AVATARS.nixhyip;
+    await demoUser.save();
+    console.log('  Updated avatar: nixhyip');
+  }
+
+  const referred = await User.findOne({ email: 'referred.demo@battleasia.local' });
+  if (referred && (!referred.avatar || referred.avatar !== DEMO_PROFILE_AVATARS.referredDemo)) {
+    referred.avatar = DEMO_PROFILE_AVATARS.referredDemo;
+    await referred.save();
+    console.log('  Updated avatar: ReferredDemo');
+  }
+
+  const avatarByUserId = new Map<string, string>();
+  for (const user of players) {
+    if (user.avatar) avatarByUserId.set(user._id.toString(), user.avatar);
+  }
+  if (demoUser?.avatar) avatarByUserId.set(demoUser._id.toString(), demoUser.avatar);
+  if (referred?.avatar) avatarByUserId.set(referred._id.toString(), referred.avatar);
+
+  let participantUpdates = 0;
+  for (const [userId, avatar] of avatarByUserId) {
+    const res = await MatchParticipant.updateMany({ userId }, { $set: { avatar } });
+    participantUpdates += res.modifiedCount;
+  }
+
+  const seededParticipants = await MatchParticipant.find({
+    userId: { $in: [...avatarByUserId.keys()] },
+  }).select('_id userId');
+
+  const avatarByParticipantId = new Map<string, string>();
+  for (const p of seededParticipants) {
+    const avatar = avatarByUserId.get(p.userId.toString());
+    if (avatar) avatarByParticipantId.set(p._id.toString(), avatar);
+  }
+
+  const matches = await Match.find({ 'results.0': { $exists: true } }).select('_id results');
+  let matchUpdates = 0;
+  for (const match of matches) {
+    let changed = false;
+    for (const row of match.results || []) {
+      const avatar = avatarByParticipantId.get(row.participantId?.toString?.() || '');
+      if (avatar && row.avatar !== avatar) {
+        row.avatar = avatar;
+        changed = true;
+      }
+    }
+    if (changed) {
+      match.markModified('results');
+      await match.save();
+      matchUpdates += 1;
+    }
+  }
+
+  console.log(`Avatar sync done — participants: ${participantUpdates}, matches: ${matchUpdates}`);
+}
+
 export { ensureFakePlayers };
+
+async function logDemoPlayUrls() {
+  const liveMatch = await Match.findOne({ status: 'start' }).select('_id matchName').lean();
+  const resultMatch = await Match.findOne({ 'results.0': { $exists: true } }).select('_id matchName').lean();
+  const pubgGame = await Game.findOne({ packageName: 'com.tencent.ig' }).select('_id name').lean();
+
+  if (pubgGame?._id) {
+    console.log(`  Demo game matches: http://localhost:8081/user/play/${pubgGame._id}`);
+  }
+  if (liveMatch?._id) {
+    console.log(`  Demo match detail: http://localhost:8081/user/play/${liveMatch._id}/detail (${liveMatch.matchName})`);
+  }
+  if (resultMatch?._id) {
+    console.log(`  Demo match result: http://localhost:8081/user/play/${resultMatch._id}/result (${resultMatch.matchName})`);
+  }
+}
 
 export async function seedDashboardData() {
   const existing = await Match.countDocuments({ roomId: /^SEED-/ });
   if (existing >= PROCESSED_MATCH_COUNT + 1) {
     console.log('Dashboard seed data already exists, skipping');
+    await logDemoPlayUrls();
     return;
   }
 
@@ -229,4 +333,5 @@ export async function seedDashboardData() {
   console.log(`  Created ${PROCESSED_MATCH_COUNT} processed matches`);
   console.log(`  Target total winnings: ${TARGET_TOTAL_WINNINGS.toLocaleString()}`);
   console.log(`  Fake players available in admin: ${FAKE_PLAYERS.length}`);
+  await logDemoPlayUrls();
 }

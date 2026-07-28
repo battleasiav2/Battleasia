@@ -1,4 +1,5 @@
 export * from './game-card';
+export * from './play-arena-hero';
 export * from './play-hero-banner';
 export * from './play-page-skeleton';
 export * from './match-card';
@@ -6,6 +7,7 @@ export * from './match-room-dialog';
 export * from './match-join-dialog';
 export * from './match-page-skeleton';
 export * from './match-stat-pill';
+export * from './match-entry-win-tile';
 export * from './match-detail-hero';
 export * from './match-detail-skeleton';
 export * from './match-detail-room-panel';

@@ -1,3 +1,4 @@
+export * from './shop-arena-hero';
 export * from './shop-hero';
 export * from './shop-features';
 export * from './shop-page-skeleton';

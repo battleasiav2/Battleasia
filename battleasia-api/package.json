@@ -8,11 +8,13 @@
     "start": "node dist/index.js",
     "build": "tsc",
     "seed": "tsx src/seed.ts",
-    "seed:dashboard": "tsx -e \"import { connectDb } from './src/db/connect.js'; import { seedDashboardData } from './src/seed-dashboard-data.js'; await connectDb(); await seedDashboardData(); process.exit(0);\"",
+    "seed:dashboard": "tsx src/run-seed-dashboard.ts",
     "seed:demo": "tsx src/run-seed-demo.ts",
     "seed:games": "tsx src/run-seed-games.ts",
     "reset-admin": "tsx src/reset-admin.ts",
     "seed:feed": "tsx src/run-seed-feed.ts",
+    "seed:social": "tsx src/run-seed-social.ts",
+    "sync:avatars": "tsx src/run-sync-avatars.ts",
     "optimize:images": "node scripts/optimize-images.mjs"
   },
   "dependencies": {
@@ -27,6 +29,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.3",
     "multer": "^2.2.0",
+    "nodemailer": "^9.0.3",
     "socket.io": "^4.8.1"
   },
   "devDependencies": {
@@ -38,6 +41,7 @@
     "@types/jsonwebtoken": "^9.0.7",
     "@types/multer": "^2.2.0",
     "@types/node": "^22.10.2",
+    "@types/nodemailer": "^8.0.1",
     "sharp": "^0.35.3",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"

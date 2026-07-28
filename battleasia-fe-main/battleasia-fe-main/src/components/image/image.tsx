@@ -107,6 +107,8 @@ export const Image = forwardRef<HTMLSpanElement, ImageProps>((props, ref) => {
       <ImageImg
         src={src}
         alt={alt}
+        loading={visibleByDefault ? 'eager' : 'lazy'}
+        decoding="async"
         onLoad={handleImageLoad}
         className={imageClasses.img}
         {...slotProps?.img}

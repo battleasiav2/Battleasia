@@ -43,11 +43,11 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
       <GlassPanelCard
         sx={{
           width: 1,
+          borderRadius: 0,
           p: wide ? { xs: 3, sm: 4, md: 4.5 } : { xs: 3.25, sm: 4.5 },
           boxShadow: `
             0 28px 60px ${alpha('#000000', 0.65)},
-            0 0 56px ${alpha('#f59e0b', 0.08)},
-            inset 0 1px 0 ${alpha('#ffffff', 0.12)}
+            0 0 40px ${alpha('#f5c518', 0.08)}
           `,
         }}
       >

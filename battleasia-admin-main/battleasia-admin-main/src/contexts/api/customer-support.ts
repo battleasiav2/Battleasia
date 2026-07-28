@@ -8,9 +8,14 @@ export interface IConversation {
     email: string;
     avatar?: string;
   };
+  subject?: string;
+  category?: 'payment' | 'match' | 'account' | 'other';
   status: 'open' | 'closed' | 'pending';
   createdAt: string;
   lastMessageAt: string;
+  previewBody?: string;
+  previewAttachments?: string[];
+  attachmentCount?: number;
 }
 
 export interface IMessage {
@@ -58,6 +63,5 @@ export const sendMessageApi = async (data: {
   attachments?: string[];
 }) => axios.post('api/v2/customer-support/message', data);
 
-export const closeConversationApi = async (conversationId: string, deleteMessages = true) =>
+export const closeConversationApi = async (conversationId: string, deleteMessages = false) =>
   axios.patch(`api/v2/customer-support/conversation/${conversationId}/close`, { deleteMessages });
-

@@ -6,7 +6,8 @@ import { setSocketServer } from './utils/socket.js';
 import bcrypt from 'bcryptjs';
 async function ensureAdminUser() {
     const email = env.adminEmail.toLowerCase();
-    let admin = await User.findOne({ email });
+    let admin = (await User.findOne({ email })) ||
+        (await User.findOne({ username: env.adminUsername }));
     const passwordHash = await bcrypt.hash(env.adminPassword, 10);
     if (!admin) {
         await User.create({
@@ -21,15 +22,18 @@ async function ensureAdminUser() {
         console.log(`Seeded admin user: ${env.adminEmail}`);
         return;
     }
+    admin.email = email;
+    admin.username = env.adminUsername;
+    admin.status = true;
+    admin.emailVerified = true;
+    if (admin.role?.type !== 'admin') {
+        admin.role = { type: 'admin', name: 'Admin', permissions: admin.role?.permissions || [] };
+    }
     if (env.syncAdminPassword) {
         admin.password = passwordHash;
-        admin.status = true;
-        if (admin.role?.type !== 'admin') {
-            admin.role = { type: 'admin', name: 'Admin', permissions: admin.role?.permissions || [] };
-        }
-        await admin.save();
         console.log('Admin password synced from env (SYNC_ADMIN_PASSWORD=true)');
     }
+    await admin.save();
 }
 async function main() {
     await connectDb();

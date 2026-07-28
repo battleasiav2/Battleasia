@@ -1,4 +1,5 @@
 import type { SxProps, Theme } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 
 import { GLASS_CARD_RADIUS, GLASS_CARD_RADIUS_SM } from './glass-card-tokens';
 import { glassShimmerKeyframes, glassShimmerLayer } from './glass-shimmer';
@@ -103,12 +104,16 @@ export function getGlassBadgeChipSx(tokens: GlassCardTokens): SxProps<Theme> {
     letterSpacing: 0.5,
     height: 26,
     bgcolor: tokens.badge.bgcolor,
-    color: tokens.badge.color,
+    color: `${tokens.badge.color} !important`,
     border: tokens.badge.border,
     boxShadow: tokens.badge.boxShadow,
     backdropFilter: 'blur(12px)',
     WebkitBackdropFilter: 'blur(12px)',
-    '& .MuiChip-label': { px: 1 },
+    '& .MuiChip-label': {
+      px: 1,
+      color: `${tokens.badge.color} !important`,
+      fontWeight: 700,
+    },
   };
 }
 
@@ -127,4 +132,31 @@ export function getGlassIconButtonSx(): SxProps<Theme> {
       borderColor: 'rgba(255, 255, 255, 0.22)',
     },
   };
+}
+
+const GOLD_TOP_LINE = '#f5c518';
+
+const goldTopLineAccentSx: SxProps<Theme> = {
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 2,
+    zIndex: 2,
+    pointerEvents: 'none',
+    background: `linear-gradient(90deg, transparent 0%, ${alpha(GOLD_TOP_LINE, 0.35)} 18%, ${GOLD_TOP_LINE} 50%, ${alpha(GOLD_TOP_LINE, 0.35)} 82%, transparent 100%)`,
+    boxShadow: `0 0 14px ${alpha(GOLD_TOP_LINE, 0.45)}`,
+  },
+};
+
+export function getGoldTopLineShellSx(extra?: SxProps<Theme>): SxProps<Theme> {
+  const tokens = getDefaultGlassTokens();
+  return mergeGlassSx(getGlassShellSx(tokens), goldTopLineAccentSx, extra);
+}
+
+export function getGoldTopLineCardSx(extra?: SxProps<Theme>): SxProps<Theme> {
+  const tokens = getDefaultGlassTokens();
+  return mergeGlassSx(getGlassInnerSx(tokens), goldTopLineAccentSx, extra);
 }

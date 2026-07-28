@@ -1,20 +1,25 @@
 import type { IconButtonProps } from '@mui/material/IconButton';
 
 import { m } from 'framer-motion';
-import { useState, useCallback } from 'react';
 import { usePopover } from 'minimal-shared/hooks';
 
-import MenuList from '@mui/material/MenuList';
-import MenuItem from '@mui/material/MenuItem';
-import IconButton from '@mui/material/IconButton';
-
-import { FlagIcon } from 'src/components/flag-icon';
-import { CustomPopover } from 'src/components/custom-popover';
-import { varTap, varHover, transitionTap } from 'src/components/animate';
-import { USER_COLORS } from 'src/layouts/user/user-theme';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import ButtonBase from '@mui/material/ButtonBase';
+import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 
+import { FlagIcon } from 'src/components/flag-icon';
+import { Iconify } from 'src/components/iconify';
+import { CustomPopover } from 'src/components/custom-popover';
+import { varTap, varHover, transitionTap } from 'src/components/animate';
+import { useTranslate } from 'src/locales/use-locales';
+import { USER_COLORS } from 'src/layouts/user/user-theme';
+
 // ----------------------------------------------------------------------
+
+const GOLD = USER_COLORS.gold;
+const RTL_LANGS = new Set(['ar']);
 
 export type LanguagePopoverProps = IconButtonProps & {
   data?: {
@@ -24,67 +29,189 @@ export type LanguagePopoverProps = IconButtonProps & {
   }[];
 };
 
+function getLangMeta(value: string) {
+  const code = value.toUpperCase();
+  return RTL_LANGS.has(value) ? `${code} · RTL` : code;
+}
+
 export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProps) {
   const { open, anchorEl, onClose, onOpen } = usePopover();
+  const { t, currentLang, onChangeLang } = useTranslate();
 
-  const [locale, setLocale] = useState<string>(data[0].value);
-
-  const currentLang = data.find((lang) => lang.value === locale);
-
-  const handleChangeLang = useCallback(
-    (newLang: string) => {
-      setLocale(newLang);
-      onClose();
-    },
-    [onClose]
-  );
+  const handleChangeLang = async (newLang: string) => {
+    await onChangeLang(newLang as any);
+    onClose();
+  };
 
   const renderMenuList = () => (
-    <CustomPopover open={open} anchorEl={anchorEl} onClose={onClose}>
-      <MenuList sx={{ width: 160, minHeight: 72 }}>
-        {data?.map((option) => (
-          <MenuItem
-            key={option.value}
-            selected={option.value === currentLang?.value}
-            onClick={() => handleChangeLang(option.value)}
-          >
-            <FlagIcon code={option.countryCode} />
-            {option.label}
-          </MenuItem>
-        ))}
-      </MenuList>
+    <CustomPopover
+      open={open}
+      anchorEl={anchorEl}
+      onClose={onClose}
+      slotProps={{
+        paper: {
+          sx: {
+            p: 0,
+            width: 280,
+            overflow: 'hidden',
+            borderRadius: 0,
+            bgcolor: alpha('#10141c', 0.96),
+            border: `1px solid ${alpha('#ffffff', 0.08)}`,
+            boxShadow: `0 20px 50px ${alpha('#000000', 0.55)}`,
+            backdropFilter: 'blur(16px)',
+          },
+        },
+        arrow: { hide: true },
+      }}
+    >
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        sx={{
+          px: 2,
+          py: 1.75,
+          borderBottom: `1px solid ${alpha('#ffffff', 0.07)}`,
+        }}
+      >
+        <Typography
+          className="font-tr"
+          sx={{ color: GOLD, fontWeight: 700, fontSize: 20, lineHeight: 1 }}
+        >
+          {t('language.title')}
+        </Typography>
+        <Typography sx={{ color: alpha('#ffffff', 0.45), fontSize: 14, fontWeight: 500 }}>
+          {data.length}
+        </Typography>
+      </Stack>
+
+      <Stack divider={<Box sx={{ height: 1, bgcolor: alpha('#ffffff', 0.06) }} />}>
+        {data.map((option) => {
+          const isSelected = option.value === currentLang?.value;
+
+          return (
+            <ButtonBase
+              key={option.value}
+              onClick={() => handleChangeLang(option.value)}
+              sx={{
+                width: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 1.5,
+                px: 2,
+                py: 1.35,
+                textAlign: 'left',
+                bgcolor: isSelected ? alpha(GOLD, 0.1) : 'transparent',
+                transition: 'background-color 0.2s ease',
+                '&:hover': {
+                  bgcolor: isSelected ? alpha(GOLD, 0.14) : alpha('#ffffff', 0.04),
+                },
+              }}
+            >
+              <Stack direction="row" alignItems="center" spacing={1.5} sx={{ minWidth: 0 }}>
+                <Box
+                  sx={{
+                    width: 36,
+                    height: 24,
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                    boxShadow: `0 1px 4px ${alpha('#000000', 0.35)}`,
+                  }}
+                >
+                  <FlagIcon code={option.countryCode} sx={{ width: 36, height: 24 }} />
+                </Box>
+
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography
+                    className="font-tr"
+                    sx={{
+                      color: isSelected ? GOLD : '#f3f3f3',
+                      fontSize: 16,
+                      fontWeight: isSelected ? 700 : 500,
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {option.label}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: alpha('#ffffff', 0.42),
+                      fontSize: 12,
+                      fontWeight: 500,
+                      letterSpacing: '0.04em',
+                      mt: 0.2,
+                    }}
+                  >
+                    {getLangMeta(option.value)}
+                  </Typography>
+                </Box>
+              </Stack>
+
+              {isSelected ? (
+                <Box
+                  sx={{
+                    width: 28,
+                    height: 28,
+                    bgcolor: GOLD,
+                    display: 'grid',
+                    placeItems: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Iconify icon="eva:checkmark-fill" width={18} sx={{ color: '#111' }} />
+                </Box>
+              ) : (
+                <Box sx={{ width: 28, height: 28, flexShrink: 0 }} />
+              )}
+            </ButtonBase>
+          );
+        })}
+      </Stack>
     </CustomPopover>
   );
 
   return (
     <>
-      <IconButton
+      <ButtonBase
         component={m.button}
         whileTap={varTap(0.96)}
-        whileHover={varHover(1.04)}
+        whileHover={varHover(1.03)}
         transition={transitionTap()}
         aria-label="Languages button"
         onClick={onOpen}
         sx={[
           {
-            p: 0.75,
-            width: 40,
-            height: 40,
-            borderRadius: 1.5,
-            border: `1px solid ${alpha('#ffffff', 0.12)}`,
-            bgcolor: alpha('#000000', 0.35),
-            backdropFilter: 'blur(8px)',
-            ...(open && {
-              bgcolor: alpha(USER_COLORS.gold, 0.12),
-              borderColor: alpha(USER_COLORS.gold, 0.35),
-            }),
+            p: 0,
+            width: { xs: 36, sm: 42 },
+            height: { xs: 32, sm: 38 },
+            borderRadius: 0,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: open ? alpha(GOLD, 0.12) : alpha('#080c14', 0.55),
+            border: '2px solid',
+            borderColor: open ? alpha(GOLD, 0.5) : alpha('#ffffff', 0.18),
+            boxShadow: `inset 0 0 0 1px ${alpha('#000000', 0.25)}`,
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              bgcolor: alpha('#0c121c', 0.7),
+              borderColor: alpha(GOLD, 0.45),
+            },
           },
           ...(Array.isArray(sx) ? sx : [sx]),
         ]}
         {...other}
       >
-        <FlagIcon code={currentLang?.countryCode} />
-      </IconButton>
+        <FlagIcon
+          code={currentLang?.countryCode}
+          sx={{
+            width: { xs: 24, sm: 28 },
+            height: { xs: 18, sm: 21 },
+            borderRadius: 0,
+          }}
+        />
+      </ButtonBase>
 
       {renderMenuList()}
     </>

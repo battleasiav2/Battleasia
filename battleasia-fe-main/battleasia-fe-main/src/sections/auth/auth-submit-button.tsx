@@ -1,5 +1,4 @@
 import LoadingButton from '@mui/lab/LoadingButton';
-import { alpha } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify/iconify';
 
@@ -29,20 +28,21 @@ export function AuthSubmitButton({
       fullWidth
       size="large"
       type={type}
-      variant="contained"
+      variant="outlined"
+      disableElevation
       loading={loading}
       loadingIndicator={loadingIndicator}
       disabled={disabled}
       onClick={onClick}
       startIcon={
-        <Iconify icon="game-icons:crossed-swords" width={22} sx={{ color: '#111111' }} />
+        <Iconify icon="game-icons:crossed-swords" width={22} />
       }
       sx={{
         ...authSubmitButtonSx,
-        '& .MuiLoadingButton-loadingIndicator': { color: '#111111' },
         '&.Mui-disabled': {
-          background: `linear-gradient(180deg, ${alpha('#f59e0b', 0.45)} 0%, ${alpha('#d97706', 0.45)} 100%)`,
-          color: alpha('#111111', 0.5),
+          bgcolor: 'rgba(0,0,0,0.35)',
+          color: 'rgba(245, 197, 24, 0.35)',
+          borderColor: 'rgba(245, 197, 24, 0.22)',
         },
       }}
     >

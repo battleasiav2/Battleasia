@@ -119,9 +119,14 @@ export const MATCH_RANK_COLORS: Record<number, string> = {
 };
 
 export function formatResultAvatarUrl(path?: string) {
-  if (!path) return '/assets/images/avatar/default-avatar.webp';
-  if (path.startsWith('data:') || path.startsWith('http')) return path;
-  if (CONFIG.serverUrl) return `${CONFIG.serverUrl}${path}`;
+  if (!path) return '/assets/images/mock/avatar/avatar-1.webp';
+  if (path.startsWith('data:') || path.startsWith('http') || path.startsWith('blob:')) return path;
+  // FE public assets stay relative to the site origin
+  if (path.startsWith('/assets/') || path.startsWith('/logo/')) return path;
+  if (CONFIG.serverUrl) {
+    const base = CONFIG.serverUrl.replace(/\/$/, '');
+    return `${base}${path.startsWith('/') ? path : `/${path}`}`;
+  }
   return path;
 }
 

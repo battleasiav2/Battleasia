@@ -16,6 +16,9 @@ const axiosInstance = axios.create({ baseURL: CONFIG.serverUrl, withCredentials:
 axiosInstance.interceptors.request.use(
   (config: any) => {
     config.baseURL = CONFIG.serverUrl;
+    if (config.url && !config.url.startsWith('http') && !config.url.startsWith('/')) {
+      config.url = `/${config.url}`;
+    }
     const state = store.getState() as any;
     const accessToken = state.auth.token;
     if (accessToken) {

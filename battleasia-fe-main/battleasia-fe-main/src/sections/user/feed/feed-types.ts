@@ -15,6 +15,7 @@ export type FeedItem = {
   totalComments: number;
   totalLikes: number;
   isLiked?: boolean;
+  isSaved?: boolean;
   createdAt: Date | string;
   author: {
     id: string;
@@ -56,6 +57,7 @@ export const mapApiFeedToItem = (feed: any): FeedItem => ({
   totalComments: feed.totalComments || 0,
   totalLikes: feed.totalLikes || 0,
   isLiked: feed.isLiked || false,
+  isSaved: feed.isSaved || false,
   createdAt: feed.createdAt ? new Date(feed.createdAt) : new Date(),
   author: {
     id: feed.author?.id || '',

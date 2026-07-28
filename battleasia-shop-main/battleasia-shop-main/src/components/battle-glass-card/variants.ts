@@ -150,7 +150,7 @@ export const GLASS_CARD_VARIANTS: Record<GlassCardVariant, GlassCardTokens> = {
       border: `1px solid ${alpha('#ffffff', 0.1)}`,
       boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.1)}`,
       overlay: `linear-gradient(180deg, ${alpha('#ffffff', 0.06)} 0%, transparent 70%)`,
-      labelColor: alpha('#94a3b8', 0.95),
+      labelColor: '#c5ced9',
       valueColor: '#ffffff',
       suffixColor: alpha('#f5c518', 0.9),
       shimmer: true,

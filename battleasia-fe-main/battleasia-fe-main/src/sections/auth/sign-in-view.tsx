@@ -103,7 +103,7 @@ export function SignInView() {
           <Field.Text
             name="email"
             label={t('auth.emailAddress')}
-            placeholder="Example@domain.com"
+            placeholder={t('auth.emailPlaceholder')}
             slotProps={{
               ...authFieldSlotProps,
               input: {
@@ -132,6 +132,11 @@ export function SignInView() {
                 ...authFieldSlotProps,
                 input: {
                   ...authFieldSlotProps.input,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: '#f59e0b' }} />
+                    </InputAdornment>
+                  ),
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={showPassword.onToggle} edge="end" sx={{ color: 'rgba(255,255,255,0.7)' }}>

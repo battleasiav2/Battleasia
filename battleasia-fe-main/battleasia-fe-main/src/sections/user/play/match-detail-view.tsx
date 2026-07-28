@@ -148,8 +148,8 @@ export function MatchDetailView() {
         </Stack>
         <UserEmptyState
           icon="solar:gamepad-bold-duotone"
-          title={t('match.resultNotFound')}
-          description={t('match.resultNotFoundDescription')}
+          title={t('match.matchNotFound')}
+          description={t('match.matchNotFoundDescription')}
           actionLabel={t('play.title')}
           onAction={() => navigate(paths.user.play)}
         />
@@ -228,7 +228,8 @@ export function MatchDetailView() {
               </Stack>
 
               <Button
-                variant="contained"
+                variant="outlined"
+                disableElevation
                 fullWidth
                 onClick={handleJoinMatch}
                 disabled={matchDetail.isJoined || joining || (matchDetail.entryFee ?? 0) > balance}

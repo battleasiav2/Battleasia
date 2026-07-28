@@ -3,11 +3,11 @@ import { alpha } from '@mui/material/styles';
 
 import type { ILeaderboardEntry } from 'src/types';
 import { CONFIG } from 'src/global-config';
-import { getImageUrl } from 'src/utils/get-image-url';
+import { getAvatarUrl } from 'src/utils/get-image-url';
 
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, userMutedTextSx } from 'src/layouts/user';
+import { USER_COLORS, userMutedTextSx, getUserChipSx } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
@@ -60,7 +60,7 @@ export function LeaderboardTable({ rows, labels, formatScore, getRankIcon }: Lea
       </Box>
 
       {rows.map((player) => {
-        const avatarSrc = getImageUrl(player.avatar) || undefined;
+        const avatarSrc = getAvatarUrl(player.avatar);
         const isTopRank = player.rank <= 3;
 
         return (
@@ -124,16 +124,11 @@ export function LeaderboardTable({ rows, labels, formatScore, getRankIcon }: Lea
               <Chip
                 label={player.badge}
                 size="small"
-                sx={{
-                  bgcolor: alpha(USER_COLORS.gold, 0.12),
-                  color: USER_COLORS.gold,
-                  fontWeight: 700,
-                  border: `1px solid ${alpha(USER_COLORS.gold, 0.3)}`,
-                }}
+                sx={getUserChipSx('gold')}
               />
             </Box>
 
-            <Typography sx={{ ...userMutedTextSx, fontSize: 11, display: { xs: 'none', md: 'block' } }}>
+            <Typography sx={{ ...userMutedTextSx, fontSize: 12, display: { xs: 'none', md: 'block' }, color: USER_COLORS.textSubtle }}>
               {player.lastPlayed || '—'}
             </Typography>
           </Box>

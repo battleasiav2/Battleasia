@@ -19,6 +19,7 @@ import { ALL_PERMISSIONS } from './constants/permissions.js';
 import { seedDashboardData } from './seed-dashboard-data.js';
 import { seedDemoUser } from './seed-demo-user.js';
 import { seedFeedPosts } from './seed-feed-posts.js';
+import { seedSocialContent } from './seed-social-content.js';
 import { ensurePlatformGames } from './utils/ensure-games.js';
 
 async function seed() {
@@ -321,6 +322,7 @@ async function seed() {
   await seedDashboardData();
   await seedDemoUser();
   await seedFeedPosts();
+  await seedSocialContent();
 
   process.exit(0);
 }

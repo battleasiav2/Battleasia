@@ -22,28 +22,19 @@ export type LogoProps = LinkProps & {
 export const Logo = forwardRef<HTMLAnchorElement, LogoProps>((props, ref) => {
   const { className, href = '/', isSingle = true, disabled, sx, ...other } = props;
 
-  const fullLogo = (
-    <img
-      alt="Full logo"
-      src={`${CONFIG.assetsDir}/logo/logo.webp`}
-      width="100%"
-      height="100%"
-    />
-  );
-
-
   return (
     <LogoRoot
       ref={ref}
       component={RouterLink}
       href={href}
-      aria-label="Logo"
+      aria-label="BattleAsia logo"
       underline="none"
       className={mergeClasses([logoClasses.root, className])}
       sx={[
         () => ({
           width: 40,
           height: 40,
+          overflow: 'visible',
           ...(!isSingle && { width: 102, height: 36 }),
           ...(disabled && { pointerEvents: 'none' }),
         }),
@@ -51,7 +42,13 @@ export const Logo = forwardRef<HTMLAnchorElement, LogoProps>((props, ref) => {
       ]}
       {...other}
     >
-      {isSingle ? fullLogo : fullLogo}
+      <img
+        alt="BattleAsia"
+        src={`${CONFIG.assetsDir}/logo/logo.webp`}
+        width="100%"
+        height="100%"
+        style={{ display: 'block', objectFit: 'contain', objectPosition: 'center' }}
+      />
     </LogoRoot>
   );
 });

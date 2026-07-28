@@ -1,29 +1,104 @@
 {
   "demo": {
     "lang": "English",
-    "description": "The starting point for your next project is based on MUI. Easy customization helps you build apps faster and better."
+    "description": "BattleAsia Coin Shop"
+  },
+  "language": {
+    "title": "Language"
+  },
+  "nav": {
+    "shop": "Shop",
+    "wallet": "Wallet",
+    "withdrawal": "Withdrawal",
+    "login": "Login",
+    "logout": "Logout",
+    "home": "Home",
+    "battleArena": "Battle Arena",
+    "backToMain": "Back to main site",
+    "bacBalance": "BAC Balance"
   },
   "auth": {
     "signIn": "Sign In",
     "signInToAccount": "Sign in to your account",
     "emailAddress": "Email address",
+    "emailPlaceholder": "Example@domain.com",
     "password": "Password",
     "passwordPlaceholder": "6+ characters",
     "forgotPassword": "Forgot password?",
     "dontHaveAccount": "Don't have an account?",
-    "signUp": "Sign Up"
+    "alreadyHaveAccount": "Already have an account?",
+    "signUp": "Sign Up",
+    "home": "Home",
+    "createAccount": "Create account",
+    "signUpTitle": "Create your account",
+    "signUpDescription": "Join BattleAsia Coin Shop to buy BAC and manage withdrawals."
   },
   "shop": {
     "bacShopName": "BattleAsia Coin Shop",
-    "bacDescription": "Sign in to buy BAC coins, manage your balance, and pay securely with your preferred method.",
+    "bacDescription": "Buy BAC coins, manage your balance, and checkout securely.",
     "authHeroTagline": "Official Store",
     "authHeroTitle": "Top up BAC coins instantly",
-    "authHeroSubtitle": "Secure payments, multiple currencies, and instant coin delivery after checkout.",
+    "authHeroSubtitle": "Secure payments and instant coin delivery after checkout.",
     "authFeatureInstant": "Instant delivery",
     "authFeatureSecure": "Secure checkout",
     "authFeaturePayments": "Multi-currency",
     "authStatCoins": "Shop coins",
     "authStatMethods": "Pay methods",
-    "authStatDelivery": "Support"
+    "authStatDelivery": "Support",
+    "heroTitle": "BAC Coin Shop",
+    "heroSubtitle": "Secure payments · Instant BAC delivery after approval",
+    "badgeOfficial": "Official Store",
+    "chipVerified": "Verified",
+    "yourBalance": "Your balance",
+    "coinPacks": "Coin packs",
+    "available": "available",
+    "paymentChannels": "Payment channels",
+    "active": "active",
+    "payment": "Payment",
+    "choosePayment": "Choose payment",
+    "allMethods": "All methods",
+    "priceRange": "Price range",
+    "min": "Min",
+    "max": "Max",
+    "buy": "Buy",
+    "buyNow": "Buy now",
+    "noOffers": "No coin packs found",
+    "noOffersHint": "Try adjusting filters or check back later.",
+    "loadFailed": "Failed to load coin offers"
+  },
+  "wallet": {
+    "title": "Wallet",
+    "badge": "Secure Vault",
+    "subtitle": "Manage balance, withdrawals, and transaction history.",
+    "totalBalance": "Total Balance",
+    "withdrawableAmount": "Withdrawable Amount",
+    "requestWithdrawal": "Request Withdrawal",
+    "withdraw": "Withdraw",
+    "walletHistory": "Wallet History",
+    "pendingWithdrawal": "Pending withdrawal",
+    "availableBalance": "Available Balance",
+    "confirmWithdrawal": "Confirm Withdrawal",
+    "selectCurrency": "Select Currency",
+    "coinAmount": "Coin Amount (BAC)",
+    "paymentChannel": "Payment Channel",
+    "walletAddress": "Wallet Address",
+    "youWillReceive": "You will receive (approx.)",
+    "cancel": "Cancel",
+    "confirmSubmit": "Confirm & Submit",
+    "processing": "Processing..."
+  },
+  "withdrawal": {
+    "title": "Withdrawal",
+    "badge": "Secure Payout",
+    "subtitle": "Withdraw your BAC coins to your preferred payment channel.",
+    "chip": "PAYOUT",
+    "pendingTitle": "Pending Withdrawal Exists",
+    "pendingBody": "Please wait until your pending withdrawal completes.",
+    "requestWithdrawal": "Request Withdrawal"
+  },
+  "error": {
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "We couldn’t find that page. Check the URL or go back to the shop.",
+    "goHome": "Go to shop"
   }
 }

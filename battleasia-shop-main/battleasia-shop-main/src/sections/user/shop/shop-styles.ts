@@ -2,35 +2,115 @@ import { alpha } from '@mui/material/styles';
 
 import { userMutedTextSx, USER_COLORS, userGlassDialogPaperSx } from 'src/layouts/user';
 
+// ----------------------------------------------------------------------
+
+const GOLD = USER_COLORS.gold;
+
+/**
+ * Shared arena form fields — stacked labels (not floating on the border).
+ * Use with InputLabelProps={SHOP_FIELD_LABEL_PROPS}.
+ */
+export const SHOP_FIELD_LABEL_PROPS = {
+  shrink: true,
+} as const;
+
 export const SHOP_FIELD_SX = {
-  '& .MuiOutlinedInput-root': {
-    color: USER_COLORS.textPrimary,
-    bgcolor: alpha('#000000', 0.5),
-    borderRadius: '2px',
-    fontSize: 14,
-    '& fieldset': { borderColor: alpha('#ffffff', 0.22) },
-    '&:hover fieldset': { borderColor: alpha('#ffffff', 0.38) },
-    '&.Mui-focused fieldset': { borderColor: USER_COLORS.gold },
+  '& .MuiInputLabel-root': {
+    position: 'relative' as const,
+    transform: 'none',
+    fontSize: 12,
+    fontWeight: 700,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase' as const,
+    color: alpha('#ffffff', 0.72),
+    mb: 0.85,
+    '&.Mui-focused': { color: GOLD },
+    '&.MuiInputLabel-shrink': { transform: 'none' },
   },
-  '& .MuiInputLabel-root': { color: alpha('#ffffff', 0.7) },
-  '& .MuiInputLabel-root.Mui-focused': { color: USER_COLORS.gold },
-  '& .MuiFormHelperText-root': { color: alpha('#ffffff', 0.5) },
+  '& .MuiOutlinedInput-root': {
+    color: '#ffffff',
+    bgcolor: alpha('#000000', 0.55),
+    borderRadius: 0,
+    fontSize: { xs: 15, md: 14 },
+    minHeight: { xs: 52, md: 48 },
+    transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease',
+    '& fieldset': {
+      border: `1px solid ${alpha('#ffffff', 0.24)}`,
+    },
+    '&:hover fieldset': {
+      borderColor: alpha('#ffffff', 0.4),
+    },
+    '&.Mui-focused': {
+      bgcolor: alpha('#000000', 0.65),
+      boxShadow: `0 0 0 3px ${alpha(GOLD, 0.18)}`,
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: GOLD,
+      borderWidth: '1px',
+    },
+    '& input::placeholder, & textarea::placeholder': {
+      color: alpha('#ffffff', 0.4),
+      opacity: 1,
+    },
+    '& .MuiSelect-select': {
+      color: '#ffffff',
+      display: 'flex',
+      alignItems: 'center',
+      py: 1.35,
+    },
+    '& .MuiSelect-icon': {
+      color: alpha('#ffffff', 0.65),
+    },
+  },
+  '& .MuiFormHelperText-root': {
+    ml: 0,
+    mt: 0.75,
+    fontSize: 12,
+    color: alpha('#ffffff', 0.5),
+    '&.Mui-error': { color: USER_COLORS.error },
+  },
+};
+
+/** Compact filter fields (sidebar) — same stacked look, slightly tighter */
+export const SHOP_FILTER_FIELD_SX = {
+  ...SHOP_FIELD_SX,
+  '& .MuiOutlinedInput-root': {
+    ...(SHOP_FIELD_SX as any)['& .MuiOutlinedInput-root'],
+    minHeight: { xs: 46, md: 44 },
+    fontSize: 13,
+  },
 };
 
 export const SHOP_SELECT_MENU_PROPS = {
   PaperProps: {
     sx: {
-      mt: 0.5,
-      bgcolor: alpha('#0a0a0a', 0.96),
+      mt: 0.75,
+      maxHeight: 320,
+      borderRadius: 0,
+      bgcolor: alpha('#0a0a0a', 0.98),
       border: `1px solid ${alpha('#ffffff', 0.14)}`,
-      backdropFilter: 'blur(12px)',
+      backdropFilter: 'blur(14px)',
+      boxShadow: `0 16px 40px ${alpha('#000000', 0.65)}`,
       '& .MuiMenuItem-root': {
-        color: alpha('#ffffff', 0.88),
-        '&:hover': { bgcolor: alpha('#f59e0b', 0.12) },
+        color: alpha('#ffffff', 0.9),
+        fontSize: 14,
+        minHeight: 44,
+        py: 1.1,
+        px: 1.5,
+        borderRadius: 0,
+        gap: 1,
+        '&:hover': { bgcolor: alpha(GOLD, 0.12) },
         '&.Mui-selected': {
-          bgcolor: alpha('#f59e0b', 0.18),
-          '&:hover': { bgcolor: alpha('#f59e0b', 0.22) },
+          bgcolor: alpha(GOLD, 0.18),
+          color: '#ffffff',
+          '&:hover': { bgcolor: alpha(GOLD, 0.24) },
         },
+        '&.Mui-disabled': {
+          color: alpha('#ffffff', 0.35),
+        },
+      },
+      '& .MuiList-root': {
+        py: 0.5,
       },
     },
   },
@@ -43,13 +123,15 @@ export const SHOP_DIALOG_TITLE_SX = {
   fontWeight: 800,
   textTransform: 'uppercase' as const,
   letterSpacing: 0.6,
-  fontSize: 18,
+  fontSize: { xs: 16, md: 18 },
 };
 
 export const SHOP_DIALOG_CONTENT_SX = {
   color: USER_COLORS.textBody,
   borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
   borderBottom: `1px solid ${alpha('#ffffff', 0.08)}`,
+  px: { xs: 2, md: 3 },
+  py: { xs: 2, md: 2.5 },
   '& .MuiDivider-root': { borderColor: alpha('#ffffff', 0.1) },
 };
 

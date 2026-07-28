@@ -2,21 +2,15 @@ import { useRef, useEffect, useCallback } from 'react';
 
 // ----------------------------------------------------------------------
 
-type ChatMessage = {
+type ScrollMessage = {
   id: string;
-  body: string;
-  senderId: string;
-  senderName: string;
-  senderAvatar?: string;
-  createdAt: Date;
-  isAdmin: boolean;
 };
 
 export type UseMessagesScrollReturn = {
   messagesEndRef: React.RefObject<HTMLDivElement>;
 };
 
-export function useMessagesScroll(messages: ChatMessage[]): UseMessagesScrollReturn {
+export function useMessagesScroll(messages: ScrollMessage[]): UseMessagesScrollReturn {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {

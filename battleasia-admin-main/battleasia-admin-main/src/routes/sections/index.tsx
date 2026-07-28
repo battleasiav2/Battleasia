@@ -21,6 +21,7 @@ import { notificationsRoutes } from './notifications';
 import { feedRoutes } from './feed';
 import { customerSupportRoutes } from './customer-support';
 import { shopRoutes } from './shop';
+import { systemRoutes } from './system';
 
 // Profile page
 const ProfilePage = lazy(() => import('src/pages/profile'));
@@ -80,6 +81,9 @@ export default function Router() {
 
     // Shop routes
     ...shopRoutes,
+
+    // System routes
+    ...systemRoutes,
 
     // No match 404
     { path: '*', element: <Navigate to="/404" replace /> },

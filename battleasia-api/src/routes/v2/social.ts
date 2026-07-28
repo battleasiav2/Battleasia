@@ -5,7 +5,10 @@ import { User } from '../../models/User.js';
 import { DirectConversation } from '../../models/DirectConversation.js';
 import { DirectMessage } from '../../models/DirectMessage.js';
 import { Feed } from '../../models/Feed.js';
+import { SocialReport } from '../../models/SocialReport.js';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
+import { requireAdmin } from '../../middleware/admin.js';
+import { getAppSettings, normalizeMessagingSettings, normalizeProfileSocialSettings } from '../../models/AppSettings.js';
 import { parsePagination, paginatedWithTotal } from '../../utils/pagination.js';
 import { emitDirectMessage } from '../../utils/socket.js';
 import { createActivityNotification } from '../../utils/social-notifications.js';
@@ -183,6 +186,153 @@ router.post('/reels/:id/view', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('reel view error:', error);
     return res.status(500).json({ status: false, message: 'Failed to record view' });
+  }
+});
+
+router.get('/reels/admin', requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+  try {
+    const { skip, limit } = parsePagination(req);
+    const [reels, total] = await Promise.all([
+      Reel.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Reel.countDocuments(),
+    ]);
+    const results = reels.map((r) => ({
+      id: r._id.toString(),
+      userId: r.userId.toString(),
+      username: r.username,
+      avatar: r.avatar,
+      videoUrl: r.videoUrl,
+      caption: r.caption,
+      musicTitle: r.musicTitle,
+      totalViews: r.totalViews,
+      totalLikes: r.totalLikes,
+      status: r.status,
+      createdAt: r.createdAt,
+    }));
+    return res.json(paginatedWithTotal(results, total));
+  } catch (error) {
+    console.error('admin reels list error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to fetch reels' });
+  }
+});
+
+router.delete('/reels/:id', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const reel = await Reel.findByIdAndDelete(req.params.id);
+    if (!reel) return res.status(404).json({ status: false, message: 'Reel not found' });
+    await SocialReport.deleteMany({ targetType: 'reel', targetId: reel._id });
+    return res.json({ status: true, message: 'Reel deleted' });
+  } catch (error) {
+    console.error('delete reel error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to delete reel' });
+  }
+});
+
+const VALID_REPORT_REASONS = new Set(['spam', 'harassment', 'inappropriate', 'fake', 'other']);
+const VALID_REPORT_TYPES = new Set(['user', 'feed', 'reel']);
+
+router.post('/reports', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const { targetType, targetId, reason, details } = req.body as {
+      targetType?: string;
+      targetId?: string;
+      reason?: string;
+      details?: string;
+    };
+
+    if (!targetType || !VALID_REPORT_TYPES.has(targetType)) {
+      return res.status(400).json({ status: false, message: 'Invalid target type' });
+    }
+    if (!targetId) {
+      return res.status(400).json({ status: false, message: 'targetId is required' });
+    }
+    const normalizedReason = String(reason || 'other').toLowerCase();
+    if (!VALID_REPORT_REASONS.has(normalizedReason)) {
+      return res.status(400).json({ status: false, message: 'Invalid reason' });
+    }
+    if (targetType === 'user' && targetId === req.userId) {
+      return res.status(400).json({ status: false, message: 'Cannot report yourself' });
+    }
+
+    const report = await SocialReport.findOneAndUpdate(
+      { reporterId: req.userId, targetType, targetId },
+      {
+        reason: normalizedReason,
+        details: String(details || '').slice(0, 500),
+        status: 'pending',
+      },
+      { upsert: true, new: true }
+    );
+
+    return res.status(201).json({
+      status: true,
+      data: {
+        id: report._id.toString(),
+        status: report.status,
+      },
+      message: 'Report submitted',
+    });
+  } catch (error) {
+    console.error('create report error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to submit report' });
+  }
+});
+
+router.get('/reports', requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+  try {
+    const { skip, limit } = parsePagination(req);
+    const status = typeof req.query.status === 'string' ? req.query.status : undefined;
+    const filter = status ? { status } : {};
+
+    const [reports, total] = await Promise.all([
+      SocialReport.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      SocialReport.countDocuments(filter),
+    ]);
+
+    const reporterIds = [...new Set(reports.map((r) => r.reporterId.toString()))];
+    const reporters = await User.find({ _id: { $in: reporterIds } }).select('username email');
+    const reporterMap = new Map(reporters.map((u) => [u._id.toString(), u]));
+
+    const results = reports.map((report) => ({
+      id: report._id.toString(),
+      reporterId: report.reporterId.toString(),
+      reporterUsername: reporterMap.get(report.reporterId.toString())?.username || '',
+      targetType: report.targetType,
+      targetId: report.targetId.toString(),
+      reason: report.reason,
+      details: report.details,
+      status: report.status,
+      adminNote: report.adminNote,
+      createdAt: report.createdAt,
+    }));
+
+    return res.json(paginatedWithTotal(results, total));
+  } catch (error) {
+    console.error('list reports error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to fetch reports' });
+  }
+});
+
+router.patch('/reports/:id', requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+  try {
+    const { status, adminNote } = req.body as { status?: string; adminNote?: string };
+    const report = await SocialReport.findById(req.params.id);
+    if (!report) return res.status(404).json({ status: false, message: 'Report not found' });
+
+    if (status && ['pending', 'reviewed', 'dismissed'].includes(status)) {
+      report.status = status as typeof report.status;
+      report.reviewedBy = req.userId as any;
+      report.reviewedAt = new Date();
+    }
+    if (typeof adminNote === 'string') {
+      report.adminNote = adminNote.slice(0, 500);
+    }
+
+    await report.save();
+    return res.json({ status: true, data: { id: report._id.toString(), status: report.status } });
+  } catch (error) {
+    console.error('update report error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to update report' });
   }
 });
 
@@ -401,6 +551,64 @@ router.get('/search', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('search error:', error);
     return res.status(500).json({ status: false, message: 'Search failed' });
+  }
+});
+
+/** Player-facing + admin messaging provider config */
+router.get('/messaging-settings', async (_req, res) => {
+  try {
+    const settings = await getAppSettings();
+    return res.json({
+      status: true,
+      data: normalizeMessagingSettings(settings.messaging),
+    });
+  } catch (error) {
+    console.error('messaging settings get error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to fetch messaging settings' });
+  }
+});
+
+router.put('/messaging-settings', requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+  try {
+    const settings = await getAppSettings();
+    settings.messaging = normalizeMessagingSettings(req.body || {});
+    await settings.save();
+    return res.json({
+      status: true,
+      data: normalizeMessagingSettings(settings.messaging),
+    });
+  } catch (error) {
+    console.error('messaging settings update error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to update messaging settings' });
+  }
+});
+
+/** Player-facing + admin profile social config */
+router.get('/profile-social-settings', async (_req, res) => {
+  try {
+    const settings = await getAppSettings();
+    return res.json({
+      status: true,
+      data: normalizeProfileSocialSettings(settings.profileSocial),
+    });
+  } catch (error) {
+    console.error('profile social settings get error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to fetch profile social settings' });
+  }
+});
+
+router.put('/profile-social-settings', requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+  try {
+    const settings = await getAppSettings();
+    settings.profileSocial = normalizeProfileSocialSettings(req.body || {});
+    await settings.save();
+    return res.json({
+      status: true,
+      data: normalizeProfileSocialSettings(settings.profileSocial),
+    });
+  } catch (error) {
+    console.error('profile social settings update error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to update profile social settings' });
   }
 });
 

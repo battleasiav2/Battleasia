@@ -81,8 +81,11 @@ export function serializeConversation(
           avatar: u.avatar || '',
         }
       : conversation.userId.toString(),
+    subject: conversation.subject || 'Live Support',
+    category: conversation.category || 'other',
     status: conversation.status,
     createdAt: conversation.createdAt,
+    updatedAt: conversation.updatedAt,
     lastMessageAt: conversation.lastMessageAt,
   };
 }

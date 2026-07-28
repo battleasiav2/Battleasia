@@ -8,6 +8,7 @@ import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
 import { signToken } from '../../utils/jwt.js';
 import { serializeUser } from '../../utils/serialize.js';
 import { logAuthCode } from '../../utils/auth-log.js';
+import { sendVerificationCodeEmail } from '../../utils/mail.js';
 import {
   ADMIN_AUTH_COOKIE_NAME,
   clearAllAuthCookies,
@@ -100,6 +101,7 @@ router.post('/signin', async (req, res) => {
       type: 'admin_login',
       expiresAt: new Date(Date.now() + OTP_TTL_MS),
     });
+    await sendVerificationCodeEmail(user.email, otpCode, 'admin_login');
     logAuthCode('admin OTP', user.email, otpCode);
 
     return res.json({

@@ -13,13 +13,13 @@ import {
 import { paths } from 'src/routes/paths';
 import {
   UserPageShell,
-  UserPageTitle,
   UserGlassCard,
   UserActionButton,
   UserStatTile,
   UserEmptyState,
   USER_COLORS,
   userMutedTextSx,
+  getUserChipSx,
 } from 'src/layouts/user';
 
 import { Image } from 'src/components/image';
@@ -97,15 +97,15 @@ export function MyOrdersView() {
   const getStatusSx = (status: string) => {
     switch (status) {
       case 'completed':
-        return { bgcolor: alpha(USER_COLORS.success, 0.15), color: USER_COLORS.success, border: `1px solid ${alpha(USER_COLORS.success, 0.35)}` };
+        return getUserChipSx('success');
       case 'paid':
-        return { bgcolor: alpha(USER_COLORS.info, 0.15), color: USER_COLORS.info, border: `1px solid ${alpha(USER_COLORS.info, 0.35)}` };
+        return getUserChipSx('info');
       case 'pending':
-        return { bgcolor: alpha(USER_COLORS.gold, 0.15), color: USER_COLORS.gold, border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}` };
+        return getUserChipSx('gold');
       case 'cancelled':
-        return { bgcolor: alpha(USER_COLORS.error, 0.15), color: USER_COLORS.error, border: `1px solid ${alpha(USER_COLORS.error, 0.35)}` };
+        return getUserChipSx('error');
       default:
-        return { bgcolor: alpha('#ffffff', 0.08), color: USER_COLORS.textMuted, border: `1px solid ${USER_COLORS.border}` };
+        return getUserChipSx('neutral');
     }
   };
 
@@ -113,10 +113,7 @@ export function MyOrdersView() {
 
   return (
     <UserPageShell>
-      <OrdersHero title={t('myOrders.title')} />
-
-      <UserPageTitle
-        badge={t('myOrders.badgeOrderHistory')}
+      <OrdersHero
         title={t('myOrders.title')}
         subtitle={t('myOrders.subtitle')}
         action={
@@ -124,12 +121,22 @@ export function MyOrdersView() {
             actionVariant="gold"
             startIcon={<Iconify icon="solar:shop-bold" width={18} />}
             onClick={() => navigate(paths.user.shop)}
-            sx={{ display: { xs: 'none', md: 'inline-flex' } }}
           >
             {t('shop.title')}
           </UserActionButton>
         }
       />
+
+      <Stack sx={{ mb: 2.5, display: { xs: 'flex', md: 'none' } }}>
+        <UserActionButton
+          actionVariant="gold"
+          startIcon={<Iconify icon="solar:shop-bold" width={18} />}
+          onClick={() => navigate(paths.user.shop)}
+          fullWidth
+        >
+          {t('shop.title')}
+        </UserActionButton>
+      </Stack>
 
       {showInitialSkeleton ? (
         <OrdersPageSkeleton />

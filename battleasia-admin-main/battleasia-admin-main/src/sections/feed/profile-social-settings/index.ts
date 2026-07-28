@@ -1,0 +1,1 @@
+export { ProfileSocialSettingsView } from './view';

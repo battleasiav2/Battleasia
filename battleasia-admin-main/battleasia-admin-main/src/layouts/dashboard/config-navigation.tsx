@@ -31,6 +31,7 @@ const ICONS = {
   feed: icon('solar:document-text-bold'),
   customerSupport: icon('solar:headphones-round-sound-bold'),
   shop: icon('iconoir:shopping-bag-check'),
+  system: icon('solar:settings-bold-duotone'),
 };
 
 // ----------------------------------------------------------------------
@@ -117,6 +118,9 @@ export function useNavData() {
               children: [
                 { title: 'Categories', path: paths.feed.categories, requiredPermission: PERMISSIONS.FEED.VIEW },
                 { title: 'List', path: paths.feed.list, requiredPermission: PERMISSIONS.FEED.VIEW },
+                { title: 'Profile Social', path: paths.feed.profileSocialSettings, requiredPermission: PERMISSIONS.FEED.VIEW },
+                { title: 'Social Reports', path: paths.feed.socialReports, requiredPermission: PERMISSIONS.FEED.VIEW },
+                { title: 'Reels Moderation', path: paths.feed.reelsModeration, requiredPermission: PERMISSIONS.FEED.VIEW },
               ],
             },
             {
@@ -126,6 +130,8 @@ export function useNavData() {
               requiredPermission: PERMISSIONS.CUSTOMER_SUPPORT.VIEW,
               children: [
                 { title: 'List', path: paths.customerSupport.list, requiredPermission: PERMISSIONS.CUSTOMER_SUPPORT.VIEW },
+                { title: 'Live Chat Settings', path: paths.customerSupport.liveChatSettings, requiredPermission: PERMISSIONS.CUSTOMER_SUPPORT.VIEW },
+                { title: 'Messaging Providers', path: paths.customerSupport.messagingProviderSettings, requiredPermission: PERMISSIONS.CUSTOMER_SUPPORT.VIEW },
               ],
             },
             {
@@ -136,6 +142,16 @@ export function useNavData() {
               children: [
                 { title: 'Coin List', path: paths.shop.coinlist, requiredPermission: PERMISSIONS.SHOP.VIEW },
                 { title: 'Coin Rate', path: paths.shop.coinrate, requiredPermission: PERMISSIONS.SHOP.VIEW },
+              ],
+            },
+            {
+              title: 'system',
+              path: paths.system.root,
+              icon: ICONS.system,
+              requiredPermission: null,
+              children: [
+                { title: 'Mail Settings', path: paths.system.mailSettings, requiredPermission: null },
+                { title: 'App Download', path: paths.system.appDownload, requiredPermission: null },
               ],
             },
           ],

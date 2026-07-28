@@ -11,6 +11,7 @@ const ROOTS = {
   CUSTOMER_SUPPORT: '/customer-support',
   SHOP: '/shop',
   PAYMENTS: '/payments',
+  SYSTEM: '/system',
 };
 
 // ----------------------------------------------------------------------
@@ -52,12 +53,17 @@ export const paths = {
     root: `${ROOTS.FEED}`,
     list: `${ROOTS.FEED}/list`,
     categories: `${ROOTS.FEED}/categories`,
+    profileSocialSettings: `${ROOTS.FEED}/profile-social-settings`,
+    socialReports: `${ROOTS.FEED}/social-reports`,
+    reelsModeration: `${ROOTS.FEED}/reels-moderation`,
     new: `${ROOTS.FEED}/new`,
     edit: (id: string) => `${ROOTS.FEED}/${id}/edit`,
   },
   customerSupport: {
     root: `${ROOTS.CUSTOMER_SUPPORT}`,
     list: `${ROOTS.CUSTOMER_SUPPORT}/list`,
+    liveChatSettings: `${ROOTS.CUSTOMER_SUPPORT}/live-chat-settings`,
+    messagingProviderSettings: `${ROOTS.CUSTOMER_SUPPORT}/messaging-provider-settings`,
     detail: (conversationId: string) => `${ROOTS.CUSTOMER_SUPPORT}/${conversationId}`,
   },
   shop: {
@@ -74,5 +80,10 @@ export const paths = {
     wallet: `${ROOTS.PAYMENTS}/wallet`,
     deposit: `${ROOTS.PAYMENTS}/deposit`,
     withdrawal: `${ROOTS.PAYMENTS}/withdrawal`,
+  },
+  system: {
+    root: `${ROOTS.SYSTEM}`,
+    mailSettings: `${ROOTS.SYSTEM}/mail-settings`,
+    appDownload: `${ROOTS.SYSTEM}/app-download`,
   },
 };

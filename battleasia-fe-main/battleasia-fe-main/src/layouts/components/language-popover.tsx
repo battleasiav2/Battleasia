@@ -7,15 +7,18 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import ButtonBase from '@mui/material/ButtonBase';
 import Typography from '@mui/material/Typography';
+import { alpha } from '@mui/material/styles';
 
 import { FlagIcon } from 'src/components/flag-icon';
 import { Iconify } from 'src/components/iconify/iconify';
 import { CustomPopover } from 'src/components/custom-popover';
 import { varTap, varHover, transitionTap } from 'src/components/animate';
 import { useTranslate } from 'src/locales/use-locales';
+import { USER_COLORS } from 'src/layouts/user/user-theme';
 
 // ----------------------------------------------------------------------
 
+const GOLD = USER_COLORS.gold;
 const RTL_LANGS = new Set(['ur', 'ar']);
 
 export type LanguagePopoverProps = IconButtonProps & {
@@ -52,9 +55,9 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
             width: 280,
             overflow: 'hidden',
             borderRadius: 0,
-            bgcolor: 'rgba(16, 20, 28, 0.96)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            boxShadow: '0 20px 50px rgba(0,0,0,0.55)',
+            bgcolor: alpha('#000000', 0.94),
+            border: `1px solid ${alpha('#ffffff', 0.08)}`,
+            boxShadow: `0 20px 50px ${alpha('#000000', 0.55)}`,
             backdropFilter: 'blur(16px)',
           },
         },
@@ -68,13 +71,13 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         sx={{
           px: 2,
           py: 1.75,
-          borderBottom: '1px solid rgba(255,255,255,0.07)',
+          borderBottom: `1px solid ${alpha('#ffffff', 0.07)}`,
         }}
       >
         <Typography
           className="font-tr"
           sx={{
-            color: '#feab02',
+            color: GOLD,
             fontWeight: 700,
             fontSize: 22,
             lineHeight: 1,
@@ -84,7 +87,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         </Typography>
         <Typography
           sx={{
-            color: 'rgba(255,255,255,0.45)',
+            color: alpha('#ffffff', 0.45),
             fontSize: 14,
             fontWeight: 500,
           }}
@@ -93,7 +96,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         </Typography>
       </Stack>
 
-      <Stack divider={<Box sx={{ height: '1px', bgcolor: 'rgba(255,255,255,0.06)' }} />}>
+      <Stack divider={<Box sx={{ height: '1px', bgcolor: alpha('#ffffff', 0.06) }} />}>
         {data.map((option) => {
           const isSelected = option.value === currentLang?.value;
 
@@ -110,10 +113,10 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                 px: 2,
                 py: 1.35,
                 textAlign: 'left',
-                bgcolor: isSelected ? 'rgba(254, 171, 2, 0.1)' : 'transparent',
+                bgcolor: isSelected ? alpha(GOLD, 0.1) : 'transparent',
                 transition: 'background-color 0.2s ease',
                 '&:hover': {
-                  bgcolor: isSelected ? 'rgba(254, 171, 2, 0.14)' : 'rgba(255,255,255,0.04)',
+                  bgcolor: isSelected ? alpha(GOLD, 0.14) : alpha('#ffffff', 0.04),
                 },
               }}
             >
@@ -125,7 +128,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                     borderRadius: 0,
                     overflow: 'hidden',
                     flexShrink: 0,
-                    boxShadow: '0 1px 4px rgba(0,0,0,0.35)',
+                    boxShadow: `0 1px 4px ${alpha('#000000', 0.35)}`,
                   }}
                 >
                   <FlagIcon code={option.countryCode} sx={{ width: 36, height: 24 }} />
@@ -135,7 +138,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                   <Typography
                     className="font-tr"
                     sx={{
-                      color: isSelected ? '#feab02' : '#f3f3f3',
+                      color: isSelected ? GOLD : '#f3f3f3',
                       fontSize: 16,
                       fontWeight: isSelected ? 700 : 500,
                       lineHeight: 1.2,
@@ -145,7 +148,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                   </Typography>
                   <Typography
                     sx={{
-                      color: 'rgba(255,255,255,0.42)',
+                      color: alpha('#ffffff', 0.42),
                       fontSize: 12,
                       fontWeight: 500,
                       letterSpacing: '0.04em',
@@ -163,7 +166,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                     width: 28,
                     height: 28,
                     borderRadius: 0,
-                    bgcolor: '#feab02',
+                    bgcolor: GOLD,
                     display: 'grid',
                     placeItems: 'center',
                     flexShrink: 0,
@@ -199,14 +202,14 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            bgcolor: open ? 'rgba(254, 171, 2, 0.12)' : 'rgba(8, 12, 20, 0.55)',
+            bgcolor: open ? alpha(GOLD, 0.12) : alpha('#080c14', 0.55),
             border: '2px solid',
-            borderColor: open ? 'rgba(254, 171, 2, 0.5)' : 'rgba(255,255,255,0.18)',
-            boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.25)',
+            borderColor: open ? alpha(GOLD, 0.5) : alpha('#ffffff', 0.18),
+            boxShadow: `inset 0 0 0 1px ${alpha('#000000', 0.25)}`,
             transition: 'all 0.2s ease',
             '&:hover': {
-              bgcolor: 'rgba(12, 18, 28, 0.7)',
-              borderColor: 'rgba(254, 171, 2, 0.45)',
+              bgcolor: alpha('#0c121c', 0.7),
+              borderColor: alpha(GOLD, 0.45),
             },
           },
           ...(Array.isArray(sx) ? sx : [sx]),

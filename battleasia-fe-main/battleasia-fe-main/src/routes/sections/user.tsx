@@ -1,6 +1,6 @@
 import type { RouteObject } from 'react-router';
 
-import { Outlet } from 'react-router';
+import { Outlet, Navigate, useSearchParams } from 'react-router';
 import { lazy, Suspense } from 'react';
 
 import AuthGuard from 'src/utils/authguard';
@@ -10,6 +10,7 @@ import { UserLayout } from 'src/layouts/user';
 
 import { LoadingScreen } from 'src/components/loading-screen';
 
+import { paths } from '../paths';
 import { usePathname } from '../hooks';
 
 // ----------------------------------------------------------------------
@@ -52,6 +53,13 @@ const userLayout = () => (
   </AuthGuard>
 );
 
+function MessagesRedirect() {
+  const [searchParams] = useSearchParams();
+  const userId = searchParams.get('userId');
+  const to = userId ? paths.user.messagesWithUser(userId) : paths.user.messages;
+  return <Navigate to={to} replace />;
+}
+
 export const userRoutes: RouteObject[] = [
   {
     path: 'user',
@@ -74,14 +82,19 @@ export const userRoutes: RouteObject[] = [
         ],
       },
       { path: 'play', element: <PlayPage /> },
-      { path: 'play/:gameId', element: <MatchPage /> },
       { path: 'play/:matchId/detail', element: <MatchDetailPage /> },
       { path: 'play/:matchId/result', element: <MatchResultPage /> },
+      { path: 'play/:gameId', element: <MatchPage /> },
       { path: 'shop', element: <ShopPage /> },
       { path: 'shop/:shopId', element: <ShopDetailPage /> },
+      { path: 'earn', element: <Navigate to={paths.user.referral} replace /> },
       { path: 'referral', element: <ReferralPage /> },
       { path: 'feed', element: <FeedPage /> },
       { path: 'feed/:id', element: <FeedDetailPage /> },
+      { path: 'explore', element: <Navigate to={paths.user.explore} replace /> },
+      { path: 'saved', element: <Navigate to={paths.user.saved} replace /> },
+      { path: 'reels', element: <Navigate to={paths.user.reels} replace /> },
+      { path: 'messages', element: <MessagesRedirect /> },
     ],
   },
 ];

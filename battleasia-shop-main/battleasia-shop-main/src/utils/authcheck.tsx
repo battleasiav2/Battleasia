@@ -1,12 +1,13 @@
 // components
 import { useState, useEffect } from 'react';
 
+import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
+
 import useApi from 'src/hooks/use-api';
 
 import { useSelector, useDispatch } from 'src/store';
 import { userAction, balanceAction } from 'src/store/reducers/auth';
-
-import { LoadingScreen } from 'src/components/loading-screen';
 
 // ----------------------------------------------------------------------
 
@@ -22,22 +23,51 @@ export function AuthConsumer({ children }: Props) {
   const [loading, setLoading] = useState<boolean>(true);
 
   const getMe = async () => {
-    // Set up temp user if not logged in
-    if (isLoggedIn) {
-      const res = await initialize();
-      if (!res?.data) return;
-      dispatch(userAction(res.data.user));
-      dispatch(balanceAction(res.data.user.balance as number));
+    try {
+      if (isLoggedIn) {
+        const res = await Promise.race([
+          initialize(),
+          new Promise<null>((_, reject) => {
+            setTimeout(() => reject(new Error('Auth initialize timeout')), 10000);
+          }),
+        ]);
+        if (!res?.data) {
+          console.error('Failed to initialize user data');
+          return;
+        }
+        const user = res.data.user ?? res.data;
+        dispatch(userAction(user));
+        if (typeof user?.balance === 'number') {
+          dispatch(balanceAction(user.balance));
+        }
+      }
+    } catch (error) {
+      console.error('Error during user initialization:', error);
+    } finally {
       setLoading(false);
-      return;
     }
-    setLoading(false);
   };
 
   useEffect(() => {
-    getMe();
+    const failSafe = setTimeout(() => setLoading(false), 12000);
+    getMe().finally(() => clearTimeout(failSafe));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  if (loading) return <LoadingScreen />;
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          minHeight: '100vh',
+          bgcolor: '#000000',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CircularProgress size={40} sx={{ color: '#f5c518' }} />
+      </Box>
+    );
+  }
   return children;
 }

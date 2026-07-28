@@ -12,6 +12,7 @@ import { useRouter, usePathname } from 'src/routes/hooks';
 
 import { useSelector } from 'src/store';
 import { CONFIG } from 'src/global-config';
+import { useTranslate } from 'src/locales/use-locales';
 
 import { Logo } from 'src/components/logo';
 import { AnimatedBalance } from 'src/components/animated-balance';
@@ -24,7 +25,7 @@ import { HeaderSection } from '../core/header-section';
 import { FooterSection } from '../core/footer-section';
 import { LayoutSection } from '../core/layout-section';
 import { AccountDrawer } from '../components/account-drawer';
-import { USER_COLORS, userHeaderPillSx } from './user-theme';
+import { USER_COLORS, userGoldButtonSx, userHeaderPillSx } from './user-theme';
 import { userLayoutVars, userNavColorVars } from './css-vars';
 import { LanguagePopover } from '../components/language-popover';
 import { FloatingFooterNav } from '../components/floating-footer-nav';
@@ -58,6 +59,7 @@ export function UserLayout({
 }: UserLayoutProps) {
   const theme = useTheme();
 
+  const { t } = useTranslate();
   const settings = useSettingsContext();
   const pathname = usePathname();
   const router = useRouter();
@@ -114,7 +116,7 @@ export function UserLayout({
   const menuStyles = {
     fontSize: 22,
     fontWeight: 'normal' as const,
-    activeColor: '#feab02',
+    activeColor: USER_COLORS.gold,
     inactiveColor: '#d9d9d8',
     transition: 'color 0.2s',
   };
@@ -170,11 +172,11 @@ export function UserLayout({
                 component={RouterLink}
                 href={item.href}
                 onClick={(e) => handleMenuClick(e as React.MouseEvent<HTMLAnchorElement>, item)}
-                className="font-tr"
                 sx={{
-                  textTransform: 'uppercase',
+                  textTransform: 'none',
                   fontSize: menuStyles.fontSize,
-                  fontWeight: menuStyles.fontWeight,
+                  fontWeight: 600,
+                  letterSpacing: 0.02,
                   color: isActive ? menuStyles.activeColor : menuStyles.inactiveColor,
                   textDecoration: 'none',
                   cursor: 'pointer',
@@ -235,19 +237,16 @@ export function UserLayout({
             <Button
               component={RouterLink}
               href={paths.auth.signIn}
-              className="font-tr"
               sx={{
-                height: { sm: 45, md: 53 },
-                px: { sm: 3, md: 6.7 },
-                fontSize: { sm: 24, md: 28 },
-                color: "#000",
-                fontWeight: "normal",
-                borderRadius: 0,
-                background: "url(/assets/images/btn-bg.webp) no-repeat center center",
-                backgroundSize: "cover",
+                ...userGoldButtonSx,
+                height: { xs: 36, sm: 45, md: 53 },
+                px: { xs: 2, sm: 3, md: 6.7 },
+                fontSize: { xs: 14, sm: 16, md: 18 },
+                minWidth: { xs: 'auto', sm: undefined },
+                fontWeight: 600,
               }}
             >
-              LOGIN
+              {t('nav.login')}
             </Button>
           )}
 

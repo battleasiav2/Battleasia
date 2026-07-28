@@ -11,7 +11,7 @@ import { useSelector, useDispatch } from 'src/store';
 import { balanceAction } from 'src/store/reducers/auth';
 import {
   UserPageShell,
-  UserPageTitle,
+  UserArenaStrip,
   UserBackButton,
   UserStatTile,
   UserEmptyState,
@@ -234,14 +234,15 @@ export function MatchView() {
 
   return (
     <UserPageShell>
-      <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={2} sx={{ mb: 1 }}>
+      <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={2} sx={{ mb: 1.5 }}>
         <UserBackButton onClick={handleBack} />
       </Stack>
 
-      <UserPageTitle
+      <UserArenaStrip
         badge={t('play.badgeMatchArena')}
         title={gameName}
         subtitle={t('play.matchListSubtitle')}
+        imageUrl={PLAY_IMAGE_PATHS.heroBanner}
       />
 
       {loading && matches.length === 0 ? (

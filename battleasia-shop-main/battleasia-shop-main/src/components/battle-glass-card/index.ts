@@ -9,6 +9,8 @@ export {
   getGlassInnerSx,
   getGlassBadgeChipSx,
   getGlassIconButtonSx,
+  getGoldTopLineShellSx,
+  getGoldTopLineCardSx,
   mergeGlassSx,
   glassSurfaceResetSx,
 } from './glass-shell-styles';

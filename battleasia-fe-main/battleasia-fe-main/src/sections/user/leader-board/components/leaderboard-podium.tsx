@@ -3,12 +3,12 @@ import { alpha } from '@mui/material/styles';
 
 import type { ILeaderboardEntry } from 'src/types';
 import { CONFIG } from 'src/global-config';
-import { getImageUrl } from 'src/utils/get-image-url';
+import { getAvatarUrl } from 'src/utils/get-image-url';
 
 import { Iconify } from 'src/components/iconify';
 import { getDefaultGlassTokens, getGlassShellSx } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, userMutedTextSx } from 'src/layouts/user';
+import { USER_COLORS, userMutedTextSx, getUserChipSx } from 'src/layouts/user';
 
 import { LEADERBOARD_PODIUM_COLORS, LEADERBOARD_PODIUM_ORDER } from '../leader-board-constants';
 
@@ -51,7 +51,7 @@ export function LeaderboardPodium({
 
         const rankColor = LEADERBOARD_PODIUM_COLORS[rank as keyof typeof LEADERBOARD_PODIUM_COLORS];
         const height = rank === 1 ? 220 : rank === 2 ? 190 : 170;
-        const avatarSrc = getImageUrl(player.avatar) || undefined;
+        const avatarSrc = getAvatarUrl(player.avatar);
 
         return (
           <Box
@@ -110,12 +110,9 @@ export function LeaderboardPodium({
               size="small"
               sx={{
                 mb: 1,
-                bgcolor: alpha(USER_COLORS.gold, 0.12),
-                color: USER_COLORS.gold,
-                fontWeight: 700,
-                height: 20,
+                height: 22,
                 fontSize: 10,
-                border: `1px solid ${alpha(USER_COLORS.gold, 0.3)}`,
+                ...getUserChipSx('gold'),
               }}
             />
 

@@ -1,7 +1,9 @@
 import { alpha } from '@mui/material/styles';
 import { inputBaseClasses } from '@mui/material/InputBase';
 
-export const AUTH_BG_IMAGE = '/assets/images/auth.webp';
+import { HOME_GAME_ARTS } from 'src/sections/home/play-your-game-section';
+
+export const AUTH_BG_IMAGE = HOME_GAME_ARTS[0];
 
 /** baccoin.shop-style white inputs on auth forms */
 export const baccoinFieldSlotProps = {
@@ -109,7 +111,7 @@ export const authFieldSlotProps = {
       minHeight: 48,
       transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease',
       '& input::placeholder': {
-        color: alpha('#ffffff', 0.4),
+        color: alpha('#ffffff', 0.55),
         opacity: 1,
       },
       '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
@@ -137,9 +139,9 @@ export const authFieldSlotProps = {
   },
 };
 
-/** Phone field — country flag sits inside the input row */
+/** Phone field — country flag + dial code sits inside the input row */
 export const authPhoneInputSx = {
-  '--popover-button-width': '80px',
+  '--popover-button-width': '108px',
   '--popover-button-height': '28px',
   '--popover-button-mr': '10px',
   [`& .${inputBaseClasses.input}`]: {
@@ -225,26 +227,14 @@ export const authSelectSx = {
   },
 };
 
+import { userGoldButtonSx } from 'src/layouts/user/user-theme';
+
 export const authSubmitButtonSx = {
-  borderRadius: 0,
+  ...userGoldButtonSx,
   py: 1.45,
   fontSize: 14,
-  fontWeight: 800,
   letterSpacing: 1,
-  textTransform: 'uppercase' as const,
-  color: '#111111',
-  boxShadow: 'none',
-  background: 'linear-gradient(180deg, #f59e0b 0%, #ea8c00 52%, #d97706 100%)',
-  border: `1px solid ${alpha('#fbbf24', 0.9)}`,
-  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-  '&:hover': {
-    background: 'linear-gradient(180deg, #fbbf24 0%, #f59e0b 52%, #ea8c00 100%)',
-    boxShadow: `0 8px 28px ${alpha('#f59e0b', 0.4)}`,
-    transform: 'translateY(-1px)',
-  },
-  '&:active': {
-    transform: 'translateY(0)',
-  },
+  width: '100%',
 };
 
 export const authLinkSx = {

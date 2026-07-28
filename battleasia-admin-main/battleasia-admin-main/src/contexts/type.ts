@@ -274,10 +274,37 @@ export type ApiContextType = {
     getReferralSettingsApi: () => Promise<any>;
     updateReferralSettingsApi: (commissionRate: number) => Promise<any>;
 
+    // live chat widget settings
+    getLiveChatSettingsApi: () => Promise<any>;
+    updateLiveChatSettingsApi: (data: any) => Promise<any>;
+
+    // messaging provider settings
+    getMessagingSettingsApi: () => Promise<any>;
+    updateMessagingSettingsApi: (data: any) => Promise<any>;
+
+    // profile social settings
+    getProfileSocialSettingsApi: () => Promise<any>;
+    updateProfileSocialSettingsApi: (data: any) => Promise<any>;
+
+    getSocialReportsApi: (params?: { page?: number; limit?: number; status?: string }) => Promise<any>;
+    updateSocialReportApi: (id: string, data: { status?: string; adminNote?: string }) => Promise<any>;
+    getAdminReelsApi: (params?: { page?: number; limit?: number }) => Promise<any>;
+    deleteReelApi: (id: string) => Promise<any>;
+
     // referral history
     getReferralHistoriesApi: (params?: { page?: number; limit?: number; search?: string }) => Promise<any>;
     getReferralStatsOverviewApi: () => Promise<any>;
 
     // dashboard
     getAdminDashboardStatsApi: () => Promise<any>;
+
+    // mail settings
+    getMailSettingsApi: () => Promise<any>;
+    updateMailSettingsApi: (data: any) => Promise<any>;
+    sendTestMailApi: (to: string) => Promise<any>;
+
+    // app download settings
+    getAppDownloadSettingsApi: () => Promise<any>;
+    updateAppDownloadSettingsApi: (data: any) => Promise<any>;
+    uploadAppApkApi: (file: File, version?: string) => Promise<any>;
 };

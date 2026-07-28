@@ -23,13 +23,15 @@ import { useTranslate } from 'src/locales/use-locales';
 import { useSelector } from 'src/store';
 import {
   UserPageShell,
-  UserPageTitle,
   UserGlassCard,
   UserActionButton,
   UserStatTile,
   USER_COLORS,
   userMutedTextSx,
   userGlassDialogPaperSx,
+  userFieldSx,
+  userFieldLabelProps,
+  userSelectMenuProps,
 } from 'src/layouts/user';
 
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
@@ -65,17 +67,7 @@ const PAYMENT_CHANNELS = [
   { value: 'Bank Transfer', label: 'Bank Transfer', currency: 'USD' },
 ];
 
-const walletFieldSx = {
-  '& .MuiOutlinedInput-root': {
-    bgcolor: alpha('#000000', 0.5),
-    color: USER_COLORS.textPrimary,
-    '& fieldset': { borderColor: alpha('#ffffff', 0.22) },
-    '&:hover fieldset': { borderColor: alpha('#ffffff', 0.38) },
-    '&.Mui-focused fieldset': { borderColor: USER_COLORS.gold },
-  },
-  '& .MuiInputLabel-root': { color: alpha('#ffffff', 0.7) },
-  '& .MuiInputLabel-root.Mui-focused': { color: USER_COLORS.gold },
-};
+const walletFieldSx = userFieldSx;
 
 // ----------------------------------------------------------------------
 
@@ -443,6 +435,7 @@ export function WalletView() {
               onChange={(e) => setWithdrawalAmount(e.target.value)}
               fullWidth
               error={!!withdrawalAmount && parseFloat(withdrawalAmount) > withdrawableAmount}
+              InputLabelProps={userFieldLabelProps}
               InputProps={{
                 endAdornment: <Typography sx={userMutedTextSx}>BAC</Typography>,
               }}
@@ -463,6 +456,8 @@ export function WalletView() {
               value={withdrawalChannel}
               onChange={(e) => setWithdrawalChannel(e.target.value)}
               fullWidth
+              InputLabelProps={userFieldLabelProps}
+              SelectProps={{ MenuProps: userSelectMenuProps }}
               sx={walletFieldSx}
             >
               {PAYMENT_CHANNELS.map((channel) => (
@@ -480,6 +475,7 @@ export function WalletView() {
               fullWidth
               placeholder={t('wallet.enterWalletAddressPlaceholder')}
               helperText={t('wallet.walletAddressHelper')}
+              InputLabelProps={userFieldLabelProps}
               sx={walletFieldSx}
             />
           </Stack>
@@ -502,7 +498,7 @@ export function WalletView() {
 
             <Box>
               <Stack direction="row" alignItems="center" spacing={1} mb={1}>
-                <Iconify icon="solar:dollar-minimalistic-bold" width={20} sx={{ color: 'success.main' }} />
+                <Iconify icon="solar:dollar-minimalistic-bold" width={20} sx={{ color: USER_COLORS.gold }} />
                 <Typography variant="body2" sx={userMutedTextSx}>
                   {t('wallet.youWillReceive')}
                 </Typography>
@@ -519,7 +515,7 @@ export function WalletView() {
                              selectedChannel.currency === 'PKR' ? '#006600' : '#1d4ed8',
                   }}
                 />
-                <Typography variant="h5" fontWeight={700} sx={{ color: USER_COLORS.success }}>
+                <Typography variant="h5" fontWeight={700} sx={{ color: USER_COLORS.gold }}>
                   {withdrawalCurrencyAmount.toFixed(2)} {selectedChannel.currency}
                 </Typography>
               </Stack>
@@ -594,14 +590,11 @@ export function WalletView() {
 
   return (
     <UserPageShell>
-      <WalletHero title={t('wallet.title')} />
-
-      <UserPageTitle
-        badge={t('wallet.badgeSecureVault')}
+      <WalletHero
         title={t('wallet.title')}
         subtitle={t('wallet.subtitle')}
         action={
-          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ display: { xs: 'none', md: 'flex' } }}>
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
             <UserActionButton
               actionVariant="gold"
               startIcon={<Iconify icon="solar:card-send-bold" />}
@@ -629,6 +622,17 @@ export function WalletView() {
           </Stack>
         }
       />
+
+      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 2.5, display: { xs: 'flex', md: 'none' } }}>
+        <UserActionButton
+          actionVariant="gold"
+          startIcon={<Iconify icon="solar:card-send-bold" />}
+          onClick={handleOpenWithdrawalDialog}
+          fullWidth
+        >
+          {t('wallet.requestWithdrawal')}
+        </UserActionButton>
+      </Stack>
 
       {showInitialSkeleton ? (
         <WalletPageSkeleton />

@@ -21,7 +21,6 @@ import { alpha } from '@mui/material/styles';
 
 import {
   UserPageShell,
-  UserPageTitle,
   UserGlassCard,
   UserActionButton,
   UserStatTile,
@@ -37,6 +36,7 @@ import { Iconify } from 'src/components/iconify';
 import { useSelector } from 'src/store';
 import { toast } from 'react-hot-toast';
 import { fNumber } from 'src/utils/format-number';
+import { useTranslate } from 'src/locales/use-locales';
 
 import { ShopHero } from './shop-hero';
 import {
@@ -49,6 +49,8 @@ import {
   SHOP_DIALOG_TITLE_SX,
   SHOP_DIALOG_CONTENT_SX,
   SHOP_FIELD_SX,
+  SHOP_FIELD_LABEL_PROPS,
+  SHOP_FILTER_FIELD_SX,
   SHOP_SELECT_MENU_PROPS,
   SHOP_BODY_TEXT_SX,
   SHOP_LABEL_TEXT_SX,
@@ -93,6 +95,7 @@ type PaymentChannel = {
 
 export function ShopView() {
     const api = useApi();
+    const { t } = useTranslate();
     const tokens = getDefaultGlassTokens();
     const { balance } = useSelector((state) => state.auth);
     const playerEmail = useSelector((state) => state.auth.user?.email || '');
@@ -142,7 +145,7 @@ export function ShopView() {
             const res = await api.getCurrencyRatesApi();
             setCurrencyRates(res?.data?.data || []);
         } catch {
-            toast.error('Failed to load coin offers');
+            toast.error(t('shop.loadFailed'));
         } finally {
             setLoading(false);
         }
@@ -154,7 +157,7 @@ export function ShopView() {
             const res = await api.listShopItemsApi();
             setShopItems(res?.data?.data?.results || []);
         } catch {
-            toast.error('Failed to load coin offers');
+            toast.error(t('shop.loadFailed'));
         } finally {
             setLoading(false);
         }
@@ -435,23 +438,17 @@ export function ShopView() {
 
     return (
         <UserPageShell>
-            <ShopHero title="BAC Coin Shop" subtitle="Secure payments · Instant BAC delivery after approval" />
-
-            <UserPageTitle
-                badge="Official Store"
-                title="Buy BAC Coins"
-                subtitle="Choose a pack, select your payment channel, and complete checkout."
-            />
+            <ShopHero />
 
             <Grid container spacing={2} sx={{ mb: 2.5 }}>
                 <Grid size={{ xs: 6, md: 4 }}>
-                    <UserStatTile label="Your balance" value={fNumber(balance ?? 0)} suffix="BAC" />
+                    <UserStatTile icon="solar:wallet-money-bold" label={t('shop.yourBalance')} value={fNumber(balance ?? 0)} suffix="BAC" />
                 </Grid>
                 <Grid size={{ xs: 6, md: 4 }}>
-                    <UserStatTile label="Coin packs" value={filteredShopItems.length} suffix="available" />
+                    <UserStatTile icon="solar:bag-check-bold" label={t('shop.coinPacks')} value={filteredShopItems.length} suffix={t('shop.available')} />
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
-                    <UserStatTile label="Payment channels" value={paymentChannels.length} suffix="active" />
+                    <UserStatTile icon="solar:card-transfer-bold" label={t('shop.paymentChannels')} value={paymentChannels.length} suffix={t('shop.active')} />
                 </Grid>
             </Grid>
 
@@ -460,16 +457,16 @@ export function ShopView() {
                         <Grid size={{ xs: 12, md: 3 }}>
                             <UserGlassCard sx={{ p: 2, position: { md: 'sticky' }, top: { md: 120 } }}>
                                 <Typography className="font-tr" sx={{ mb: 1, fontSize: 13, fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: USER_COLORS.gold }}>
-                                    Payment
+                                    {t('shop.payment')}
                                 </Typography>
                                 <TextField
                                     select
                                     fullWidth
-                                    size="small"
-                                    label="Choose payment"
+                                    label={t('shop.choosePayment')}
                                     value={paymentFilter}
                                     onChange={(e) => {setPaymentFilter(e.target.value); setPaymentMethod(e.target.value)}}
-                                    sx={{ mb: 2, ...SHOP_FIELD_SX, textTransform: 'capitalize' }}
+                                    InputLabelProps={SHOP_FIELD_LABEL_PROPS}
+                                    sx={{ mb: 2, ...SHOP_FILTER_FIELD_SX }}
                                     SelectProps={{ MenuProps: SHOP_SELECT_MENU_PROPS }}
                                 >
                                     {paymentChannels.length === 0 ? (
@@ -505,22 +502,22 @@ export function ShopView() {
                                 </TextField>
 
                                 <Typography className="font-tr" sx={{ mb: 1, fontSize: 13, fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: USER_COLORS.gold }}>
-                                    Price range (USD)
+                                    {t('shop.priceRange')}
                                 </Typography>
-                                <Stack direction="row" spacing={1}>
+                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
                                     <TextField
-                                        size="small"
-                                        label="Min"
+                                        label={t('shop.min')}
                                         value={minPrice}
                                         onChange={(e) => setMinPrice(e.target.value)}
-                                        sx={SHOP_FIELD_SX}
+                                        InputLabelProps={SHOP_FIELD_LABEL_PROPS}
+                                        sx={SHOP_FILTER_FIELD_SX}
                                     />
                                     <TextField
-                                        size="small"
-                                        label="Max"
+                                        label={t('shop.max')}
                                         value={maxPrice}
                                         onChange={(e) => setMaxPrice(e.target.value)}
-                                        sx={SHOP_FIELD_SX}
+                                        InputLabelProps={SHOP_FIELD_LABEL_PROPS}
+                                        sx={SHOP_FILTER_FIELD_SX}
                                     />
                                 </Stack>
                                 <UserActionButton
@@ -555,7 +552,7 @@ export function ShopView() {
                             ) : filteredShopItems.length === 0 ? (
                                 <UserEmptyState
                                     icon="solar:bag-smile-bold-duotone"
-                                    title="No coin packs"
+                                    title={t('shop.noOffers')}
                                     description="Try clearing your filters or check back later for new offers."
                                     actionLabel="Clear filters"
                                     onAction={() => {
@@ -589,10 +586,14 @@ export function ShopView() {
                                                         sx={{
                                                             alignSelf: 'flex-start',
                                                             visibility: shopItem.badge.toLowerCase() !== 'none' ? 'visible' : 'hidden',
-                                                            bgcolor: alpha(USER_COLORS.gold, 0.15),
-                                                            color: USER_COLORS.gold,
-                                                            border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
+                                                            bgcolor: alpha(USER_COLORS.gold, 0.16),
+                                                            color: `${USER_COLORS.gold} !important`,
+                                                            border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}`,
                                                             fontWeight: 700,
+                                                            '& .MuiChip-label': {
+                                                              color: `${USER_COLORS.gold} !important`,
+                                                              fontWeight: 700,
+                                                            },
                                                         }}
                                                     />
                                                 )}
@@ -619,15 +620,20 @@ export function ShopView() {
                                                         size="small"
                                                         sx={{
                                                             alignSelf: 'flex-start',
-                                                            bgcolor: alpha(USER_COLORS.gold, 0.12),
-                                                            color: USER_COLORS.gold,
+                                                            bgcolor: alpha(USER_COLORS.gold, 0.16),
+                                                            color: `${USER_COLORS.gold} !important`,
                                                             fontWeight: 700,
+                                                            border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}`,
+                                                            '& .MuiChip-label': {
+                                                              color: `${USER_COLORS.gold} !important`,
+                                                              fontWeight: 700,
+                                                            },
                                                         }}
                                                     />
                                                 )}
                                                 <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mt: 'auto' }}>
                                                     <UserActionButton size="small" actionVariant="gold" onClick={() => handleOpenModal(shopItem)}>
-                                                        Buy
+                                                        {t('shop.buy')}
                                                     </UserActionButton>
                                                 </Stack>
                                             </UserGlassCard>
@@ -808,14 +814,24 @@ export function ShopView() {
                                                                         >
                                                                             {currencyLabel()} {originalTotal.toFixed(2)}
                                                                         </Typography>
-                                                                        <Typography sx={{ fontSize: 20, fontWeight: 700, color: USER_COLORS.success }}>
+                                                                        <Typography sx={{ fontSize: 20, fontWeight: 700, color: USER_COLORS.gold }}>
                                                                             {currencyLabel()} {discountedTotal.toFixed(2)}
                                                                         </Typography>
                                                                         <Chip 
                                                                             label={`-${selectedItem.discountPercent}% Premium Discount`} 
-                                                                            color="success" 
                                                                             size="small"
-                                                                            sx={{ height: 20, fontSize: '0.7rem' }}
+                                                                            sx={{
+                                                                              height: 22,
+                                                                              fontSize: '0.7rem',
+                                                                              fontWeight: 700,
+                                                                              bgcolor: alpha(USER_COLORS.gold, 0.16),
+                                                                              color: `${USER_COLORS.gold} !important`,
+                                                                              border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}`,
+                                                                              '& .MuiChip-label': {
+                                                                                color: `${USER_COLORS.gold} !important`,
+                                                                                fontWeight: 700,
+                                                                              },
+                                                                            }}
                                                                         />
                                                                     </>
                                                                 );
@@ -833,15 +849,13 @@ export function ShopView() {
                                             </Stack>
                                         ) : (
                                             <Stack spacing={1.5}>
-                                                <Typography sx={SHOP_BODY_TEXT_SX}>
-                                                    Select Currency
-                                                </Typography>
                                                 <TextField
                                                     select
                                                     fullWidth
-                                                    size="small"
+                                                    label="Currency"
                                                     value={selectedCurrency}
                                                     onChange={(e) => setSelectedCurrency(e.target.value)}
+                                                    InputLabelProps={SHOP_FIELD_LABEL_PROPS}
                                                     SelectProps={{
                                                         MenuProps: SHOP_SELECT_MENU_PROPS,
                                                     }}
@@ -891,14 +905,24 @@ export function ShopView() {
                                                                         >
                                                                             {selectedTotal.code} {originalTotal.toFixed(2)}
                                                                         </Typography>
-                                                                        <Typography sx={{ fontSize: 20, fontWeight: 700, color: USER_COLORS.success }}>
+                                                                        <Typography sx={{ fontSize: 20, fontWeight: 700, color: USER_COLORS.gold }}>
                                                                             {selectedTotal.code} {discountedTotal.toFixed(2)}
                                                                         </Typography>
                                                                         <Chip 
                                                                             label={`-${selectedItem.discountPercent}% Premium Discount`} 
-                                                                            color="success" 
                                                                             size="small"
-                                                                            sx={{ height: 20, fontSize: '0.7rem' }}
+                                                                            sx={{
+                                                                              height: 22,
+                                                                              fontSize: '0.7rem',
+                                                                              fontWeight: 700,
+                                                                              bgcolor: alpha(USER_COLORS.gold, 0.16),
+                                                                              color: `${USER_COLORS.gold} !important`,
+                                                                              border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}`,
+                                                                              '& .MuiChip-label': {
+                                                                                color: `${USER_COLORS.gold} !important`,
+                                                                                fontWeight: 700,
+                                                                              },
+                                                                            }}
                                                                         />
                                                                     </>
                                                                 );
@@ -1040,6 +1064,7 @@ export function ShopView() {
                                 value={fromAddress}
                                 onChange={(e) => setFromAddress(e.target.value)}
                                 helperText="Please enter the wallet address you used to send the payment"
+                                InputLabelProps={SHOP_FIELD_LABEL_PROPS}
                                 sx={SHOP_FIELD_SX}
                             />
 
@@ -1051,6 +1076,7 @@ export function ShopView() {
                                 value={transactionId}
                                 onChange={(e) => setTransactionId(e.target.value)}
                                 helperText="Please enter the transaction ID from your payment"
+                                InputLabelProps={SHOP_FIELD_LABEL_PROPS}
                                 sx={SHOP_FIELD_SX}
                             />
                         </Stack>

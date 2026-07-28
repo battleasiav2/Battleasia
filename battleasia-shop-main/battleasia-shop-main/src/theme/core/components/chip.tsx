@@ -152,8 +152,9 @@ const MuiChip: Components<Theme>['MuiChip'] = {
               [`& .${chipClasses.avatar}`]: { color: theme.vars.palette.text.primary },
               '&:hover': { backgroundColor: theme.vars.palette.grey[700] },
               ...theme.applyStyles('dark', {
-                color: theme.vars.palette.grey[800],
-                '&:hover': { backgroundColor: theme.vars.palette.grey[100] },
+                color: theme.vars.palette.common.white,
+                backgroundColor: theme.vars.palette.grey[700],
+                '&:hover': { backgroundColor: theme.vars.palette.grey[600] },
               }),
             }),
         },

@@ -1,0 +1,1 @@
+import{j as o,B as r}from"./mui-core-18bDoQFe.js";import{I as a,a4 as s}from"./index-dzkzF9vW.js";function i({onClick:i,label:l="Back"}){return o.jsx(r,{startIcon:o.jsx(a,{icon:"solar:alt-arrow-left-bold"}),onClick:i,sx:s,children:l})}export{i as U};

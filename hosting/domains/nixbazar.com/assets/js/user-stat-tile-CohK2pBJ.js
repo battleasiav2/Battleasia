@@ -1,0 +1,1 @@
+import{j as a}from"./mui-core-18bDoQFe.js";import{ac as o,g as s}from"./index-dzkzF9vW.js";function e({label:e,value:i,suffix:l,loading:n}){const r=s();return a.jsx(o,{label:e,value:i,suffix:l,loading:n,tokens:r})}export{e as U};

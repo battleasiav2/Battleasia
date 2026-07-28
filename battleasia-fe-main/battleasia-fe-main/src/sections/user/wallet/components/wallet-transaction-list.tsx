@@ -1,4 +1,3 @@
-import { alpha } from '@mui/material/styles';
 import { Box, Chip, Stack, Typography } from '@mui/material';
 
 import { useTranslate } from 'src/locales/use-locales';
@@ -7,6 +6,7 @@ import {
   UserEmptyState,
   USER_COLORS,
   userMutedTextSx,
+  getUserChipSx,
 } from 'src/layouts/user';
 
 import { CoinValue } from 'src/components/coin-value';
@@ -120,11 +120,8 @@ export function WalletTransactionList({
                       mb: 1,
                       height: 22,
                       fontSize: 10,
-                      fontWeight: 800,
                       textTransform: 'uppercase',
-                      bgcolor: isDebit ? alpha(USER_COLORS.error, 0.15) : alpha(USER_COLORS.success, 0.15),
-                      color: isDebit ? USER_COLORS.error : USER_COLORS.success,
-                      border: `1px solid ${isDebit ? alpha(USER_COLORS.error, 0.35) : alpha(USER_COLORS.success, 0.35)}`,
+                      ...getUserChipSx(isDebit ? 'error' : 'gold'),
                     }}
                   />
                   <Typography

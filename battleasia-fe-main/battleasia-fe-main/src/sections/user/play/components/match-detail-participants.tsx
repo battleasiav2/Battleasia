@@ -2,6 +2,7 @@ import { Box, Stack, Avatar, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
+import { getAvatarUrl } from 'src/utils/get-image-url';
 
 import { USER_COLORS, UserEmptyState } from 'src/layouts/user';
 
@@ -71,7 +72,7 @@ export function MatchDetailParticipants({
         >
           <Stack direction="row" alignItems="center" spacing={1} sx={{ flex: 1, minWidth: 0 }}>
             <Avatar
-              src={player.avatar}
+              src={getAvatarUrl(player.avatar)}
               sx={{
                 width: 32,
                 height: 32,

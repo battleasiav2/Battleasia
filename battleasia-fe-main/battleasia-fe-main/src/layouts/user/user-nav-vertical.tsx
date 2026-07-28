@@ -54,15 +54,9 @@ export function UserNavVertical({
     >
       <Logo
         sx={{
-          width: { xs: 64, md: 72 },
-          height: { xs: 64, md: 72 },
+          width: { xs: 74, md: 92 },
+          height: { xs: 74, md: 92 },
           flexShrink: 0,
-          '& img': {
-            borderRadius: `${GLASS_CARD_RADIUS}px`,
-            width: 1,
-            height: 1,
-            objectFit: 'contain',
-          },
         }}
       />
       <Box sx={{ minWidth: 0 }}>

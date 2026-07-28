@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { merge } from 'es-toolkit';
 
 import { Alert, useMediaQuery } from '@mui/material';
-import { useTheme, type Breakpoint } from '@mui/material/styles';
+import { alpha, useTheme, type Breakpoint } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -12,6 +12,7 @@ import { useSelector } from 'src/store';
 import { AuthSplitSection } from './section';
 import { AuthSplitContent } from './content';
 import { AuthHeroPanel } from 'src/sections/auth/auth-hero-panel';
+import { HOME_GAME_ARTS } from 'src/sections/home/play-your-game-section';
 import { MainSection } from '../core/main-section';
 import { LayoutSection } from '../core/layout-section';
 import { HeaderSection } from '../core/header-section';
@@ -23,6 +24,9 @@ import type { HeaderSectionProps } from '../core/header-section';
 import type { LayoutSectionProps } from '../core/layout-section';
 
 // ----------------------------------------------------------------------
+
+const GOLD = '#f5c518';
+const AUTH_BG = HOME_GAME_ARTS[0];
 
 type LayoutBaseProps = Pick<LayoutSectionProps, 'sx' | 'children' | 'cssVars'>;
 
@@ -102,9 +106,10 @@ export function AuthSplitLayout({
           ? (slotProps?.main?.sx ?? [])
           : [slotProps?.main?.sx]),
         {
-          backgroundImage: 'url(/assets/images/auth.webp)',
+          bgcolor: '#0a0a0a',
+          backgroundImage: `url(${AUTH_BG})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'center top',
           backgroundRepeat: 'no-repeat',
           position: 'relative',
           minHeight: '100vh',
@@ -112,16 +117,17 @@ export function AuthSplitLayout({
             content: "''",
             position: 'absolute',
             inset: 0,
-            background:
-              'linear-gradient(90deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.55) 100%)',
+            background: `
+              linear-gradient(90deg, ${alpha('#0a0a0a', 0.88)} 0%, ${alpha('#0a0a0a', 0.62)} 48%, ${alpha('#0a0a0a', 0.78)} 100%),
+              radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(GOLD, 0.08)} 0%, transparent 55%)
+            `,
             zIndex: 0,
           },
           '&::after': {
             content: "''",
             position: 'absolute',
             inset: 0,
-            background:
-              'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 40%, rgba(0,0,0,0.8) 100%)',
+            background: `linear-gradient(180deg, ${alpha('#0a0a0a', 0.35)} 0%, transparent 40%, ${alpha('#0a0a0a', 0.88)} 100%)`,
             zIndex: 0,
           },
         },

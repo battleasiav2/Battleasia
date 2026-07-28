@@ -22,37 +22,11 @@
 /* scrollbar */
 @import './components/scrollbar/styles.css';
 
-@font-face {
-  font-family: 'tr';
-  src: url('./assets/fonts/tekoregular.ttf');
-  font-display: swap; /* Prevent FOUT - show fallback font first */
-  font-weight: 400;
-}
-
-@font-face {
-  font-family: 'tm';
-  src: url('./assets/fonts/tekomedium.ttf');
-  font-display: swap;
-  font-weight: 500;
-}
-
-@font-face {
-  font-family: 'an';
-  src: url('./assets/fonts/arialn.TTF');
-  font-display: swap;
-  font-weight: 400;
-}
-
-.font-tr {
-  font-family: 'tr' !important;
-}
-
-.font-tm {
-  font-family: 'tm' !important;
-}
-
+/** Legacy display font hooks — use app default typography (Public Sans). */
+.font-tr,
+.font-tm,
 .font-an {
-  font-family: 'an' !important;
+  font-family: inherit !important;
 }
 
 /** **************************************
@@ -60,7 +34,26 @@
 *************************************** */
 html {
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/** PUBG Mobile–style home scroll panels (desktop) */
+.home-scroll-story {
+  scroll-padding-top: 108px;
+}
+
+@media (min-width: 900px) {
+  .home-scroll-story > * {
+    scroll-margin-top: 108px;
+  }
+}
+
 body {
   min-height: 100vh;
 }

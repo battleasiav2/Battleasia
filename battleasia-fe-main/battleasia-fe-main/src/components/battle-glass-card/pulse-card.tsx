@@ -1,4 +1,5 @@
 import { Box, Card, Chip, Grid, Stack, Typography } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
 import { glassShimmerKeyframes, glassShimmerLayer } from './glass-shimmer';
 import { GLASS_CARD_RADIUS, GLASS_CARD_RADIUS_SM } from './glass-card-tokens';
@@ -50,7 +51,7 @@ export function PulseCard({
           <Typography variant="subtitle2" sx={{ color: '#f5c518', fontWeight: 700, letterSpacing: 0.4 }}>
             {tokens.label}
           </Typography>
-          <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+          <Typography variant="caption" sx={{ color: alpha('#ffffff', 0.72) }}>
             {tokens.description}
           </Typography>
         </Stack>
@@ -68,6 +69,14 @@ export function PulseCard({
           backdropFilter: tokens.shell.backdropFilter,
           WebkitBackdropFilter: tokens.shell.backdropFilter,
           ...(tokens.shell.shimmer ? { ...glassShimmerKeyframes, ...glassShimmerLayer } : {}),
+          transition:
+            'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.4s ease',
+          '&:hover': {
+            transform: 'translateY(-6px)',
+            borderColor: 'rgba(245, 197, 24, 0.45)',
+            boxShadow:
+              '0 22px 48px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(245, 197, 24, 0.2), 0 0 32px rgba(245, 197, 24, 0.12)',
+          },
           '&:before': tokens.shell.overlay
             ? {
                 content: "''",
@@ -95,13 +104,15 @@ export function PulseCard({
                   letterSpacing: 0.6,
                   height: 28,
                   px: 0.5,
-                  bgcolor: tokens.badge.bgcolor,
-                  color: tokens.badge.color,
-                  border: tokens.badge.border,
-                  boxShadow: tokens.badge.boxShadow,
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                  '& .MuiChip-label': { px: 1.25 },
+                  bgcolor: 'rgba(245, 197, 24, 0.12)',
+                  color: '#f5c518',
+                  border: '1px solid rgba(245, 197, 24, 0.45)',
+                  boxShadow: '0 0 12px rgba(245, 197, 24, 0.1)',
+                  '& .MuiChip-label': {
+                    px: 1.25,
+                    color: '#f5c518',
+                    fontWeight: 700,
+                  },
                 }}
               />
               <Typography
@@ -110,6 +121,8 @@ export function PulseCard({
                   color: tokens.titleColor,
                   fontSize: { xs: '1.25rem', sm: '1.5rem', md: '2rem' },
                   fontWeight: 800,
+                  textTransform: 'uppercase',
+                  letterSpacing: { xs: 0.6, md: 1.2 },
                   wordBreak: 'break-word',
                 }}
               >

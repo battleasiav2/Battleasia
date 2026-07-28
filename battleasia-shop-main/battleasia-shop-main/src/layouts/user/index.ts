@@ -7,6 +7,7 @@ export { UserBackButton } from './user-back-button';
 export { UserActionButton } from './user-action-button';
 export { UserEmptyState } from './user-empty-state';
 export { UserStatTile } from './user-stat-tile';
+export { UserArenaStrip, UserArenaChip } from './user-arena-strip';
 
 export {
   USER_COLORS,

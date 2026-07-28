@@ -46,6 +46,8 @@ type ProfileSidebarProps = {
   following?: number;
   userId?: string;
   hideBalance?: boolean;
+  onFollowersClick?: () => void;
+  onFollowingClick?: () => void;
 };
 
 export function ProfileSidebar({
@@ -54,6 +56,8 @@ export function ProfileSidebar({
   following = 0,
   userId,
   hideBalance = false,
+  onFollowersClick,
+  onFollowingClick,
 }: ProfileSidebarProps) {
   const { t, currentLang } = useTranslate();
   const { user, balance } = useSelector((state: RootState) => state.auth);
@@ -141,17 +145,29 @@ export function ProfileSidebar({
 
         <Stack direction="row" spacing={1.5} sx={{ mb: 2 }}>
           {[
-            { label: t('profile.followers'), value: followers, icon: 'solar:users-group-rounded-bold' },
-            { label: t('profile.following'), value: following, icon: 'streamline-ultimate:following-1-bold' },
-          ].map((item) => (
-            <Box key={item.label} sx={{ ...getGlassInnerSx(tokens, { p: 1.5, flex: 1, textAlign: 'center' }) }}>
+            { type: 'followers' as const, label: t('profile.followers'), value: followers, icon: 'solar:users-group-rounded-bold' },
+            { type: 'following' as const, label: t('profile.following'), value: following, icon: 'streamline-ultimate:following-1-bold' },
+          ].map((item) => {
+            const handleClick = item.type === 'followers' ? onFollowersClick : onFollowingClick;
+            return (
+            <Box
+              key={item.type}
+              onClick={handleClick}
+              sx={{
+                ...getGlassInnerSx(tokens, { p: 1.5, flex: 1, textAlign: 'center' }),
+                cursor: handleClick ? 'pointer' : 'default',
+                transition: 'border-color 0.2s, transform 0.2s',
+                '&:hover': handleClick ? { borderColor: alpha(USER_COLORS.gold, 0.35), transform: 'translateY(-1px)' } : undefined,
+              }}
+            >
               <Iconify icon={item.icon} width={20} sx={{ color: USER_COLORS.gold, mb: 0.5 }} />
               <Typography sx={{ fontSize: 18, fontWeight: 800, color: USER_COLORS.textPrimary }}>{item.value}</Typography>
               <Typography sx={{ fontSize: 10, color: USER_COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
                 {item.label}
               </Typography>
             </Box>
-          ))}
+            );
+          })}
         </Stack>
 
         <Typography sx={{ fontSize: 12, color: USER_COLORS.textMuted, mb: 1 }}>

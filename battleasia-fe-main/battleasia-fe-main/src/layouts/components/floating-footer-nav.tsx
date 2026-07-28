@@ -106,10 +106,10 @@ export function FloatingFooterNav() {
                         <Box
                             component="span"
                             sx={{
-                                fontSize: 9,
-                                fontWeight: 700,
-                                letterSpacing: 0.4,
-                                textTransform: 'uppercase',
+                                fontSize: 10,
+                                fontWeight: 600,
+                                letterSpacing: 0.02,
+                                textTransform: 'none',
                                 lineHeight: 1,
                             }}
                         >

@@ -4,7 +4,6 @@ import { Box, Stack } from '@mui/material';
 
 import {
   UserPageShell,
-  UserPageTitle,
   UserGlassCard,
   UserStatTile,
   UserEmptyState,
@@ -84,11 +83,9 @@ export function NotificationsView() {
 
   return (
     <UserPageShell contentSx={{ maxWidth: 860, mx: 'auto' }}>
-      <NotificationsHero title={t('notifications.title')} unreadCount={unreadCount} />
-
-      <UserPageTitle
-        badge={t('notifications.badgeInbox')}
+      <NotificationsHero
         title={t('notifications.title')}
+        unreadCount={unreadCount}
         subtitle={t('notifications.subtitle')}
         action={
           unreadCount > 0 ? (
@@ -97,7 +94,6 @@ export function NotificationsView() {
               size="small"
               onClick={handleMarkAllAsRead}
               startIcon={<Iconify icon="hugeicons:tick-double-02" />}
-              sx={{ display: { xs: 'none', md: 'inline-flex' } }}
             >
               {t('notifications.markAllAsRead')}
             </UserActionButton>

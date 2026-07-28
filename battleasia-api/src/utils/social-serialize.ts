@@ -101,11 +101,12 @@ export async function serializePublicUser(
   viewerId?: string
 ) {
   const userId = user._id.toString();
-  const [socialStats, gamingStats, following, postsCount] = await Promise.all([
+  const [socialStats, gamingStats, following, postsCount, blockedByViewer] = await Promise.all([
     getUserSocialStats(userId),
     getUserGamingStats(userId),
     viewerId ? isFollowing(viewerId, userId) : Promise.resolve(false),
     Feed.countDocuments({ authorId: userId, status: 'published' }),
+    viewerId && viewerId !== userId ? isBlocked(viewerId, userId) : Promise.resolve(false),
   ]);
 
   return {
@@ -131,6 +132,7 @@ export async function serializePublicUser(
     following: socialStats.following,
     posts: postsCount,
     isFollowing: following,
+    isBlocked: blockedByViewer,
     isOwnProfile: viewerId === userId,
     privacy: user.privacy || { profile: 'public' },
     gamingStats,

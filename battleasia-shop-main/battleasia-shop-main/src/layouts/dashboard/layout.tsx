@@ -14,7 +14,9 @@ import { RouterLink } from 'src/routes/components';
 import { useSelector } from 'src/store';
 
 import { Logo } from 'src/components/logo';
+import { SiteScrollProgress } from 'src/components/animate';
 import { useSettingsContext } from 'src/components/settings';
+import { userGoldButtonSx } from 'src/layouts/user/user-theme';
 
 import { layoutClasses } from '../core/classes';
 import { NavHorizontal } from './nav-horizontal';
@@ -165,11 +167,11 @@ export function DashboardLayout({
                 component={RouterLink}
                 href={item.href}
                 onClick={(e) => handleMenuClick(e as React.MouseEvent<HTMLAnchorElement>, item)}
-                className="font-tr"
                 sx={{
-                  textTransform: 'uppercase',
+                  textTransform: 'none',
                   fontSize: menuStyles.fontSize,
-                  fontWeight: menuStyles.fontWeight,
+                  fontWeight: 600,
+                  letterSpacing: 0.02,
                   color: isActive ? menuStyles.activeColor : menuStyles.inactiveColor,
                   textDecoration: 'none',
                   cursor: 'pointer',
@@ -194,16 +196,12 @@ export function DashboardLayout({
             <Button
               component={RouterLink}
               href={paths.auth.signIn}
-              className="font-tr"
               sx={{
+                ...userGoldButtonSx,
                 height: { sm: 45, md: 53 },
                 px: { sm: 3, md: 6.7 },
-                fontSize: { sm: 24, md: 28 },
-                color: "#000",
-                fontWeight: "normal",
-                borderRadius: 0,
-                background: "url(/assets/images/btn-bg.webp) no-repeat center center",
-                backgroundSize: "cover",
+                fontSize: { sm: 16, md: 18 },
+                fontWeight: 600,
               }}
             >
               LOGIN
@@ -254,39 +252,42 @@ export function DashboardLayout({
   const renderMain = () => <MainSection {...slotProps?.main}>{children}</MainSection>;
 
   return (
-    <LayoutSection
-      /** **************************************
-       * @Header
-       *************************************** */
-      headerSection={renderHeader()}
-      /** **************************************
-       * @Sidebar
-       *************************************** */
-      // sidebarSection={isNavHorizontal ? null : renderSidebar()}
-      /** **************************************
-       * @Footer
-       *************************************** */
-      footerSection={renderFooter()}
-      /** **************************************
-       * @Styles
-       *************************************** */
-      cssVars={{ ...dashboardLayoutVars(theme), ...navVars.layout, ...cssVars }}
-      sx={[
-        {
-          [`& .${layoutClasses.sidebarContainer}`]: {
-            [theme.breakpoints.up(layoutQuery)]: {
-              pl: isNavMini ? 'var(--layout-nav-mini-width)' : 'var(--layout-nav-vertical-width)',
-              transition: theme.transitions.create(['padding-left'], {
-                easing: 'var(--layout-transition-easing)',
-                duration: 'var(--layout-transition-duration)',
-              }),
+    <>
+      <SiteScrollProgress />
+      <LayoutSection
+        /** **************************************
+         * @Header
+         *************************************** */
+        headerSection={renderHeader()}
+        /** **************************************
+         * @Sidebar
+         *************************************** */
+        // sidebarSection={isNavHorizontal ? null : renderSidebar()}
+        /** **************************************
+         * @Footer
+         *************************************** */
+        footerSection={renderFooter()}
+        /** **************************************
+         * @Styles
+         *************************************** */
+        cssVars={{ ...dashboardLayoutVars(theme), ...navVars.layout, ...cssVars }}
+        sx={[
+          {
+            [`& .${layoutClasses.sidebarContainer}`]: {
+              [theme.breakpoints.up(layoutQuery)]: {
+                pl: isNavMini ? 'var(--layout-nav-mini-width)' : 'var(--layout-nav-vertical-width)',
+                transition: theme.transitions.create(['padding-left'], {
+                  easing: 'var(--layout-transition-easing)',
+                  duration: 'var(--layout-transition-duration)',
+                }),
+              },
             },
           },
-        },
-        ...(Array.isArray(sx) ? sx : [sx]),
-      ]}
-    >
-      {renderMain()}
-    </LayoutSection>
+          ...(Array.isArray(sx) ? sx : [sx]),
+        ]}
+      >
+        {renderMain()}
+      </LayoutSection>
+    </>
   );
 }

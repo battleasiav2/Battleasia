@@ -8,10 +8,11 @@ type UserStatTileProps = {
   label: string;
   value: ReactNode;
   suffix?: string;
+  icon?: string;
   loading?: boolean;
 };
 
-export function UserStatTile({ label, value, suffix, loading }: UserStatTileProps) {
+export function UserStatTile({ label, value, suffix, icon, loading }: UserStatTileProps) {
   const tokens = getDefaultGlassTokens();
 
   return (
@@ -19,6 +20,7 @@ export function UserStatTile({ label, value, suffix, loading }: UserStatTileProp
       label={label}
       value={value}
       suffix={suffix}
+      icon={icon}
       loading={loading}
       tokens={tokens}
     />

@@ -1,0 +1,26 @@
+NIXBAZAR.COM — same logo as localhost (transparent Mansory crest)
+================================================================
+
+Ready package (full site):
+  hosting/upload/nixbazar-public_html.zip  (~76 MB)
+
+Server path:
+  /home/nixbazar/public_html/
+
+Steps (Webuzo / File Manager):
+  1. Backup current public_html (optional)
+  2. Upload nixbazar-public_html.zip
+  3. Extract into public_html (overwrite)
+  4. Hard refresh: Ctrl+Shift+R on https://nixbazar.com/
+
+Logo files only (if you already updated JS elsewhere):
+  public_html/logo/logo.png
+  public_html/logo/logo.webp
+  public_html/store/logo/logo.png
+  public_html/store/logo/logo.webp
+
+Local source (same files):
+  battleasia-fe-main/battleasia-fe-main/public/logo/logo.png
+
+Built bundle uses:
+  /logo/logo.png?v=user-transparent

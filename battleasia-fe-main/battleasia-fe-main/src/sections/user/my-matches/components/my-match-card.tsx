@@ -1,16 +1,15 @@
-import { Box, Stack, Button, Typography, Grid2 as Grid } from '@mui/material';
+import { Box, Stack, Button, Typography, Grid2 as Grid, Chip } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
 import { CoinValue } from 'src/components/coin-value';
 import {
-  GLASS_CARD_RADIUS_SM,
   getDefaultGlassTokens,
-  getGlassShellSx,
   getGlassBadgeChipSx,
+  getGoldTopLineShellSx,
 } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, userGoldButtonSx } from 'src/layouts/user';
+import { USER_COLORS, userGoldButtonSx, getUserChipSx } from 'src/layouts/user';
 
 import { MatchStatPill } from '../../play/components/match-stat-pill';
 import type { MyMatchCardData } from '../my-matches-types';
@@ -41,7 +40,7 @@ export function MyMatchCard({ match, onViewDetails, translations }: MyMatchCardP
   const isLoss = match.status === 'loss';
   const isWin = match.status === 'win';
 
-  const statusColor = isWin ? USER_COLORS.success : isLoss ? USER_COLORS.error : USER_COLORS.gold;
+  const statusChipTone = isWin ? 'success' : isLoss ? 'error' : 'gold';
   const statusLabel = isWin ? translations.won : isLoss ? translations.lost : translations.pending;
 
   const matchType = match.matchType?.toLowerCase();
@@ -54,7 +53,7 @@ export function MyMatchCard({ match, onViewDetails, translations }: MyMatchCardP
 
   return (
     <Box
-      sx={getGlassShellSx(tokens, {
+      sx={getGoldTopLineShellSx({
         p: 0,
         overflow: 'hidden',
         height: 1,
@@ -107,7 +106,7 @@ export function MyMatchCard({ match, onViewDetails, translations }: MyMatchCardP
           </Box>
           {match.map ? (
             <Box sx={getGlassBadgeChipSx(tokens)}>
-              <Typography sx={{ fontSize: 10, fontWeight: 700, px: 0.5, color: USER_COLORS.textMuted }}>
+              <Typography sx={{ fontSize: 10, fontWeight: 700, px: 0.5, color: USER_COLORS.gold }}>
                 {match.map}
               </Typography>
             </Box>
@@ -115,14 +114,9 @@ export function MyMatchCard({ match, onViewDetails, translations }: MyMatchCardP
         </Stack>
 
         <Box sx={{ position: 'absolute', bottom: 10, right: 10 }}>
-          <Box
-            sx={{
-              ...getGlassBadgeChipSx(tokens),
-              bgcolor: alpha(statusColor, 0.2),
-              border: `1px solid ${alpha(statusColor, 0.45)}`,
-            }}
-          >
-            <Stack direction="row" alignItems="center" spacing={0.5} sx={{ px: 0.5 }}>
+          <Chip
+            size="small"
+            icon={
               <Iconify
                 icon={
                   isWin
@@ -131,14 +125,18 @@ export function MyMatchCard({ match, onViewDetails, translations }: MyMatchCardP
                       ? 'solar:close-circle-bold'
                       : 'solar:clock-circle-bold'
                 }
-                width={12}
-                sx={{ color: statusColor }}
+                width={14}
               />
-              <Typography sx={{ fontSize: 10, fontWeight: 800, color: statusColor }}>
-                {statusLabel}
-              </Typography>
-            </Stack>
-          </Box>
+            }
+            label={statusLabel}
+            sx={{
+              ...getUserChipSx(statusChipTone),
+              height: 26,
+              fontWeight: 800,
+              letterSpacing: 0.5,
+              '& .MuiChip-icon': { color: 'inherit', ml: 0.75 },
+            }}
+          />
         </Box>
       </Box>
 
@@ -204,22 +202,14 @@ export function MyMatchCard({ match, onViewDetails, translations }: MyMatchCardP
 
         <Button
           fullWidth
+          variant="outlined"
+          disableElevation
           onClick={onViewDetails}
           startIcon={<Iconify icon="solar:eye-bold" width={16} />}
           sx={{
             ...userGoldButtonSx,
             mt: 'auto',
             py: 1.1,
-            borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
-            bgcolor: alpha(USER_COLORS.gold, 0.14),
-            color: USER_COLORS.gold,
-            background: 'none',
-            border: `1px solid ${alpha(USER_COLORS.gold, 0.4)}`,
-            boxShadow: 'none',
-            '&:hover': {
-              bgcolor: alpha(USER_COLORS.gold, 0.22),
-              background: 'none',
-            },
           }}
         >
           {translations.viewDetails}

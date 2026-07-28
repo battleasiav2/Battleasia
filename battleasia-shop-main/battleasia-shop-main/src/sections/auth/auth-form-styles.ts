@@ -30,7 +30,7 @@ export const authFieldSlotProps = {
       minHeight: 48,
       transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease',
       '& input::placeholder': {
-        color: alpha('#ffffff', 0.4),
+        color: alpha('#ffffff', 0.55),
         opacity: 1,
       },
       '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
@@ -97,22 +97,32 @@ export const authPhoneCountrySx = {
 export const authSelectMenuProps = {
   PaperProps: {
     sx: {
-      mt: 0.5,
-      bgcolor: alpha('#0a0a0a', 0.96),
+      mt: 0.75,
+      maxHeight: 320,
+      borderRadius: 0,
+      bgcolor: alpha('#0a0a0a', 0.98),
       border: `1px solid ${alpha('#ffffff', 0.14)}`,
-      backdropFilter: 'blur(12px)',
+      backdropFilter: 'blur(14px)',
       boxShadow: `0 16px 40px ${alpha('#000000', 0.65)}`,
       '& .MuiMenuItem-root': {
-        color: alpha('#ffffff', 0.88),
+        color: alpha('#ffffff', 0.9),
         fontSize: 14,
+        minHeight: 44,
+        py: 1.1,
+        px: 1.5,
+        borderRadius: 0,
         '&:hover': { bgcolor: alpha('#f59e0b', 0.12) },
         '&.Mui-selected': {
           bgcolor: alpha('#f59e0b', 0.18),
-          '&:hover': { bgcolor: alpha('#f59e0b', 0.22) },
+          color: '#ffffff',
+          '&:hover': { bgcolor: alpha('#f59e0b', 0.24) },
         },
         '&.Mui-disabled': {
           color: alpha('#ffffff', 0.35),
         },
+      },
+      '& .MuiList-root': {
+        py: 0.5,
       },
     },
   },

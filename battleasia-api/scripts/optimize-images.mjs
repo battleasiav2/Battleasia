@@ -9,7 +9,32 @@ const TARGETS = [
     dir: 'battleasia-fe-main/battleasia-fe-main/public',
     maxWidth: 1920,
     quality: 78,
-    patterns: [/hero-banner-pubg\.png$/i, /about-pubg-black\.png$/i, /dashboard-pubg-black\.png$/i],
+    patterns: [
+      /hero-banner-pubg\.png$/i,
+      /hero-banner-pubg-drop\.png$/i,
+      /hero-banner-pubg-pan\.png$/i,
+      /hero-banner-war-gaming\.png$/i,
+      /about-pubg-black\.png$/i,
+      /dashboard-pubg-black\.png$/i,
+    ],
+  },
+  {
+    dir: 'battleasia-fe-main/battleasia-fe-main/public',
+    maxWidth: 800,
+    quality: 80,
+    patterns: [/home[/\\]modes[/\\]mode-.*\.png$/i],
+  },
+  {
+    dir: 'battleasia-fe-main/battleasia-fe-main/public',
+    maxWidth: 512,
+    quality: 82,
+    patterns: [/games[/\\]art[/\\].*\.png$/i],
+  },
+  {
+    dir: 'battleasia-fe-main/battleasia-fe-main/public',
+    maxWidth: 640,
+    quality: 82,
+    patterns: [/hero-title-battleasia\.png$/i],
   },
   {
     dir: 'battleasia-shop-main/battleasia-shop-main/public',

@@ -10,7 +10,6 @@ import { useApi, useLiveSync, LIVE_SYNC_TOPICS } from 'src/hooks';
 import { useSelector } from 'src/store';
 import {
   UserPageShell,
-  UserPageTitle,
   UserGlassCard,
   UserStatTile,
   UserEmptyState,
@@ -87,13 +86,7 @@ export function MyStatisticsView() {
 
   return (
     <UserPageShell>
-      <StatisticsHero title={t('myStatistics.title')} />
-
-      <UserPageTitle
-        badge={t('myStatistics.badgePerformance')}
-        title={t('myStatistics.title')}
-        subtitle={t('myStatistics.subtitle')}
-      />
+      <StatisticsHero title={t('myStatistics.title')} subtitle={t('myStatistics.subtitle')} />
 
       {showInitialSkeleton ? (
         <StatisticsPageSkeleton />

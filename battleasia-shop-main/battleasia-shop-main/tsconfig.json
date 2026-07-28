@@ -20,7 +20,10 @@
     /* Linting */
     "strict": true,
     "noEmit": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "paths": {
+      "src/*": ["src/*"]
+    }
   },
   "include": ["src"],
   "exclude": ["node_modules"],

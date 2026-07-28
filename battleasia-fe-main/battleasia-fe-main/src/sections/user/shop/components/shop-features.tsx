@@ -2,9 +2,11 @@ import { Box, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
-import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
+import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
-import { UserGlassCard, USER_COLORS } from 'src/layouts/user';
+import { getGoldTopLineCardSx } from 'src/components/battle-glass-card';
+
+import { USER_COLORS } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
@@ -20,63 +22,75 @@ type ShopFeaturesProps = {
 };
 
 export function ShopFeatures({ title, features }: ShopFeaturesProps) {
-  const tokens = getDefaultGlassTokens();
-
   return (
-    <UserGlassCard sx={{ p: { xs: 2, md: 2.5 }, height: 1 }}>
+    <Box>
       <Typography
         className="font-tr"
         sx={{
-          fontSize: 16,
+          fontSize: { xs: 18, md: 22 },
           fontWeight: 800,
           textTransform: 'uppercase',
-          color: USER_COLORS.gold,
+          color: USER_COLORS.textPrimary,
           letterSpacing: 0.5,
-          mb: 2,
         }}
       >
         {title}
       </Typography>
+      <BattleGoldDivider variant="section" sx={{ mt: 0.75, mb: 2, width: 100 }} />
 
-      <Stack spacing={1.25}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
+          gap: 1.5,
+        }}
+      >
         {features.map((feature) => (
           <Box
             key={feature.title}
-            sx={getGlassInnerSx(tokens, {
-              p: 1.5,
-              display: 'flex',
-              gap: 1.25,
-              alignItems: 'flex-start',
+            sx={getGoldTopLineCardSx({
+              p: { xs: 1.75, md: 2 },
+              pt: { xs: 2.25, md: 2.5 },
+              '& > *': { position: 'relative', zIndex: 1 },
             })}
           >
-            <Box
-              sx={{
-                width: 40,
-                height: 40,
-                borderRadius: '6px',
-                flexShrink: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                bgcolor: alpha(USER_COLORS.gold, 0.1),
-                border: `1px solid ${alpha(USER_COLORS.gold, 0.22)}`,
-                color: USER_COLORS.gold,
-              }}
-            >
-              <Iconify icon={feature.icon} width={20} />
-            </Box>
+            <Stack direction="row" spacing={1.25} alignItems="flex-start">
+              <Box
+                sx={{
+                  width: 40,
+                  height: 40,
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  bgcolor: alpha(USER_COLORS.gold, 0.1),
+                  border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
+                  color: USER_COLORS.gold,
+                }}
+              >
+                <Iconify icon={feature.icon} width={20} />
+              </Box>
 
-            <Box sx={{ minWidth: 0 }}>
-              <Typography sx={{ fontSize: 14, fontWeight: 700, color: USER_COLORS.textPrimary }}>
-                {feature.title}
-              </Typography>
-              <Typography sx={{ mt: 0.35, fontSize: 12, color: USER_COLORS.textMuted, lineHeight: 1.5 }}>
-                {feature.description}
-              </Typography>
-            </Box>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography
+                  sx={{
+                    fontSize: 13,
+                    fontWeight: 800,
+                    letterSpacing: 0.4,
+                    textTransform: 'uppercase',
+                    color: USER_COLORS.textPrimary,
+                  }}
+                >
+                  {feature.title}
+                </Typography>
+                <Typography sx={{ mt: 0.5, fontSize: 12, color: USER_COLORS.textMuted, lineHeight: 1.55 }}>
+                  {feature.description}
+                </Typography>
+              </Box>
+            </Stack>
           </Box>
         ))}
-      </Stack>
-    </UserGlassCard>
+      </Box>
+    </Box>
   );
 }

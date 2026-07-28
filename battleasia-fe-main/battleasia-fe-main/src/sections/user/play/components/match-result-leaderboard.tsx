@@ -1,11 +1,11 @@
-import { Box, Stack, Avatar, Typography } from '@mui/material';
+import { Box, Stack, Avatar, Typography, Chip } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
 import CoinValue from 'src/components/coin-value';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, UserEmptyState } from 'src/layouts/user';
+import { USER_COLORS, UserEmptyState, getUserChipSx } from 'src/layouts/user';
 import { useTranslate } from 'src/locales/use-locales';
 
 import {
@@ -118,23 +118,18 @@ export function MatchResultLeaderboard({ participants }: MatchResultLeaderboardP
 
               {/* Status */}
               <Box sx={{ flexShrink: 0, alignSelf: { xs: 'flex-start', md: 'center' } }}>
-                <Box
+                <Chip
+                  size="small"
+                  label={isWinner ? 'Winner' : 'Lose'}
                   sx={{
-                    display: 'inline-flex',
-                    px: 1.25,
-                    py: 0.4,
-                    borderRadius: '4px',
+                    ...getUserChipSx(isWinner ? 'success' : 'error'),
+                    height: 24,
                     fontSize: 10,
                     fontWeight: 800,
                     letterSpacing: 0.6,
                     textTransform: 'uppercase',
-                    color: isWinner ? USER_COLORS.success : USER_COLORS.error,
-                    bgcolor: alpha(isWinner ? USER_COLORS.success : USER_COLORS.error, 0.12),
-                    border: `1px solid ${alpha(isWinner ? USER_COLORS.success : USER_COLORS.error, 0.35)}`,
                   }}
-                >
-                  {isWinner ? 'Winner' : 'Lose'}
-                </Box>
+                />
               </Box>
             </Stack>
           </Box>

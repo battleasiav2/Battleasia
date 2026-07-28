@@ -10,6 +10,12 @@ export * from './motion-viewport';
 
 export * from './scroll-progress';
 
+export * from './scroll-reveal';
+
+export * from './scroll-parallax';
+
+export * from './site-scroll-progress';
+
 export * from './animate-count-up';
 
 export * from './motion-container';

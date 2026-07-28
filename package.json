@@ -16,7 +16,8 @@
     "docker:prod:down": "docker compose -f docker-compose.prod.yml down",
     "backup:mongo": "powershell -ExecutionPolicy Bypass -File deploy/backup-mongo.ps1",
     "build:hosting": "powershell -ExecutionPolicy Bypass -File hosting/scripts/build-for-hosting.ps1",
-    "build:nixbazar": "powershell -ExecutionPolicy Bypass -File hosting/scripts/build-for-nixbazar.ps1"
+    "build:nixbazar": "powershell -ExecutionPolicy Bypass -File hosting/scripts/build-for-nixbazar.ps1",
+    "package:webuzo": "powershell -ExecutionPolicy Bypass -File hosting/scripts/package-webuzo.ps1"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

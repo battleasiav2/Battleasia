@@ -21,6 +21,10 @@ const AuthGuard = ({ children }: GuardProps) => {
     }
   }, [isLoggedIn, dispatch, router]);
 
+  if (!isLoggedIn) {
+    return null;
+  }
+
   return children;
 };
 

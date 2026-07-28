@@ -1,4 +1,5 @@
 import type { ButtonProps } from '@mui/material/Button';
+import type { SxProps, Theme } from '@mui/material/styles';
 
 import { useCallback } from 'react';
 
@@ -6,6 +7,7 @@ import Button from '@mui/material/Button';
 
 import { dispatch } from 'src/store';
 import { logoutAction } from 'src/store/reducers/auth';
+import { userLogoutButtonSx } from 'src/layouts/user/user-theme';
 
 // ----------------------------------------------------------------------
 
@@ -14,7 +16,6 @@ type Props = ButtonProps & {
 };
 
 export function SignOutButton({ onClose, sx, ...other }: Props) {
-
   const handleLogout = useCallback(async () => {
     try {
       dispatch(logoutAction());
@@ -24,14 +25,19 @@ export function SignOutButton({ onClose, sx, ...other }: Props) {
     }
   }, [onClose]);
 
+  const mergedSx: SxProps<Theme> = sx
+    ? [userLogoutButtonSx, ...(Array.isArray(sx) ? sx : [sx])]
+    : userLogoutButtonSx;
+
   return (
     <Button
+      {...other}
       fullWidth
-      variant="contained"
+      variant="outlined"
+      disableElevation
       size="large"
       onClick={handleLogout}
-      sx={sx}
-      {...other}
+      sx={mergedSx}
     >
       Logout
     </Button>

@@ -1,4 +1,4 @@
-import { Box, Stack, Button, Typography, Grid2 as Grid } from '@mui/material';
+import { Box, Stack, Button, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
@@ -12,18 +12,18 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
 import CoinValue from 'src/components/coin-value';
-import TextMaxLine from 'src/components/text-max-line';
 import {
-  GLASS_CARD_RADIUS_SM,
   getDefaultGlassTokens,
-  getGlassShellSx,
   getGlassBadgeChipSx,
+  getGoldTopLineShellSx,
 } from 'src/components/battle-glass-card';
 
 import { USER_COLORS, userGoldButtonSx } from 'src/layouts/user';
 
 import { MatchStatPill } from './match-stat-pill';
+import { MatchEntryWinTile } from './match-entry-win-tile';
 import { MatchRoomDialog } from './match-room-dialog';
+import { estimateMatchWinningPool } from '../match-prize-utils';
 import { getMatchBannerUrl, type MatchCardProps } from '../match-types';
 
 
@@ -44,6 +44,7 @@ export function MatchCard({
   const bannerUrl = getMatchBannerUrl(match.banner);
   const isPremiumMatch = match.premiumOnly === true;
   const buttonDisabled = joining || isJoined || !canJoin || (isPremiumMatch && !isPremiumUser);
+  const winningPool = estimateMatchWinningPool(match);
 
   const goToDetail = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -61,7 +62,7 @@ export function MatchCard({
   return (
     <Box
       onClick={isResult ? handleCardClick : undefined}
-      sx={getGlassShellSx(tokens, {
+      sx={getGoldTopLineShellSx({
         p: 0,
         overflow: 'hidden',
         cursor: isResult ? 'pointer' : 'default',
@@ -152,25 +153,18 @@ export function MatchCard({
           </Stack>
         </Box>
 
-        <Grid container spacing={1}>
-          <Grid size={4}>
-            <MatchStatPill label={t('match.entry')}>
-              <CoinValue value={match.entryFee ?? 0} size={14} />
-            </MatchStatPill>
-          </Grid>
-          <Grid size={4}>
-            <MatchStatPill label={t('match.perKill')}>
-              <CoinValue value={match.perKill ?? 0} size={14} />
-            </MatchStatPill>
-          </Grid>
-          <Grid size={4}>
-            <MatchStatPill label={t('match.prize')}>
-              <TextMaxLine line={1} sx={{ fontSize: 12 }}>
-                {match.prizeDescription || 'N/A'}
-              </TextMaxLine>
-            </MatchStatPill>
-          </Grid>
-        </Grid>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+            gap: 1.25,
+          }}
+        >
+          <MatchEntryWinTile entryFee={match.entryFee ?? 0} winningAmount={winningPool} />
+          <MatchStatPill label={t('match.perKill')} minHeight={88} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <CoinValue value={match.perKill ?? 0} size={18} />
+          </MatchStatPill>
+        </Box>
 
         {!isResult ? (
           <MatchRoomDialog
@@ -199,6 +193,8 @@ export function MatchCard({
         {isResult ? (
           <Button
             fullWidth
+            variant="outlined"
+            disableElevation
             onClick={(e) => {
               e.stopPropagation();
               router.push(paths.user.matchResult(match.id));
@@ -206,16 +202,6 @@ export function MatchCard({
             sx={{
               ...userGoldButtonSx,
               py: 1.1,
-              borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
-              bgcolor: alpha(USER_COLORS.gold, 0.14),
-              color: USER_COLORS.gold,
-              background: 'none',
-              border: `1px solid ${alpha(USER_COLORS.gold, 0.4)}`,
-              boxShadow: 'none',
-              '&:hover': {
-                bgcolor: alpha(USER_COLORS.gold, 0.22),
-                background: 'none',
-              },
             }}
           >
             View Results
@@ -223,6 +209,8 @@ export function MatchCard({
         ) : (
           <Button
             fullWidth
+            variant="outlined"
+            disableElevation
             disabled={buttonDisabled}
             onClick={(e) => {
               e.stopPropagation();
@@ -231,7 +219,6 @@ export function MatchCard({
             sx={{
               ...userGoldButtonSx,
               py: 1.1,
-              borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
             }}
           >
             {isJoined ? (

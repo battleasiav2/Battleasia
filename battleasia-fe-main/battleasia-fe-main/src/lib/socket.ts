@@ -12,6 +12,17 @@ function resolveSocketUrl(serverUrl: string) {
   return '';
 }
 
+/** Vite proxies /socket.io; production Passenger serves under /api/socket.io */
+function resolveSocketPath(serverUrl: string) {
+  if (serverUrl && serverUrl.length > 0) {
+    return '/socket.io';
+  }
+  if (typeof window !== 'undefined' && import.meta.env.PROD) {
+    return '/api/socket.io';
+  }
+  return '/socket.io';
+}
+
 class SocketService {
   private socket: Socket | null = null;
   private publicSocket: Socket | null = null;
@@ -125,6 +136,7 @@ class SocketService {
     this.coreHandlersAttached = false;
 
     this.socket = io(url, {
+      path: resolveSocketPath(serverUrl),
       auth: { token },
       transports: ['websocket', 'polling'],
       reconnection: true,
@@ -338,6 +350,7 @@ class SocketService {
     const url = resolveSocketUrl(serverUrl);
 
     this.publicSocket = io(url, {
+      path: resolveSocketPath(serverUrl),
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 2000,

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
 
 import Box from '@mui/material/Box';
+import { m, useReducedMotion } from 'framer-motion';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 
@@ -25,6 +26,7 @@ export function UserPageShell({
   contentSx,
 }: UserPageShellProps) {
   const overlays = getUserPageShellOverlays();
+  const reduceMotion = useReducedMotion();
 
   return (
     <Box
@@ -56,7 +58,17 @@ export function UserPageShell({
           ...(Array.isArray(contentSx) ? contentSx : contentSx ? [contentSx] : []),
         ]}
       >
-        {children}
+        <Box
+          component={reduceMotion ? 'div' : m.div}
+          initial={reduceMotion ? undefined : { opacity: 0, y: 18 }}
+          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
+          transition={
+            reduceMotion ? undefined : { duration: 0.55, ease: [0.22, 1, 0.36, 1] }
+          }
+          sx={{ width: '100%' }}
+        >
+          {children}
+        </Box>
       </DashboardContent>
     </Box>
   );

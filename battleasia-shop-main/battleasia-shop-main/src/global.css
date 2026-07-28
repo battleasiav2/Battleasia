@@ -22,31 +22,11 @@
 /* scrollbar */
 @import './components/scrollbar/styles.css';
 
-@font-face {
-  font-family: 'tr';
-  src: url('./assets/fonts/tekoregular.ttf');
-}
-
-@font-face {
-  font-family: 'tm';
-  src: url('./assets/fonts/tekomedium.ttf');
-}
-
-@font-face {
-  font-family: 'an';
-  src: url('./assets/fonts/arialn.TTF');
-}
-
-.font-tr {
-  font-family: 'tr' !important;
-}
-
-.font-tm {
-  font-family: 'tm' !important;
-}
-
+/** Legacy display font hooks — use app default typography (Public Sans). */
+.font-tr,
+.font-tm,
 .font-an {
-  font-family: 'an' !important;
+  font-family: inherit !important;
 }
 
 /** **************************************
@@ -55,6 +35,13 @@
 html {
   height: 100%;
   -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 body,
 #root,

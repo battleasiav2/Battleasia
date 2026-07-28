@@ -4,7 +4,14 @@ import { useState } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
 
 import {
-  Box, Link, Avatar, Drawer, MenuList, MenuItem, Collapse, Typography, IconButton, ListItemButton
+  Box,
+  Link,
+  Stack,
+  Avatar,
+  Drawer,
+  Collapse,
+  Typography,
+  IconButton,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
@@ -15,13 +22,15 @@ import { RouterLink } from 'src/routes/components';
 import { getImageUrl } from 'src/utils/get-image-url';
 
 import { useSelector } from 'src/store';
+import { CONFIG } from 'src/global-config';
+import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
+import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { Scrollbar } from 'src/components/scrollbar';
-import { GLASS_CARD_RADIUS } from 'src/components/battle-glass-card';
-import { USER_COLORS, USER_IMAGES, userMeshButtonSx } from 'src/layouts/user/user-theme';
+import { GLASS_CARD_RADIUS, getGoldTopLineCardSx, mergeGlassSx } from 'src/components/battle-glass-card';
+import { USER_COLORS, USER_IMAGES } from 'src/layouts/user/user-theme';
 
-import { UpgradeBlock } from './nav-upgrade';
 import { AccountButton } from './account-button';
 import { SignOutButton } from './sign-out-button';
 
@@ -35,10 +44,123 @@ export type AccountDrawerProps = IconButtonProps & {
   data?: AccountMenuItem[];
 };
 
+const MAIN_APP_URL = (import.meta.env.VITE_MAIN_APP_URL as string | undefined) || 'http://localhost:8081';
+
+function isMenuItemActive(pathname: string, option: AccountMenuItem): boolean {
+  if (option.href && pathname.startsWith(option.href)) {
+    return true;
+  }
+
+  return !!option.children?.some((child) => child.href && pathname.startsWith(child.href));
+}
+
+type MenuCardProps = {
+  label: string;
+  icon: React.ReactNode;
+  href?: string;
+  onClick?: () => void;
+  isActive?: boolean;
+  showChevron?: boolean;
+  chevronDown?: boolean;
+  nested?: boolean;
+};
+
+function MenuCard({
+  label,
+  icon,
+  href,
+  onClick,
+  isActive = false,
+  showChevron = false,
+  chevronDown = false,
+  nested = false,
+}: MenuCardProps) {
+  const content = (
+    <>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          color: 'inherit',
+          '& svg': {
+            width: nested ? 18 : 20,
+            height: nested ? 18 : 20,
+          },
+        }}
+      >
+        {icon}
+      </Box>
+
+      <Typography
+        sx={{
+          flex: 1,
+          fontSize: nested ? 13 : 14,
+          fontWeight: isActive ? 700 : 600,
+          letterSpacing: 0.02,
+          color: 'inherit',
+        }}
+      >
+        {label}
+      </Typography>
+
+      {showChevron && (
+        <Iconify
+          icon={chevronDown ? 'eva:arrow-ios-downward-fill' : 'eva:arrow-ios-forward-fill'}
+          width={18}
+          sx={{ color: alpha('#ffffff', 0.4), flexShrink: 0 }}
+        />
+      )}
+    </>
+  );
+
+  const cardSx = mergeGlassSx(
+    getGoldTopLineCardSx({
+      display: 'flex',
+      alignItems: 'center',
+      gap: 1.25,
+      px: nested ? 1.5 : 1.75,
+      py: nested ? 1 : 1.125,
+      pt: nested ? 1.2 : 1.35,
+      minHeight: nested ? 44 : 48,
+      borderRadius: `${GLASS_CARD_RADIUS}px`,
+      textDecoration: 'none',
+      cursor: 'pointer',
+      color: isActive ? GOLD : alpha('#ffffff', 0.78),
+      bgcolor: isActive ? alpha(GOLD, 0.08) : alpha('#000000', 0.42),
+      border: `1px solid ${isActive ? alpha(GOLD, 0.32) : alpha('#ffffff', 0.08)}`,
+      boxShadow: isActive ? `0 4px 18px ${alpha(GOLD, 0.1)}` : 'none',
+      transition: 'background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease',
+      '&:hover': {
+        bgcolor: alpha(GOLD, 0.1),
+        borderColor: alpha(GOLD, 0.28),
+        color: GOLD,
+      },
+    })
+  );
+
+  if (href) {
+    return (
+      <Box component={RouterLink} href={href} sx={cardSx}>
+        {content}
+      </Box>
+    );
+  }
+
+  return (
+    <Box onClick={onClick} sx={cardSx}>
+      {content}
+    </Box>
+  );
+}
+
 export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
   const pathname = usePathname();
+  const { t } = useTranslate();
 
   const storeUser = useSelector((state) => state.auth.user);
+  const balance = useSelector((state) => state.auth.balance);
 
   const user = {
     displayName: storeUser?.username || storeUser?.email || '',
@@ -61,133 +183,193 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
     });
   };
 
-  const menuItemSx = {
-    p: 1,
-    width: 1,
-    display: 'flex',
-    typography: 'body2',
-    alignItems: 'center',
-    color: alpha('#ffffff', 0.62),
-    borderRadius: `${GLASS_CARD_RADIUS}px`,
-    '& svg': { width: 24, height: 24 },
-    '&:hover': {
-      color: '#ffffff',
-      bgcolor: alpha(GOLD, 0.1),
-    },
-  } as const;
+  const renderProfile = () => (
+    <Stack alignItems="center" spacing={1.25} sx={{ px: 2.5, pt: 7, pb: 2 }}>
+      <Avatar
+        src={user.photoURL}
+        alt={user.displayName}
+        sx={{
+          width: 84,
+          height: 84,
+          fontSize: 30,
+          fontWeight: 800,
+          color: GOLD,
+          bgcolor: alpha('#000000', 0.65),
+          border: `2px solid ${GOLD}`,
+          boxShadow: `0 0 28px ${alpha(GOLD, 0.22)}`,
+        }}
+      >
+        {user.displayName?.charAt(0).toUpperCase()}
+      </Avatar>
 
-  const renderAvatar = () => (
-    <Avatar
-      src={user?.photoURL}
-      alt={user?.displayName}
-      sx={{
-        width: 84,
-        height: 84,
-        fontSize: 30,
-        fontWeight: 800,
-        color: GOLD,
-        bgcolor: alpha('#000000', 0.65),
-        border: `2px solid ${GOLD}`,
-        boxShadow: `0 0 28px ${alpha(GOLD, 0.22)}`,
-      }}
-    >
-      {user?.displayName?.charAt(0).toUpperCase()}
-    </Avatar>
+      <Typography
+        variant="subtitle1"
+        noWrap
+        sx={{
+          maxWidth: 1,
+          fontWeight: 800,
+          letterSpacing: 0.02,
+          color: '#ffffff',
+        }}
+      >
+        {user.displayName}
+      </Typography>
+
+      <Typography
+        variant="body2"
+        noWrap
+        sx={{
+          maxWidth: 1,
+          color: alpha('#ffffff', 0.5),
+          fontSize: 13,
+        }}
+      >
+        {user.email}
+      </Typography>
+
+      <BattleGoldDivider variant="compact" />
+    </Stack>
   );
 
   const renderList = () => (
-    <MenuList
-      disablePadding
-      sx={{
-        py: 2,
-        px: 2,
-        borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
-        borderBottom: `1px solid ${alpha('#ffffff', 0.08)}`,
-        '& li': { p: 0, mb: 0.5 },
-      }}
-    >
+    <Stack spacing={1.25} sx={{ px: 2, py: 1 }}>
       {data.map((option) => {
-        const rootLabel = pathname.includes('/dashboard') ? 'Home' : 'Dashboard';
-        const rootHref = pathname.includes('/dashboard') ? '/' : paths.dashboard.root;
+        const translatedLabel = t(option.label);
         const hasChildren = option.children && option.children.length > 0;
         const isExpanded = expandedItems.has(option.label);
+        const isActive = isMenuItemActive(pathname, option);
 
         if (hasChildren) {
           return (
             <Box key={option.label}>
-              <MenuItem>
-                <ListItemButton
-                  onClick={() => handleToggleExpand(option.label)}
-                  sx={menuItemSx}
-                >
-                  {option.icon}
-
-                  <Box component="span" sx={{ ml: 2, flexGrow: 1 }}>
-                    {option.label === 'Home' ? rootLabel : option.label}
-                  </Box>
-
-                  <Iconify
-                    icon={isExpanded ? 'iconamoon:arrow-down-2-light' : 'iconamoon:arrow-right-2-light'}
-                    width={20}
-                    sx={{ ml: 1 }}
-                  />
-                </ListItemButton>
-              </MenuItem>
+              <MenuCard
+                label={translatedLabel}
+                icon={option.icon}
+                isActive={isActive}
+                showChevron
+                chevronDown={isExpanded}
+                onClick={() => handleToggleExpand(option.label)}
+              />
 
               <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                <Box sx={{ pl: 2 }}>
-                  {option.children?.map((child) => (
-                    <MenuItem key={child.label}>
-                      <Link
-                        component={RouterLink}
-                        href={child.href || '#'}
-                        color="inherit"
-                        underline="none"
-                        onClick={onClose}
-                        sx={{ ...menuItemSx, '& svg': { width: 20, height: 20 } }}
-                      >
-                        {child.icon}
+                <Stack spacing={0.75} sx={{ mt: 0.75, pl: 1.25 }}>
+                  {option.children?.map((child) => {
+                    const childActive = !!(child.href && pathname.startsWith(child.href));
 
-                        <Box component="span" sx={{ ml: 2 }}>
-                          {child.label}
-                        </Box>
-                      </Link>
-                    </MenuItem>
-                  ))}
-                </Box>
+                    return (
+                      <Box key={child.label} onClick={onClose}>
+                        <MenuCard
+                          label={t(child.label)}
+                          icon={child.icon}
+                          href={child.href || '#'}
+                          isActive={childActive}
+                          nested
+                        />
+                      </Box>
+                    );
+                  })}
+                </Stack>
               </Collapse>
             </Box>
           );
         }
 
         return (
-          <MenuItem key={option.label}>
-            <Link
-              component={RouterLink}
-              href={option.label === 'Home' ? rootHref : option.href || '#'}
-              color="inherit"
-              underline="none"
-              onClick={onClose}
-              sx={menuItemSx}
-            >
-              {option.icon}
-
-              <Box component="span" sx={{ ml: 2 }}>
-                {option.label === 'Home' ? rootLabel : option.label}
-              </Box>
-            </Link>
-          </MenuItem>
+          <Box key={option.label} onClick={onClose}>
+            <MenuCard
+              label={translatedLabel}
+              icon={option.icon}
+              href={option.href || '#'}
+              isActive={isActive}
+            />
+          </Box>
         );
       })}
-    </MenuList>
+    </Stack>
+  );
+
+  const renderExtras = () => (
+    <Stack spacing={1.25} sx={{ px: 2, py: 2 }}>
+      <Box
+        sx={mergeGlassSx(
+          getGoldTopLineCardSx({
+            p: 2,
+            pt: 2.25,
+            borderRadius: `${GLASS_CARD_RADIUS}px`,
+            bgcolor: alpha('#000000', 0.42),
+            border: `1px solid ${alpha(GOLD, 0.28)}`,
+          })
+        )}
+      >
+        <Typography
+          sx={{
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: 1.2,
+            textTransform: 'uppercase',
+            color: alpha('#ffffff', 0.55),
+            mb: 0.75,
+          }}
+        >
+          {t('nav.bacBalance')}
+        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box
+            component="img"
+            src={CONFIG.currencyIcon}
+            alt="BAC"
+            sx={{ width: 22, height: 22, objectFit: 'contain' }}
+          />
+          <Typography sx={{ fontSize: 22, fontWeight: 800, color: GOLD, lineHeight: 1 }}>
+            {(balance ?? 0).toLocaleString()}
+          </Typography>
+        </Box>
+      </Box>
+
+      <Box
+        component={Link}
+        href={MAIN_APP_URL}
+        underline="none"
+        sx={mergeGlassSx(
+          getGoldTopLineCardSx({
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1.25,
+            p: 1.5,
+            pt: 1.65,
+            borderRadius: `${GLASS_CARD_RADIUS}px`,
+            color: alpha('#ffffff', 0.78),
+            bgcolor: alpha('#000000', 0.42),
+            border: `1px solid ${alpha('#ffffff', 0.08)}`,
+            transition: 'all 0.2s ease',
+            '&:hover': {
+              color: GOLD,
+              bgcolor: alpha(GOLD, 0.1),
+              borderColor: alpha(GOLD, 0.28),
+            },
+          })
+        )}
+      >
+        <Iconify icon="game-icons:crossed-swords" width={20} sx={{ color: GOLD, flexShrink: 0 }} />
+        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
+          <Typography sx={{ fontSize: 13, fontWeight: 700, lineHeight: 1.3 }}>
+            {t('nav.battleArena')}
+          </Typography>
+          <Typography sx={{ fontSize: 11, color: alpha('#ffffff', 0.45), lineHeight: 1.3 }}>
+            {t('nav.backToMain')}
+          </Typography>
+        </Box>
+        <Iconify icon="eva:arrow-ios-forward-fill" width={18} sx={{ color: alpha('#ffffff', 0.4), flexShrink: 0 }} />
+      </Box>
+    </Stack>
   );
 
   return (
     <>
       <AccountButton
         onClick={onOpen}
-        photoURL={user?.photoURL || ""}
-        displayName={user?.displayName}
+        photoURL={user.photoURL || ''}
+        displayName={user.displayName}
         sx={sx}
         {...other}
       />
@@ -245,52 +427,9 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
         </IconButton>
 
         <Scrollbar sx={{ flex: '1 1 auto' }}>
-          <Box
-            sx={{
-              pt: 8,
-              pb: 3,
-              px: 2,
-              display: 'flex',
-              alignItems: 'center',
-              flexDirection: 'column',
-              gap: 1,
-            }}
-          >
-            {renderAvatar()}
-
-            <Typography
-              variant="subtitle1"
-              noWrap
-              className="font-tr"
-              sx={{
-                maxWidth: 1,
-                fontWeight: 800,
-                letterSpacing: 0.4,
-                color: '#ffffff',
-                textTransform: 'uppercase',
-              }}
-            >
-              {user?.displayName}
-            </Typography>
-
-            <Typography
-              variant="body2"
-              noWrap
-              sx={{
-                maxWidth: 1,
-                color: alpha('#ffffff', 0.5),
-                fontSize: 13,
-              }}
-            >
-              {user?.email}
-            </Typography>
-          </Box>
-
+          {renderProfile()}
           {renderList()}
-
-          <Box sx={{ px: 2, py: 2 }}>
-            <UpgradeBlock />
-          </Box>
+          {renderExtras()}
         </Scrollbar>
 
         <Box
@@ -310,7 +449,6 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
               height: 48,
               fontSize: 13,
               borderRadius: `${GLASS_CARD_RADIUS}px`,
-              ...userMeshButtonSx,
             }}
           />
         </Box>

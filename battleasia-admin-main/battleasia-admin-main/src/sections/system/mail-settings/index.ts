@@ -1,0 +1,1 @@
+export { MailSettingsView } from './view';

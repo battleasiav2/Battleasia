@@ -26,11 +26,10 @@ import { useTranslate } from 'src/locales';
 import { Iconify } from 'src/components/iconify';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { Scrollbar } from 'src/components/scrollbar';
-import { GLASS_CARD_RADIUS } from 'src/components/battle-glass-card';
+import { GLASS_CARD_RADIUS, getGoldTopLineCardSx, mergeGlassSx } from 'src/components/battle-glass-card';
 import {
   USER_COLORS,
   USER_IMAGES,
-  userMeshButtonSx,
 } from 'src/layouts/user/user-theme';
 
 import { AccountButton } from './account-button';
@@ -82,16 +81,11 @@ function MenuCard({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: nested ? 36 : 40,
-          height: nested ? 36 : 40,
-          borderRadius: `${GLASS_CARD_RADIUS - 1}px`,
           flexShrink: 0,
-          bgcolor: isActive ? alpha(GOLD, 0.18) : alpha('#ffffff', 0.06),
-          border: `1px solid ${isActive ? alpha(GOLD, 0.3) : alpha('#ffffff', 0.08)}`,
+          color: 'inherit',
           '& svg': {
             width: nested ? 18 : 20,
             height: nested ? 18 : 20,
-            color: 'inherit',
           },
         }}
       >
@@ -103,7 +97,7 @@ function MenuCard({
           flex: 1,
           fontSize: nested ? 13 : 14,
           fontWeight: isActive ? 700 : 600,
-          letterSpacing: 0.3,
+          letterSpacing: 0.02,
           color: 'inherit',
         }}
       >
@@ -114,32 +108,36 @@ function MenuCard({
         <Iconify
           icon={chevronDown ? 'eva:arrow-ios-downward-fill' : 'eva:arrow-ios-forward-fill'}
           width={18}
-          sx={{ color: alpha('#ffffff', 0.45), flexShrink: 0 }}
+          sx={{ color: alpha('#ffffff', 0.4), flexShrink: 0 }}
         />
       )}
     </>
   );
 
-  const cardSx = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: 1.5,
-    px: nested ? 1.5 : 1.75,
-    py: nested ? 1 : 1.25,
-    borderRadius: `${GLASS_CARD_RADIUS}px`,
-    textDecoration: 'none',
-    cursor: 'pointer',
-    color: isActive ? GOLD : alpha('#ffffff', 0.78),
-    bgcolor: isActive ? alpha(GOLD, 0.1) : alpha('#ffffff', 0.03),
-    border: `1px solid ${isActive ? alpha(GOLD, 0.32) : alpha('#ffffff', 0.08)}`,
-    boxShadow: isActive ? `0 4px 20px ${alpha(GOLD, 0.12)}` : 'none',
-    transition: 'background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease',
-    '&:hover': {
-      bgcolor: alpha(GOLD, 0.1),
-      borderColor: alpha(GOLD, 0.28),
-      color: GOLD,
-    },
-  };
+  const cardSx = mergeGlassSx(
+    getGoldTopLineCardSx({
+      display: 'flex',
+      alignItems: 'center',
+      gap: 1.25,
+      px: nested ? 1.5 : 1.75,
+      py: nested ? 1 : 1.125,
+      pt: nested ? 1.2 : 1.35,
+      minHeight: nested ? 44 : 48,
+      borderRadius: `${GLASS_CARD_RADIUS}px`,
+      textDecoration: 'none',
+      cursor: 'pointer',
+      color: isActive ? GOLD : alpha('#ffffff', 0.78),
+      bgcolor: isActive ? alpha(GOLD, 0.08) : alpha('#000000', 0.42),
+      border: `1px solid ${isActive ? alpha(GOLD, 0.32) : alpha('#ffffff', 0.08)}`,
+      boxShadow: isActive ? `0 4px 18px ${alpha(GOLD, 0.1)}` : 'none',
+      transition: 'background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease',
+      '&:hover': {
+        bgcolor: alpha(GOLD, 0.1),
+        borderColor: alpha(GOLD, 0.28),
+        color: GOLD,
+      },
+    })
+  );
 
   if (href) {
     return (
@@ -205,13 +203,11 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
       <Typography
         variant="subtitle1"
         noWrap
-        className="font-tr"
         sx={{
           maxWidth: 1,
           fontWeight: 800,
-          letterSpacing: 0.4,
+          letterSpacing: 0.02,
           color: '#ffffff',
-          textTransform: 'uppercase',
         }}
       >
         {user.displayName}
@@ -234,7 +230,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
   );
 
   const renderList = () => (
-    <Stack spacing={1} sx={{ px: 2, py: 1 }}>
+    <Stack spacing={1.25} sx={{ px: 2, py: 1 }}>
       {data.map((option) => {
         const translatedLabel = t(option.labelKey);
         const rootLabel = pathname.includes('/dashboard') ? t('navigation.home') : 'Dashboard';
@@ -378,8 +374,6 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                 flex: 1,
                 height: 48,
                 fontSize: 13,
-                borderRadius: `${GLASS_CARD_RADIUS}px`,
-                ...userMeshButtonSx,
               }}
             />
 

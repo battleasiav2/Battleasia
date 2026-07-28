@@ -77,7 +77,7 @@ export type ApiContextType = {
     incrementFeedViewsApi: (id: string) => Promise<any>;
     toggleFeedLikeApi: (id: string) => Promise<any>;
     getFeedCommentsApi: (id: string, params?: { page?: number; limit?: number }) => Promise<any>;
-    addFeedCommentApi: (id: string, content: string) => Promise<any>;
+    addFeedCommentApi: (id: string, content: string, parentId?: string) => Promise<any>;
     getUserByIdApi: (id: string) => Promise<any>;
     getUserFeedsApi: (id: string, params?: { page?: number; limit?: number }) => Promise<any>;
     followUserApi: (id: string) => Promise<any>;
@@ -88,7 +88,18 @@ export type ApiContextType = {
     
     getFollowersApi: (id?: string) => Promise<any>;
     getFollowingApi: (id?: string) => Promise<any>;
+    getSuggestedFollowsApi: (contextUserId?: string) => Promise<any>;
+    getMutualFollowersApi: (id: string) => Promise<any>;
+    getRecentFollowsApi: (id: string) => Promise<any>;
+    getProfileSocialSettingsApi: () => Promise<any>;
     getOrCreateConversationApi: () => Promise<any>;
+    getMyTicketsApi: (params?: { page?: number; limit?: number; status?: string }) => Promise<any>;
+    createTicketApi: (data: {
+      subject: string;
+      category: string;
+      body: string;
+      attachments?: string[];
+    }) => Promise<any>;
     getMessagesApi: (conversationId: string, params?: { page?: number; limit?: number }) => Promise<any>;
     sendMessageApi: (data: { body: string; conversationId?: string; attachments?: string[] }) => Promise<any>;
     closeConversationApi: (conversationId: string) => Promise<any>;
@@ -103,6 +114,7 @@ export type ApiContextType = {
     uploadFilesApi: (files: File[], options?: { folder?: string; onProgress?: (progress: number) => void }) => Promise<any>;
     deleteFileApi: (fileUrl: string) => Promise<any>;
     getPublicDashboardStatsApi: () => Promise<any>;
+    getAppDownloadSettingsApi: () => Promise<any>;
 
     // Coingo payout
     createCoingoPayoutApi: (data: { amount: number; walletNumber: string; walletType: string; description?: string }) => Promise<any>;
@@ -131,11 +143,18 @@ export type ApiContextType = {
     getDirectMessagesApi: (conversationId: string, params?: { page?: number; limit?: number }) => Promise<any>;
     sendDirectMessageApi: (conversationId: string, data: { body: string; attachments?: string[] }) => Promise<any>;
     globalSearchApi: (q: string) => Promise<any>;
+    getMessagingSettingsApi: () => Promise<any>;
     getExploreApi: (params?: { page?: number; limit?: number }) => Promise<any>;
     createFeedPostApi: (data: { title?: string; description: string; coverUrl?: string; mediaUrls?: string[]; postType?: string; visibility?: string }) => Promise<any>;
     toggleSaveFeedApi: (id: string, collectionName?: string) => Promise<any>;
     getSavedFeedsApi: (params?: { page?: number; limit?: number }) => Promise<any>;
     blockUserApi: (id: string) => Promise<any>;
     unblockUserApi: (id: string) => Promise<any>;
+    submitSocialReportApi: (data: {
+      targetType: 'user' | 'feed' | 'reel';
+      targetId: string;
+      reason: string;
+      details?: string;
+    }) => Promise<any>;
 };
 

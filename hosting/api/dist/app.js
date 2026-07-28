@@ -54,11 +54,12 @@ export function createApp() {
     app.use(cookieParser());
     app.use(cors({
         origin(origin, callback) {
+            // Never throw — a thrown Error becomes HTTP 500 and breaks the browser fetch.
             if (!origin || env.corsOrigins.includes(origin)) {
                 callback(null, true);
                 return;
             }
-            callback(new Error('Not allowed by CORS'));
+            callback(null, false);
         },
         credentials: true,
     }));
@@ -82,7 +83,20 @@ export function createApp() {
         const code = health.status === 'ok' ? 200 : 503;
         return res.status(code).json(health);
     });
+    // Alias for reverse-proxy / Passenger that keep the /api prefix
+    app.get('/api/health', async (_req, res) => {
+        const health = await getHealthStatus();
+        const code = health.status === 'ok' ? 200 : 503;
+        return res.status(code).json(health);
+    });
     app.get('/ready', async (_req, res) => {
+        const health = await getHealthStatus();
+        if (health.checks.database !== 'ok') {
+            return res.status(503).json({ status: false, message: 'Database not ready' });
+        }
+        return res.json({ status: true, message: 'Ready' });
+    });
+    app.get('/api/ready', async (_req, res) => {
         const health = await getHealthStatus();
         if (health.checks.database !== 'ok') {
             return res.status(503).json({ status: false, message: 'Database not ready' });
@@ -101,6 +115,8 @@ export function createApp() {
     app.use('/api/v3/users/referral-history', requireAdmin, usersReferralHistoryRoutes);
     app.use('/api/v3/dashboard', requireAdmin, dashboardRoutes);
     app.use('/api/v3/public/dashboard', publicDashboardRoutes);
+    // Alias when Passenger/proxy strips the /api prefix
+    app.use('/v3/public/dashboard', publicDashboardRoutes);
     app.use('/api/v3/games/list', requireAdmin, gamesListRoutes);
     app.use('/api/v3/games/matches', requireAdmin, gamesMatchesRoutes);
     app.use('/api/v3/games/participants-history', requireAdmin, gamesParticipantsHistoryRoutes);
@@ -122,6 +138,7 @@ export function createApp() {
 export function createSocketServer(app) {
     const httpServer = createServer(app);
     const io = new Server(httpServer, {
+        path: '/socket.io',
         cors: {
             origin: env.corsOrigins,
             credentials: true,

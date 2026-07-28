@@ -1,52 +1,142 @@
 
 
-import { Box, Grid, Stack, SvgIcon, Accordion, Typography, AccordionSummary, AccordionDetails } from '@mui/material';
-import { alpha } from '@mui/material/styles';
+import { useEffect, useState } from 'react';
+import { Box, Stack, SvgIcon, Accordion, Typography, AccordionSummary, AccordionDetails } from '@mui/material';
+import { alpha, keyframes } from '@mui/material/styles';
 
 import { useImagePreloader } from 'src/hooks';
+import useApi from 'src/hooks/use-api';
 
 import { Image } from 'src/components/image';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { HeroMeshButtons } from 'src/components/mesh-buttons';
-import {
-  GlassPanelCard,
-  GlassStatTile,
-  getDefaultGlassTokens,
-  getGlassShellSx,
-  getGlassInnerSx,
-  GLASS_CARD_RADIUS,
-} from 'src/components/battle-glass-card';
+import { ScrollReveal, ScrollParallax } from 'src/components/animate';
 import { LandingDashboardSection } from './dashboard-widgets';
-import { PlayYourGameSection, PLAY_YOUR_GAME_IMAGE_PATHS } from './play-your-game-section';
+import { PlayYourGameSection, HOME_GAME_ARTS } from './play-your-game-section';
+import { homeMobileScrollGridSx, homeMobileScrollItemSx } from './home-horizontal-scroll';
+import { HeroFxOverlay } from './hero-fx-overlay';
 import { useTranslate } from 'src/locales/use-locales';
 
 // ----------------------------------------------------------------------
 
+const GOLD = '#f5c518';
+
+const cardReveal = keyframes`
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+`;
+
+const titleGlow = keyframes`
+  0%, 100% { text-shadow: 0 0 0 transparent; }
+  50% { text-shadow: 0 0 24px ${alpha(GOLD, 0.35)}; }
+`;
+
+const borderPulse = keyframes`
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.85; }
+`;
+
+const heroKenBurns = keyframes`
+  0% { transform: scale(1) translate3d(0, 0, 0); }
+  50% { transform: scale(1.08) translate3d(-1.5%, -1%, 0); }
+  100% { transform: scale(1) translate3d(0, 0, 0); }
+`;
+
 const HOME_IMAGE_PATHS = {
-  banner: '/assets/images/hero-banner-pubg.webp',
-  aboutBg: '/assets/images/about-pubg-black.webp',
-  howToPlayBg: '/assets/images/about-pubg-black.webp',
-  rulesBg: '/assets/images/dashboard-pubg-black.webp',
-  sBg: '/assets/images/s-bg.webp',
-  gsBg: '/assets/images/gs-bg.webp',
-  gsTop: '/assets/images/gs-top.webp',
-  spr: '/assets/images/spr.webp',
-  gameUiBg: '/assets/images/game-ui-bg.webp',
-  blackBg: '/assets/images/black_bg.webp',
-  dealer: '/assets/images/dealer.webp',
+  banner: '/assets/images/hero-banner-pubg-drop.webp',
+  heroTitleLogo: '/assets/images/hero-title-battleasia.webp',
 } as const;
 
+const HOME_MODE_ARTS = {
+  solo: '/assets/images/home/modes/mode-solo.webp',
+  duo: '/assets/images/home/modes/mode-duo.webp',
+  squad: '/assets/images/home/modes/mode-squad.webp',
+  tdm: '/assets/images/home/modes/mode-tdm.webp',
+} as const;
+
+function blackGamingSectionSx(art?: string) {
+  return {
+    scrollMarginTop: { xs: '80px', md: '100px' },
+    position: 'relative' as const,
+    overflowX: 'hidden' as const,
+    bgcolor: '#0a0a0a',
+    py: { xs: 4.5, md: 6 },
+    px: { xs: 2, md: 4 },
+    ...(art
+      ? {
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `url(${art})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center top',
+            opacity: 0.18,
+            filter: 'grayscale(0.35) contrast(1.05)',
+            pointerEvents: 'none',
+            zIndex: 0,
+          },
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            background: `
+              linear-gradient(180deg, ${alpha('#0a0a0a', 0.82)} 0%, ${alpha('#0a0a0a', 0.92)} 45%, #0a0a0a 100%),
+              radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(GOLD, 0.08)} 0%, transparent 55%)
+            `,
+            pointerEvents: 'none',
+            zIndex: 0,
+          },
+        }
+      : {
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            background: `
+              radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(GOLD, 0.08)} 0%, transparent 55%),
+              radial-gradient(ellipse 40% 30% at 10% 100%, ${alpha('#38bdf8', 0.04)} 0%, transparent 50%)
+            `,
+            pointerEvents: 'none',
+          },
+        }),
+  };
+}
+
 // ----------------------------------------------------------------------
-const imagePaths = [HOME_IMAGE_PATHS.banner];
+// Preload only above-the-fold hero assets — mode/game cards lazy-load on scroll.
+const imagePaths = [HOME_IMAGE_PATHS.banner, HOME_IMAGE_PATHS.heroTitleLogo];
 
 export function HomeView() {
   const { t } = useTranslate();
-  const glassTokens = getDefaultGlassTokens();
+  const { getAppDownloadSettingsApi } = useApi();
+  const [apkDownload, setApkDownload] = useState({
+    enabled: false,
+    href: '',
+    fileName: 'BattleAsia.apk',
+  });
 
   useImagePreloader(imagePaths, {
     delay: 100,
     continueOnError: true,
-  }); 
+  });
+
+  useEffect(() => {
+    getAppDownloadSettingsApi()
+      .then((response) => {
+        const data = response?.data?.data;
+        if (data?.enabled && data?.downloadUrl) {
+          setApkDownload({
+            enabled: true,
+            href: data.downloadUrl,
+            fileName: data.fileName || 'BattleAsia.apk',
+          });
+        }
+      })
+      .catch(() => {
+        // Keep download hidden until admin uploads APK.
+      });
+  }, [getAppDownloadSettingsApi]);
 
   const FAQ = [
     {
@@ -94,93 +184,162 @@ export function HomeView() {
   const sectionSlide = (
     <Box id="home" sx={{
       scrollMarginTop: { xs: '80px', md: '100px' },
-      height: { xs: 500, sm: 720, md: 892 },
+      height: { xs: 580, sm: 700, md: 860, lg: 920 },
       bgcolor: '#000000',
-      backgroundImage: `url(${HOME_IMAGE_PATHS.banner})`,
-      backgroundRepeat: 'no-repeat',
-      backgroundPosition: 'center center',
-      backgroundSize: 'cover',
       position: 'relative',
       overflow: 'hidden',
       '&::before': {
         content: "''",
         position: 'absolute',
         inset: 0,
-        background: 'linear-gradient(90deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.12) 45%, rgba(0,0,0,0.4) 100%)',
+        background: {
+          xs: 'linear-gradient(180deg, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.18) 36%, rgba(0,0,0,0.22) 58%, rgba(0,0,0,0.82) 100%)',
+          md: 'linear-gradient(90deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.06) 38%, rgba(0,0,0,0.48) 66%, rgba(0,0,0,0.72) 100%)',
+        },
         zIndex: 1,
       },
       '&::after': {
         content: "''",
         position: 'absolute',
         inset: 0,
-        background: 'linear-gradient(180deg, rgba(0,0,0,0.25) 0%, transparent 35%, rgba(0,0,0,0.75) 100%)',
+        background:
+          'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 28%, transparent 62%, rgba(0,0,0,0.55) 100%)',
         zIndex: 1,
       },
     }}>
-      <Stack sx={{
-        position: 'absolute',
-        top: { xs: '20%', sm: '26%', md: '30%' },
-        right: { xs: '4%', sm: '6%', md: '8%' },
-        left: { xs: '4%', sm: 'auto' },
-        maxWidth: { xs: '92%', sm: 520, md: 580 },
-        zIndex: 2,
-      }}>
+      {/* Full hero image with slow cinematic zoom + scroll parallax */}
+      <ScrollParallax offset={120} scaleRange={[1.12, 1, 1.08]} sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <Box
+          component="img"
+          src={HOME_IMAGE_PATHS.banner}
+          alt=""
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          sx={{
+            width: 1,
+            height: 1,
+            objectFit: 'cover',
+            objectPosition: { xs: '50% 18%', sm: '48% 24%', md: '36% center', lg: '32% center' },
+            animation: `${heroKenBurns} 28s ease-in-out infinite`,
+            willChange: 'transform',
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+          }}
+        />
+      </ScrollParallax>
+
+      <HeroFxOverlay />
+
+      {/* Logo + copy — top on mobile, upper-right on desktop */}
+      <Stack
+        spacing={{ xs: 1, sm: 1.25, md: 1.5 }}
+        sx={{
+          position: 'absolute',
+          zIndex: 2,
+          top: { xs: 76, sm: 92, md: '18%', lg: '20%' },
+          left: { xs: 16, sm: 24, md: 'auto' },
+          right: { xs: 16, sm: 24, md: '6%', lg: '7%' },
+          alignItems: { xs: 'center', md: 'flex-end' },
+          textAlign: { xs: 'center', md: 'right' },
+          maxWidth: { xs: 'calc(100% - 32px)', md: 560, lg: 600 },
+        }}
+      >
         <Typography
           sx={{
-            fontSize: 11,
+            fontSize: { xs: 10, sm: 11 },
             fontWeight: 700,
-            letterSpacing: 1.8,
+            letterSpacing: { xs: 1.4, sm: 1.8 },
             textTransform: 'uppercase',
-            color: alpha('#f5c518', 0.9),
-            mb: 1.5,
+            color: alpha('#f5c518', 0.92),
+            textShadow: '0 1px 10px rgba(0,0,0,0.85)',
           }}
         >
           {t('common.brandTagline')}
         </Typography>
-        <Typography
-          className='font-tr'
+
+        <Box
           sx={{
-            fontSize: { xs: 26, sm: 34, md: 50, lg: 58 },
-            fontWeight: 800,
-            color: '#ffffff',
-            lineHeight: 1.08,
-            mb: { xs: 1.25, sm: 2 },
-            textShadow: '0 2px 16px rgba(0, 0, 0, 0.85)',
-            wordBreak: 'break-word',
-            overflowWrap: 'break-word',
-            letterSpacing: { md: 0.5 },
+            position: 'relative',
+            width: 1,
+            display: 'flex',
+            justifyContent: { xs: 'center', md: 'flex-end' },
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              inset: { xs: '-6px -10px', md: '-8px -12px' },
+              bgcolor: alpha('#000000', 0.28),
+              filter: 'blur(14px)',
+              borderRadius: 0,
+              zIndex: 0,
+            },
           }}
         >
-          {t('home.title')}
-        </Typography>
+          <Box
+            component="img"
+            src={HOME_IMAGE_PATHS.heroTitleLogo}
+            alt="Battle Asia"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            sx={{
+              position: 'relative',
+              zIndex: 1,
+              width: { xs: 'min(100%, 300px)', sm: 340, md: 440, lg: 500 },
+              height: 'auto',
+              display: 'block',
+              objectFit: 'contain',
+              objectPosition: { xs: 'center', md: 'right' },
+              mixBlendMode: 'screen',
+              filter: 'drop-shadow(0 8px 28px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 40px rgba(245, 197, 24, 0.14))',
+              animation: `${titleGlow} 4.5s ease-in-out infinite`,
+              '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+            }}
+          />
+        </Box>
+
         <Typography
-          className='font-tr'
+          className="font-tr"
           sx={{
-            fontSize: { xs: 14, sm: 18, md: 26 },
-            color: alpha('#ffffff', 0.88),
-            lineHeight: { xs: 1.35, sm: 1.25 },
-            textShadow: '0 1px 8px rgba(0, 0, 0, 0.8)',
+            fontSize: { xs: 13, sm: 15, md: 18, lg: 20 },
+            color: alpha('#ffffff', 0.9),
+            lineHeight: 1.4,
+            textShadow: '0 2px 12px rgba(0, 0, 0, 0.9)',
             wordBreak: 'break-word',
             overflowWrap: 'break-word',
-            maxWidth: 520,
+            maxWidth: { xs: 340, sm: 420, md: 480 },
+            px: { xs: 0.5, md: 0 },
           }}
         >
           {t('home.subtitle')}
         </Typography>
-        <BattleGoldDivider variant="hero" />
+
+        <BattleGoldDivider
+          variant="hero"
+          sx={{
+            width: { xs: 140, sm: 180, md: 220 },
+            alignSelf: { xs: 'center', md: 'flex-end' },
+          }}
+        />
       </Stack>
 
-      <Stack sx={{
-        width: 1,
-        bottom: { xs: 36, sm: 48, md: 64 },
-        position: 'absolute',
-        alignItems: 'center',
-        px: 2,
-        zIndex: 2,
-      }} >
+      {/* Both CTAs — always side-by-side on mobile + desktop */}
+      <Stack
+        sx={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: { xs: 24, sm: 36, md: 52, lg: 60 },
+          zIndex: 2,
+          alignItems: 'center',
+          px: { xs: 2, sm: 3, md: 4 },
+        }}
+      >
         <HeroMeshButtons
           joinLabel={t('home.joinTournament')}
           downloadLabel={t('home.downloadApkButton')}
+          downloadHref={apkDownload.href}
+          downloadFileName={apkDownload.fileName}
+          showDownload={apkDownload.enabled}
         />
       </Stack>
 
@@ -190,7 +349,7 @@ export function HomeView() {
           bottom: 0,
           left: 0,
           right: 0,
-          height: 80,
+          height: { xs: 100, md: 80 },
           background: 'linear-gradient(180deg, transparent, #000000)',
           zIndex: 2,
           pointerEvents: 'none',
@@ -199,106 +358,187 @@ export function HomeView() {
     </Box>
   );
 
+  const aboutStats = [
+    { value: '500K+', label: t('home.stats.activePlayers') },
+    { value: '$2M+', label: t('home.stats.prizeMoney') },
+    { value: '15+', label: t('home.stats.gamesSupported') },
+    { value: '24/7', label: t('home.stats.tournaments') },
+  ];
+
   const sectionAbout = (
-    <Box id="about-us" sx={{
-      scrollMarginTop: { xs: '80px', md: '100px' },
-      position: 'relative',
-      overflow: 'hidden',
-      py: { xs: 4, md: 5 },
-      bgcolor: '#000000',
-      '&::before': {
-        content: "''",
-        position: 'absolute',
-        inset: 0,
-        backgroundImage: `url(${HOME_IMAGE_PATHS.aboutBg})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        zIndex: 0,
-      },
-      '&::after': {
-        content: "''",
-        position: 'absolute',
-        inset: 0,
-        background: `linear-gradient(180deg, ${alpha('#000000', 0.62)} 0%, ${alpha('#000000', 0.42)} 50%, ${alpha('#000000', 0.78)} 100%)`,
-        zIndex: 0,
-      },
-    }}>
-      <Stack sx={{
-        position: 'relative',
-        zIndex: 1,
-        width: { xs: 1, lg: 1129 },
-        maxWidth: '100%',
-        margin: '0 auto',
-        px: { xs: 2, sm: 4, md: 5 },
-        alignItems: 'center',
-      }} >
-        <Stack sx={{ alignItems: 'center', mb: { xs: 2, md: 3 } }}>
+    <Box id="about-us" sx={blackGamingSectionSx(HOME_GAME_ARTS[0])}>
+      <Stack
+        spacing={{ xs: 3, md: 4 }}
+        sx={{ position: 'relative', zIndex: 1, maxWidth: 1280, mx: 'auto' }}
+      >
+        <Stack spacing={1.25} alignItems="center">
           <Typography
-            variant='h2'
-            className='font-tr'
             sx={{
-              fontSize: { xs: 24, sm: 32, md: 48 },
-              fontWeight: 'bold',
+              fontSize: { xs: 11, md: 12 },
+              fontWeight: 700,
+              letterSpacing: 2.5,
+              color: GOLD,
+              textTransform: 'uppercase',
+            }}
+          >
+            {t('home.playYourGame.brandLabel')}
+          </Typography>
+          <Typography
+            variant="h2"
+            className="font-tr"
+            sx={{
+              fontSize: { xs: 22, sm: 32, md: 40 },
+              fontWeight: 800,
               textAlign: 'center',
-              color: glassTokens.titleColor,
-              wordBreak: 'break-word',
+              textTransform: 'uppercase',
+              letterSpacing: { xs: 1, md: 2 },
+              color: '#ffffff',
+              animation: `${titleGlow} 4s ease-in-out infinite`,
             }}
           >
             {t('home.aboutBattleAsia')}
           </Typography>
-          <BattleGoldDivider variant="hero" sx={{ mt: 1.5, width: { xs: 150, sm: 200 } }} />
+          <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
         </Stack>
 
-        <Grid container spacing={{ xs: 2, sm: 3, md: 4 }} sx={{ width: 1 }}>
-          <Grid item xs={12} md={7}>
-            <GlassPanelCard sx={{ height: '100%', textAlign: 'left' }}>
-              <Stack spacing={{ xs: 1.5, sm: 2.5 }}>
-                <Typography className="font-tr" sx={{ fontSize: { xs: 13, sm: 15, md: 18 }, lineHeight: 1.7, color: glassTokens.subtitleColor }}>
-                  {t('home.aboutDescription1')}
-                </Typography>
-                <Typography className="font-tr" sx={{ fontSize: { xs: 13, sm: 15, md: 18 }, lineHeight: 1.7, color: glassTokens.subtitleColor }}>
-                  {t('home.aboutDescription2')}
-                </Typography>
-                <Typography className="font-tr" sx={{ fontSize: { xs: 13, sm: 15, md: 18 }, lineHeight: 1.7, color: glassTokens.subtitleColor }}>
-                  {t('home.aboutDescription3')}
-                </Typography>
-              </Stack>
-            </GlassPanelCard>
-          </Grid>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1.4fr 1fr' },
+            gap: { xs: 1.5, sm: 2, md: 2.5 },
+            alignItems: 'stretch',
+          }}
+        >
+          <Box
+            sx={{
+              position: 'relative',
+              bgcolor: '#161618',
+              border: `1px solid ${alpha('#ffffff', 0.08)}`,
+              p: { xs: 2.25, md: 3 },
+              boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
+              animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) both`,
+              transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.4s ease',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                inset: 0,
+                border: `1px solid ${alpha(GOLD, 0.55)}`,
+                opacity: 0,
+                pointerEvents: 'none',
+                transition: 'opacity 0.35s ease',
+              },
+              '&:hover': {
+                transform: 'translateY(-6px)',
+                borderColor: alpha(GOLD, 0.45),
+                boxShadow: `
+                  0 22px 48px ${alpha('#000000', 0.7)},
+                  0 0 0 1px ${alpha(GOLD, 0.2)},
+                  0 0 32px ${alpha(GOLD, 0.12)}
+                `,
+                '&::before': { opacity: 1, animation: `${borderPulse} 1.8s ease-in-out infinite` },
+              },
+            }}
+          >
+            <Box
+              sx={{
+                height: 2,
+                width: 48,
+                bgcolor: GOLD,
+                mb: 2,
+                boxShadow: `0 0 12px ${alpha(GOLD, 0.45)}`,
+              }}
+            />
+            <Stack spacing={{ xs: 1.5, md: 2 }}>
+              {[t('home.aboutDescription1'), t('home.aboutDescription2'), t('home.aboutDescription3')].map(
+                (text) => (
+                  <Typography
+                    key={text.slice(0, 24)}
+                    className="font-tr"
+                    sx={{
+                      fontSize: { xs: 13, sm: 14, md: 15 },
+                      lineHeight: 1.7,
+                      color: alpha('#ffffff', 0.62),
+                    }}
+                  >
+                    {text}
+                  </Typography>
+                )
+              )}
+            </Stack>
+          </Box>
 
-          <Grid item xs={12} md={5}>
-            <Grid container spacing={{ xs: 1.25, sm: 2 }}>
-              {[
-                { value: '500K+', label: t('home.stats.activePlayers') },
-                { value: '$2M+', label: t('home.stats.prizeMoney') },
-                { value: '15+', label: t('home.stats.gamesSupported') },
-                { value: '24/7', label: t('home.stats.tournaments') },
-              ].map((stat, index) => (
-                <Grid item xs={6} key={index}>
-                  <GlassStatTile
-                    label={stat.label}
-                    value={stat.value}
-                    tokens={glassTokens}
-                  />
-                </Grid>
-              ))}
-            </Grid>
-          </Grid>
-        </Grid>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
+              gap: { xs: 1.25, sm: 1.5 },
+            }}
+          >
+            {aboutStats.map((stat, index) => (
+              <Box
+                key={stat.label}
+                sx={{
+                  position: 'relative',
+                  bgcolor: '#161618',
+                  border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                  p: { xs: 1.75, md: 2.25 },
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  minHeight: { xs: 100, md: 120 },
+                  boxShadow: `0 10px 28px ${alpha('#000000', 0.45)}`,
+                  animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) ${0.08 + index * 0.08}s both`,
+                  transition: 'transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
+                  '&:hover': {
+                    transform: 'translateY(-6px)',
+                    borderColor: alpha(GOLD, 0.4),
+                    boxShadow: `0 18px 40px ${alpha('#000000', 0.65)}, 0 0 24px ${alpha(GOLD, 0.1)}`,
+                    '& .about-stat-value': { color: GOLD },
+                  },
+                }}
+              >
+                <Typography
+                  className="about-stat-value font-tr"
+                  sx={{
+                    fontSize: { xs: 22, sm: 26, md: 30 },
+                    fontWeight: 800,
+                    color: '#ffffff',
+                    letterSpacing: 0.5,
+                    lineHeight: 1.1,
+                    transition: 'color 0.3s ease',
+                    mb: 0.75,
+                  }}
+                >
+                  {stat.value}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: { xs: 10, md: 11 },
+                    fontWeight: 700,
+                    letterSpacing: 1.2,
+                    color: alpha('#ffffff', 0.4),
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {stat.label}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
       </Stack>
     </Box>
-  )
+  );
 
   const gameModes = [
     {
       title: t('home.gameModes.solo.title'),
       description: t('home.gameModes.solo.description'),
-      iconType: 'svg',
+      art: HOME_MODE_ARTS.solo,
+      players: '1',
+      playersLabel: '1 Player',
+      iconType: 'svg' as const,
       iconPath: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
-      iconColor: '#9333ea',
-      shadowColor: 'rgba(147, 51, 234, 0.3)',
-      hoverShadowColor: 'rgba(147, 51, 234, 0.5)',
       features: [
         { iconPath: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z', text: t('home.gameModes.solo.feature1') },
         { iconPath: 'M15.5 12c0 1.38-1.12 2.5-2.5 2.5s-2.5-1.12-2.5-2.5 1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5zm-2.5-8c-5.52 0-10 4.48-10 10s4.48 10 10 10 10-4.48 10-10-4.48-10-10-10zm-1 15l-5-5 1.41-1.41L12 16.17l4.59-4.58L18 13l-6 6z', text: t('home.gameModes.solo.feature2') },
@@ -309,11 +549,11 @@ export function HomeView() {
     {
       title: t('home.gameModes.duo.title'),
       description: t('home.gameModes.duo.description'),
-      iconType: 'dual-svg',
+      art: HOME_MODE_ARTS.duo,
+      players: '2',
+      playersLabel: '2 Players',
+      iconType: 'dual-svg' as const,
       iconPath: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
-      iconColor: '#9333ea',
-      shadowColor: 'rgba(147, 51, 234, 0.3)',
-      hoverShadowColor: 'rgba(147, 51, 234, 0.5)',
       features: [
         { iconPath: 'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z', text: t('home.gameModes.duo.feature1') },
         { iconPath: 'M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z', text: t('home.gameModes.duo.feature2') },
@@ -324,11 +564,11 @@ export function HomeView() {
     {
       title: t('home.gameModes.squad.title'),
       description: t('home.gameModes.squad.description'),
-      iconType: 'emoji',
-      iconEmoji: '👥',
-      iconColor: '#ff8c00',
-      shadowColor: 'rgba(255, 140, 0, 0.3)',
-      hoverShadowColor: 'rgba(255, 140, 0, 0.5)',
+      art: HOME_MODE_ARTS.squad,
+      players: '4',
+      playersLabel: '4 Players',
+      iconType: 'svg' as const,
+      iconPath: 'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z',
       features: [
         { iconPath: 'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z', text: t('home.gameModes.squad.feature1') },
         { iconPath: 'M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z', text: t('home.gameModes.squad.feature2') },
@@ -339,11 +579,11 @@ export function HomeView() {
     {
       title: t('home.gameModes.tdm.title'),
       description: t('home.gameModes.tdm.description'),
-      iconType: 'svg',
+      art: HOME_MODE_ARTS.tdm,
+      players: '6–8',
+      playersLabel: '6–8 Players',
+      iconType: 'svg' as const,
       iconPath: 'M7.05 2.05L5 12h3v7l8-14h-4l2-3z',
-      iconColor: '#ff8c00',
-      shadowColor: 'rgba(255, 140, 0, 0.3)',
-      hoverShadowColor: 'rgba(255, 140, 0, 0.5)',
       features: [
         { iconPath: 'M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z', text: t('home.gameModes.tdm.feature1') },
         { iconPath: 'M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z', text: t('home.gameModes.tdm.feature2') },
@@ -354,291 +594,424 @@ export function HomeView() {
   ];
 
   const sectionHowToPlay = (
-    <Box id="how-to-play" sx={{
-      scrollMarginTop: { xs: '80px', md: '100px' },
-      position: 'relative',
-      overflow: 'hidden',
-      py: { xs: 4, md: 5 },
-      bgcolor: '#000000',
-      '&::before': {
-        content: "''",
-        position: 'absolute',
-        inset: 0,
-        backgroundImage: `url(${HOME_IMAGE_PATHS.howToPlayBg})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        zIndex: 0,
-      },
-      '&::after': {
-        content: "''",
-        position: 'absolute',
-        inset: 0,
-        background: `linear-gradient(180deg, ${alpha('#000000', 0.72)} 0%, ${alpha('#000000', 0.5)} 50%, ${alpha('#000000', 0.82)} 100%)`,
-        zIndex: 0,
-      },
-    }}>
-      <Stack sx={{
-        position: 'relative',
-        zIndex: 1,
-        maxWidth: { xs: 1, md: 1200 },
-        margin: '0 auto',
-        px: { xs: 2, md: 4 },
-      }}>
-        <Stack sx={{ alignItems: 'center', mb: { xs: 2.5, md: 3.5 } }}>
+    <Box id="how-to-play" sx={blackGamingSectionSx(HOME_GAME_ARTS[2])}>
+      <Stack
+        spacing={{ xs: 3, md: 4 }}
+        sx={{ position: 'relative', zIndex: 1, maxWidth: 1280, mx: 'auto' }}
+      >
+        <Stack spacing={1.25} alignItems="center">
           <Typography
-            variant='h2'
-            className='font-tr'
             sx={{
-              fontSize: { xs: 24, sm: 36, md: 48 },
-              fontWeight: 'bold',
+              fontSize: { xs: 11, md: 12 },
+              fontWeight: 700,
+              letterSpacing: 2.5,
+              color: GOLD,
+              textTransform: 'uppercase',
+            }}
+          >
+            {t('home.playYourGame.brandLabel')}
+          </Typography>
+          <Typography
+            variant="h2"
+            className="font-tr"
+            sx={{
+              fontSize: { xs: 22, sm: 32, md: 40 },
+              fontWeight: 800,
               textAlign: 'center',
               textTransform: 'uppercase',
-              color: glassTokens.titleColor,
-              mb: 1,
-              wordBreak: 'break-word',
+              letterSpacing: { xs: 1, md: 2 },
+              color: '#ffffff',
+              animation: `${titleGlow} 4s ease-in-out infinite`,
             }}
           >
             {t('home.howToPlay')}
           </Typography>
-          <BattleGoldDivider variant="section" />
+          <Typography
+            className="font-tr"
+            sx={{
+              fontSize: { xs: 12, sm: 14 },
+              color: alpha('#ffffff', 0.5),
+              textAlign: 'center',
+              maxWidth: 520,
+              lineHeight: 1.6,
+            }}
+          >
+            Solo 1 · Duo 2 · Squad 4 · TDM 6–8 — pick your team size.
+          </Typography>
+          <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
         </Stack>
 
-        <Grid container spacing={{ xs: 2, md: 3 }} justifyContent="center">
+        <Box
+          sx={homeMobileScrollGridSx(
+            {
+              xs: 'repeat(4, minmax(280px, 1fr))',
+              lg: 'repeat(4, minmax(0, 1fr))',
+            },
+            { xs: 1.5, md: 2.5 }
+          )}
+        >
           {gameModes.map((mode, index) => (
-            <Grid item xs={12} sm={6} lg={3} key={index}>
+            <Box
+              key={mode.title}
+              sx={{
+                ...homeMobileScrollItemSx,
+                minWidth: { xs: 280, lg: 0 },
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                height: 1,
+                borderRadius: 0,
+                overflow: 'hidden',
+                bgcolor: '#161618',
+                border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                isolation: 'isolate',
+                animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.1}s both`,
+                transition:
+                  'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, border-color 0.35s ease',
+                boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  inset: 0,
+                  border: `1px solid ${alpha(GOLD, 0.55)}`,
+                  opacity: 0,
+                  zIndex: 2,
+                  pointerEvents: 'none',
+                  transition: 'opacity 0.35s ease',
+                },
+                '&:hover': {
+                  transform: 'translateY(-8px)',
+                  borderColor: alpha(GOLD, 0.45),
+                  boxShadow: `
+                    0 22px 48px ${alpha('#000000', 0.7)},
+                    0 0 0 1px ${alpha(GOLD, 0.2)},
+                    0 0 32px ${alpha(GOLD, 0.12)}
+                  `,
+                  '&::before': { opacity: 1, animation: `${borderPulse} 1.8s ease-in-out infinite` },
+                  '& .mode-card-bar': { transform: 'scaleX(1)' },
+                  '& .mode-card-title': { color: GOLD },
+                  '& .mode-card-art': { transform: 'scale(1.06)' },
+                },
+              }}
+            >
               <Box
-                sx={getGlassShellSx(glassTokens, {
-                  p: { xs: 2, md: 3 },
-                  textAlign: 'center',
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'transform 0.25s ease, box-shadow 0.25s ease',
-                  '&:hover': {
-                    transform: 'translateY(-4px)',
-                    boxShadow: `0 20px 50px ${alpha('#000000', 0.65)}, inset 0 1px 0 ${alpha('#ffffff', 0.16)}`,
-                  },
-                })}
+                sx={{
+                  position: 'relative',
+                  height: { xs: 160, md: 190 },
+                  overflow: 'hidden',
+                  bgcolor: '#0a0a0a',
+                }}
               >
-                <Box sx={{ mb: { xs: 1, sm: 2.5 }, display: 'flex', justifyContent: 'center' }}>
-                  <Box
+                <Box
+                  className="mode-card-art"
+                  component="img"
+                  src={mode.art}
+                  alt={mode.playersLabel}
+                  loading="lazy"
+                  sx={{
+                    width: 1,
+                    height: 1,
+                    objectFit: 'cover',
+                    objectPosition: 'center center',
+                    display: 'block',
+                    transition: 'transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)',
+                  }}
+                />
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: `linear-gradient(180deg, ${alpha('#000000', 0.1)} 0%, ${alpha('#161618', 0.45)} 65%, #161618 100%)`,
+                    pointerEvents: 'none',
+                  }}
+                />
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 10,
+                    left: 10,
+                    zIndex: 1,
+                    px: 1,
+                    py: 0.4,
+                    bgcolor: alpha('#000000', 0.72),
+                    border: `1px solid ${alpha(GOLD, 0.55)}`,
+                  }}
+                >
+                  <Typography
+                    className="font-tr"
                     sx={{
-                      width: { xs: 56, sm: 72 },
-                      height: { xs: 56, sm: 72 },
-                      borderRadius: `${GLASS_CARD_RADIUS}px`,
-                      bgcolor: alpha('#000000', 0.35),
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: `1px solid ${alpha('#ffffff', 0.14)}`,
-                      boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.12)}`,
-                      position: mode.iconType === 'dual-svg' ? 'relative' : 'static',
+                      fontSize: 11,
+                      fontWeight: 800,
+                      letterSpacing: 1,
+                      color: GOLD,
+                      textTransform: 'uppercase',
+                      lineHeight: 1.2,
                     }}
                   >
-                    {mode.iconType === 'emoji' ? (
-                      <Typography sx={{ fontSize: { xs: 36, sm: 50 } }}>{mode.iconEmoji}</Typography>
-                    ) : mode.iconType === 'dual-svg' ? (
-                      <>
-                        <SvgIcon sx={{ fontSize: { xs: 28, sm: 40 }, color: mode.iconColor, position: 'absolute', left: { xs: 4, sm: 8 } }}>
-                          <path d={mode.iconPath} />
-                        </SvgIcon>
-                        <SvgIcon sx={{ fontSize: { xs: 28, sm: 40 }, color: mode.iconColor, position: 'absolute', right: { xs: 4, sm: 8 } }}>
-                          <path d={mode.iconPath} />
-                        </SvgIcon>
-                      </>
-                    ) : (
-                      <SvgIcon sx={{ fontSize: { xs: 36, sm: 50 }, color: mode.iconColor }}>
+                    {mode.playersLabel}
+                  </Typography>
+                </Box>
+              </Box>
+
+              <Stack
+                spacing={1.5}
+                sx={{
+                  px: { xs: 2, md: 2.25 },
+                  pt: { xs: 1.75, md: 2 },
+                  pb: { xs: 2, md: 2.25 },
+                  flex: 1,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 52,
+                    height: 52,
+                    bgcolor: alpha('#000000', 0.45),
+                    border: `1px solid ${alpha(GOLD, 0.35)}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: mode.iconType === 'dual-svg' ? 'relative' : 'static',
+                  }}
+                >
+                  {mode.iconType === 'dual-svg' ? (
+                    <>
+                      <SvgIcon sx={{ fontSize: 22, color: GOLD, position: 'absolute', left: 6 }}>
                         <path d={mode.iconPath} />
                       </SvgIcon>
-                    )}
-                  </Box>
+                      <SvgIcon sx={{ fontSize: 22, color: GOLD, position: 'absolute', right: 6 }}>
+                        <path d={mode.iconPath} />
+                      </SvgIcon>
+                    </>
+                  ) : (
+                    <SvgIcon sx={{ fontSize: 28, color: GOLD }}>
+                      <path d={mode.iconPath} />
+                    </SvgIcon>
+                  )}
                 </Box>
 
-                <Typography
-                  className='font-tr'
-                  sx={{
-                    fontSize: { xs: 18, sm: 24, md: 28 },
-                    fontWeight: 'bold',
-                    color: glassTokens.titleColor,
-                    mb: { xs: 0.5, sm: 1.25 },
-                    wordBreak: 'break-word',
-                  }}
-                >
-                  {mode.title}
-                </Typography>
+                <Box>
+                  <Typography
+                    className="mode-card-title font-tr"
+                    sx={{
+                      fontSize: { xs: 16, md: 18 },
+                      fontWeight: 800,
+                      letterSpacing: 0.6,
+                      color: '#ffffff',
+                      textTransform: 'uppercase',
+                      lineHeight: 1.2,
+                      transition: 'color 0.3s ease',
+                      mb: 0.75,
+                    }}
+                  >
+                    {mode.title}
+                  </Typography>
+                  <Typography
+                    className="font-tr"
+                    sx={{
+                      fontSize: { xs: 12, md: 13 },
+                      color: alpha('#ffffff', 0.5),
+                      lineHeight: 1.55,
+                    }}
+                  >
+                    {mode.description}
+                  </Typography>
+                </Box>
 
-                <Typography
-                  className='font-tr'
+                <Box
+                  className="mode-card-bar"
                   sx={{
-                    fontSize: { xs: 12, sm: 14, md: 15 },
-                    color: glassTokens.subtitleColor,
-                    mb: { xs: 1.5, sm: 2.5 },
-                    lineHeight: 1.5,
+                    height: 2,
+                    bgcolor: GOLD,
+                    transform: 'scaleX(0)',
+                    transformOrigin: 'left center',
+                    transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
+                    boxShadow: `0 0 12px ${alpha(GOLD, 0.45)}`,
                   }}
-                >
-                  {mode.description}
-                </Typography>
+                />
 
-                <Stack spacing={{ xs: 0.75, sm: 1.5 }} sx={{ alignItems: 'flex-start', textAlign: 'left', mt: 'auto' }}>
-                  {mode.features.map((feature, featureIndex) => (
-                    <Stack key={featureIndex} direction="row" spacing={1} alignItems="flex-start">
-                      <SvgIcon sx={{ fontSize: { xs: 16, sm: 18 }, color: glassTokens.stat.suffixColor, flexShrink: 0, mt: 0.25 }}>
+                <Stack spacing={1} sx={{ mt: 'auto' }}>
+                  {mode.features.map((feature) => (
+                    <Stack key={feature.text} direction="row" spacing={1} alignItems="flex-start">
+                      <SvgIcon sx={{ fontSize: 16, color: GOLD, flexShrink: 0, mt: 0.15 }}>
                         <path d={feature.iconPath} />
                       </SvgIcon>
-                      <Typography className='font-tr' sx={{ fontSize: { xs: 11, sm: 13 }, color: glassTokens.stat.labelColor, lineHeight: 1.4 }}>
+                      <Typography
+                        className="font-tr"
+                        sx={{
+                          fontSize: { xs: 11, md: 12 },
+                          color: alpha('#ffffff', 0.65),
+                          lineHeight: 1.45,
+                        }}
+                      >
                         {feature.text}
                       </Typography>
                     </Stack>
                   ))}
                 </Stack>
-              </Box>
-            </Grid>
+              </Stack>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Stack>
     </Box>
   );
 
   const sectionRoules = (
-    <Box id="rules" sx={{
-      scrollMarginTop: { xs: '80px', md: '100px' },
-      position: 'relative',
-      overflow: 'hidden',
-      py: { xs: 4, md: 5 },
-      bgcolor: '#000000',
-      '&::before': {
-        content: "''",
-        position: 'absolute',
-        inset: 0,
-        backgroundImage: `url(${HOME_IMAGE_PATHS.rulesBg})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        zIndex: 0,
-      },
-      '&::after': {
-        content: "''",
-        position: 'absolute',
-        inset: 0,
-        background: `linear-gradient(180deg, ${alpha('#000000', 0.68)} 0%, ${alpha('#000000', 0.48)} 50%, ${alpha('#000000', 0.8)} 100%)`,
-        zIndex: 0,
-      },
-    }}>
-      <Stack sx={{
-        position: 'relative',
-        zIndex: 1,
-        maxWidth: { xs: 1, sm: 980 },
-        margin: '0 auto',
-        px: { xs: 2, sm: 3 },
-      }}>
-        <Stack sx={{ alignItems: 'center', mb: { xs: 2, md: 3 } }}>
+    <Box id="rules" sx={blackGamingSectionSx(HOME_GAME_ARTS[4])}>
+      <Stack
+        spacing={{ xs: 3, md: 4 }}
+        sx={{ position: 'relative', zIndex: 1, maxWidth: 900, mx: 'auto' }}
+      >
+        <Stack spacing={1.25} alignItems="center">
           <Typography
-            variant='h2'
-            className='font-tr'
             sx={{
-              fontSize: { xs: 22, sm: 32, md: 42 },
-              fontWeight: 'bold',
+              fontSize: { xs: 11, md: 12 },
+              fontWeight: 700,
+              letterSpacing: 2.5,
+              color: GOLD,
+              textTransform: 'uppercase',
+            }}
+          >
+            {t('home.playYourGame.brandLabel')}
+          </Typography>
+          <Typography
+            variant="h2"
+            className="font-tr"
+            sx={{
+              fontSize: { xs: 22, sm: 32, md: 40 },
+              fontWeight: 800,
               textAlign: 'center',
               textTransform: 'uppercase',
-              color: glassTokens.titleColor,
-              mb: 1,
-              wordBreak: 'break-word',
+              letterSpacing: { xs: 1, md: 2 },
+              color: '#ffffff',
+              animation: `${titleGlow} 4s ease-in-out infinite`,
             }}
           >
             {t('home.tournamentRules')}
           </Typography>
           <Typography
-            className='font-tr'
+            className="font-tr"
             sx={{
-              fontSize: { xs: 13, sm: 16, md: 20 },
-              color: glassTokens.subtitleColor,
+              fontSize: { xs: 12, sm: 14 },
+              color: alpha('#ffffff', 0.5),
               textAlign: 'center',
+              maxWidth: 520,
+              lineHeight: 1.6,
             }}
           >
             {t('home.officialRegulations')}
           </Typography>
-          <BattleGoldDivider variant="section" sx={{ mt: 1.5 }} />
+          <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
         </Stack>
 
-        <GlassPanelCard>
-          <Stack spacing={1.25}>
-            {FAQ.map((faq, index) => (
-              <Accordion
-                key={index}
-                disableGutters
-                elevation={0}
+        <Stack spacing={1.25}>
+          {FAQ.map((faq, index) => (
+            <Accordion
+              key={faq.question}
+              disableGutters
+              elevation={0}
+              sx={{
+                bgcolor: '#161618',
+                border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                borderRadius: '0 !important',
+                overflow: 'hidden',
+                boxShadow: `0 8px 24px ${alpha('#000000', 0.4)}`,
+                animation: `${cardReveal} 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.07}s both`,
+                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+                '&:before': { display: 'none' },
+                '&.Mui-expanded': {
+                  margin: 0,
+                  borderColor: alpha(GOLD, 0.35),
+                  boxShadow: `0 12px 32px ${alpha('#000000', 0.55)}, 0 0 20px ${alpha(GOLD, 0.08)}`,
+                },
+                '&:hover': {
+                  borderColor: alpha(GOLD, 0.28),
+                },
+              }}
+            >
+              <AccordionSummary
+                expandIcon={
+                  <SvgIcon sx={{ color: GOLD, fontSize: { xs: 20, sm: 22 } }}>
+                    <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z" />
+                  </SvgIcon>
+                }
                 sx={{
-                  ...getGlassInnerSx(glassTokens, {
-                    p: 0,
-                    overflow: 'hidden',
-                  }),
-                  '&:before': { display: 'none' },
-                  '&.Mui-expanded': {
-                    margin: 0,
-                    bgcolor: glassTokens.stat.bgcolor,
-                    backgroundColor: glassTokens.stat.bgcolor,
-                    boxShadow: glassTokens.stat.boxShadow,
-                  },
+                  py: { xs: 0.5, sm: 0.75 },
+                  px: { xs: 1.5, sm: 2.25 },
+                  minHeight: 52,
+                  bgcolor: 'transparent',
+                  '& .MuiAccordionSummary-content': { margin: '12px 0' },
+                  '&.Mui-expanded': { bgcolor: 'transparent' },
                 }}
               >
-                <AccordionSummary
-                  expandIcon={
-                    <SvgIcon sx={{ color: glassTokens.stat.suffixColor, fontSize: { xs: 20, sm: 24 } }}>
-                      <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z" />
-                    </SvgIcon>
-                  }
+                <Typography
+                  className="font-tr"
                   sx={{
-                    py: { xs: 0.5, sm: 1 },
-                    px: { xs: 1.25, sm: 2 },
-                    minHeight: 48,
-                    bgcolor: 'transparent',
-                    '& .MuiAccordionSummary-content': { margin: '10px 0' },
-                    '&.Mui-expanded': { bgcolor: 'transparent' },
+                    fontSize: { xs: 13, sm: 15, md: 16 },
+                    fontWeight: 700,
+                    color: '#ffffff',
+                    wordBreak: 'break-word',
+                    lineHeight: 1.35,
+                    letterSpacing: 0.2,
                   }}
                 >
-                  <Typography
-                    className="font-tr"
-                    sx={{
-                      fontSize: { xs: 14, sm: 16, md: 18 },
-                      fontWeight: 700,
-                      color: glassTokens.titleColor,
-                      wordBreak: 'break-word',
-                      lineHeight: 1.35,
-                    }}
-                  >
-                    {faq.question}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails sx={{ pb: 2, px: { xs: 1.25, sm: 2 }, pt: 0, bgcolor: 'transparent' }}>
-                  <Typography
-                    className="font-tr"
-                    sx={{
-                      fontSize: { xs: 12, sm: 14, md: 16 },
-                      color: glassTokens.subtitleColor,
-                      lineHeight: 1.65,
-                    }}
-                  >
-                    {faq.answer}
-                  </Typography>
-                </AccordionDetails>
-              </Accordion>
-            ))}
-          </Stack>
-        </GlassPanelCard>
+                  {faq.question}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails
+                sx={{
+                  pb: 2.25,
+                  px: { xs: 1.5, sm: 2.25 },
+                  pt: 0,
+                  bgcolor: 'transparent',
+                  borderTop: `1px solid ${alpha(GOLD, 0.15)}`,
+                }}
+              >
+                <Typography
+                  className="font-tr"
+                  sx={{
+                    fontSize: { xs: 12, sm: 13, md: 14 },
+                    color: alpha('#ffffff', 0.55),
+                    lineHeight: 1.7,
+                    pt: 1.5,
+                  }}
+                >
+                  {faq.answer}
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </Stack>
       </Stack>
     </Box>
-  )
+  );
 
 
   return (
-    <Box sx={{ bgcolor: '#000000' }}>
+    <Box
+      className="home-scroll-story"
+      sx={{
+        bgcolor: '#000000',
+        scrollSnapType: { xs: 'none', md: 'y proximity' },
+      }}
+    >
       {sectionSlide}
-      <LandingDashboardSection />
-      <PlayYourGameSection />
-      {sectionAbout}
-      {sectionHowToPlay}
-      {sectionRoules}
-    </Box >
+      <ScrollReveal preset="cinematic" fullViewport>
+        <LandingDashboardSection />
+      </ScrollReveal>
+      <ScrollReveal preset="cinematic" fullViewport>
+        <PlayYourGameSection />
+      </ScrollReveal>
+      <ScrollReveal preset="cinematic-slide-left" fullViewport>
+        {sectionAbout}
+      </ScrollReveal>
+      <ScrollReveal preset="cinematic-slide-right" fullViewport>
+        {sectionHowToPlay}
+      </ScrollReveal>
+      <ScrollReveal preset="cinematic" fullViewport>
+        {sectionRoules}
+      </ScrollReveal>
+    </Box>
   );
 }

@@ -1,12 +1,10 @@
 import type { ReactNode } from 'react';
-
 import type { CardProps } from '@mui/material/Card';
 
 import Card from '@mui/material/Card';
 
 import {
-  getDefaultGlassTokens,
-  getGlassShellSx,
+  getGoldTopLineShellSx,
   mergeGlassSx,
 } from 'src/components/battle-glass-card';
 
@@ -18,15 +16,15 @@ type UserGlassCardProps = CardProps & {
 };
 
 export function UserGlassCard({ children, sx, noPadding, ...other }: UserGlassCardProps) {
-  const tokens = getDefaultGlassTokens();
-
   return (
     <Card
       elevation={0}
       sx={mergeGlassSx(
-        getGlassShellSx(tokens, {
+        getGoldTopLineShellSx({
           p: noPadding ? 0 : { xs: 1.5, sm: 2 },
+          pt: noPadding ? 0 : { xs: 2, sm: 2.25 },
           height: 'auto',
+          transition: 'border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease',
         }),
         sx
       )}

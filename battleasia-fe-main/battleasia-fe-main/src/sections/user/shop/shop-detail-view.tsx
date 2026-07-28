@@ -12,7 +12,6 @@ import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
 import {
   UserPageShell,
-  UserPageTitle,
   UserGlassCard,
   UserBackButton,
   UserActionButton,
@@ -20,6 +19,7 @@ import {
   UserEmptyState,
   USER_COLORS,
   userMutedTextSx,
+  getUserChipSx,
 } from 'src/layouts/user';
 
 import { Image } from 'src/components/image';
@@ -132,11 +132,8 @@ export function ShopDetailView() {
         <UserBackButton onClick={() => navigate(paths.user.shop)} label={t('common.goBack')} />
       </Box>
 
-      <ShopHero shopName={itemTitle} />
-
-      <UserPageTitle
-        badge={t('shop.badgeCoinPack')}
-        title={itemTitle}
+      <ShopHero
+        shopName={itemTitle}
         subtitle={t('shop.detailSubtitle')}
         action={
           <UserActionButton
@@ -146,12 +143,25 @@ export function ShopDetailView() {
             actionVariant="gold"
             disabled={isSoldOut}
             startIcon={<Iconify icon="solar:cart-check-bold" width={18} />}
-            sx={{ display: { xs: 'none', md: 'inline-flex' } }}
           >
             {isSoldOut ? t('shop.soldOut') : t('shop.buyNow')}
           </UserActionButton>
         }
       />
+
+      <Stack sx={{ mb: 2.5, display: { xs: 'flex', md: 'none' } }}>
+        <UserActionButton
+          href={SHOP_EXTERNAL_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          actionVariant="gold"
+          disabled={isSoldOut}
+          startIcon={<Iconify icon="solar:cart-check-bold" width={18} />}
+          fullWidth
+        >
+          {isSoldOut ? t('shop.soldOut') : t('shop.buyNow')}
+        </UserActionButton>
+      </Stack>
 
       <Box
         sx={{
@@ -198,10 +208,7 @@ export function ShopDetailView() {
                     position: 'absolute',
                     top: 12,
                     left: 12,
-                    fontWeight: 700,
-                    bgcolor: alpha(USER_COLORS.gold, 0.2),
-                    color: USER_COLORS.gold,
-                    border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
+                    ...getUserChipSx('gold'),
                   }}
                 />
               ) : null}
@@ -253,10 +260,7 @@ export function ShopDetailView() {
                       size="small"
                       sx={{
                         alignSelf: 'flex-start',
-                        fontWeight: 700,
-                        bgcolor: alpha(USER_COLORS.gold, 0.15),
-                        color: USER_COLORS.gold,
-                        border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
+                        ...getUserChipSx('gold'),
                       }}
                     />
                   </>

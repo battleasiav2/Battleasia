@@ -110,7 +110,6 @@ export function AccountPopover({ data = [], sx, ...other }: AccountPopoverProps)
       <Box sx={{ p: 1 }}>
         <SignOutButton
           size="medium"
-          variant="text"
           onClose={onClose}
           sx={{ display: 'block', textAlign: 'left' }}
         />

@@ -89,7 +89,7 @@ export function ForgotPasswordView() {
           <Field.Text
             name="email"
             label={t('auth.emailAddress')}
-            placeholder="Example@domain.com"
+            placeholder={t('auth.emailPlaceholder')}
             slotProps={{
               ...authFieldSlotProps,
               input: {

@@ -1,22 +1,24 @@
-import { Box, Grid, Stack, Divider, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { RouterLink } from 'src/routes/components';
 
 import { Logo } from 'src/components/logo';
+import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { createMenuClickHandler } from '../menu-items-config';
 import { useRouter, usePathname } from 'src/routes/hooks';
 import { useTranslate } from 'src/locales/use-locales';
 
-const FOOTER_TOP_IMAGE = '/assets/images/about-pubg-black.webp';
+const GOLD = '#f5c518';
 
 const linkSx = {
-  color: alpha('#ffffff', 0.65),
+  color: alpha('#ffffff', 0.55),
   textDecoration: 'none',
-  fontSize: 14,
+  fontSize: { xs: 12, sm: 13 },
+  lineHeight: 1.4,
   cursor: 'pointer',
   transition: 'color 0.2s ease',
-  '&:hover': { color: '#feab02' },
+  '&:hover': { color: GOLD },
 };
 
 export function FooterSection() {
@@ -40,13 +42,11 @@ export function FooterSection() {
     {
       titleKey: 'footer.social',
       links: [
-        { labelKey: 'footer.facebook', href: 'https://www.facebook.com/share/14XUaoaUgUL/?mibextid=wwXIfr', scrollTarget: 'facebook' },
-        { labelKey: 'footer.tiktok', href: 'https://www.tiktok.com/@battleasia?_r=1&_t=ZN-93nBYQnjiGU', scrollTarget: 'tiktok' },
-        { labelKey: 'footer.instagram', href: 'https://www.instagram.com/battleasia', scrollTarget: 'instagram' },
-        { labelKey: 'footer.twitter', href: 'https://twitter.com/battleasia', scrollTarget: 'twitter' },
-        { labelKey: 'footer.youtube', href: 'https://www.youtube.com/@BattleAsia', scrollTarget: 'youtube' },
-        { labelKey: 'footer.discord', href: 'https://discord.com/invite/battleasia', scrollTarget: 'discord' },
-        { labelKey: 'footer.telegram', href: 'https://t.me/battleasiaofficial', scrollTarget: 'telegram' },
+        { labelKey: 'footer.facebook', href: 'https://www.facebook.com/share/14XUaoaUgUL/?mibextid=wwXIfr' },
+        { labelKey: 'footer.tiktok', href: 'https://www.tiktok.com/@battleasia?_r=1&_t=ZN-93nBYQnjiGU' },
+        { labelKey: 'footer.instagram', href: 'https://www.instagram.com/battleasia' },
+        { labelKey: 'footer.youtube', href: 'https://www.youtube.com/@BattleAsia' },
+        { labelKey: 'footer.telegram', href: 'https://t.me/battleasiaofficial' },
       ],
     },
     {
@@ -67,118 +67,120 @@ export function FooterSection() {
   ];
 
   return (
-    <Box component="footer" sx={{ bgcolor: '#000000' }}>
-      {/* Top image strip */}
-      <Box
+    <Box
+      component="footer"
+      sx={{
+        position: 'relative',
+        overflowX: 'hidden',
+        bgcolor: '#0a0a0a',
+        borderTop: `1px solid ${alpha('#ffffff', 0.06)}`,
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          inset: 0,
+          background: `radial-gradient(ellipse 60% 40% at 50% 0%, ${alpha(GOLD, 0.06)} 0%, transparent 55%)`,
+          pointerEvents: 'none',
+        },
+      }}
+    >
+      <Stack
+        spacing={{ xs: 2.5, md: 3.5 }}
         sx={{
           position: 'relative',
-          width: 1,
-          height: { xs: 110, sm: 140, md: 160 },
-          overflow: 'hidden',
-        }}
-      >
-        <Box
-          component="img"
-          src={FOOTER_TOP_IMAGE}
-          alt=""
-          sx={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center 40%',
-            display: 'block',
-          }}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            background: `linear-gradient(180deg, transparent 0%, ${alpha('#000000', 0.55)} 55%, #000000 100%)`,
-          }}
-        />
-      </Box>
-
-      <Stack
-        spacing={{ xs: 3, md: 4 }}
-        sx={{
-          px: { xs: 2, md: 6 },
-          py: { xs: 3.5, md: 5 },
+          zIndex: 1,
+          px: { xs: 2, sm: 3, md: 4 },
+          pt: { xs: 3, md: 4.5 },
+          pb: { xs: 2.5, md: 3.5 },
           maxWidth: 1280,
           mx: 'auto',
         }}
       >
-        {/* Logo + text — navbar style */}
-        <Stack
-          direction="row"
-          alignItems="center"
-          spacing={{ xs: 1.25, sm: 1.5 }}
-          sx={{ flexWrap: 'wrap' }}
-        >
-          <Logo
+        {/* Brand — logo + title + gold line (matches header / arena strip) */}
+        <Box sx={{ width: 1, maxWidth: { xs: 340, sm: 380, md: 420 } }}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={{ xs: 1.25, sm: 1.5 }}
+            sx={{ minWidth: 0 }}
+          >
+            <Logo
+              sx={{
+                width: { xs: 52, sm: 64, md: 72 },
+                height: { xs: 52, sm: 64, md: 72 },
+                flexShrink: 0,
+              }}
+            />
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Typography
+                className="font-tr"
+                sx={{
+                  fontSize: isBengali
+                    ? { xs: 16, sm: 20, md: 22 }
+                    : { xs: 18, sm: 22, md: 24 },
+                  color: GOLD,
+                  fontWeight: 800,
+                  lineHeight: 1.1,
+                  letterSpacing: 0.3,
+                  textTransform: 'uppercase',
+                }}
+              >
+                {t('common.brandName')}
+              </Typography>
+              <Typography
+                className="font-tr"
+                sx={{
+                  mt: 0.35,
+                  fontSize: { xs: 9, sm: 11, md: 12 },
+                  color: alpha('#ffffff', 0.5),
+                  fontWeight: 600,
+                  letterSpacing: { xs: 0.5, md: 0.9 },
+                  textTransform: 'uppercase',
+                  lineHeight: 1.25,
+                }}
+              >
+                {t('common.brandTagline')}
+              </Typography>
+            </Box>
+          </Stack>
+
+          <BattleGoldDivider
+            variant="title"
             sx={{
-              width: { xs: 52, sm: 72, md: 84 },
-              height: { xs: 52, sm: 72, md: 84 },
-              flexShrink: 0,
-              '& img': {
-                borderRadius: '10%',
-                width: 1,
-                height: 1,
-                objectFit: 'contain',
-              },
+              mt: 1.25,
+              width: 1,
+              maxWidth: 1,
             }}
           />
-          <Box sx={{ minWidth: 0 }}>
-            <Typography
-              className="font-tr"
-              sx={{
-                fontSize: isBengali
-                  ? { xs: 18, sm: 22, md: 28 }
-                  : { xs: 20, sm: 24, md: 28 },
-                color: '#feab02',
-                fontWeight: 700,
-                lineHeight: 1.05,
-                letterSpacing: 0.3,
-              }}
-            >
-              {t('common.brandName')}
-            </Typography>
-            <Typography
-              className="font-tr"
-              sx={{
-                mt: 0.4,
-                fontSize: isBengali
-                  ? { xs: 8, sm: 10, md: 12 }
-                  : { xs: 10, sm: 12, md: 13 },
-                color: alpha('#ffffff', 0.75),
-                fontWeight: 500,
-                letterSpacing: { xs: 0.6, md: 1 },
-                textTransform: 'uppercase',
-                lineHeight: 1.2,
-              }}
-            >
-              {t('common.brandTagline')}
-            </Typography>
-          </Box>
-        </Stack>
+        </Box>
 
-        {/* Nav links — flat, no cards */}
-        <Grid container spacing={{ xs: 2.5, md: 3 }}>
+        {/* Link columns — 2 on mobile, 4 on desktop */}
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: 'repeat(2, minmax(0, 1fr))',
+              md: 'repeat(4, minmax(0, 1fr))',
+            },
+            gap: { xs: 2.5, sm: 3, md: 3.5 },
+            rowGap: { xs: 2.75, md: 3 },
+          }}
+        >
           {navSections.map((section) => (
-            <Grid item xs={12} sm={6} md={3} key={section.titleKey}>
+            <Box key={section.titleKey} sx={{ minWidth: 0 }}>
               <Typography
-                variant="subtitle2"
                 sx={{
                   fontWeight: 800,
-                  mb: 1.25,
-                  letterSpacing: 0.6,
+                  mb: { xs: 1, md: 1.25 },
+                  letterSpacing: 0.8,
                   color: '#ffffff',
                   textTransform: 'uppercase',
-                  fontSize: { xs: 12, sm: 13 },
+                  fontSize: { xs: 11, sm: 12 },
+                  lineHeight: 1.3,
                 }}
               >
                 {t(section.titleKey)}
               </Typography>
-              <Stack spacing={0.85}>
+              <Stack spacing={{ xs: 0.7, md: 0.85 }}>
                 {section.links.map((link: { labelKey: string; href?: string; scrollTarget?: string }) => {
                   const isExternalLink =
                     link.href?.startsWith('http://') || link.href?.startsWith('https://');
@@ -218,18 +220,29 @@ export function FooterSection() {
                   );
                 })}
               </Stack>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
 
-        <Divider sx={{ borderColor: alpha('#ffffff', 0.1) }} />
-
-        <Typography
-          variant="body2"
-          sx={{ color: alpha('#ffffff', 0.45), textAlign: { xs: 'center', md: 'left' } }}
+        {/* Bottom bar */}
+        <Box
+          sx={{
+            pt: { xs: 1.5, md: 2 },
+            mt: { xs: 0.5, md: 1 },
+            borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
+          }}
         >
-          {t('footer.copyright', { year: new Date().getFullYear() })}
-        </Typography>
+          <Typography
+            sx={{
+              color: alpha('#ffffff', 0.35),
+              textAlign: 'center',
+              fontSize: { xs: 11, sm: 12 },
+              lineHeight: 1.5,
+            }}
+          >
+            {t('footer.copyright', { year: new Date().getFullYear() })}
+          </Typography>
+        </Box>
       </Stack>
     </Box>
   );

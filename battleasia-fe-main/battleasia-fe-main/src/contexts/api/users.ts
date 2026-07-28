@@ -59,6 +59,17 @@ export const getFollowingApi = (id?: string) => {
   return axios.get(endpoint);
 };
 
+export const getSuggestedFollowsApi = (contextUserId?: string) => {
+  const query = contextUserId ? `?contextUserId=${encodeURIComponent(contextUserId)}` : '';
+  return axios.get(`api/v2/users/suggested-follows${query}`);
+};
+
+export const getMutualFollowersApi = (id: string) => axios.get(`api/v2/users/${id}/mutual-followers`);
+
+export const getRecentFollowsApi = (id: string) => axios.get(`api/v2/users/${id}/recent-follows`);
+
+export const getProfileSocialSettingsApi = () => axios.get('api/v2/social/profile-social-settings');
+
 // Withdrawal
 export const submitWithdrawalApi = (data: {
   user_email: string;

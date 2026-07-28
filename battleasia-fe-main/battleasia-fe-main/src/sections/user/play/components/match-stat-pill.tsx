@@ -1,3 +1,4 @@
+import type { SxProps, Theme } from '@mui/material/styles';
 import { Box, Typography } from '@mui/material';
 
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
@@ -10,13 +11,14 @@ type MatchStatPillProps = {
   label: string;
   children: React.ReactNode;
   minHeight?: number;
+  sx?: SxProps<Theme>;
 };
 
-export function MatchStatPill({ label, children, minHeight = 64 }: MatchStatPillProps) {
+export function MatchStatPill({ label, children, minHeight = 64, sx }: MatchStatPillProps) {
   const tokens = getDefaultGlassTokens();
 
   return (
-    <Box sx={getGlassInnerSx(tokens, { p: 1.25, minHeight })}>
+    <Box sx={getGlassInnerSx(tokens, { p: 1.25, minHeight, ...((sx as object) || {}) })}>
       <Typography
         sx={{
           fontSize: 9,

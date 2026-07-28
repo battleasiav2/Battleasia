@@ -48,7 +48,7 @@ export const paths = {
       leaderBoard: `${ROOTS.USER}/account/leader-board`,
       customerSupport: `${ROOTS.USER}/account/customer-support`,
     },
-    earn: `${ROOTS.USER}/earn`,
+    earn: `${ROOTS.USER}/referral`,
     play: `${ROOTS.USER}/play`,
     playDetail: (id: string | number) => `${ROOTS.USER}/play/${id}`,
     match: (id: string | number) => `${ROOTS.USER}/play/${id}/detail`,
@@ -57,7 +57,14 @@ export const paths = {
     shopDetail: (id: string | number) => `${ROOTS.USER}/shop/${id}`,
     referral: `${ROOTS.USER}/referral`,
     feed: `${ROOTS.USER}/feed`,
+    feedTab: (tab: 'feed' | 'explore' | 'reels' | 'saved' | 'messages' = 'feed') =>
+      tab === 'feed' ? `${ROOTS.USER}/feed` : `${ROOTS.USER}/feed?tab=${tab}`,
     feedDetail: (id: string | number) => `${ROOTS.USER}/feed/${id}`,
+    explore: `${ROOTS.USER}/feed?tab=explore`,
+    reels: `${ROOTS.USER}/feed?tab=reels`,
+    saved: `${ROOTS.USER}/feed?tab=saved`,
+    messages: `${ROOTS.USER}/feed?tab=messages`,
+    messagesWithUser: (userId: string | number) => `${ROOTS.USER}/feed?tab=messages&userId=${userId}`,
   },
   // Public profile (no auth required)
   profile: (userId: string | number) => `/profile/${userId}`,

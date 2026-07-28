@@ -4,7 +4,7 @@ import { Box, Chip, Stack, InputBase, IconButton, CircularProgress } from '@mui/
 import { Iconify } from 'src/components/iconify';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
-import { USER_COLORS } from 'src/layouts/user';
+import { USER_COLORS, getUserChipSx } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
@@ -94,11 +94,7 @@ export function SupportComposer({
                 label={fileName}
                 onDelete={() => onRemoveAttachment(idx)}
                 size="small"
-                sx={{
-                  bgcolor: alpha(USER_COLORS.gold, 0.12),
-                  color: USER_COLORS.gold,
-                  border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
-                }}
+                sx={getUserChipSx('gold')}
               />
             );
           })}

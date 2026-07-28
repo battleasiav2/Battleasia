@@ -26,6 +26,7 @@ import { ConfirmDialog } from 'src/components/custom-dialog';
 import { fDateTime } from 'src/utils/format-time';
 import { paths } from 'src/routes/paths';
 import { IConversation } from 'src/contexts/api/customer-support';
+import { API_URL } from 'src/config-global';
 
 export default function CustomerSupportListView() {
   const settings = useSettingsContext();
@@ -103,6 +104,63 @@ export default function CustomerSupportListView() {
 
   const columns: GridColDef[] = useMemo(
     () => [
+      {
+        field: 'preview',
+        headerName: 'Image',
+        width: 88,
+        sortable: false,
+        filterable: false,
+        renderCell: (params: GridRenderCellParams<IConversation>) => {
+          const thumb = params.row.previewAttachments?.[0];
+          let src = '';
+          if (thumb) {
+            src = thumb.startsWith('http') ? thumb : `${API_URL || ''}${thumb}`;
+          }
+          return (
+            <Box
+              sx={{
+                width: 48,
+                height: 48,
+                borderRadius: 1,
+                overflow: 'hidden',
+                bgcolor: 'background.neutral',
+                display: 'grid',
+                placeItems: 'center',
+              }}
+            >
+              {src ? (
+                <Box component="img" src={src} alt="" sx={{ width: 1, height: 1, objectFit: 'cover' }} />
+              ) : (
+                <Iconify icon="solar:ticket-bold" width={20} />
+              )}
+            </Box>
+          );
+        },
+      },
+      {
+        field: 'subject',
+        headerName: 'Subject',
+        flex: 1,
+        minWidth: 180,
+        renderCell: (params: GridRenderCellParams<IConversation>) => (
+          <Box sx={{ py: 1, minWidth: 0 }}>
+            <Typography variant="subtitle2" noWrap>
+              {params.row.subject || 'Support Ticket'}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" noWrap>
+              {params.row.previewBody || 'No messages'}
+            </Typography>
+          </Box>
+        ),
+      },
+      {
+        field: 'category',
+        headerName: 'Category',
+        width: 110,
+        renderCell: (params: GridRenderCellParams<IConversation>) => (
+          <Chip label={params.row.category || 'other'} size="small" variant="outlined" />
+        ),
+      },
       {
         field: 'user',
         headerName: 'User',
@@ -197,7 +255,7 @@ export default function CustomerSupportListView() {
         }}
       >
         <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Typography variant="h4">Customer Support</Typography>
+          <Typography variant="h4">Support Tickets</Typography>
           <Stack direction="row" spacing={1}>
             <Button
               variant={statusFilter === 'all' ? 'contained' : 'outlined'}

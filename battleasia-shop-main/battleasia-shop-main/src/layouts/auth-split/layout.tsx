@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { merge } from 'es-toolkit';
 
 import { Alert, useMediaQuery } from '@mui/material';
-import { useTheme, type Breakpoint } from '@mui/material/styles';
+import { alpha, useTheme, type Breakpoint } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -24,6 +24,8 @@ import type { HeaderSectionProps } from '../core/header-section';
 import type { LayoutSectionProps } from '../core/layout-section';
 
 // ----------------------------------------------------------------------
+
+const GOLD = '#f5c518';
 
 type LayoutBaseProps = Pick<LayoutSectionProps, 'sx' | 'children' | 'cssVars'>;
 
@@ -103,10 +105,10 @@ export function AuthSplitLayout({
           ? (slotProps?.main?.sx ?? [])
           : [slotProps?.main?.sx]),
         {
-          backgroundColor: '#050505',
+          bgcolor: '#0a0a0a',
           backgroundImage: `url(${AUTH_BG_IMAGE})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'center top',
           backgroundRepeat: 'no-repeat',
           position: 'relative',
           minHeight: '100vh',
@@ -114,16 +116,17 @@ export function AuthSplitLayout({
             content: "''",
             position: 'absolute',
             inset: 0,
-            background:
-              'linear-gradient(90deg, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.35) 100%)',
+            background: `
+              linear-gradient(90deg, ${alpha('#0a0a0a', 0.9)} 0%, ${alpha('#0a0a0a', 0.62)} 48%, ${alpha('#0a0a0a', 0.78)} 100%),
+              radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(GOLD, 0.1)} 0%, transparent 55%)
+            `,
             zIndex: 0,
           },
           '&::after': {
             content: "''",
             position: 'absolute',
             inset: 0,
-            background:
-              'linear-gradient(180deg, rgba(0,0,0,0.45) 0%, transparent 35%, rgba(0,0,0,0.75) 100%)',
+            background: `linear-gradient(180deg, ${alpha('#0a0a0a', 0.4)} 0%, transparent 40%, ${alpha('#0a0a0a', 0.9)} 100%)`,
             zIndex: 0,
           },
         },
@@ -159,7 +162,7 @@ export function AuthSplitLayout({
     <LayoutSection
       headerSection={renderHeader()}
       footerSection={null}
-      cssVars={{ '--layout-auth-content-width': '480px', ...cssVars }}
+      cssVars={{ '--layout-auth-content-width': '620px', ...cssVars }}
       sx={sx}
     >
       {renderMain()}

@@ -163,7 +163,7 @@ export function UserProfileForm() {
               </Box>
 
               <Stack sx={{ mt: 3, alignItems: 'flex-end' }}>
-                <LoadingButton type="submit" loading={isSubmitting} sx={userGoldButtonSx}>
+                <LoadingButton type="submit" variant="outlined" disableElevation loading={isSubmitting} sx={userGoldButtonSx}>
                   {t('common.saveChanges')}
                 </LoadingButton>
               </Stack>

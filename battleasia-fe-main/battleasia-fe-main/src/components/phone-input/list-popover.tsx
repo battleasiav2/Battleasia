@@ -82,8 +82,10 @@ export function CountryListPopover({
         {
           zIndex: 9,
           display: 'flex',
+          alignItems: 'center',
           position: 'absolute',
           justifyContent: 'flex-start',
+          gap: 0.5,
           width: 'var(--popover-button-width)',
           height: 'var(--popover-button-height)',
         },
@@ -96,12 +98,30 @@ export function CountryListPopover({
           borderRadius: '50%',
           width: 'var(--popover-button-height)',
           height: 'var(--popover-button-height)',
+          flexShrink: 0,
         }}
       />
 
+      {selectedCountry?.phone && (
+        <Box
+          component="span"
+          sx={{
+            flexShrink: 0,
+            fontSize: 13,
+            fontWeight: 600,
+            letterSpacing: 0.2,
+            color: alpha('#ffffff', 0.88),
+            lineHeight: 1,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          +{selectedCountry.phone}
+        </Box>
+      )}
+
       <Iconify
         icon="eva:chevron-down-fill"
-        sx={{ ml: 0.25, flexShrink: 0, color: alpha('#ffffff', 0.65) }}
+        sx={{ flexShrink: 0, color: alpha('#ffffff', 0.65), width: 16, height: 16 }}
       />
 
       <Box

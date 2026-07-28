@@ -18,12 +18,19 @@ import { UserBlock } from '../../models/UserBlock.js';
 import { serializePublicUser, getFollowCounts } from '../../utils/social-serialize.js';
 import { createActivityNotification } from '../../utils/social-notifications.js';
 import { getWithdrawableInfo } from '../../utils/withdrawable-amount.js';
-import { getAppSettings } from '../../models/AppSettings.js';
+import { getAppSettings, normalizeProfileSocialSettings } from '../../models/AppSettings.js';
+import {
+  getMutualFollowers,
+  getRecentFollows,
+  getSuggestedFollows,
+  serializeFollowUsers,
+} from '../../utils/profile-social.js';
 import { recordBalanceHistory } from '../../utils/balance-history.js';
 import { notifyBalanceChange } from '../../utils/balance-notify.js';
 import { buildMyMatchHistory, buildUserMatchHistory } from '../../utils/match-history.js';
 import { resolveReferrerId } from '../../utils/referral.js';
 import { logAuthCode } from '../../utils/auth-log.js';
+import { sendVerificationCodeEmail } from '../../utils/mail.js';
 import { clearAllAuthCookies, setAuthCookie } from '../../utils/auth-cookie.js';
 import mongoose from 'mongoose';
 
@@ -53,6 +60,7 @@ async function saveVerificationCode(email: string, type: 'signup' | 'reset') {
   await VerificationCode.deleteMany({ email, type });
   await VerificationCode.create({ email, code, type, expiresAt });
 
+  await sendVerificationCodeEmail(email, code, type);
   logAuthCode(`${type} verification code`, email, code);
   return code;
 }
@@ -645,7 +653,8 @@ async function listFollowUsers(
   field: 'followerId' | 'followingId',
   userId: string,
   skip: number,
-  limit: number
+  limit: number,
+  viewerId?: string
 ) {
   const matchField = field === 'followerId' ? 'followingId' : 'followerId';
   const filter = { [matchField]: userId };
@@ -655,19 +664,8 @@ async function listFollowUsers(
   ]);
 
   const userIds = records.map((r) => r[field].toString());
-  const users = await User.find({ _id: { $in: userIds } }).select('username avatar role');
-  const userMap = new Map(users.map((u) => [u._id.toString(), u]));
-
-  const results = records.map((r) => {
-    const u = userMap.get(r[field].toString());
-    return {
-      id: u?._id.toString() || r[field].toString(),
-      username: u?.username || '',
-      avatar: u?.avatar || '',
-      role: u?.role?.name || 'Player',
-      followedAt: r.createdAt,
-    };
-  });
+  const followedAtMap = new Map(records.map((r) => [r[field].toString(), r.createdAt]));
+  const results = await serializeFollowUsers(userIds, viewerId, followedAtMap);
 
   return { results, total };
 }
@@ -675,7 +673,7 @@ async function listFollowUsers(
 router.get('/me/followers', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const { skip, limit } = parsePagination(req);
-    const { results, total } = await listFollowUsers('followerId', req.userId!, skip, limit);
+    const { results, total } = await listFollowUsers('followerId', req.userId!, skip, limit, req.userId);
     return res.json({ status: true, data: { results, total, count: total } });
   } catch (error) {
     console.error('me followers error:', error);
@@ -686,11 +684,29 @@ router.get('/me/followers', requireAuth, async (req: AuthedRequest, res) => {
 router.get('/me/following', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const { skip, limit } = parsePagination(req);
-    const { results, total } = await listFollowUsers('followingId', req.userId!, skip, limit);
+    const { results, total } = await listFollowUsers('followingId', req.userId!, skip, limit, req.userId);
     return res.json({ status: true, data: { results, total, count: total } });
   } catch (error) {
     console.error('me following error:', error);
     return res.status(500).json({ status: false, message: 'Failed to fetch following' });
+  }
+});
+
+router.get('/suggested-follows', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const settingsDoc = await getAppSettings();
+    const profileSocial = normalizeProfileSocialSettings(settingsDoc.profileSocial);
+    const contextUserId = typeof req.query.contextUserId === 'string' ? req.query.contextUserId : undefined;
+
+    if (!profileSocial.showSuggestedFollows) {
+      return res.json({ status: true, data: { results: [] } });
+    }
+
+    const results = await getSuggestedFollows(req.userId!, profileSocial, contextUserId);
+    return res.json({ status: true, data: { results } });
+  } catch (error) {
+    console.error('suggested follows error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to fetch suggested follows' });
   }
 });
 
@@ -790,7 +806,7 @@ router.delete('/:id/follow', requireAuth, async (req: AuthedRequest, res) => {
 router.get('/:id/followers', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const { skip, limit } = parsePagination(req);
-    const { results, total } = await listFollowUsers('followerId', String(req.params.id), skip, limit);
+    const { results, total } = await listFollowUsers('followerId', String(req.params.id), skip, limit, req.userId);
     return res.json({ status: true, data: { results, total, count: total } });
   } catch (error) {
     console.error('followers error:', error);
@@ -801,11 +817,67 @@ router.get('/:id/followers', requireAuth, async (req: AuthedRequest, res) => {
 router.get('/:id/following', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const { skip, limit } = parsePagination(req);
-    const { results, total } = await listFollowUsers('followingId', String(req.params.id), skip, limit);
+    const { results, total } = await listFollowUsers('followingId', String(req.params.id), skip, limit, req.userId);
     return res.json({ status: true, data: { results, total, count: total } });
   } catch (error) {
     console.error('following error:', error);
     return res.status(500).json({ status: false, message: 'Failed to fetch following' });
+  }
+});
+
+router.get('/:id/mutual-followers', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const profileUserId = String(req.params.id);
+    if (!mongoose.Types.ObjectId.isValid(profileUserId)) {
+      return res.status(400).json({ status: false, message: 'Invalid user id' });
+    }
+
+    const settingsDoc = await getAppSettings();
+    const profileSocial = normalizeProfileSocialSettings(settingsDoc.profileSocial);
+    if (!profileSocial.showMutualFollowers) {
+      return res.json({ status: true, data: { results: [], total: 0 } });
+    }
+
+    const results = await getMutualFollowers(
+      req.userId!,
+      profileUserId,
+      profileSocial.mutualFollowersLimit
+    );
+
+    const total = await Follow.countDocuments({
+      followerId: {
+        $in: (
+          await Follow.find({ followerId: req.userId }).select('followingId')
+        ).map((f) => f.followingId),
+      },
+      followingId: profileUserId,
+    });
+
+    return res.json({ status: true, data: { results, total } });
+  } catch (error) {
+    console.error('mutual followers error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to fetch mutual followers' });
+  }
+});
+
+router.get('/:id/recent-follows', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const profileUserId = String(req.params.id);
+    if (!mongoose.Types.ObjectId.isValid(profileUserId)) {
+      return res.status(400).json({ status: false, message: 'Invalid user id' });
+    }
+
+    const settingsDoc = await getAppSettings();
+    const profileSocial = normalizeProfileSocialSettings(settingsDoc.profileSocial);
+    if (!profileSocial.showRecentFollows) {
+      return res.json({ status: true, data: { results: [] } });
+    }
+
+    const results = await getRecentFollows(profileUserId, profileSocial.recentFollowsLimit, req.userId);
+    return res.json({ status: true, data: { results } });
+  } catch (error) {
+    console.error('recent follows error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to fetch recent follows' });
   }
 });
 
