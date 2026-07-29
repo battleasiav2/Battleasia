@@ -15,7 +15,8 @@
     "docker:prod": "docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build",
     "docker:prod:down": "docker compose -f docker-compose.prod.yml down",
     "backup:mongo": "powershell -ExecutionPolicy Bypass -File deploy/backup-mongo.ps1",
-    "build": "powershell -ExecutionPolicy Bypass -File deploy/build.ps1"
+    "build:win": "powershell -ExecutionPolicy Bypass -File deploy/build.ps1",
+    "build": "npm run install:all && bash deploy/build.sh"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
