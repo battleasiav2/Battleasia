@@ -80,16 +80,16 @@ export function ProfileSocialSettingsView() {
   }, [getProfileSocialSettingsApi]);
 
   useEffect(() => {
-    void loadSettings();
+    loadSettings().catch(() => undefined);
   }, [loadSettings]);
 
   useEffect(() => {
     if (!form.pinnedUserIds.length) {
       setPinnedOptions([]);
-      return;
+      return undefined;
     }
 
-    void (async () => {
+    (async () => {
       try {
         const response = await getUsersApi({ page: 1, limit: 50, search: '' });
         const users = response?.data?.data?.results || response?.data?.data || [];
@@ -103,13 +103,15 @@ export function ProfileSocialSettingsView() {
       } catch {
         setPinnedOptions(form.pinnedUserIds.map((id) => ({ id, label: id })));
       }
-    })();
+    })().catch(() => undefined);
+
+    return undefined;
   }, [form.pinnedUserIds, getUsersApi]);
 
   useEffect(() => {
     if (!userSearch.trim()) {
       setSearchOptions([]);
-      return;
+      return () => undefined;
     }
 
     const timer = setTimeout(async () => {
@@ -127,7 +129,9 @@ export function ProfileSocialSettingsView() {
       }
     }, 300);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+    };
   }, [getUsersApi, userSearch]);
 
   const selectedPinned = useMemo(
@@ -283,7 +287,13 @@ export function ProfileSocialSettingsView() {
         </CardContent>
         <Divider />
         <CardContent>
-          <Button variant="contained" onClick={() => void handleSave()} disabled={saving || loading}>
+          <Button
+            variant="contained"
+            onClick={() => {
+              handleSave().catch(() => undefined);
+            }}
+            disabled={saving || loading}
+          >
             {saving ? 'Saving...' : 'Save profile social settings'}
           </Button>
         </CardContent>

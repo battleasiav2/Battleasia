@@ -52,7 +52,7 @@ export function SocialReportsView() {
   }, [getSocialReportsApi, status]);
 
   useEffect(() => {
-    void load();
+    load().catch(() => undefined);
   }, [load]);
 
   const updateStatus = async (id: string, nextStatus: string) => {
@@ -81,7 +81,13 @@ export function SocialReportsView() {
               <MenuItem value="reviewed">Reviewed</MenuItem>
               <MenuItem value="dismissed">Dismissed</MenuItem>
             </TextField>
-            <Button variant="outlined" onClick={() => void load()} disabled={loading}>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                load().catch(() => undefined);
+              }}
+              disabled={loading}
+            >
               Refresh
             </Button>
           </Stack>
@@ -109,10 +115,21 @@ export function SocialReportsView() {
                   </TableCell>
                   <TableCell align="right">
                     <Stack direction="row" spacing={1} justifyContent="flex-end">
-                      <Button size="small" onClick={() => void updateStatus(row.id, 'reviewed')}>
+                      <Button
+                        size="small"
+                        onClick={() => {
+                          updateStatus(row.id, 'reviewed').catch(() => undefined);
+                        }}
+                      >
                         Review
                       </Button>
-                      <Button size="small" color="inherit" onClick={() => void updateStatus(row.id, 'dismissed')}>
+                      <Button
+                        size="small"
+                        color="inherit"
+                        onClick={() => {
+                          updateStatus(row.id, 'dismissed').catch(() => undefined);
+                        }}
+                      >
                         Dismiss
                       </Button>
                     </Stack>

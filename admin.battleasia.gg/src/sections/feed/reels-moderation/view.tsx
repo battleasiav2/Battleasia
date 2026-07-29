@@ -46,7 +46,7 @@ export function ReelsModerationView() {
   }, [getAdminReelsApi]);
 
   useEffect(() => {
-    void load();
+    load().catch(() => undefined);
   }, [load]);
 
   const handleDelete = async (id: string) => {
@@ -69,7 +69,13 @@ export function ReelsModerationView() {
       <Card>
         <CardContent>
           <Stack direction="row" justifyContent="flex-end" sx={{ mb: 2 }}>
-            <Button variant="outlined" onClick={() => void load()} disabled={loading}>
+            <Button
+              variant="outlined"
+              onClick={() => {
+                load().catch(() => undefined);
+              }}
+              disabled={loading}
+            >
               Refresh
             </Button>
           </Stack>
@@ -91,7 +97,13 @@ export function ReelsModerationView() {
                   <TableCell>{row.totalViews}</TableCell>
                   <TableCell>{row.status}</TableCell>
                   <TableCell align="right">
-                    <Button size="small" color="error" onClick={() => void handleDelete(row.id)}>
+                    <Button
+                      size="small"
+                      color="error"
+                      onClick={() => {
+                        handleDelete(row.id).catch(() => undefined);
+                      }}
+                    >
                       Delete
                     </Button>
                   </TableCell>
