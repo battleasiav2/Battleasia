@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Adaptive Icon background layer.
+    Plain solid fill — no grid lines.
+    Color matches the dark edge of the BattleAsia shield logo.
+-->
+<vector
+    android:height="108dp"
+    android:width="108dp"
+    android:viewportHeight="108"
+    android:viewportWidth="108"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="#00000000"
+          android:pathData="M0,0h108v108h-108z"/>
+</vector>

@@ -1,0 +1,30 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  ,}
+  "identifier" : "AC7C2A50",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+"net.battleasia.app.premium.subscription",
+"net.battleasia.app.premiumY.subscription"
+  ],
+  "settings" : {
+    "_failTransactionsEnabled" : false
+  },
+  "subscriptionGroups" : [
+
+  ],
+  "version" : {
+    "major" : 4,
+    "minor" : 0
+  }
+}

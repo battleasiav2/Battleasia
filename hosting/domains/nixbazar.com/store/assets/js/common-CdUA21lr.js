@@ -1,1 +1,0 @@
-const s={lang:"Chinese",description:"您的下一个项目的起点基于 MUI。简单的定制可帮助您更快、更好地构建应用程序。"},o={signIn:"登录",signInToAccount:"登录您的账户",emailAddress:"邮箱地址",password:"密码",passwordPlaceholder:"6+字符",forgotPassword:"忘记密码？",dontHaveAccount:"没有账户？",signUp:"注册"},n={demo:s,auth:o};export{o as auth,n as default,s as demo};

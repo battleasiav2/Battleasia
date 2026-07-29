@@ -1,9 +1,9 @@
 # Production multi-stage build for Admin
 FROM node:20-alpine AS build
 WORKDIR /app
-COPY battleasia-admin-main/battleasia-admin-main/package.json battleasia-admin-main/battleasia-admin-main/package-lock.json ./
+COPY admin.battleasia.gg/package.json admin.battleasia.gg/package-lock.json ./
 RUN npm ci --legacy-peer-deps
-COPY battleasia-admin-main/battleasia-admin-main/ .
+COPY admin.battleasia.gg/ .
 ARG REACT_APP_API_URL=
 ENV REACT_APP_API_URL=$REACT_APP_API_URL
 RUN npm run build

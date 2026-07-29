@@ -2,11 +2,11 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY battleasia-fe-main/battleasia-fe-main/package.json battleasia-fe-main/battleasia-fe-main/package-lock.json ./
+COPY battleasia.gg/package.json battleasia.gg/package-lock.json ./
 
 RUN npm ci
 
-COPY battleasia-fe-main/battleasia-fe-main/ .
+COPY battleasia.gg/ .
 
 EXPOSE 8081
 

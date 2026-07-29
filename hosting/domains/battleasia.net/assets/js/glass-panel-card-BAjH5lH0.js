@@ -1,1 +1,0 @@
-import{j as s,aV as r}from"./mui-core-18bDoQFe.js";import{h as e,g as i}from"./index-Dog6LnHB.js";function o({children:o,sx:n}){const t=i();return s.jsx(r,{elevation:0,sx:e(t,{p:{xs:1.5,sm:2},height:"100%",...n}),children:o})}export{o as G};

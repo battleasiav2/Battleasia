@@ -1,9 +1,9 @@
 # Production multi-stage build for Player FE
 FROM node:20-alpine AS build
 WORKDIR /app
-COPY battleasia-fe-main/battleasia-fe-main/package.json battleasia-fe-main/battleasia-fe-main/package-lock.json ./
+COPY battleasia.gg/package.json battleasia.gg/package-lock.json ./
 RUN npm ci
-COPY battleasia-fe-main/battleasia-fe-main/ .
+COPY battleasia.gg/ .
 ARG VITE_SERVER_URL=
 ARG VITE_CDN_URL=
 ARG VITE_BAC_SHOP_URL=

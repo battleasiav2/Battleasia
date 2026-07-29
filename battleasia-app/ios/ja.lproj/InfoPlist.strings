@@ -1,0 +1,44 @@
+
+
+
+/* Permission descriptions for localization - Japanese */
+
+/* Microphone permission */
+NSMicrophoneUsageDescription = "このアプリは、音声メモの録音や音声からテキストへの変換機能を提供するためにマイクへのアクセスが必要です。";
+
+/* Camera permission */
+NSCameraUsageDescription = "このアプリは、写真の撮影やドキュメントのスキャン機能を提供するためにカメラへのアクセスが必要です。";
+
+/* Location permissions */
+NSLocationWhenInUseUsageDescription = "このアプリは、位置情報ベースの機能やサービスを提供するために、使用中の位置情報アクセスが必要です。";
+NSLocationAlwaysAndWhenInUseUsageDescription = "このアプリは、位置情報ベースの機能やサービスを提供するために位置情報アクセスが必要です。";
+
+/* Notification permission */
+NSUserNotificationsUsageDescription = "このアプリは、重要な更新やリマインダーをお知らせするために通知の許可が必要です。";
+
+/* Speech Recognition permission */
+NSSpeechRecognitionUsageDescription = "このアプリは、音声をテキストに変換し、音声制御機能を提供するために音声認識が必要です。";
+
+/* Contacts permission */
+NSContactsUsageDescription = "このアプリは、人々とのつながりを管理し、関係性をサポートするために連絡先へのアクセスが必要です。";
+
+/* Calendar permission */
+NSCalendarsUsageDescription = "このアプリは、スケジュールや予定の管理をサポートするためにカレンダーへのアクセスが必要です。";
+
+/* Bluetooth permission */
+NSBluetoothAlwaysUsageDescription = "このアプリは、近くのデバイスとの接続やワイヤレス機能を提供するためにBluetoothアクセスが必要です。";
+
+/* Apple Music permission */
+NSAppleMusicUsageDescription = "このアプリは、オーディオコンテンツの再生とエクスペリエンスの向上のためにApple Musicへのアクセスが必要です。";
+
+/* Motion permission */
+NSMotionUsageDescription = "このアプリは、パーソナライズされた機能とインサイトを提供するためにモーションとフィットネスデータへのアクセスが必要です。";
+
+/* Siri permission */
+NSSiriUsageDescription = "このアプリは、音声アクティベート機能とショートカットを提供するためにSiriと統合されています。";
+
+/* Photos permission */
+NSPhotoLibraryUsageDescription = "このアプリは、画像の保存と管理のために写真ライブラリへのアクセスが必要です。";
+
+/* Media Library permission */
+NSMediaLibraryUsageDescription = "このアプリは、オーディオコンテンツを再生するためにメディアライブラリへのアクセスが必要です。";

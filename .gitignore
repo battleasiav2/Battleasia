@@ -10,21 +10,14 @@ node_modules/
 **/.env
 !**/.env.example
 !.env.production.example
-!hosting/env/.env.production.example
 
-# Build outputs (source app dist — hosting/domains keeps built uploads)
+# Build outputs (built in-place inside each app folder)
 **/dist/
 **/build/
 **/.next/
 **/out/
 **/.vite/
 **/tsconfig.app.tsbuildinfo
-
-# Keep hosting domain builds for file-manager upload
-!hosting/domains/**/*
-!hosting/api/dist/
-!hosting/api/package.json
-!hosting/api/package-lock.json
 
 # Logs & OS
 *.log
@@ -36,16 +29,33 @@ Thumbs.db
 backups/
 *.zip
 *.tar.gz
-hosting/upload/*.zip
+battleasia-app-main.zip
+battleasiafibal.bundle
 
 # IDE / local tools
 .cursor/
 terminals/
 ngrok.yml
+_tools/
 
-# Inspect / scratch (not part of deploy)
+# Inspect / scratch
 _inspect-battleasia-app/
 _inspect-lanvin/
+_demo/
+_live-logo/
 
 # Uploads at runtime
-battleasia-api/uploads/
+api/uploads/
+
+# Flutter
+battleasia-app/.dart_tool/
+battleasia-app/.fvm/
+battleasia-app/build/
+battleasia-app/.flutter-plugins
+battleasia-app/.flutter-plugins-dependencies
+battleasia-app/android/app/.cxx/
+battleasia-app/android/.gradle/
+battleasia-app/**/service-account-google-play.json
+
+# Old layout (removed)
+hosting/

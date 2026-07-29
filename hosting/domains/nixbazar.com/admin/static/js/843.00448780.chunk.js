@@ -1,2 +1,0 @@
-"use strict";(self.webpackChunk_battleasia_admin=self.webpackChunk_battleasia_admin||[]).push([[843],{35965:(a,e,t)=>{t.r(e),t.d(e,{default:()=>i});var s=t(6907),l=t(27668),n=t(80184);function i(){return(0,n.jsxs)(n.Fragment,{children:[(0,n.jsx)(s.ql,{children:(0,n.jsx)("title",{children:"Update Match Results"})}),(0,n.jsx)(l.aP,{})]})}}}]);
-//# sourceMappingURL=843.00448780.chunk.js.map

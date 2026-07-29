@@ -1,0 +1,43 @@
+
+
+/* Permission descriptions for localization */
+
+/* Microphone permission */
+NSMicrophoneUsageDescription = "This app needs access to your microphone to record voice notes and enable voice-to-text features.";
+
+/* Camera permission */
+NSCameraUsageDescription = "This app needs access to your camera to capture photos and scan documents.";
+
+/* Location permissions */
+NSLocationWhenInUseUsageDescription = "This app needs location access while in use to provide location-based features and services.";
+NSLocationAlwaysAndWhenInUseUsageDescription = "This app needs location access to provide location-based features and services.";
+
+/* Notification permission */
+NSUserNotificationsUsageDescription = "This app needs your permission to send notifications to inform you about important updates and reminders.";
+
+/* Speech Recognition permission */
+NSSpeechRecognitionUsageDescription = "This app needs speech recognition to convert your voice to text and provide voice-controlled features.";
+
+/* Contacts permission */
+NSContactsUsageDescription = "This app needs access to your contacts to help you connect with people and manage your relationships.";
+
+/* Calendar permission */
+NSCalendarsUsageDescription = "This app needs access to your calendar to help you manage your schedule and appointments.";
+
+/* Bluetooth permission */
+NSBluetoothAlwaysUsageDescription = "This app needs Bluetooth access to connect with nearby devices and provide wireless functionality.";
+
+/* Apple Music permission */
+NSAppleMusicUsageDescription = "This app needs access to Apple Music to play audio content and enhance your experience.";
+
+/* Motion permission */
+NSMotionUsageDescription = "This app needs access to motion and fitness data to provide personalized features and insights.";
+
+/* Siri permission */
+NSSiriUsageDescription = "This app integrates with Siri to provide voice-activated features and shortcuts.";
+
+/* Photos permission */
+NSPhotoLibraryUsageDescription = "This app needs access to your photo library to save and manage your images.";
+
+/* Media Library permission */
+NSMediaLibraryUsageDescription = "This app needs access to your media library to play audio content.";

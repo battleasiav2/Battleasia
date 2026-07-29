@@ -1,9 +1,9 @@
 # Production multi-stage build for Shop
 FROM node:20-alpine AS build
 WORKDIR /app
-COPY battleasia-shop-main/battleasia-shop-main/package.json battleasia-shop-main/battleasia-shop-main/package-lock.json ./
+COPY shop.battleasia.gg/package.json shop.battleasia.gg/package-lock.json ./
 RUN npm ci
-COPY battleasia-shop-main/battleasia-shop-main/ .
+COPY shop.battleasia.gg/ .
 ARG VITE_SERVER_URL=
 ARG VITE_CDN_URL=
 ENV VITE_SERVER_URL=$VITE_SERVER_URL

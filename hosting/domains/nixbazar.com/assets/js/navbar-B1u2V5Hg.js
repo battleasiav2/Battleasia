@@ -1,1 +1,0 @@
-const e="অ্যাপ",t="চাকরি",a="ইউজার",o="ভ্রমণ",i="ইনভয়েস",l={title:"ব্লগ",caption:"কাস্টম কীবোর্ড শর্টকাট।"},p="সাব হেডার",r={app:e,job:t,user:a,travel:o,invoice:i,blog:l,subheader:p};export{e as app,l as blog,r as default,i as invoice,t as job,p as subheader,o as travel,a as user};
