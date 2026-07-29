@@ -2,7 +2,7 @@
   "name": "battleasia-local",
   "private": true,
   "scripts": {
-    "install:all": "npm install && npm --prefix battleasia.gg install && npm --prefix shop.battleasia.gg install && npm --prefix admin.battleasia.gg install && npm --prefix api install",
+    "install:all": "npm install --include=dev && npm --prefix battleasia.gg install --include=dev && npm --prefix shop.battleasia.gg install --include=dev && npm --prefix admin.battleasia.gg install --include=dev && npm --prefix api install --include=dev",
     "dev:fe": "npm --prefix battleasia.gg run dev",
     "dev:shop": "npm --prefix shop.battleasia.gg run dev",
     "dev:admin": "npm --prefix admin.battleasia.gg start",

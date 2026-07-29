@@ -13,11 +13,17 @@ echo "==> BattleAsia build ($MAIN_DOMAIN)"
 echo "Root: $ROOT"
 
 echo "==> API..."
-(cd api && npm run build)
+(
+  cd api
+  # Hostinger sets NODE_ENV=production and skips devDependencies (tsc lives there).
+  npm install --include=dev
+  npx tsc
+)
 
 echo "==> Player FE (battleasia.gg)..."
 (
   cd battleasia.gg
+  npm install --include=dev
   export VITE_SERVER_URL=''
   export VITE_BAC_SHOP_URL="${SHOP_DOMAIN}/user/shop"
   export VITE_CDN_URL=''
@@ -27,6 +33,7 @@ echo "==> Player FE (battleasia.gg)..."
 echo "==> Shop (shop.battleasia.gg)..."
 (
   cd shop.battleasia.gg
+  npm install --include=dev
   export VITE_SERVER_URL=''
   export VITE_MAIN_APP_URL="$MAIN_DOMAIN"
   export VITE_BASE_PATH='/'
@@ -37,6 +44,7 @@ echo "==> Shop (shop.battleasia.gg)..."
 echo "==> Admin (admin.battleasia.gg)..."
 (
   cd admin.battleasia.gg
+  npm install --include=dev
   export REACT_APP_API_URL="$MAIN_DOMAIN"
   npm run build
 )
