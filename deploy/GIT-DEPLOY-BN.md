@@ -99,7 +99,36 @@ Cursor edit → git push → GitHub
 
 ---
 
-## ৬. `.htaccess` API proxy
+## ৬. Demo user / seed (MongoDB)
+
+Git deploy **কোড** আপডেট করে; demo user **MongoDB seed** দিয়ে আসে।
+
+**অটো (প্রথম deploy):** `webuzo-git-deploy.sh` চালালে `.battleasia-demo-seeded` marker না থাকলে seed চলে।
+
+**ম্যানুয়াল (যেকোনো সময়):**
+
+```bash
+bash /home/nixbazar/Battleasia/deploy/seed-all.sh
+# অথবা
+bash /home/nixbazar/Battleasia/deploy/webuzo-seed-demo.sh
+```
+
+**আবার seed চালাতে (marker মুছে দিন):**
+
+```bash
+rm -f /home/nixbazar/.battleasia-demo-seeded
+RUN_SEED=1 bash /home/nixbazar/Battleasia/deploy/webuzo-git-deploy.sh
+```
+
+| Role | Email | Password |
+|------|-------|----------|
+| Admin | `.env` `ADMIN_EMAIL` | `.env` `ADMIN_PASSWORD` |
+| Player | player@battleasia.local | Player@123456 |
+| Player | nixhyip@gmail.com | Nix@7777 |
+
+---
+
+## ৭. `.htaccess` API proxy
 
 `public_html/.htaccess`-এ uncomment:
 

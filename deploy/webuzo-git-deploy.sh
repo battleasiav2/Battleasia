@@ -27,3 +27,14 @@ if [[ ! -f "$LIVE_API/.env" ]]; then
 fi
 
 bash "$REPO_DIR/deploy/deploy.sh"
+
+SEED_MARKER="${SEED_MARKER:-/home/nixbazar/.battleasia-demo-seeded}"
+if [[ "${RUN_SEED:-}" == "1" ]] || [[ ! -f "$SEED_MARKER" ]]; then
+  echo "==> First deploy or RUN_SEED=1 — seeding demo MongoDB data..."
+  if bash "$REPO_DIR/deploy/seed-all.sh"; then
+    touch "$SEED_MARKER"
+    echo "==> Demo seed done (marker: $SEED_MARKER)"
+  else
+    echo "WARNING: Demo seed failed — run manually: bash $REPO_DIR/deploy/seed-all.sh"
+  fi
+fi
