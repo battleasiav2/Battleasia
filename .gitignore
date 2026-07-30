@@ -49,6 +49,7 @@ _inspect-battleasia-app/
 _inspect-lanvin/
 _demo/
 _live-logo/
+temp/
 
 # Uploads at runtime
 api/uploads/
