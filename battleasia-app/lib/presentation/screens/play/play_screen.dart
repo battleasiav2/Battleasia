@@ -1,4 +1,6 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
+import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
@@ -9,7 +11,10 @@ import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_hero_banner.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/play/game_card.dart';
+import 'package:battleasia_app/core/utils/link_utils.dart';
 import 'package:battleasia_app/presentation/screens/play/match_screen.dart';
+import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
+import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
 
 class PlayScreen extends StatefulWidget {
   const PlayScreen({super.key});
@@ -76,13 +81,13 @@ class _PlayScreenState extends State<PlayScreen> {
             const Icon(
               Icons.error_outline,
               size: 64,
-              color: AppTheme.textSecondary,
+              color: AppColors.textMuted,
             ),
             const SizedBox(height: 16),
             Text(
               _errorMessage ?? 'Failed to load games',
               style: AppTheme.bodyLarge.copyWith(
-                color: AppTheme.textSecondary,
+                color: AppColors.textMuted,
                 fontSize: ResponsiveUtils.getResponsiveFontSize(
                   context,
                   baseSize: 18.0,
@@ -91,32 +96,10 @@ class _PlayScreenState extends State<PlayScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
+            GoldButton(
+              label: 'Retry',
+              expanded: false,
               onPressed: _fetchGames,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.accentColor,
-                padding: EdgeInsets.symmetric(
-                  horizontal: ResponsiveUtils.getResponsiveSpacing(
-                    context,
-                    baseSize: 24.0,
-                  ).clamp(16.0, 24.0),
-                  vertical: ResponsiveUtils.getResponsiveSpacing(
-                    context,
-                    baseSize: 12.0,
-                  ).clamp(8.0, 12.0),
-                ),
-              ),
-              child: Text(
-                'Retry',
-                style: AppTheme.bodyMedium.copyWith(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: ResponsiveUtils.getResponsiveFontSize(
-                    context,
-                    baseSize: 16.0,
-                  ),
-                ),
-              ),
             ),
           ],
         ),
@@ -125,46 +108,38 @@ class _PlayScreenState extends State<PlayScreen> {
   }
 
   void _handleWatchLive() {
-    // TODO: Implement watch live functionality
+    LinkUtils.openYoutubeLive();
   }
 
   Widget _buildSkeletonCardWithSpinner() {
-    return Card(
-      color: AppTheme.surfaceColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    return GlassCard(
+      padding: EdgeInsets.zero,
+      showGoldGlow: false,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(2),
         child: Stack(
+          fit: StackFit.expand,
           children: [
-            // Background image immediately visible
-            Positioned.fill(
-              child: Image.asset(
-                'assets/images/game2.webp',
-                fit: BoxFit.cover,
-              ),
+            Image.asset(
+              'assets/images/game2.webp',
+              fit: BoxFit.cover,
             ),
-            // Dark gradient overlay
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.8),
-                    ],
-                  ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.8),
+                  ],
                 ),
               ),
             ),
-            // Spinner centered on card
-            const Positioned.fill(
-              child: Center(
-                child: CircularProgressIndicator(
-                  color: AppTheme.accentColor,
-                  strokeWidth: 2.5,
-                ),
+            const Center(
+              child: CircularProgressIndicator(
+                color: AppColors.gold,
+                strokeWidth: 2.5,
               ),
             ),
           ],
@@ -202,13 +177,14 @@ class _PlayScreenState extends State<PlayScreen> {
     ).clamp(60.0, 80.0);
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: AppColors.pageBg,
       body: Stack(
         fit: StackFit.expand,
         children: [
           // Scrollable content
           CustomScrollView(
             controller: _scrollController,
+            physics: appScrollPhysics,
             slivers: [
               // Add top padding for header
               SliverToBoxAdapter(child: SizedBox(height: topPadding)),
@@ -290,7 +266,7 @@ class _PlayScreenState extends State<PlayScreen> {
                     child: Text(
                       'No games available',
                       style: AppTheme.bodyLarge.copyWith(
-                        color: AppTheme.textSecondary,
+                        color: AppColors.textMuted,
                         fontSize: ResponsiveUtils.getResponsiveFontSize(
                           context,
                           baseSize: 18.0,

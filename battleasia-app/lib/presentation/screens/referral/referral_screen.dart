@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
@@ -89,7 +90,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
     ).clamp(32.0, 48.0);
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: AppColors.pageBg,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -106,12 +107,16 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       // Main Container with gradient background
                       Container(
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
-                            colors: [Color(0xFF444444), Color(0xFF04040B)],
+                            colors: [
+                              AppColors.surfaceElevated,
+                              AppColors.pageBg,
+                            ],
                           ),
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(2),
+                          border: Border.all(color: AppColors.border(0.14)),
                         ),
                         padding: EdgeInsets.all(containerPadding),
                         child: Column(
@@ -179,8 +184,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
         Text(
           'REFER MORE TO EARN MORE',
           style: AppTheme.heading2.copyWith(
-            color: const Color(0xFF10b981),
-            fontWeight: FontWeight.bold,
+            color: AppColors.gold,
+            fontWeight: FontWeight.w800,
             fontSize: titleFontSize,
           ),
           textAlign: TextAlign.center,
@@ -205,8 +210,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
                     text: '$_commissionRate%',
                     style: AppTheme.bodyMedium.copyWith(
                       fontSize: bodyFontSize,
-                      color: const Color(0xFF10b981),
-                      fontWeight: FontWeight.bold,
+                      color: AppColors.gold,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   const TextSpan(
@@ -233,8 +238,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
                     text: '20',
                     style: AppTheme.bodyMedium.copyWith(
                       fontSize: bodyFontSize,
-                      color: const Color(0xFF10b981),
-                      fontWeight: FontWeight.bold,
+                      color: AppColors.gold,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   const TextSpan(text: '.'),
@@ -256,8 +261,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
                     text: '5',
                     style: AppTheme.bodyMedium.copyWith(
                       fontSize: bodyFontSize,
-                      color: const Color(0xFF10b981),
-                      fontWeight: FontWeight.bold,
+                      color: AppColors.gold,
+                      fontWeight: FontWeight.w800,
                     ),
                   ),
                   const TextSpan(text: ' as Signup Bonus!'),
@@ -315,8 +320,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
         Text(
           'YOUR REFERRAL LINK',
           style: AppTheme.heading3.copyWith(
-            color: const Color(0xFF10b981),
-            fontWeight: FontWeight.w600,
+            color: AppColors.gold,
+            fontWeight: FontWeight.w700,
             fontSize: labelFontSize,
           ),
         ),
@@ -327,9 +332,9 @@ class _ReferralScreenState extends State<ReferralScreen> {
             vertical: codePaddingV,
           ),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.white.withOpacity(0.2)),
+            color: Colors.white.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(2),
+            border: Border.all(color: AppColors.border(0.2)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -353,7 +358,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                   size: iconSize,
                 ),
                 style: IconButton.styleFrom(
-                  backgroundColor: Colors.white.withOpacity(0.1),
+                  backgroundColor: Colors.white.withValues(alpha: 0.1),
                 ),
               ),
             ],
@@ -365,7 +370,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
             'Copied to clipboard!',
             style: AppTheme.bodySmall.copyWith(
               fontSize: smallFontSize,
-              color: const Color(0xFF10b981),
+              color: AppColors.gold,
             ),
           ),
         ],
@@ -389,9 +394,12 @@ class _ReferralScreenState extends State<ReferralScreen> {
       baseSize: 32.0,
     ).clamp(24.0, 40.0);
 
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceElevated.withValues(alpha: 0.95),
+        borderRadius: BorderRadius.circular(2),
+        border: Border.all(color: AppColors.border(0.12)),
+      ),
       child: Padding(
         padding: EdgeInsets.all(cardPadding),
         child: Column(
@@ -399,8 +407,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
             Text(
               'How It Works',
               style: AppTheme.heading2.copyWith(
-                color: const Color(0xFFFF8C42),
-                fontWeight: FontWeight.bold,
+                color: AppColors.gold,
+                fontWeight: FontWeight.w800,
                 fontSize: headingFontSize,
               ),
               textAlign: TextAlign.center,
@@ -435,7 +443,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       SizedBox(height: spacing16),
                       Icon(
                         Icons.arrow_downward,
-                        color: const Color(0xFF10b981),
+                        color: AppColors.gold,
                         size: arrowSize,
                       ),
                       SizedBox(height: spacing16),
@@ -446,7 +454,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       SizedBox(height: spacing16),
                       Icon(
                         Icons.arrow_downward,
-                        color: const Color(0xFF10b981),
+                        color: AppColors.gold,
                         size: arrowSize,
                       ),
                       SizedBox(height: spacing16),
@@ -473,7 +481,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                         padding: EdgeInsets.symmetric(horizontal: arrowPadding),
                         child: Icon(
                           Icons.arrow_forward,
-                          color: const Color(0xFF10b981),
+                          color: AppColors.gold,
                           size: arrowSize,
                         ),
                       ),
@@ -489,7 +497,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                         padding: EdgeInsets.symmetric(horizontal: arrowPadding),
                         child: Icon(
                           Icons.arrow_forward,
-                          color: const Color(0xFF10b981),
+                          color: AppColors.gold,
                           size: arrowSize,
                         ),
                       ),
@@ -541,25 +549,25 @@ class _ReferralScreenState extends State<ReferralScreen> {
           width: stepCircleSize,
           height: stepCircleSize,
           decoration: BoxDecoration(
-            color: const Color(0xFF1976d2),
+            color: AppColors.gold.withValues(alpha: 0.15),
             shape: BoxShape.circle,
-            border: Border.all(color: Colors.white, width: borderWidth),
+            border: Border.all(color: AppColors.gold, width: borderWidth),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.15),
+                color: AppColors.goldGlow(0.2),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
             ],
           ),
-          child: Icon(icon, color: Colors.white, size: stepIconSize),
+          child: Icon(icon, color: AppColors.gold, size: stepIconSize),
         ),
         SizedBox(height: spacing16),
         Text(
           title,
           style: AppTheme.heading3.copyWith(
-            color: Colors.black,
-            fontWeight: FontWeight.w600,
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.w700,
             fontSize: stepTitleFontSize,
           ),
           textAlign: TextAlign.center,

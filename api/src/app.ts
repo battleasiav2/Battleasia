@@ -91,6 +91,7 @@ import { SupportConversation } from './models/SupportConversation.js';
 import { isAdminRole } from './utils/admin-role.js';
 
 import { getHealthStatus } from './utils/health.js';
+import { uploadsRoot } from './utils/uploads-path.js';
 
 
 
@@ -143,7 +144,7 @@ export function createApp() {
 
   app.use(
     '/uploads',
-    express.static(path.join(__dirname, '../uploads'), {
+    express.static(uploadsRoot, {
       maxAge: env.isProduction ? '7d' : 0,
       etag: true,
     })

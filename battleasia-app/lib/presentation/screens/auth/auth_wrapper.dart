@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 
@@ -14,7 +15,10 @@ class AuthWrapper extends StatelessWidget {
         // Show loading while checking auth status
         if (authProvider.isLoading) {
           return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+            backgroundColor: AppColors.pageBg,
+            body: Center(
+              child: CircularProgressIndicator(color: AppColors.gold),
+            ),
           );
         }
 

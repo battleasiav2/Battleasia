@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/shop_item_model.dart';
+import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
-// Badge colour map — mirrors BADGE_COLOR_MAP in the web shop frontend.
 const Map<String, Color> _kBadgeBgColor = {
-  'Popular': Color(0xFF22c55e), // success / green
-  'New': Color(0xFF3b82f6),     // info   / blue
-  'Hot': Color(0xFFf59e0b),     // warning / amber
-  'Best': Color(0xFF8b5cf6),    // secondary / purple
+  'Popular': Color(0xFF22c55e),
+  'New': Color(0xFF3b82f6),
+  'Hot': Color(0xFFf59e0b),
+  'Best': Color(0xFF8b5cf6),
 };
 
 class ShopItemCard extends StatelessWidget {
@@ -30,11 +32,6 @@ class ShopItemCard extends StatelessWidget {
       context,
       baseSize: 8.0,
     ).clamp(6.0, 12.0);
-
-    final spacing12 = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 12.0,
-    ).clamp(10.0, 16.0);
 
     final titleFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
@@ -57,13 +54,6 @@ class ShopItemCard extends StatelessWidget {
       max: 24.0,
     );
 
-    final buttonFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 14.0,
-      min: 12.0,
-      max: 16.0,
-    );
-
     final screenWidth = MediaQuery.of(context).size.width;
     final imageHeight = screenWidth < 600
         ? screenWidth * 0.42
@@ -74,204 +64,188 @@ class ShopItemCard extends StatelessWidget {
     final showBadge =
         item.badge.isNotEmpty && item.badge.toLowerCase() != 'none';
 
-    return Card(
-      color: AppTheme.surfaceColor,
-      clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    return Material(
+      color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Coin image ────────────────────────────────────────────────
-            Stack(
+        borderRadius: BorderRadius.circular(2),
+        child: Ink(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceElevated.withValues(alpha: 0.9),
+            borderRadius: BorderRadius.circular(2),
+            border: Border.all(color: AppColors.border(0.12)),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  height: imageHeight,
-                  width: double.infinity,
-                  color: const Color(0xFF1A1A1A),
-                  child: _buildImage(item.image),
+                Stack(
+                  children: [
+                    Container(
+                      height: imageHeight,
+                      width: double.infinity,
+                      color: AppColors.surface,
+                      child: _buildImage(item.image),
+                    ),
+                    if (showBadge)
+                      Positioned(
+                        top: spacing8,
+                        left: spacing8,
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: spacing8,
+                            vertical: spacing8 / 2,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _kBadgeBgColor[item.badge] ?? AppColors.gold,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                          child: Text(
+                            item.badge,
+                            style: TextStyle(
+                              fontSize: bodyFontSize - 1,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-                // Badge chip (top-left)
-                if (showBadge)
-                  Positioned(
-                    top: spacing8,
-                    left: spacing8,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: spacing8,
-                        vertical: spacing8 / 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color:
-                            _kBadgeBgColor[item.badge] ?? AppTheme.primaryColor,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        item.badge,
-                        style: TextStyle(
-                          fontSize: bodyFontSize - 1,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    cardPadding,
+                    spacing8,
+                    cardPadding,
+                    cardPadding,
                   ),
-              ],
-            ),
-
-            // ── Content ───────────────────────────────────────────────────
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                cardPadding, spacing8, cardPadding, cardPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Coin amount + symbol  e.g. "100 BAC"
-                  Text(
-                    '${item.amount} ${item.symbol}',
-                    style: AppTheme.heading3.copyWith(
-                      fontSize: titleFontSize,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                      height: 1.1,
-                    ),
-                  ),
-
-                  SizedBox(height: spacing8 * 0.75),
-
-                  // ── Price row + Buy button ────────────────────────────
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Price column
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Active price
-                          Text(
-                            _displayPrice(),
-                            style: AppTheme.heading3.copyWith(
-                              fontSize: priceFontSize,
-                              color: AppTheme.primaryColor,
-                              fontWeight: FontWeight.w700,
-                              height: 1.15,
-                            ),
-                          ),
-                          // Strikethrough original  +  premium chip on same row
-                          if (item.discountPercent > 0)
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  '\$${item.originalPrice.toStringAsFixed(0)}',
-                                  style: AppTheme.bodySmall.copyWith(
-                                    fontSize: bodyFontSize - 1,
-                                    color: AppTheme.textSecondary,
-                                    decoration: TextDecoration.lineThrough,
-                                  ),
-                                ),
-                                SizedBox(width: spacing8 * 0.5),
-                                Container(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: spacing8 * 0.6,
-                                    vertical: 1,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFf59e0b)
-                                        .withOpacity(0.15),
-                                    border: Border.all(
-                                        color: const Color(0xFFf59e0b),
-                                        width: 1),
-                                    borderRadius: BorderRadius.circular(3),
-                                  ),
-                                  child: Text(
-                                    '-${item.discountPercent.toInt()}%',
-                                    style: TextStyle(
-                                      fontSize: bodyFontSize - 2,
-                                      color: const Color(0xFFf59e0b),
-                                      fontWeight: FontWeight.w700,
-                                      height: 1.3,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-
-                      // Buy button
-                      Material(
-                        color: AppTheme.primaryColor,
-                        borderRadius: BorderRadius.circular(8),
-                        child: InkWell(
-                          onTap: onBuy,
-                          borderRadius: BorderRadius.circular(8),
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: spacing12,
-                              vertical: spacing8,
-                            ),
-                            child: Text(
-                              'Buy',
-                              style: AppTheme.bodyMedium.copyWith(
-                                fontSize: buttonFontSize,
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
+                      Text(
+                        '${item.amount} ${item.symbol}',
+                        style: AppTheme.heading3.copyWith(
+                          fontSize: titleFontSize,
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w800,
+                          height: 1.1,
                         ),
+                      ),
+                      SizedBox(height: spacing8 * 0.75),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                _displayPrice(),
+                                style: AppTheme.heading3.copyWith(
+                                  fontSize: priceFontSize,
+                                  color: AppColors.gold,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.15,
+                                ),
+                              ),
+                              if (item.discountPercent > 0)
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      '\$${item.originalPrice.toStringAsFixed(0)}',
+                                      style: AppTheme.bodySmall.copyWith(
+                                        fontSize: bodyFontSize - 1,
+                                        color: AppColors.textMuted,
+                                        decoration: TextDecoration.lineThrough,
+                                      ),
+                                    ),
+                                    SizedBox(width: spacing8 * 0.5),
+                                    Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: spacing8 * 0.6,
+                                        vertical: 1,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.gold.withValues(alpha: 0.15),
+                                        border: Border.all(color: AppColors.gold),
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                      child: Text(
+                                        '-${item.discountPercent.toInt()}%',
+                                        style: TextStyle(
+                                          fontSize: bodyFontSize - 2,
+                                          color: AppColors.gold,
+                                          fontWeight: FontWeight.w700,
+                                          height: 1.3,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                          ),
+                          GoldButton(
+                            label: 'Buy',
+                            expanded: false,
+                            onPressed: onBuy,
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  /// Returns the price text to display on the card.
-  ///
-  /// Premium logic (mirrors web frontend):
-  ///   - If the current user IS premium AND the item has discountPercent > 0,
-  ///     the server already applies a price reduction **or** we show the
-  ///     discounted price computed from originalPrice.
-  ///   - The server currently stores the already-discounted `price` field, so
-  ///     we just show `item.price` as the active price.
-  String _displayPrice() {
-    return '\$${item.price.toStringAsFixed(0)}';
-  }
+  String _displayPrice() => '\$${item.price.toStringAsFixed(0)}';
 
   Widget _buildImage(String imageUrl) {
     if (imageUrl.isEmpty) {
       return const Center(
-        child: Icon(Icons.monetization_on_outlined,
-            size: 64, color: Colors.white38),
+        child: Icon(
+          Icons.monetization_on_outlined,
+          size: 64,
+          color: AppColors.textMuted,
+        ),
       );
     }
 
     final fullUrl = AppConfig.getImageUrl(imageUrl);
     if (fullUrl == null) {
       return const Center(
-        child: Icon(Icons.monetization_on_outlined,
-            size: 64, color: Colors.white38),
+        child: Icon(
+          Icons.monetization_on_outlined,
+          size: 64,
+          color: AppColors.textMuted,
+        ),
       );
+    }
+
+    if (ImageUtils.isBase64DataUri(fullUrl)) {
+      final bytes = ImageUtils.decodeBase64DataUri(fullUrl);
+      if (bytes != null) {
+        return Image.memory(bytes, fit: BoxFit.contain);
+      }
     }
 
     return Image.network(
       fullUrl,
       fit: BoxFit.contain,
       errorBuilder: (_, __, ___) => const Center(
-        child: Icon(Icons.monetization_on_outlined,
-            size: 64, color: Colors.white38),
+        child: Icon(
+          Icons.monetization_on_outlined,
+          size: 64,
+          color: AppColors.textMuted,
+        ),
       ),
     );
   }

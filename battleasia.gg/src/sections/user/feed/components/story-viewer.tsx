@@ -30,6 +30,8 @@ type StoryViewerProps = {
   onViewStory: (storyId: string) => Promise<void> | void;
 };
 
+const DOUBLE_TAP_MS = 280;
+
 export function StoryViewer({
   open,
   groups,
@@ -42,8 +44,11 @@ export function StoryViewer({
   const [storyIndex, setStoryIndex] = useState(initialStoryIndex);
   const [progress, setProgress] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [showPauseHint, setShowPauseHint] = useState(false);
   const viewedRef = useRef<Set<string>>(new Set());
   const videoRef = useRef<HTMLVideoElement>(null);
+  const lastTapRef = useRef(0);
+  const pauseHintTimerRef = useRef<number | null>(null);
 
   const group = groups[groupIndex];
   const story = group?.stories[storyIndex];
@@ -56,6 +61,40 @@ export function StoryViewer({
     setPaused(false);
     viewedRef.current = new Set();
   }, [open, initialGroupIndex, initialStoryIndex]);
+
+  useEffect(
+    () => () => {
+      if (pauseHintTimerRef.current) {
+        window.clearTimeout(pauseHintTimerRef.current);
+      }
+    },
+    []
+  );
+
+  const flashPauseHint = useCallback((nextPaused: boolean) => {
+    setShowPauseHint(true);
+    if (pauseHintTimerRef.current) {
+      window.clearTimeout(pauseHintTimerRef.current);
+    }
+    pauseHintTimerRef.current = window.setTimeout(() => {
+      setShowPauseHint(false);
+    }, 900);
+    setPaused(nextPaused);
+  }, []);
+
+  const togglePause = useCallback(() => {
+    flashPauseHint(!paused);
+  }, [flashPauseHint, paused]);
+
+  const handleMediaTap = useCallback(() => {
+    const now = Date.now();
+    if (now - lastTapRef.current <= DOUBLE_TAP_MS) {
+      lastTapRef.current = 0;
+      togglePause();
+      return;
+    }
+    lastTapRef.current = now;
+  }, [togglePause]);
 
   const goNext = useCallback(() => {
     if (!group) return;
@@ -96,7 +135,7 @@ export function StoryViewer({
 
     if (!viewedRef.current.has(story.id)) {
       viewedRef.current.add(story.id);
-      void onViewStory(story.id);
+      Promise.resolve(onViewStory(story.id)).catch(() => undefined);
     }
 
     if (story.mediaType === 'video') {
@@ -104,12 +143,17 @@ export function StoryViewer({
       return undefined;
     }
 
-    if (paused) return undefined;
+    return undefined;
+  }, [open, story, onViewStory]);
+
+  useEffect(() => {
+    if (!open || !story || story.mediaType === 'video' || paused) return undefined;
 
     const startedAt = Date.now();
+    const startProgress = progress;
     const timer = window.setInterval(() => {
       const elapsed = Date.now() - startedAt;
-      const nextProgress = Math.min(100, (elapsed / STORY_DURATION_MS) * 100);
+      const nextProgress = Math.min(100, startProgress + (elapsed / STORY_DURATION_MS) * 100);
       setProgress(nextProgress);
       if (nextProgress >= 100) {
         window.clearInterval(timer);
@@ -118,7 +162,9 @@ export function StoryViewer({
     }, 50);
 
     return () => window.clearInterval(timer);
-  }, [open, story, paused, goNext, onViewStory]);
+    // Resume timer from current progress when unpaused; reset when story changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, story?.id, paused, goNext]);
 
   useEffect(() => {
     if (!open || story?.mediaType !== 'video') return;
@@ -172,8 +218,9 @@ export function StoryViewer({
                   height: 3,
                   bgcolor: 'transparent',
                   '& .MuiLinearProgress-bar': {
-                    bgcolor: USER_COLORS.gold,
+                    bgcolor: paused && index === storyIndex ? alpha(USER_COLORS.gold, 0.55) : USER_COLORS.gold,
                     boxShadow: `0 0 8px ${alpha(USER_COLORS.gold, 0.6)}`,
+                    transition: paused ? 'none' : undefined,
                   },
                 }}
               />
@@ -210,6 +257,8 @@ export function StoryViewer({
         </Stack>
 
         <Box
+          onDoubleClick={togglePause}
+          onClick={handleMediaTap}
           sx={{
             position: 'absolute',
             inset: 0,
@@ -217,6 +266,7 @@ export function StoryViewer({
             alignItems: 'center',
             justifyContent: 'center',
             bgcolor: '#000000',
+            zIndex: 1,
           }}
         >
           {story.mediaType === 'video' && mediaUrl ? (
@@ -228,21 +278,19 @@ export function StoryViewer({
               muted={false}
               onEnded={goNext}
               onTimeUpdate={(e) => {
+                if (paused) return;
                 const video = e.currentTarget;
                 if (video.duration > 0) {
                   setProgress((video.currentTime / video.duration) * 100);
                 }
               }}
-              onMouseDown={() => setPaused(true)}
-              onMouseUp={() => setPaused(false)}
-              onTouchStart={() => setPaused(true)}
-              onTouchEnd={() => setPaused(false)}
               sx={{
                 maxWidth: '100%',
                 maxHeight: '100%',
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
+                pointerEvents: 'none',
               }}
             />
           ) : mediaUrl ? (
@@ -256,8 +304,31 @@ export function StoryViewer({
                 width: '100%',
                 height: '100%',
                 objectFit: 'contain',
+                pointerEvents: 'none',
               }}
             />
+          ) : null}
+
+          {showPauseHint ? (
+            <Box
+              sx={{
+                position: 'absolute',
+                width: 72,
+                height: 72,
+                borderRadius: '50%',
+                bgcolor: alpha('#000000', 0.55),
+                border: `1px solid ${alpha('#ffffff', 0.18)}`,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Iconify
+                icon={paused ? 'solar:play-bold' : 'solar:pause-bold'}
+                width={34}
+                sx={{ color: '#ffffff' }}
+              />
+            </Box>
           ) : null}
         </Box>
 
@@ -268,7 +339,7 @@ export function StoryViewer({
             top: 0,
             bottom: 0,
             left: 0,
-            width: '35%',
+            width: '30%',
             zIndex: 2,
             cursor: 'pointer',
           }}
@@ -280,7 +351,7 @@ export function StoryViewer({
             top: 0,
             bottom: 0,
             right: 0,
-            width: '35%',
+            width: '30%',
             zIndex: 2,
             cursor: 'pointer',
           }}

@@ -1,23 +1,20 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/presentation/screens/splash/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
 
-  // Load environment variables
   await dotenv.load(fileName: '.env');
 
-
-  // Enable edge-to-edge so Flutter receives correct system inset padding
-  // (required for devices with gesture navigation or a virtual navbar)
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-
-  // Set system UI overlay style
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -28,13 +25,19 @@ void main() async {
     ),
   );
 
-  // Set preferred orientations
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(const BattleAsiaApp());
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [Locale('en'), Locale('bn')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      child: const BattleAsiaApp(),
+    ),
+  );
 }
 
 class BattleAsiaApp extends StatelessWidget {
@@ -48,6 +51,10 @@ class BattleAsiaApp extends StatelessWidget {
         title: 'BattleAsia',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.darkTheme,
+        scrollBehavior: const AppScrollBehavior(),
+        locale: context.locale,
+        supportedLocales: context.supportedLocales,
+        localizationsDelegates: context.localizationDelegates,
         home: const SplashScreen(),
       ),
     );

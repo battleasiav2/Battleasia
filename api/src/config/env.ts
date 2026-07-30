@@ -49,6 +49,7 @@ export const env = {
   syncAdminPassword: process.env.SYNC_ADMIN_PASSWORD === 'true',
   coingoMock: process.env.COINGO_MOCK === 'true' && !isProduction,
   logAuthCodes: process.env.LOG_AUTH_CODES === 'true',
+  adminLoginOtp: process.env.ADMIN_LOGIN_OTP !== 'false',
   appUrl: process.env.APP_URL || '',
   cdnUrl: process.env.CDN_URL || '',
 };

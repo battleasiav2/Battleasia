@@ -11,9 +11,13 @@ import { logAuthCode } from '../../utils/auth-log.js';
 import { sendVerificationCodeEmail } from '../../utils/mail.js';
 import {
   ADMIN_AUTH_COOKIE_NAME,
+  AUTH_COOKIE_NAME,
   clearAllAuthCookies,
+  clearAuthCookie,
   setAuthCookie,
 } from '../../utils/auth-cookie.js';
+import { env } from '../../config/env.js';
+import type { Response } from 'express';
 
 const router = Router();
 const OTP_TTL_MS = 10 * 60 * 1000;
@@ -64,6 +68,23 @@ async function createAdminSession(
   return accessToken;
 }
 
+async function completeAdminLogin(
+  user: InstanceType<typeof User>,
+  req: { ip?: string; headers: Record<string, string | string[] | undefined>; socket?: { remoteAddress?: string } },
+  res: Response
+) {
+  const accessToken = await createAdminSession(user, req);
+  clearAuthCookie(res, AUTH_COOKIE_NAME);
+  setAuthCookie(res, accessToken, ADMIN_AUTH_COOKIE_NAME);
+
+  return res.json({
+    status: true,
+    user: serializeUser(user),
+    session: { accessToken },
+    balance: { balance: user.balance ?? 0 },
+  });
+}
+
 router.post('/signin', async (req, res) => {
   try {
     const { email, password } = req.body as { email?: string; password?: string };
@@ -91,6 +112,10 @@ router.post('/signin', async (req, res) => {
       return res.status(403).json({
         message: 'Admin access required. Use your admin account (not player login).',
       });
+    }
+
+    if (!env.adminLoginOtp) {
+      return completeAdminLogin(user, req, res);
     }
 
     const otpCode = String(Math.floor(100000 + Math.random() * 900000));
@@ -153,15 +178,7 @@ router.post('/verify-otp', async (req, res) => {
 
     await VerificationCode.deleteOne({ _id: record._id });
 
-    const accessToken = await createAdminSession(user, req);
-    setAuthCookie(res, accessToken, ADMIN_AUTH_COOKIE_NAME);
-
-    return res.json({
-      status: true,
-      user: serializeUser(user),
-      session: { accessToken },
-      balance: { balance: user.balance ?? 0 },
-    });
+    return completeAdminLogin(user, req, res);
   } catch (error) {
     console.error('verify-otp error:', error);
     return res.status(500).json({ status: false, message: 'OTP verification failed' });

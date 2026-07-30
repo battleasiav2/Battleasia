@@ -1,29 +1,31 @@
 # BattleAsia — Full Stack (battleasia.gg)
 
-Monorepo for production domains on Hostinger. **No duplicate folders** — each app lives in its domain-named folder.
+Monorepo for **single-domain** production on Hostinger. Each app lives in its domain-named folder; deploy merges them into one `public_html`.
+
+## Live URLs (one domain)
+
+| URL | App |
+|-----|-----|
+| `https://battleasia.gg/` | Player site |
+| `https://battleasia.gg/store/` | Coin shop |
+| `https://battleasia.gg/admin/` | Admin panel |
+| `https://battleasia.gg/api/` | API |
+
+**GitHub:** [battleasiav2/Battleasia](https://github.com/battleasiav2/Battleasia)
 
 ## Repository layout
 
 ```
 Battleasia/
-├── battleasia.gg/        # Player site (React/Vite) → battleasia.gg public_html
-├── shop.battleasia.gg/   # Coin shop → shop subdomain public_html
-├── admin.battleasia.gg/  # Admin panel → admin subdomain public_html
+├── battleasia.gg/        # Player site (React/Vite)
+├── shop.battleasia.gg/   # Coin shop → /store/
+├── admin.battleasia.gg/  # Admin panel → /admin/
 ├── api/                  # Node.js API → ~/api/ on server
 ├── battleasia-app/       # Flutter mobile app (build APK separately)
-├── deploy/               # build.ps1, build.sh, deploy.sh, htaccess, guides
+├── deploy/               # build, assemble, deploy scripts
 ├── docker/               # Optional Docker (VPS)
 └── .env.production.example
 ```
-
-| Domain | Folder | Local dev |
-|--------|--------|-----------|
-| `https://battleasia.gg` | `battleasia.gg/` | http://localhost:8081 |
-| `https://shop.battleasia.gg` | `shop.battleasia.gg/` | http://localhost:8082 |
-| `https://admin.battleasia.gg` | `admin.battleasia.gg/` | http://localhost:3000 |
-| API `/api/` | `api/` | http://localhost:5050 |
-
-**GitHub:** [battleasiav2/Battleasia](https://github.com/battleasiav2/Battleasia)
 
 ## Local development
 
@@ -32,18 +34,24 @@ npm run install:all
 npm run dev
 ```
 
+Open http://localhost:8080 — one proxy serves player, shop, admin, and API.
+
+| Path | Local target |
+|------|----------------|
+| `/` | http://localhost:8081 |
+| `/store/` | http://localhost:8082 |
+| `/admin/` | http://localhost:3000 |
+| `/api/` | http://localhost:5050 |
+
 ## Production build (Hostinger)
 
 ```powershell
 npm run build
-# or: powershell -ExecutionPolicy Bypass -File deploy/build.ps1
 ```
 
-Build output (upload or rsync these):
+Output:
 
-- `battleasia.gg/dist/` → main `public_html`
-- `shop.battleasia.gg/dist/` → shop `public_html`
-- `admin.battleasia.gg/build/` → admin `public_html`
+- `deploy/output/public_html/` → `~/domains/battleasia.gg/public_html/`
 - `api/dist/` + `api/package.json` → `~/api/`
 
 Full Hostinger setup: **`deploy/HOSTINGER-SETUP.md`**

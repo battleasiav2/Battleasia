@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:typed_data';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/presentation/widgets/common/account_menu_tile.dart';
+import 'package:battleasia_app/presentation/widgets/common/gold_divider.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
@@ -49,7 +52,7 @@ class AccountDrawer extends StatelessWidget {
         final Widget avatarIcon = pendingFile != null
             ? CircleAvatar(
                 radius: avatarSize,
-                backgroundColor: AppTheme.accentColor,
+                backgroundColor: AppColors.gold,
                 backgroundImage: FileImage(pendingFile),
               )
             : _buildAvatarWidget(
@@ -86,7 +89,7 @@ class AccountDrawer extends StatelessWidget {
     Color? textColor,
     FontWeight fontWeight = FontWeight.bold,
   }) {
-    final bg = backgroundColor ?? AppTheme.accentColor;
+    final bg = backgroundColor ?? AppColors.gold;
     final fg = textColor ?? Colors.black;
     final initial =
         displayName.isNotEmpty ? displayName[0].toUpperCase() : 'U';
@@ -145,10 +148,10 @@ class AccountDrawer extends StatelessWidget {
   ) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.surfaceColor,
+      backgroundColor: AppColors.surface,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
       ),
       builder: (context) => DraggableScrollableSheet(
         initialChildSize: 0.7,
@@ -220,16 +223,15 @@ class _AccountDrawerContent extends StatelessWidget {
           width: 40,
           height: 4,
           decoration: BoxDecoration(
-            color: AppTheme.textSecondary.withOpacity(0.3),
+            color: AppColors.textMuted.withValues(alpha: 0.35),
             borderRadius: BorderRadius.circular(2),
           ),
         ),
 
-        // Close button
         Align(
           alignment: Alignment.topRight,
           child: IconButton(
-            icon: const Icon(Icons.close, color: AppTheme.textPrimary),
+            icon: const Icon(Icons.close, color: AppColors.textPrimary),
             onPressed: () => Navigator.pop(context),
           ),
         ),
@@ -246,13 +248,20 @@ class _AccountDrawerContent extends StatelessWidget {
               constraints: const BoxConstraints(maxWidth: 500),
               child: Column(
                 children: [
-                  // Avatar section
-                  AccountDrawer._buildAvatarWidget(
-                    avatarUrl: avatarUrl,
-                    radius: avatarSize,
-                    displayName: displayName,
-                    fontSize: avatarFontSize,
-                    textColor: Colors.black,
+                  // Avatar section — gold ring
+                  Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.gold, width: 2),
+                    ),
+                    child: AccountDrawer._buildAvatarWidget(
+                      avatarUrl: avatarUrl,
+                      radius: avatarSize,
+                      displayName: displayName,
+                      fontSize: avatarFontSize,
+                      textColor: Colors.black,
+                    ),
                   ),
                   SizedBox(
                     height: ResponsiveUtils.getResponsiveSpacing(
@@ -266,7 +275,8 @@ class _AccountDrawerContent extends StatelessWidget {
                     displayName,
                     style: AppTheme.heading3.copyWith(
                       fontSize: titleFontSize,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   SizedBox(
@@ -281,9 +291,11 @@ class _AccountDrawerContent extends StatelessWidget {
                     email,
                     style: AppTheme.bodyMedium.copyWith(
                       fontSize: bodyFontSize,
-                      color: AppTheme.textSecondary,
+                      color: AppColors.textMuted,
                     ),
                   ),
+                  const SizedBox(height: 12),
+                  const Center(child: GoldDivider(width: 140)),
                   SizedBox(
                     height: ResponsiveUtils.getResponsiveSpacing(
                       context,
@@ -294,11 +306,8 @@ class _AccountDrawerContent extends StatelessWidget {
                   // Menu items - Based on web menu-items-config.tsx
                   // Account (with children)
                   _buildExpandableAccountMenu(context),
-                  const Divider(color: AppTheme.textSecondary, height: 1),
 
-                  // Play
-                  _buildMenuItem(
-                    context,
+                  AccountMenuTile(
                     icon: Icons.sports_esports,
                     label: 'Play',
                     onTap: () {
@@ -311,11 +320,8 @@ class _AccountDrawerContent extends StatelessWidget {
                       );
                     },
                   ),
-                  const Divider(color: AppTheme.textSecondary, height: 1),
 
-                  // Shop
-                  _buildMenuItem(
-                    context,
+                  AccountMenuTile(
                     icon: Icons.shopping_bag,
                     label: 'Shop',
                     onTap: () {
@@ -328,11 +334,8 @@ class _AccountDrawerContent extends StatelessWidget {
                       );
                     },
                   ),
-                  const Divider(color: AppTheme.textSecondary, height: 1),
 
-                  // Referral
-                  _buildMenuItem(
-                    context,
+                  AccountMenuTile(
                     icon: Icons.people,
                     label: 'Referral',
                     onTap: () {
@@ -345,11 +348,8 @@ class _AccountDrawerContent extends StatelessWidget {
                       );
                     },
                   ),
-                  const Divider(color: AppTheme.textSecondary, height: 1),
 
-                  // Feed
-                  _buildMenuItem(
-                    context,
+                  AccountMenuTile(
                     icon: Icons.article,
                     label: 'Feed',
                     onTap: () {
@@ -362,12 +362,12 @@ class _AccountDrawerContent extends StatelessWidget {
                       );
                     },
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
 
-                  // Sign out button
+                  // Sign out
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
+                    child: OutlinedButton(
                       onPressed: () async {
                         await authProvider.signOut();
                         if (context.mounted) {
@@ -379,8 +379,9 @@ class _AccountDrawerContent extends StatelessWidget {
                           );
                         }
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.red.shade300,
+                        side: BorderSide(color: Colors.red.shade400.withValues(alpha: 0.6)),
                         padding: EdgeInsets.symmetric(
                           vertical: ResponsiveUtils.getResponsiveSpacing(
                             context,
@@ -388,15 +389,14 @@ class _AccountDrawerContent extends StatelessWidget {
                           ).clamp(12.0, 20.0),
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(2),
                         ),
                       ),
                       child: Text(
                         'Logout',
                         style: AppTheme.bodyLarge.copyWith(
                           fontSize: buttonFontSize,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ),
@@ -416,234 +416,155 @@ class _AccountDrawerContent extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    final bodyFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 16.0,
-    );
-    final iconSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 24.0,
-    ).clamp(20.0, 28.0);
-
-    return ListTile(
-      leading: Icon(icon, color: AppTheme.textPrimary, size: iconSize),
-      title: Text(
-        label,
-        style: AppTheme.bodyLarge.copyWith(
-          fontSize: bodyFontSize,
-          color: AppTheme.textPrimary,
-        ),
-      ),
-      trailing: Icon(
-        Icons.chevron_right,
-        color: AppTheme.textSecondary,
-        size: iconSize,
-      ),
-      onTap: onTap,
-    );
-  }
-
   Widget _buildExpandableAccountMenu(BuildContext context) {
-    final bodyFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 16.0,
-    );
-    final iconSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 24.0,
-    ).clamp(20.0, 28.0);
-
-    return ExpansionTile(
-      leading: Icon(Icons.person, color: AppTheme.textPrimary, size: iconSize),
-      title: Text(
-        'Account',
-        style: AppTheme.bodyLarge.copyWith(
-          fontSize: bodyFontSize,
-          color: AppTheme.textPrimary,
+    return Theme(
+      data: Theme.of(context).copyWith(
+        dividerColor: Colors.transparent,
+        splashColor: AppColors.gold.withValues(alpha: 0.08),
+        highlightColor: AppColors.gold.withValues(alpha: 0.05),
+      ),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceElevated.withValues(alpha: 0.85),
+          borderRadius: BorderRadius.circular(2),
+          border: Border.all(color: AppColors.border(0.12)),
+        ),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          childrenPadding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
+          leading: const Icon(Icons.person, color: AppColors.goldAccent, size: 22),
+          title: Text(
+            'Account',
+            style: AppTheme.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          iconColor: AppColors.textMuted,
+          collapsedIconColor: AppColors.textMuted,
+          children: [
+            AccountMenuTile(
+              icon: Icons.person_outline,
+              label: 'Profile',
+              nested: true,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AccountScreen()),
+                );
+              },
+            ),
+            AccountMenuTile(
+              icon: Icons.account_balance_wallet,
+              label: 'Wallet',
+              nested: true,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const WalletScreen()),
+                );
+              },
+            ),
+            AccountMenuTile(
+              icon: Icons.sports_esports,
+              label: 'My Matches',
+              nested: true,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyMatchesScreen()),
+                );
+              },
+            ),
+            AccountMenuTile(
+              icon: Icons.shopping_bag,
+              label: 'My Orders',
+              nested: true,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyOrdersScreen()),
+                );
+              },
+            ),
+            AccountMenuTile(
+              icon: Icons.bar_chart,
+              label: 'My Statistics',
+              nested: true,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MyStatisticsScreen(),
+                  ),
+                );
+              },
+            ),
+            AccountMenuTile(
+              icon: Icons.people,
+              label: 'My Referrals',
+              nested: true,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MyReferralsScreen(),
+                  ),
+                );
+              },
+            ),
+            AccountMenuTile(
+              icon: Icons.notifications,
+              label: 'Notifications',
+              nested: true,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const NotificationsScreen(),
+                  ),
+                );
+              },
+            ),
+            AccountMenuTile(
+              icon: Icons.emoji_events,
+              label: 'Leader Board',
+              nested: true,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LeaderboardScreen(),
+                  ),
+                );
+              },
+            ),
+            AccountMenuTile(
+              icon: Icons.support_agent,
+              label: 'Customer Support',
+              nested: true,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CustomerSupportScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
-      iconColor: AppTheme.textSecondary,
-      collapsedIconColor: AppTheme.textSecondary,
-      children: [
-        // Profile
-        _buildChildMenuItem(
-          context,
-          icon: Icons.person_outline,
-          label: 'Profile',
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AccountScreen()),
-            );
-          },
-        ),
-        // Wallet
-        _buildChildMenuItem(
-          context,
-          icon: Icons.account_balance_wallet,
-          label: 'Wallet',
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const WalletScreen()),
-            );
-          },
-        ),
-        // My Matches
-        _buildChildMenuItem(
-          context,
-          icon: Icons.sports_esports,
-          label: 'My Matches',
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const MyMatchesScreen()),
-            );
-          },
-        ),
-        // My Orders
-        _buildChildMenuItem(
-          context,
-          icon: Icons.shopping_bag,
-          label: 'My Orders',
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const MyOrdersScreen()),
-            );
-          },
-        ),
-        // My Statistics
-        _buildChildMenuItem(
-          context,
-          icon: Icons.bar_chart,
-          label: 'My Statistics',
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MyStatisticsScreen(),
-              ),
-            );
-          },
-        ),
-        // My Referrals
-        _buildChildMenuItem(
-          context,
-          icon: Icons.people,
-          label: 'My Referrals',
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MyReferralsScreen(),
-              ),
-            );
-          },
-        ),
-        // Notifications
-        _buildChildMenuItem(
-          context,
-          icon: Icons.notifications,
-          label: 'Notifications',
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const NotificationsScreen(),
-              ),
-            );
-          },
-        ),
-        // Leader Board
-        _buildChildMenuItem(
-          context,
-          icon: Icons.emoji_events,
-          label: 'Leader Board',
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const LeaderboardScreen(),
-              ),
-            );
-          },
-        ),
-        // Customer Support
-        _buildChildMenuItem(
-          context,
-          icon: Icons.support_agent,
-          label: 'Customer Support',
-          onTap: () {
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CustomerSupportScreen(),
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-
-  Widget _buildChildMenuItem(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    final isMobile = ResponsiveUtils.isMobile(context);
-    final labelFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 14.0,
-      min: 12.0,
-      max: 16.0,
-    );
-    final iconSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 20.0,
-    ).clamp(18.0, 24.0);
-    final horizontalPadding = isMobile ? 24.0 : 40.0;
-
-    return ListTile(
-      leading: Icon(icon, color: AppTheme.textPrimary, size: iconSize),
-      title: Text(
-        label,
-        style: AppTheme.bodyMedium.copyWith(
-          fontSize: labelFontSize,
-          color: AppTheme.textPrimary,
-        ),
-      ),
-      trailing: Icon(
-        Icons.chevron_right,
-        color: AppTheme.textSecondary,
-        size: iconSize,
-      ),
-      onTap: onTap,
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: horizontalPadding,
-        vertical: ResponsiveUtils.getResponsiveSpacing(
-          context,
-          baseSize: 4.0,
-        ).clamp(2.0, 6.0),
-      ),
-      dense: true,
     );
   }
 }

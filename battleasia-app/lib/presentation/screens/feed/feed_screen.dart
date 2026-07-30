@@ -1,12 +1,18 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
+import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/feed_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/common/refresh_overlay.dart';
+import 'package:battleasia_app/presentation/widgets/feed/feed_hub_panels.dart';
+import 'package:battleasia_app/presentation/widgets/feed/feed_hub_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_item.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
 
@@ -36,6 +42,7 @@ class _FeedScreenState extends State<FeedScreen> {
   bool _dragStartedAtTop = false;
   bool _dragStartedAtBottom = false;
   double _wheelAccumulator = 0.0;
+  FeedHubSection _hubSection = FeedHubSection.feed;
 
   @override
   void initState() {
@@ -300,19 +307,16 @@ class _FeedScreenState extends State<FeedScreen> {
     ).clamp(60.0, 80.0);
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      body: Listener(
-        onPointerDown: _onPointerDown,
-        onPointerMove: _onPointerMove,
-        onPointerSignal: _onPointerSignal,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            CustomScrollView(
-              controller: _scrollController,
-              physics: const ClampingScrollPhysics(),
-              slivers: [
-                SliverToBoxAdapter(child: SizedBox(height: headerHeight)),
+      backgroundColor: AppColors.pageBg,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          CustomScrollView(
+            controller: _scrollController,
+            physics: appScrollPhysics,
+            slivers: [
+              CupertinoSliverRefreshControl(onRefresh: _onRefresh),
+              SliverToBoxAdapter(child: SizedBox(height: headerHeight)),
               SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -321,15 +325,26 @@ class _FeedScreenState extends State<FeedScreen> {
                     children: [
                       SizedBox(height: spacing16),
                       _buildHeader(context),
-                      SizedBox(height: spacing24),
-                      _buildSearchBar(context),
                       SizedBox(height: spacing16),
-                      if (_categories.isNotEmpty) _buildCategories(context),
-                      SizedBox(height: spacing16),
+                      FeedHubTabs(
+                        active: _hubSection,
+                        onChanged: (section) {
+                          setState(() => _hubSection = section);
+                        },
+                      ),
+                      if (_hubSection == FeedHubSection.feed) ...[
+                        SizedBox(height: spacing24),
+                        _buildSearchBar(context),
+                        SizedBox(height: spacing16),
+                        if (_categories.isNotEmpty) _buildCategories(context),
+                        SizedBox(height: spacing16),
+                      ] else
+                        SizedBox(height: spacing16),
                     ],
                   ),
                 ),
               ),
+              if (_hubSection == FeedHubSection.feed) ...[
               // Feeds List
               if (_loading)
                 SliverToBoxAdapter(
@@ -380,14 +395,21 @@ class _FeedScreenState extends State<FeedScreen> {
                         onLike: () => _handleLike(feed),
                         onShare: () {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Share feature coming soon'),
+                            SnackBar(
+                              content: Text('feedHub.shareSoon'.tr()),
                             ),
                           );
                         },
                       ),
                     );
                   }, childCount: _feeds.length + (_hasMore ? 1 : 0)),
+                ),
+              ] else
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                    child: _buildHubPanel(),
+                  ),
                 ),
                 // Bottom padding for floating nav
                 SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
@@ -400,10 +422,8 @@ class _FeedScreenState extends State<FeedScreen> {
               child: AppHeader(scrollController: _scrollController),
             ),
             const FloatingBottomNav(),
-            if (_isRefreshing) const RefreshOverlay(),
           ],
         ),
-      ),
     );
   }
 
@@ -416,10 +436,10 @@ class _FeedScreenState extends State<FeedScreen> {
     );
 
     return Text(
-      'Feed',
+      'feedHub.feed'.tr(),
       style: AppTheme.heading2.copyWith(
-        color: Colors.black,
-        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+        fontWeight: FontWeight.w800,
         fontSize: titleFontSize,
         letterSpacing: 1,
       ),
@@ -446,32 +466,33 @@ class _FeedScreenState extends State<FeedScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
-        borderRadius: BorderRadius.circular(12),
+        color: AppColors.surfaceElevated.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(2),
+        border: Border.all(color: AppColors.border(0.12)),
       ),
       child: TextField(
         controller: _searchController,
         style: AppTheme.bodyMedium.copyWith(
           fontSize: fontSize,
-          color: Colors.black,
+          color: AppColors.textPrimary,
         ),
         decoration: InputDecoration(
-          hintText: 'Search feeds...',
+          hintText: 'feedHub.searchHint'.tr(),
           hintStyle: AppTheme.bodySmall.copyWith(
             fontSize: fontSize,
-            color: AppTheme.textSecondary,
+            color: AppColors.textMuted,
           ),
           prefixIcon: Icon(
             Icons.search,
             size: iconSize,
-            color: AppTheme.textSecondary,
+            color: AppColors.textMuted,
           ),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
                   icon: Icon(
                     Icons.clear,
                     size: iconSize,
-                    color: AppTheme.textSecondary,
+                    color: AppColors.textMuted,
                   ),
                   onPressed: () {
                     _searchController.clear();
@@ -556,24 +577,24 @@ class _FeedScreenState extends State<FeedScreen> {
   }) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(2),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: paddingH, vertical: paddingV),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryColor : AppTheme.surfaceColor,
-          borderRadius: BorderRadius.circular(20),
+          color: isSelected
+              ? AppColors.gold.withValues(alpha: 0.15)
+              : AppColors.surfaceElevated.withValues(alpha: 0.7),
+          borderRadius: BorderRadius.circular(2),
           border: Border.all(
-            color: isSelected
-                ? AppTheme.primaryColor
-                : AppTheme.textSecondary.withOpacity(0.2),
+            color: isSelected ? AppColors.gold : AppColors.border(0.2),
           ),
         ),
         child: Text(
           label,
           style: AppTheme.bodyMedium.copyWith(
             fontSize: fontSize,
-            color: isSelected ? Colors.white : AppTheme.textSecondary,
-            fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            color: isSelected ? AppColors.gold : AppColors.textMuted,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
           ),
         ),
       ),
@@ -611,19 +632,34 @@ class _FeedScreenState extends State<FeedScreen> {
             Icon(
               Icons.article_outlined,
               size: iconSize,
-              color: Colors.grey[400],
+              color: AppColors.textMuted,
             ),
             SizedBox(height: spacing16),
             Text(
-              'No feeds found',
+              'feedHub.noFeeds'.tr(),
               style: AppTheme.heading3.copyWith(
                 fontSize: headingFontSize,
-                color: Colors.grey,
+                color: AppColors.textMuted,
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildHubPanel() {
+    switch (_hubSection) {
+      case FeedHubSection.explore:
+        return const FeedExplorePanel();
+      case FeedHubSection.reels:
+        return const FeedReelsPanel();
+      case FeedHubSection.saved:
+        return const FeedSavedPanel();
+      case FeedHubSection.messages:
+        return const FeedMessagesPanel();
+      case FeedHubSection.feed:
+        return const SizedBox.shrink();
+    }
   }
 }

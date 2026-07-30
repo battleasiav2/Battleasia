@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "play": "খেলুন",
+    "shop": "শপ",
+    "referral": "রেফারেল",
+    "feed": "ফিড",
+    "login": "লগইন"
+  },
+  "feedHub": {
+    "feed": "ফিড",
+    "explore": "এক্সপ্লোর",
+    "reels": "রিলস",
+    "saved": "সেভড",
+    "messages": "মেসেজ",
+    "searchHint": "ফিড খুঁজুন...",
+    "noFeeds": "কোনো ফিড পাওয়া যায়নি",
+    "noSaved": "এখনো কোনো সেভড পোস্ট নেই",
+    "noReels": "এখনো কোনো রিল নেই",
+    "noConversations": "এখনো কোনো কথোপকথন নেই",
+    "trendingPosts": "ট্রেন্ডিং পোস্ট",
+    "trendingHashtags": "ট্রেন্ডিং হ্যাশট্যাগ",
+    "recommendedCreators": "সুপারিশকৃত ক্রিয়েটর",
+    "shareSoon": "শেয়ার ফিচার শীঘ্রই আসছে"
+  },
+  "auth": {
+    "signInTitle": "আপনার অ্যাকাউন্টে সাইন ইন করুন",
+    "signInDesc": "মোবাইল টুর্নামেন্টে খেলুন এবং আসল পুরস্কার জিতুন।",
+    "signUpTitle": "আপনার অ্যাকাউন্ট তৈরি করুন",
+    "signUpDesc": "টুর্নামেন্টে যোগ দিন এবং পুরস্কার অর্জন শুরু করুন।",
+    "dontHaveAccount": "অ্যাকাউন্ট নেই?",
+    "alreadyHaveAccount": "ইতিমধ্যে অ্যাকাউন্ট আছে?",
+    "signUp": "সাইন আপ",
+    "signIn": "সাইন ইন",
+    "email": "ইমেইল ঠিকানা",
+    "password": "পাসওয়ার্ড",
+    "confirmPassword": "পাসওয়ার্ড নিশ্চিত করুন",
+    "inGameName": "ইন-গেম ইউজারনেম",
+    "mobileNo": "মোবাইল নম্বর",
+    "pubgId": "PUBG ID",
+    "gameServer": "গেম সার্ভার",
+    "createAccount": "অ্যাকাউন্ট তৈরি করুন",
+    "termsAgreement": "সাইন আপ করে, আমি Terms of Service এবং Privacy Policy-তে সম্মত হচ্ছি।",
+    "forgotPassword": "পাসওয়ার্ড ভুলে গেছেন?",
+    "emailPlaceholder": "Example@domain.com",
+    "passwordPlaceholder": "৬+ অক্ষর",
+    "emailRequired": "ইমেইল প্রয়োজন",
+    "emailInvalid": "সঠিক ইমেইল দিন",
+    "passwordRequired": "পাসওয়ার্ড প্রয়োজন",
+    "passwordMin": "পাসওয়ার্ড কমপক্ষে ৬ অক্ষর"
+  },
+  "common": {
+    "retry": "আবার চেষ্টা",
+    "loading": "লোড হচ্ছে...",
+    "brandTagline": "OFFICIAL PUBG ON MOBILE"
+  },
+  "footer": {
+    "home": "হোম"
+  }
+}

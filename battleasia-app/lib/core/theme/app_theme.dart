@@ -1,84 +1,83 @@
 import 'package:flutter/material.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 
 class AppTheme {
-  // Colors
-  static const Color primaryColor = Color(0xFFFEAB02);
-  static const Color secondaryColor = Color(0xFF8B5CF6);
-  static const Color accentColor = Color(0xFFFEAB02);
-  static const Color backgroundColor = Color(0xFFE7E7E7);
-  static const Color surfaceColor = Color(0xFFFFFFFF);
-  static const Color textPrimary = Color(0xFFFEAB02);
-  static const Color textSecondary = Color(0xFFB0B0B0);
+  // Legacy aliases — prefer AppColors in new code.
+  static const Color primaryColor = AppColors.gold;
+  static const Color secondaryColor = AppColors.goldAccent;
+  static const Color accentColor = AppColors.gold;
+  static const Color backgroundColor = AppColors.pageBg;
+  static const Color surfaceColor = AppColors.surface;
+  static const Color textPrimary = AppColors.textPrimary;
+  static const Color textSecondary = AppColors.textMuted;
 
-  // Gradient
-  static const LinearGradient primaryGradient = LinearGradient(
-    colors: [Color(0xFF5A87DB), Color(0xFF8B5CF6)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
+  static const LinearGradient accentGradient = AppColors.goldGradient;
 
-  static const LinearGradient accentGradient = LinearGradient(
-    colors: [Color(0xFFFEAB02), Color(0xFFFF8C00)],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
-  // Text Styles
   static const TextStyle heading1 = TextStyle(
-    fontSize: 48,
-    fontWeight: FontWeight.bold,
-    color: textPrimary,
+    fontSize: 32,
+    fontWeight: FontWeight.w800,
+    color: AppColors.textPrimary,
     fontFamily: 'Poppins',
-    height: 1.1,
+    height: 1.15,
+    letterSpacing: 0.3,
   );
 
   static const TextStyle heading2 = TextStyle(
-    fontSize: 36,
-    fontWeight: FontWeight.bold,
-    color: textPrimary,
+    fontSize: 24,
+    fontWeight: FontWeight.w800,
+    color: AppColors.textPrimary,
     fontFamily: 'Poppins',
+    height: 1.25,
   );
 
   static const TextStyle heading3 = TextStyle(
-    fontSize: 28,
-    fontWeight: FontWeight.bold,
-    color: textPrimary,
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimary,
     fontFamily: 'Poppins',
   );
 
   static const TextStyle bodyLarge = TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.normal,
-    color: textPrimary,
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textBody,
     fontFamily: 'Poppins',
   );
 
   static const TextStyle bodyMedium = TextStyle(
-    fontSize: 16,
-    fontWeight: FontWeight.normal,
-    color: textPrimary,
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textBody,
     fontFamily: 'Poppins',
   );
 
   static const TextStyle bodySmall = TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.normal,
-    color: textSecondary,
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    color: AppColors.textMuted,
     fontFamily: 'Poppins',
   );
 
-  // Theme Data
+  static const TextStyle labelUppercase = TextStyle(
+    fontSize: 10,
+    fontWeight: FontWeight.w700,
+    letterSpacing: 1.6,
+    color: AppColors.gold,
+    fontFamily: 'Poppins',
+  );
+
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
-      primaryColor: primaryColor,
-      scaffoldBackgroundColor: backgroundColor,
+      primaryColor: AppColors.gold,
+      scaffoldBackgroundColor: AppColors.pageBg,
       colorScheme: const ColorScheme.dark(
-        primary: primaryColor,
-        secondary: secondaryColor,
-        surface: surfaceColor,
-        onSurface: primaryColor,
+        primary: AppColors.gold,
+        secondary: AppColors.goldAccent,
+        surface: AppColors.surface,
+        onSurface: AppColors.textPrimary,
+        error: AppColors.error,
       ),
       fontFamily: 'Poppins',
       textTheme: const TextTheme(
@@ -90,25 +89,76 @@ class AppTheme {
         bodySmall: bodySmall,
       ),
       appBarTheme: const AppBarTheme(
-        backgroundColor: backgroundColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
+        foregroundColor: AppColors.textPrimary,
         titleTextStyle: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.bold,
-          color: textPrimary,
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          color: AppColors.textPrimary,
           fontFamily: 'Poppins',
         ),
       ),
-      cardTheme: CardThemeData(
-        color: surfaceColor,
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
+      dividerColor: AppColors.border(0.12),
       textSelectionTheme: TextSelectionThemeData(
-        selectionColor: Colors.orange.withOpacity(0.3),
-        cursorColor: Colors.orange,
-        selectionHandleColor: Colors.orange,
+        selectionColor: AppColors.gold.withValues(alpha: 0.28),
+        cursorColor: AppColors.gold,
+        selectionHandleColor: AppColors.gold,
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.black.withValues(alpha: 0.5),
+        labelStyle: bodySmall.copyWith(
+          color: AppColors.textPrimary.withValues(alpha: 0.82),
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.4,
+        ),
+        hintStyle: bodyMedium.copyWith(
+          color: Colors.white.withValues(alpha: 0.55),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(2),
+          borderSide: BorderSide(color: AppColors.border(0.22)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(2),
+          borderSide: BorderSide(color: AppColors.border(0.22)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(2),
+          borderSide: const BorderSide(color: AppColors.goldAccent, width: 1),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(2),
+          borderSide: const BorderSide(color: AppColors.error),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.goldAccent,
+          foregroundColor: Colors.black,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+          textStyle: const TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w700,
+            fontSize: 14,
+            letterSpacing: 0.8,
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: AppColors.goldAccent,
+          textStyle: const TextStyle(
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.w600,
+            fontSize: 13,
+          ),
+        ),
       ),
     );
   }

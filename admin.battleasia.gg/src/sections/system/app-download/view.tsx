@@ -140,8 +140,8 @@ export function AppDownloadSettingsView() {
         <CardContent>
           <Stack spacing={3}>
             <Alert severity="info">
-              The home page download button uses this file. Uploaded APK is stored at
-              <strong> /uploads/app/BattleAsia.apk</strong>.
+              The logged-in user menu shows <strong>Download APK</strong> when enabled. Uploaded APK is stored at
+              <strong> /uploads/app/BattleAsia.apk</strong>. Maximum upload size: 500 MB.
             </Alert>
 
             <FormControlLabel

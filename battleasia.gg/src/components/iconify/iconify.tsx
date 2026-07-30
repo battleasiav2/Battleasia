@@ -1,12 +1,13 @@
-import type { IconProps } from '@iconify/react';
+import type { IconProps } from '@iconify/react/offline';
 
 import { forwardRef } from 'react';
-import { Icon, disableCache } from '@iconify/react';
+import { Icon } from '@iconify/react/offline';
 import { mergeClasses } from 'minimal-shared/utils';
 
 import { styled } from '@mui/material/styles';
 
 import { iconifyClasses } from './classes';
+import './iconify-offline';
 
 // ----------------------------------------------------------------------
 
@@ -33,9 +34,6 @@ export const Iconify = forwardRef<SVGSVGElement, IconifyProps>((props, ref) => {
     />
   );
 });
-
-// https://iconify.design/docs/iconify-icon/disable-cache.html
-disableCache('local');
 
 // ----------------------------------------------------------------------
 

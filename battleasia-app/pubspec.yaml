@@ -6,7 +6,7 @@ publish_to: "none"
 version: 1.0.0+1
 
 environment:
-  sdk: "3.8.1"
+  sdk: ">=3.8.1 <4.0.0"
 
 dependencies:
   flutter:
@@ -88,6 +88,7 @@ flutter:
     - assets/images/
     - assets/images/map/
     - assets/icon/
+    - assets/translations/
     - .env
 
 

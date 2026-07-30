@@ -1,6 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
+import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
 
 class GameCard extends StatelessWidget {
   final String title;
@@ -20,11 +25,12 @@ class GameCard extends StatelessWidget {
     this.onTap,
   });
 
+  static const _fallbackImage = 'assets/images/game2.webp';
+
   @override
   Widget build(BuildContext context) {
     final isDisabled = comingSoon || onTap == null;
 
-    // Responsive sizes
     final cardPadding = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 12.0,
@@ -51,16 +57,6 @@ class GameCard extends StatelessWidget {
       max: 12.0,
     );
 
-    final badgePaddingH = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 8.0,
-    ).clamp(6.0, 8.0);
-
-    final badgePaddingV = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 4.0,
-    ).clamp(3.0, 4.0);
-
     final badgePosition = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 12.0,
@@ -81,138 +77,174 @@ class GameCard extends StatelessWidget {
       baseSize: 4.0,
     ).clamp(2.0, 4.0);
 
-    return Card(
-      color: AppTheme.surfaceColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    return Material(
+      color: Colors.transparent,
       child: InkWell(
         onTap: isDisabled ? null : onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Stack(
-          children: [
-            // Game image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                height: double.infinity,
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/game2.webp'),
-                    fit: BoxFit.cover,
-                  ),
+        borderRadius: BorderRadius.circular(2),
+        child: GlassCard(
+          padding: EdgeInsets.zero,
+          showGoldGlow: false,
+          child: SizedBox.expand(
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: _buildCoverImage(),
+          ),
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(2),
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.85),
+                  ],
                 ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.8),
-                      ],
+              ),
+            ),
+          ),
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Padding(
+              padding: EdgeInsets.all(cardPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    style: AppTheme.bodyLarge.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: titleFontSize,
                     ),
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(cardPadding),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              style: AppTheme.bodyLarge.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: titleFontSize,
-                                shadows: [
-                                  Shadow(
-                                    offset: const Offset(0, 1),
-                                    blurRadius: 2,
-                                    color: Colors.black.withOpacity(0.8),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            if (subTitle != null) ...[
-                              SizedBox(height: spacing),
-                              Text(
-                                subTitle!,
-                                style: AppTheme.bodySmall.copyWith(
-                                  color: AppTheme.accentColor,
-                                  fontSize: subtitleFontSize,
-                                  shadows: [
-                                    Shadow(
-                                      offset: const Offset(0, 1),
-                                      blurRadius: 2,
-                                      color: Colors.black.withOpacity(0.8),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
+                  if (subTitle != null) ...[
+                    SizedBox(height: spacing),
+                    Text(
+                      subTitle!,
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppColors.gold,
+                        fontSize: subtitleFontSize,
+                        fontWeight: FontWeight.w600,
                       ),
-                    ],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          if (comingSoon)
+            Positioned(
+              top: badgePosition,
+              left: badgePosition,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.gold,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                child: Text(
+                  'COMING SOON',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w800,
+                    fontSize: badgeFontSize,
                   ),
                 ),
               ),
             ),
-
-            // Coming Soon badge
-            if (comingSoon)
-              Positioned(
-                top: badgePosition,
-                left: badgePosition,
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: badgePaddingH,
-                    vertical: badgePaddingV,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.orange,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    'COMING SOON',
-                    style: AppTheme.bodySmall.copyWith(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: badgeFontSize,
-                    ),
-                  ),
+          if (logo != null && logo!.isNotEmpty)
+            Positioned(
+              top: logoPosition,
+              right: logoPosition,
+              child: _buildLogo(logo!, logoSize),
+            ),
+          if (isDisabled)
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: Colors.black.withValues(alpha: 0.35),
+                  borderRadius: BorderRadius.circular(2),
                 ),
               ),
-
-            // Logo overlay
-            if (logo != null)
-              Positioned(
-                top: logoPosition,
-                right: logoPosition,
-                child: Image.asset(
-                  'assets/images/logo.webp',
-                  width: logoSize,
-                  height: logoSize,
-                  errorBuilder: (context, error, stackTrace) =>
-                      const SizedBox.shrink(),
-                ),
-              ),
-
-            // Disabled overlay
-            if (isDisabled)
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.3),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-          ],
+            ),
+              ],
+            ),
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildCoverImage() {
+    final url = imageUrl;
+    if (url == null || url.isEmpty) {
+      return Image.asset(_fallbackImage, fit: BoxFit.cover);
+    }
+
+    if (ImageUtils.isBase64DataUri(url)) {
+      final bytes = ImageUtils.decodeBase64DataUri(url);
+      if (bytes != null) {
+        return Image.memory(bytes, fit: BoxFit.cover);
+      }
+      return Image.asset(_fallbackImage, fit: BoxFit.cover);
+    }
+
+    return Image.network(
+      url,
+      fit: BoxFit.cover,
+      errorBuilder: (_, __, ___) =>
+          Image.asset(_fallbackImage, fit: BoxFit.cover),
+      loadingBuilder: (context, child, progress) {
+        if (progress == null) return child;
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(_fallbackImage, fit: BoxFit.cover),
+            Center(
+              child: CircularProgressIndicator(
+                color: AppColors.gold,
+                strokeWidth: 2,
+                value: progress.expectedTotalBytes != null
+                    ? progress.cumulativeBytesLoaded /
+                        progress.expectedTotalBytes!
+                    : null,
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildLogo(String url, double size) {
+    if (ImageUtils.isBase64DataUri(url)) {
+      final Uint8List? bytes = ImageUtils.decodeBase64DataUri(url);
+      if (bytes == null) return const SizedBox.shrink();
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: Image.memory(bytes, width: size, height: size, fit: BoxFit.cover),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(4),
+      child: Image.network(
+        url,
+        width: size,
+        height: size,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
       ),
     );
   }

@@ -15,5 +15,7 @@ export const uploadAppApkApi = (file: File, version?: string) => {
   }
   return axios.post('api/v2/app-settings/app-download/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
+    maxContentLength: 500 * 1024 * 1024,
+    maxBodyLength: 500 * 1024 * 1024,
   });
 };

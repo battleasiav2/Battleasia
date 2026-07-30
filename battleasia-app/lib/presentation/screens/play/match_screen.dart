@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
@@ -10,6 +11,7 @@ import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/play/match_card.dart';
+import 'package:battleasia_app/core/utils/link_utils.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/match_detail_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/match_result_screen.dart';
@@ -163,7 +165,7 @@ class _MatchScreenState extends State<MatchScreen> {
   }
 
   void _handleWatchLive() {
-    // TODO: Implement watch live functionality
+    LinkUtils.openYoutubeLive();
   }
 
   void _handleShowRoomDetails(MatchModel match) {
@@ -375,7 +377,7 @@ class _MatchScreenState extends State<MatchScreen> {
     );
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: AppColors.pageBg,
       body: Stack(
         fit: StackFit.expand,
         children: [

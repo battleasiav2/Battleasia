@@ -16,7 +16,8 @@
     "docker:prod:down": "docker compose -f docker-compose.prod.yml down",
     "backup:mongo": "powershell -ExecutionPolicy Bypass -File deploy/backup-mongo.ps1",
     "build:win": "powershell -ExecutionPolicy Bypass -File deploy/build.ps1",
-    "build": "npm run install:all && bash deploy/build.sh"
+    "build": "npm run install:all && bash deploy/build.sh",
+    "package:hostinger": "powershell -ExecutionPolicy Bypass -File deploy/package-hostinger-upload.ps1"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

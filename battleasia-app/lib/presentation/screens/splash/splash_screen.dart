@@ -1,4 +1,5 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/presentation/screens/auth/auth_wrapper.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -21,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen>
     // Initialize animation controller
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 1200),
     );
 
     // Fade animation
@@ -53,7 +54,7 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         // Wait a bit before navigating
-        Future.delayed(const Duration(milliseconds: 500), () {
+        Future.delayed(const Duration(milliseconds: 200), () {
           if (mounted) {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
@@ -78,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen>
     final logoSize = screenSize.width * 0.4; // 40% of screen width
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.pageBg,
       body: Container(
         decoration: const BoxDecoration(
           color: Colors.black,

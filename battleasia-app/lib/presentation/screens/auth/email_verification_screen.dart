@@ -8,7 +8,8 @@ import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/presentation/widgets/common/battleasia_logo.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_up_screen.dart';
-import 'package:battleasia_app/presentation/screens/account/account_screen.dart';
+import 'package:battleasia_app/data/models/user_model.dart';
+import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:battleasia_app/core/utils/api_client.dart';
 import 'dart:convert';
@@ -150,22 +151,15 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           // Save session using AuthService
           final authService = AuthService();
           await authService.saveToken(sessionData['accessToken'] as String);
-          
-          // Save user data
-          final userModel = await authService.getUser();
-          if (userModel != null) {
-            await authService.saveUser(userModel);
-          }
+          await authService.saveUser(UserModel.fromJson(userData));
 
-          // Update AuthProvider
           if (mounted) {
             final authProvider =
                 Provider.of<AuthProvider>(context, listen: false);
             await authProvider.refreshUser();
 
-            // Navigate to account screen
             Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => const AccountScreen()),
+              MaterialPageRoute(builder: (context) => const PlayScreen()),
               (route) => false,
             );
           }

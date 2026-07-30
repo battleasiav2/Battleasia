@@ -8,13 +8,13 @@ class AppConfig {
   /// Application name
   static const String appName = 'BattleAsia';
 
-  /// Server base URL
+  /// Server base URL — use .env; Android emulator: http://10.0.2.2:5050
   static String get serverUrl =>
-      dotenv.env['API_BASE_URL'] ?? 'https://battleasia.net';
+      dotenv.env['API_BASE_URL'] ?? 'http://10.0.2.2:5050';
 
-  /// Frontend site URL (used for referral links, etc.)
+  /// Frontend site URL (referral links)
   static String get siteUrl =>
-      dotenv.env['SITE_URL'] ?? 'https://battleasia.net';
+      dotenv.env['SITE_URL'] ?? 'https://battleasia.gg';
 
   /// Assets directory path
   static String get assetsDir => dotenv.env['ASSETS_DIR'] ?? '';

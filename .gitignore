@@ -10,10 +10,16 @@ node_modules/
 **/.env
 !**/.env.example
 !.env.production.example
+deploy/.github-token.local
+deploy/.env.deploy.local
 
 # Build outputs (built in-place inside each app folder)
 **/dist/
 **/build/
+deploy/output/
+deploy/hosting-upload/
+deploy/BattleAsia-hosting-upload.zip
+backups/
 **/.next/
 **/out/
 **/.vite/
@@ -50,6 +56,8 @@ api/uploads/
 # Flutter
 battleasia-app/.dart_tool/
 battleasia-app/.fvm/
+battleasia-app/.env.device
+battleasia-app/.env.emulator
 battleasia-app/build/
 battleasia-app/.flutter-plugins
 battleasia-app/.flutter-plugins-dependencies

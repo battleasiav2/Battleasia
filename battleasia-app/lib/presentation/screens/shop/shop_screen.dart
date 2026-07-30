@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/shop_service.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
+import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/shop_item_model.dart';
@@ -226,19 +229,16 @@ class _ShopScreenState extends State<ShopScreen> {
     ).clamp(60.0, 80.0);
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
-      body: Listener(
-        onPointerDown: _onPointerDown,
-        onPointerMove: _onPointerMove,
-        onPointerSignal: _onPointerSignal,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            CustomScrollView(
-              controller: _scrollController,
-              physics: const ClampingScrollPhysics(),
-              slivers: [
-                SliverToBoxAdapter(child: SizedBox(height: headerHeight)),
+      backgroundColor: AppColors.pageBg,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          CustomScrollView(
+            controller: _scrollController,
+            physics: appScrollPhysics,
+            slivers: [
+              CupertinoSliverRefreshControl(onRefresh: _onRefresh),
+              SliverToBoxAdapter(child: SizedBox(height: headerHeight)),
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
@@ -330,10 +330,8 @@ class _ShopScreenState extends State<ShopScreen> {
               child: AppHeader(scrollController: _scrollController),
             ),
             const FloatingBottomNav(),
-            if (_isRefreshing) const RefreshOverlay(),
           ],
         ),
-      ),
     );
   }
 
@@ -348,8 +346,8 @@ class _ShopScreenState extends State<ShopScreen> {
     return Text(
       'Shop',
       style: AppTheme.heading2.copyWith(
-        color: Colors.black,
-        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+        fontWeight: FontWeight.w800,
         fontSize: titleFontSize,
         letterSpacing: 1,
       ),
@@ -388,7 +386,7 @@ class _ShopScreenState extends State<ShopScreen> {
             padding: EdgeInsets.only(right: spacing8),
             child: InkWell(
               onTap: () => _handleCategorySelect(category['value']!),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(2),
               child: Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: categoryPaddingH,
@@ -396,25 +394,25 @@ class _ShopScreenState extends State<ShopScreen> {
                 ),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? AppTheme.surfaceColor
+                      ? AppColors.surfaceElevated
                       : Colors.transparent,
                   border: Border.all(
                     color: isSelected
-                        ? AppTheme.primaryColor
-                        : AppTheme.textSecondary.withOpacity(0.2),
+                        ? AppColors.gold
+                        : AppColors.border(0.2),
                   ),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(2),
                 ),
                 child: Text(
                   category['label']!,
                   style: AppTheme.bodyMedium.copyWith(
                     fontSize: categoryFontSize,
                     color: isSelected
-                        ? AppTheme.primaryColor
-                        : AppTheme.textSecondary,
+                        ? AppColors.gold
+                        : AppColors.textMuted,
                     fontWeight: isSelected
                         ? FontWeight.w800
-                        : FontWeight.normal,
+                        : FontWeight.w500,
                   ),
                 ),
               ),
@@ -456,14 +454,14 @@ class _ShopScreenState extends State<ShopScreen> {
             Icon(
               Icons.shopping_bag_outlined,
               size: iconSize,
-              color: Colors.grey[400],
+              color: AppColors.textMuted,
             ),
             SizedBox(height: spacing16),
             Text(
               'No items found',
               style: AppTheme.heading3.copyWith(
                 fontSize: headingFontSize,
-                color: Colors.grey,
+                color: AppColors.textMuted,
               ),
             ),
           ],

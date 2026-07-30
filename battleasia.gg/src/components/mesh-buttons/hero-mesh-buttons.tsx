@@ -5,7 +5,7 @@ import { userGhostButtonSx, userGoldButtonSx } from 'src/layouts/user/user-theme
 
 type HeroMeshButtonsProps = {
   joinLabel: string;
-  downloadLabel: string;
+  downloadLabel?: string;
   joinHref?: string;
   downloadHref?: string;
   downloadFileName?: string;
@@ -57,7 +57,7 @@ export function HeroMeshButtons({
         {joinLabel}
       </Button>
 
-      {showDownload && downloadHref ? (
+      {showDownload && downloadHref && downloadLabel ? (
         <Button
           component="a"
           href={downloadHref}

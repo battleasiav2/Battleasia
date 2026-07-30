@@ -1,4 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_screen.dart';
@@ -13,11 +15,11 @@ class FloatingBottomNav extends StatefulWidget {
 }
 
 class _FloatingBottomNavState extends State<FloatingBottomNav> {
-  static const List<NavItem> navItems = [
-    NavItem(label: 'Play', route: '/play', icon: Icons.sports_esports),
-    NavItem(label: 'Shop', route: '/shop', icon: Icons.shopping_bag),
-    NavItem(label: 'Referral', route: '/referral', icon: Icons.people),
-    NavItem(label: 'Feed', route: '/feed', icon: Icons.article),
+  static List<NavItem> navItems(BuildContext context) => [
+    NavItem(label: 'nav.play'.tr(), route: '/play', icon: Icons.sports_esports),
+    NavItem(label: 'nav.shop'.tr(), route: '/shop', icon: Icons.shopping_bag),
+    NavItem(label: 'nav.referral'.tr(), route: '/referral', icon: Icons.people),
+    NavItem(label: 'nav.feed'.tr(), route: '/feed', icon: Icons.article),
   ];
 
   String _currentRoute = '/play';
@@ -193,11 +195,12 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           decoration: BoxDecoration(
-            color: AppTheme.surfaceColor,
+            color: AppColors.surface.withValues(alpha: 0.92),
             borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: AppColors.border(0.14)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
+                color: Colors.black.withValues(alpha: 0.45),
                 blurRadius: 20,
                 offset: const Offset(0, 4),
               ),
@@ -206,7 +209,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
-            children: navItems.map((item) {
+            children: navItems(context).map((item) {
               final isActive = _isActive(item.route, _currentRoute);
               return _buildNavItem(context, item, isActive);
             }).toList(),
@@ -228,7 +231,8 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
         ),
         margin: const EdgeInsets.symmetric(horizontal: 4),
         decoration: BoxDecoration(
-          color: isActive ? AppTheme.accentColor : Colors.transparent,
+          gradient: isActive ? AppColors.goldGradient : null,
+          color: isActive ? null : Colors.transparent,
           borderRadius: BorderRadius.circular(isActive ? 10 : 22),
         ),
         child: Row(
@@ -238,14 +242,14 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
             Icon(
               item.icon,
               size: isActive ? 18 : 22,
-              color: isActive ? Colors.white : AppTheme.textSecondary,
+              color: isActive ? Colors.black : AppColors.textMuted,
             ),
             if (isActive) ...[
               const SizedBox(width: 6),
               Text(
                 item.label,
                 style: AppTheme.bodySmall.copyWith(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontWeight: FontWeight.w600,
                   fontSize: 11,
                 ),

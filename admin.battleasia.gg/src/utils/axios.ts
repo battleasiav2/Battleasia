@@ -14,7 +14,9 @@ axiosInstance.interceptors.request.use(
     const state = store.getState() as any;
     const accessToken = state.auth.token;
     if (accessToken) {
-      config.headers.authorization = accessToken;
+      config.headers.authorization = accessToken.startsWith('Bearer ')
+        ? accessToken
+        : `Bearer ${accessToken}`;
     }
     return config;
   },
@@ -38,13 +40,24 @@ axiosInstance.interceptors.response.use(
       console.error(response.data);
       toast.error(getErrorMessage(response.data, 'Bad request'));
     } else if (response && response.status === 401) {
-      store.dispatch(logoutAction());
+      const state = store.getState() as { auth?: { isLoggedIn?: boolean } };
+      const requestUrl = String(error?.config?.url || '');
+      const isAuthRequest =
+        requestUrl.includes('/auth/signin') ||
+        requestUrl.includes('/auth/verify-otp') ||
+        requestUrl.includes('/auth/logout');
+
+      if (state.auth?.isLoggedIn && !isAuthRequest) {
+        store.dispatch(logoutAction());
+      }
     } else if (response && response.status === 402) {
       toast.error(getErrorMessage(response.data, 'Payment required'));
     } else if (response && response.status === 500) {
       toast.error(getErrorMessage(response.data, 'Internal server error'));
     } else if (response && response.status === 404) {
       toast.error('API not found');
+    } else if (!response) {
+      console.error('[API] Network error:', error?.message || error);
     } else {
       toast.error(getErrorMessage(response?.data, 'API error'));
     }

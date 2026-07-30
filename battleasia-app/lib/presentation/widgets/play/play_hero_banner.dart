@@ -1,6 +1,8 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
+import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
 class PlayHeroBanner extends StatefulWidget {
   final List<Map<String, dynamic>> slides;
@@ -94,8 +96,8 @@ class _PlayHeroBannerState extends State<PlayHeroBanner> {
                   margin: EdgeInsets.only(right: indicatorMargin),
                   decoration: BoxDecoration(
                     color: _currentIndex == index
-                        ? Colors.white
-                        : Colors.white.withOpacity(0.3),
+                        ? AppColors.gold
+                        : Colors.white.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -194,7 +196,7 @@ class _PlayHeroBannerState extends State<PlayHeroBanner> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.transparent, Colors.black.withOpacity(0.8)],
+            colors: [Colors.transparent, Colors.black.withValues(alpha: 0.8)],
           ),
         ),
         child: Padding(
@@ -213,7 +215,7 @@ class _PlayHeroBannerState extends State<PlayHeroBanner> {
                     Shadow(
                       offset: const Offset(0, 2),
                       blurRadius: 4,
-                      color: Colors.black.withOpacity(0.8),
+                      color: Colors.black.withValues(alpha: 0.8),
                     ),
                   ],
                 ),
@@ -228,7 +230,7 @@ class _PlayHeroBannerState extends State<PlayHeroBanner> {
                     Shadow(
                       offset: const Offset(0, 1),
                       blurRadius: 2,
-                      color: Colors.black.withOpacity(0.8),
+                      color: Colors.black.withValues(alpha: 0.8),
                     ),
                   ],
                 ),
@@ -238,27 +240,10 @@ class _PlayHeroBannerState extends State<PlayHeroBanner> {
               SizedBox(height: spacing16),
               Row(
                 children: [
-                  ElevatedButton.icon(
+                  GoldButton(
+                    label: 'Watch Live',
+                    expanded: false,
                     onPressed: widget.onWatchLive,
-                    icon: Icon(
-                      Icons.play_arrow,
-                      color: Colors.white,
-                      size: iconSize,
-                    ),
-                    label: Text(
-                      'Watch Live',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: descriptionFontSize,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: buttonPaddingH,
-                        vertical: buttonPaddingV,
-                      ),
-                    ),
                   ),
                   SizedBox(width: spacing12),
                   Container(
@@ -267,15 +252,15 @@ class _PlayHeroBannerState extends State<PlayHeroBanner> {
                       vertical: badgePaddingV,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(4),
+                      color: AppColors.success,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                     child: Text(
                       'LIVE',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: liveBadgeFontSize,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                   ),

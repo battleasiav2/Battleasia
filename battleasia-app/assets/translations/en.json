@@ -1,0 +1,59 @@
+{
+  "nav": {
+    "play": "Play",
+    "shop": "Shop",
+    "referral": "Referral",
+    "feed": "Feed",
+    "login": "LOGIN"
+  },
+  "feedHub": {
+    "feed": "Feed",
+    "explore": "Explore",
+    "reels": "Reels",
+    "saved": "Saved",
+    "messages": "Messages",
+    "searchHint": "Search feeds...",
+    "noFeeds": "No feeds found",
+    "noSaved": "No saved posts yet",
+    "noReels": "No reels yet",
+    "noConversations": "No conversations yet",
+    "trendingPosts": "Trending Posts",
+    "trendingHashtags": "Trending Hashtags",
+    "recommendedCreators": "Recommended Creators",
+    "shareSoon": "Share feature coming soon"
+  },
+  "auth": {
+    "signInTitle": "Sign in to your account",
+    "signInDesc": "Win real cash via playing MOBILE tournaments for free.",
+    "signUpTitle": "Create your account",
+    "signUpDesc": "Join tournaments and start earning rewards.",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "signUp": "Sign up",
+    "signIn": "Sign in",
+    "email": "Email address",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "inGameName": "In-game username",
+    "mobileNo": "Mobile number",
+    "pubgId": "PUBG ID",
+    "gameServer": "Game server",
+    "createAccount": "Create account",
+    "termsAgreement": "By signing up, I agree to Terms of Service and Privacy Policy.",
+    "forgotPassword": "Forgot password?",
+    "emailPlaceholder": "Example@domain.com",
+    "passwordPlaceholder": "6+ characters",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Enter a valid email",
+    "passwordRequired": "Password is required",
+    "passwordMin": "Password must be at least 6 characters"
+  },
+  "common": {
+    "retry": "Retry",
+    "loading": "Loading...",
+    "brandTagline": "OFFICIAL PUBG ON MOBILE"
+  },
+  "footer": {
+    "home": "Home"
+  }
+}

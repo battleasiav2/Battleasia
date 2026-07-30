@@ -165,6 +165,44 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
     return result;
   }
 
+  Future<Map<String, dynamic>> forgotPassword(String email) async {
+    _isLoading = true;
+    notifyListeners();
+    final result = await _authService.forgotPassword(email: email);
+    _isLoading = false;
+    notifyListeners();
+    return result;
+  }
+
+  Future<Map<String, dynamic>> verifyResetCode({
+    required String email,
+    required String code,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    final result = await _authService.verifyResetCode(email: email, code: code);
+    _isLoading = false;
+    notifyListeners();
+    return result;
+  }
+
+  Future<Map<String, dynamic>> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    final result = await _authService.resetPassword(
+      email: email,
+      code: code,
+      newPassword: newPassword,
+    );
+    _isLoading = false;
+    notifyListeners();
+    return result;
+  }
+
   // Refresh user data
   Future<void> refreshUser() async {
     _isLoading = true;

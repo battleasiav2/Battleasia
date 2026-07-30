@@ -5,12 +5,9 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
 import { requireAdmin } from '../../middleware/admin.js';
+import { uploadsRoot } from '../../utils/uploads-path.js';
 
 const router = Router();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const uploadsRoot = path.join(__dirname, '../../uploads');
 
 const ALLOWED_MIME = new Set([
   'image/jpeg',

@@ -1,8 +1,7 @@
 import { Router } from 'express';
+import type express from 'express';
 import multer from 'multer';
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { requireAuth } from '../../middleware/auth.js';
 import { requireAdmin } from '../../middleware/admin.js';
 import {
@@ -14,15 +13,9 @@ import {
   type MailSettings,
 } from '../../models/AppSettings.js';
 import { sendTestMail } from '../../utils/mail.js';
+import { appDownloadDir, appDownloadFileName, appDownloadPath } from '../../utils/uploads-path.js';
 
 const router = Router();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const uploadsRoot = path.join(__dirname, '../../uploads');
-const appDownloadDir = path.join(uploadsRoot, 'app');
-const appDownloadFileName = 'BattleAsia.apk';
-const appDownloadPath = path.join(appDownloadDir, appDownloadFileName);
 
 function ensureAppDownloadDir() {
   if (!fs.existsSync(appDownloadDir)) {
@@ -34,9 +27,11 @@ function isApkBuffer(buffer: Buffer) {
   return buffer.length >= 4 && buffer[0] === 0x50 && buffer[1] === 0x4b;
 }
 
+const APK_MAX_BYTES = Math.max(Number(process.env.APP_APK_MAX_MB) || 500, 50) * 1024 * 1024;
+
 const apkUpload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 150 * 1024 * 1024 },
+  limits: { fileSize: APK_MAX_BYTES },
   fileFilter: (_req, file, cb) => {
     const allowed =
       file.mimetype === 'application/vnd.android.package-archive' ||
@@ -45,6 +40,29 @@ const apkUpload = multer({
     cb(null, allowed);
   },
 });
+
+function handleApkUpload(req: express.Request, res: express.Response, next: express.NextFunction) {
+  apkUpload.single('apk')(req, res, (error) => {
+    if (!error) {
+      next();
+      return;
+    }
+
+    if (error instanceof multer.MulterError) {
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        const maxMb = Math.round(APK_MAX_BYTES / (1024 * 1024));
+        return res.status(413).json({
+          status: false,
+          message: `APK file is too large. Maximum allowed size is ${maxMb} MB.`,
+        });
+      }
+      return res.status(400).json({ status: false, message: error.message || 'Invalid upload' });
+    }
+
+    console.error('apk upload middleware error:', error);
+    return res.status(400).json({ status: false, message: 'Failed to upload APK' });
+  });
+}
 
 router.get('/mail-settings', requireAuth, requireAdmin, async (_req, res) => {
   try {
@@ -183,7 +201,7 @@ router.put('/app-download', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-router.post('/app-download/upload', requireAuth, requireAdmin, apkUpload.single('apk'), async (req, res) => {
+router.post('/app-download/upload', requireAuth, requireAdmin, handleApkUpload, async (req, res) => {
   try {
     const file = req.file;
     if (!file) {

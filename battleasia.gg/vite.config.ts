@@ -46,6 +46,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const PORT = Number(env.VITE_PORT) || 8081;
   const isProduction = mode === 'production';
+  const skipChecker = env.SKIP_CHECKER === 'true';
 
   return {
     // Base public path - use CDN origin in production when VITE_CDN_URL is set
@@ -53,18 +54,22 @@ export default defineConfig(({ mode }) => {
     plugins: [
       react(),
       chunkErrorRetryPlugin(),
-      checker({
-        typescript: true,
-        eslint: {
-          useFlatConfig: true,
-          lintCommand: 'eslint "./src/**/*.{js,jsx,ts,tsx}"',
-          dev: { logLevel: ['error'] },
-        },
-        overlay: {
-          position: 'tl',
-          initialIsOpen: false,
-        },
-      }),
+      ...(!skipChecker
+        ? [
+            checker({
+              typescript: true,
+              eslint: {
+                useFlatConfig: true,
+                lintCommand: 'eslint "./src/**/*.{js,jsx,ts,tsx}"',
+                dev: { logLevel: ['error'] },
+              },
+              overlay: {
+                position: 'tl',
+                initialIsOpen: false,
+              },
+            }),
+          ]
+        : []),
     ],
     resolve: {
       alias: [
@@ -216,6 +221,10 @@ export default defineConfig(({ mode }) => {
       host: true,
       proxy: {
         '/api': {
+          target: env.VITE_SERVER_URL || 'http://localhost:5050',
+          changeOrigin: true,
+        },
+        '/uploads': {
           target: env.VITE_SERVER_URL || 'http://localhost:5050',
           changeOrigin: true,
         },

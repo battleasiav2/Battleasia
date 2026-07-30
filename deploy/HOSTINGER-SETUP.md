@@ -1,30 +1,30 @@
-# BattleAsia — Hostinger Setup (battleasia.gg)
+# BattleAsia — Hostinger Setup (single domain: battleasia.gg)
 
-One git repo, **domain-named folders**, no duplicate `hosting/` layout.
+One git repo, **one domain**, path-based apps:
 
-## Folder → Hostinger mapping
+| Path | App |
+|------|-----|
+| `https://battleasia.gg/` | Player site |
+| `https://battleasia.gg/store/` | Coin shop |
+| `https://battleasia.gg/admin/` | Admin panel |
+| `https://battleasia.gg/api/` | Node.js API (proxy to port 5050) |
 
-| Git folder | Live URL | Hostinger path |
-|------------|----------|----------------|
-| `battleasia.gg/dist/` | https://battleasia.gg | `~/domains/battleasia.gg/public_html/` |
-| `shop.battleasia.gg/dist/` | https://shop.battleasia.gg | `~/domains/shop.battleasia.gg/public_html/` |
-| `admin.battleasia.gg/build/` | https://admin.battleasia.gg | `~/domains/admin.battleasia.gg/public_html/` |
-| `api/` | https://battleasia.gg/api/ | `~/api/` |
+Build output: `deploy/output/public_html/` → upload to `~/domains/battleasia.gg/public_html/`
 
-## 1. hPanel — DNS & subdomains
+## 1. hPanel — DNS
 
 1. Point **battleasia.gg** nameservers to Hostinger.
-2. Create subdomains: `shop`, `admin`.
-3. Enable SSL for all four hostnames.
+2. Enable SSL for `battleasia.gg` and `www.battleasia.gg`.
+3. **No shop/admin subdomains needed** for this layout.
 
-## 2. MongoDB
+## 2. MongoDB & API env
 
 hPanel → Databases → MongoDB → create DB + user → copy connection string into `~/api/.env`:
 
 ```env
 MONGODB_URI=mongodb://USER:PASS@HOST:27017/battleasia?authSource=admin
 APP_URL=https://battleasia.gg
-CORS_ORIGINS=https://battleasia.gg,https://www.battleasia.gg,https://shop.battleasia.gg,https://admin.battleasia.gg
+CORS_ORIGINS=https://battleasia.gg,https://www.battleasia.gg
 JWT_SECRET=your-64-char-secret
 ADMIN_EMAIL=admin@battleasia.gg
 ADMIN_PASSWORD=strong-password
@@ -52,9 +52,7 @@ npm run build
 
 Upload:
 
-- `battleasia.gg/dist/*` → main public_html
-- `shop.battleasia.gg/dist/*` → shop public_html
-- `admin.battleasia.gg/build/*` → admin public_html
+- `deploy/output/public_html/*` → `~/domains/battleasia.gg/public_html/`
 - `api/dist/` + `api/package.json` → `~/api/`
 
 ## 5. Seed demo data (once)
@@ -72,11 +70,11 @@ Demo player: `player@battleasia.local` / `Player@123456`
 
 Add secrets: `HOSTINGER_SSH_HOST`, `HOSTINGER_SSH_USER`, `HOSTINGER_SSH_KEY`
 
-Push to `main` → runs `deploy/deploy.sh` on server.
+Push to `main` on [battleasiav2/Battleasia](https://github.com/battleasiav2/Battleasia) → runs `deploy/deploy.sh` on server.
 
 ## 7. `.htaccess`
 
-Built into each dist folder by `deploy/build.ps1`. Templates: `deploy/htaccess/`.
+Included in `deploy/output/public_html/.htaccess` by the build scripts.
 
 Uncomment proxy rules if your plan supports LiteSpeed `[P]` to Node on port 5050.
 
@@ -87,9 +85,17 @@ npm run install:all
 npm run dev
 ```
 
-| App | Folder | Port |
-|-----|--------|------|
-| Player | `battleasia.gg/` | 8081 |
-| Shop | `shop.battleasia.gg/` | 8082 |
-| Admin | `admin.battleasia.gg/` | 3000 |
-| API | `api/` | 5050 |
+Open **http://localhost:8080** (unified proxy):
+
+| Path | Port |
+|------|------|
+| `/` | 8081 (player) |
+| `/store/` | 8082 (shop) |
+| `/admin/` | 3000 (admin) |
+| `/api/` | 5050 (API) |
+
+Optional hosts file (legacy multi-host dev still works via proxy):
+
+```
+127.0.0.1 battleasia.local shop.battleasia.local admin.battleasia.local
+```

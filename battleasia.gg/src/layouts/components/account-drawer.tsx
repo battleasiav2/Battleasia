@@ -23,6 +23,8 @@ import { getImageUrl } from 'src/utils/get-image-url';
 import { useSelector } from 'src/store';
 import { useTranslate } from 'src/locales';
 
+import { useAppDownload } from 'src/hooks/use-app-download';
+
 import { Iconify } from 'src/components/iconify';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { Scrollbar } from 'src/components/scrollbar';
@@ -62,6 +64,7 @@ type MenuCardProps = {
   showChevron?: boolean;
   chevronDown?: boolean;
   nested?: boolean;
+  downloadFileName?: string;
 };
 
 function MenuCard({
@@ -73,6 +76,7 @@ function MenuCard({
   showChevron = false,
   chevronDown = false,
   nested = false,
+  downloadFileName,
 }: MenuCardProps) {
   const content = (
     <>
@@ -139,6 +143,14 @@ function MenuCard({
     })
   );
 
+  if (href && downloadFileName) {
+    return (
+      <Box component="a" href={href} download={downloadFileName} sx={cardSx}>
+        {content}
+      </Box>
+    );
+  }
+
   if (href) {
     return (
       <Box component={RouterLink} href={href} sx={cardSx}>
@@ -157,6 +169,7 @@ function MenuCard({
 export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
   const pathname = usePathname();
   const { t } = useTranslate();
+  const appDownload = useAppDownload();
 
   const storeUser = useSelector((state) => state.auth.user);
 
@@ -286,6 +299,17 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
           </Box>
         );
       })}
+
+      {appDownload.enabled && appDownload.href ? (
+        <Box onClick={onClose}>
+          <MenuCard
+            label={t('navigation.downloadApk')}
+            icon={<Iconify icon="solar:download-bold-duotone" />}
+            href={appDownload.href}
+            downloadFileName={appDownload.fileName}
+          />
+        </Box>
+      ) : null}
     </Stack>
   );
 

@@ -70,6 +70,11 @@ export default function JwtLoginView() {
                 setOtpStep(true);
                 return;
             }
+            if (res?.data?.session?.accessToken) {
+                dispatch(loginAction(res.data));
+                router.push(returnTo || PATH_AFTER_LOGIN);
+                return;
+            }
             setErrorMsg('Login failed. Please check your email and password.');
         } catch (error: any) {
             setErrorMsg(error?.response?.data?.message || error?.message || 'Login failed.');

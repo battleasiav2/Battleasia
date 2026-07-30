@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 
@@ -18,7 +19,6 @@ class PlayTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Responsive font size
     final responsiveFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
       baseSize: 16.0,
@@ -26,30 +26,16 @@ class PlayTabs extends StatelessWidget {
       max: 18.0,
     );
     final tabFontSize = fontSize ?? responsiveFontSize;
-    
-    // Responsive padding
+
     final verticalPadding = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 16.0,
     ).clamp(12.0, 20.0);
-    
-    // Responsive border widths
-    final bottomBorderWidth = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 1.0,
-    ).clamp(0.5, 1.5);
-    final activeBorderWidth = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 2.0,
-    ).clamp(1.5, 3.0);
 
     return Container(
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-            color: AppTheme.textSecondary.withOpacity(0.2),
-            width: bottomBorderWidth,
-          ),
+          bottom: BorderSide(color: AppColors.border(0.12)),
         ),
       ),
       child: Row(
@@ -58,16 +44,16 @@ class PlayTabs extends StatelessWidget {
           return Expanded(
             child: InkWell(
               onTap: () => onTabChanged(tab['value']!),
-              child: Container(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 180),
                 padding: EdgeInsets.symmetric(vertical: verticalPadding),
                 decoration: BoxDecoration(
-                  color: isActive ? AppTheme.surfaceColor : Colors.transparent,
+                  color: isActive
+                      ? AppColors.surfaceElevated.withValues(alpha: 0.6)
+                      : Colors.transparent,
                   border: isActive
-                      ? Border(
-                          bottom: BorderSide(
-                            color: AppTheme.accentColor,
-                            width: activeBorderWidth,
-                          ),
+                      ? const Border(
+                          bottom: BorderSide(color: AppColors.gold, width: 2),
                         )
                       : null,
                 ),
@@ -75,10 +61,8 @@ class PlayTabs extends StatelessWidget {
                   tab['label'] ?? '',
                   textAlign: TextAlign.center,
                   style: AppTheme.bodyLarge.copyWith(
-                    color: isActive
-                        ? AppTheme.textPrimary
-                        : AppTheme.textSecondary,
-                    fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                    color: isActive ? AppColors.gold : AppColors.textMuted,
+                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
                     fontSize: tabFontSize,
                   ),
                 ),

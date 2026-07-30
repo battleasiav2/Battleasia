@@ -171,6 +171,93 @@ class FeedService {
     }
   }
 
+  /// Get explore hub data
+  Future<Map<String, dynamic>> getExplore({int page = 1, int limit = 20}) async {
+    try {
+      final headers = await _getHeaders();
+      final uri = Uri.parse('$_baseUrl/api/v2/feed/explore').replace(
+        queryParameters: {'page': '$page', 'limit': '$limit'},
+      );
+      final response = await ApiClient.get(uri, headers: headers);
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to load explore',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
+  /// Get saved feeds for current user
+  Future<Map<String, dynamic>> getSavedFeeds({
+    int page = 1,
+    int limit = 20,
+  }) async {
+    try {
+      final headers = await _getHeaders();
+      final uri = Uri.parse('$_baseUrl/api/v2/feed/saved/me').replace(
+        queryParameters: {'page': '$page', 'limit': '$limit'},
+      );
+      final response = await ApiClient.get(uri, headers: headers);
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to fetch saved posts',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
+  /// Toggle save on a feed post
+  Future<Map<String, dynamic>> toggleSaveFeed(String feedId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/feed/$feedId/save'),
+        headers: headers,
+      );
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to save post',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
   /// Get feed categories
   Future<Map<String, dynamic>> getFeedCategories() async {
     try {

@@ -238,4 +238,82 @@ class AuthService {
   Future<void> signOut() async {
     await clearAuth();
   }
+
+  Future<Map<String, dynamic>> _parseJsonResponse(http.Response response) async {
+    final body = response.body;
+    if (body.isEmpty) {
+      return {'success': false, 'message': 'Empty response from server'};
+    }
+    final data = jsonDecode(body) as Map<String, dynamic>;
+    final ok = response.statusCode >= 200 &&
+        response.statusCode < 300 &&
+        data['status'] == true;
+    return {
+      'success': ok,
+      'message': data['message'] as String? ??
+          (ok ? 'Success' : 'Request failed'),
+      ...data,
+    };
+  }
+
+  Future<Map<String, dynamic>> forgotPassword({required String email}) async {
+    try {
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/users/forgot-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email.trim()}),
+      );
+      return _parseJsonResponse(response);
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyResetCode({
+    required String email,
+    required String code,
+  }) async {
+    try {
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/users/verify-reset-code'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email.trim(), 'code': code.trim()}),
+      );
+      final parsed = await _parseJsonResponse(response);
+      parsed['codeValid'] = parsed['codeValid'] == true;
+      return parsed;
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/users/reset-password'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': email.trim(),
+          'code': code.trim(),
+          'newPassword': newPassword,
+        }),
+      );
+      return _parseJsonResponse(response);
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
 }

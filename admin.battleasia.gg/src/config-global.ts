@@ -6,7 +6,7 @@ import { paths } from 'src/routes/paths';
 
 export const HOST_API = process.env.REACT_APP_HOST_API;
 export const ASSETS_API = process.env.REACT_APP_ASSETS_API;
-export const API_URL = process.env.REACT_APP_API_URL;
+export const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5050';
 
 // ROOT PATH AFTER LOGIN SUCCESSFUL
 export const PATH_AFTER_LOGIN = paths.dashboard.root; // as '/dashboard'

@@ -1,11 +1,10 @@
 
 
-import { useEffect, useState } from 'react';
 import { Box, Stack, SvgIcon, Accordion, Typography, AccordionSummary, AccordionDetails } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
 import { useImagePreloader } from 'src/hooks';
-import useApi from 'src/hooks/use-api';
+import { useAppDownload } from 'src/hooks/use-app-download';
 
 import { Image } from 'src/components/image';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
@@ -109,34 +108,12 @@ const imagePaths = [HOME_IMAGE_PATHS.banner, HOME_IMAGE_PATHS.heroTitleLogo];
 
 export function HomeView() {
   const { t } = useTranslate();
-  const { getAppDownloadSettingsApi } = useApi();
-  const [apkDownload, setApkDownload] = useState({
-    enabled: false,
-    href: '',
-    fileName: 'BattleAsia.apk',
-  });
+  const appDownload = useAppDownload();
 
   useImagePreloader(imagePaths, {
     delay: 100,
     continueOnError: true,
   });
-
-  useEffect(() => {
-    getAppDownloadSettingsApi()
-      .then((response) => {
-        const data = response?.data?.data;
-        if (data?.enabled && data?.downloadUrl) {
-          setApkDownload({
-            enabled: true,
-            href: data.downloadUrl,
-            fileName: data.fileName || 'BattleAsia.apk',
-          });
-        }
-      })
-      .catch(() => {
-        // Keep download hidden until admin uploads APK.
-      });
-  }, [getAppDownloadSettingsApi]);
 
   const FAQ = [
     {
@@ -337,9 +314,9 @@ export function HomeView() {
         <HeroMeshButtons
           joinLabel={t('home.joinTournament')}
           downloadLabel={t('home.downloadApkButton')}
-          downloadHref={apkDownload.href}
-          downloadFileName={apkDownload.fileName}
-          showDownload={apkDownload.enabled}
+          downloadHref={appDownload.href}
+          downloadFileName={appDownload.fileName}
+          showDownload={appDownload.enabled}
         />
       </Stack>
 
