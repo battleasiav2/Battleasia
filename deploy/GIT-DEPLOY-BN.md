@@ -43,21 +43,63 @@ chmod +x deploy/webuzo-git-deploy.sh
 
 ---
 
-## ৪. Webuzo — প্রতিবার আপডেট (Git থেকে)
+## ৪. Webuzo — ম্যানুয়াল deploy
 
 ```bash
 /home/nixbazar/Battleasia/deploy/webuzo-git-deploy.sh
 ```
 
-অথবা cron (৫ মিনিট পর পর):
+---
+
+## ৫. Auto deploy cron (প্রতি ৫ মিনিট — GitHub push হলে auto live)
+
+**Webuzo SSH-তে একবার চালান:**
 
 ```bash
-*/5 * * * * /home/nixbazar/Battleasia/deploy/webuzo-git-deploy.sh >> /home/nixbazar/deploy.log 2>&1
+cd /home/nixbazar
+git clone https://github.com/battleasiav2/Battleasia.git   # না থাকলে
+cd Battleasia
+git pull origin main
+chmod +x deploy/install-webuzo-cron.sh deploy/webuzo-cron-deploy.sh deploy/webuzo-git-deploy.sh
+bash deploy/install-webuzo-cron.sh
+```
+
+**টেস্ট (এখনই deploy চালাতে):**
+
+```bash
+bash /home/nixbazar/Battleasia/deploy/webuzo-cron-deploy.sh
+tail -30 /home/nixbazar/logs/battleasia-deploy.log
+```
+
+**কী হয়:**
+
+| ধাপ | কাজ |
+|-----|-----|
+| প্রতি ৫ মিনিট | `git fetch` — GitHub-এ নতুন commit আছে কিনা |
+| নতুন commit থাকলে | build + `public_html` sync + API restart |
+| না থাকলে | `no new commits` লগ করে exit (হালকা) |
+| একসাথে ২টা run | lock file দিয়ে ব্লক |
+
+**Cron দেখতে / বন্ধ করতে:**
+
+```bash
+crontab -l
+crontab -e    # লাইন মুছলে auto deploy বন্ধ
+```
+
+**পুরো flow:**
+
+```
+Cursor edit → git push → GitHub
+                              ↓ (max 5 min)
+                    webuzo-cron-deploy.sh
+                              ↓
+                    battleasia.gg live
 ```
 
 ---
 
-## ৫. `.htaccess` API proxy
+## ৬. `.htaccess` API proxy
 
 `public_html/.htaccess`-এ uncomment:
 
