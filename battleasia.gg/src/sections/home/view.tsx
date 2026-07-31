@@ -213,9 +213,11 @@ export function HomeView() {
         sx={{
           position: 'absolute',
           zIndex: 2,
-          top: { xs: 76, sm: 92, md: '18%', lg: '20%' },
+          top: { xs: 64, sm: 76, md: 0 },
+          bottom: { xs: 96, sm: 116, md: 0 },
           left: { xs: 16, sm: 24, md: 'auto' },
           right: { xs: 16, sm: 24, md: '6%', lg: '7%' },
+          justifyContent: 'center',
           alignItems: { xs: 'center', md: 'flex-end' },
           textAlign: { xs: 'center', md: 'right' },
           maxWidth: { xs: 'calc(100% - 32px)', md: 560, lg: 600 },
@@ -971,6 +973,9 @@ export function HomeView() {
       sx={{
         bgcolor: '#000000',
         scrollSnapType: { xs: 'none', md: 'y proximity' },
+        // Slide-in sections sit translated on the X axis until they scroll into
+        // view; `clip` keeps that off-screen travel from widening the page.
+        overflowX: 'clip',
       }}
     >
       {sectionSlide}
