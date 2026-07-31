@@ -64,7 +64,10 @@ function walk(dir) {
 }
 
 function collectIconNames() {
-  const iconPattern = /icon=["'`{]([a-z0-9-]+:[a-z0-9-]+)/g;
+  // Matches any quoted "<known-prefix>:<name>" so JSX attributes, object properties,
+  // arrays and lookup maps are all picked up.
+  const prefixes = Object.keys(COLLECTIONS).join('|');
+  const iconPattern = new RegExp(`["'\`]((?:${prefixes}):[a-z0-9-]+)["'\`]`, 'g');
   const names = new Set(EXTRA_ICONS);
 
   for (const file of walk(srcDir)) {
