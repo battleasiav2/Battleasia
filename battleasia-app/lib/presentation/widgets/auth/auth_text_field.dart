@@ -9,7 +9,7 @@ class AuthTextField extends StatelessWidget {
   final bool obscureText;
   final TextInputType keyboardType;
   final Widget? suffix;
-  final Widget? suffix;
+  final Widget? prefix;
   final IconData? prefixIcon;
   final String? Function(String?)? validator;
   final int maxLines;
@@ -22,7 +22,7 @@ class AuthTextField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
     this.suffix,
-    this.suffix,
+    this.prefix,
     this.prefixIcon,
     this.validator,
     this.maxLines = 1,
@@ -65,9 +65,10 @@ class AuthTextField extends StatelessWidget {
               horizontal: 14,
               vertical: 14,
             ),
-            prefixIcon: prefixIcon != null
-                ? Icon(prefixIcon, color: AppColors.goldAccent, size: 20)
-                : null,
+            prefixIcon: prefix ??
+                (prefixIcon != null
+                    ? Icon(prefixIcon, color: AppColors.goldAccent, size: 20)
+                    : null),
             suffixIcon: suffix,
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(2),

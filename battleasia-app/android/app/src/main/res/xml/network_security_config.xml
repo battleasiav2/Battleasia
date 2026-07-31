@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
-    <!-- Trust system CAs for battleasia.net (production) -->
+    <!-- Trust system CAs for production -->
     <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">battleasia.gg</domain>
         <domain includeSubdomains="true">battleasia.net</domain>
         <trust-anchors>
             <certificates src="system" />

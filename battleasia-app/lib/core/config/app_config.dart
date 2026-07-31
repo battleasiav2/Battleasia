@@ -8,9 +8,26 @@ class AppConfig {
   /// Application name
   static const String appName = 'BattleAsia';
 
-  /// Server base URL — use .env; Android emulator: http://10.0.2.2:5050
-  static String get serverUrl =>
-      dotenv.env['API_BASE_URL'] ?? 'http://10.0.2.2:5050';
+  /// Live API. A build only talks to a dev machine when it is asked to, so an
+  /// APK that ships without (or with a stale) .env still reaches the domain.
+  static const String defaultServerUrl = 'https://battleasia.gg';
+
+  /// `--dart-define=API_BASE_URL=...` wins, then the bundled .env profile.
+  static const String _serverUrlOverride =
+      String.fromEnvironment('API_BASE_URL');
+
+  static String get serverUrl {
+    if (_serverUrlOverride.isNotEmpty) {
+      return _serverUrlOverride;
+    }
+
+    final fromEnv = dotenv.env['API_BASE_URL'];
+    if (fromEnv != null && fromEnv.isNotEmpty) {
+      return fromEnv;
+    }
+
+    return defaultServerUrl;
+  }
 
   /// Frontend site URL (referral links)
   static String get siteUrl =>

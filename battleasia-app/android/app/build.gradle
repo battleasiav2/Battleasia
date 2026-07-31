@@ -75,13 +75,13 @@ android {
     }
 
    signingConfigs {
-
-       
        release {
-           keyAlias keystoreProperties['keyAlias']
-           keyPassword keystoreProperties['keyPassword']
-           storeFile keystoreProperties['storeFile'] ? file("${rootProject.projectDir}/${keystoreProperties['storeFile']}") : null
-           storePassword keystoreProperties['storePassword']
+           if (keystorePropertiesFile.exists()) {
+               keyAlias keystoreProperties['keyAlias']
+               keyPassword keystoreProperties['keyPassword']
+               storeFile file("${rootProject.projectDir}/${keystoreProperties['storeFile']}")
+               storePassword keystoreProperties['storePassword']
+           }
        }
    }
 
@@ -100,7 +100,9 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-            signingConfig signingConfigs.release
+            // Side-loaded builds still have to install, so fall back to the debug
+            // key until android/key.properties provides a real release keystore.
+            signingConfig keystorePropertiesFile.exists() ? signingConfigs.release : signingConfigs.debug
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             // buildConfigField("String", 'GoogleClientId', prodGoogleClientId)
         }
