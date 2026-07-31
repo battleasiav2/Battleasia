@@ -22,6 +22,7 @@ import { useFileUpload } from 'src/hooks/use-file-upload';
 import FormProvider, { RHFSelect, RHFTextField, RHFUploadAvatar, RHFSwitch } from 'src/components/hook-form';
 import { IMatchData } from 'src/contexts/type';
 import { IMatchRow, IMatchStatus } from 'src/types';
+import { assetPath } from 'src/utils/asset-path';
 
 // ----------------------------------------------------------------------
 
@@ -474,7 +475,7 @@ export function MatchDialog({
                                 {selectedMap ? (
                                     <Box
                                         component="img"
-                                        src={`/assets/images/map/${selectedMap}.webp`}
+                                        src={assetPath(`/assets/images/map/${selectedMap}.webp`)}
                                         alt={selectedMap}
                                         sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                     />

@@ -7,6 +7,8 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 // theme
 import { bgBlur } from 'src/theme/css';
+// utils
+import { assetPath } from 'src/utils/asset-path';
 // hooks
 import { useOffSetTop } from 'src/hooks/use-off-set-top';
 import { useResponsive } from 'src/hooks/use-responsive';
@@ -61,7 +63,7 @@ export default function Header({ onOpenNav }: Props) {
 
       {!lgUp && (
         <IconButton onClick={onOpenNav}>
-          <SvgColor src="/assets/icons/navbar/ic_menu_item.svg" />
+          <SvgColor src={assetPath('/assets/icons/navbar/ic_menu_item.svg')} />
         </IconButton>
       )}
 

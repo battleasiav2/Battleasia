@@ -2,6 +2,8 @@
 import { alpha } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
 import ButtonBase from '@mui/material/ButtonBase';
+// utils
+import { assetPath } from 'src/utils/asset-path';
 //
 import SvgColor from '../../svg-color';
 
@@ -49,7 +51,9 @@ export default function BaseOptions({ icons, options, value, onChange }: Props) 
               },
             }}
           >
-            <SvgColor src={`/assets/icons/setting/ic_${index === 0 ? icons[0] : icons[1]}.svg`} />
+            <SvgColor
+              src={assetPath(`/assets/icons/setting/ic_${index === 0 ? icons[0] : icons[1]}.svg`)}
+            />
           </ButtonBase>
         );
       })}

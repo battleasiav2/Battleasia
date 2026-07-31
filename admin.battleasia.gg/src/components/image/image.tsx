@@ -3,6 +3,8 @@ import { LazyLoadImage } from 'react-lazy-load-image-component';
 // @mui
 import { alpha, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+// utils
+import { assetPath } from 'src/utils/asset-path';
 //
 import { getRatio } from './utils';
 import { ImageProps } from './types';
@@ -68,7 +70,9 @@ const Image = forwardRef<HTMLSpanElement, ImageProps>(
         effect={disabledEffect ? undefined : effect}
         useIntersectionObserver={useIntersectionObserver}
         wrapperClassName={wrapperClassName || 'component-image-wrapper'}
-        placeholderSrc={disabledEffect ? '/assets/transparent.png' : '/assets/placeholder.svg'}
+        placeholderSrc={
+          disabledEffect ? assetPath('/assets/transparent.png') : assetPath('/assets/placeholder.svg')
+        }
         //
         sx={{
           width: 1,

@@ -1,3 +1,5 @@
+import { assetPath } from 'src/utils/asset-path';
+//
 import { _mock } from './_mock';
 
 // ----------------------------------------------------------------------
@@ -159,9 +161,9 @@ export const _homePlans = [...Array(3)].map((_, index) => ({
     'Commercial applications',
   ],
   icons: [
-    '/assets/icons/platforms/ic_figma.svg',
-    '/assets/icons/platforms/ic_js.svg',
-    '/assets/icons/platforms/ic_ts.svg',
+    assetPath('/assets/icons/platforms/ic_figma.svg'),
+    assetPath('/assets/icons/platforms/ic_js.svg'),
+    assetPath('/assets/icons/platforms/ic_ts.svg'),
   ],
 }));
 

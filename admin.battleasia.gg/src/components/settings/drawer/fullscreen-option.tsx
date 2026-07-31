@@ -3,6 +3,8 @@ import { useState, useCallback } from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import ButtonBase from '@mui/material/ButtonBase';
+// utils
+import { assetPath } from 'src/utils/asset-path';
 //
 import SvgColor from '../../svg-color';
 
@@ -46,7 +48,9 @@ export default function FullScreenOption() {
         }}
       >
         <SvgColor
-          src={`/assets/icons/setting/${fullscreen ? 'ic_exit_full_screen' : 'ic_full_screen'}.svg`}
+          src={assetPath(
+            `/assets/icons/setting/${fullscreen ? 'ic_exit_full_screen' : 'ic_full_screen'}.svg`
+          )}
           sx={{ width: 16, height: 16, mr: 1 }}
         />
 

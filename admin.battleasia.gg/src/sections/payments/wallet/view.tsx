@@ -32,6 +32,7 @@ import { useSettingsContext } from 'src/components/settings';
 import useApi from 'src/hooks/use-api';
 import { usePermissions } from 'src/hooks/use-permissions';
 import { PERMISSIONS } from 'src/constants/permissions';
+import { assetPath } from 'src/utils/asset-path';
 
 type WalletStats = {
   totalBalance: number;
@@ -128,7 +129,7 @@ export default function WalletView() {
         const channels = channelsResponse.data.data.results.map((ch: any) => ({
           id: ch._id,
           name: ch.channel_name,
-          icon: ch.icon || '/assets/images/default-payment.webp',
+          icon: ch.icon || assetPath('/assets/images/default-payment.webp'),
           enabled: ch.enabled,
           description: ch.description || '',
         }));
@@ -142,7 +143,7 @@ export default function WalletView() {
           id: wallet._id,
           channel_id: wallet.channel_id?._id || wallet.channel_id,
           channel_name: wallet.channel_id?.channel_name || 'Unknown',
-          channel_icon: wallet.channel_id?.icon || '/assets/images/default-payment.webp',
+          channel_icon: wallet.channel_id?.icon || assetPath('/assets/images/default-payment.webp'),
           wallet_address: wallet.wallet_address,
           currency_type: wallet.currency_type,
           enabled: wallet.enabled,

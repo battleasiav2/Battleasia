@@ -2,6 +2,8 @@ import { memo } from 'react';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import Box, { BoxProps } from '@mui/material/Box';
+// utils
+import { assetPath } from 'src/utils/asset-path';
 //
 import BackgroundShape from './background-shape';
 
@@ -27,7 +29,12 @@ function MotivationIllustration({ ...other }: BoxProps) {
     >
       <BackgroundShape />
 
-      <image href="/assets/illustrations/characters/character_2.png" height="300" x="322" y="30" />
+      <image
+        href={assetPath('/assets/illustrations/characters/character_2.png')}
+        height="300"
+        x="322"
+        y="30"
+      />
 
       <path
         fill="url(#paint0_linear_1_43)"

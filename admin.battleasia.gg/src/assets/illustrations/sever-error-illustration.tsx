@@ -2,6 +2,8 @@ import { memo } from 'react';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import Box, { BoxProps } from '@mui/material/Box';
+// utils
+import { assetPath } from 'src/utils/asset-path';
 //
 import BackgroundShape from './background-shape';
 
@@ -31,7 +33,12 @@ function SeverErrorIllustration({ ...other }: BoxProps) {
     >
       <BackgroundShape />
 
-      <image href="/assets/illustrations/characters/character_8.png" height="300" x="340" y="30" />
+      <image
+        href={assetPath('/assets/illustrations/characters/character_8.png')}
+        height="300"
+        x="340"
+        y="30"
+      />
 
       <path
         fill={PRIMARY_MAIN}

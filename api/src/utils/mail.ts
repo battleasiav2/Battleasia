@@ -4,9 +4,12 @@ import {
   normalizeMailSettings,
   type MailSettings,
 } from '../models/AppSettings.js';
+import { env } from '../config/env.js';
 import { logAuthCode } from './auth-log.js';
 
 type AuthMailType = 'signup' | 'reset' | 'admin_login';
+
+let warnedMailDisabled = false;
 
 const MAIL_COPY: Record<AuthMailType, { subject: string; intro: string; ttl: string }> = {
   signup: {
@@ -26,9 +29,33 @@ const MAIL_COPY: Record<AuthMailType, { subject: string; intro: string; ttl: str
   },
 };
 
+function envMailSettings(): MailSettings | null {
+  const { mail } = env;
+  if (!mail.host || !mail.fromEmail) {
+    return null;
+  }
+
+  return {
+    enabled: true,
+    smtpHost: mail.host,
+    smtpPort: mail.port,
+    secure: mail.secure,
+    smtpUser: mail.user,
+    smtpPass: mail.pass,
+    fromName: mail.fromName,
+    fromEmail: mail.fromEmail,
+  };
+}
+
 async function loadMailSettings(): Promise<MailSettings> {
   const settings = await getAppSettings();
-  return normalizeMailSettings(settings.mail);
+  const fromDb = normalizeMailSettings(settings.mail);
+
+  if (fromDb.enabled && fromDb.smtpHost && fromDb.fromEmail) {
+    return fromDb;
+  }
+
+  return envMailSettings() ?? fromDb;
 }
 
 export async function sendAuthEmail(options: {
@@ -40,6 +67,13 @@ export async function sendAuthEmail(options: {
   const mail = await loadMailSettings();
 
   if (!mail.enabled || !mail.smtpHost || !mail.fromEmail) {
+    if (!warnedMailDisabled) {
+      warnedMailDisabled = true;
+      console.warn(
+        '[mail] SMTP is not configured — verification codes cannot be delivered. ' +
+          'Set it in Admin > Settings > Mail, or via SMTP_HOST / SMTP_USER / SMTP_PASS / MAIL_FROM.'
+      );
+    }
     return { sent: false, reason: 'mail_disabled' as const };
   }
 

@@ -42,12 +42,13 @@ import { API_URL } from 'src/config-global';
 import Image from 'src/components/image';
 import { ConfirmDialog } from 'src/components/custom-dialog';
 import { fCurrency } from 'src/utils/format-number';
+import { assetPath } from 'src/utils/asset-path';
 
 // Coin Icon Component
 const CoinIcon = ({ sx }: { sx?: any }) => (
     <Box
         component="img"
-        src="/assets/images/currency.webp"
+        src={assetPath('/assets/images/currency.webp')}
         alt="coin"
         sx={{
             width: '1em',

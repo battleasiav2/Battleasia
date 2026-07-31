@@ -14,6 +14,8 @@ import { useResponsive } from 'src/hooks/use-responsive';
 import { bgGradient } from 'src/theme/css';
 // components
 import Logo from 'src/components/logo';
+// utils
+import { assetPath } from 'src/utils/asset-path';
 
 // ----------------------------------------------------------------------
 
@@ -22,7 +24,7 @@ const METHODS = [
     id: 'jwt',
     label: 'Jwt',
     path: paths.auth.login,
-    icon: '/assets/icons/auth/ic_jwt.svg',
+    icon: assetPath('/assets/icons/auth/ic_jwt.svg'),
   },
 ];
 
@@ -76,7 +78,7 @@ export default function AuthClassicLayout({ children, image, title }: Props) {
             theme.palette.background.default,
             theme.palette.mode === 'light' ? 0.88 : 0.94
           ),
-          imgUrl: '/assets/background/overlay_2.webp',
+          imgUrl: assetPath('/assets/background/overlay_2.webp'),
         }),
       }}
     >
@@ -87,7 +89,7 @@ export default function AuthClassicLayout({ children, image, title }: Props) {
       <Box
         component="img"
         alt="auth"
-        src={image || '/assets/illustrations/illustration_dashboard.webp'}
+        src={image || assetPath('/assets/illustrations/illustration_dashboard.webp')}
         sx={{
           maxWidth: {
             xs: 480,

@@ -49,7 +49,19 @@ export const env = {
   syncAdminPassword: process.env.SYNC_ADMIN_PASSWORD === 'true',
   coingoMock: process.env.COINGO_MOCK === 'true' && !isProduction,
   logAuthCodes: process.env.LOG_AUTH_CODES === 'true',
-  adminLoginOtp: process.env.ADMIN_LOGIN_OTP !== 'false',
+  // Opt-in: e-mail delivery has to be configured before a second factor can be
+  // required, otherwise admins get locked out of the panel.
+  adminLoginOtp: process.env.ADMIN_LOGIN_OTP === 'true',
   appUrl: process.env.APP_URL || '',
   cdnUrl: process.env.CDN_URL || '',
+  // Fallback SMTP — used when mail settings are not filled in from the admin panel.
+  mail: {
+    host: process.env.SMTP_HOST || '',
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true',
+    user: process.env.SMTP_USER || '',
+    pass: process.env.SMTP_PASS || '',
+    fromName: process.env.MAIL_FROM_NAME || 'BattleAsia',
+    fromEmail: process.env.MAIL_FROM || process.env.SMTP_USER || '',
+  },
 };
