@@ -15,7 +15,7 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import { layoutClasses } from '../core/classes';
 import { NavToggleButton } from '../components/nav-toggle-button';
-import { USER_COLORS, brandPremiumSoftWordmarkSx } from './user-theme';
+import { USER_COLORS } from './user-theme';
 
 // ----------------------------------------------------------------------
 
@@ -61,13 +61,15 @@ export function UserNavVertical({
       />
       <Box sx={{ minWidth: 0 }}>
         <Typography
-          className="font-brand-gaming"
+          className="font-tr"
           sx={{
-            ...brandPremiumSoftWordmarkSx,
-            fontSize: isBengali ? 18 : 20,
+            fontSize: isBengali ? 24 : 28,
+            color: USER_COLORS.gold,
+            fontWeight: 700,
+            lineHeight: 1.05,
           }}
         >
-          BattleAsia
+          {t('common.brandName')}
         </Typography>
         <Typography
           sx={{

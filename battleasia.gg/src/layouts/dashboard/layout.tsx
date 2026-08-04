@@ -16,7 +16,7 @@ import { useSelector } from 'src/store';
 import { Logo } from 'src/components/logo';
 import { SiteScrollProgress } from 'src/components/animate';
 import { useSettingsContext } from 'src/components/settings';
-import { userGoldButtonSx, brandPremiumSoftWordmarkSx, brandVersionBadgeSx, brandVersionBadgeTextSx, getPremiumSoftHeaderSx } from 'src/layouts/user/user-theme';
+import { userGoldButtonSx } from 'src/layouts/user/user-theme';
 
 import { allLangs, useTranslate } from 'src/locales';
 import { layoutClasses } from '../core/classes';
@@ -89,9 +89,9 @@ export function DashboardLayout({
         sx: {
           alignItems: 'center',
           justifyContent: 'space-between',
-          minHeight: { xs: 64, md: 72 },
-          height: { xs: 64, md: 72 },
-          px: { xs: 1.5, sm: 2.5, md: 3 },
+          minHeight: { xs: 88, md: 108 },
+          height: { xs: 88, md: 108 },
+          px: { xs: 2, sm: 3, md: 4 },
           py: 0,
           ...(isNavVertical && { px: { [layoutQuery]: 4 } }),
           ...(isNavHorizontal && {
@@ -144,8 +144,8 @@ export function DashboardLayout({
         >
           <Logo
             sx={{
-              width: { xs: 44, sm: 48, md: 52 },
-              height: { xs: 44, sm: 48, md: 52 },
+              width: { xs: 72, sm: 86, md: 100 },
+              height: { xs: 72, sm: 86, md: 100 },
               flexShrink: 0,
             }}
           />
@@ -153,21 +153,43 @@ export function DashboardLayout({
             <Typography
               className="font-brand-gaming"
               sx={{
-                ...brandPremiumSoftWordmarkSx,
                 fontSize: isBengali
-                  ? { xs: 15, sm: 18, md: 22 }
-                  : { xs: 16, sm: 20, md: 24 },
+                  ? { xs: 16, sm: 20, md: 24 }
+                  : { xs: 18, sm: 22, md: 26 },
+                color: GOLD,
+                fontWeight: 800,
+                lineHeight: 1,
+                whiteSpace: 'nowrap',
+                background: `linear-gradient(180deg, #ffe08a 0%, ${GOLD} 48%, #d4a017 100%)`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                filter: `drop-shadow(0 0 14px ${alpha(GOLD, 0.5)}) drop-shadow(0 2px 6px rgba(0,0,0,0.85))`,
               }}
             >
               BattleAsia
             </Typography>
             <Box
               sx={{
-                ...brandVersionBadgeSx,
+                px: 0.9,
+                py: 0.35,
+                border: `1.5px solid ${alpha(GOLD, 0.75)}`,
+                bgcolor: alpha(GOLD, 0.08),
                 display: { xs: 'none', sm: 'inline-flex' },
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              <Typography className="font-tr" sx={brandVersionBadgeTextSx}>
+              <Typography
+                className="font-tr"
+                sx={{
+                  fontSize: 13,
+                  fontWeight: 800,
+                  letterSpacing: 0.8,
+                  color: GOLD,
+                  lineHeight: 1.2,
+                }}
+              >
                 2.0
               </Typography>
             </Box>
@@ -241,20 +263,20 @@ export function DashboardLayout({
       <HeaderSection
         disableOffset
         layoutQuery={layoutQuery}
-        disableElevation
-        position="fixed"
+        disableElevation={isNavVertical}
         {...slotProps?.header}
         slots={{ ...headerSlots, ...slotProps?.header?.slots }}
         slotProps={merge(headerSlotProps, slotProps?.header?.slotProps ?? {})}
         sx={{
-          ...getPremiumSoftHeaderSx(
-            isNavVertical
-              ? {
-                  xs: 8,
-                  [layoutQuery]: `calc(${isNavMini ? 'var(--layout-nav-mini-width)' : 'var(--layout-nav-vertical-width)'} + 12px)`,
-                }
-              : undefined
-          ),
+          bgcolor: alpha('#161618', 0.55),
+          backdropFilter: 'blur(0px)',
+          WebkitBackdropFilter: 'blur(0px)',
+          borderBottom: `2px solid ${alpha('#ffffff', 0.16)}`,
+          boxShadow: `
+            inset 0 1px 0 ${alpha('#ffffff', 0.04)},
+            0 0 0 1px ${alpha(GOLD, 0.2)},
+            0 8px 20px ${alpha('#000000', 0.22)}
+          `,
           ...slotProps?.header?.sx,
         }}
       />
@@ -303,8 +325,8 @@ export function DashboardLayout({
         cssVars={{
           ...dashboardLayoutVars(theme),
           ...navVars.layout,
-          '--layout-header-mobile-height': '72px',
-          '--layout-header-desktop-height': '84px',
+          '--layout-header-mobile-height': '88px',
+          '--layout-header-desktop-height': '108px',
           ...cssVars,
         }}
         sx={[
