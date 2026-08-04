@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 
 import {
   Box,
@@ -29,6 +29,45 @@ import axios from 'src/lib/axios';
 // ----------------------------------------------------------------------
 
 const GOLD = '#f5c518';
+const FAB_SIZE = 56;
+const POS_STORAGE_KEY = 'ba-support-chat-pos';
+const DRAG_THRESHOLD_PX = 8;
+
+type FabPos = { x: number; y: number };
+
+function getDefaultFabPos(): FabPos {
+  if (typeof window === 'undefined') return { x: 24, y: 24 };
+  const margin = window.innerWidth < 900 ? 16 : 28;
+  return {
+    x: window.innerWidth - FAB_SIZE - margin,
+    y: window.innerHeight - FAB_SIZE - margin,
+  };
+}
+
+function clampFabPos(pos: FabPos): FabPos {
+  if (typeof window === 'undefined') return pos;
+  const pad = 8;
+  return {
+    x: Math.min(Math.max(pad, pos.x), window.innerWidth - FAB_SIZE - pad),
+    y: Math.min(Math.max(pad, pos.y), window.innerHeight - FAB_SIZE - pad),
+  };
+}
+
+function loadFabPos(): FabPos {
+  if (typeof window === 'undefined') return getDefaultFabPos();
+  try {
+    const raw = window.localStorage.getItem(POS_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as FabPos;
+      if (typeof parsed?.x === 'number' && typeof parsed?.y === 'number') {
+        return clampFabPos(parsed);
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return getDefaultFabPos();
+}
 
 type LiveChatSocialLink = {
   label: string;
@@ -85,12 +124,39 @@ export function SupportChat() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [fabPos, setFabPos] = useState<FabPos>(getDefaultFabPos);
+  const [dragging, setDragging] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const dragRef = useRef<{
+    pointerId: number | null;
+    startX: number;
+    startY: number;
+    originX: number;
+    originY: number;
+    moved: boolean;
+  }>({
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    originX: 0,
+    originY: 0,
+    moved: false,
+  });
 
   const router = useRouter();
   const { t } = useTranslate();
   const api = useApi();
   const { isLoggedIn, user } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    setFabPos(loadFabPos());
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => setFabPos((prev) => clampFabPos(prev));
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const logoSrc = useMemo(
     () => resolveAsset(settings.logoUrl || settings.agentAvatar) || '/logo/logo.webp',
@@ -206,6 +272,72 @@ export function SupportChat() {
     setOpen((prev) => !prev);
   };
 
+  const handleFabPointerDown = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    if (event.button !== 0) return;
+    dragRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      originX: fabPos.x,
+      originY: fabPos.y,
+      moved: false,
+    };
+    setDragging(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
+  };
+
+  const handleFabPointerMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    const drag = dragRef.current;
+    if (drag.pointerId !== event.pointerId) return;
+
+    const dx = event.clientX - drag.startX;
+    const dy = event.clientY - drag.startY;
+    if (!drag.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD_PX) return;
+
+    drag.moved = true;
+    setFabPos(clampFabPos({ x: drag.originX + dx, y: drag.originY + dy }));
+  };
+
+  const finishFabDrag = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    const drag = dragRef.current;
+    if (drag.pointerId !== event.pointerId) return;
+
+    const wasDrag = drag.moved;
+    drag.pointerId = null;
+    setDragging(false);
+
+    try {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    } catch {
+      // already released
+    }
+
+    if (wasDrag) {
+      setFabPos((prev) => {
+        const next = clampFabPos(prev);
+        try {
+          window.localStorage.setItem(POS_STORAGE_KEY, JSON.stringify(next));
+        } catch {
+          // ignore
+        }
+        return next;
+      });
+      return;
+    }
+
+    handleToggle();
+  };
+
+  const openPanelUpward = typeof window !== 'undefined' ? fabPos.y > window.innerHeight * 0.45 : true;
+  const panelWidth =
+    typeof window !== 'undefined' ? Math.min(380, Math.max(280, window.innerWidth - 32)) : 380;
+  const fabRight = fabPos.x + FAB_SIZE;
+  const panelAbsLeft =
+    typeof window !== 'undefined'
+      ? Math.min(Math.max(8, fabRight - panelWidth), window.innerWidth - panelWidth - 8)
+      : fabPos.x + FAB_SIZE - panelWidth;
+  const panelLeftOffset = panelAbsLeft - fabPos.x;
+
   const handleSend = async () => {
     const body = message.trim();
     if (!body || sending) return;
@@ -273,16 +405,26 @@ export function SupportChat() {
     <Box
       sx={{
         position: 'fixed',
-        bottom: { xs: 16, md: 28 },
-        right: { xs: 16, md: 28 },
+        left: fabPos.x,
+        top: fabPos.y,
         zIndex: 1400,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-        gap: 1.5,
+        width: FAB_SIZE,
+        height: FAB_SIZE,
+        pointerEvents: 'none',
       }}
     >
-      <Collapse in={open} timeout={220} unmountOnExit>
+      <Collapse
+        in={open}
+        timeout={220}
+        unmountOnExit
+        sx={{
+          position: 'absolute',
+          pointerEvents: 'auto',
+          ...(openPanelUpward
+            ? { bottom: FAB_SIZE + 12, left: panelLeftOffset }
+            : { top: FAB_SIZE + 12, left: panelLeftOffset }),
+        }}
+      >
         <Paper
           elevation={0}
           sx={{
@@ -533,15 +675,26 @@ export function SupportChat() {
       </Collapse>
 
       <Fab
-        onClick={handleToggle}
+        onPointerDown={handleFabPointerDown}
+        onPointerMove={handleFabPointerMove}
+        onPointerUp={finishFabDrag}
+        onPointerCancel={finishFabDrag}
         aria-label="Open live chat"
+        title="Drag to move · Click to open"
         sx={{
-          width: 56,
-          height: 56,
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'auto',
+          width: FAB_SIZE,
+          height: FAB_SIZE,
+          cursor: dragging ? 'grabbing' : 'grab',
+          touchAction: 'none',
+          userSelect: 'none',
           bgcolor: alpha('#0a0a0a', 0.9),
           color: GOLD,
           border: `1px solid ${alpha(GOLD, 0.4)}`,
           boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
+          transition: dragging ? 'none' : 'background-color 0.2s ease, border-color 0.2s ease',
           '&:hover': {
             bgcolor: alpha(GOLD, 0.16),
             borderColor: alpha(GOLD, 0.55),
