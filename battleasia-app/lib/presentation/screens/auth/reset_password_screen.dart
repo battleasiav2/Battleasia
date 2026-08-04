@@ -5,7 +5,6 @@ import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_alert.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_form_shell.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_text_field.dart';
-import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   final String email;

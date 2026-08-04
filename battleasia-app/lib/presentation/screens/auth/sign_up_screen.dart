@@ -13,7 +13,6 @@ import 'package:battleasia_app/presentation/widgets/auth/auth_alert.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_form_shell.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_phone_field.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_text_field.dart';
-import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -187,7 +186,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       : null,
                   dropdownColor: AppColors.surfaceElevated,
                   style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
-                  decoration: const InputDecoration(hintText: 'Select server'),
+                  decoration: InputDecoration(
+                    hintText: 'Select server',
+                    filled: true,
+                    fillColor: const Color(0xFF1A1A1A),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 14,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: Colors.white.withValues(alpha: 0.08),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: AppColors.gold,
+                        width: 1.2,
+                      ),
+                    ),
+                  ),
                   items: AppConstants.gameServers
                       .map(
                         (server) => DropdownMenuItem<String>(
@@ -263,8 +283,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
               },
             ),
             const SizedBox(height: 24),
-            GoldButton(
+            AuthPrimaryButton(
               label: 'auth.createAccount'.tr(),
+              icon: Icons.person_add_alt_1_rounded,
               loading: authProvider.isLoading,
               onPressed: authProvider.isLoading ? null : _handleSignUp,
             ),

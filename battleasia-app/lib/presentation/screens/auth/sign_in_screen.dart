@@ -12,7 +12,6 @@ import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_alert.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_form_shell.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_text_field.dart';
-import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -151,9 +150,9 @@ class _SignInScreenState extends State<SignInScreen> {
               },
             ),
             const SizedBox(height: 22),
-            GoldButton(
+            AuthPrimaryButton(
               label: 'auth.signIn'.tr(),
-              icon: Icons.sports_martial_arts,
+              icon: Icons.login_rounded,
               loading: authProvider.isLoading,
               onPressed: authProvider.isLoading ? null : _handleSignIn,
             ),

@@ -5,7 +5,6 @@ import 'package:battleasia_app/presentation/screens/auth/reset_password_screen.d
 import 'package:battleasia_app/presentation/widgets/auth/auth_alert.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_form_shell.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_text_field.dart';
-import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -89,7 +88,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   v == null || !v.contains('@') ? 'Enter a valid email' : null,
             ),
             const SizedBox(height: 20),
-            GoldButton(
+            AuthPrimaryButton(
               label: 'Send reset code',
               loading: loading,
               onPressed: loading ? null : _submit,

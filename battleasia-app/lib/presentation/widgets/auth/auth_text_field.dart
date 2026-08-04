@@ -13,6 +13,8 @@ class AuthTextField extends StatelessWidget {
   final IconData? prefixIcon;
   final String? Function(String?)? validator;
   final int maxLines;
+  final TextInputAction? textInputAction;
+  final VoidCallback? onEditingComplete;
 
   const AuthTextField({
     super.key,
@@ -26,6 +28,8 @@ class AuthTextField extends StatelessWidget {
     this.prefixIcon,
     this.validator,
     this.maxLines = 1,
+    this.textInputAction,
+    this.onEditingComplete,
   });
 
   @override
@@ -36,10 +40,10 @@ class AuthTextField extends StatelessWidget {
         Text(
           label.toUpperCase(),
           style: AppTheme.bodySmall.copyWith(
-            color: AppColors.textPrimary.withValues(alpha: 0.82),
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.4,
-            fontSize: 12,
+            color: AppColors.textMuted,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
+            fontSize: 11,
           ),
         ),
         const SizedBox(height: 8),
@@ -49,42 +53,46 @@ class AuthTextField extends StatelessWidget {
           keyboardType: keyboardType,
           maxLines: maxLines,
           validator: validator,
+          textInputAction: textInputAction,
+          onEditingComplete: onEditingComplete,
           style: AppTheme.bodyMedium.copyWith(
             color: AppColors.textPrimary,
-            fontSize: 14,
+            fontSize: 15,
           ),
-          cursorColor: AppColors.goldAccent,
+          cursorColor: AppColors.gold,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: AppTheme.bodyMedium.copyWith(
-              color: Colors.white.withValues(alpha: 0.55),
+              color: Colors.white.withValues(alpha: 0.35),
+              fontSize: 14,
             ),
             filled: true,
-            fillColor: Colors.black.withValues(alpha: 0.5),
+            fillColor: const Color(0xFF1A1A1A),
+            isDense: true,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 14,
-              vertical: 14,
+              vertical: 15,
             ),
             prefixIcon: prefix ??
                 (prefixIcon != null
-                    ? Icon(prefixIcon, color: AppColors.goldAccent, size: 20)
+                    ? Icon(prefixIcon, color: AppColors.gold, size: 20)
                     : null),
             suffixIcon: suffix,
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(2),
-              borderSide: BorderSide(color: AppColors.border(0.22)),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(2),
-              borderSide: const BorderSide(color: AppColors.goldAccent),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(2),
-              borderSide: const BorderSide(color: AppColors.error),
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.gold, width: 1.2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(color: AppColors.error),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: AppColors.error, width: 1.2),
             ),
           ),
         ),

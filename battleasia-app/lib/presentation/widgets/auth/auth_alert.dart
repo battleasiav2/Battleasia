@@ -32,12 +32,12 @@ class AuthAlert extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.black.withValues(alpha: 0.45),
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: _color.withValues(alpha: 0.45)),
       ),
       child: Text(
         message,
-        style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
+        style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary, fontSize: 13),
       ),
     );
   }
