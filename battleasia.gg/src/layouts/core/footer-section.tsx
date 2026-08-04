@@ -14,7 +14,7 @@ const GOLD = '#f5c518';
 /** Trusted partner / affiliate domain pills */
 const FOOTER_PARTNERS = [
   { label: 'battleasia.com', href: 'https://battleasia.com', icon: '/logo/logo.webp' },
-  { label: 'baccoin.shop', href: 'https://baccoin.shop', icon: '/assets/images/coin.webp' },
+  { label: 'baccoin.shop', href: 'https://baccoin.shop', icon: '/assets/images/currency.webp' },
   { label: 'battleasia.net', href: 'https://battleasia.net', icon: '/logo/logo.webp' },
   { label: 'pubg.com', href: 'https://www.pubg.com', icon: '/assets/images/games/pubg-mobile.png' },
   { label: 'www.bkash.com', href: 'https://www.bkash.com', icon: '/assets/images/bkash.webp' },
