@@ -1,95 +1,109 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/app_utils.dart';
+import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
+import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
+import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
 class HeroBannerSection extends StatelessWidget {
   const HeroBannerSection({super.key});
 
+  void _joinTournament(BuildContext context) {
+    final authed = context.read<AuthProvider>().isAuthenticated;
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) =>
+            authed ? const PlayScreen() : const SignInScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenHeight = AppUtils.screenHeight(context);
-    final screenWidth = AppUtils.screenWidth(context);
     final isMobile = AppUtils.isMobile(context);
 
     return Container(
-      height: isMobile ? 500 : 892,
+      height: isMobile ? 520 : 720,
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Colors.black, Colors.grey.shade900],
-        ),
-        image: const DecorationImage(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
           image: AssetImage('assets/images/banner.webp'),
           fit: BoxFit.cover,
         ),
       ),
       child: Stack(
         children: [
-          // Text Overlay
-          Positioned(
-            top: screenHeight * 0.3,
-            right: isMobile ? 20 : screenWidth * 0.07,
-            child: Container(
-              constraints: BoxConstraints(maxWidth: isMobile ? 300 : 500),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "It's all about Gaming means BattleAsia",
-                    style: AppTheme.heading1.copyWith(
-                      fontSize: isMobile ? 32 : 58,
-                      shadows: AppUtils.getTextShadow(
-                        blurRadius: 4.0,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Win real cash via playing MOBILE tournaments for free. Get it now!',
-                    style: AppTheme.bodyLarge.copyWith(
-                      fontSize: isMobile ? 20 : 28,
-                      shadows: AppUtils.getTextShadow(
-                        blurRadius: 3.0,
-                        color: Colors.black87,
-                      ),
-                    ),
-                  ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withValues(alpha: 0.55),
+                  Colors.black.withValues(alpha: 0.25),
+                  Colors.black.withValues(alpha: 0.8),
                 ],
               ),
             ),
           ),
-
-          // Button at bottom
           Positioned(
-            bottom: 50,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Navigate to play/matches screen
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.accentColor,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 40 : 60,
-                    vertical: isMobile ? 16 : 20,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+            top: screenHeight * 0.18,
+            left: 20,
+            right: 20,
+            child: Column(
+              children: [
+                Text(
+                  'OFFICIAL PUBG ON MOBILE',
+                  textAlign: TextAlign.center,
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppColors.gold,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.6,
+                    fontSize: 11,
                   ),
                 ),
-                child: Text(
-                  'Get Started',
+                const SizedBox(height: 10),
+                Text(
+                  'BATTLE ASIA',
+                  textAlign: TextAlign.center,
+                  style: AppTheme.heading1.copyWith(
+                    fontSize: isMobile ? 36 : 56,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: 1,
+                    shadows: AppUtils.getTextShadow(
+                      blurRadius: 8,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Win real cash via playing MOBILE tournaments for free. Get it now!',
+                  textAlign: TextAlign.center,
                   style: AppTheme.bodyLarge.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    fontSize: isMobile ? 15 : 20,
+                    color: Colors.white.withValues(alpha: 0.9),
+                    shadows: AppUtils.getTextShadow(
+                      blurRadius: 4,
+                      color: Colors.black87,
+                    ),
                   ),
                 ),
-              ),
+              ],
+            ),
+          ),
+          Positioned(
+            bottom: 48,
+            left: 24,
+            right: 24,
+            child: GoldButton(
+              label: 'Join Tournament',
+              onPressed: () => _joinTournament(context),
             ),
           ),
         ],

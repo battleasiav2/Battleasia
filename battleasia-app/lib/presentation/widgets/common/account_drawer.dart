@@ -10,6 +10,7 @@ import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 import 'package:battleasia_app/presentation/screens/account/account_screen.dart';
+import 'package:battleasia_app/presentation/screens/home/home_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
@@ -307,6 +308,20 @@ class _AccountDrawerContent extends StatelessWidget {
                   // Menu items - Based on web menu-items-config.tsx
                   // Account (with children)
                   _buildExpandableAccountMenu(context),
+
+                  AccountMenuTile(
+                    icon: Icons.home_outlined,
+                    label: 'Home',
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HomeScreen(),
+                        ),
+                      );
+                    },
+                  ),
 
                   AccountMenuTile(
                     icon: Icons.sports_esports,

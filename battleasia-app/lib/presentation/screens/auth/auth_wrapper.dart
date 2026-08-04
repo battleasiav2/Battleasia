@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
-import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
+import 'package:battleasia_app/presentation/screens/home/home_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 
 class AuthWrapper extends StatelessWidget {
@@ -12,7 +12,6 @@ class AuthWrapper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
-        // Show loading while checking auth status
         if (authProvider.isLoading) {
           return const Scaffold(
             backgroundColor: AppColors.pageBg,
@@ -22,13 +21,13 @@ class AuthWrapper extends StatelessWidget {
           );
         }
 
-        // If authenticated, show play screen
+        // Logged-in users land on Play (product). Guests see marketing Home
+        // with live dashboard — same split as web /dashboard vs /user/play.
         if (authProvider.isAuthenticated) {
           return const PlayScreen();
         }
 
-        // If not authenticated, show sign in screen
-        return const SignInScreen();
+        return const HomeScreen();
       },
     );
   }

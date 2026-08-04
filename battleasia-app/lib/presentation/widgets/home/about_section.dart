@@ -67,7 +67,7 @@ class AboutSection extends StatelessWidget {
                   width: 200,
                   height: 2,
                   decoration: BoxDecoration(
-                    gradient: AppTheme.primaryGradient,
+                    gradient: AppTheme.accentGradient,
                     borderRadius: BorderRadius.circular(1),
                   ),
                 ),
