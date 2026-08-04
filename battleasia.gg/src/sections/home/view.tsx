@@ -198,8 +198,8 @@ export function HomeView() {
             height: 1,
             objectFit: 'cover',
             objectPosition: { xs: '50% 18%', sm: '48% 24%', md: '36% center', lg: '32% center' },
-            animation: `${heroKenBurns} 28s ease-in-out infinite`,
-            willChange: 'transform',
+            // Desktop-only slow drift — skip on phones (Ken Burns + parallax felt heavy)
+            animation: { xs: 'none', md: `${heroKenBurns} 36s ease-in-out infinite` },
             '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
           }}
         />
@@ -216,11 +216,14 @@ export function HomeView() {
           top: { xs: 64, sm: 76, md: 0 },
           bottom: { xs: 96, sm: 116, md: 0 },
           left: { xs: 16, sm: 24, md: 'auto' },
-          right: { xs: 16, sm: 24, md: '6%', lg: '7%' },
+          right: { xs: 16, sm: 24, md: 32, lg: 48 },
+          width: { xs: 'auto', md: 'min(480px, 46vw)' },
+          maxWidth: { xs: 'calc(100% - 32px)', md: 480 },
+          boxSizing: 'border-box',
+          overflow: 'hidden',
           justifyContent: 'center',
           alignItems: { xs: 'center', md: 'flex-end' },
           textAlign: { xs: 'center', md: 'right' },
-          maxWidth: { xs: 'calc(100% - 32px)', md: 560, lg: 600 },
         }}
       >
         <Typography
@@ -231,6 +234,7 @@ export function HomeView() {
             textTransform: 'uppercase',
             color: alpha('#f5c518', 0.92),
             textShadow: '0 1px 10px rgba(0,0,0,0.85)',
+            width: 1,
           }}
         >
           {t('common.brandTagline')}
@@ -240,14 +244,17 @@ export function HomeView() {
           sx={{
             position: 'relative',
             width: 1,
+            maxWidth: 1,
             display: 'flex',
             justifyContent: { xs: 'center', md: 'flex-end' },
+            overflow: 'hidden',
             '&::before': {
               content: '""',
               position: 'absolute',
-              inset: { xs: '-6px -10px', md: '-8px -12px' },
+              inset: { xs: '-4px -8px', md: '-6px -10px' },
               bgcolor: alpha('#000000', 0.28),
-              filter: 'blur(14px)',
+              // Soft shadow without live CSS filter blur (cheaper paint)
+              boxShadow: `0 0 28px 12px ${alpha('#000000', 0.35)}`,
               borderRadius: 0,
               zIndex: 0,
             },
@@ -263,14 +270,15 @@ export function HomeView() {
             sx={{
               position: 'relative',
               zIndex: 1,
-              width: { xs: 'min(100%, 300px)', sm: 340, md: 440, lg: 500 },
+              width: { xs: 'min(100%, 280px)', sm: 'min(100%, 340px)', md: '100%' },
+              maxWidth: { xs: 280, sm: 340, md: 420 },
               height: 'auto',
               display: 'block',
               objectFit: 'contain',
               objectPosition: { xs: 'center', md: 'right' },
               mixBlendMode: 'screen',
-              filter: 'drop-shadow(0 8px 28px rgba(0, 0, 0, 0.95)) drop-shadow(0 0 40px rgba(245, 197, 24, 0.14))',
-              animation: `${titleGlow} 4.5s ease-in-out infinite`,
+              filter: 'drop-shadow(0 6px 18px rgba(0, 0, 0, 0.9))',
+              // Static presence — no infinite title glow (was causing soft flicker)
               '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
             }}
           />
@@ -279,13 +287,14 @@ export function HomeView() {
         <Typography
           className="font-tr"
           sx={{
-            fontSize: { xs: 13, sm: 15, md: 18, lg: 20 },
+            fontSize: { xs: 13, sm: 15, md: 17, lg: 18 },
             color: alpha('#ffffff', 0.9),
             lineHeight: 1.4,
             textShadow: '0 2px 12px rgba(0, 0, 0, 0.9)',
             wordBreak: 'break-word',
-            overflowWrap: 'break-word',
-            maxWidth: { xs: 340, sm: 420, md: 480 },
+            overflowWrap: 'anywhere',
+            width: 1,
+            maxWidth: { xs: 340, sm: 400, md: '100%' },
             px: { xs: 0.5, md: 0 },
           }}
         >

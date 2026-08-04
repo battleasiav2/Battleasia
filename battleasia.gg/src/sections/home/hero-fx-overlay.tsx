@@ -145,6 +145,8 @@ export function HeroFxOverlay() {
         zIndex: 1,
         pointerEvents: 'none',
         overflow: 'hidden',
+        // Phones: skip continuous FX — biggest source of hero jank
+        display: { xs: 'none', md: 'block' },
         '@media (prefers-reduced-motion: reduce)': { display: 'none' },
       }}
     >
@@ -189,8 +191,8 @@ export function HeroFxOverlay() {
             ${alpha(GOLD, 0.12)} 50%,
             ${alpha('#ffffff', 0.05)} 65%,
             transparent 100%)`,
-          filter: 'blur(18px)',
-          animation: `${lightFlare} 14s ease-in-out infinite`,
+          filter: 'blur(10px)',
+          animation: `${lightFlare} 18s ease-in-out infinite`,
         }}
       />
 
@@ -198,27 +200,26 @@ export function HeroFxOverlay() {
       <Box
         sx={{
           position: 'absolute',
-          width: { xs: 180, md: 280 },
-          height: { xs: 180, md: 280 },
+          width: { xs: 180, md: 240 },
+          height: { xs: 180, md: 240 },
           top: '12%',
           left: '8%',
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha(GOLD, 0.22)} 0%, transparent 70%)`,
-          filter: 'blur(10px)',
-          animation: `${glowBreath} 5.5s ease-in-out infinite`,
+          background: `radial-gradient(circle, ${alpha(GOLD, 0.18)} 0%, transparent 70%)`,
+          // Avoid nested CSS filters (blur + animated opacity = expensive)
+          animation: `${glowBreath} 7s ease-in-out infinite`,
         }}
       />
       <Box
         sx={{
           position: 'absolute',
-          width: { xs: 160, md: 240 },
-          height: { xs: 160, md: 240 },
+          width: { xs: 160, md: 200 },
+          height: { xs: 160, md: 200 },
           bottom: '18%',
           right: '10%',
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha(CYAN, 0.16)} 0%, transparent 70%)`,
-          filter: 'blur(12px)',
-          animation: `${glowBreath} 7s ease-in-out infinite`,
+          background: `radial-gradient(circle, ${alpha(CYAN, 0.12)} 0%, transparent 70%)`,
+          animation: `${glowBreath} 9s ease-in-out infinite`,
           animationDelay: '1.5s',
         }}
       />
