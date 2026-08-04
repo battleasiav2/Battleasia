@@ -93,13 +93,13 @@ export function ShopArenaHero({
         position: 'relative',
         width: 'auto',
         mx: { xs: -2, sm: -3, md: -4 },
-        // Keep under header padding — negative pull was clipping the badge row
-        mt: { xs: -1, sm: -2, md: -3 },
+        // Mobile: no negative pull (header + overflow:clip was cutting the badge)
+        mt: { xs: 0, sm: -2, md: -3 },
         mb: { xs: 3, md: 4 },
-        minHeight: { xs: 460, sm: 500, md: 560 },
+        // Mobile grows past minHeight if needed; desktop keeps flex-end panel
+        minHeight: { xs: 380, sm: 500, md: 560 },
         display: 'flex',
-        alignItems: 'flex-end',
-        // Don't clip badge/title — media layers handle their own overflow
+        alignItems: { xs: 'stretch', sm: 'flex-end' },
         overflow: 'visible',
         bgcolor: '#000000',
         borderTop: `1px solid ${alpha(GOLD, 0.16)}`,
@@ -183,8 +183,8 @@ export function ShopArenaHero({
           zIndex: 3,
           width: 1,
           px: { xs: 3, sm: 4, md: 6 },
-          pt: { xs: 5, md: 5 },
-          pb: { xs: 4, md: 5 },
+          pt: { xs: 2.5, sm: 5, md: 5 },
+          pb: { xs: 3.5, md: 5 },
           maxWidth: { md: 760 },
         }}
       >
@@ -196,6 +196,7 @@ export function ShopArenaHero({
               letterSpacing: 1.8,
               textTransform: 'uppercase',
               color: alpha(GOLD, 0.92),
+              lineHeight: 1.3,
             }}
           >
             {badge}
@@ -207,14 +208,15 @@ export function ShopArenaHero({
             spacing={0.6}
             sx={{
               px: 1,
-              py: 0.4,
+              py: 0.45,
               border: `1px solid ${alpha(GOLD, 0.32)}`,
               bgcolor: alpha('#000000', 0.5),
               backdropFilter: 'blur(6px)',
+              flexShrink: 0,
             }}
           >
             <Iconify icon="solar:shield-check-bold" width={12} sx={{ color: GOLD }} />
-            <Typography sx={{ fontSize: 10, fontWeight: 800, letterSpacing: 1, color: '#ffffff' }}>
+            <Typography sx={{ fontSize: 10, fontWeight: 800, letterSpacing: 1, color: '#ffffff', lineHeight: 1.2 }}>
               {verifiedLabel}
             </Typography>
           </Stack>
@@ -223,9 +225,9 @@ export function ShopArenaHero({
         <Typography
           className="font-tr"
           sx={{
-            fontSize: { xs: 32, sm: 44, md: 58 },
+            fontSize: { xs: 28, sm: 44, md: 58 },
             fontWeight: 800,
-            lineHeight: 1.02,
+            lineHeight: 1.08,
             letterSpacing: { md: 0.5 },
             color: '#ffffff',
             textTransform: 'uppercase',
