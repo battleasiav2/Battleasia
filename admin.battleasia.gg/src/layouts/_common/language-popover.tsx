@@ -4,7 +4,7 @@ import { m } from 'framer-motion';
 import MenuItem from '@mui/material/MenuItem';
 import IconButton from '@mui/material/IconButton';
 // components
-import Iconify from 'src/components/iconify';
+import { FlagIcon } from 'src/components/flag-icon';
 import { varHover } from 'src/components/animate';
 import CustomPopover, { usePopover } from 'src/components/custom-popover';
 
@@ -14,27 +14,27 @@ export const allLangs = [
   {
     label: 'English',
     value: 'en',
-    icon: 'flagpack:gb-nir',
+    countryCode: 'GB',
   },
   {
     label: 'French',
     value: 'fr',
-    icon: 'flagpack:fr',
+    countryCode: 'FR',
   },
   {
     label: 'Vietnamese',
     value: 'vi',
-    icon: 'flagpack:vn',
+    countryCode: 'VN',
   },
   {
     label: 'Chinese',
     value: 'cn',
-    icon: 'flagpack:cn',
+    countryCode: 'CN',
   },
   {
     label: 'Arabic',
     value: 'ar',
-    icon: 'flagpack:sa',
+    countryCode: 'SA',
   },
 ];
 
@@ -63,7 +63,7 @@ export default function LanguagePopover() {
           }),
         }}
       >
-        <Iconify icon={currentLang.icon} sx={{ borderRadius: 0.65, width: 28 }} />
+        <FlagIcon code={currentLang.countryCode} sx={{ width: 28, height: 20, borderRadius: 0.65 }} />
       </IconButton>
 
       <CustomPopover open={popover.open} onClose={popover.onClose} sx={{ width: 160 }}>
@@ -73,7 +73,7 @@ export default function LanguagePopover() {
             selected={option.value === currentLang.value}
             onClick={handleChangeLang}
           >
-            <Iconify icon={option.icon} sx={{ borderRadius: 0.65, width: 28 }} />
+            <FlagIcon code={option.countryCode} sx={{ mr: 1, width: 28, height: 20, borderRadius: 0.65 }} />
 
             {option.label}
           </MenuItem>
