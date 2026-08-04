@@ -43,8 +43,6 @@ import { RouterLink } from 'src/routes/components';
 import { paths } from 'src/routes/paths';
 import { Logo } from 'src/components/logo';
 import {
-  getDefaultGlassTokens,
-  getGlassBadgeChipSx,
   getGoldTopLineShellSx,
 } from 'src/components/battle-glass-card';
 
@@ -503,7 +501,6 @@ export function FeedDetailView() {
     );
   }
 
-  const tokens = getDefaultGlassTokens();
   const coverUrl = getFeedCoverUrl(feed.coverUrl);
   const isOfficial = isOfficialAuthor(feed.author?.role?.name);
 
@@ -593,14 +590,32 @@ export function FeedDetailView() {
             </Typography>
           </Stack>
 
+          <IconButton
+            onClick={() => {
+              const url = window.location.href;
+              if (navigator.share) {
+                void navigator.share({ title: feed.title, url }).catch(() => undefined);
+              } else {
+                void navigator.clipboard.writeText(url);
+              }
+            }}
+            sx={{
+              ...feedIconButtonSx,
+              color: USER_COLORS.textMuted,
+            }}
+            aria-label="Share"
+          >
+            <Iconify icon="solar:share-outline" width={22} />
+          </IconButton>
+
           <Box sx={{ flex: 1 }} />
 
-          <Box sx={getGlassBadgeChipSx(tokens)}>
-            <Stack direction="row" alignItems="center" spacing={0.5} sx={{ px: 0.5 }}>
-              <Iconify icon="solar:eye-outline" width={14} sx={{ color: USER_COLORS.textMuted }} />
-              <Typography sx={{ fontSize: 11, fontWeight: 700 }}>{feed.totalViews || 0} views</Typography>
-            </Stack>
-          </Box>
+          <Stack direction="row" alignItems="center" spacing={0.75}>
+            <Iconify icon="solar:eye-outline" width={22} sx={{ color: USER_COLORS.textMuted }} />
+            <Typography sx={{ color: USER_COLORS.textPrimary, fontWeight: 700 }}>
+              {feed.totalViews || 0}
+            </Typography>
+          </Stack>
         </Stack>
       </Box>
 
