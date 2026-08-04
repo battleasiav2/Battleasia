@@ -144,16 +144,41 @@ export function UserLayout({
                 </Alert>
             ),
             leftArea: (
-                <Logo sx={{
-                    width: { xs: 50, sm: 80 }, 
-                    height: { xs: 50, sm: 80 },
-                    display: { xs: 'flex', md: 'none' },
-                    mt: { xs: 2, sm: 4 },
-                    flexShrink: 0,
-                    "& img": {
-                        borderRadius: 0.5,
-                    }
-                }} />
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={{ xs: 1, sm: 1.25 }}
+                    sx={{
+                        display: { xs: 'flex', md: 'none' },
+                        flexShrink: 0,
+                        minWidth: 0,
+                    }}
+                >
+                    <Logo
+                        sx={{
+                            width: { xs: 40, sm: 48 },
+                            height: { xs: 40, sm: 48 },
+                            flexShrink: 0,
+                            '& img': { borderRadius: 0.5 },
+                        }}
+                    />
+                    <Typography
+                        component={RouterLink}
+                        href="/"
+                        sx={{
+                            fontSize: { xs: 14, sm: 16 },
+                            fontWeight: 800,
+                            letterSpacing: { xs: 0.8, sm: 1.2 },
+                            color: USER_COLORS.gold,
+                            textDecoration: 'none',
+                            whiteSpace: 'nowrap',
+                            lineHeight: 1,
+                            textShadow: `0 0 18px ${alpha(USER_COLORS.gold, 0.35)}`,
+                        }}
+                    >
+                        {t('home.playYourGame.brandLabel')}
+                    </Typography>
+                </Stack>
             ),
             centerArea: (
                 <Stack
@@ -271,12 +296,14 @@ export function UserLayout({
                             href={paths.auth.signIn}
                             sx={{
                                 ...userGoldButtonSx,
-                                height: { xs: 32, sm: 45, md: 53 },
-                                px: { xs: 2, sm: 3, md: 6.7 },
-                                fontSize: { xs: 14, sm: 16, md: 18 },
-                                fontWeight: 600,
+                                height: { xs: 34, sm: 42, md: 48 },
+                                px: { xs: 1.75, sm: 2.75, md: 4 },
+                                minWidth: { xs: 0, sm: 'auto' },
+                                fontSize: { xs: 11, sm: 13, md: 15 },
+                                fontWeight: 800,
+                                letterSpacing: 0.8,
                                 whiteSpace: 'nowrap',
-                                minWidth: 'auto',
+                                borderRadius: '6px',
                             }}
                         >
                             {t('auth.signIn')}
@@ -310,12 +337,28 @@ export function UserLayout({
                             : 'var(--layout-nav-vertical-width)',
                     },
                     width: 'auto',
-                    bgcolor: alpha('#000000', 0.88),
-                    borderBottom: `1px solid ${alpha('#ffffff', 0.1)}`,
-                    backdropFilter: 'blur(16px)',
-                    WebkitBackdropFilter: 'blur(16px)',
-                    pb: 1.5,
-                    pt: 1,
+                    minHeight: { xs: 56, sm: 64 },
+                    bgcolor: alpha('#000000', 0.78),
+                    borderBottom: 'none',
+                    backdropFilter: { xs: 'blur(10px)', md: 'blur(16px)' },
+                    WebkitBackdropFilter: { xs: 'blur(10px)', md: 'blur(16px)' },
+                    boxShadow: `
+                        inset 0 1px 0 ${alpha('#ffffff', 0.06)},
+                        0 8px 28px ${alpha('#000000', 0.35)}
+                    `,
+                    // Gold brand rail under the bar
+                    '&::after': {
+                        content: '""',
+                        position: 'absolute',
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        height: 1.5,
+                        background: `linear-gradient(90deg, transparent 0%, ${alpha(USER_COLORS.gold, 0.15)} 12%, ${USER_COLORS.gold} 50%, ${alpha(USER_COLORS.gold, 0.15)} 88%, transparent 100%)`,
+                        pointerEvents: 'none',
+                    },
+                    pb: { xs: 1, sm: 1.25 },
+                    pt: { xs: 1, sm: 1.25 },
                     ...slotProps?.header?.sx
                 }}
             />

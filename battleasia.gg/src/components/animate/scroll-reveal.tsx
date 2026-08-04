@@ -55,8 +55,8 @@ export const ScrollReveal = forwardRef<HTMLDivElement, ScrollRevealProps>((props
     direction = 'inUp',
     preset = 'soft',
     stagger = false,
-    amount = preset.startsWith('cinematic') ? 0.22 : 0.18,
-    distance = preset.startsWith('cinematic') ? 88 : 36,
+    amount = preset.startsWith('cinematic') ? 0.14 : 0.18,
+    distance = preset.startsWith('cinematic') ? 48 : 28,
     disabled = false,
     fullViewport = false,
     viewport,
@@ -98,7 +98,7 @@ export const ScrollReveal = forwardRef<HTMLDivElement, ScrollRevealProps>((props
       viewport={{
         once: true,
         amount,
-        margin: preset.startsWith('cinematic') ? '0px 0px -12% 0px' : '0px 0px -8% 0px',
+        margin: preset.startsWith('cinematic') ? '0px 0px -6% 0px' : '0px 0px -8% 0px',
         ...viewport,
       }}
       variants={resolvedVariants}

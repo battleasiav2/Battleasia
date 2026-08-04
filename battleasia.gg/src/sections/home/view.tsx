@@ -161,7 +161,7 @@ export function HomeView() {
   const sectionSlide = (
     <Box id="home" sx={{
       scrollMarginTop: { xs: '80px', md: '100px' },
-      height: { xs: 580, sm: 700, md: 860, lg: 920 },
+      height: { xs: 560, sm: 680, md: 860, lg: 920 },
       bgcolor: '#000000',
       position: 'relative',
       overflow: 'hidden',
@@ -170,7 +170,7 @@ export function HomeView() {
         position: 'absolute',
         inset: 0,
         background: {
-          xs: 'linear-gradient(180deg, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.18) 36%, rgba(0,0,0,0.22) 58%, rgba(0,0,0,0.82) 100%)',
+          xs: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.12) 32%, rgba(0,0,0,0.14) 62%, rgba(0,0,0,0.55) 100%)',
           md: 'linear-gradient(90deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.06) 38%, rgba(0,0,0,0.48) 66%, rgba(0,0,0,0.72) 100%)',
         },
         zIndex: 1,
@@ -179,12 +179,14 @@ export function HomeView() {
         content: "''",
         position: 'absolute',
         inset: 0,
-        background:
-          'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 28%, transparent 62%, rgba(0,0,0,0.55) 100%)',
+        background: {
+          xs: 'linear-gradient(180deg, rgba(0,0,0,0.28) 0%, transparent 24%, transparent 72%, rgba(0,0,0,0.35) 100%)',
+          md: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 28%, transparent 62%, rgba(0,0,0,0.55) 100%)',
+        },
         zIndex: 1,
       },
     }}>
-      {/* Full hero image with slow cinematic zoom + scroll parallax */}
+      {/* Full hero image — parallax desktop-only for smoother mobile scroll */}
       <ScrollParallax offset={120} scaleRange={[1.12, 1, 1.08]} sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         <Box
           component="img"
@@ -197,8 +199,7 @@ export function HomeView() {
             width: 1,
             height: 1,
             objectFit: 'cover',
-            objectPosition: { xs: '50% 18%', sm: '48% 24%', md: '36% center', lg: '32% center' },
-            // Desktop-only slow drift — skip on phones (Ken Burns + parallax felt heavy)
+            objectPosition: { xs: '50% 22%', sm: '48% 24%', md: '36% center', lg: '32% center' },
             animation: { xs: 'none', md: `${heroKenBurns} 36s ease-in-out infinite` },
             '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
           }}
@@ -207,21 +208,21 @@ export function HomeView() {
 
       <HeroFxOverlay />
 
-      {/* Logo + copy — top on mobile, upper-right on desktop */}
+      {/* Copy + mobile CTAs — mid-hero cluster (not stuck in the black fade) */}
       <Stack
         spacing={{ xs: 1, sm: 1.25, md: 1.5 }}
         sx={{
           position: 'absolute',
           zIndex: 2,
-          top: { xs: 64, sm: 76, md: 0 },
-          bottom: { xs: 96, sm: 116, md: 0 },
+          top: { xs: 72, sm: 84, md: 0 },
+          bottom: { xs: 28, sm: 40, md: 0 },
           left: { xs: 16, sm: 24, md: 'auto' },
           right: { xs: 16, sm: 24, md: 32, lg: 48 },
           width: { xs: 'auto', md: 'min(480px, 46vw)' },
           maxWidth: { xs: 'calc(100% - 32px)', md: 480 },
           boxSizing: 'border-box',
           overflow: 'hidden',
-          justifyContent: 'center',
+          justifyContent: { xs: 'center', md: 'center' },
           alignItems: { xs: 'center', md: 'flex-end' },
           textAlign: { xs: 'center', md: 'right' },
         }}
@@ -308,18 +309,30 @@ export function HomeView() {
             alignSelf: { xs: 'center', md: 'flex-end' },
           }}
         />
+
+        {/* Mobile: CTAs sit under the divider (higher, on the art — not in the black band) */}
+        <Box sx={{ display: { xs: 'block', md: 'none' }, width: 1, pt: { xs: 1.25, sm: 1.5 } }}>
+          <HeroMeshButtons
+            joinLabel={t('home.joinTournament')}
+            downloadLabel={t('home.downloadApkButton')}
+            downloadHref={appDownload.href}
+            downloadFileName={appDownload.fileName}
+            showDownload={appDownload.enabled}
+          />
+        </Box>
       </Stack>
 
-      {/* Both CTAs — always side-by-side on mobile + desktop */}
+      {/* Desktop CTAs — anchored lower */}
       <Stack
         sx={{
+          display: { xs: 'none', md: 'flex' },
           position: 'absolute',
           left: 0,
           right: 0,
-          bottom: { xs: 24, sm: 36, md: 52, lg: 60 },
+          bottom: { md: 52, lg: 60 },
           zIndex: 2,
           alignItems: 'center',
-          px: { xs: 2, sm: 3, md: 4 },
+          px: { md: 4 },
         }}
       >
         <HeroMeshButtons
@@ -337,8 +350,11 @@ export function HomeView() {
           bottom: 0,
           left: 0,
           right: 0,
-          height: { xs: 100, md: 80 },
-          background: 'linear-gradient(180deg, transparent, #000000)',
+          height: { xs: 40, md: 80 },
+          background: {
+            xs: 'linear-gradient(180deg, transparent, rgba(0,0,0,0.72))',
+            md: 'linear-gradient(180deg, transparent, #000000)',
+          },
           zIndex: 2,
           pointerEvents: 'none',
         }}
@@ -988,19 +1004,19 @@ export function HomeView() {
       }}
     >
       {sectionSlide}
-      <ScrollReveal preset="cinematic" fullViewport>
+      <ScrollReveal preset="cinematic" fullViewport distance={48} amount={0.15}>
         <LandingDashboardSection />
       </ScrollReveal>
-      <ScrollReveal preset="cinematic" fullViewport>
+      <ScrollReveal preset="cinematic" fullViewport distance={48} amount={0.15}>
         <PlayYourGameSection />
       </ScrollReveal>
-      <ScrollReveal preset="cinematic-slide-left" fullViewport>
+      <ScrollReveal preset="cinematic-slide-left" fullViewport distance={40} amount={0.12}>
         {sectionAbout}
       </ScrollReveal>
-      <ScrollReveal preset="cinematic-slide-right" fullViewport>
+      <ScrollReveal preset="cinematic-slide-right" fullViewport distance={40} amount={0.12}>
         {sectionHowToPlay}
       </ScrollReveal>
-      <ScrollReveal preset="cinematic" fullViewport>
+      <ScrollReveal preset="cinematic" fullViewport distance={48} amount={0.15}>
         {sectionRoules}
       </ScrollReveal>
     </Box>

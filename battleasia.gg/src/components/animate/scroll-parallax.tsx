@@ -5,6 +5,8 @@ import { useRef } from 'react';
 import { m, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 
 import Box from '@mui/material/Box';
+import { useMediaQuery } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 // ----------------------------------------------------------------------
 
@@ -12,11 +14,11 @@ type ScrollParallaxProps = BoxProps & {
   children: ReactNode;
   /** Vertical travel in px while section scrolls through viewport */
   offset?: number;
-  /** Scale range while scrolling [enter, exit] */
+  /** Scale range while scrolling [enter, mid, exit] */
   scaleRange?: [number, number, number];
 };
 
-/** Background / hero parallax — PUBG Mobile style depth on scroll */
+/** Background / hero parallax — desktop only (phones skip for smoother scroll) */
 export function ScrollParallax({
   children,
   offset = 100,
@@ -25,6 +27,8 @@ export function ScrollParallax({
   ...other
 }: ScrollParallaxProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const theme = useTheme();
+  const isDesktop = useMediaQuery(theme.breakpoints.up('md'), { defaultMatches: false });
   const reduceMotion = useReducedMotion();
 
   const { scrollYProgress } = useScroll({
@@ -35,9 +39,11 @@ export function ScrollParallax({
   const y = useTransform(scrollYProgress, [0, 1], [-offset * 0.35, offset * 0.65]);
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], scaleRange);
 
-  if (reduceMotion) {
+  const staticSx = [{ overflow: 'hidden' }, ...(Array.isArray(sx) ? sx : sx ? [sx] : [])];
+
+  if (reduceMotion || !isDesktop) {
     return (
-      <Box ref={ref} sx={[{ overflow: 'hidden' }, ...(Array.isArray(sx) ? sx : sx ? [sx] : [])]} {...other}>
+      <Box ref={ref} sx={staticSx} {...other}>
         {children}
       </Box>
     );
