@@ -156,30 +156,58 @@ export function UserLayout({
                 >
                     <Logo
                         sx={{
-                            width: { xs: 40, sm: 48 },
-                            height: { xs: 40, sm: 48 },
+                            width: { xs: 52, sm: 58 },
+                            height: { xs: 52, sm: 58 },
                             flexShrink: 0,
                             '& img': { borderRadius: 0.5 },
                         }}
                     />
-                    <Typography
-                        component={RouterLink}
-                        href="/"
-                        className="font-brand-gaming"
-                        sx={{
-                            fontSize: { xs: 13, sm: 15 },
-                            textDecoration: 'none',
-                            whiteSpace: 'nowrap',
-                            lineHeight: 1,
-                            background: `linear-gradient(180deg, #ffe08a 0%, ${USER_COLORS.gold} 48%, #d4a017 100%)`,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text',
-                            filter: `drop-shadow(0 0 12px ${alpha(USER_COLORS.gold, 0.4)})`,
-                        }}
-                    >
-                        {t('home.playYourGame.brandLabel')}
-                    </Typography>
+                    <Stack direction="row" alignItems="center" spacing={0.65} sx={{ minWidth: 0 }}>
+                        <Typography
+                            component={RouterLink}
+                            href="/"
+                            className="font-brand-gaming"
+                            sx={{
+                                fontSize: { xs: 16, sm: 18 },
+                                fontWeight: 800,
+                                textDecoration: 'none',
+                                whiteSpace: 'nowrap',
+                                lineHeight: 1,
+                                background: `linear-gradient(180deg, #ffe08a 0%, ${USER_COLORS.gold} 48%, #d4a017 100%)`,
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                                backgroundClip: 'text',
+                                filter: `drop-shadow(0 0 10px ${alpha(USER_COLORS.gold, 0.45)}) drop-shadow(0 1px 3px rgba(0,0,0,0.75))`,
+                            }}
+                        >
+                            BattleAsia
+                        </Typography>
+                        <Box
+                            sx={{
+                                px: 0.55,
+                                py: 0.15,
+                                borderRadius: '3px',
+                                border: `1px solid ${alpha(USER_COLORS.gold, 0.65)}`,
+                                bgcolor: alpha(USER_COLORS.gold, 0.08),
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                            }}
+                        >
+                            <Typography
+                                className="font-tr"
+                                sx={{
+                                    fontSize: 10,
+                                    fontWeight: 800,
+                                    letterSpacing: 0.5,
+                                    color: USER_COLORS.gold,
+                                    lineHeight: 1.2,
+                                }}
+                            >
+                                2.0
+                            </Typography>
+                        </Box>
+                    </Stack>
                 </Stack>
             ),
             centerArea: (
@@ -339,7 +367,7 @@ export function UserLayout({
                             : 'var(--layout-nav-vertical-width)',
                     },
                     width: 'auto',
-                    minHeight: { xs: 56, sm: 64 },
+                    minHeight: { xs: 64, sm: 68 },
                     bgcolor: alpha('#000000', 0.78),
                     borderBottom: 'none',
                     backdropFilter: { xs: 'blur(10px)', md: 'blur(16px)' },
@@ -359,8 +387,8 @@ export function UserLayout({
                         background: `linear-gradient(90deg, transparent 0%, ${alpha(USER_COLORS.gold, 0.15)} 12%, ${USER_COLORS.gold} 50%, ${alpha(USER_COLORS.gold, 0.15)} 88%, transparent 100%)`,
                         pointerEvents: 'none',
                     },
-                    pb: { xs: 1, sm: 1.25 },
-                    pt: { xs: 1, sm: 1.25 },
+                    pb: { xs: 0.75, sm: 1 },
+                    pt: { xs: 0.75, sm: 1 },
                     ...slotProps?.header?.sx
                 }}
             />

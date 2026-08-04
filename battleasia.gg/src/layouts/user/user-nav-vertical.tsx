@@ -54,26 +54,58 @@ export function UserNavVertical({
     >
       <Logo
         sx={{
-          width: { xs: 74, md: 92 },
-          height: { xs: 74, md: 92 },
+          width: { xs: 56, md: 64 },
+          height: { xs: 56, md: 64 },
           flexShrink: 0,
         }}
       />
       <Box sx={{ minWidth: 0 }}>
+        <Stack direction="row" alignItems="center" spacing={0.75}>
+          <Typography
+            className="font-brand-gaming"
+            sx={{
+              fontSize: isBengali ? { md: 18, lg: 20 } : { md: 20, lg: 22 },
+              fontWeight: 800,
+              lineHeight: 1,
+              whiteSpace: 'nowrap',
+              background: `linear-gradient(180deg, #ffe08a 0%, ${USER_COLORS.gold} 48%, #d4a017 100%)`,
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              filter: `drop-shadow(0 0 12px ${alpha(USER_COLORS.gold, 0.45)}) drop-shadow(0 1px 3px rgba(0,0,0,0.75))`,
+            }}
+          >
+            BattleAsia
+          </Typography>
+          <Box
+            sx={{
+              px: 0.65,
+              py: 0.2,
+              borderRadius: '3px',
+              border: `1px solid ${alpha(USER_COLORS.gold, 0.65)}`,
+              bgcolor: alpha(USER_COLORS.gold, 0.08),
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography
+              className="font-tr"
+              sx={{
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: 0.6,
+                color: USER_COLORS.gold,
+                lineHeight: 1.2,
+              }}
+            >
+              2.0
+            </Typography>
+          </Box>
+        </Stack>
         <Typography
-          className="font-tr"
           sx={{
-            fontSize: isBengali ? 24 : 28,
-            color: USER_COLORS.gold,
-            fontWeight: 700,
-            lineHeight: 1.05,
-          }}
-        >
-          {t('common.brandName')}
-        </Typography>
-        <Typography
-          sx={{
-            mt: 0.25,
+            mt: 0.5,
             fontSize: 10,
             fontWeight: 700,
             letterSpacing: 1.4,
@@ -120,7 +152,7 @@ export function UserNavVertical({
   const renderNavMini = () => (
     <>
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 2.5 }}>
-        <Logo sx={{ width: 44, height: 44 }} />
+        <Logo sx={{ width: 52, height: 52 }} />
       </Box>
 
       <NavSectionMini
