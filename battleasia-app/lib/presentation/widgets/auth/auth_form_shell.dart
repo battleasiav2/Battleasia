@@ -84,20 +84,17 @@ class _AuthFormShellState extends State<AuthFormShell> {
             SafeArea(
               child: Column(
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: _AuthHomeChip(
-                        onPressed: widget.onHome ??
-                            () {
-                              if (Navigator.of(context).canPop()) {
-                                Navigator.of(context).pop();
-                              }
-                            },
+                  if (Navigator.of(context).canPop())
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: _AuthHomeChip(
+                          onPressed: widget.onHome ??
+                              () => Navigator.of(context).pop(),
+                        ),
                       ),
                     ),
-                  ),
                   Expanded(
                     child: LayoutBuilder(
                       builder: (context, constraints) {

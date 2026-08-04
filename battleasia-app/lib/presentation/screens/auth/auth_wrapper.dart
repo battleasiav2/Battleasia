@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
-import 'package:battleasia_app/presentation/screens/home/home_screen.dart';
+import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 
 class AuthWrapper extends StatelessWidget {
@@ -21,13 +21,12 @@ class AuthWrapper extends StatelessWidget {
           );
         }
 
-        // Logged-in users land on Play (product). Guests see marketing Home
-        // with live dashboard — same split as web /dashboard vs /user/play.
+        // APK entry: logged-in → Play; guests → Sign In (no marketing Home).
         if (authProvider.isAuthenticated) {
           return const PlayScreen();
         }
 
-        return const HomeScreen();
+        return const SignInScreen();
       },
     );
   }
