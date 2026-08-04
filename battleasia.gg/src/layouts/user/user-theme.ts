@@ -284,6 +284,64 @@ export const userHeaderPillSx: SxProps<Theme> = {
   WebkitBackdropFilter: 'blur(12px)',
 };
 
+/** Style #4 Premium Soft — brand wordmark (Orbitron + soft gold) */
+export const brandPremiumSoftWordmarkSx: SxProps<Theme> = {
+  fontWeight: 800,
+  lineHeight: 1,
+  whiteSpace: 'nowrap',
+  background: `linear-gradient(175deg, #fff6d0 0%, #ffe08a 26%, ${USER_COLORS.gold} 52%, #c9a017 100%)`,
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  backgroundClip: 'text',
+  filter: `drop-shadow(0 0 10px ${alpha(USER_COLORS.gold, 0.28)}) drop-shadow(0 1px 3px rgba(0,0,0,0.55))`,
+};
+
+/** Style #4 — "2.0" badge (thin white outline) */
+export const brandVersionBadgeSx: SxProps<Theme> = {
+  px: 0.85,
+  py: 0.28,
+  border: `1px solid ${alpha('#ffffff', 0.88)}`,
+  bgcolor: 'transparent',
+  borderRadius: '3px',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+};
+
+export const brandVersionBadgeTextSx: SxProps<Theme> = {
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: 0.6,
+  color: '#ffffff',
+  lineHeight: 1.2,
+};
+
+/**
+ * Style #4 Premium Soft — floating glass capsule header chrome.
+ * Pass `insetLeft` when a vertical nav pushes the bar (e.g. `var(--layout-nav-vertical-width)`).
+ */
+export function getPremiumSoftHeaderSx(insetLeft?: string | Record<string, string | number>): SxProps<Theme> {
+  return {
+    top: { xs: 8, md: 12 },
+    right: { xs: 8, md: 16 },
+    left: insetLeft ?? { xs: 8, md: 16 },
+    width: 'auto',
+    borderRadius: { xs: '16px', md: '22px' },
+    bgcolor: alpha('#050505', 0.72),
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
+    border: `1px solid ${alpha('#ffffff', 0.12)}`,
+    borderBottom: `1px solid ${alpha('#ffffff', 0.12)}`,
+    boxShadow: `
+      inset 0 1px 0 ${alpha('#ffffff', 0.07)},
+      0 12px 40px ${alpha('#000000', 0.42)}
+    `,
+    overflow: 'hidden',
+    '&::after': { display: 'none' },
+  };
+}
+
 /** Scoped typography + form colors for dark user pages (light theme defaults are black text). */
 export function getUserLayoutMainSx(): SxProps<Theme> {
   return {

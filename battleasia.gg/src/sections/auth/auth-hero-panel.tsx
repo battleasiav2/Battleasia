@@ -6,6 +6,7 @@ import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { useTranslate } from 'src/locales/use-locales';
 import { GlassStatTile, getDefaultGlassTokens } from 'src/components/battle-glass-card';
 import { Iconify } from 'src/components/iconify';
+import { brandPremiumSoftWordmarkSx } from 'src/layouts/user/user-theme';
 
 // ----------------------------------------------------------------------
 
@@ -35,13 +36,11 @@ export function AuthHeroPanel() {
           {t('common.brandTagline')}
         </Typography>
         <Typography
-          className="font-tr"
+          className="font-brand-gaming"
           sx={{
-            fontSize: { md: 38, lg: 46 },
-            fontWeight: 800,
-            color: '#ffffff',
-            lineHeight: 1.08,
-            textShadow: '0 2px 16px rgba(0, 0, 0, 0.85)',
+            ...brandPremiumSoftWordmarkSx,
+            fontSize: { md: 34, lg: 42 },
+            whiteSpace: 'normal',
           }}
         >
           {t('home.title')}

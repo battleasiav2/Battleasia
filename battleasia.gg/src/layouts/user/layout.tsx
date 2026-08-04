@@ -28,7 +28,7 @@ import { UserNavVertical } from './user-nav-vertical';
 import { AccountDrawer } from '../components/account-drawer';
 import { NotificationsDrawer } from '../components/notifications-drawer';
 import { userLayoutVars, userBattleNavColorVars } from './css-vars';
-import { USER_COLORS, userGoldButtonSx, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
+import { USER_COLORS, userGoldButtonSx, userHeaderPillSx, getUserLayoutMainSx, brandPremiumSoftWordmarkSx, getPremiumSoftHeaderSx } from './user-theme';
 import { LanguagePopover } from '../components/language-popover';
 import { FloatingFooterNav } from '../components/floating-footer-nav';
 import { menuItems, accountMenuItems, createMenuClickHandler } from '../menu-items-config';
@@ -167,18 +167,12 @@ export function UserLayout({
                         href="/"
                         className="font-brand-gaming"
                         sx={{
-                            fontSize: { xs: 13, sm: 15 },
+                            ...brandPremiumSoftWordmarkSx,
+                            fontSize: { xs: 12, sm: 14 },
                             textDecoration: 'none',
-                            whiteSpace: 'nowrap',
-                            lineHeight: 1,
-                            background: `linear-gradient(180deg, #ffe08a 0%, ${USER_COLORS.gold} 48%, #d4a017 100%)`,
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                            backgroundClip: 'text',
-                            filter: `drop-shadow(0 0 12px ${alpha(USER_COLORS.gold, 0.4)})`,
                         }}
                     >
-                        {t('home.playYourGame.brandLabel')}
+                        BattleAsia
                     </Typography>
                 </Stack>
             ),
@@ -330,38 +324,18 @@ export function UserLayout({
                 slots={{ ...headerSlots, ...slotProps?.header?.slots }}
                 slotProps={merge(headerSlotProps, slotProps?.header?.slotProps ?? {})}
                 sx={{
-                    top: 0,
-                    right: 0,
-                    left: {
-                        xs: 0,
-                        [layoutQuery]: isNavMini
-                            ? 'var(--layout-nav-mini-width)'
-                            : 'var(--layout-nav-vertical-width)',
-                    },
-                    width: 'auto',
+                    ...getPremiumSoftHeaderSx(
+                        isNavVertical
+                            ? {
+                                  xs: 8,
+                                  [layoutQuery]: `calc(${isNavMini ? 'var(--layout-nav-mini-width)' : 'var(--layout-nav-vertical-width)'} + 12px)`,
+                              }
+                            : undefined
+                    ),
                     minHeight: { xs: 56, sm: 64 },
-                    bgcolor: alpha('#000000', 0.78),
-                    borderBottom: 'none',
-                    backdropFilter: { xs: 'blur(10px)', md: 'blur(16px)' },
-                    WebkitBackdropFilter: { xs: 'blur(10px)', md: 'blur(16px)' },
-                    boxShadow: `
-                        inset 0 1px 0 ${alpha('#ffffff', 0.06)},
-                        0 8px 28px ${alpha('#000000', 0.35)}
-                    `,
-                    // Gold brand rail under the bar
-                    '&::after': {
-                        content: '""',
-                        position: 'absolute',
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        height: 1.5,
-                        background: `linear-gradient(90deg, transparent 0%, ${alpha(USER_COLORS.gold, 0.15)} 12%, ${USER_COLORS.gold} 50%, ${alpha(USER_COLORS.gold, 0.15)} 88%, transparent 100%)`,
-                        pointerEvents: 'none',
-                    },
-                    pb: { xs: 1, sm: 1.25 },
-                    pt: { xs: 1, sm: 1.25 },
-                    ...slotProps?.header?.sx
+                    pb: { xs: 0.75, sm: 1 },
+                    pt: { xs: 0.75, sm: 1 },
+                    ...slotProps?.header?.sx,
                 }}
             />
         );

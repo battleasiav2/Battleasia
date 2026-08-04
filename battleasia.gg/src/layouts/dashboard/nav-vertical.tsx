@@ -14,6 +14,7 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import { layoutClasses } from '../core/classes';
 import { NavToggleButton } from '../components/nav-toggle-button';
+import { brandPremiumSoftWordmarkSx } from '../user/user-theme';
 
 // ----------------------------------------------------------------------
 
@@ -65,15 +66,13 @@ export function NavVertical({
                     />
                     <Box sx={{ minWidth: 0 }}>
                         <Typography
-                            className="font-tr"
+                            className="font-brand-gaming"
                             sx={{
-                                fontSize: isBengali ? { xs: 26, md: 30 } : { xs: 28, md: 30 },
-                                color: '#feab02',
-                                fontWeight: 700,
-                                lineHeight: 1.05,
+                                ...brandPremiumSoftWordmarkSx,
+                                fontSize: isBengali ? { xs: 18, md: 20 } : { xs: 18, md: 22 },
                             }}
                         >
-                            {t('common.brandName')}
+                            BattleAsia
                         </Typography>
                         <Typography
                             className="font-tr"

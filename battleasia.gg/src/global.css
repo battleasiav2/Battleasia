@@ -32,12 +32,12 @@
   font-family: inherit !important;
 }
 
-/** Header / lockup brand text only */
+/** Header / lockup brand text — Style #4 Premium Soft */
 .font-brand-gaming {
   font-family: 'Orbitron', 'Barlow', sans-serif !important;
   font-weight: 800 !important;
   font-style: italic;
-  letter-spacing: 0.08em !important;
+  letter-spacing: 0.1em !important;
   text-transform: uppercase;
 }
 
@@ -57,7 +57,7 @@ html {
 
 /** PUBG Mobile–style home scroll panels (desktop) */
 .home-scroll-story {
-  scroll-padding-top: 108px;
+  scroll-padding-top: 96px;
 }
 
 @media (min-width: 900px) {

@@ -8,6 +8,7 @@ import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { createMenuClickHandler } from '../menu-items-config';
 import { useRouter, usePathname } from 'src/routes/hooks';
 import { useTranslate } from 'src/locales/use-locales';
+import { brandPremiumSoftWordmarkSx } from '../user/user-theme';
 
 const GOLD = '#f5c518';
 
@@ -114,19 +115,14 @@ export function FooterSection() {
               <Typography
                 className="font-brand-gaming"
                 sx={{
+                  ...brandPremiumSoftWordmarkSx,
                   fontSize: isBengali
-                    ? { xs: 14, sm: 18, md: 20 }
-                    : { xs: 16, sm: 20, md: 22 },
-                  fontWeight: 800,
-                  lineHeight: 1.1,
-                  background: `linear-gradient(180deg, #ffe08a 0%, ${GOLD} 48%, #d4a017 100%)`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  filter: `drop-shadow(0 0 12px ${alpha(GOLD, 0.4)})`,
+                    ? { xs: 14, sm: 17, md: 19 }
+                    : { xs: 15, sm: 18, md: 20 },
+                  whiteSpace: 'normal',
                 }}
               >
-                {t('common.brandName')}
+                BattleAsia
               </Typography>
               <Typography
                 className="font-tr"
