@@ -28,6 +28,114 @@ class CustomerSupportService {
     };
   }
 
+  /// List the current user's support tickets.
+  Future<Map<String, dynamic>> getMyTickets({
+    int page = 1,
+    int limit = 50,
+    String? status,
+  }) async {
+    try {
+      final headers = await _getHeaders();
+      final queryParams = <String, String>{
+        'page': page.toString(),
+        'limit': limit.toString(),
+      };
+      if (status != null && status.isNotEmpty && status != 'all') {
+        queryParams['status'] = status;
+      }
+
+      final uri = Uri.parse(
+        '$_baseUrl/api/v2/customer-support/conversations/mine',
+      ).replace(queryParameters: queryParams);
+
+      final response = await ApiClient.get(uri, headers: headers);
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        final dataMap = data['data'] as Map<String, dynamic>? ?? {};
+        final results = dataMap['results'] as List? ?? [];
+        final tickets = results.map((item) {
+          final map = item is Map<String, dynamic>
+              ? item
+              : Map<String, dynamic>.from(item as Map);
+          return ConversationModel.fromJson(map);
+        }).toList();
+        return {
+          'success': true,
+          'data': {
+            'results': tickets,
+            'total': dataMap['total'] ?? tickets.length,
+          },
+        };
+      }
+
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to load tickets',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
+  /// Create a new support ticket (subject + category + first message).
+  Future<Map<String, dynamic>> createTicket({
+    required String subject,
+    required String category,
+    required String body,
+    List<String>? attachments,
+  }) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/customer-support/conversation'),
+        headers: headers,
+        body: jsonEncode({
+          'subject': subject,
+          'category': category,
+          'body': body,
+          if (attachments != null && attachments.isNotEmpty)
+            'attachments': attachments,
+        }),
+      );
+
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          data['status'] == true) {
+        return {
+          'success': true,
+          'data': ConversationModel.fromJson(
+            data['data'] is Map<String, dynamic>
+                ? data['data'] as Map<String, dynamic>
+                : {},
+          ),
+        };
+      }
+
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to create ticket',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
   /// Get or create conversation
   Future<Map<String, dynamic>> getOrCreateConversation() async {
     try {
@@ -209,36 +317,28 @@ class CustomerSupportService {
     }
   }
 
-  /// Upload files (for attachments)
-  /// Note: This uses the file upload endpoint from the backend
+  /// Upload files (for attachments). Always uses multi endpoint for consistent response.
   Future<Map<String, dynamic>> uploadFiles(
     List<String> filePaths, {
     String folder = 'support',
   }) async {
     try {
+      if (filePaths.isEmpty) {
+        return {'success': false, 'message': 'No files selected'};
+      }
+
       final headers = await _getMultipartHeaders();
-      final endpoint = filePaths.length == 1
-          ? '$_baseUrl/api/v1/files/upload/$folder'
-          : '$_baseUrl/api/v1/files/upload/$folder/multi';
       final request = http.MultipartRequest(
         'POST',
-        Uri.parse(endpoint),
+        Uri.parse('$_baseUrl/api/v1/files/upload/$folder/multi'),
       );
 
-      // Add authorization header
       if (headers.containsKey('Authorization')) {
         request.headers['Authorization'] = headers['Authorization']!;
       }
 
-      // Add files
-      if (filePaths.length == 1) {
-        final file = await http.MultipartFile.fromPath('file', filePaths.first);
-        request.files.add(file);
-      } else {
-        for (final filePath in filePaths) {
-          final file = await http.MultipartFile.fromPath('files', filePath);
-          request.files.add(file);
-        }
+      for (final filePath in filePaths) {
+        request.files.add(await http.MultipartFile.fromPath('files', filePath));
       }
 
       final streamedResponse = await ApiClient.send(request);
@@ -254,11 +354,21 @@ class CustomerSupportService {
       if ((response.statusCode == 200 || response.statusCode == 201) &&
           data['status'] == true) {
         final dataMap = data['data'] as Map<String, dynamic>? ?? {};
+        final fileUrls = <String>[];
+
         final files = dataMap['files'] as List? ?? [];
-        final fileUrls = files
-            .map((file) => (file as Map<String, dynamic>)['url']?.toString() ?? '')
-            .where((url) => url.isNotEmpty)
-            .toList();
+        for (final file in files) {
+          if (file is Map) {
+            final url = file['url']?.toString();
+            if (url != null && url.isNotEmpty) fileUrls.add(url);
+          }
+        }
+
+        // Fallback: single-upload shaped response
+        final single = dataMap['url']?.toString();
+        if (fileUrls.isEmpty && single != null && single.isNotEmpty) {
+          fileUrls.add(single);
+        }
 
         return {
           'success': true,

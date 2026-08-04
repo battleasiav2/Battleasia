@@ -1,33 +1,97 @@
 /// Customer Support Models
 /// Based on the backend API structure
 
+const kTicketCategories = ['payment', 'match', 'account', 'other'];
+
 class ConversationModel {
   final String id;
   final String userId;
   final String status;
+  final String subject;
+  final String category;
   final String? createdAt;
   final String? updatedAt;
   final String? closedAt;
+  final String? lastMessageAt;
+  final String? previewBody;
+  final List<String> previewAttachments;
+  final int attachmentCount;
 
   ConversationModel({
     required this.id,
     required this.userId,
     required this.status,
+    this.subject = 'Support Ticket',
+    this.category = 'other',
     this.createdAt,
     this.updatedAt,
     this.closedAt,
+    this.lastMessageAt,
+    this.previewBody,
+    this.previewAttachments = const [],
+    this.attachmentCount = 0,
   });
 
+  bool get isClosed => status.toLowerCase() == 'closed';
+
   factory ConversationModel.fromJson(Map<String, dynamic> json) {
+    String? getString(dynamic value) {
+      if (value == null) return null;
+      if (value is String) return value;
+      return value.toString();
+    }
+
+    final userIdRaw = json['userId'];
+    String userId = '';
+    if (userIdRaw is Map) {
+      userId = getString(userIdRaw['_id']) ?? getString(userIdRaw['id']) ?? '';
+    } else {
+      userId = getString(userIdRaw) ?? getString(json['user_id']) ?? '';
+    }
+
+    final previews = <String>[];
+    final rawPreviews = json['previewAttachments'];
+    if (rawPreviews is List) {
+      for (final e in rawPreviews) {
+        final s = getString(e);
+        if (s != null && s.isNotEmpty) previews.add(s);
+      }
+    }
+
     return ConversationModel(
-      id: json['id']?.toString() ?? '',
-      userId: json['userId']?.toString() ?? json['user_id']?.toString() ?? '',
-      status: json['status']?.toString() ?? 'open',
-      createdAt:
-          json['createdAt']?.toString() ?? json['created_at']?.toString(),
-      updatedAt:
-          json['updatedAt']?.toString() ?? json['updated_at']?.toString(),
-      closedAt: json['closedAt']?.toString() ?? json['closed_at']?.toString(),
+      id: getString(json['id']) ?? getString(json['_id']) ?? '',
+      userId: userId,
+      status: getString(json['status']) ?? 'open',
+      subject: getString(json['subject']) ?? 'Support Ticket',
+      category: getString(json['category']) ?? 'other',
+      createdAt: getString(json['createdAt']) ?? getString(json['created_at']),
+      updatedAt: getString(json['updatedAt']) ?? getString(json['updated_at']),
+      closedAt: getString(json['closedAt']) ?? getString(json['closed_at']),
+      lastMessageAt:
+          getString(json['lastMessageAt']) ?? getString(json['last_message_at']),
+      previewBody:
+          getString(json['previewBody']) ?? getString(json['preview_body']),
+      previewAttachments: previews,
+      attachmentCount: (json['attachmentCount'] as num?)?.toInt() ??
+          (json['attachment_count'] as num?)?.toInt() ??
+          previews.length,
+    );
+  }
+
+  ConversationModel copyWith({String? status}) {
+    return ConversationModel(
+      id: id,
+      userId: userId,
+      status: status ?? this.status,
+      subject: subject,
+      category: category,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      closedAt: closedAt,
+      lastMessageAt: lastMessageAt,
+      previewBody: previewBody,
+      previewAttachments: previewAttachments,
+      attachmentCount: attachmentCount,
     );
   }
 
@@ -36,9 +100,15 @@ class ConversationModel {
       'id': id,
       'userId': userId,
       'status': status,
+      'subject': subject,
+      'category': category,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
       'closedAt': closedAt,
+      'lastMessageAt': lastMessageAt,
+      'previewBody': previewBody,
+      'previewAttachments': previewAttachments,
+      'attachmentCount': attachmentCount,
     };
   }
 }
@@ -65,14 +135,12 @@ class MessageModel {
   });
 
   factory MessageModel.fromJson(Map<String, dynamic> json) {
-    // Helper to safely get string value
     String? getString(dynamic value) {
       if (value == null) return null;
       if (value is String) return value;
       return value.toString();
     }
 
-    // Helper to safely get bool value
     bool getBool(dynamic value, {bool defaultValue = false}) {
       if (value == null) return defaultValue;
       if (value is bool) return value;
@@ -88,8 +156,7 @@ class MessageModel {
       body: getString(json['body']) ?? '',
       senderId:
           getString(json['senderId']) ?? getString(json['sender_id']) ?? '',
-      senderName:
-          getString(json['senderName']) ??
+      senderName: getString(json['senderName']) ??
           getString(json['sender_name']) ??
           'Unknown',
       senderAvatar:
@@ -98,9 +165,9 @@ class MessageModel {
       createdAt: getString(json['createdAt']) ?? getString(json['created_at']),
       attachments: json['attachments'] != null && json['attachments'] is List
           ? (json['attachments'] as List)
-                .map((e) => getString(e) ?? '')
-                .where((e) => e.isNotEmpty)
-                .toList()
+              .map((e) => getString(e) ?? '')
+              .where((e) => e.isNotEmpty)
+              .toList()
           : [],
     );
   }

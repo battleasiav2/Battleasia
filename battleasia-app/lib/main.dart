@@ -32,7 +32,13 @@ void main() async {
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale('en'), Locale('bn')],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('bn'),
+        Locale('zh'),
+        Locale('hi'),
+        Locale('ur'),
+      ],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       child: const BattleAsiaApp(),

@@ -1,0 +1,73 @@
+{
+  "nav": {
+    "play": "玩",
+    "shop": "商店",
+    "referral": "推荐",
+    "feed": "动态",
+    "login": "登录"
+  },
+  "feedHub": {
+    "feed": "动态",
+    "explore": "发现",
+    "reels": "短视频",
+    "saved": "收藏",
+    "messages": "消息",
+    "searchHint": "搜索动态...",
+    "noFeeds": "暂无动态",
+    "noSaved": "还没有收藏",
+    "noReels": "暂无短视频",
+    "noConversations": "暂无会话",
+    "trendingPosts": "热门动态",
+    "trendingHashtags": "热门标签",
+    "recommendedCreators": "推荐创作者",
+    "shareSoon": "分享功能即将推出"
+  },
+  "auth": {
+    "signInTitle": "登录您的账户",
+    "signInDesc": "免费参加手机赛事赢取现金。",
+    "signUpTitle": "创建账户",
+    "signUpDesc": "加入赛事并开始赢取奖励。",
+    "dontHaveAccount": "没有账户？",
+    "alreadyHaveAccount": "已有账户？",
+    "signUp": "注册",
+    "signIn": "登录",
+    "email": "电子邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "inGameName": "游戏内用户名",
+    "mobileNo": "手机号码",
+    "pubgId": "PUBG ID",
+    "gameServer": "游戏服务器",
+    "createAccount": "创建账户",
+    "termsAgreement": "注册即表示我同意服务条款和隐私政策。",
+    "forgotPassword": "忘记密码？",
+    "emailPlaceholder": "Example@domain.com",
+    "passwordPlaceholder": "至少6个字符",
+    "emailRequired": "需要电子邮箱",
+    "emailInvalid": "请输入有效邮箱",
+    "passwordRequired": "需要密码",
+    "passwordMin": "密码至少6个字符"
+  },
+  "support": {
+    "title": "客户支持",
+    "newTicket": "新建",
+    "close": "关闭",
+    "closed": "此工单已关闭",
+    "noTickets": "暂无工单。点击新建创建。",
+    "submit": "提交工单",
+    "addAttachments": "添加附件",
+    "typeMessage": "输入消息..."
+  },
+  "wallet": {
+    "paymentChannel": "支付渠道",
+    "requestWithdrawal": "申请提现"
+  },
+  "common": {
+    "retry": "重试",
+    "loading": "加载中...",
+    "brandTagline": "OFFICIAL PUBG ON MOBILE"
+  },
+  "footer": {
+    "home": "首页"
+  }
+}

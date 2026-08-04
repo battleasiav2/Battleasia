@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/constants/withdrawal_channels.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/socket_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
@@ -195,11 +196,7 @@ class _WalletScreenState extends State<WalletScreen> {
     }
   }
 
-  static const List<Map<String, String>> _paymentOptions = [
-    {'value': 'bkash', 'label': 'BKash'},
-    {'value': 'nagad', 'label': 'Nagad'},
-    {'value': 'crypto', 'label': 'Crypto (USDT)'},
-  ];
+  static const List<WithdrawalChannel> _paymentOptions = kWithdrawalChannels;
 
   static const List<Map<String, String>> _currencyOptions = [
     {'value': 'BDT', 'label': 'Bangladeshi Taka (BDT)'},
@@ -643,8 +640,8 @@ class _WalletScreenState extends State<WalletScreen> {
                                 items: _paymentOptions
                                     .map(
                                       (p) => DropdownMenuItem<String>(
-                                        value: p['value'],
-                                        child: Text(p['label']!),
+                                        value: p.value,
+                                        child: Text('${p.label} (${p.currency})'),
                                       ),
                                     )
                                     .toList(),
@@ -652,8 +649,14 @@ class _WalletScreenState extends State<WalletScreen> {
                                     ? null
                                     : (v) {
                                         if (v != null) {
-                                          setModalState(() =>
-                                              selectedPaymentChannel = v);
+                                          final channel =
+                                              _paymentOptions.firstWhere(
+                                            (c) => c.value == v,
+                                          );
+                                          setModalState(() {
+                                            selectedPaymentChannel = v;
+                                            selectedCurrency = channel.currency;
+                                          });
                                         }
                                       },
                               ),

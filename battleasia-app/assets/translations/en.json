@@ -48,6 +48,20 @@
     "passwordRequired": "Password is required",
     "passwordMin": "Password must be at least 6 characters"
   },
+  "support": {
+    "title": "Customer Support",
+    "newTicket": "New",
+    "close": "Close",
+    "closed": "This ticket is closed",
+    "noTickets": "No tickets yet. Tap New to create one.",
+    "submit": "Submit ticket",
+    "addAttachments": "Add attachments",
+    "typeMessage": "Type your message..."
+  },
+  "wallet": {
+    "paymentChannel": "Payment Channel",
+    "requestWithdrawal": "Request Withdrawal"
+  },
   "common": {
     "retry": "Retry",
     "loading": "Loading...",

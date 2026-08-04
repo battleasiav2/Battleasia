@@ -48,6 +48,20 @@
     "passwordRequired": "পাসওয়ার্ড প্রয়োজন",
     "passwordMin": "পাসওয়ার্ড কমপক্ষে ৬ অক্ষর"
   },
+  "support": {
+    "title": "কাস্টমার সাপোর্ট",
+    "newTicket": "নতুন",
+    "close": "বন্ধ",
+    "closed": "এই টিকিট বন্ধ করা হয়েছে",
+    "noTickets": "এখনো কোনো টিকিট নেই। নতুন ট্যাপ করুন।",
+    "submit": "টিকিট জমা দিন",
+    "addAttachments": "অ্যাটাচমেন্ট যোগ করুন",
+    "typeMessage": "আপনার মেসেজ লিখুন..."
+  },
+  "wallet": {
+    "paymentChannel": "পেমেন্ট চ্যানেল",
+    "requestWithdrawal": "উইথড্রয়াল অনুরোধ"
+  },
   "common": {
     "retry": "আবার চেষ্টা",
     "loading": "লোড হচ্ছে...",

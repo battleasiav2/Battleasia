@@ -1,0 +1,73 @@
+{
+  "nav": {
+    "play": "खेलें",
+    "shop": "शॉप",
+    "referral": "रेफ़रल",
+    "feed": "फ़ीड",
+    "login": "लॉगिन"
+  },
+  "feedHub": {
+    "feed": "फ़ीड",
+    "explore": "एक्सप्लोर",
+    "reels": "रील्स",
+    "saved": "सेव्ड",
+    "messages": "संदेश",
+    "searchHint": "फ़ीड खोजें...",
+    "noFeeds": "कोई फ़ीड नहीं मिला",
+    "noSaved": "अभी कोई सेव्ड पोस्ट नहीं",
+    "noReels": "अभी कोई रील नहीं",
+    "noConversations": "अभी कोई बातचीत नहीं",
+    "trendingPosts": "ट्रेंडिंग पोस्ट",
+    "trendingHashtags": "ट्रेंडिंग हैशटैग",
+    "recommendedCreators": "सुझाए गए क्रिएटर",
+    "shareSoon": "शेयर सुविधा जल्द आ रही है"
+  },
+  "auth": {
+    "signInTitle": "अपने खाते में साइन इन करें",
+    "signInDesc": "मोबाइल टूर्नामेंट खेलकर असली इनाम जीतें।",
+    "signUpTitle": "अपना खाता बनाएं",
+    "signUpDesc": "टूर्नामेंट में शामिल हों और इनाम कमाना शुरू करें।",
+    "dontHaveAccount": "खाता नहीं है?",
+    "alreadyHaveAccount": "पहले से खाता है?",
+    "signUp": "साइन अप",
+    "signIn": "साइन इन",
+    "email": "ईमेल पता",
+    "password": "पासवर्ड",
+    "confirmPassword": "पासवर्ड की पुष्टि करें",
+    "inGameName": "इन-गेम यूज़रनेम",
+    "mobileNo": "मोबाइल नंबर",
+    "pubgId": "PUBG ID",
+    "gameServer": "गेम सर्वर",
+    "createAccount": "खाता बनाएं",
+    "termsAgreement": "साइन अप करके, मैं सेवा की शर्तों और गोपनीयता नीति से सहमत हूँ।",
+    "forgotPassword": "पासवर्ड भूल गए?",
+    "emailPlaceholder": "Example@domain.com",
+    "passwordPlaceholder": "6+ अक्षर",
+    "emailRequired": "ईमेल आवश्यक है",
+    "emailInvalid": "मान्य ईमेल दर्ज करें",
+    "passwordRequired": "पासवर्ड आवश्यक है",
+    "passwordMin": "पासवर्ड कम से कम 6 अक्षर का होना चाहिए"
+  },
+  "support": {
+    "title": "कस्टमर सपोर्ट",
+    "newTicket": "नया",
+    "close": "बंद करें",
+    "closed": "यह टिकट बंद है",
+    "noTickets": "अभी कोई टिकट नहीं। नया पर टैप करें।",
+    "submit": "टिकट जमा करें",
+    "addAttachments": "अटैचमेंट जोड़ें",
+    "typeMessage": "अपना संदेश लिखें..."
+  },
+  "wallet": {
+    "paymentChannel": "पेमेंट चैनल",
+    "requestWithdrawal": "निकासी का अनुरोध"
+  },
+  "common": {
+    "retry": "फिर कोशिश करें",
+    "loading": "लोड हो रहा है...",
+    "brandTagline": "OFFICIAL PUBG ON MOBILE"
+  },
+  "footer": {
+    "home": "होम"
+  }
+}
