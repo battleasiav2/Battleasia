@@ -126,7 +126,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            GoldButton(
+            AuthPrimaryButton(
               label: 'Update password',
               loading: loading,
               onPressed: loading ? null : _submit,
