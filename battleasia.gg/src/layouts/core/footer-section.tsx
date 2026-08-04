@@ -13,13 +13,13 @@ const GOLD = '#f5c518';
 
 /** Trusted partner / affiliate domain pills */
 const FOOTER_PARTNERS = [
-  { label: 'battleasia.com', href: 'https://battleasia.com' },
-  { label: 'baccoin.shop', href: 'https://baccoin.shop' },
-  { label: 'battleasia.net', href: 'https://battleasia.net' },
-  { label: 'pubg.com', href: 'https://www.pubg.com' },
-  { label: 'www.bkash.com', href: 'https://www.bkash.com' },
-  { label: 'nagadwallet.net', href: 'https://nagadwallet.net' },
-  { label: 'coinremitter.com', href: 'https://coinremitter.com' },
+  { label: 'battleasia.com', href: 'https://battleasia.com', icon: '/logo/logo.webp' },
+  { label: 'baccoin.shop', href: 'https://baccoin.shop', icon: '/assets/images/coin.webp' },
+  { label: 'battleasia.net', href: 'https://battleasia.net', icon: '/logo/logo.webp' },
+  { label: 'pubg.com', href: 'https://www.pubg.com', icon: '/assets/images/games/pubg-mobile.png' },
+  { label: 'www.bkash.com', href: 'https://www.bkash.com', icon: '/assets/images/bkash.webp' },
+  { label: 'nagadwallet.net', href: 'https://nagadwallet.net', icon: '/assets/images/nagad.webp' },
+  { label: 'coinremitter.com', href: 'https://coinremitter.com', icon: '/assets/images/currency.webp' },
 ] as const;
 
 const linkSx = {
@@ -237,18 +237,18 @@ export function FooterSection() {
           ))}
         </Box>
 
-        {/* Trusted partners — domain pills */}
+        {/* Trusted partners — centered pills with icons */}
         <Box
           sx={{
-            pt: { xs: 2, md: 2.5 },
+            pt: { xs: 2.25, md: 3 },
             mt: { xs: 0.5, md: 1 },
             borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
           }}
         >
           <Typography
             sx={{
-              mb: { xs: 1.5, md: 2 },
-              textAlign: { xs: 'center', sm: 'left' },
+              mb: { xs: 1.75, md: 2.25 },
+              textAlign: 'center',
               fontSize: { xs: 12, sm: 13 },
               fontWeight: 500,
               color: alpha('#ffffff', 0.45),
@@ -262,8 +262,10 @@ export function FooterSection() {
               display: 'flex',
               flexWrap: 'wrap',
               alignItems: 'center',
-              justifyContent: { xs: 'center', sm: 'flex-start' },
-              gap: 1.25,
+              justifyContent: 'center',
+              gap: { xs: 1, sm: 1.25 },
+              maxWidth: 980,
+              mx: 'auto',
             }}
           >
             {FOOTER_PARTNERS.map((partner) => (
@@ -274,26 +276,54 @@ export function FooterSection() {
                 target="_blank"
                 rel="noopener noreferrer"
                 sx={{
-                  px: 1.75,
-                  py: 0.85,
-                  borderRadius: '8px',
-                  border: `1px solid ${alpha('#ffffff', 0.18)}`,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  px: { xs: 1.25, sm: 1.5 },
+                  py: { xs: 0.75, sm: 0.9 },
+                  minHeight: { xs: 36, sm: 40 },
+                  borderRadius: '10px',
+                  border: `1px solid ${alpha('#ffffff', 0.16)}`,
                   bgcolor: alpha('#ffffff', 0.04),
                   color: '#ffffff',
-                  fontSize: { xs: 12, sm: 13 },
-                  fontWeight: 700,
                   textDecoration: 'none',
-                  lineHeight: 1.2,
-                  whiteSpace: 'nowrap',
-                  transition: 'border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease',
+                  transition: 'border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease',
                   '&:hover': {
                     borderColor: alpha(GOLD, 0.55),
                     bgcolor: alpha(GOLD, 0.08),
-                    color: GOLD,
+                    transform: 'translateY(-1px)',
+                    '& .partner-label': { color: GOLD },
                   },
                 }}
               >
-                {partner.label}
+                <Box
+                  component="img"
+                  src={partner.icon}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  sx={{
+                    width: { xs: 20, sm: 22 },
+                    height: { xs: 20, sm: 22 },
+                    objectFit: 'contain',
+                    borderRadius: '4px',
+                    flexShrink: 0,
+                    bgcolor: alpha('#000000', 0.25),
+                  }}
+                />
+                <Typography
+                  className="partner-label"
+                  sx={{
+                    color: '#ffffff',
+                    fontSize: { xs: 12, sm: 13 },
+                    fontWeight: 700,
+                    lineHeight: 1.2,
+                    whiteSpace: 'nowrap',
+                    transition: 'color 0.2s ease',
+                  }}
+                >
+                  {partner.label}
+                </Typography>
               </Box>
             ))}
           </Box>
