@@ -165,15 +165,17 @@ export function UserLayout({
                     <Typography
                         component={RouterLink}
                         href="/"
+                        className="font-brand-gaming"
                         sx={{
-                            fontSize: { xs: 14, sm: 16 },
-                            fontWeight: 800,
-                            letterSpacing: { xs: 0.8, sm: 1.2 },
-                            color: USER_COLORS.gold,
+                            fontSize: { xs: 13, sm: 15 },
                             textDecoration: 'none',
                             whiteSpace: 'nowrap',
                             lineHeight: 1,
-                            textShadow: `0 0 18px ${alpha(USER_COLORS.gold, 0.35)}`,
+                            background: `linear-gradient(180deg, #ffe08a 0%, ${USER_COLORS.gold} 48%, #d4a017 100%)`,
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            backgroundClip: 'text',
+                            filter: `drop-shadow(0 0 12px ${alpha(USER_COLORS.gold, 0.4)})`,
                         }}
                     >
                         {t('home.playYourGame.brandLabel')}

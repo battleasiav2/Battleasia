@@ -151,17 +151,20 @@ export function DashboardLayout({
           />
           <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0 }}>
             <Typography
-              className="font-tr"
+              className="font-brand-gaming"
               sx={{
                 fontSize: isBengali
-                  ? { xs: 18, sm: 22, md: 26 }
-                  : { xs: 20, sm: 24, md: 28 },
-                color: '#ffffff',
+                  ? { xs: 16, sm: 20, md: 24 }
+                  : { xs: 18, sm: 22, md: 26 },
+                color: GOLD,
                 fontWeight: 800,
                 lineHeight: 1,
-                letterSpacing: 1.2,
-                textTransform: 'uppercase',
                 whiteSpace: 'nowrap',
+                background: `linear-gradient(180deg, #ffe08a 0%, ${GOLD} 48%, #d4a017 100%)`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                filter: `drop-shadow(0 0 14px ${alpha(GOLD, 0.5)}) drop-shadow(0 2px 6px rgba(0,0,0,0.85))`,
               }}
             >
               BattleAsia

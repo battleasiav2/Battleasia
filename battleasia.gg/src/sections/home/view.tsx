@@ -171,7 +171,8 @@ export function HomeView() {
         inset: 0,
         background: {
           xs: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.12) 32%, rgba(0,0,0,0.14) 62%, rgba(0,0,0,0.55) 100%)',
-          md: 'linear-gradient(90deg, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.06) 38%, rgba(0,0,0,0.48) 66%, rgba(0,0,0,0.72) 100%)',
+          // Keep art readable behind hero copy — no heavy black plate on the right
+          md: 'linear-gradient(90deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.02) 42%, rgba(0,0,0,0.12) 72%, rgba(0,0,0,0.22) 100%)',
         },
         zIndex: 1,
       },
@@ -181,7 +182,7 @@ export function HomeView() {
         inset: 0,
         background: {
           xs: 'linear-gradient(180deg, rgba(0,0,0,0.28) 0%, transparent 24%, transparent 72%, rgba(0,0,0,0.35) 100%)',
-          md: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 28%, transparent 62%, rgba(0,0,0,0.55) 100%)',
+          md: 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.35) 100%)',
         },
         zIndex: 1,
       },
@@ -248,17 +249,7 @@ export function HomeView() {
             maxWidth: 1,
             display: 'flex',
             justifyContent: { xs: 'center', md: 'flex-end' },
-            overflow: 'hidden',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              inset: { xs: '-4px -8px', md: '-6px -10px' },
-              bgcolor: alpha('#000000', 0.28),
-              // Soft shadow without live CSS filter blur (cheaper paint)
-              boxShadow: `0 0 28px 12px ${alpha('#000000', 0.35)}`,
-              borderRadius: 0,
-              zIndex: 0,
-            },
+            overflow: 'visible',
           }}
         >
           <Box
@@ -277,9 +268,7 @@ export function HomeView() {
               display: 'block',
               objectFit: 'contain',
               objectPosition: { xs: 'center', md: 'right' },
-              mixBlendMode: 'screen',
-              filter: 'drop-shadow(0 6px 18px rgba(0, 0, 0, 0.9))',
-              // Static presence — no infinite title glow (was causing soft flicker)
+              filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.55))',
               '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
             }}
           />

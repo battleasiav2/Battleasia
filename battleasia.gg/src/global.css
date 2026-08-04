@@ -16,6 +16,9 @@
 @import '@fontsource-variable/inter';
 @import '@fontsource-variable/nunito-sans';
 
+/** Brand wordmark — angular esports display */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&display=swap');
+
 /** **************************************
 * Plugins
 *************************************** */
@@ -27,6 +30,15 @@
 .font-tm,
 .font-an {
   font-family: inherit !important;
+}
+
+/** Header / lockup brand text only */
+.font-brand-gaming {
+  font-family: 'Orbitron', 'Barlow', sans-serif !important;
+  font-weight: 800 !important;
+  font-style: italic;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase;
 }
 
 /** **************************************
