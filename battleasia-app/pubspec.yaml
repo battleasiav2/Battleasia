@@ -77,10 +77,11 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: false
-  # Full crest with padding so round/adaptive masks do not clip the horse/crown.
+  # Full-bleed crest; white corners removed so adaptive mask stays clean.
   image_path: "assets/icon/icon.png"
   adaptive_icon_foreground: "assets/icon/icon_foreground.png"
-  adaptive_icon_background: "#0B0204"
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground_inset: 0
   min_sdk_android: 21
 
 flutter:
