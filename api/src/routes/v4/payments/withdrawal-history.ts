@@ -10,6 +10,11 @@ import { serializeWithdrawal } from '../../../utils/payment-serialize.js';
 import { emitNewWithdrawal, emitPendingPaymentCounts } from '../../../utils/socket.js';
 import { getWithdrawableInfo } from '../../../utils/withdrawable-amount.js';
 import { notifyBalanceChange } from '../../../utils/balance-notify.js';
+import {
+  notifyWithdrawalApproved,
+  notifyWithdrawalCompleted,
+  notifyWithdrawalRejected,
+} from '../../../utils/payment-notifications.js';
 import { safeQueryStatus, WITHDRAWAL_STATUSES } from '../../../utils/query-filter.js';
 
 const router = Router();
@@ -212,6 +217,11 @@ router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
 
     await emitPendingPaymentCounts();
     await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
+    await notifyWithdrawalApproved({
+      userId: user._id.toString(),
+      amount: withdrawal.coin_amount,
+      withdrawalId: withdrawal._id.toString(),
+    });
     return res.json({ status: true, data: serializeWithdrawal(withdrawal) });
   } catch (error) {
     console.error('approve withdrawal error:', error);
@@ -233,6 +243,12 @@ router.patch('/:id/complete', requireAdmin, async (req: AuthedRequest, res) => {
     withdrawal.transaction_hash = req.body.transaction_hash || '';
     withdrawal.processed_at = new Date();
     await withdrawal.save();
+
+    await notifyWithdrawalCompleted({
+      userId: withdrawal.userId.toString(),
+      amount: withdrawal.coin_amount,
+      withdrawalId: withdrawal._id.toString(),
+    });
 
     return res.json({ status: true, data: serializeWithdrawal(withdrawal) });
   } catch (error) {
@@ -257,8 +273,9 @@ router.patch('/:id/reject', requireAdmin, async (req: AuthedRequest, res) => {
     }
 
     const admin = req.userId ? await User.findById(req.userId) : null;
+    const wasProcessing = withdrawal.status === 'processing';
 
-    if (withdrawal.status === 'processing') {
+    if (wasProcessing) {
       const balanceBefore = user.balance ?? 0;
       user.balance = balanceBefore + withdrawal.coin_amount;
       await user.save();
@@ -286,6 +303,13 @@ router.patch('/:id/reject', requireAdmin, async (req: AuthedRequest, res) => {
     await withdrawal.save();
 
     await emitPendingPaymentCounts();
+    await notifyWithdrawalRejected({
+      userId: user._id.toString(),
+      amount: withdrawal.coin_amount,
+      withdrawalId: withdrawal._id.toString(),
+      reason: withdrawal.rejection_reason,
+      refunded: wasProcessing,
+    });
     return res.json({ status: true, data: serializeWithdrawal(withdrawal) });
   } catch (error) {
     console.error('reject withdrawal error:', error);

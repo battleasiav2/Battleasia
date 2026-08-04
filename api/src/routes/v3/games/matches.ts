@@ -13,6 +13,7 @@ import {
 import { serializeMatch } from '../../../utils/serialize.js';
 import { recordBalanceHistory } from '../../../utils/balance-history.js';
 import { notifyBalanceChange } from '../../../utils/balance-notify.js';
+import { notifyMatchRefund, notifyMatchWinnings } from '../../../utils/payment-notifications.js';
 import {
   emitDashboardStatsUpdated,
   emitMatchCreated,
@@ -185,6 +186,12 @@ router.post('/:id/distribute-winnings', requireAuth, async (req, res) => {
         },
       });
       await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
+      await notifyMatchWinnings({
+        userId: user._id.toString(),
+        amount: totalWin,
+        matchId: match._id.toString(),
+        matchName: match.matchName,
+      });
     }
 
     match.winningsDistributed = true;
@@ -236,6 +243,12 @@ router.post('/:id/refund', requireAuth, async (req, res) => {
         },
       });
       await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
+      await notifyMatchRefund({
+        userId: user._id.toString(),
+        amount: participant.entryFee,
+        matchId: match._id.toString(),
+        matchName: match.matchName,
+      });
     }
 
     match.entriesRefunded = true;

@@ -10,6 +10,10 @@ import { recordBalanceHistory } from '../../../utils/balance-history.js';
 import { serializeDeposit } from '../../../utils/payment-serialize.js';
 import { emitNewDeposit, emitPendingPaymentCounts } from '../../../utils/socket.js';
 import { notifyBalanceChange } from '../../../utils/balance-notify.js';
+import {
+  notifyDepositApproved,
+  notifyDepositRejected,
+} from '../../../utils/payment-notifications.js';
 import { processReferralCommission } from '../../../utils/referral.js';
 import { safeQueryStatus, DEPOSIT_STATUSES } from '../../../utils/query-filter.js';
 
@@ -235,6 +239,11 @@ router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
 
     await emitPendingPaymentCounts();
     await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
+    await notifyDepositApproved({
+      userId: user._id.toString(),
+      amount: deposit.coin_amount,
+      depositId: deposit._id.toString(),
+    });
 
     await processReferralCommission({
       depositor: user,
@@ -268,6 +277,12 @@ router.patch('/:id/reject', requireAdmin, async (req: AuthedRequest, res) => {
     await deposit.save();
 
     await emitPendingPaymentCounts();
+    await notifyDepositRejected({
+      userId: deposit.userId.toString(),
+      amount: deposit.coin_amount,
+      depositId: deposit._id.toString(),
+      reason: deposit.rejection_reason,
+    });
     const channel = await PaymentChannel.findById(deposit.payment_channel);
     return res.json({ status: true, data: serializeDeposit(deposit, channel) });
   } catch (error) {
