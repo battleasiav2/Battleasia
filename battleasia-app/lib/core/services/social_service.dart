@@ -30,6 +30,106 @@ class SocialService {
     }
   }
 
+  Future<Map<String, dynamic>> viewReel(String reelId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/social/reels/$reelId/view'),
+        headers: headers,
+        body: '{}',
+      );
+      final data = response.body.isEmpty
+          ? <String, dynamic>{}
+          : jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to record view',
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> getStories() async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/social/stories'),
+        headers: headers,
+      );
+      final data = response.body.isEmpty
+          ? <String, dynamic>{}
+          : jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to fetch stories',
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> createStory({
+    required String mediaUrl,
+    String mediaType = 'image',
+    String? caption,
+  }) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/social/stories'),
+        headers: headers,
+        body: jsonEncode({
+          'mediaUrl': mediaUrl,
+          'mediaType': mediaType,
+          if (caption != null && caption.isNotEmpty) 'caption': caption,
+        }),
+      );
+      final data = response.body.isEmpty
+          ? <String, dynamic>{}
+          : jsonDecode(response.body) as Map<String, dynamic>;
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to create story',
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> viewStory(String storyId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/social/stories/$storyId/view'),
+        headers: headers,
+        body: '{}',
+      );
+      final data = response.body.isEmpty
+          ? <String, dynamic>{}
+          : jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to record story view',
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
   Future<Map<String, dynamic>> getConversations({
     int page = 1,
     int limit = 30,

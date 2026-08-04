@@ -14,6 +14,8 @@ import 'package:battleasia_app/presentation/widgets/common/refresh_overlay.dart'
 import 'package:battleasia_app/presentation/widgets/feed/feed_hub_panels.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_hub_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_item.dart';
+import 'package:battleasia_app/presentation/widgets/feed/feed_composer.dart';
+import 'package:battleasia_app/presentation/widgets/feed/stories_bar.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
 
 class FeedScreen extends StatefulWidget {
@@ -36,6 +38,7 @@ class _FeedScreenState extends State<FeedScreen> {
   bool _hasMore = true;
   String? _selectedCategoryId;
   String? _searchQuery;
+  String _feedMode = 'all';
   bool _isRefreshing = false;
   double _overscrollAccumulator = 0.0;
   double _dragStartY = 0.0;
@@ -105,6 +108,7 @@ class _FeedScreenState extends State<FeedScreen> {
         limit: 20,
         categoryId: _selectedCategoryId,
         search: _searchQuery,
+        feedMode: _feedMode,
       );
 
       if (result['success'] == true && result['data'] != null) {
@@ -169,26 +173,12 @@ class _FeedScreenState extends State<FeedScreen> {
   }
 
   Future<void> _handleLike(FeedModel feed) async {
-    // Optimistically update UI
     setState(() {
       _feeds = _feeds.map((f) {
         if (f.id == feed.id) {
-          return FeedModel(
-            id: f.id,
-            title: f.title,
-            description: f.description,
-            coverUrl: f.coverUrl,
-            status: f.status,
-            categoryId: f.categoryId,
-            category: f.category,
-            author: f.author,
-            totalViews: f.totalViews,
-            totalShares: f.totalShares,
-            totalComments: f.totalComments,
+          return f.copyWith(
             totalLikes: f.isLiked ? f.totalLikes - 1 : f.totalLikes + 1,
             isLiked: !f.isLiked,
-            createdAt: f.createdAt,
-            updatedAt: f.updatedAt,
           );
         }
         return f;
@@ -197,10 +187,39 @@ class _FeedScreenState extends State<FeedScreen> {
 
     try {
       await _feedService.toggleFeedLike(feed.id);
-    } catch (e) {
-      // Revert on error
+    } catch (_) {
       _fetchFeeds();
     }
+  }
+
+  Future<void> _handleSave(FeedModel feed) async {
+    setState(() {
+      _feeds = _feeds
+          .map((f) => f.id == feed.id ? f.copyWith(isSaved: !f.isSaved) : f)
+          .toList();
+    });
+
+    try {
+      final result = await _feedService.toggleSaveFeed(feed.id);
+      if (result['success'] == true && result['data'] is Map) {
+        final saved = (result['data'] as Map)['isSaved'] == true;
+        if (mounted) {
+          setState(() {
+            _feeds = _feeds
+                .map((f) => f.id == feed.id ? f.copyWith(isSaved: saved) : f)
+                .toList();
+          });
+        }
+      }
+    } catch (_) {
+      _fetchFeeds();
+    }
+  }
+
+  void _handleFeedMode(String mode) {
+    if (_feedMode == mode) return;
+    setState(() => _feedMode = mode);
+    _fetchFeeds();
   }
 
   void _handleCategorySelect(String? categoryId) {
@@ -333,7 +352,13 @@ class _FeedScreenState extends State<FeedScreen> {
                         },
                       ),
                       if (_hubSection == FeedHubSection.feed) ...[
-                        SizedBox(height: spacing24),
+                        SizedBox(height: spacing16),
+                        const StoriesBar(),
+                        SizedBox(height: spacing16),
+                        FeedComposer(onPosted: () => _fetchFeeds()),
+                        SizedBox(height: spacing16),
+                        _buildFeedModes(context),
+                        SizedBox(height: spacing16),
                         _buildSearchBar(context),
                         SizedBox(height: spacing16),
                         if (_categories.isNotEmpty) _buildCategories(context),
@@ -393,6 +418,7 @@ class _FeedScreenState extends State<FeedScreen> {
                           );
                         },
                         onLike: () => _handleLike(feed),
+                        onSave: () => _handleSave(feed),
                         onShare: () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -442,6 +468,51 @@ class _FeedScreenState extends State<FeedScreen> {
         fontWeight: FontWeight.w800,
         fontSize: titleFontSize,
         letterSpacing: 1,
+      ),
+    );
+  }
+
+  Widget _buildFeedModes(BuildContext context) {
+    const modes = [
+      ('all', 'All'),
+      ('following', 'Following'),
+      ('trending', 'Trending'),
+      ('latest', 'Latest'),
+      ('recommended', 'For you'),
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: modes.map((m) {
+          final selected = _feedMode == m.$1;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: InkWell(
+              onTap: () => _handleFeedMode(m.$1),
+              borderRadius: BorderRadius.circular(2),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: selected
+                      ? AppColors.gold.withValues(alpha: 0.15)
+                      : Colors.transparent,
+                  border: Border.all(
+                    color: selected ? AppColors.gold : AppColors.border(0.2),
+                  ),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+                child: Text(
+                  m.$2,
+                  style: AppTheme.bodySmall.copyWith(
+                    color: selected ? AppColors.gold : AppColors.textMuted,
+                    fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

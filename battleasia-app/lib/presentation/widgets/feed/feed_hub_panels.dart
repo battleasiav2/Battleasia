@@ -1,7 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
 import 'package:battleasia_app/core/services/social_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
@@ -11,6 +9,7 @@ import 'package:battleasia_app/data/models/conversation_model.dart';
 import 'package:battleasia_app/data/models/feed_model.dart';
 import 'package:battleasia_app/data/models/reel_model.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
+import 'package:battleasia_app/presentation/screens/feed/reel_player_screen.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_item.dart';
 
 class FeedExplorePanel extends StatefulWidget {
@@ -208,12 +207,13 @@ class _FeedReelsPanelState extends State<FeedReelsPanel> {
   }
 
   Future<void> _openReel(ReelModel reel) async {
-    final url = AppConfig.getImageUrl(reel.videoUrl) ?? reel.videoUrl;
-    if (url.isEmpty) return;
-    final uri = Uri.tryParse(url);
-    if (uri != null && await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    }
+    if (!mounted) return;
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ReelPlayerScreen(reel: reel),
+      ),
+    );
   }
 
   @override

@@ -13,6 +13,7 @@ class FeedModel {
   final int totalComments;
   final int totalLikes;
   final bool isLiked;
+  final bool isSaved;
   final String? createdAt;
   final String? updatedAt;
 
@@ -31,9 +32,50 @@ class FeedModel {
     required this.totalComments,
     required this.totalLikes,
     required this.isLiked,
+    this.isSaved = false,
     this.createdAt,
     this.updatedAt,
   });
+
+  FeedModel copyWith({
+    String? id,
+    String? title,
+    String? description,
+    String? coverUrl,
+    String? status,
+    bool? premiumOnly,
+    String? categoryId,
+    FeedCategory? category,
+    FeedAuthor? author,
+    int? totalViews,
+    int? totalShares,
+    int? totalComments,
+    int? totalLikes,
+    bool? isLiked,
+    bool? isSaved,
+    String? createdAt,
+    String? updatedAt,
+  }) {
+    return FeedModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      description: description ?? this.description,
+      coverUrl: coverUrl ?? this.coverUrl,
+      status: status ?? this.status,
+      premiumOnly: premiumOnly ?? this.premiumOnly,
+      categoryId: categoryId ?? this.categoryId,
+      category: category ?? this.category,
+      author: author ?? this.author,
+      totalViews: totalViews ?? this.totalViews,
+      totalShares: totalShares ?? this.totalShares,
+      totalComments: totalComments ?? this.totalComments,
+      totalLikes: totalLikes ?? this.totalLikes,
+      isLiked: isLiked ?? this.isLiked,
+      isSaved: isSaved ?? this.isSaved,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 
   factory FeedModel.fromJson(Map<String, dynamic> json) {
     return FeedModel(
@@ -63,6 +105,7 @@ class FeedModel {
       totalComments: (json['totalComments'] ?? json['total_comments'] ?? 0) as int,
       totalLikes: (json['totalLikes'] ?? json['total_likes'] ?? 0) as int,
       isLiked: json['isLiked'] == true || json['is_liked'] == true,
+      isSaved: json['isSaved'] == true || json['is_saved'] == true,
       createdAt: json['createdAt']?.toString() ?? json['created_at']?.toString(),
       updatedAt: json['updatedAt']?.toString() ?? json['updated_at']?.toString(),
     );
@@ -84,6 +127,7 @@ class FeedModel {
       'totalComments': totalComments,
       'totalLikes': totalLikes,
       'isLiked': isLiked,
+      'isSaved': isSaved,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };

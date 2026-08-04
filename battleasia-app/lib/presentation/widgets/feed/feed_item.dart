@@ -24,6 +24,7 @@ class FeedItem extends StatelessWidget {
   final FeedModel feed;
   final VoidCallback? onTap;
   final VoidCallback? onLike;
+  final VoidCallback? onSave;
   final VoidCallback? onShare;
 
   const FeedItem({
@@ -31,6 +32,7 @@ class FeedItem extends StatelessWidget {
     required this.feed,
     this.onTap,
     this.onLike,
+    this.onSave,
     this.onShare,
   });
 
@@ -277,6 +279,20 @@ class FeedItem extends StatelessWidget {
                         iconSize: iconSize,
                         fontSize: captionFontSize,
                         iconColor: feed.isLiked ? AppColors.error : null,
+                      ),
+                    ),
+                    SizedBox(width: spacing16),
+                    InkWell(
+                      onTap: onSave,
+                      borderRadius: BorderRadius.circular(2),
+                      child: Icon(
+                        feed.isSaved
+                            ? Icons.bookmark
+                            : Icons.bookmark_border,
+                        size: iconSize,
+                        color: feed.isSaved
+                            ? AppColors.gold
+                            : AppColors.goldAccent,
                       ),
                     ),
                     const Spacer(),
