@@ -4,6 +4,7 @@ import Link from '@mui/material/Link';
 import Box, { BoxProps } from '@mui/material/Box';
 // routes
 import { RouterLink } from 'src/routes/components';
+import { assetPath } from 'src/utils/asset-path';
 
 // ----------------------------------------------------------------------
 
@@ -13,14 +14,11 @@ export interface LogoProps extends BoxProps {
 
 const Logo = forwardRef<HTMLDivElement, LogoProps>(
   ({ disabledLink = false, sx, ...other }, ref) => {
-
-    // OR using local (public folder)
-    // -------------------------------------------------------
     const logo = (
       <Box
         component="img"
-        src="/logo/logo.webp" // => your path
-        sx={{ width: 70, height: "auto", cursor: 'pointer', ...sx }}
+        src={assetPath('/logo/logo.webp')}
+        sx={{ width: 70, height: 'auto', cursor: 'pointer', ...sx }}
         {...other}
       />
     );

@@ -51,7 +51,7 @@ export function LiveChatSettingsView() {
     agentName: 'BattleAsia Support',
     agentTitle: 'Live Support',
     agentAvatar: '',
-    logoUrl: '/logo/logo.webp',
+    logoUrl: '',
     welcomeMessage: 'Hi! How can we help you today?',
     socialLinks: [],
   });

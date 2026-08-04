@@ -5,6 +5,8 @@ import { checkboxClasses } from '@mui/material/Checkbox';
 import { menuItemClasses } from '@mui/material/MenuItem';
 import { autocompleteClasses } from '@mui/material/Autocomplete';
 
+import { assetPath } from 'src/utils/asset-path';
+
 // ----------------------------------------------------------------------
 
 export const paper = ({
@@ -24,7 +26,7 @@ export const paper = ({
       color: bgcolor,
     }),
   }),
-  backgroundImage: 'url(/assets/cyan-blur.png), url(/assets/red-blur.png)',
+  backgroundImage: `url(${assetPath('/assets/cyan-blur.png')}), url(${assetPath('/assets/red-blur.png')})`,
   backgroundRepeat: 'no-repeat, no-repeat',
   backgroundPosition: 'top right, left bottom',
   backgroundSize: '50%, 50%',
