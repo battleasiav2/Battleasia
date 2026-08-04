@@ -36,37 +36,32 @@ const borderPulse = keyframes`
 `;
 
 const heroKenBurns = keyframes`
-  0% { transform: scale(1.12) translate3d(2%, 1%, 0); }
-  35% { transform: scale(1.18) translate3d(-1.5%, -1.2%, 0); }
-  70% { transform: scale(1.1) translate3d(-3%, 0.5%, 0); }
-  100% { transform: scale(1.12) translate3d(2%, 1%, 0); }
+  0% { transform: scale(1.08) translate3d(1.2%, 0.6%, 0); }
+  40% { transform: scale(1.12) translate3d(-1.2%, -0.8%, 0); }
+  75% { transform: scale(1.07) translate3d(-2%, 0.4%, 0); }
+  100% { transform: scale(1.08) translate3d(1.2%, 0.6%, 0); }
 `;
 
+/** Transform + opacity only — never animate filter (major jank source) */
 const heroEnter = keyframes`
-  0% { transform: scale(1.28) translate3d(0, 2%, 0); filter: brightness(0.55) saturate(0.7); opacity: 0.6; }
-  100% { transform: scale(1.12) translate3d(2%, 1%, 0); filter: brightness(1) saturate(1); opacity: 1; }
-`;
-
-const heroDepthDrift = keyframes`
-  0%, 100% { transform: scale(1.2) translate3d(-1%, 0, 0); opacity: 0.35; }
-  50% { transform: scale(1.28) translate3d(1.5%, -1%, 0); opacity: 0.5; }
+  0% { transform: scale(1.18) translate3d(0, 1.5%, 0); opacity: 0.55; }
+  100% { transform: scale(1.08) translate3d(1.2%, 0.6%, 0); opacity: 1; }
 `;
 
 const logoEnter = keyframes`
-  0% { opacity: 0; transform: translateY(18px) scale(0.94); filter: drop-shadow(0 0 0 transparent); }
-  60% { opacity: 1; transform: translateY(0) scale(1.02); }
-  100% { opacity: 1; transform: translateY(0) scale(1); filter: drop-shadow(0 2px 16px rgba(245, 197, 24, 0.35)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.65)); }
+  0% { opacity: 0; transform: translateY(16px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
 `;
 
 const logoShimmer = keyframes`
   0% { transform: translateX(-120%) skewX(-16deg); opacity: 0; }
-  15% { opacity: 0.85; }
-  35% { opacity: 0.4; }
+  15% { opacity: 0.75; }
+  35% { opacity: 0.3; }
   50%, 100% { transform: translateX(160%) skewX(-16deg); opacity: 0; }
 `;
 
 const copyEnter = keyframes`
-  0% { opacity: 0; transform: translateY(14px); }
+  0% { opacity: 0; transform: translateY(12px); }
   100% { opacity: 1; transform: translateY(0); }
 `;
 
@@ -216,29 +211,8 @@ export function HomeView() {
         zIndex: 1,
       },
     }}>
-      {/* Full hero image — cinematic depth + Ken Burns */}
-      <ScrollParallax offset={120} scaleRange={[1.12, 1, 1.08]} sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-        <Box
-          component="img"
-          src={HOME_IMAGE_PATHS.banner}
-          alt=""
-          aria-hidden
-          loading="eager"
-          decoding="async"
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            position: 'absolute',
-            inset: '-6%',
-            width: '112%',
-            height: '112%',
-            objectFit: 'cover',
-            objectPosition: { md: '36% center', lg: '32% center' },
-            filter: 'blur(28px) saturate(1.15) brightness(0.75)',
-            transformOrigin: 'center center',
-            animation: `${heroDepthDrift} 22s ease-in-out infinite`,
-            '@media (prefers-reduced-motion: reduce)': { animation: 'none', opacity: 0.3 },
-          }}
-        />
+      {/* Full hero image — Ken Burns + light parallax (no animated blur) */}
+      <ScrollParallax offset={80} scaleRange={[1.06, 1, 1.04]} sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         <Box
           component="img"
           src={HOME_IMAGE_PATHS.banner}
@@ -247,21 +221,20 @@ export function HomeView() {
           fetchPriority="high"
           decoding="async"
           sx={{
-            position: 'relative',
             width: 1,
             height: 1,
             objectFit: 'cover',
             objectPosition: { xs: '50% 22%', sm: '48% 24%', md: '36% center', lg: '32% center' },
             transformOrigin: 'center center',
+            backfaceVisibility: 'hidden',
             animation: {
-              xs: `${heroEnter} 1.4s cubic-bezier(0.22, 1, 0.36, 1) both`,
-              md: `${heroEnter} 1.8s cubic-bezier(0.22, 1, 0.36, 1) both, ${heroKenBurns} 28s 1.8s ease-in-out infinite`,
+              xs: `${heroEnter} 1.2s cubic-bezier(0.22, 1, 0.36, 1) both`,
+              md: `${heroEnter} 1.5s cubic-bezier(0.22, 1, 0.36, 1) both, ${heroKenBurns} 32s 1.5s ease-in-out infinite`,
             },
             willChange: 'transform',
             '@media (prefers-reduced-motion: reduce)': {
               animation: 'none',
               transform: 'none',
-              filter: 'none',
               opacity: 1,
             },
           }}
