@@ -323,8 +323,8 @@ export function UserLayout({
                 {...slotProps?.header}
                 slots={{ ...headerSlots, ...slotProps?.header?.slots }}
                 slotProps={merge(headerSlotProps, slotProps?.header?.slotProps ?? {})}
-                sx={[
-                    getPremiumSoftHeaderSx(
+                sx={{
+                    ...getPremiumSoftHeaderSx(
                         isNavVertical
                             ? {
                                   xs: 8,
@@ -332,17 +332,11 @@ export function UserLayout({
                               }
                             : undefined
                     ),
-                    {
-                        minHeight: { xs: 56, sm: 64 },
-                        pb: { xs: 0.75, sm: 1 },
-                        pt: { xs: 0.75, sm: 1 },
-                    },
-                    ...(Array.isArray(slotProps?.header?.sx)
-                        ? slotProps.header.sx
-                        : slotProps?.header?.sx
-                          ? [slotProps.header.sx]
-                          : []),
-                ]}
+                    minHeight: { xs: 56, sm: 64 },
+                    pb: { xs: 0.75, sm: 1 },
+                    pt: { xs: 0.75, sm: 1 },
+                    ...slotProps?.header?.sx,
+                }}
             />
         );
     };
