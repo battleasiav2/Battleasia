@@ -16,7 +16,6 @@ import { alpha } from '@mui/material/styles';
 
 import { CONFIG } from 'src/global-config';
 import useApi from 'src/hooks/use-api';
-import { toast } from 'react-hot-toast';
 import { Image } from 'src/components/image';
 import { fNumber, fShortenNumber } from 'src/utils/format-number';
 import { getAvatarUrl } from 'src/utils/get-image-url';
@@ -474,19 +473,25 @@ export function LandingDashboardSection() {
         try {
             setState((prev) => ({ ...prev, loading: true, error: undefined }));
             let payload: PublicDashboardStats | undefined;
+
             try {
                 const res = await api.getPublicDashboardStatsApi();
                 payload = res?.data?.data || res?.data;
-            } catch (axiosError) {
-                // Fallback: plain fetch (bypasses axios interceptors / baseURL quirks)
-                const res = await fetch('/api/v3/public/dashboard', {
+            } catch {
+                // Fallback: same-origin (Vite/nginx proxy) or absolute API base
+                const base = (CONFIG.serverUrl || '').replace(/\/$/, '');
+                const url = `${base}/api/v3/public/dashboard`;
+                const res = await fetch(url, {
                     credentials: 'same-origin',
                     headers: { Accept: 'application/json' },
                 });
-                if (!res.ok) throw axiosError;
+                if (!res.ok) {
+                    throw new Error(`Dashboard stats HTTP ${res.status}`);
+                }
                 const json = await res.json();
                 payload = json?.data || json;
             }
+
             if (payload?.platform) {
                 setState({ loading: false, data: payload });
             } else {
@@ -494,8 +499,11 @@ export function LandingDashboardSection() {
             }
         } catch (error) {
             console.error('Failed to load landing stats', error);
-            toast.error('Failed to load live stats');
-            setState((prev) => ({ ...prev, loading: false, error: 'Unable to load stats' }));
+            setState((prev) => ({
+                ...prev,
+                loading: false,
+                error: 'Unable to load stats right now. Please try again shortly.',
+            }));
         }
     };
 

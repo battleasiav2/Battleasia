@@ -97,7 +97,15 @@ async function aggregatePlayerStats(sortField: 'totalWinnings' | 'totalKills', l
 }
 
 async function getGameNameMap(gameIds: string[]) {
-  const games = await Game.find({ _id: { $in: gameIds } });
+  const validIds = gameIds
+    .filter((id) => Types.ObjectId.isValid(id))
+    .map((id) => new Types.ObjectId(id));
+
+  if (!validIds.length) {
+    return new Map<string, string>();
+  }
+
+  const games = await Game.find({ _id: { $in: validIds } }).select('name').lean();
   return new Map(games.map((g) => [g._id.toString(), g.name]));
 }
 
