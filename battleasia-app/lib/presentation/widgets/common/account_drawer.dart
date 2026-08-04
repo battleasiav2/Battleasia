@@ -12,6 +12,7 @@ import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 import 'package:battleasia_app/presentation/screens/account/account_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_screen.dart';
+import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
 import 'package:battleasia_app/presentation/screens/referral/referral_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
 import 'package:battleasia_app/presentation/screens/wallet/wallet_screen.dart';
@@ -464,7 +465,23 @@ class _AccountDrawerContent extends StatelessWidget {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const WalletScreen()),
+                  MaterialPageRoute(
+                    builder: (context) => const WalletScreen(fromShop: true),
+                  ),
+                );
+              },
+            ),
+            AccountMenuTile(
+              icon: Icons.payments_outlined,
+              label: 'Withdraw',
+              nested: true,
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ShopWithdrawalScreen(),
+                  ),
                 );
               },
             ),

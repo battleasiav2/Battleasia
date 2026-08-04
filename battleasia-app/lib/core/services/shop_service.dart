@@ -3,7 +3,6 @@ import 'package:http/http.dart' as http;
 import 'package:battleasia_app/core/utils/api_client.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/services/auth_service.dart';
-import 'package:battleasia_app/data/models/shop_item_model.dart';
 
 class ShopService {
   final AuthService _authService = AuthService();
@@ -245,6 +244,61 @@ class ShopService {
       return {
         'success': false,
         'message': data['message'] as String? ?? 'Failed to submit deposit',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Coingo payout  (POST /api/v4/payments/coingo/payout)
+  // Dedicated store withdrawal path used by web /user/withdrawal.
+  // ---------------------------------------------------------------------------
+
+  Future<Map<String, dynamic>> createCoingoPayout({
+    required double amount,
+    required String walletNumber,
+    required String walletType,
+    String? description,
+    String? email,
+    String? username,
+    String? currencyType,
+    double? currencyAmount,
+  }) async {
+    try {
+      final headers = await _getHeaders();
+      final body = <String, dynamic>{
+        'amount': amount,
+        'walletNumber': walletNumber,
+        'walletType': walletType,
+        if (description != null && description.isNotEmpty)
+          'description': description,
+        if (email != null && email.isNotEmpty) 'email': email,
+        if (username != null && username.isNotEmpty) 'username': username,
+        if (currencyType != null && currencyType.isNotEmpty)
+          'currency_type': currencyType,
+        if (currencyAmount != null) 'currency_amount': currencyAmount,
+      };
+
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v4/payments/coingo/payout'),
+        headers: headers,
+        body: jsonEncode(body),
+      );
+      final data = _parseResponse(response);
+
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+
+      return {
+        'success': false,
+        'message':
+            data['message'] as String? ?? 'Failed to submit withdrawal request',
       };
     } catch (e) {
       return {

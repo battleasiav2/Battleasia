@@ -8,9 +8,13 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/balance_history_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
 
 class WalletScreen extends StatefulWidget {
-  const WalletScreen({super.key});
+  /// When opened from the store section tabs (Shop / Wallet / Withdraw).
+  final bool fromShop;
+
+  const WalletScreen({super.key, this.fromShop = false});
 
   @override
   State<WalletScreen> createState() => _WalletScreenState();
@@ -960,6 +964,12 @@ class _WalletScreenState extends State<WalletScreen> {
                       return Column(
                         children: [
                           SizedBox(height: spacing16),
+                          if (widget.fromShop) ...[
+                            const ShopSectionNav(
+                              current: ShopSectionTab.wallet,
+                            ),
+                            SizedBox(height: spacing16),
+                          ],
                           // Main Balance Card
                           _buildBalanceCard(context, walletData),
                           SizedBox(height: spacing24),

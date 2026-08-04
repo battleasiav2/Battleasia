@@ -87,8 +87,13 @@ class _BusinessWallet {
 
 class ShopDetailScreen extends StatefulWidget {
   final String itemId;
+  final String? preferredChannelId;
 
-  const ShopDetailScreen({super.key, required this.itemId});
+  const ShopDetailScreen({
+    super.key,
+    required this.itemId,
+    this.preferredChannelId,
+  });
 
   @override
   State<ShopDetailScreen> createState() => _ShopDetailScreenState();
@@ -205,7 +210,16 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
         setState(() {
           _rates = rates;
           _channels = channels;
-          if (channels.isNotEmpty) _selectedChannelId = channels.first.id;
+          if (channels.isNotEmpty) {
+            final preferred = widget.preferredChannelId;
+            if (preferred != null &&
+                preferred.isNotEmpty &&
+                channels.any((c) => c.id == preferred)) {
+              _selectedChannelId = preferred;
+            } else {
+              _selectedChannelId = channels.first.id;
+            }
+          }
         });
       }
     } catch (_) {
