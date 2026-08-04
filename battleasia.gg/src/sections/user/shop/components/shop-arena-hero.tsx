@@ -93,77 +93,88 @@ export function ShopArenaHero({
         position: 'relative',
         width: 'auto',
         mx: { xs: -2, sm: -3, md: -4 },
-        mt: { xs: -4, sm: -5, md: -6 },
+        // Keep under header padding — negative pull was clipping the badge row
+        mt: { xs: -1, sm: -2, md: -3 },
         mb: { xs: 3, md: 4 },
-        minHeight: { xs: 400, sm: 450, md: 520 },
+        minHeight: { xs: 460, sm: 500, md: 560 },
         display: 'flex',
         alignItems: 'flex-end',
-        overflow: 'hidden',
+        // Don't clip badge/title — media layers handle their own overflow
+        overflow: 'visible',
         bgcolor: '#000000',
         borderTop: `1px solid ${alpha(GOLD, 0.16)}`,
         borderBottom: `1px solid ${alpha(GOLD, 0.16)}`,
       }}
     >
       <Box
-        component="img"
-        src={imageUrl}
-        alt=""
         sx={{
           position: 'absolute',
           inset: 0,
-          width: 1,
-          height: 1,
-          objectFit: 'cover',
-          objectPosition: 'center center',
-          animation: `${kenBurns} 28s ease-in-out infinite`,
-          willChange: 'transform',
-          '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-        }}
-      />
-
-      <Box
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          background: `
-            linear-gradient(90deg, ${alpha('#000000', 0.9)} 0%, ${alpha('#000000', 0.6)} 48%, ${alpha('#000000', 0.38)} 100%),
-            linear-gradient(180deg, ${alpha('#000000', 0.55)} 0%, transparent 34%, ${alpha('#000000', 0.92)} 100%),
-            radial-gradient(ellipse 55% 40% at 18% 22%, ${alpha(GOLD, 0.14)} 0%, transparent 60%)
-          `,
-        }}
-      />
-
-      <Box
-        aria-hidden
-        sx={{
-          position: 'absolute',
-          inset: 0,
+          overflow: 'hidden',
           pointerEvents: 'none',
-          '@media (prefers-reduced-motion: reduce)': { display: 'none' },
         }}
       >
-        {SPARKS.map((spark, i) => (
-          <Box
-            key={`shop-spark-${i}`}
-            sx={{
-              position: 'absolute',
-              top: spark.top,
-              left: spark.left,
-              width: 3,
-              height: 3,
-              borderRadius: '50%',
-              bgcolor: GOLD,
-              boxShadow: `0 0 8px ${GOLD}`,
-              animation: `${sparkTwinkle} 3s ${spark.delay} ease-in-out infinite`,
-            }}
-          />
-        ))}
-      </Box>
+        <Box
+          component="img"
+          src={imageUrl}
+          alt=""
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            width: 1,
+            height: 1,
+            objectFit: 'cover',
+            objectPosition: 'center center',
+            animation: `${kenBurns} 28s ease-in-out infinite`,
+            willChange: 'transform',
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+          }}
+        />
 
-      <Box sx={bracketSx('tl')} />
-      <Box sx={bracketSx('tr')} />
-      <Box sx={bracketSx('bl')} />
-      <Box sx={bracketSx('br')} />
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            background: `
+              linear-gradient(90deg, ${alpha('#000000', 0.9)} 0%, ${alpha('#000000', 0.6)} 48%, ${alpha('#000000', 0.38)} 100%),
+              linear-gradient(180deg, ${alpha('#000000', 0.55)} 0%, transparent 34%, ${alpha('#000000', 0.92)} 100%),
+              radial-gradient(ellipse 55% 40% at 18% 22%, ${alpha(GOLD, 0.14)} 0%, transparent 60%)
+            `,
+          }}
+        />
+
+        <Box
+          aria-hidden
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            pointerEvents: 'none',
+            '@media (prefers-reduced-motion: reduce)': { display: 'none' },
+          }}
+        >
+          {SPARKS.map((spark, i) => (
+            <Box
+              key={`shop-spark-${i}`}
+              sx={{
+                position: 'absolute',
+                top: spark.top,
+                left: spark.left,
+                width: 3,
+                height: 3,
+                borderRadius: '50%',
+                bgcolor: GOLD,
+                boxShadow: `0 0 8px ${GOLD}`,
+                animation: `${sparkTwinkle} 3s ${spark.delay} ease-in-out infinite`,
+              }}
+            />
+          ))}
+        </Box>
+
+        <Box sx={bracketSx('tl')} />
+        <Box sx={bracketSx('tr')} />
+        <Box sx={bracketSx('bl')} />
+        <Box sx={bracketSx('br')} />
+      </Box>
 
       <Stack
         spacing={{ xs: 1.5, md: 2 }}
@@ -172,7 +183,8 @@ export function ShopArenaHero({
           zIndex: 3,
           width: 1,
           px: { xs: 3, sm: 4, md: 6 },
-          py: { xs: 4, md: 5 },
+          pt: { xs: 5, md: 5 },
+          pb: { xs: 4, md: 5 },
           maxWidth: { md: 760 },
         }}
       >
