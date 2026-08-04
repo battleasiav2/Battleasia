@@ -14,7 +14,6 @@ import { RouterLink } from 'src/routes/components';
 import { useSelector } from 'src/store';
 
 import { Logo } from 'src/components/logo';
-import { SiteScrollProgress } from 'src/components/animate';
 import { useSettingsContext } from 'src/components/settings';
 import { userGoldButtonSx } from 'src/layouts/user/user-theme';
 
@@ -89,11 +88,11 @@ export function DashboardLayout({
         sx: {
           alignItems: 'center',
           justifyContent: 'space-between',
-          minHeight: { xs: 88, md: 108 },
-          height: { xs: 88, md: 108 },
-          px: { xs: 2, sm: 3, md: 4 },
+          minHeight: { xs: 60, md: 68 },
+          height: { xs: 60, md: 68 },
+          px: { xs: 1.75, sm: 2.5, md: 3.5 },
           py: 0,
-          ...(isNavVertical && { px: { [layoutQuery]: 4 } }),
+          ...(isNavVertical && { px: { [layoutQuery]: 3.5 } }),
           ...(isNavHorizontal && {
             bgcolor: 'var(--layout-nav-bg)',
             height: { [layoutQuery]: 'var(--layout-nav-horizontal-height)' },
@@ -113,17 +112,34 @@ export function DashboardLayout({
     };
 
     const navLinkSx = (isActive: boolean) => ({
-      textTransform: 'none' as const,
-      fontSize: { lg: 15, xl: 16 },
-      fontWeight: 600,
-      letterSpacing: 0.02,
-      color: isActive ? GOLD : alpha('#ffffff', 0.78),
+      textTransform: 'uppercase' as const,
+      fontSize: { lg: 13, xl: 14 },
+      fontWeight: isActive ? 700 : 600,
+      letterSpacing: '0.08em',
+      color: isActive ? GOLD : alpha('#ffffff', 0.72),
       textDecoration: 'none',
       cursor: 'pointer',
       whiteSpace: 'nowrap' as const,
       lineHeight: 1,
+      position: 'relative' as const,
+      py: 0.75,
       transition: 'color 0.2s ease',
-      '&:hover': { color: GOLD },
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        left: '50%',
+        bottom: 0,
+        width: isActive ? '70%' : 0,
+        height: 1.5,
+        bgcolor: GOLD,
+        transform: 'translateX(-50%)',
+        transition: 'width 0.2s ease',
+        boxShadow: isActive ? `0 0 8px ${alpha(GOLD, 0.55)}` : 'none',
+      },
+      '&:hover': {
+        color: GOLD,
+        '&::after': { width: '70%' },
+      },
     });
 
     const headerSlots: HeaderSectionProps['slots'] = {
@@ -139,23 +155,23 @@ export function DashboardLayout({
         <Stack
           direction="row"
           alignItems="center"
-          spacing={{ xs: 1, sm: 1.25 }}
+          spacing={{ xs: 0.75, sm: 1 }}
           sx={{ flexShrink: 0, minWidth: 0, height: 1 }}
         >
           <Logo
             sx={{
-              width: { xs: 72, sm: 86, md: 100 },
-              height: { xs: 72, sm: 86, md: 100 },
+              width: { xs: 42, sm: 48, md: 52 },
+              height: { xs: 42, sm: 48, md: 52 },
               flexShrink: 0,
             }}
           />
-          <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0 }}>
+          <Stack direction="row" alignItems="center" spacing={0.75} sx={{ minWidth: 0 }}>
             <Typography
               className="font-brand-gaming"
               sx={{
                 fontSize: isBengali
-                  ? { xs: 16, sm: 20, md: 24 }
-                  : { xs: 18, sm: 22, md: 26 },
+                  ? { xs: 14, sm: 16, md: 18 }
+                  : { xs: 15, sm: 17, md: 20 },
                 color: GOLD,
                 fontWeight: 800,
                 lineHeight: 1,
@@ -164,16 +180,17 @@ export function DashboardLayout({
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
-                filter: `drop-shadow(0 0 14px ${alpha(GOLD, 0.5)}) drop-shadow(0 2px 6px rgba(0,0,0,0.85))`,
+                filter: `drop-shadow(0 0 10px ${alpha(GOLD, 0.4)}) drop-shadow(0 1px 3px rgba(0,0,0,0.75))`,
               }}
             >
               BattleAsia
             </Typography>
             <Box
               sx={{
-                px: 0.9,
-                py: 0.35,
-                border: `1.5px solid ${alpha(GOLD, 0.75)}`,
+                px: 0.65,
+                py: 0.2,
+                borderRadius: '3px',
+                border: `1px solid ${alpha(GOLD, 0.65)}`,
                 bgcolor: alpha(GOLD, 0.08),
                 display: { xs: 'none', sm: 'inline-flex' },
                 alignItems: 'center',
@@ -183,9 +200,9 @@ export function DashboardLayout({
               <Typography
                 className="font-tr"
                 sx={{
-                  fontSize: 13,
+                  fontSize: 11,
                   fontWeight: 800,
-                  letterSpacing: 0.8,
+                  letterSpacing: 0.6,
                   color: GOLD,
                   lineHeight: 1.2,
                 }}
@@ -201,7 +218,7 @@ export function DashboardLayout({
           direction="row"
           alignItems="center"
           justifyContent="center"
-          spacing={{ lg: 3.5, xl: 4.5 }}
+          spacing={{ lg: 3, xl: 4 }}
           sx={{
             display: { xs: 'none', lg: 'flex' },
             height: 1,
@@ -228,8 +245,8 @@ export function DashboardLayout({
         <Stack
           direction="row"
           alignItems="center"
-          spacing={{ xs: 0.75, sm: 1.25 }}
-          sx={{ flexShrink: 0, height: 1, minWidth: { lg: 140 }, justifyContent: 'flex-end' }}
+          spacing={{ xs: 0.65, sm: 1 }}
+          sx={{ flexShrink: 0, height: 1, minWidth: { lg: 120 }, justifyContent: 'flex-end' }}
         >
           {isLoggedIn ? (
             <>
@@ -242,9 +259,9 @@ export function DashboardLayout({
               href={paths.auth.signIn}
               sx={{
                 ...userGoldButtonSx,
-                height: { xs: 36, sm: 40 },
-                px: { xs: 1.75, sm: 2.25 },
-                fontSize: { xs: 13, sm: 14 },
+                height: { xs: 32, sm: 34 },
+                px: { xs: 1.5, sm: 2 },
+                fontSize: { xs: 12, sm: 13 },
                 fontWeight: 600,
                 whiteSpace: 'nowrap',
                 minWidth: 'auto',
@@ -268,14 +285,15 @@ export function DashboardLayout({
         slots={{ ...headerSlots, ...slotProps?.header?.slots }}
         slotProps={merge(headerSlotProps, slotProps?.header?.slotProps ?? {})}
         sx={{
-          bgcolor: alpha('#161618', 0.55),
-          backdropFilter: 'blur(0px)',
-          WebkitBackdropFilter: 'blur(0px)',
-          borderBottom: `2px solid ${alpha('#ffffff', 0.16)}`,
+          bgcolor: alpha('#0a0c10', 0.78),
+          backdropFilter: 'blur(18px) saturate(1.25)',
+          WebkitBackdropFilter: 'blur(18px) saturate(1.25)',
+          borderBottom: `1px solid ${alpha('#ffffff', 0.1)}`,
+          borderRadius: { xs: '0 0 12px 12px', md: '0 0 16px 16px' },
           boxShadow: `
-            inset 0 1px 0 ${alpha('#ffffff', 0.04)},
-            0 0 0 1px ${alpha(GOLD, 0.2)},
-            0 8px 20px ${alpha('#000000', 0.22)}
+            inset 0 1px 0 ${alpha('#ffffff', 0.07)},
+            0 1px 0 ${alpha(GOLD, 0.1)},
+            0 10px 28px ${alpha('#000000', 0.32)}
           `,
           ...slotProps?.header?.sx,
         }}
@@ -304,9 +322,7 @@ export function DashboardLayout({
   );
 
   return (
-    <>
-      <SiteScrollProgress />
-      <LayoutSection
+    <LayoutSection
         /** **************************************
          * @Header
          *************************************** */
@@ -325,8 +341,8 @@ export function DashboardLayout({
         cssVars={{
           ...dashboardLayoutVars(theme),
           ...navVars.layout,
-          '--layout-header-mobile-height': '88px',
-          '--layout-header-desktop-height': '108px',
+          '--layout-header-mobile-height': '60px',
+          '--layout-header-desktop-height': '68px',
           ...cssVars,
         }}
         sx={[
@@ -346,6 +362,5 @@ export function DashboardLayout({
       >
         {renderMain()}
       </LayoutSection>
-    </>
   );
 }

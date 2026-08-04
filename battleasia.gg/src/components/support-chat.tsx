@@ -591,26 +591,32 @@ export function SupportChat() {
 
             {!!settings.socialLinks?.length && (
               <Stack direction="row" spacing={1} justifyContent="center" sx={{ mt: 2.5, flexWrap: 'wrap' }}>
-                {settings.socialLinks.map((link) => (
-                  <IconButton
-                    key={`${link.label}-${link.href}`}
-                    component="a"
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    sx={{
-                      width: 36,
-                      height: 36,
-                      borderRadius: 0,
-                      bgcolor: alpha(link.color || GOLD, 0.15),
-                      border: `1px solid ${alpha(link.color || GOLD, 0.35)}`,
-                      color: link.color || GOLD,
-                      '&:hover': { bgcolor: alpha(link.color || GOLD, 0.25) },
-                    }}
-                  >
-                    <Iconify icon={link.icon as any} width={18} />
-                  </IconButton>
-                ))}
+                {settings.socialLinks.map((link) => {
+                  const brand = link.color || GOLD;
+                  const isDarkBrand = /^#0{3,6}$/i.test(brand) || /^#111(111)?$/i.test(brand);
+                  const iconColor = isDarkBrand ? '#ffffff' : brand;
+                  return (
+                    <IconButton
+                      key={`${link.label}-${link.href}`}
+                      component="a"
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={link.label || 'Social link'}
+                      sx={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 0,
+                        bgcolor: alpha(isDarkBrand ? '#ffffff' : brand, 0.15),
+                        border: `1px solid ${alpha(isDarkBrand ? '#ffffff' : brand, 0.35)}`,
+                        color: iconColor,
+                        '&:hover': { bgcolor: alpha(isDarkBrand ? '#ffffff' : brand, 0.25) },
+                      }}
+                    >
+                      <Iconify icon={link.icon as any} width={18} />
+                    </IconButton>
+                  );
+                })}
               </Stack>
             )}
           </Box>

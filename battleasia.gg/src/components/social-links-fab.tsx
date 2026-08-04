@@ -10,25 +10,25 @@ import { Iconify } from 'src/components/iconify';
 const SOCIAL_LINKS = [
   {
     label: 'Facebook',
-    icon: 'ri:facebook-fill',
+    icon: 'mingcute:facebook-fill',
     color: '#1877F2',
     href: 'https://www.facebook.com/share/1HQV9D33ic/?mibextid=wwXIfr',
   },
   {
     label: 'YouTube',
-    icon: 'ri:youtube-fill',
+    icon: 'mingcute:youtube-fill',
     color: '#FF0000',
     href: 'https://youtube.com/@battleasia?si=9ROsHqQNc3mVFMvl',
   },
   {
     label: 'WhatsApp',
-    icon: 'ri:whatsapp-fill',
+    icon: 'mingcute:whatsapp-fill',
     color: '#25D366',
     href: 'https://whatsapp.com/channel/0029VbBDBVtGpLHQgYC7WM44',
   },
   {
     label: 'TikTok',
-    icon: 'ri:tiktok-fill',
+    icon: 'mingcute:tiktok-fill',
     color: '#000000',
     href: 'https://www.tiktok.com/@battleasia?_r=1&_t=ZN-91f9vFOUJcc',
   },
@@ -113,7 +113,7 @@ export function SocialLinksFab() {
         }}
       >
         <Iconify
-          icon={open ? 'solar:close-circle-bold-duotone' : 'mynaui:chat-messages'}
+          icon={open ? 'solar:close-circle-bold-duotone' : 'solar:chat-round-dots-bold'}
           width={28}
         />
       </Fab>

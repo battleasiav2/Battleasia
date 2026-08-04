@@ -39,7 +39,7 @@ type LiveChatForm = {
 
 const EMPTY_LINK: SocialLink = {
   label: '',
-  icon: 'solar:link-bold',
+  icon: 'mingcute:facebook-fill',
   color: '#f5c518',
   href: '',
 };
@@ -238,7 +238,7 @@ export function LiveChatSettingsView() {
                           label="Icon (iconify)"
                           value={link.icon}
                           onChange={(e) => updateSocialLink(index, 'icon', e.target.value)}
-                          placeholder="ri:facebook-fill"
+                          placeholder="mingcute:facebook-fill"
                         />
                       </Grid>
                       <Grid item xs={12} md={2}>
