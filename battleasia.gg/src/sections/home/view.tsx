@@ -36,9 +36,38 @@ const borderPulse = keyframes`
 `;
 
 const heroKenBurns = keyframes`
-  0% { transform: scale(1) translate3d(0, 0, 0); }
-  50% { transform: scale(1.08) translate3d(-1.5%, -1%, 0); }
-  100% { transform: scale(1) translate3d(0, 0, 0); }
+  0% { transform: scale(1.12) translate3d(2%, 1%, 0); }
+  35% { transform: scale(1.18) translate3d(-1.5%, -1.2%, 0); }
+  70% { transform: scale(1.1) translate3d(-3%, 0.5%, 0); }
+  100% { transform: scale(1.12) translate3d(2%, 1%, 0); }
+`;
+
+const heroEnter = keyframes`
+  0% { transform: scale(1.28) translate3d(0, 2%, 0); filter: brightness(0.55) saturate(0.7); opacity: 0.6; }
+  100% { transform: scale(1.12) translate3d(2%, 1%, 0); filter: brightness(1) saturate(1); opacity: 1; }
+`;
+
+const heroDepthDrift = keyframes`
+  0%, 100% { transform: scale(1.2) translate3d(-1%, 0, 0); opacity: 0.35; }
+  50% { transform: scale(1.28) translate3d(1.5%, -1%, 0); opacity: 0.5; }
+`;
+
+const logoEnter = keyframes`
+  0% { opacity: 0; transform: translateY(18px) scale(0.94); filter: drop-shadow(0 0 0 transparent); }
+  60% { opacity: 1; transform: translateY(0) scale(1.02); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: drop-shadow(0 2px 16px rgba(245, 197, 24, 0.35)) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.65)); }
+`;
+
+const logoShimmer = keyframes`
+  0% { transform: translateX(-120%) skewX(-16deg); opacity: 0; }
+  15% { opacity: 0.85; }
+  35% { opacity: 0.4; }
+  50%, 100% { transform: translateX(160%) skewX(-16deg); opacity: 0; }
+`;
+
+const copyEnter = keyframes`
+  0% { opacity: 0; transform: translateY(14px); }
+  100% { opacity: 1; transform: translateY(0); }
 `;
 
 const HOME_IMAGE_PATHS = {
@@ -187,8 +216,29 @@ export function HomeView() {
         zIndex: 1,
       },
     }}>
-      {/* Full hero image — parallax desktop-only for smoother mobile scroll */}
+      {/* Full hero image — cinematic depth + Ken Burns */}
       <ScrollParallax offset={120} scaleRange={[1.12, 1, 1.08]} sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <Box
+          component="img"
+          src={HOME_IMAGE_PATHS.banner}
+          alt=""
+          aria-hidden
+          loading="eager"
+          decoding="async"
+          sx={{
+            display: { xs: 'none', md: 'block' },
+            position: 'absolute',
+            inset: '-6%',
+            width: '112%',
+            height: '112%',
+            objectFit: 'cover',
+            objectPosition: { md: '36% center', lg: '32% center' },
+            filter: 'blur(28px) saturate(1.15) brightness(0.75)',
+            transformOrigin: 'center center',
+            animation: `${heroDepthDrift} 22s ease-in-out infinite`,
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none', opacity: 0.3 },
+          }}
+        />
         <Box
           component="img"
           src={HOME_IMAGE_PATHS.banner}
@@ -197,12 +247,23 @@ export function HomeView() {
           fetchPriority="high"
           decoding="async"
           sx={{
+            position: 'relative',
             width: 1,
             height: 1,
             objectFit: 'cover',
             objectPosition: { xs: '50% 22%', sm: '48% 24%', md: '36% center', lg: '32% center' },
-            animation: { xs: 'none', md: `${heroKenBurns} 36s ease-in-out infinite` },
-            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+            transformOrigin: 'center center',
+            animation: {
+              xs: `${heroEnter} 1.4s cubic-bezier(0.22, 1, 0.36, 1) both`,
+              md: `${heroEnter} 1.8s cubic-bezier(0.22, 1, 0.36, 1) both, ${heroKenBurns} 28s 1.8s ease-in-out infinite`,
+            },
+            willChange: 'transform',
+            '@media (prefers-reduced-motion: reduce)': {
+              animation: 'none',
+              transform: 'none',
+              filter: 'none',
+              opacity: 1,
+            },
           }}
         />
       </ScrollParallax>
@@ -237,6 +298,8 @@ export function HomeView() {
             color: alpha('#f5c518', 0.92),
             textShadow: '0 1px 10px rgba(0,0,0,0.85)',
             width: 1,
+            animation: `${copyEnter} 0.7s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both`,
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
           }}
         >
           {t('common.brandTagline')}
@@ -249,7 +312,9 @@ export function HomeView() {
             maxWidth: 1,
             display: 'flex',
             justifyContent: { xs: 'center', md: 'flex-end' },
-            overflow: 'visible',
+            overflow: 'hidden',
+            animation: `${logoEnter} 1s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both`,
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
           }}
         >
           <Box
@@ -269,7 +334,25 @@ export function HomeView() {
               objectFit: 'contain',
               objectPosition: { xs: 'center', md: 'right' },
               filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.55))',
-              '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+            }}
+          />
+          <Box
+            aria-hidden
+            sx={{
+              display: { xs: 'none', md: 'block' },
+              position: 'absolute',
+              inset: 0,
+              zIndex: 2,
+              background: `linear-gradient(90deg,
+                transparent 0%,
+                ${alpha('#ffffff', 0.05)} 35%,
+                ${alpha(GOLD, 0.45)} 50%,
+                ${alpha('#ffffff', 0.08)} 65%,
+                transparent 100%)`,
+              mixBlendMode: 'screen',
+              pointerEvents: 'none',
+              animation: `${logoShimmer} 5.5s 2s ease-in-out infinite`,
+              '@media (prefers-reduced-motion: reduce)': { display: 'none' },
             }}
           />
         </Box>
@@ -286,6 +369,8 @@ export function HomeView() {
             width: 1,
             maxWidth: { xs: 340, sm: 400, md: '100%' },
             px: { xs: 0.5, md: 0 },
+            animation: `${copyEnter} 0.75s 0.55s cubic-bezier(0.22, 1, 0.36, 1) both`,
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
           }}
         >
           {t('home.subtitle')}
@@ -296,11 +381,21 @@ export function HomeView() {
           sx={{
             width: { xs: 140, sm: 180, md: 220 },
             alignSelf: { xs: 'center', md: 'flex-end' },
+            animation: `${copyEnter} 0.7s 0.7s cubic-bezier(0.22, 1, 0.36, 1) both`,
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
           }}
         />
 
         {/* Mobile: CTAs sit under the divider (higher, on the art — not in the black band) */}
-        <Box sx={{ display: { xs: 'block', md: 'none' }, width: 1, pt: { xs: 1.25, sm: 1.5 } }}>
+        <Box
+          sx={{
+            display: { xs: 'block', md: 'none' },
+            width: 1,
+            pt: { xs: 1.25, sm: 1.5 },
+            animation: `${copyEnter} 0.7s 0.85s cubic-bezier(0.22, 1, 0.36, 1) both`,
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+          }}
+        >
           <HeroMeshButtons
             joinLabel={t('home.joinTournament')}
             downloadLabel={t('home.downloadApkButton')}
@@ -322,6 +417,8 @@ export function HomeView() {
           zIndex: 2,
           alignItems: 'center',
           px: { md: 4 },
+          animation: `${copyEnter} 0.85s 0.95s cubic-bezier(0.22, 1, 0.36, 1) both`,
+          '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
         }}
       >
         <HeroMeshButtons
