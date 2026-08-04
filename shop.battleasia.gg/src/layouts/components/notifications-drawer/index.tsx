@@ -9,7 +9,6 @@ import Box from '@mui/material/Box';
 import Badge from '@mui/material/Badge';
 import Drawer from '@mui/material/Drawer';
 import Button from '@mui/material/Button';
-import SvgIcon from '@mui/material/SvgIcon';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -134,22 +133,51 @@ export function NotificationsDrawer({ data = [], sx, ...other }: NotificationsDr
         transition={transitionTap()}
         aria-label="Notifications button"
         onClick={onOpen}
-        sx={sx}
+        sx={[
+          {
+            width: { xs: 36, sm: 42 },
+            height: { xs: 32, sm: 38 },
+            p: 0,
+            borderRadius: '6px',
+            bgcolor: open ? 'rgba(245, 197, 24, 0.14)' : 'rgba(8, 12, 20, 0.55)',
+            border: '1.5px solid',
+            borderColor: open ? 'rgba(245, 197, 24, 0.55)' : 'rgba(255, 255, 255, 0.18)',
+            boxShadow: 'inset 0 0 0 1px rgba(0, 0, 0, 0.25)',
+            transition: 'background-color 0.2s ease, border-color 0.2s ease',
+            '&:hover': {
+              bgcolor: 'rgba(12, 18, 28, 0.72)',
+              borderColor: 'rgba(245, 197, 24, 0.45)',
+            },
+          },
+          ...(Array.isArray(sx) ? sx : [sx]),
+        ]}
         {...other}
       >
-        <Badge badgeContent={totalUnRead} color="error">
-          <SvgIcon>
-            {/* https://icon-sets.iconify.design/solar/bell-bing-bold-duotone/ */}
-            <path
-              fill="currentColor"
-              d="M18.75 9v.704c0 .845.24 1.671.692 2.374l1.108 1.723c1.011 1.574.239 3.713-1.52 4.21a25.794 25.794 0 0 1-14.06 0c-1.759-.497-2.531-2.636-1.52-4.21l1.108-1.723a4.393 4.393 0 0 0 .693-2.374V9c0-3.866 3.022-7 6.749-7s6.75 3.134 6.75 7"
-              opacity="0.5"
-            />
-            <path
-              fill="currentColor"
-              d="M12.75 6a.75.75 0 0 0-1.5 0v4a.75.75 0 0 0 1.5 0zM7.243 18.545a5.002 5.002 0 0 0 9.513 0c-3.145.59-6.367.59-9.513 0"
-            />
-          </SvgIcon>
+        <Badge
+          badgeContent={totalUnRead}
+          color="error"
+          max={99}
+          sx={{
+            '& .MuiBadge-badge': {
+              fontSize: 10,
+              fontWeight: 800,
+              minWidth: 16,
+              height: 16,
+              px: 0.5,
+              top: 2,
+              right: 2,
+              border: '1.5px solid rgba(0, 0, 0, 0.85)',
+            },
+          }}
+        >
+          <Iconify
+            icon="solar:bell-bold"
+            width={20}
+            sx={{
+              color: open ? '#f5c518' : 'rgba(255, 255, 255, 0.92)',
+              transition: 'color 0.2s ease',
+            }}
+          />
         </Badge>
       </IconButton>
 

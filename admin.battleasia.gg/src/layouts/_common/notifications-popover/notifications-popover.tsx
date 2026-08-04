@@ -143,9 +143,40 @@ export default function NotificationsPopover() {
         variants={varHover(1.05)}
         color={drawer.value ? 'primary' : 'default'}
         onClick={drawer.onTrue}
+        sx={{
+          width: 40,
+          height: 40,
+          borderRadius: '8px',
+          bgcolor: drawer.value ? 'rgba(245, 197, 24, 0.14)' : 'rgba(8, 12, 20, 0.55)',
+          border: '1.5px solid',
+          borderColor: drawer.value ? 'rgba(245, 197, 24, 0.55)' : 'rgba(255, 255, 255, 0.18)',
+          transition: 'background-color 0.2s ease, border-color 0.2s ease',
+          '&:hover': {
+            bgcolor: 'rgba(12, 18, 28, 0.72)',
+            borderColor: 'rgba(245, 197, 24, 0.45)',
+          },
+        }}
       >
-        <Badge badgeContent={totalUnRead} color="error">
-          <Iconify icon="solar:bell-bing-bold-duotone" width={24} />
+        <Badge
+          badgeContent={totalUnRead}
+          color="error"
+          max={99}
+          sx={{
+            '& .MuiBadge-badge': {
+              fontSize: 10,
+              fontWeight: 800,
+              minWidth: 16,
+              height: 16,
+              top: 2,
+              right: 2,
+            },
+          }}
+        >
+          <Iconify
+            icon="solar:bell-bold"
+            width={22}
+            sx={{ color: drawer.value ? '#f5c518' : 'rgba(255,255,255,0.92)' }}
+          />
         </Badge>
       </IconButton>
 
