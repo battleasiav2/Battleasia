@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
@@ -189,7 +190,7 @@ class ShopItemCard extends StatelessWidget {
                             ],
                           ),
                           GoldButton(
-                            label: 'Buy',
+                            label: 'shop.buy'.tr(),
                             expanded: false,
                             onPressed: onBuy,
                           ),

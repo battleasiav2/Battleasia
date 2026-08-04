@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
@@ -58,7 +59,7 @@ class _PlayScreenState extends State<PlayScreen> {
           _games = result['data'] as List<GameModel>? ?? [];
         } else {
           _errorMessage =
-              result['message'] as String? ?? 'Failed to load games';
+              result['message'] as String? ?? 'play.failedLoadGames'.tr();
         }
       });
     }
@@ -85,7 +86,7 @@ class _PlayScreenState extends State<PlayScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              _errorMessage ?? 'Failed to load games',
+              _errorMessage ?? 'play.failedLoadGames'.tr(),
               style: AppTheme.bodyLarge.copyWith(
                 color: AppColors.textMuted,
                 fontSize: ResponsiveUtils.getResponsiveFontSize(
@@ -97,7 +98,7 @@ class _PlayScreenState extends State<PlayScreen> {
             ),
             const SizedBox(height: 24),
             GoldButton(
-              label: 'Retry',
+              label: 'common.retry'.tr(),
               expanded: false,
               onPressed: _fetchGames,
             ),
@@ -221,9 +222,9 @@ class _PlayScreenState extends State<PlayScreen> {
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                   child: PlayTabs(
-                    tabs: const [
-                      {'label': 'Tournament', 'value': 'tournament'},
-                      {'label': 'Live', 'value': 'live'},
+                    tabs: [
+                      {'label': 'play.tabTournament'.tr(), 'value': 'tournament'},
+                      {'label': 'play.tabLive'.tr(), 'value': 'live'},
                     ],
                     activeTab: _activeTab,
                     onTabChanged: (tab) {
@@ -264,7 +265,7 @@ class _PlayScreenState extends State<PlayScreen> {
                   hasScrollBody: false,
                   child: Center(
                     child: Text(
-                      'No games available',
+                      'play.noGames'.tr(),
                       style: AppTheme.bodyLarge.copyWith(
                         color: AppColors.textMuted,
                         fontSize: ResponsiveUtils.getResponsiveFontSize(

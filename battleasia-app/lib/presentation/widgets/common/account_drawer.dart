@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:typed_data';
@@ -33,7 +34,7 @@ class AccountDrawer extends StatelessWidget {
     return Consumer<AuthProvider>(
       builder: (context, authProvider, child) {
         final user = authProvider.user;
-        final displayName = user?.username ?? user?.email ?? 'User';
+        final displayName = user?.username ?? user?.email ?? 'account.user'.tr();
         final email = user?.email ?? '';
         final avatarUrl = ImageUtils.getImageUrl(user?.avatar);
         final pendingFile = authProvider.pendingAvatarFile;
@@ -311,7 +312,7 @@ class _AccountDrawerContent extends StatelessWidget {
 
                   AccountMenuTile(
                     icon: Icons.home_outlined,
-                    label: 'Home',
+                    label: 'nav.home'.tr(),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -325,7 +326,7 @@ class _AccountDrawerContent extends StatelessWidget {
 
                   AccountMenuTile(
                     icon: Icons.sports_esports,
-                    label: 'Play',
+                    label: 'nav.play'.tr(),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -339,7 +340,7 @@ class _AccountDrawerContent extends StatelessWidget {
 
                   AccountMenuTile(
                     icon: Icons.shopping_bag,
-                    label: 'Shop',
+                    label: 'nav.shop'.tr(),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -353,7 +354,7 @@ class _AccountDrawerContent extends StatelessWidget {
 
                   AccountMenuTile(
                     icon: Icons.people,
-                    label: 'Referral',
+                    label: 'nav.referral'.tr(),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -367,7 +368,7 @@ class _AccountDrawerContent extends StatelessWidget {
 
                   AccountMenuTile(
                     icon: Icons.article,
-                    label: 'Feed',
+                    label: 'nav.feed'.tr(),
                     onTap: () {
                       Navigator.pop(context);
                       Navigator.push(
@@ -409,7 +410,7 @@ class _AccountDrawerContent extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'Logout',
+                        'account.logout'.tr(),
                         style: AppTheme.bodyLarge.copyWith(
                           fontSize: buttonFontSize,
                           fontWeight: FontWeight.w700,
@@ -451,7 +452,7 @@ class _AccountDrawerContent extends StatelessWidget {
           childrenPadding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
           leading: const Icon(Icons.person, color: AppColors.goldAccent, size: 22),
           title: Text(
-            'Account',
+            'account.menuAccount'.tr(),
             style: AppTheme.bodyMedium.copyWith(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
@@ -462,7 +463,7 @@ class _AccountDrawerContent extends StatelessWidget {
           children: [
             AccountMenuTile(
               icon: Icons.person_outline,
-              label: 'Profile',
+              label: 'account.profile'.tr(),
               nested: true,
               onTap: () {
                 Navigator.pop(context);
@@ -474,7 +475,7 @@ class _AccountDrawerContent extends StatelessWidget {
             ),
             AccountMenuTile(
               icon: Icons.account_balance_wallet,
-              label: 'Wallet',
+              label: 'account.wallet'.tr(),
               nested: true,
               onTap: () {
                 Navigator.pop(context);
@@ -488,7 +489,7 @@ class _AccountDrawerContent extends StatelessWidget {
             ),
             AccountMenuTile(
               icon: Icons.payments_outlined,
-              label: 'Withdraw',
+              label: 'account.withdraw'.tr(),
               nested: true,
               onTap: () {
                 Navigator.pop(context);
@@ -502,7 +503,7 @@ class _AccountDrawerContent extends StatelessWidget {
             ),
             AccountMenuTile(
               icon: Icons.sports_esports,
-              label: 'My Matches',
+              label: 'account.myMatches'.tr(),
               nested: true,
               onTap: () {
                 Navigator.pop(context);
@@ -514,7 +515,7 @@ class _AccountDrawerContent extends StatelessWidget {
             ),
             AccountMenuTile(
               icon: Icons.shopping_bag,
-              label: 'My Orders',
+              label: 'account.myOrders'.tr(),
               nested: true,
               onTap: () {
                 Navigator.pop(context);
@@ -526,7 +527,7 @@ class _AccountDrawerContent extends StatelessWidget {
             ),
             AccountMenuTile(
               icon: Icons.bar_chart,
-              label: 'My Statistics',
+              label: 'account.myStatistics'.tr(),
               nested: true,
               onTap: () {
                 Navigator.pop(context);
@@ -540,7 +541,7 @@ class _AccountDrawerContent extends StatelessWidget {
             ),
             AccountMenuTile(
               icon: Icons.people,
-              label: 'My Referrals',
+              label: 'account.myReferrals'.tr(),
               nested: true,
               onTap: () {
                 Navigator.pop(context);
@@ -554,7 +555,7 @@ class _AccountDrawerContent extends StatelessWidget {
             ),
             AccountMenuTile(
               icon: Icons.notifications,
-              label: 'Notifications',
+              label: 'account.notifications'.tr(),
               nested: true,
               onTap: () {
                 Navigator.pop(context);
@@ -568,7 +569,7 @@ class _AccountDrawerContent extends StatelessWidget {
             ),
             AccountMenuTile(
               icon: Icons.emoji_events,
-              label: 'Leader Board',
+              label: 'account.leaderboard'.tr(),
               nested: true,
               onTap: () {
                 Navigator.pop(context);
@@ -582,7 +583,7 @@ class _AccountDrawerContent extends StatelessWidget {
             ),
             AccountMenuTile(
               icon: Icons.support_agent,
-              label: 'Customer Support',
+              label: 'account.customerSupport'.tr(),
               nested: true,
               onTap: () {
                 Navigator.pop(context);

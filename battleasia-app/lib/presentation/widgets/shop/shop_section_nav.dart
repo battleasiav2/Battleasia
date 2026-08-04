@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
@@ -37,9 +38,9 @@ class ShopSectionNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tabs = [
-      (ShopSectionTab.shop, 'Shop', Icons.storefront_outlined),
-      (ShopSectionTab.wallet, 'Wallet', Icons.account_balance_wallet_outlined),
-      (ShopSectionTab.withdrawal, 'Withdraw', Icons.payments_outlined),
+      (ShopSectionTab.shop, 'shop.tabShop'.tr(), Icons.storefront_outlined),
+      (ShopSectionTab.wallet, 'shop.tabWallet'.tr(), Icons.account_balance_wallet_outlined),
+      (ShopSectionTab.withdrawal, 'shop.tabWithdraw'.tr(), Icons.payments_outlined),
     ];
 
     return Container(

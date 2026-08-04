@@ -18,6 +18,29 @@ import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 
 enum _SupportMode { list, create, detail }
 
+String _supportFilterLabel(String filter) => switch (filter) {
+      'all' => 'support.filterAll'.tr(),
+      'open' => 'support.filterOpen'.tr(),
+      'pending' => 'support.filterPending'.tr(),
+      'closed' => 'support.filterClosed'.tr(),
+      _ => filter,
+    };
+
+String _supportCategoryLabel(String category) => switch (category) {
+      'payment' => 'support.categoryPayment'.tr(),
+      'match' => 'support.categoryMatch'.tr(),
+      'account' => 'support.categoryAccount'.tr(),
+      'other' => 'support.categoryOther'.tr(),
+      _ => category,
+    };
+
+String _supportStatusLabel(String status) => switch (status.toLowerCase()) {
+      'open' => 'support.filterOpen'.tr(),
+      'pending' => 'support.filterPending'.tr(),
+      'closed' => 'support.filterClosed'.tr(),
+      _ => status.toUpperCase(),
+    };
+
 class CustomerSupportScreen extends StatefulWidget {
   const CustomerSupportScreen({super.key});
 
@@ -110,7 +133,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
       setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result['message']?.toString() ?? 'Failed to load tickets'),
+          content: Text(result['message']?.toString() ?? 'support.failedLoad'.tr()),
         ),
       );
     }
@@ -184,7 +207,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(upload['message']?.toString() ?? 'Upload failed'),
+          content: Text(upload['message']?.toString() ?? 'support.uploadFailed'.tr()),
         ),
       );
     }
@@ -197,9 +220,9 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
 
     setState(() => _creating = true);
     final result = await _service.createTicket(
-      subject: subject.isEmpty ? 'Support Ticket' : subject,
+      subject: subject.isEmpty ? 'support.defaultSubject'.tr() : subject,
       category: _createCategory,
-      body: body.isEmpty ? 'See attached' : body,
+      body: body.isEmpty ? 'support.seeAttached'.tr() : body,
       attachments: _pendingUploadedUrls,
     );
     if (!mounted) return;
@@ -215,7 +238,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result['message']?.toString() ?? 'Failed to create ticket'),
+          content: Text(result['message']?.toString() ?? 'support.failedCreate'.tr()),
         ),
       );
     }
@@ -232,12 +255,12 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
         _conversation = _conversation!.copyWith(status: 'closed');
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Ticket closed')),
+        SnackBar(content: Text('support.ticketClosed'.tr())),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result['message']?.toString() ?? 'Failed to close'),
+          content: Text(result['message']?.toString() ?? 'support.failedClose'.tr()),
         ),
       );
     }
@@ -258,7 +281,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
       id: 'temp-${DateTime.now().millisecondsSinceEpoch}',
       body: text.isEmpty ? ' ' : text,
       senderId: user?.id ?? '',
-      senderName: user?.username ?? user?.email ?? 'You',
+      senderName: user?.username ?? user?.email ?? 'support.you'.tr(),
       senderAvatar: ImageUtils.getImageUrl(user?.avatar),
       isAdmin: false,
       createdAt: DateTime.now().toIso8601String(),
@@ -275,7 +298,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
     _scrollToBottom();
 
     final result = await _service.sendMessage(
-      body: text.isEmpty ? 'See attached' : text,
+      body: text.isEmpty ? 'support.seeAttached'.tr() : text,
       conversationId: _conversation!.id,
       attachments: attachments.isEmpty ? null : attachments,
     );
@@ -289,7 +312,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(result['message']?.toString() ?? 'Failed to send'),
+          content: Text(result['message']?.toString() ?? 'support.failedSend'.tr()),
         ),
       );
     }
@@ -450,7 +473,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: ChoiceChip(
-                  label: Text(f[0].toUpperCase() + f.substring(1)),
+                  label: Text(_supportFilterLabel(f)),
                   selected: selected,
                   onSelected: (_) {
                     setState(() => _statusFilter = f);
@@ -475,7 +498,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
               : _tickets.isEmpty
                   ? Center(
                       child: Text(
-                        'No tickets yet. Tap New to create one.',
+                        'support.noTickets'.tr(),
                         style: AppTheme.bodyMedium
                             .copyWith(color: AppTheme.textSecondary),
                       ),
@@ -514,7 +537,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                                     ),
                                     const SizedBox(height: 6),
                                     Text(
-                                      t.category.toUpperCase(),
+                                      _supportCategoryLabel(t.category).toUpperCase(),
                                       style: AppTheme.bodySmall.copyWith(
                                         color: AppColors.gold,
                                         fontWeight: FontWeight.w700,
@@ -534,7 +557,9 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                                     if (t.attachmentCount > 0) ...[
                                       const SizedBox(height: 6),
                                       Text(
-                                        '${t.attachmentCount} attachment(s)',
+                                        'support.attachmentsCount'.tr(namedArgs: {
+                                          'count': '${t.attachmentCount}',
+                                        }),
                                         style: AppTheme.bodySmall.copyWith(
                                           color: AppTheme.textSecondary,
                                         ),
@@ -560,23 +585,23 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
         children: [
           TextField(
             controller: _subjectController,
-            decoration: const InputDecoration(
-              labelText: 'Subject',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: 'support.subject'.tr(),
+              border: const OutlineInputBorder(),
             ),
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
             value: _createCategory,
-            decoration: const InputDecoration(
-              labelText: 'Category',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: 'support.category'.tr(),
+              border: const OutlineInputBorder(),
             ),
             items: kTicketCategories
                 .map(
                   (c) => DropdownMenuItem(
                     value: c,
-                    child: Text(c[0].toUpperCase() + c.substring(1)),
+                    child: Text(_supportCategoryLabel(c)),
                   ),
                 )
                 .toList(),
@@ -589,9 +614,9 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
             controller: _bodyController,
             minLines: 4,
             maxLines: 8,
-            decoration: const InputDecoration(
-              labelText: 'Describe your issue',
-              border: OutlineInputBorder(),
+            decoration: InputDecoration(
+              labelText: 'support.describeIssue'.tr(),
+              border: const OutlineInputBorder(),
               alignLabelWithHint: true,
             ),
           ),
@@ -601,8 +626,10 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
             icon: const Icon(Icons.attach_file),
             label: Text(
               _pendingLocalPaths.isEmpty
-                  ? 'Add attachments'
-                  : '${_pendingLocalPaths.length} file(s) attached',
+                  ? 'support.addAttachments'.tr()
+                  : 'support.filesAttached'.tr(namedArgs: {
+                      'count': '${_pendingLocalPaths.length}',
+                    }),
             ),
           ),
           if (_pendingLocalPaths.isNotEmpty) ...[
@@ -639,7 +666,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                     height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('Submit ticket'),
+                : Text('support.submit'.tr()),
           ),
         ],
       ),
@@ -659,7 +686,8 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                 if (_conversation != null) _StatusChip(status: _conversation!.status),
                 const SizedBox(width: 8),
                 Text(
-                  (_conversation?.category ?? 'other').toUpperCase(),
+                  _supportCategoryLabel(_conversation?.category ?? 'other')
+                      .toUpperCase(),
                   style: AppTheme.bodySmall.copyWith(
                     color: AppColors.gold,
                     fontWeight: FontWeight.w700,
@@ -688,7 +716,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                     : _messages.isEmpty
                         ? Center(
                             child: Text(
-                              'No messages yet',
+                              'support.noMessages'.tr(),
                               style: AppTheme.bodyMedium.copyWith(
                                 color: AppTheme.textSecondary,
                               ),
@@ -730,7 +758,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
               Padding(
                 padding: const EdgeInsets.all(8),
                 child: Text(
-                  'This ticket is closed',
+                  'support.closed'.tr(),
                   style: AppTheme.bodySmall.copyWith(color: Colors.redAccent),
                 ),
               )
@@ -748,7 +776,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                       maxLines: 3,
                       enabled: !_sending,
                       decoration: InputDecoration(
-                        hintText: 'Type your message...',
+                        hintText: 'support.typeMessage'.tr(),
                         filled: true,
                         fillColor: AppTheme.backgroundColor,
                         border: OutlineInputBorder(
@@ -808,7 +836,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                   isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
               children: [
                 Text(
-                  isMe ? 'You' : 'Support Admin',
+                  isMe ? 'support.you'.tr() : 'support.admin'.tr(),
                   style: AppTheme.bodySmall.copyWith(
                     color: AppTheme.textSecondary,
                   ),
@@ -862,7 +890,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                 Text(
                   message.createdAt != null
                       ? TimeUtils.timeAgo(message.createdAt!)
-                      : 'Just now',
+                      : 'support.justNow'.tr(),
                   style: AppTheme.bodySmall.copyWith(
                     color: AppTheme.textSecondary,
                     fontSize: 11,
@@ -916,7 +944,7 @@ class _StatusChip extends StatelessWidget {
         border: Border.all(color: color.withValues(alpha: 0.5)),
       ),
       child: Text(
-        s.toUpperCase(),
+        _supportStatusLabel(s),
         style: TextStyle(
           color: color,
           fontSize: 10,

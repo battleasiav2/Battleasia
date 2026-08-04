@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/constants/withdrawal_channels.dart';
@@ -136,7 +137,7 @@ class _WalletScreenState extends State<WalletScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to load wallet history: ${e.toString()}'),
+            content: Text('common.error'.tr(namedArgs: {'error': e.toString()})),
             backgroundColor: Colors.red,
           ),
         );
@@ -198,11 +199,11 @@ class _WalletScreenState extends State<WalletScreen> {
 
   static const List<WithdrawalChannel> _paymentOptions = kWithdrawalChannels;
 
-  static const List<Map<String, String>> _currencyOptions = [
-    {'value': 'BDT', 'label': 'Bangladeshi Taka (BDT)'},
-    {'value': 'INR', 'label': 'Indian Rupee (INR)'},
-    {'value': 'PKR', 'label': 'Pakistani Rupee (PKR)'},
-    {'value': 'USD', 'label': 'US Dollar (USD)'},
+  List<Map<String, String>> get _currencyOptions => [
+    {'value': 'BDT', 'label': 'wallet.currencyBdt'.tr()},
+    {'value': 'INR', 'label': 'wallet.currencyInr'.tr()},
+    {'value': 'PKR', 'label': 'wallet.currencyPkr'.tr()},
+    {'value': 'USD', 'label': 'wallet.currencyUsd'.tr()},
   ];
 
   void _showWithdrawalModal(BuildContext context, double availableBalance) {
@@ -242,8 +243,8 @@ class _WalletScreenState extends State<WalletScreen> {
               // Validation
               if (coins <= 0) {
                 ScaffoldMessenger.of(parentContext).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please enter a valid coin amount'),
+                  SnackBar(
+                    content: Text('wallet.invalidCoinAmount'.tr()),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -251,8 +252,8 @@ class _WalletScreenState extends State<WalletScreen> {
               }
               if (selectedPaymentChannel.isEmpty) {
                 ScaffoldMessenger.of(parentContext).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please select a payment channel'),
+                  SnackBar(
+                    content: Text('wallet.selectPaymentChannel'.tr()),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -260,8 +261,8 @@ class _WalletScreenState extends State<WalletScreen> {
               }
               if (walletAddressController.text.trim().isEmpty) {
                 ScaffoldMessenger.of(parentContext).showSnackBar(
-                  const SnackBar(
-                    content: Text('Please enter a wallet address'),
+                  SnackBar(
+                    content: Text('wallet.enterWalletAddress'.tr()),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -270,8 +271,9 @@ class _WalletScreenState extends State<WalletScreen> {
               if (coins > maxWithdrawable) {
                 ScaffoldMessenger.of(parentContext).showSnackBar(
                   SnackBar(
-                    content: Text(
-                        'Exceeds withdrawable amount. Maximum: ${maxWithdrawable.toStringAsFixed(2)} BAC'),
+                    content: Text('wallet.exceedsWithdrawableMax'.tr(namedArgs: {
+                      'max': maxWithdrawable.toStringAsFixed(2),
+                    })),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -304,9 +306,8 @@ class _WalletScreenState extends State<WalletScreen> {
                   // Show success
                   if (parentContext.mounted) {
                     ScaffoldMessenger.of(parentContext).showSnackBar(
-                      const SnackBar(
-                        content:
-                            Text('Withdrawal request submitted successfully'),
+                      SnackBar(
+                        content: Text('wallet.submitSuccess'.tr()),
                         backgroundColor: Colors.green,
                       ),
                     );
@@ -324,7 +325,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     ScaffoldMessenger.of(parentContext).showSnackBar(
                       SnackBar(
                         content: Text(result['message']?.toString() ??
-                            'Failed to submit withdrawal'),
+                            'wallet.submitFailed'.tr()),
                         backgroundColor: Colors.red,
                       ),
                     );
@@ -337,7 +338,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 if (parentContext.mounted) {
                   ScaffoldMessenger.of(parentContext).showSnackBar(
                     SnackBar(
-                      content: Text('Error: ${e.toString()}'),
+                      content: Text('common.error'.tr(namedArgs: {'error': e.toString()})),
                       backgroundColor: Colors.red,
                     ),
                   );
@@ -376,10 +377,10 @@ class _WalletScreenState extends State<WalletScreen> {
                             const Icon(Icons.swap_horiz,
                                 color: Colors.orange, size: 22),
                             const SizedBox(width: 8),
-                            const Expanded(
+                            Expanded(
                               child: Text(
-                                'Request Withdrawal',
-                                style: TextStyle(
+                                'wallet.requestWithdrawal'.tr(),
+                                style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
                                   color: Colors.black,
@@ -417,7 +418,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                 child: Column(
                                   children: [
                                     _buildModalBalanceRow(
-                                      'Available Balance',
+                                      'wallet.availableBalance'.tr(),
                                       availableBalance,
                                       valueColor: Colors.orange.shade700,
                                     ),
@@ -425,7 +426,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                     const Divider(height: 1),
                                     const SizedBox(height: 12),
                                     _buildModalBalanceRow(
-                                      'Withdrawable Amount',
+                                      'wallet.withdrawableAmount'.tr(),
                                       maxWithdrawable,
                                       valueColor: _hasPendingWithdrawal
                                           ? Colors.black38
@@ -434,7 +435,10 @@ class _WalletScreenState extends State<WalletScreen> {
                                     if (_hasPendingWithdrawal) ...[
                                       const SizedBox(height: 6),
                                       Text(
-                                        'Pending withdrawal: ${_pendingWithdrawalAmount.toStringAsFixed(2)} BAC',
+                                        'wallet.pendingWithdrawal'.tr(namedArgs: {
+                                          'amount': _pendingWithdrawalAmount
+                                              .toStringAsFixed(2),
+                                        }),
                                         style: const TextStyle(
                                           color: Colors.red,
                                           fontSize: 12,
@@ -447,9 +451,9 @@ class _WalletScreenState extends State<WalletScreen> {
                               const SizedBox(height: 20),
 
                               // Select Currency
-                              const Text(
-                                'Select Currency',
-                                style: TextStyle(
+                              Text(
+                                'wallet.selectCurrency'.tr(),
+                                style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.black54,
@@ -473,8 +477,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                     borderSide: BorderSide(
                                         color: Colors.grey.shade300),
                                   ),
-                                  hintText:
-                                      'Choose the currency for withdrawal',
+                                  hintText: 'wallet.currencyHint'.tr(),
                                   hintStyle: const TextStyle(
                                       color: Colors.black38, fontSize: 13),
                                 ),
@@ -498,9 +501,9 @@ class _WalletScreenState extends State<WalletScreen> {
                               const SizedBox(height: 20),
 
                               // Coin Amount
-                              const Text(
-                                'Coin Amount (BAC)',
-                                style: TextStyle(
+                              Text(
+                                'wallet.coinAmount'.tr(),
+                                style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.black54,
@@ -515,7 +518,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                         decimal: true),
                                 onChanged: (_) => setModalState(() {}),
                                 decoration: InputDecoration(
-                                  hintText: 'Enter amount in BAC',
+                                  hintText: 'wallet.coinAmountHint'.tr(),
                                   hintStyle: const TextStyle(
                                       color: Colors.black38, fontSize: 13),
                                   prefixIcon: Padding(
@@ -532,15 +535,16 @@ class _WalletScreenState extends State<WalletScreen> {
                                       ),
                                     ),
                                   ),
-                                  helperText:
-                                      'Maximum: ${maxWithdrawable.toStringAsFixed(2)} BAC',
+                                  helperText: 'wallet.maximum'.tr(namedArgs: {
+                                    'amount': maxWithdrawable.toStringAsFixed(2),
+                                  }),
                                   helperStyle: const TextStyle(
                                       color: Colors.black38, fontSize: 11),
                                   errorText: () {
                                     final v = double.tryParse(
                                         coinAmountController.text);
                                     if (v != null && v > maxWithdrawable) {
-                                      return 'Exceeds withdrawable amount';
+                                      return 'wallet.exceedsWithdrawable'.tr();
                                     }
                                     return null;
                                   }(),
@@ -583,7 +587,9 @@ class _WalletScreenState extends State<WalletScreen> {
                                         MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
-                                        'Estimated $selectedCurrency',
+                                        'wallet.estimatedCurrency'.tr(namedArgs: {
+                                          'currency': selectedCurrency,
+                                        }),
                                         style: const TextStyle(
                                           fontSize: 13,
                                           color: Colors.black54,
@@ -604,9 +610,9 @@ class _WalletScreenState extends State<WalletScreen> {
                               const SizedBox(height: 20),
 
                               // Payment Channel
-                              const Text(
-                                'Payment Channel',
-                                style: TextStyle(
+                              Text(
+                                'wallet.paymentChannel'.tr(),
+                                style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.black54,
@@ -632,8 +638,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                     borderSide: BorderSide(
                                         color: Colors.grey.shade300),
                                   ),
-                                  hintText:
-                                      'Select your preferred payment method',
+                                  hintText: 'wallet.paymentChannelHint'.tr(),
                                   hintStyle: const TextStyle(
                                       color: Colors.black38, fontSize: 13),
                                 ),
@@ -663,9 +668,9 @@ class _WalletScreenState extends State<WalletScreen> {
                               const SizedBox(height: 20),
 
                               // Wallet Address
-                              const Text(
-                                'Wallet Address',
-                                style: TextStyle(
+                              Text(
+                                'wallet.walletAddress'.tr(),
+                                style: const TextStyle(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.black54,
@@ -677,8 +682,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                 enabled: !isSubmitting,
                                 onChanged: (_) => setModalState(() {}),
                                 decoration: InputDecoration(
-                                  hintText:
-                                      'Enter the destination address for receiving funds',
+                                  hintText: 'wallet.walletAddressHint'.tr(),
                                   hintStyle: const TextStyle(
                                       color: Colors.black38, fontSize: 13),
                                   border: OutlineInputBorder(
@@ -725,7 +729,7 @@ class _WalletScreenState extends State<WalletScreen> {
                                           BorderRadius.circular(8),
                                     ),
                                   ),
-                                  child: const Text('Cancel'),
+                                  child: Text('wallet.cancel'.tr()),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -754,9 +758,9 @@ class _WalletScreenState extends State<WalletScreen> {
                                             color: Colors.white,
                                           ),
                                         )
-                                      : const Text(
-                                          'Continue',
-                                          style: TextStyle(
+                                      : Text(
+                                          'wallet.continue'.tr(),
+                                          style: const TextStyle(
                                               fontWeight: FontWeight.w700),
                                         ),
                                 ),
@@ -858,34 +862,46 @@ class _WalletScreenState extends State<WalletScreen> {
     final matchName = detail['matchName']?.toString();
 
     if (reason == 'match_entry_fee') {
-      return matchName != null ? 'Match Joined - $matchName' : 'Match Entry Fee';
+      return matchName != null
+          ? 'wallet.txMatchJoined'.tr(namedArgs: {'name': matchName})
+          : 'wallet.txMatchEntryFee'.tr();
     }
     if (reason == 'match_result_update') {
-      return matchName != null ? 'Match Earning - $matchName' : 'Match Earning';
+      return matchName != null
+          ? '${'wallet.txMatchEarning'.tr()} - $matchName'
+          : 'wallet.txMatchEarning'.tr();
     }
     if (reason == 'match_winnings') {
-      return matchName != null ? 'Match Winning - $matchName' : 'Match Winning';
+      return matchName != null
+          ? '${'wallet.txMatchWinning'.tr()} - $matchName'
+          : 'wallet.txMatchWinning'.tr();
     }
     if (reason == 'match_reward') {
-      return matchName != null ? 'Match Reward - $matchName' : 'Match Reward';
+      return matchName != null
+          ? '${'wallet.txMatchReward'.tr()} - $matchName'
+          : 'wallet.txMatchReward'.tr();
     }
     if (reason == 'match_cancelled_refund') {
-      return matchName != null ? 'Match Refund - $matchName' : 'Match Refund';
+      return matchName != null
+          ? '${'wallet.txMatchRefund'.tr()} - $matchName'
+          : 'wallet.txMatchRefund'.tr();
     }
     if (reason == 'withdrawal_approved') {
-      return 'Withdrawal';
+      return 'wallet.txWithdrawal'.tr();
     }
     if (reason == 'withdrawal_rejected_refund') {
-      return 'Withdrawal Refund';
+      return 'wallet.txWithdrawalRefund'.tr();
     }
     if (reason == 'referral_bonus') {
-      return 'Referral Bonus';
+      return 'wallet.txReferralBonus'.tr();
     }
     if (detail['note'] != null) {
       return detail['note'].toString();
     }
-    if (transaction.type == 'earning') return 'Earning';
-    return transaction.type == 'deposit' ? 'Deposit' : 'Withdrawal';
+    if (transaction.type == 'earning') return 'wallet.txEarning'.tr();
+    return transaction.type == 'deposit'
+        ? 'wallet.txDeposit'.tr()
+        : 'wallet.txWithdrawal'.tr();
   }
 
   String _formatDate(DateTime? date) {
@@ -1087,7 +1103,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 ),
                 SizedBox(width: spacing8),
                 Text(
-                  'Total Balance',
+                  'wallet.totalBalance'.tr(),
                   style: AppTheme.heading3.copyWith(
                     color: Colors.black,
                     fontWeight: FontWeight.w500,
@@ -1133,7 +1149,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 Expanded(
                   child: _buildBreakdownItem(
                     context,
-                    'Total Deposit',
+                    'wallet.totalDeposit'.tr(),
                     walletData['totalDeposit'].toStringAsFixed(2),
                   ),
                 ),
@@ -1141,7 +1157,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 Expanded(
                   child: _buildBreakdownItem(
                     context,
-                    'Total Join',
+                    'wallet.totalJoin'.tr(),
                     walletData['totalJoin'].toStringAsFixed(2),
                   ),
                 ),
@@ -1153,7 +1169,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 Expanded(
                   child: _buildBreakdownItem(
                     context,
-                    'Total Withdrawal',
+                    'wallet.totalWithdrawal'.tr(),
                     walletData['totalWithdrawal'].toStringAsFixed(2),
                   ),
                 ),
@@ -1161,7 +1177,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 Expanded(
                   child: _buildBreakdownItem(
                     context,
-                    'Withdrawable',
+                    'wallet.withdrawable'.tr(),
                     _hasPendingWithdrawal
                         ? '0.00'
                         : _withdrawableAmount.toStringAsFixed(2),
@@ -1175,7 +1191,9 @@ class _WalletScreenState extends State<WalletScreen> {
             if (_hasPendingWithdrawal) ...[
               SizedBox(height: spacing8),
               Text(
-                'Pending withdrawal: ${_pendingWithdrawalAmount.toStringAsFixed(2)} BAC',
+                'wallet.pendingWithdrawal'.tr(namedArgs: {
+                  'amount': _pendingWithdrawalAmount.toStringAsFixed(2),
+                }),
                 style: AppTheme.bodySmall.copyWith(
                   color: Colors.red,
                   fontSize: 11.0,
@@ -1184,7 +1202,7 @@ class _WalletScreenState extends State<WalletScreen> {
             ] else ...[
               SizedBox(height: spacing8),
               Text(
-                '* Min(Total match bets × 70% - Already withdrawn, Current balance)',
+                'wallet.withdrawableFormula'.tr(),
                 style: AppTheme.bodySmall.copyWith(
                   color: Colors.black38,
                   fontSize: 10.0,
@@ -1214,7 +1232,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       ),
                     ),
                     child: Text(
-                      'WITHDRAW',
+                      'wallet.withdrawButton'.tr(),
                       style: TextStyle(
                           fontSize: buttonFontSize,
                           fontWeight: FontWeight.w700),
@@ -1328,7 +1346,7 @@ class _WalletScreenState extends State<WalletScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Wallet History',
+          'wallet.history'.tr(),
           style: AppTheme.heading2.copyWith(
             color: AppTheme.primaryColor,
             fontWeight: FontWeight.w700,
@@ -1348,7 +1366,7 @@ class _WalletScreenState extends State<WalletScreen> {
             child: Padding(
               padding: EdgeInsets.all(emptyStatePadding),
               child: Text(
-                'No transaction history found',
+                'wallet.noHistory'.tr(),
                 style: AppTheme.bodyMedium.copyWith(
                   color: Colors.grey,
                   fontSize: emptyStateFontSize,
@@ -1370,29 +1388,31 @@ class _WalletScreenState extends State<WalletScreen> {
     final reason = detail['reason']?.toString();
 
     // Default
-    String label = transaction.type == 'withdraw' ? 'Betting' : 'Earning';
+    String label = transaction.type == 'withdraw'
+        ? 'wallet.txBetting'.tr()
+        : 'wallet.txEarning'.tr();
     Color color = transaction.type == 'withdraw' ? Colors.blue : Colors.green;
 
     if (reason == 'match_entry_fee') {
-      label = 'Betting';
+      label = 'wallet.txBetting'.tr();
       color = Colors.blue;
     } else if (reason == 'match_winnings' ||
         reason == 'match_result_update' ||
         reason == 'match_winner_refund_return' ||
         reason == 'match_reward') {
-      label = 'Earning';
+      label = 'wallet.txEarning'.tr();
       color = Colors.red;
     } else if (reason == 'withdrawal_approved') {
-      label = 'Withdrawal';
+      label = 'wallet.txWithdrawal'.tr();
       color = Colors.orange;
     } else if (reason == 'withdrawal_rejected_refund') {
-      label = 'Refund';
+      label = 'wallet.txRefund'.tr();
       color = Colors.blue;
     } else if (detail['deposit_id'] != null) {
-      label = 'Deposit';
+      label = 'wallet.txDeposit'.tr();
       color = Colors.green;
     } else if (reason == 'referral_bonus') {
-      label = 'Referral';
+      label = 'wallet.txReferral'.tr();
       color = Colors.green;
     }
 
@@ -1405,14 +1425,14 @@ class _WalletScreenState extends State<WalletScreen> {
 
     switch (status) {
       case 'pending':
-        return {'label': 'Pending', 'color': Colors.orange};
+        return {'label': 'wallet.statusPending'.tr(), 'color': Colors.orange};
       case 'processing':
-        return {'label': 'Processing', 'color': Colors.blue};
+        return {'label': 'wallet.statusProcessing'.tr(), 'color': Colors.blue};
       case 'rejected':
       case 'failed':
-        return {'label': 'Failed', 'color': Colors.red};
+        return {'label': 'wallet.statusFailed'.tr(), 'color': Colors.red};
       default:
-        return {'label': 'Completed', 'color': Colors.green};
+        return {'label': 'wallet.statusCompleted'.tr(), 'color': Colors.green};
     }
   }
 

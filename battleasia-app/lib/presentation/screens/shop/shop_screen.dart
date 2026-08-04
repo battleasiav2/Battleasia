@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -42,9 +43,9 @@ class _ShopScreenState extends State<ShopScreen> {
   double _wheelAccumulator = 0.0;
 
   final List<Map<String, String>> _categories = [
-    {'value': 'all', 'label': 'All'},
-    {'value': 'premium', 'label': 'Premium'},
-    {'value': 'normal', 'label': 'Normal'},
+    {'value': 'all', 'key': 'shop.categoryAll'},
+    {'value': 'premium', 'key': 'shop.categoryPremium'},
+    {'value': 'normal', 'key': 'shop.categoryNormal'},
   ];
 
   @override
@@ -116,7 +117,7 @@ class _ShopScreenState extends State<ShopScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to load shop items: $e'),
+            content: Text('common.error'.tr(namedArgs: {'error': e.toString()})),
             backgroundColor: Colors.red,
           ),
         );
@@ -386,7 +387,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'BAC STORE',
+                      'shop.heroTitle'.tr(),
                       style: AppTheme.heading2.copyWith(
                         color: AppColors.gold,
                         fontWeight: FontWeight.w900,
@@ -396,7 +397,7 @@ class _ShopScreenState extends State<ShopScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Buy BattleAsia coins — pay with bKash, Nagad or crypto.',
+                      'shop.heroSubtitle'.tr(),
                       style: AppTheme.bodySmall.copyWith(
                         color: Colors.white.withValues(alpha: 0.85),
                       ),
@@ -415,15 +416,15 @@ class _ShopScreenState extends State<ShopScreen> {
     return Row(
       children: [
         Expanded(
-          child: _statTile('Balance', '${balance.toStringAsFixed(0)} BAC'),
+          child: _statTile('shop.statBalance'.tr(), '${balance.toStringAsFixed(0)} BAC'),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _statTile('Packs', '${_allItems.length}'),
+          child: _statTile('shop.statPacks'.tr(), '${_allItems.length}'),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _statTile('Channels', '${_channels.length}'),
+          child: _statTile('shop.statChannels'.tr(), '${_channels.length}'),
         ),
       ],
     );
@@ -465,7 +466,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
   Widget _buildFilters() {
     final channelItems = <DropdownMenuItem<String>>[
-      const DropdownMenuItem(value: '', child: Text('All channels')),
+      DropdownMenuItem(value: '', child: Text('shop.allChannels'.tr())),
       ..._channels.map((c) {
         final id = c['_id']?.toString() ?? '';
         final name = c['channel_name']?.toString() ?? 'Channel';
@@ -484,7 +485,7 @@ class _ShopScreenState extends State<ShopScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'FILTERS',
+            'shop.filters'.tr(),
             style: AppTheme.bodySmall.copyWith(
               color: AppColors.textMuted,
               fontWeight: FontWeight.w800,
@@ -528,7 +529,7 @@ class _ShopScreenState extends State<ShopScreen> {
                     color: AppColors.textPrimary,
                     fontSize: 13,
                   ),
-                  decoration: _priceDecoration('Min \$'),
+                  decoration: _priceDecoration('shop.minPrice'.tr()),
                 ),
               ),
               const SizedBox(width: 8),
@@ -543,14 +544,14 @@ class _ShopScreenState extends State<ShopScreen> {
                     color: AppColors.textPrimary,
                     fontSize: 13,
                   ),
-                  decoration: _priceDecoration('Max \$'),
+                  decoration: _priceDecoration('shop.maxPrice'.tr()),
                 ),
               ),
               const SizedBox(width: 8),
               TextButton(
                 onPressed: _clearPriceFilters,
                 child: Text(
-                  'Clear',
+                  'shop.clear'.tr(),
                   style: TextStyle(color: AppColors.gold, fontSize: 12),
                 ),
               ),
@@ -611,7 +612,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   borderRadius: BorderRadius.circular(2),
                 ),
                 child: Text(
-                  category['label']!,
+                  category['key']!.tr(),
                   style: AppTheme.bodyMedium.copyWith(
                     fontSize: 13,
                     color: isSelected ? AppColors.gold : AppColors.textMuted,
@@ -640,7 +641,7 @@ class _ShopScreenState extends State<ShopScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'No packs match your filters',
+              'shop.emptyFilters'.tr(),
               style: AppTheme.heading3.copyWith(color: AppColors.textMuted),
             ),
           ],

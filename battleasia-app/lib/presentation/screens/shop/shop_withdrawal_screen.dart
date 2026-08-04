@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
@@ -75,15 +76,15 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
     final max = _hasPending ? 0.0 : _withdrawable;
 
     if (amount <= 0) {
-      _toast('Enter a valid BAC amount');
+      _toast('shop.invalidAmount'.tr());
       return;
     }
     if (wallet.isEmpty) {
-      _toast('Enter your wallet / mobile number');
+      _toast('shop.enterWallet'.tr());
       return;
     }
     if (amount > max) {
-      _toast('Exceeds withdrawable amount. Max: ${max.toStringAsFixed(2)} BAC');
+      _toast('shop.exceedsMax'.tr(namedArgs: {'max': max.toStringAsFixed(2)}));
       return;
     }
 
@@ -91,19 +92,23 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surfaceElevated,
-        title: Text('Confirm withdrawal', style: AppTheme.heading3),
+        title: Text('shop.confirmTitle'.tr(), style: AppTheme.heading3),
         content: Text(
-          'Withdraw ${amount.toStringAsFixed(2)} BAC via $_channel to:\n$wallet',
+          'shop.confirmBody'.tr(namedArgs: {
+            'amount': amount.toStringAsFixed(2),
+            'channel': _channel,
+            'wallet': wallet,
+          }),
           style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text('shop.cancel'.tr()),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Confirm', style: TextStyle(color: AppColors.gold)),
+            child: Text('shop.confirm'.tr(), style: TextStyle(color: AppColors.gold)),
           ),
         ],
       ),
@@ -124,12 +129,12 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
 
       if (!mounted) return;
       if (result['success'] == true) {
-        _toast('Withdrawal request submitted', ok: true);
+        _toast('shop.submitSuccess'.tr(), ok: true);
         _amountController.clear();
         _walletController.clear();
         await _load();
       } else {
-        _toast(result['message']?.toString() ?? 'Withdrawal failed');
+        _toast(result['message']?.toString() ?? 'shop.submitFailed'.tr());
       }
     } finally {
       if (mounted) setState(() => _submitting = false);
@@ -174,7 +179,7 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                       const ShopSectionNav(current: ShopSectionTab.withdrawal),
                       const SizedBox(height: 16),
                       Text(
-                        'Withdraw BAC',
+                        'shop.withdrawTitle'.tr(),
                         style: AppTheme.heading2.copyWith(
                           color: AppColors.textPrimary,
                           fontWeight: FontWeight.w800,
@@ -182,7 +187,7 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Request a payout to bKash, Nagad, or crypto wallet.',
+                        'shop.withdrawSubtitle'.tr(),
                         style: AppTheme.bodyMedium.copyWith(
                           color: AppColors.textMuted,
                         ),
@@ -200,14 +205,14 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                           children: [
                             Expanded(
                               child: _statTile(
-                                'Balance',
+                                'shop.statBalance'.tr(),
                                 '${balance.toStringAsFixed(2)} BAC',
                               ),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: _statTile(
-                                'Withdrawable',
+                                'wallet.withdrawable'.tr(),
                                 '${maxOut.toStringAsFixed(2)} BAC',
                               ),
                             ),
@@ -226,7 +231,9 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                               borderRadius: BorderRadius.circular(2),
                             ),
                             child: Text(
-                              'Pending withdrawal: ${_pendingAmount.toStringAsFixed(2)} BAC. New requests are blocked until it clears.',
+                              'shop.pendingBlocked'.tr(namedArgs: {
+                                'amount': _pendingAmount.toStringAsFixed(2),
+                              }),
                               style: AppTheme.bodySmall.copyWith(
                                 color: AppColors.gold,
                               ),
@@ -234,7 +241,7 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                           ),
                         ],
                         const SizedBox(height: 20),
-                        _label('Currency'),
+                        _label('shop.labelCurrency'.tr()),
                         const SizedBox(height: 6),
                         _dropdown(
                           value: _currency,
@@ -242,7 +249,7 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                           onChanged: (v) => setState(() => _currency = v!),
                         ),
                         const SizedBox(height: 14),
-                        _label('Channel'),
+                        _label('shop.labelChannel'.tr()),
                         const SizedBox(height: 6),
                         _dropdown(
                           value: _channel,
@@ -250,7 +257,7 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                           onChanged: (v) => setState(() => _channel = v!),
                         ),
                         const SizedBox(height: 14),
-                        _label('BAC amount'),
+                        _label('shop.labelBacAmount'.tr()),
                         const SizedBox(height: 6),
                         TextField(
                           controller: _amountController,
@@ -263,18 +270,20 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                           decoration: _fieldDecoration('0.00'),
                         ),
                         const SizedBox(height: 14),
-                        _label('Wallet / mobile number'),
+                        _label('shop.labelWalletMobile'.tr()),
                         const SizedBox(height: 6),
                         TextField(
                           controller: _walletController,
                           style: AppTheme.bodyMedium.copyWith(
                             color: AppColors.textPrimary,
                           ),
-                          decoration: _fieldDecoration('01XXXXXXXXX or address'),
+                          decoration: _fieldDecoration('shop.walletHint'.tr()),
                         ),
                         const SizedBox(height: 24),
                         GoldButton(
-                          label: _submitting ? 'Submitting…' : 'Request withdrawal',
+                          label: _submitting
+                              ? 'shop.submitting'.tr()
+                              : 'shop.requestWithdrawal'.tr(),
                           onPressed: (_submitting || _hasPending) ? null : _submit,
                         ),
                       ],
