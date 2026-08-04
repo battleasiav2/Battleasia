@@ -11,15 +11,15 @@ import { useTranslate } from 'src/locales/use-locales';
 
 const GOLD = '#f5c518';
 
-/** Supported games + payment partners — Activision-style logo strip */
+/** Trusted partner / affiliate domain pills */
 const FOOTER_PARTNERS = [
-  { name: 'PUBG Mobile', image: '/assets/images/games/pubg-mobile.png' },
-  { name: 'Free Fire', image: '/assets/images/games/free-fire.png' },
-  { name: 'COD Mobile', image: '/assets/images/games/cod-mobile.png' },
-  { name: 'Valorant', image: '/assets/images/games/valorant.png' },
-  { name: 'Mobile Legends', image: '/assets/images/games/mobile-legends.png' },
-  { name: 'Bkash', image: '/assets/images/bkash.webp' },
-  { name: 'Nagad', image: '/assets/images/nagad.webp' },
+  { label: 'battleasia.com', href: 'https://battleasia.com' },
+  { label: 'baccoin.shop', href: 'https://baccoin.shop' },
+  { label: 'battleasia.net', href: 'https://battleasia.net' },
+  { label: 'pubg.com', href: 'https://www.pubg.com' },
+  { label: 'www.bkash.com', href: 'https://www.bkash.com' },
+  { label: 'nagadwallet.net', href: 'https://nagadwallet.net' },
+  { label: 'coinremitter.com', href: 'https://coinremitter.com' },
 ] as const;
 
 const linkSx = {
@@ -237,7 +237,7 @@ export function FooterSection() {
           ))}
         </Box>
 
-        {/* Partners strip — icon + name (reference: studio logo bar) */}
+        {/* Trusted partners — domain pills */}
         <Box
           sx={{
             pt: { xs: 2, md: 2.5 },
@@ -247,13 +247,11 @@ export function FooterSection() {
         >
           <Typography
             sx={{
-              mb: { xs: 1.75, md: 2.25 },
-              textAlign: 'center',
-              fontSize: { xs: 10, sm: 11 },
-              fontWeight: 700,
-              letterSpacing: 1.6,
-              textTransform: 'uppercase',
-              color: alpha('#ffffff', 0.4),
+              mb: { xs: 1.5, md: 2 },
+              textAlign: { xs: 'center', sm: 'left' },
+              fontSize: { xs: 12, sm: 13 },
+              fontWeight: 500,
+              color: alpha('#ffffff', 0.45),
             }}
           >
             {t('footer.trustedPartners')}
@@ -264,58 +262,39 @@ export function FooterSection() {
               display: 'flex',
               flexWrap: 'wrap',
               alignItems: 'center',
-              justifyContent: 'center',
-              gap: { xs: 2, sm: 2.75, md: 3.5 },
-              rowGap: { xs: 2, md: 2.5 },
-              px: { xs: 0.5, md: 1 },
+              justifyContent: { xs: 'center', sm: 'flex-start' },
+              gap: 1.25,
             }}
           >
             {FOOTER_PARTNERS.map((partner) => (
-              <Stack
-                key={partner.name}
-                direction="row"
-                alignItems="center"
-                spacing={1}
+              <Box
+                key={partner.label}
+                component="a"
+                href={partner.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 sx={{
-                  opacity: 0.72,
-                  transition: 'opacity 0.2s ease, transform 0.2s ease',
+                  px: 1.75,
+                  py: 0.85,
+                  borderRadius: '8px',
+                  border: `1px solid ${alpha('#ffffff', 0.18)}`,
+                  bgcolor: alpha('#ffffff', 0.04),
+                  color: '#ffffff',
+                  fontSize: { xs: 12, sm: 13 },
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  lineHeight: 1.2,
+                  whiteSpace: 'nowrap',
+                  transition: 'border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease',
                   '&:hover': {
-                    opacity: 1,
-                    transform: 'translateY(-1px)',
+                    borderColor: alpha(GOLD, 0.55),
+                    bgcolor: alpha(GOLD, 0.08),
+                    color: GOLD,
                   },
                 }}
               >
-                <Box
-                  component="img"
-                  src={partner.image}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  sx={{
-                    width: { xs: 28, sm: 34, md: 38 },
-                    height: { xs: 28, sm: 34, md: 38 },
-                    objectFit: 'cover',
-                    borderRadius: '4px',
-                    filter: 'grayscale(1) brightness(1.15) contrast(1.05)',
-                    border: `1px solid ${alpha('#ffffff', 0.14)}`,
-                    bgcolor: alpha('#ffffff', 0.04),
-                    flexShrink: 0,
-                  }}
-                />
-                <Typography
-                  sx={{
-                    color: '#ffffff',
-                    fontWeight: 700,
-                    fontSize: { xs: 11, sm: 12, md: 13 },
-                    letterSpacing: 0.6,
-                    textTransform: 'uppercase',
-                    whiteSpace: 'nowrap',
-                    lineHeight: 1,
-                  }}
-                >
-                  {partner.name}
-                </Typography>
-              </Stack>
+                {partner.label}
+              </Box>
             ))}
           </Box>
         </Box>
