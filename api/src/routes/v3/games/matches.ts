@@ -13,7 +13,13 @@ import {
 import { serializeMatch } from '../../../utils/serialize.js';
 import { recordBalanceHistory } from '../../../utils/balance-history.js';
 import { notifyBalanceChange } from '../../../utils/balance-notify.js';
-import { notifyMatchRefund, notifyMatchWinnings } from '../../../utils/payment-notifications.js';
+import {
+  notifyMatchCancelled,
+  notifyMatchRefund,
+  notifyMatchRoomReady,
+  notifyMatchStarted,
+  notifyMatchWinnings,
+} from '../../../utils/payment-notifications.js';
 import {
   emitDashboardStatsUpdated,
   emitMatchCreated,
@@ -255,6 +261,11 @@ router.post('/:id/refund', requireAuth, async (req, res) => {
     match.status = 'cancel';
     await match.save();
 
+    await notifyMatchCancelled({
+      matchId: match._id.toString(),
+      matchName: match.matchName,
+    });
+
     const game = await Game.findById(match.gameId);
     return res.json({ status: true, data: serializeMatch(match, game?.name) });
   } catch (error) {
@@ -333,6 +344,9 @@ router.put('/:id', requireAuth, async (req, res) => {
       return res.status(404).json({ status: false, message: 'Match not found' });
     }
 
+    const prevStatus = match.status;
+    const prevRoomId = (match.roomId || '').trim();
+
     const updatable = [
       'gameId', 'gameMode', 'roomId', 'password', 'matchName', 'matchUrl',
       'matchSchedule', 'killRateType', 'entryFee', 'totalPlayer', 'teamType',
@@ -348,6 +362,25 @@ router.put('/:id', requireAuth, async (req, res) => {
     }
 
     await match.save();
+
+    const nextRoomId = (match.roomId || '').trim();
+    const roomJustPublished = Boolean(nextRoomId) && nextRoomId !== prevRoomId;
+    const statusJustStarted = prevStatus !== 'start' && match.status === 'start';
+
+    if (roomJustPublished) {
+      await notifyMatchRoomReady({
+        matchId: match._id.toString(),
+        matchName: match.matchName,
+        roomId: nextRoomId,
+        password: match.password || '',
+      });
+    } else if (statusJustStarted) {
+      await notifyMatchStarted({
+        matchId: match._id.toString(),
+        matchName: match.matchName,
+      });
+    }
+
     const game = await Game.findById(match.gameId);
     const data = serializeMatch(match, game?.name);
     emitMatchUpdated({ ...data, gameId: match.gameId.toString() });

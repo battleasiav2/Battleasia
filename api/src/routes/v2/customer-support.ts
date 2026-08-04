@@ -13,6 +13,7 @@ import {
   serializeSupportMessage,
 } from '../../utils/feed-serialize.js';
 import { getSocketServer } from '../../utils/socket.js';
+import { notifySupportReply } from '../../utils/payment-notifications.js';
 import { getAppSettings, normalizeLiveChatSettings } from '../../models/AppSettings.js';
 
 const router = Router();
@@ -292,6 +293,14 @@ router.post('/message', requireAuth, async (req: AuthedRequest, res) => {
 
     const serialized = serializeSupportMessage(message);
     emitToConversation(conversationId, 'new-message', serialized);
+
+    if (isAdmin) {
+      await notifySupportReply({
+        userId: conversation.userId.toString(),
+        conversationId: conversation._id.toString(),
+        preview: String(body),
+      });
+    }
 
     return res.status(201).json({ status: true, data: serialized });
   } catch (error) {

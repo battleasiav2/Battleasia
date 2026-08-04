@@ -11,6 +11,10 @@ import {
 import { generateReferralCode, serializeUser } from '../../../utils/serialize.js';
 import { recordBalanceHistory } from '../../../utils/balance-history.js';
 import { notifyBalanceChange } from '../../../utils/balance-notify.js';
+import {
+  notifyAdminBalanceCredit,
+  notifyAdminBalanceDebit,
+} from '../../../utils/payment-notifications.js';
 import { processReferralCommission } from '../../../utils/referral.js';
 
 const router = Router();
@@ -230,10 +234,21 @@ router.patch('/:id/balance', requireAuth, async (req: AuthedRequest, res) => {
     await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
 
     if (type === 'deposit') {
+      await notifyAdminBalanceCredit({
+        userId: user._id.toString(),
+        amount,
+        adminName: admin?.username || 'Admin',
+      });
       await processReferralCommission({
         depositor: user,
         depositAmount: amount,
         depositSource: 'admin',
+      });
+    } else {
+      await notifyAdminBalanceDebit({
+        userId: user._id.toString(),
+        amount,
+        adminName: admin?.username || 'Admin',
       });
     }
 

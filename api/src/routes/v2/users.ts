@@ -27,6 +27,7 @@ import {
 } from '../../utils/profile-social.js';
 import { recordBalanceHistory } from '../../utils/balance-history.js';
 import { notifyBalanceChange } from '../../utils/balance-notify.js';
+import { notifyPremiumActivated } from '../../utils/payment-notifications.js';
 import { buildMyMatchHistory, buildUserMatchHistory } from '../../utils/match-history.js';
 import { resolveReferrerId } from '../../utils/referral.js';
 import { logAuthCode } from '../../utils/auth-log.js';
@@ -525,6 +526,10 @@ router.post('/premium/activate', requireAuth, async (req: AuthedRequest, res) =>
     });
 
     await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
+    await notifyPremiumActivated({
+      userId: user._id.toString(),
+      days: settings.premiumDuration,
+    });
 
     return res.json({ status: true, user: serializeUser(user) });
   } catch (error) {

@@ -13,6 +13,7 @@ import { notifyBalanceChange } from '../../../utils/balance-notify.js';
 import {
   notifyDepositApproved,
   notifyDepositRejected,
+  notifyDepositSubmitted,
 } from '../../../utils/payment-notifications.js';
 import { processReferralCommission } from '../../../utils/referral.js';
 import { safeQueryStatus, DEPOSIT_STATUSES } from '../../../utils/query-filter.js';
@@ -139,6 +140,11 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
 
     await emitPendingPaymentCounts();
     emitNewDeposit(serializeDeposit(deposit, channel));
+    await notifyDepositSubmitted({
+      userId: user._id.toString(),
+      amount: coinAmount,
+      depositId: deposit._id.toString(),
+    });
 
     return res.status(201).json({
       status: true,

@@ -7,6 +7,7 @@ import { BalanceHistory } from '../../models/BalanceHistory.js';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
 import { serializeMatch } from '../../utils/serialize.js';
 import { notifyBalanceChange } from '../../utils/balance-notify.js';
+import { notifyMatchJoined } from '../../utils/payment-notifications.js';
 import { buildMyMatchHistory, buildUserMatchHistory } from '../../utils/match-history.js';
 import { isUserPremium } from '../../utils/serialize.js';
 
@@ -288,6 +289,13 @@ router.post('/matches/:id/join', requireAuth, async (req: AuthedRequest, res) =>
       pubgId: user.pubgId,
       entryFee,
       joinedAt: new Date(),
+    });
+
+    await notifyMatchJoined({
+      userId: user._id.toString(),
+      matchId: match._id.toString(),
+      matchName: match.matchName,
+      entryFee,
     });
 
     return res.json({

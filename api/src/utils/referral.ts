@@ -4,6 +4,7 @@ import { ReferralHistory } from '../models/ReferralHistory.js';
 import { getAppSettings } from '../models/AppSettings.js';
 import { recordBalanceHistory } from './balance-history.js';
 import { notifyBalanceChange } from './balance-notify.js';
+import { notifyReferralCommission } from './payment-notifications.js';
 
 export type ReferralDepositSource = 'manual' | 'admin' | 'coingo';
 
@@ -81,6 +82,11 @@ export async function processReferralCommission(input: {
   });
 
   await notifyBalanceChange(referrer._id.toString(), referrer.balance, balanceBefore);
+  await notifyReferralCommission({
+    userId: referrer._id.toString(),
+    amount: commissionAmount,
+    fromUsername: depositor.username,
+  });
 
   return { commissionAmount, commissionRate, historyId: history._id.toString() };
 }

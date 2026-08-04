@@ -14,6 +14,7 @@ import {
   notifyWithdrawalApproved,
   notifyWithdrawalCompleted,
   notifyWithdrawalRejected,
+  notifyWithdrawalSubmitted,
 } from '../../../utils/payment-notifications.js';
 import { safeQueryStatus, WITHDRAWAL_STATUSES } from '../../../utils/query-filter.js';
 
@@ -118,6 +119,11 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
 
     await emitPendingPaymentCounts();
     emitNewWithdrawal(serializeWithdrawal(withdrawal));
+    await notifyWithdrawalSubmitted({
+      userId: user._id.toString(),
+      amount: coinAmount,
+      withdrawalId: withdrawal._id.toString(),
+    });
 
     return res.status(201).json({
       status: true,
