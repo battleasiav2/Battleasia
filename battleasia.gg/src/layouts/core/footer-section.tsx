@@ -11,6 +11,17 @@ import { useTranslate } from 'src/locales/use-locales';
 
 const GOLD = '#f5c518';
 
+/** Supported games + payment partners — Activision-style logo strip */
+const FOOTER_PARTNERS = [
+  { name: 'PUBG Mobile', image: '/assets/images/games/pubg-mobile.png' },
+  { name: 'Free Fire', image: '/assets/images/games/free-fire.png' },
+  { name: 'COD Mobile', image: '/assets/images/games/cod-mobile.png' },
+  { name: 'Valorant', image: '/assets/images/games/valorant.png' },
+  { name: 'Mobile Legends', image: '/assets/images/games/mobile-legends.png' },
+  { name: 'Bkash', image: '/assets/images/bkash.webp' },
+  { name: 'Nagad', image: '/assets/images/nagad.webp' },
+] as const;
+
 const linkSx = {
   color: alpha('#ffffff', 0.55),
   textDecoration: 'none',
@@ -224,6 +235,89 @@ export function FooterSection() {
               </Stack>
             </Box>
           ))}
+        </Box>
+
+        {/* Partners strip — icon + name (reference: studio logo bar) */}
+        <Box
+          sx={{
+            pt: { xs: 2, md: 2.5 },
+            mt: { xs: 0.5, md: 1 },
+            borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
+          }}
+        >
+          <Typography
+            sx={{
+              mb: { xs: 1.75, md: 2.25 },
+              textAlign: 'center',
+              fontSize: { xs: 10, sm: 11 },
+              fontWeight: 700,
+              letterSpacing: 1.6,
+              textTransform: 'uppercase',
+              color: alpha('#ffffff', 0.4),
+            }}
+          >
+            {t('footer.trustedPartners')}
+          </Typography>
+
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: { xs: 2, sm: 2.75, md: 3.5 },
+              rowGap: { xs: 2, md: 2.5 },
+              px: { xs: 0.5, md: 1 },
+            }}
+          >
+            {FOOTER_PARTNERS.map((partner) => (
+              <Stack
+                key={partner.name}
+                direction="row"
+                alignItems="center"
+                spacing={1}
+                sx={{
+                  opacity: 0.72,
+                  transition: 'opacity 0.2s ease, transform 0.2s ease',
+                  '&:hover': {
+                    opacity: 1,
+                    transform: 'translateY(-1px)',
+                  },
+                }}
+              >
+                <Box
+                  component="img"
+                  src={partner.image}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  sx={{
+                    width: { xs: 28, sm: 34, md: 38 },
+                    height: { xs: 28, sm: 34, md: 38 },
+                    objectFit: 'cover',
+                    borderRadius: '4px',
+                    filter: 'grayscale(1) brightness(1.15) contrast(1.05)',
+                    border: `1px solid ${alpha('#ffffff', 0.14)}`,
+                    bgcolor: alpha('#ffffff', 0.04),
+                    flexShrink: 0,
+                  }}
+                />
+                <Typography
+                  sx={{
+                    color: '#ffffff',
+                    fontWeight: 700,
+                    fontSize: { xs: 11, sm: 12, md: 13 },
+                    letterSpacing: 0.6,
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap',
+                    lineHeight: 1,
+                  }}
+                >
+                  {partner.name}
+                </Typography>
+              </Stack>
+            ))}
+          </Box>
         </Box>
 
         {/* Bottom bar */}
