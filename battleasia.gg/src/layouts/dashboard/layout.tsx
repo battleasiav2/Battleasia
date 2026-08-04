@@ -246,8 +246,8 @@ export function DashboardLayout({
         {...slotProps?.header}
         slots={{ ...headerSlots, ...slotProps?.header?.slots }}
         slotProps={merge(headerSlotProps, slotProps?.header?.slotProps ?? {})}
-        sx={{
-          ...getPremiumSoftHeaderSx(
+        sx={[
+          getPremiumSoftHeaderSx(
             isNavVertical
               ? {
                   xs: 8,
@@ -255,8 +255,12 @@ export function DashboardLayout({
                 }
               : undefined
           ),
-          ...slotProps?.header?.sx,
-        }}
+          ...(Array.isArray(slotProps?.header?.sx)
+            ? slotProps.header.sx
+            : slotProps?.header?.sx
+              ? [slotProps.header.sx]
+              : []),
+        ]}
       />
     );
   };

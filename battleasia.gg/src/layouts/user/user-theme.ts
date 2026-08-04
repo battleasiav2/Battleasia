@@ -321,7 +321,9 @@ export const brandVersionBadgeTextSx: SxProps<Theme> = {
  * Style #4 Premium Soft — floating glass capsule header chrome.
  * Pass `insetLeft` when a vertical nav pushes the bar (e.g. `var(--layout-nav-vertical-width)`).
  */
-export function getPremiumSoftHeaderSx(insetLeft?: string | Record<string, string | number>): SxProps<Theme> {
+export function getPremiumSoftHeaderSx(
+  insetLeft?: string | Record<string, string | number>
+): Record<string, unknown> {
   return {
     top: { xs: 8, md: 12 },
     right: { xs: 8, md: 16 },
