@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/socket_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/balance_history_model.dart';
@@ -11,6 +12,7 @@ import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/withdraw_sheet.dart';
+import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
 
 class WalletScreen extends StatefulWidget {
   /// When opened from the store section tabs (Shop / Wallet / Withdraw).
@@ -486,11 +488,14 @@ class _WalletScreenState extends State<WalletScreen> {
       baseSize: 16.0,
     ).clamp(12.0, 16.0);
 
-    return Card(
-      color: AppTheme.surfaceColor,
-      child: Padding(
-        padding: EdgeInsets.all(cardPadding),
-        child: Column(
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surfaceElevated.withValues(alpha: 0.95),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border(0.16)),
+      ),
+      padding: EdgeInsets.all(cardPadding),
+      child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Total Balance
@@ -498,15 +503,15 @@ class _WalletScreenState extends State<WalletScreen> {
               children: [
                 Icon(
                   Icons.account_balance_wallet,
-                  color: AppTheme.primaryColor,
+                  color: AppColors.gold,
                   size: iconSize,
                 ),
                 SizedBox(width: spacing8),
                 Text(
                   'wallet.totalBalance'.tr(),
                   style: AppTheme.heading3.copyWith(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w500,
+                    color: AppColors.gold,
+                    fontWeight: FontWeight.w600,
                     fontSize: titleFontSize,
                   ),
                 ),
@@ -522,7 +527,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   errorBuilder: (context, error, stackTrace) {
                     return Icon(
                       Icons.account_balance_wallet,
-                      color: AppTheme.primaryColor,
+                      color: AppColors.gold,
                       size: currencyIconSize,
                     );
                   },
@@ -532,8 +537,8 @@ class _WalletScreenState extends State<WalletScreen> {
                   child: Text(
                     walletData['totalBalance'].toStringAsFixed(2),
                     style: AppTheme.heading2.copyWith(
-                      color: AppTheme.primaryColor,
-                      fontWeight: FontWeight.w700,
+                      color: AppColors.gold,
+                      fontWeight: FontWeight.w800,
                       fontSize: balanceFontSize,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -582,8 +587,8 @@ class _WalletScreenState extends State<WalletScreen> {
                         ? '0.00'
                         : _withdrawableAmount.toStringAsFixed(2),
                     valueColor: _hasPendingWithdrawal
-                        ? Colors.black38
-                        : Colors.orange.shade700,
+                        ? AppColors.textMuted
+                        : AppColors.gold,
                   ),
                 ),
               ],
@@ -595,7 +600,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   'amount': _pendingWithdrawalAmount.toStringAsFixed(2),
                 }),
                 style: AppTheme.bodySmall.copyWith(
-                  color: Colors.red,
+                  color: AppColors.error,
                   fontSize: 11.0,
                 ),
               ),
@@ -604,7 +609,7 @@ class _WalletScreenState extends State<WalletScreen> {
               Text(
                 'wallet.withdrawableFormula'.tr(),
                 style: AppTheme.bodySmall.copyWith(
-                  color: Colors.black38,
+                  color: AppColors.textMuted.withValues(alpha: 0.7),
                   fontSize: 10.0,
                 ),
               ),
@@ -618,15 +623,29 @@ class _WalletScreenState extends State<WalletScreen> {
                   child: ElevatedButton(
                     onPressed: _hasPendingWithdrawal
                         ? null
-                        : () => _showWithdrawalModal(
+                        : () {
+                            if (widget.fromShop) {
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const ShopWithdrawalScreen(),
+                                ),
+                              );
+                              return;
+                            }
+                            _showWithdrawalModal(
                               context,
                               walletData['totalBalance'] as double,
-                            ),
+                            );
+                          },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryColor,
+                      backgroundColor: AppColors.gold,
                       foregroundColor: Colors.white,
-                      disabledBackgroundColor: Colors.grey.shade300,
+                      disabledBackgroundColor:
+                          AppColors.gold.withValues(alpha: 0.25),
+                      disabledForegroundColor: Colors.white54,
                       padding: EdgeInsets.symmetric(vertical: buttonPadding),
+                      elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -635,7 +654,8 @@ class _WalletScreenState extends State<WalletScreen> {
                       'wallet.withdrawButton'.tr(),
                       style: TextStyle(
                           fontSize: buttonFontSize,
-                          fontWeight: FontWeight.w700),
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.8),
                     ),
                   ),
                 ),
@@ -643,7 +663,6 @@ class _WalletScreenState extends State<WalletScreen> {
             ),
           ],
         ),
-      ),
     );
   }
 
@@ -678,7 +697,7 @@ class _WalletScreenState extends State<WalletScreen> {
         Text(
           label,
           style: AppTheme.bodySmall.copyWith(
-            color: Colors.black54,
+            color: AppColors.textMuted,
             fontSize: labelFontSize,
           ),
           overflow: TextOverflow.ellipsis,
@@ -693,7 +712,7 @@ class _WalletScreenState extends State<WalletScreen> {
               errorBuilder: (context, error, stackTrace) {
                 return Icon(
                   Icons.account_balance_wallet,
-                  color: AppTheme.primaryColor,
+                  color: AppColors.gold,
                   size: currencyIconSize,
                 );
               },
@@ -703,8 +722,8 @@ class _WalletScreenState extends State<WalletScreen> {
               child: Text(
                 value,
                 style: AppTheme.bodyMedium.copyWith(
-                  color: valueColor ?? Colors.black,
-                  fontWeight: FontWeight.w600,
+                  color: valueColor ?? AppColors.textPrimary,
+                  fontWeight: FontWeight.w700,
                   fontSize: valueFontSize,
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -922,12 +941,15 @@ class _WalletScreenState extends State<WalletScreen> {
       baseSize: 16.0,
     ).clamp(14.0, 16.0);
 
-    return Card(
-      color: AppTheme.surfaceColor,
+    return Container(
       margin: EdgeInsets.only(bottom: cardMargin),
-      child: Padding(
-        padding: EdgeInsets.all(cardPadding),
-        child: Row(
+      padding: EdgeInsets.all(cardPadding),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceElevated.withValues(alpha: 0.92),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.border(0.14)),
+      ),
+      child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
@@ -937,7 +959,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   Text(
                     _getTransactionTitle(transaction),
                     style: AppTheme.bodyMedium.copyWith(
-                      color: Colors.black,
+                      color: AppColors.textPrimary,
                       fontWeight: FontWeight.w600,
                       fontSize: titleFontSize,
                     ),
@@ -946,7 +968,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   Text(
                     _formatDate(transaction.createdAt),
                     style: AppTheme.bodySmall.copyWith(
-                      color: Colors.grey,
+                      color: AppColors.textMuted,
                       fontSize: dateFontSize,
                     ),
                   ),
@@ -1016,7 +1038,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       errorBuilder: (context, error, stackTrace) {
                         return Icon(
                           Icons.account_balance_wallet,
-                          color: AppTheme.primaryColor,
+                          color: AppColors.gold,
                           size: currencyIconSize,
                         );
                       },
@@ -1043,7 +1065,7 @@ class _WalletScreenState extends State<WalletScreen> {
                       errorBuilder: (context, error, stackTrace) {
                         return Icon(
                           Icons.account_balance_wallet,
-                          color: AppTheme.primaryColor,
+                          color: AppColors.gold,
                           size: currencyIconSize,
                         );
                       },
@@ -1052,7 +1074,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     Text(
                       transaction.balanceAfter.toStringAsFixed(2),
                       style: AppTheme.bodySmall.copyWith(
-                        color: Colors.grey,
+                        color: AppColors.textMuted,
                         fontSize: balanceFontSize,
                       ),
                     ),
@@ -1062,7 +1084,6 @@ class _WalletScreenState extends State<WalletScreen> {
             ),
           ],
         ),
-      ),
     );
   }
 }
