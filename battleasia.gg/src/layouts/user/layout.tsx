@@ -170,6 +170,7 @@ export function UserLayout({
                             sx={{
                                 fontSize: { xs: 16, sm: 18 },
                                 fontWeight: 800,
+                                color: USER_COLORS.gold,
                                 textDecoration: 'none',
                                 whiteSpace: 'nowrap',
                                 lineHeight: 1,
@@ -177,7 +178,6 @@ export function UserLayout({
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent',
                                 backgroundClip: 'text',
-                                filter: `drop-shadow(0 0 10px ${alpha(USER_COLORS.gold, 0.45)}) drop-shadow(0 1px 3px rgba(0,0,0,0.75))`,
                             }}
                         >
                             BattleAsia

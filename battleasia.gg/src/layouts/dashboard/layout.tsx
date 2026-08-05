@@ -180,7 +180,6 @@ export function DashboardLayout({
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
-                filter: `drop-shadow(0 0 10px ${alpha(GOLD, 0.4)}) drop-shadow(0 1px 3px rgba(0,0,0,0.75))`,
               }}
             >
               BattleAsia

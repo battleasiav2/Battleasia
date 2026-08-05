@@ -66,13 +66,13 @@ export function UserNavVertical({
             sx={{
               fontSize: isBengali ? { md: 18, lg: 20 } : { md: 20, lg: 22 },
               fontWeight: 800,
+              color: USER_COLORS.gold,
               lineHeight: 1,
               whiteSpace: 'nowrap',
               background: `linear-gradient(180deg, #ffe08a 0%, ${USER_COLORS.gold} 48%, #d4a017 100%)`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
-              filter: `drop-shadow(0 0 12px ${alpha(USER_COLORS.gold, 0.45)}) drop-shadow(0 1px 3px rgba(0,0,0,0.75))`,
             }}
           >
             BattleAsia

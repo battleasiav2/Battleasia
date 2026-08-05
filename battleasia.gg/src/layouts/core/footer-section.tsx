@@ -130,11 +130,11 @@ export function FooterSection() {
                     : { xs: 16, sm: 20, md: 22 },
                   fontWeight: 800,
                   lineHeight: 1.1,
+                  color: GOLD,
                   background: `linear-gradient(180deg, #ffe08a 0%, ${GOLD} 48%, #d4a017 100%)`,
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
-                  filter: `drop-shadow(0 0 12px ${alpha(GOLD, 0.4)})`,
                 }}
               >
                 {t('common.brandName')}
