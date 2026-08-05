@@ -225,6 +225,77 @@ class UserService {
     }
   }
 
+  /// Get referral dashboard stats
+  Future<Map<String, dynamic>> getReferralStats() async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/users/referral-stats'),
+        headers: headers,
+      );
+
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+
+      return {
+        'success': false,
+        'message':
+            data['message'] as String? ?? 'Failed to fetch referral stats',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
+  /// Get referral commission history
+  Future<Map<String, dynamic>> getReferralCommissions({
+    int page = 1,
+    int limit = 100,
+  }) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse(
+          '$_baseUrl/api/v2/users/referral-commissions?page=$page&limit=$limit',
+        ),
+        headers: headers,
+      );
+
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+
+      return {
+        'success': false,
+        'message': data['message'] as String? ??
+            'Failed to fetch referral commissions',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
   /// Get withdrawable amount for current user
   Future<Map<String, dynamic>> getWithdrawableAmount() async {
     try {

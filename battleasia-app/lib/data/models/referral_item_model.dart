@@ -4,6 +4,8 @@ class ReferralItemModel {
   final String playerName;
   final String status; // 'active' or 'inactive'
   final double? earnings;
+  final double totalDeposits;
+  final int depositCount;
 
   ReferralItemModel({
     required this.id,
@@ -11,6 +13,8 @@ class ReferralItemModel {
     required this.playerName,
     required this.status,
     this.earnings,
+    this.totalDeposits = 0,
+    this.depositCount = 0,
   });
 
   factory ReferralItemModel.fromJson(Map<String, dynamic> json) {
@@ -21,27 +25,26 @@ class ReferralItemModel {
         user?['id']?.toString() ??
         user?['_id']?.toString() ??
         '';
-    
+
     final playerName = user?['username']?.toString() ??
         json['username']?.toString() ??
         user?['email']?.toString() ??
         json['email']?.toString() ??
         'Unknown Player';
-    
-    final createdAt = json['createdAt']?.toString() ??
-        json['joinedAt']?.toString() ??
-        '';
-    
+
+    final createdAt =
+        json['createdAt']?.toString() ?? json['joinedAt']?.toString() ?? '';
+
     final isActive = user?['isActive'] ?? json['isActive'] ?? true;
-    final statusValue = json['status']?.toString() ?? user?['status']?.toString();
-    
-    // Determine status
+    final statusValue =
+        json['status']?.toString() ?? user?['status']?.toString();
+
     String referralStatus = 'active';
     if (statusValue == 'inactive' ||
         statusValue == 'deactive' ||
         statusValue == 'banned') {
       referralStatus = 'inactive';
-    } else if (!isActive) {
+    } else if (isActive == false) {
       referralStatus = 'inactive';
     }
 
@@ -51,11 +54,16 @@ class ReferralItemModel {
       playerName: playerName,
       status: referralStatus,
       earnings: json['earnings'] is num
-          ? json['earnings'].toDouble()
+          ? (json['earnings'] as num).toDouble()
           : json['totalEarnings'] is num
-              ? json['totalEarnings'].toDouble()
+              ? (json['totalEarnings'] as num).toDouble()
               : null,
+      totalDeposits: json['totalDeposits'] is num
+          ? (json['totalDeposits'] as num).toDouble()
+          : 0,
+      depositCount: json['depositCount'] is num
+          ? (json['depositCount'] as num).toInt()
+          : 0,
     );
   }
 }
-

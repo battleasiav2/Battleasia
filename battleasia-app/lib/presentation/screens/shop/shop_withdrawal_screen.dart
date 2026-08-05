@@ -1,18 +1,20 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/constants/withdrawal_channels.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
-import 'package:battleasia_app/core/services/shop_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
+import 'package:battleasia_app/presentation/widgets/wallet/withdraw_sheet.dart';
 
-/// Native store withdrawal — mirrors web shop `/user/withdrawal` (Coingo payout).
+/// Store withdraw tab — dark glass UI aligned with battleasia.gg wallet withdraw.
 class ShopWithdrawalScreen extends StatefulWidget {
   const ShopWithdrawalScreen({super.key});
 
@@ -22,21 +24,13 @@ class ShopWithdrawalScreen extends StatefulWidget {
 
 class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
   final ScrollController _scrollController = ScrollController();
-  final ShopService _shopService = ShopService();
   final UserService _userService = UserService();
-  final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _walletController = TextEditingController();
 
-  final List<String> _channels = const ['bkash', 'nagad', 'crypto'];
-  final List<String> _currencies = const ['BDT', 'INR', 'PKR', 'USD'];
-
-  String _channel = 'bkash';
-  String _currency = 'BDT';
   double _withdrawable = 0;
   bool _hasPending = false;
   double _pendingAmount = 0;
   bool _loading = true;
-  bool _submitting = false;
+  List<Map<String, dynamic>> _currencyRates = [];
 
   @override
   void initState() {
@@ -47,107 +41,63 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
-    _amountController.dispose();
-    _walletController.dispose();
     super.dispose();
   }
 
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final result = await _userService.getWithdrawableAmount();
-      if (result['success'] == true && result['data'] != null) {
-        final data = result['data'] as Map<String, dynamic>;
+      final results = await Future.wait([
+        _userService.getWithdrawableAmount(),
+        _userService.getCurrencyRates(),
+      ]);
+
+      final withdrawResult = results[0];
+      if (withdrawResult['success'] == true && withdrawResult['data'] != null) {
+        final data = withdrawResult['data'] as Map<String, dynamic>;
         _withdrawable =
             (data['withdrawableAmount'] as num?)?.toDouble() ?? 0;
         _hasPending = data['hasPendingWithdrawal'] == true;
         _pendingAmount =
             (data['pendingWithdrawalAmount'] as num?)?.toDouble() ?? 0;
       }
+
+      final ratesResult = results[1];
+      if (ratesResult['success'] == true && ratesResult['data'] is List) {
+        _currencyRates = (ratesResult['data'] as List)
+            .map<Map<String, dynamic>>(
+              (item) => {
+                'currency': item['currency']?.toString() ?? '',
+                'rate': (item['rate'] as num?)?.toDouble() ?? 0.0,
+              },
+            )
+            .where((item) => item['currency'].toString().isNotEmpty)
+            .toList();
+      }
     } finally {
       if (mounted) setState(() => _loading = false);
     }
   }
 
-  Future<void> _submit() async {
-    final auth = context.read<AuthProvider>();
-    final amount = double.tryParse(_amountController.text.trim()) ?? 0;
-    final wallet = _walletController.text.trim();
-    final max = _hasPending ? 0.0 : _withdrawable;
-
-    if (amount <= 0) {
-      _toast('shop.invalidAmount'.tr());
-      return;
-    }
-    if (wallet.isEmpty) {
-      _toast('shop.enterWallet'.tr());
-      return;
-    }
-    if (amount > max) {
-      _toast('shop.exceedsMax'.tr(namedArgs: {'max': max.toStringAsFixed(2)}));
-      return;
-    }
-
-    final confirmed = await showDialog<bool>(
+  Future<void> _openWithdraw() async {
+    final balance = context.read<AuthProvider>().user?.balance ?? 0.0;
+    final ok = await showWithdrawSheet(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surfaceElevated,
-        title: Text('shop.confirmTitle'.tr(), style: AppTheme.heading3),
-        content: Text(
-          'shop.confirmBody'.tr(namedArgs: {
-            'amount': amount.toStringAsFixed(2),
-            'channel': _channel,
-            'wallet': wallet,
-          }),
-          style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
+      availableBalance: balance,
+      withdrawableAmount: _withdrawable,
+      hasPendingWithdrawal: _hasPending,
+      pendingWithdrawalAmount: _pendingAmount,
+      currencyRates: _currencyRates,
+    );
+    if (ok == true && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('wallet.submitSuccess'.tr()),
+          backgroundColor: AppColors.success,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text('shop.cancel'.tr()),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text('shop.confirm'.tr(), style: TextStyle(color: AppColors.gold)),
-          ),
-        ],
-      ),
-    );
-    if (confirmed != true) return;
-
-    setState(() => _submitting = true);
-    try {
-      final result = await _shopService.createCoingoPayout(
-        amount: amount,
-        walletNumber: wallet,
-        walletType: _channel,
-        description: 'Withdrawal: $amount BAC to $_currency',
-        email: auth.user?.email,
-        username: auth.user?.username,
-        currencyType: _currency,
       );
-
-      if (!mounted) return;
-      if (result['success'] == true) {
-        _toast('shop.submitSuccess'.tr(), ok: true);
-        _amountController.clear();
-        _walletController.clear();
-        await _load();
-      } else {
-        _toast(result['message']?.toString() ?? 'shop.submitFailed'.tr());
-      }
-    } finally {
-      if (mounted) setState(() => _submitting = false);
+      await _load();
     }
-  }
-
-  void _toast(String msg, {bool ok = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: ok ? Colors.green.shade700 : Colors.red.shade700,
-      ),
-    );
   }
 
   @override
@@ -187,7 +137,7 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'shop.withdrawSubtitle'.tr(),
+                        'shop.withdrawSubtitleWeb'.tr(),
                         style: AppTheme.bodyMedium.copyWith(
                           color: AppColors.textMuted,
                         ),
@@ -197,94 +147,106 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                         const Center(
                           child: Padding(
                             padding: EdgeInsets.all(24),
-                            child: CircularProgressIndicator(),
+                            child: CircularProgressIndicator(
+                              color: AppColors.gold,
+                            ),
                           ),
                         )
                       else ...[
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _statTile(
-                                'shop.statBalance'.tr(),
-                                '${balance.toStringAsFixed(2)} BAC',
+                        GlassCard(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _statTile(
+                                      'shop.statBalance'.tr(),
+                                      '${balance.toStringAsFixed(2)} BAC',
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: _statTile(
+                                      'wallet.withdrawable'.tr(),
+                                      '${maxOut.toStringAsFixed(2)} BAC',
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: _statTile(
-                                'wallet.withdrawable'.tr(),
-                                '${maxOut.toStringAsFixed(2)} BAC',
+                              if (_hasPending) ...[
+                                const SizedBox(height: 12),
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        AppColors.gold.withValues(alpha: 0.1),
+                                    border: Border.all(
+                                      color: AppColors.gold
+                                          .withValues(alpha: 0.4),
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    'shop.pendingBlocked'.tr(namedArgs: {
+                                      'amount':
+                                          _pendingAmount.toStringAsFixed(2),
+                                    }),
+                                    style: AppTheme.bodySmall.copyWith(
+                                      color: AppColors.gold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              const SizedBox(height: 16),
+                              Text(
+                                'shop.channelsHint'.tr(),
+                                style: AppTheme.bodySmall.copyWith(
+                                  color: AppColors.textMuted,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        if (_hasPending) ...[
-                          const SizedBox(height: 12),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: AppColors.gold.withValues(alpha: 0.1),
-                              border: Border.all(
-                                color: AppColors.gold.withValues(alpha: 0.4),
+                              const SizedBox(height: 10),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: kWithdrawalChannels
+                                    .map(
+                                      (c) => Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.black
+                                              .withValues(alpha: 0.4),
+                                          borderRadius:
+                                              BorderRadius.circular(6),
+                                          border: Border.all(
+                                            color: AppColors.border(0.2),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${c.label} · ${c.currency}',
+                                          style: AppTheme.bodySmall.copyWith(
+                                            color: AppColors.textPrimary,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
                               ),
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                            child: Text(
-                              'shop.pendingBlocked'.tr(namedArgs: {
-                                'amount': _pendingAmount.toStringAsFixed(2),
-                              }),
-                              style: AppTheme.bodySmall.copyWith(
-                                color: AppColors.gold,
+                              const SizedBox(height: 20),
+                              GoldButton(
+                                label: 'shop.requestWithdrawal'.tr(),
+                                icon: Icons.account_balance_wallet_outlined,
+                                onPressed:
+                                    _hasPending ? null : _openWithdraw,
                               ),
-                            ),
+                            ],
                           ),
-                        ],
-                        const SizedBox(height: 20),
-                        _label('shop.labelCurrency'.tr()),
-                        const SizedBox(height: 6),
-                        _dropdown(
-                          value: _currency,
-                          items: _currencies,
-                          onChanged: (v) => setState(() => _currency = v!),
-                        ),
-                        const SizedBox(height: 14),
-                        _label('shop.labelChannel'.tr()),
-                        const SizedBox(height: 6),
-                        _dropdown(
-                          value: _channel,
-                          items: _channels,
-                          onChanged: (v) => setState(() => _channel = v!),
-                        ),
-                        const SizedBox(height: 14),
-                        _label('shop.labelBacAmount'.tr()),
-                        const SizedBox(height: 6),
-                        TextField(
-                          controller: _amountController,
-                          keyboardType: const TextInputType.numberWithOptions(
-                            decimal: true,
-                          ),
-                          style: AppTheme.bodyMedium.copyWith(
-                            color: AppColors.textPrimary,
-                          ),
-                          decoration: _fieldDecoration('0.00'),
-                        ),
-                        const SizedBox(height: 14),
-                        _label('shop.labelWalletMobile'.tr()),
-                        const SizedBox(height: 6),
-                        TextField(
-                          controller: _walletController,
-                          style: AppTheme.bodyMedium.copyWith(
-                            color: AppColors.textPrimary,
-                          ),
-                          decoration: _fieldDecoration('shop.walletHint'.tr()),
-                        ),
-                        const SizedBox(height: 24),
-                        GoldButton(
-                          label: _submitting
-                              ? 'shop.submitting'.tr()
-                              : 'shop.requestWithdrawal'.tr(),
-                          onPressed: (_submitting || _hasPending) ? null : _submit,
                         ),
                       ],
                       const SizedBox(height: 100),
@@ -310,8 +272,8 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.surfaceElevated.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(2),
+        color: Colors.black.withValues(alpha: 0.35),
+        borderRadius: BorderRadius.circular(8),
         border: Border.all(color: AppColors.border(0.14)),
       ),
       child: Column(
@@ -338,64 +300,4 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
       ),
     );
   }
-
-  Widget _label(String text) => Text(
-        text.toUpperCase(),
-        style: AppTheme.bodySmall.copyWith(
-          color: AppColors.textMuted,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.6,
-          fontSize: 11,
-        ),
-      );
-
-  Widget _dropdown({
-    required String value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.45),
-        borderRadius: BorderRadius.circular(2),
-        border: Border.all(color: AppColors.border(0.22)),
-      ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          dropdownColor: AppColors.surfaceElevated,
-          style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
-          items: items
-              .map(
-                (e) => DropdownMenuItem(
-                  value: e,
-                  child: Text(e.toUpperCase()),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      ),
-    );
-  }
-
-  InputDecoration _fieldDecoration(String hint) => InputDecoration(
-        hintText: hint,
-        hintStyle: AppTheme.bodyMedium.copyWith(
-          color: Colors.white.withValues(alpha: 0.4),
-        ),
-        filled: true,
-        fillColor: Colors.black.withValues(alpha: 0.45),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(2),
-          borderSide: BorderSide(color: AppColors.border(0.22)),
-        ),
-        focusedBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(2)),
-          borderSide: BorderSide(color: AppColors.gold),
-        ),
-      );
 }
