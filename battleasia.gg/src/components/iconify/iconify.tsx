@@ -20,7 +20,7 @@ export const Iconify = forwardRef<SVGSVGElement, IconifyProps>((props, ref) => {
 
   return (
     <IconRoot
-      ssr
+      // CSR app — `ssr` causes removeChild crashes on remount
       ref={ref}
       icon={resolvedIcon}
       className={mergeClasses([iconifyClasses.root, className])}
