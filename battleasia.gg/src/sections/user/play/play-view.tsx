@@ -145,12 +145,12 @@ export function PlayView() {
                   onAction={fetchGames}
                 />
               ) : (
-                <Grid container spacing={{ xs: 1.25, sm: 1.5, md: 2 }}>
+                <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }}>
                   {games.map((game) => (
-                    <Grid key={game.id} size={{ xs: 6, sm: 4, md: 3, lg: 2.4 }}>
+                    <Grid key={game.id} size={{ xs: 6, sm: 4, md: 2.4 }}>
                       <GameCard
                         title={game.name}
-                        subTitle={game.idPrefix}
+                        subTitle={game.packageName || game.idPrefix}
                         logo={resolvePlayGameArt(game, 'logo')}
                         imageUrl={resolvePlayGameArt(game, 'image')}
                         comingSoon={game.comingSoon}

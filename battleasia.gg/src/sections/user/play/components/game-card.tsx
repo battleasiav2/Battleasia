@@ -1,27 +1,14 @@
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { alpha, keyframes } from '@mui/material/styles';
-
-import { Iconify } from 'src/components/iconify';
+import { alpha } from '@mui/material/styles';
 
 import { USER_COLORS } from 'src/layouts/user/user-theme';
-import { PLAY_IMAGE_PATHS, getGameGenre, getGamePlatforms } from '../play-constants';
+import { PLAY_IMAGE_PATHS } from '../play-constants';
 
 // ----------------------------------------------------------------------
 
 const GOLD = USER_COLORS.gold;
-
-const livePulse = keyframes`
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 ${alpha('#22c55e', 0.55)}; }
-  50% { opacity: 0.7; box-shadow: 0 0 0 5px ${alpha('#22c55e', 0)}; }
-`;
-
-const goldScan = keyframes`
-  0% { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
-  35% { opacity: 0.55; }
-  100% { transform: translateX(220%) skewX(-18deg); opacity: 0; }
-`;
 
 type GameCardProps = {
   title: string;
@@ -33,11 +20,10 @@ type GameCardProps = {
   onClick?: () => void;
 };
 
+/** Simple full-bleed game tile — title + package id over cinematic art. */
 export function GameCard(props: GameCardProps) {
-  const { title, subTitle, imageUrl, comingSoon, disabled, onClick } = props;
+  const { title, subTitle, imageUrl, logo, comingSoon, disabled, onClick } = props;
   const isDisabled = disabled || comingSoon;
-  const genre = getGameGenre(subTitle);
-  const platforms = getGamePlatforms(subTitle);
 
   return (
     <Box
@@ -53,35 +39,23 @@ export function GameCard(props: GameCardProps) {
       aria-disabled={isDisabled}
       sx={{
         position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
         width: 1,
-        aspectRatio: '3 / 4.4',
+        aspectRatio: '3 / 4.15',
         borderRadius: 0,
         overflow: 'hidden',
-        bgcolor: '#161618',
-        border: `1px solid ${alpha('#ffffff', 0.08)}`,
-        isolation: 'isolate',
+        bgcolor: '#0a0a0a',
+        border: `1px solid ${alpha('#ffffff', 0.14)}`,
         cursor: isDisabled ? 'not-allowed' : 'pointer',
-        opacity: isDisabled ? 0.85 : 1,
-        boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
-        transition:
-          'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, border-color 0.35s ease',
+        opacity: isDisabled ? 0.78 : 1,
+        boxShadow: `0 8px 24px ${alpha('#000000', 0.45)}`,
+        transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.3s ease',
         '&:hover': isDisabled
           ? undefined
           : {
-              transform: 'translateY(-10px)',
-              borderColor: alpha(GOLD, 0.45),
-              boxShadow: `
-                0 22px 48px ${alpha('#000000', 0.7)},
-                0 0 0 1px ${alpha(GOLD, 0.2)},
-                0 0 32px ${alpha(GOLD, 0.12)}
-              `,
-              '& .game-card-art': { transform: 'scale(1.08)' },
-              '& .game-card-scan': { opacity: 1 },
-              '& .game-card-bar': { transform: 'scaleX(1)' },
-              '& .game-card-title': { color: GOLD },
-              '& .game-card-play': { opacity: 1, transform: 'translate(-50%, 0)' },
+              transform: 'translateY(-8px)',
+              borderColor: alpha(GOLD, 0.4),
+              boxShadow: `0 20px 44px ${alpha('#000000', 0.65)}, 0 0 0 1px ${alpha(GOLD, 0.15)}`,
+              '& .game-card-art': { transform: 'scale(1.06)' },
             },
         '&:focus-visible': {
           outline: `2px solid ${alpha(GOLD, 0.7)}`,
@@ -89,225 +63,116 @@ export function GameCard(props: GameCardProps) {
         },
       }}
     >
-      {/* Artwork */}
       <Box
+        className="game-card-art"
+        component="img"
+        src={imageUrl || PLAY_IMAGE_PATHS.pubgCard}
+        alt={title}
+        loading="lazy"
         sx={{
-          position: 'relative',
-          flex: '1 1 72%',
-          minHeight: 0,
-          overflow: 'hidden',
-          bgcolor: '#0a0a0a',
-        }}
-      >
-        <Box
-          className="game-card-art"
-          component="img"
-          src={imageUrl || PLAY_IMAGE_PATHS.pubgCard}
-          alt={title}
-          loading="lazy"
-          sx={{
-            width: 1,
-            height: 1,
-            objectFit: 'cover',
-            objectPosition: 'center top',
-            display: 'block',
-            transition: 'transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
-            willChange: 'transform',
-          }}
-        />
-
-        <Box
-          className="game-card-scan"
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            opacity: 0,
-            pointerEvents: 'none',
-            zIndex: 2,
-            overflow: 'hidden',
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '42%',
-              height: '100%',
-              background: `linear-gradient(90deg, transparent, ${alpha(GOLD, 0.18)}, transparent)`,
-              animation: `${goldScan} 1.1s ease-in-out`,
-            },
-          }}
-        />
-
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            background: `
-              linear-gradient(180deg, ${alpha('#000000', 0.15)} 0%, transparent 30%),
-              linear-gradient(180deg, transparent 45%, ${alpha('#161618', 0.75)} 82%, #161618 100%)
-            `,
-            pointerEvents: 'none',
-            zIndex: 1,
-          }}
-        />
-
-        {!isDisabled ? (
-          <Stack
-            className="game-card-play"
-            direction="row"
-            alignItems="center"
-            spacing={0.6}
-            sx={{
-              position: 'absolute',
-              left: '50%',
-              bottom: 18,
-              transform: 'translate(-50%, 8px)',
-              zIndex: 3,
-              opacity: 0,
-              px: 1.25,
-              py: 0.55,
-              bgcolor: alpha('#000000', 0.7),
-              border: `1px solid ${alpha(GOLD, 0.55)}`,
-              transition: 'opacity 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
-            }}
-          >
-            <Iconify icon="solar:play-bold" width={12} sx={{ color: GOLD }} />
-            <Typography
-              sx={{
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: 1.2,
-                color: '#ffffff',
-                textTransform: 'uppercase',
-              }}
-            >
-              Enter Arena
-            </Typography>
-          </Stack>
-        ) : null}
-
-        {!isDisabled ? (
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              zIndex: 3,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 0.55,
-              px: 0.85,
-              py: 0.45,
-              bgcolor: alpha('#000000', 0.72),
-              borderBottom: `1px solid ${alpha('#22c55e', 0.45)}`,
-              borderRight: `1px solid ${alpha('#22c55e', 0.45)}`,
-            }}
-          >
-            <Box
-              sx={{
-                width: 6,
-                height: 6,
-                borderRadius: '50%',
-                bgcolor: '#22c55e',
-                animation: `${livePulse} 1.6s ease-out infinite`,
-              }}
-            />
-            <Typography sx={{ fontSize: 9, fontWeight: 800, color: '#22c55e', letterSpacing: 0.6 }}>
-              LIVE
-            </Typography>
-          </Box>
-        ) : (
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 10,
-              right: 10,
-              zIndex: 3,
-              px: 0.8,
-              py: 0.25,
-              bgcolor: alpha('#000000', 0.65),
-              border: `1px solid ${alpha(GOLD, 0.35)}`,
-            }}
-          >
-            <Typography sx={{ fontSize: 9, fontWeight: 800, color: GOLD, letterSpacing: 0.5 }}>
-              SOON
-            </Typography>
-          </Box>
-        )}
-      </Box>
-
-      {/* Gold accent line */}
-      <Box
-        className="game-card-bar"
-        sx={{
-          height: 2,
-          bgcolor: GOLD,
-          transform: 'scaleX(0)',
-          transformOrigin: 'left center',
-          transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
-          boxShadow: `0 0 12px ${alpha(GOLD, 0.65)}`,
+          position: 'absolute',
+          inset: 0,
+          width: 1,
+          height: 1,
+          objectFit: 'cover',
+          objectPosition: 'center center',
+          display: 'block',
+          transition: 'transform 0.65s cubic-bezier(0.22, 1, 0.36, 1)',
+          willChange: 'transform',
         }}
       />
 
-      {/* Clean info panel */}
-      <Stack
-        spacing={0.75}
+      <Box
         sx={{
-          flexShrink: 0,
-          px: { xs: 1.5, md: 1.75 },
-          pt: 1.4,
-          pb: 1.5,
-          bgcolor: '#161618',
-          minHeight: { xs: 96, md: 104 },
-          justifyContent: 'space-between',
+          position: 'absolute',
+          inset: 0,
+          background: `
+            linear-gradient(180deg, ${alpha('#000000', 0.08)} 0%, transparent 28%),
+            linear-gradient(180deg, transparent 42%, ${alpha('#000000', 0.55)} 72%, ${alpha('#000000', 0.88)} 100%)
+          `,
+          pointerEvents: 'none',
         }}
-      >
-        <Box>
-          <Typography
-            sx={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: 1.6,
-              color: GOLD,
-              textTransform: 'uppercase',
-              mb: 0.4,
-            }}
-          >
-            BATTLE ASIA
-          </Typography>
-          <Typography
-            className="game-card-title font-tr"
-            sx={{
-              fontSize: { xs: 13, sm: 14, md: 15 },
-              fontWeight: 800,
-              letterSpacing: 0.5,
-              color: '#ffffff',
-              textTransform: 'uppercase',
-              lineHeight: 1.2,
-              transition: 'color 0.3s ease',
-            }}
-          >
-            {title}
+      />
+
+      {logo ? (
+        <Box
+          component="img"
+          src={logo}
+          alt=""
+          loading="lazy"
+          sx={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            width: { xs: 40, sm: 44 },
+            height: { xs: 40, sm: 44 },
+            objectFit: 'cover',
+            borderRadius: '4px',
+            border: `1px solid ${alpha('#ffffff', 0.22)}`,
+            boxShadow: `0 4px 14px ${alpha('#000000', 0.55)}`,
+            zIndex: 2,
+          }}
+        />
+      ) : null}
+
+      {comingSoon ? (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 10,
+            left: 10,
+            zIndex: 2,
+            px: 0.85,
+            py: 0.35,
+            bgcolor: alpha('#000000', 0.65),
+            border: `1px solid ${alpha(GOLD, 0.45)}`,
+          }}
+        >
+          <Typography sx={{ fontSize: 9, fontWeight: 800, color: GOLD, letterSpacing: 0.8 }}>
+            SOON
           </Typography>
         </Box>
+      ) : null}
 
-        <Stack direction="row" alignItems="center" spacing={1}>
-          {platforms.map((icon) => (
-            <Iconify key={icon} icon={icon} width={15} sx={{ color: alpha('#ffffff', 0.45) }} />
-          ))}
+      <Stack
+        spacing={0.35}
+        sx={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 2,
+          px: { xs: 1.25, sm: 1.5 },
+          pb: { xs: 1.25, sm: 1.5 },
+          pt: 4,
+        }}
+      >
+        <Typography
+          className="font-tr"
+          sx={{
+            fontSize: { xs: 15, sm: 16, md: 17 },
+            fontWeight: 800,
+            lineHeight: 1.15,
+            color: '#ffffff',
+            textShadow: `0 2px 12px ${alpha('#000000', 0.85)}`,
+          }}
+        >
+          {title}
+        </Typography>
+        {subTitle ? (
           <Typography
             sx={{
-              ml: 'auto !important',
-              fontSize: 9,
+              fontSize: { xs: 11, sm: 12 },
               fontWeight: 700,
-              letterSpacing: 0.9,
-              color: alpha('#ffffff', 0.45),
-              textTransform: 'uppercase',
+              color: GOLD,
+              letterSpacing: 0.2,
+              textShadow: `0 1px 8px ${alpha('#000000', 0.8)}`,
+              wordBreak: 'break-all',
             }}
           >
-            {genre}
+            {subTitle}
           </Typography>
-        </Stack>
+        ) : null}
       </Stack>
     </Box>
   );
