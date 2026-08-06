@@ -14,15 +14,15 @@ import {
 // ----------------------------------------------------------------------
 
 const heroKenBurns = keyframes`
-  0% { transform: scale(1.08) translate3d(1.2%, 0.6%, 0); }
-  40% { transform: scale(1.12) translate3d(-1.2%, -0.8%, 0); }
-  75% { transform: scale(1.07) translate3d(-2%, 0.4%, 0); }
-  100% { transform: scale(1.08) translate3d(1.2%, 0.6%, 0); }
+  0% { transform: scale(1) translate3d(0.4%, 0.2%, 0); }
+  40% { transform: scale(1.02) translate3d(-0.4%, -0.3%, 0); }
+  75% { transform: scale(1.01) translate3d(-0.6%, 0.2%, 0); }
+  100% { transform: scale(1) translate3d(0.4%, 0.2%, 0); }
 `;
 
 const heroEnter = keyframes`
-  0% { transform: scale(1.18) translate3d(0, 1.5%, 0); opacity: 0.55; }
-  100% { transform: scale(1.08) translate3d(1.2%, 0.6%, 0); opacity: 1; }
+  0% { transform: scale(1.03) translate3d(0, 0.4%, 0); opacity: 0.55; }
+  100% { transform: scale(1) translate3d(0, 0, 0); opacity: 1; }
 `;
 
 const GOLD = '#f5c518';
@@ -40,7 +40,7 @@ export function HeroRotatingBanner() {
 
   return (
     <>
-      <ScrollParallax offset={80} scaleRange={[1.06, 1, 1.04]} sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+      <ScrollParallax offset={40} scaleRange={[1, 1, 1]} sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
         {HOME_HERO_SLIDES.map((slide, index) => {
           const isActive = index === activeIndex;
 
@@ -59,13 +59,9 @@ export function HeroRotatingBanner() {
                 width: 1,
                 height: 1,
                 objectFit: 'cover',
-                objectPosition: {
-                  xs: '50% 22%',
-                  sm: '48% 24%',
-                  md: '36% center',
-                  lg: '32% center',
-                },
+                objectPosition: 'center center',
                 transformOrigin: 'center center',
+                imageRendering: 'auto',
                 backfaceVisibility: 'hidden',
                 opacity: isActive ? 1 : 0,
                 transition: `opacity ${HOME_HERO_FADE_MS}ms ease-in-out`,

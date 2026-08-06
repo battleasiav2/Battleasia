@@ -10,13 +10,13 @@ import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
-/// Premium hero slides — one per top arena game, rotate every ~90s.
+/// Wide cinematic hero slides — distant establishing shots (not close-up portraits).
 const _heroSlides = [
-  'assets/images/hero/hero-pubg.webp',
-  'assets/images/hero/hero-free-fire.webp',
-  'assets/images/hero/hero-cod-mobile.webp',
-  'assets/images/hero/hero-valorant.webp',
-  'assets/images/hero/hero-mobile-legends.webp',
+  'assets/images/hero/hero-pubg-wide.webp',
+  'assets/images/hero/hero-free-fire-wide.png',
+  'assets/images/hero/hero-cod-mobile-wide.png',
+  'assets/images/hero/hero-valorant-wide.png',
+  'assets/images/hero/hero-mobile-legends-wide.png',
 ];
 
 const _rotateEvery = Duration(seconds: 90);
@@ -75,8 +75,10 @@ class _HeroBannerSectionState extends State<HeroBannerSection> {
               _heroSlides[_activeIndex],
               key: ValueKey(_heroSlides[_activeIndex]),
               fit: BoxFit.cover,
+              alignment: Alignment.center,
               width: double.infinity,
               height: double.infinity,
+              filterQuality: FilterQuality.high,
             ),
           ),
           Container(
