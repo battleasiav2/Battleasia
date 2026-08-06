@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
@@ -8,15 +10,48 @@ import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
-class HeroBannerSection extends StatelessWidget {
+/// Premium hero slides — one per top arena game, rotate every ~90s.
+const _heroSlides = [
+  'assets/images/hero/hero-pubg.webp',
+  'assets/images/hero/hero-free-fire.webp',
+  'assets/images/hero/hero-cod-mobile.webp',
+  'assets/images/hero/hero-valorant.webp',
+  'assets/images/hero/hero-mobile-legends.webp',
+];
+
+const _rotateEvery = Duration(seconds: 90);
+
+class HeroBannerSection extends StatefulWidget {
   const HeroBannerSection({super.key});
+
+  @override
+  State<HeroBannerSection> createState() => _HeroBannerSectionState();
+}
+
+class _HeroBannerSectionState extends State<HeroBannerSection> {
+  int _activeIndex = 0;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(_rotateEvery, (_) {
+      if (!mounted) return;
+      setState(() => _activeIndex = (_activeIndex + 1) % _heroSlides.length);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   void _joinTournament(BuildContext context) {
     final authed = context.read<AuthProvider>().isAuthenticated;
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) =>
-            authed ? const PlayScreen() : const SignInScreen(),
+        builder: (_) => authed ? const PlayScreen() : const SignInScreen(),
       ),
     );
   }
@@ -26,17 +61,24 @@ class HeroBannerSection extends StatelessWidget {
     final screenHeight = AppUtils.screenHeight(context);
     final isMobile = AppUtils.isMobile(context);
 
-    return Container(
+    return SizedBox(
       height: isMobile ? 520 : 720,
       width: double.infinity,
-      decoration: const BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/images/banner.webp'),
-          fit: BoxFit.cover,
-        ),
-      ),
       child: Stack(
+        fit: StackFit.expand,
         children: [
+          AnimatedSwitcher(
+            duration: const Duration(milliseconds: 1800),
+            switchInCurve: Curves.easeInOut,
+            switchOutCurve: Curves.easeInOut,
+            child: Image.asset(
+              _heroSlides[_activeIndex],
+              key: ValueKey(_heroSlides[_activeIndex]),
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+            ),
+          ),
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -104,6 +146,32 @@ class HeroBannerSection extends StatelessWidget {
             child: GoldButton(
               label: 'Join Tournament',
               onPressed: () => _joinTournament(context),
+            ),
+          ),
+          Positioned(
+            bottom: 16,
+            left: 0,
+            right: 0,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(_heroSlides.length, (index) {
+                final active = index == _activeIndex;
+                return GestureDetector(
+                  onTap: () => setState(() => _activeIndex = index),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 350),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: active ? 22 : 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: active
+                          ? AppColors.gold
+                          : Colors.white.withValues(alpha: 0.35),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                );
+              }),
             ),
           ),
         ],

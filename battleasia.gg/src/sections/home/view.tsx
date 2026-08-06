@@ -14,6 +14,8 @@ import { LandingDashboardSection } from './dashboard-widgets';
 import { PlayYourGameSection, HOME_GAME_ARTS } from './play-your-game-section';
 import { homeMobileScrollGridSx, homeMobileScrollItemSx } from './home-horizontal-scroll';
 import { HeroFxOverlay } from './hero-fx-overlay';
+import { HeroRotatingBanner } from './hero-rotating-banner';
+import { HOME_HERO_SLIDES } from './hero-slides';
 import { useTranslate } from 'src/locales/use-locales';
 
 // ----------------------------------------------------------------------
@@ -35,19 +37,6 @@ const borderPulse = keyframes`
   50% { opacity: 0.85; }
 `;
 
-const heroKenBurns = keyframes`
-  0% { transform: scale(1.08) translate3d(1.2%, 0.6%, 0); }
-  40% { transform: scale(1.12) translate3d(-1.2%, -0.8%, 0); }
-  75% { transform: scale(1.07) translate3d(-2%, 0.4%, 0); }
-  100% { transform: scale(1.08) translate3d(1.2%, 0.6%, 0); }
-`;
-
-/** Transform + opacity only — never animate filter (major jank source) */
-const heroEnter = keyframes`
-  0% { transform: scale(1.18) translate3d(0, 1.5%, 0); opacity: 0.55; }
-  100% { transform: scale(1.08) translate3d(1.2%, 0.6%, 0); opacity: 1; }
-`;
-
 const logoEnter = keyframes`
   0% { opacity: 0; transform: translateY(16px) scale(0.96); }
   100% { opacity: 1; transform: translateY(0) scale(1); }
@@ -66,7 +55,6 @@ const copyEnter = keyframes`
 `;
 
 const HOME_IMAGE_PATHS = {
-  banner: '/assets/images/hero-banner-pubg-drop.webp',
   heroTitleLogo: '/assets/images/hero-title-battleasia.webp',
 } as const;
 
@@ -127,8 +115,11 @@ function blackGamingSectionSx(art?: string) {
 }
 
 // ----------------------------------------------------------------------
-// Preload only above-the-fold hero assets — mode/game cards lazy-load on scroll.
-const imagePaths = [HOME_IMAGE_PATHS.banner, HOME_IMAGE_PATHS.heroTitleLogo];
+// Preload hero slides + title logo — mode/game cards lazy-load on scroll.
+const imagePaths = [
+  ...HOME_HERO_SLIDES.map((slide) => slide.src),
+  HOME_IMAGE_PATHS.heroTitleLogo,
+];
 
 export function HomeView() {
   const { t } = useTranslate();
@@ -211,35 +202,8 @@ export function HomeView() {
         zIndex: 1,
       },
     }}>
-      {/* Full hero image — Ken Burns + light parallax (no animated blur) */}
-      <ScrollParallax offset={80} scaleRange={[1.06, 1, 1.04]} sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-        <Box
-          component="img"
-          src={HOME_IMAGE_PATHS.banner}
-          alt=""
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-          sx={{
-            width: 1,
-            height: 1,
-            objectFit: 'cover',
-            objectPosition: { xs: '50% 22%', sm: '48% 24%', md: '36% center', lg: '32% center' },
-            transformOrigin: 'center center',
-            backfaceVisibility: 'hidden',
-            animation: {
-              xs: `${heroEnter} 1.2s cubic-bezier(0.22, 1, 0.36, 1) both`,
-              md: `${heroEnter} 1.5s cubic-bezier(0.22, 1, 0.36, 1) both, ${heroKenBurns} 32s 1.5s ease-in-out infinite`,
-            },
-            willChange: 'transform',
-            '@media (prefers-reduced-motion: reduce)': {
-              animation: 'none',
-              transform: 'none',
-              opacity: 1,
-            },
-          }}
-        />
-      </ScrollParallax>
+      {/* Full hero image — 5 premium game slides, rotate every ~90s */}
+      <HeroRotatingBanner />
 
       <HeroFxOverlay />
 
