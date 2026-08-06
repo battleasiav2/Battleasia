@@ -15,7 +15,7 @@ const GOLD = '#f5c518';
 
 const NAV_ICONS: Record<string, string> = {
   home: 'solar:home-2-bold',
-  'about-us': 'solar:info-circle-bold',
+  'about-us': 'solar:users-group-rounded-bold',
   'how-to-play': 'solar:gamepad-bold',
   rules: 'solar:document-text-bold',
 };
