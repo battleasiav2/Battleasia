@@ -29,6 +29,7 @@ import { NotificationsDrawer } from '../components/notifications-drawer';
 import { LanguagePopover } from '../components/language-popover';
 import { navData as dashboardNavData } from '../nav-config-dashboard';
 import { dashboardLayoutVars, dashboardNavColorVars } from './css-vars';
+import { PublicMobileNav } from '../components/public-mobile-nav';
 import { menuItems, accountMenuItems, createMenuClickHandler } from '../menu-items-config';
 
 import type { MainSectionProps } from '../core/main-section';
@@ -160,8 +161,8 @@ export function DashboardLayout({
         >
           <Logo
             sx={{
-              width: { xs: 42, sm: 48, md: 52 },
-              height: { xs: 42, sm: 48, md: 52 },
+              width: { xs: 52, sm: 58, md: 64 },
+              height: { xs: 52, sm: 58, md: 64 },
               flexShrink: 0,
             }}
           />
@@ -284,9 +285,9 @@ export function DashboardLayout({
         slots={{ ...headerSlots, ...slotProps?.header?.slots }}
         slotProps={merge(headerSlotProps, slotProps?.header?.slotProps ?? {})}
         sx={{
-          bgcolor: alpha('#0a0c10', 0.78),
-          backdropFilter: 'blur(18px) saturate(1.25)',
-          WebkitBackdropFilter: 'blur(18px) saturate(1.25)',
+          bgcolor: alpha('#0a0c10', 0.68),
+          backdropFilter: 'blur(10px) saturate(1.2)',
+          WebkitBackdropFilter: 'blur(10px) saturate(1.2)',
           borderBottom: `1px solid ${alpha('#ffffff', 0.1)}`,
           borderRadius: { xs: '0 0 12px 12px', md: '0 0 16px 16px' },
           boxShadow: `
@@ -309,6 +310,7 @@ export function DashboardLayout({
       {...slotProps?.main}
       sx={[
         isHomePage && { bgcolor: '#000000' },
+        { pb: { xs: 10, lg: 0 } },
         ...(Array.isArray(slotProps?.main?.sx)
           ? slotProps.main.sx
           : slotProps?.main?.sx
@@ -360,6 +362,7 @@ export function DashboardLayout({
         ]}
       >
         {renderMain()}
+        <PublicMobileNav />
       </LayoutSection>
   );
 }

@@ -13,6 +13,8 @@ import {
   CircularProgress,
 } from '@mui/material';
 
+import { toast } from 'react-hot-toast';
+
 import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
 import { CONFIG } from 'src/global-config';
@@ -90,6 +92,7 @@ export function ReelCreateDialog({ open, onClose, onCreated }: ReelCreateDialogP
       onClose();
     } catch (error) {
       console.error('Failed to create reel:', error);
+      toast.error(t('reels.createFailed'));
     } finally {
       setSubmitting(false);
     }

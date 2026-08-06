@@ -96,9 +96,10 @@ export function HeroRotatingBanner() {
           px: 1.25,
           py: 0.75,
           borderRadius: 999,
-          bgcolor: alpha('#000000', 0.35),
-          border: `1px solid ${alpha('#ffffff', 0.12)}`,
-          backdropFilter: 'blur(8px)',
+          bgcolor: alpha('#000000', 0.28),
+          border: `1px solid ${alpha('#ffffff', 0.1)}`,
+          backdropFilter: 'blur(4px)',
+          WebkitBackdropFilter: 'blur(4px)',
         }}
       >
         {HOME_HERO_SLIDES.map((slide, index) => (

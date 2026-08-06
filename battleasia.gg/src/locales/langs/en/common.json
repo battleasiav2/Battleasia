@@ -899,7 +899,8 @@
     "musicPlaceholder": "Music title (optional)",
     "views": "views",
     "emptyTitle": "No reels yet",
-    "emptyDescription": "Be the first to share a reel with the community."
+    "emptyDescription": "Be the first to share a reel with the community.",
+    "createFailed": "Failed to create reel. Check video size and try again."
   },
   "report": {
     "title": "Report",

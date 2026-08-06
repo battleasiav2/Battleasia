@@ -116,8 +116,8 @@ export function FooterSection() {
           >
             <Logo
               sx={{
-                width: { xs: 52, sm: 64, md: 72 },
-                height: { xs: 52, sm: 64, md: 72 },
+                width: { xs: 58, sm: 68, md: 78 },
+                height: { xs: 58, sm: 68, md: 78 },
                 flexShrink: 0,
               }}
             />

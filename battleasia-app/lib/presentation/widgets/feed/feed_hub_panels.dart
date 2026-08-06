@@ -180,6 +180,7 @@ class FeedReelsPanel extends StatefulWidget {
 class _FeedReelsPanelState extends State<FeedReelsPanel> {
   final SocialService _socialService = SocialService();
   bool _loading = true;
+  String? _error;
   List<ReelModel> _reels = [];
 
   @override
@@ -189,20 +190,34 @@ class _FeedReelsPanelState extends State<FeedReelsPanel> {
   }
 
   Future<void> _load() async {
-    setState(() => _loading = true);
-    final result = await _socialService.getReels(limit: 30);
-    if (!mounted) return;
-    if (result['success'] == true) {
-      final data = result['data'] as Map<String, dynamic>;
-      final items = data['results'] as List? ?? [];
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final result = await _socialService.getReels(limit: 30);
+      if (!mounted) return;
+      if (result['success'] == true) {
+        final data = result['data'] as Map<String, dynamic>;
+        final items = data['results'] as List? ?? [];
+        setState(() {
+          _reels = items
+              .map((e) => ReelModel.fromJson(e as Map<String, dynamic>))
+              .toList();
+          _loading = false;
+        });
+      } else {
+        setState(() {
+          _loading = false;
+          _error = result['message']?.toString() ?? 'feedHub.loadFailed'.tr();
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
       setState(() {
-        _reels = items
-            .map((e) => ReelModel.fromJson(e as Map<String, dynamic>))
-            .toList();
         _loading = false;
+        _error = e.toString();
       });
-    } else {
-      setState(() => _loading = false);
     }
   }
 
@@ -222,6 +237,28 @@ class _FeedReelsPanelState extends State<FeedReelsPanel> {
       return const Padding(
         padding: EdgeInsets.all(32),
         child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
+      );
+    }
+    if (_error != null) {
+      return Padding(
+        padding: const EdgeInsets.all(32),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                _error!,
+                textAlign: TextAlign.center,
+                style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: _load,
+                child: Text('common.retry'.tr()),
+              ),
+            ],
+          ),
+        ),
       );
     }
     if (_reels.isEmpty) {

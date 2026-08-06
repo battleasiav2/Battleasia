@@ -103,8 +103,9 @@ class _FeedScreenState extends State<FeedScreen> {
     });
 
     try {
+      final requestedPage = loadMore ? _currentPage + 1 : 1;
       final result = await _feedService.getFeeds(
-        page: loadMore ? _currentPage + 1 : 1,
+        page: requestedPage,
         limit: 20,
         categoryId: _selectedCategoryId,
         search: _searchQuery,
@@ -122,19 +123,18 @@ class _FeedScreenState extends State<FeedScreen> {
             .map((item) => FeedModel.fromJson(item as Map<String, dynamic>))
             .toList();
 
-        final total = data['total'] as int? ?? 0;
-        final currentPage = data['page'] as int? ?? 1;
-        final limit = data['limit'] as int? ?? 20;
-        final hasMore = (currentPage * limit) < total;
+        final total = (data['total'] as num?)?.toInt() ?? 0;
+        final nextCount = loadMore ? _feeds.length + feedsList.length : feedsList.length;
+        final hasMore = nextCount < total;
 
         if (mounted) {
           setState(() {
             if (loadMore) {
               _feeds.addAll(feedsList);
-              _currentPage = currentPage;
+              _currentPage = requestedPage;
             } else {
               _feeds = feedsList;
-              _currentPage = currentPage;
+              _currentPage = 1;
             }
             _hasMore = hasMore;
           });

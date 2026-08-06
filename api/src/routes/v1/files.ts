@@ -93,11 +93,18 @@ function validateUploadedFile(file: Express.Multer.File): string | null {
   return null;
 }
 
+function getUploadLimit(folder: string): number {
+  if (folder === 'reels' || folder === 'stories') {
+    return 100 * 1024 * 1024;
+  }
+  return 5 * 1024 * 1024;
+}
+
 router.post('/upload/:folder', requireAuth, (req: AuthedRequest, res) => {
   const folder = sanitizeFolder(String(req.params.folder || 'support'));
   const upload = multer({
     storage: buildStorage(folder),
-    limits: { fileSize: 5 * 1024 * 1024 },
+    limits: { fileSize: getUploadLimit(folder) },
     fileFilter,
   }).single('file');
 
@@ -133,7 +140,7 @@ router.post('/upload/:folder/multi', requireAuth, (req: AuthedRequest, res) => {
   const folder = sanitizeFolder(String(req.params.folder || 'support'));
   const upload = multer({
     storage: buildStorage(folder),
-    limits: { fileSize: 5 * 1024 * 1024, files: 10 },
+    limits: { fileSize: getUploadLimit(folder), files: 10 },
     fileFilter,
   }).array('files', 10);
 

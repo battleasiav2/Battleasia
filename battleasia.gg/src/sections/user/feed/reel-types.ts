@@ -1,3 +1,5 @@
+import { CONFIG } from 'src/global-config';
+
 export type ReelItem = {
   id: string;
   userId: string;
@@ -30,5 +32,8 @@ export const getReelVideoUrl = (videoUrl: string) => {
   if (!videoUrl) return '';
   if (videoUrl.startsWith('http')) return videoUrl;
   if (videoUrl.startsWith('/assets/')) return videoUrl;
+  if (videoUrl.startsWith('/uploads/')) {
+    return `${CONFIG.serverUrl || ''}${videoUrl}`;
+  }
   return videoUrl;
 };

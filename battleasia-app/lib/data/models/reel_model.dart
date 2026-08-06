@@ -34,9 +34,9 @@ class ReelModel {
       videoUrl: json['videoUrl']?.toString() ?? '',
       caption: json['caption']?.toString() ?? '',
       musicTitle: json['musicTitle']?.toString() ?? '',
-      totalViews: (json['totalViews'] ?? 0) as int,
-      totalLikes: (json['totalLikes'] ?? 0) as int,
-      totalComments: (json['totalComments'] ?? 0) as int,
+      totalViews: (json['totalViews'] as num?)?.toInt() ?? 0,
+      totalLikes: (json['totalLikes'] as num?)?.toInt() ?? 0,
+      totalComments: (json['totalComments'] as num?)?.toInt() ?? 0,
       createdAt: json['createdAt']?.toString(),
     );
   }
