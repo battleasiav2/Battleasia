@@ -1,21 +1,21 @@
-import { Helmet } from 'react-helmet-async';
-
-import { CONFIG } from 'src/global-config';
+import { PageMeta } from 'src/perf';
 
 import { HomeView } from 'src/sections/home/view';
 
 // ----------------------------------------------------------------------
 
-const metadata = { title: `${CONFIG.appName} | Dashboard` };
-
 export default function HomePage() {
   return (
     <>
-      <Helmet>
-        <title> {metadata.title}</title>
-      </Helmet>
-
-      <HomeView />
+      <PageMeta
+        title="BattleAsia | Mobile Esports Tournaments"
+        description="Win real rewards playing free mobile tournaments — PUBG Mobile, Free Fire, COD Mobile, Valorant, Mobile Legends."
+        path="/dashboard"
+        image="https://battleasia.gg/assets/images/hero/hero-pubg-wide.webp"
+      />
+      <main>
+        <HomeView />
+      </main>
     </>
   );
 }

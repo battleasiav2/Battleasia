@@ -3,8 +3,6 @@ import { useEffect, useState } from 'react';
 import { Box } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
-import { ScrollParallax } from 'src/components/animate';
-
 import {
   HOME_HERO_FADE_MS,
   HOME_HERO_ROTATE_MS,
@@ -12,6 +10,7 @@ import {
 } from './hero-slides';
 
 // ----------------------------------------------------------------------
+// LCP-critical: CSS animations only — no framer-motion / ScrollParallax
 
 const heroKenBurns = keyframes`
   0% { transform: scale(1) translate3d(0.4%, 0.2%, 0); }
@@ -40,7 +39,15 @@ export function HeroRotatingBanner() {
 
   return (
     <>
-      <ScrollParallax offset={40} scaleRange={[1, 1, 1]} sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 0,
+          // Fixed hero box prevents CLS while images load
+          minHeight: { xs: 520, md: 720 },
+        }}
+      >
         {HOME_HERO_SLIDES.map((slide, index) => {
           const isActive = index === activeIndex;
 
@@ -50,6 +57,8 @@ export function HeroRotatingBanner() {
               component="img"
               src={slide.src}
               alt={slide.label}
+              width={1920}
+              height={1080}
               loading={index === 0 ? 'eager' : 'lazy'}
               fetchPriority={index === 0 ? 'high' : 'auto'}
               decoding="async"
@@ -81,10 +90,11 @@ export function HeroRotatingBanner() {
             />
           );
         })}
-      </ScrollParallax>
+      </Box>
 
-      {/* Slide dots */}
       <Box
+        role="tablist"
+        aria-label="Hero slides"
         sx={{
           position: 'absolute',
           zIndex: 2,
@@ -105,7 +115,8 @@ export function HeroRotatingBanner() {
         {HOME_HERO_SLIDES.map((slide, index) => (
           <Box
             key={slide.key}
-            role="button"
+            role="tab"
+            aria-selected={index === activeIndex}
             tabIndex={0}
             aria-label={slide.label}
             onClick={() => setActiveIndex(index)}

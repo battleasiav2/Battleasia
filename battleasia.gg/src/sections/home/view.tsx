@@ -1,4 +1,5 @@
 
+import { lazy, Suspense } from 'react';
 
 import { Box, Stack, SvgIcon, Accordion, Typography, AccordionSummary, AccordionDetails } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
@@ -9,14 +10,21 @@ import { useAppDownload } from 'src/hooks/use-app-download';
 import { Image } from 'src/components/image';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { HeroMeshButtons } from 'src/components/mesh-buttons';
-import { ScrollReveal, ScrollParallax } from 'src/components/animate';
-import { LandingDashboardSection } from './dashboard-widgets';
-import { PlayYourGameSection, HOME_GAME_ARTS } from './play-your-game-section';
+import { LazySection } from 'src/perf';
+import { HOME_GAME_ARTS } from './home-game-arts';
 import { homeMobileScrollGridSx, homeMobileScrollItemSx } from './home-horizontal-scroll';
 import { HeroFxOverlay } from './hero-fx-overlay';
 import { HeroRotatingBanner } from './hero-rotating-banner';
 import { HOME_HERO_SLIDES } from './hero-slides';
 import { useTranslate } from 'src/locales/use-locales';
+
+// Below-fold: code-split + viewport gate (never block LCP)
+const LandingDashboardSection = lazy(() =>
+  import('./dashboard-widgets').then((m) => ({ default: m.LandingDashboardSection }))
+);
+const PlayYourGameSection = lazy(() =>
+  import('./play-your-game-section').then((m) => ({ default: m.PlayYourGameSection }))
+);
 
 // ----------------------------------------------------------------------
 
@@ -1026,22 +1034,24 @@ export function HomeView() {
         overflowX: 'clip',
       }}
     >
+      {/* LCP: hero only — no framer-motion */}
       {sectionSlide}
-      <ScrollReveal preset="cinematic" fullViewport distance={48} amount={0.15}>
-        <LandingDashboardSection />
-      </ScrollReveal>
-      <ScrollReveal preset="cinematic" fullViewport distance={48} amount={0.15}>
-        <PlayYourGameSection />
-      </ScrollReveal>
-      <ScrollReveal preset="cinematic-slide-left" fullViewport distance={40} amount={0.12}>
-        {sectionAbout}
-      </ScrollReveal>
-      <ScrollReveal preset="cinematic-slide-right" fullViewport distance={40} amount={0.12}>
-        {sectionHowToPlay}
-      </ScrollReveal>
-      <ScrollReveal preset="cinematic" fullViewport distance={48} amount={0.15}>
-        {sectionRoules}
-      </ScrollReveal>
+
+      <LazySection minHeight={{ xs: 420, md: 520 }}>
+        <Suspense fallback={<Box sx={{ minHeight: { xs: 420, md: 520 } }} />}>
+          <LandingDashboardSection />
+        </Suspense>
+      </LazySection>
+
+      <LazySection minHeight={{ xs: 480, md: 560 }}>
+        <Suspense fallback={<Box sx={{ minHeight: { xs: 480, md: 560 } }} />}>
+          <PlayYourGameSection />
+        </Suspense>
+      </LazySection>
+
+      <LazySection minHeight={{ xs: 640, md: 720 }}>{sectionAbout}</LazySection>
+      <LazySection minHeight={{ xs: 720, md: 800 }}>{sectionHowToPlay}</LazySection>
+      <LazySection minHeight={{ xs: 640, md: 720 }}>{sectionRoules}</LazySection>
     </Box>
   );
 }

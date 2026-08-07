@@ -2,24 +2,34 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="/logo/logo.webp" />
-    <link rel="preload" as="image" href="/assets/images/hero-banner-pubg-drop.webp" fetchpriority="high" />
-    <link rel="preload" as="image" href="/logo/logo.webp" />
-    <meta name="theme-color" content="#000000" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- Prevent caching of HTML to avoid chunk loading errors after deployment -->
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="BattleAsia — play mobile esports tournaments, win real rewards. PUBG Mobile, Free Fire, COD, Valorant and more."
+    />
+    <link rel="icon" href="/logo/logo.webp" type="image/webp" />
+    <link rel="apple-touch-icon" href="/logo/logo.webp" />
+
+    <!-- LCP: preload ONLY the first hero image (fixed dimensions via width/height on img) -->
+    <link
+      rel="preload"
+      as="image"
+      href="/assets/images/hero/hero-pubg-wide.webp"
+      type="image/webp"
+      fetchpriority="high"
+    />
+    <link rel="preload" as="image" href="/logo/logo.webp" type="image/webp" />
+
+    <!-- Avoid stale HTML after deploys (hashed assets still cache long-term) -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    
-    <!-- DNS Prefetch for faster API calls -->
-    <link rel="dns-prefetch" href="https://api.battleasia.com" />
-    
-    <!-- Preconnect to API domain -->
-    <link rel="preconnect" href="https://api.battleasia.com" crossorigin />
-    
-    <title>BattleAsia</title>
+
+    <!-- Optional API hints — remove if no backend on this package -->
+    <link rel="dns-prefetch" href="https://battleasia.gg" />
+
+    <title>BattleAsia | Mobile Esports Tournaments</title>
   </head>
 
   <body>
