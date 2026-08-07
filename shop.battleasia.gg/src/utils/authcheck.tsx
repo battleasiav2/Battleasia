@@ -15,6 +15,10 @@ type Props = {
   children: React.ReactNode;
 };
 
+/**
+ * Keep the route tree mounted while auth initializes.
+ * Swapping spinner ↔ children caused removeChild DOM races with portals/motion.
+ */
 export function AuthConsumer({ children }: Props) {
   const dispatch = useDispatch();
   const { initialize } = useApi();
@@ -54,20 +58,24 @@ export function AuthConsumer({ children }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (loading) {
-    return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          bgcolor: '#000000',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <CircularProgress size={40} sx={{ color: '#f5c518' }} />
-      </Box>
-    );
-  }
-  return children;
+  return (
+    <>
+      {children}
+      {loading ? (
+        <Box
+          sx={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 20000,
+            bgcolor: '#000000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <CircularProgress size={40} sx={{ color: '#f5c518' }} />
+        </Box>
+      ) : null}
+    </>
+  );
 }

@@ -24,8 +24,8 @@ const TermsAndConditionsPage = lazy(() => lazyRetry(() => import('src/pages/term
 function SuspenseOutlet() {
   const pathname = usePathname();
   return (
-    <Suspense key={pathname} fallback={<LoadingScreen />}>
-      <Outlet />
+    <Suspense fallback={<LoadingScreen />}>
+      <Outlet key={pathname} />
     </Suspense>
   );
 }

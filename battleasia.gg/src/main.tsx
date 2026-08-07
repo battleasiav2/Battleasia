@@ -9,15 +9,18 @@ import App from './app';
 import { store, persister } from './store';
 import { routesSection } from './routes/sections';
 import { ErrorBoundary } from './routes/components';
+import { SoftRemountBoundary } from './components/soft-remount-boundary';
 
 // ----------------------------------------------------------------------
 
 const router = createBrowserRouter([
   {
     Component: () => (
-      <App>
-        <Outlet />
-      </App>
+      <SoftRemountBoundary>
+        <App>
+          <Outlet />
+        </App>
+      </SoftRemountBoundary>
     ),
     errorElement: <ErrorBoundary />,
     children: routesSection,

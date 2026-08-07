@@ -78,14 +78,12 @@ export const Image = forwardRef<HTMLSpanElement, ImageProps>((props, ref) => {
   });
 
   const handleImageLoad = useCallback(() => {
-    const timer = setTimeout(() => {
+    window.setTimeout(() => {
       startTransition(() => {
         setIsLoaded(true);
         onLoad?.();
       });
     }, delayTime);
-
-    return () => clearTimeout(timer);
   }, [delayTime, onLoad]);
 
   const finalEffect = {

@@ -23,8 +23,8 @@ const ShopPage = lazy(() => lazyRetry(() => import('src/pages/user/shop')));
 function SuspenseOutlet() {
   const pathname = usePathname();
   return (
-    <Suspense key={pathname} fallback={<LoadingScreen />}>
-      <Outlet />
+    <Suspense fallback={<LoadingScreen />}>
+      <Outlet key={pathname} />
     </Suspense>
   );
 }

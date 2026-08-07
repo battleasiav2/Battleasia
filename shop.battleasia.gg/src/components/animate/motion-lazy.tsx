@@ -12,7 +12,7 @@ const loadFeatures = () =>
 
 export function MotionLazy({ children }: MotionLazyProps) {
   return (
-    <LazyMotion strict features={loadFeatures}>
+    <LazyMotion features={loadFeatures}>
       {children}
     </LazyMotion>
   );
