@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { merge } from 'es-toolkit';
 
-import { Alert, useMediaQuery } from '@mui/material';
+import { Alert, Box, useMediaQuery } from '@mui/material';
 import { alpha, useTheme, type Breakpoint } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
@@ -11,8 +11,7 @@ import { useSelector } from 'src/store';
 
 import { AuthSplitSection } from './section';
 import { AuthSplitContent } from './content';
-import { AuthHeroPanel } from 'src/sections/auth/auth-hero-panel';
-import { HOME_GAME_ARTS } from 'src/sections/home/play-your-game-section';
+import { HOME_GAME_ARTS } from 'src/sections/home/home-game-arts';
 import { MainSection } from '../core/main-section';
 import { LayoutSection } from '../core/layout-section';
 import { HeaderSection } from '../core/header-section';
@@ -22,6 +21,10 @@ import type { AuthSplitContentProps } from './content';
 import type { MainSectionProps } from '../core/main-section';
 import type { HeaderSectionProps } from '../core/header-section';
 import type { LayoutSectionProps } from '../core/layout-section';
+
+const AuthHeroPanel = lazy(() =>
+  import('src/sections/auth/auth-hero-panel').then((m) => ({ default: m.AuthHeroPanel }))
+);
 
 // ----------------------------------------------------------------------
 
@@ -153,7 +156,9 @@ export function AuthSplitLayout({
       </AuthSplitSection>
       {!isMobile && (
         <AuthSplitContent layoutQuery={layoutQuery} {...slotProps?.content} sx={{ position: 'relative', zIndex: 1 }}>
-          <AuthHeroPanel />
+          <Suspense fallback={<BoxMinHeight />}>
+            <AuthHeroPanel />
+          </Suspense>
         </AuthSplitContent>
       )}
     </MainSection>
@@ -169,4 +174,8 @@ export function AuthSplitLayout({
       {renderMain()}
     </LayoutSection>
   );
+}
+
+function BoxMinHeight() {
+  return <Box sx={{ minHeight: 420, width: 1 }} aria-hidden />;
 }

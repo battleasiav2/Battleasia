@@ -1,20 +1,16 @@
-import { Helmet } from 'react-helmet-async';
-
-import { CONFIG } from 'src/global-config';
+import { PageMeta } from 'src/perf';
 
 import { SignUpView } from 'src/sections/auth';
-
-// ----------------------------------------------------------------------
-
-const metadata = { title: `${CONFIG.appName} | Sign up` };
 
 export default function Page() {
   return (
     <>
-      <Helmet>
-        <title> {metadata.title}</title>
-      </Helmet>
-
+      <PageMeta
+        title="Sign up"
+        description="Create a BattleAsia account and start playing free mobile tournaments."
+        path="/auth/sign-up"
+        noIndex
+      />
       <SignUpView />
     </>
   );

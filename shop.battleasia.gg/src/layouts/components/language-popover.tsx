@@ -1,6 +1,5 @@
 import type { IconButtonProps } from '@mui/material/IconButton';
 
-import { m } from 'framer-motion';
 import { usePopover } from 'minimal-shared/hooks';
 
 import Box from '@mui/material/Box';
@@ -10,16 +9,15 @@ import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 
 import { FlagIcon } from 'src/components/flag-icon';
-import { Iconify } from 'src/components/iconify';
+import { Iconify } from 'src/components/iconify/iconify';
 import { CustomPopover } from 'src/components/custom-popover';
-import { varTap, varHover, transitionTap } from 'src/components/animate';
 import { useTranslate } from 'src/locales/use-locales';
 import { USER_COLORS } from 'src/layouts/user/user-theme';
 
 // ----------------------------------------------------------------------
 
 const GOLD = USER_COLORS.gold;
-const RTL_LANGS = new Set(['ar']);
+const RTL_LANGS = new Set(['ur', 'ar']);
 
 export type LanguagePopoverProps = IconButtonProps & {
   data?: {
@@ -31,12 +29,12 @@ export type LanguagePopoverProps = IconButtonProps & {
 
 function getLangMeta(value: string) {
   const code = value.toUpperCase();
-  return RTL_LANGS.has(value) ? `${code} · RTL` : code;
+  return RTL_LANGS.has(value) ? `${code} • RTL` : code;
 }
 
 export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProps) {
   const { open, anchorEl, onClose, onOpen } = usePopover();
-  const { t, currentLang, onChangeLang } = useTranslate();
+  const { currentLang, onChangeLang } = useTranslate();
 
   const handleChangeLang = async (newLang: string) => {
     await onChangeLang(newLang as any);
@@ -55,7 +53,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
             width: 280,
             overflow: 'hidden',
             borderRadius: 0,
-            bgcolor: alpha('#10141c', 0.96),
+            bgcolor: alpha('#000000', 0.94),
             border: `1px solid ${alpha('#ffffff', 0.08)}`,
             boxShadow: `0 20px 50px ${alpha('#000000', 0.55)}`,
             backdropFilter: 'blur(16px)',
@@ -76,16 +74,27 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
       >
         <Typography
           className="font-tr"
-          sx={{ color: GOLD, fontWeight: 700, fontSize: 20, lineHeight: 1 }}
+          sx={{
+            color: GOLD,
+            fontWeight: 700,
+            fontSize: 22,
+            lineHeight: 1,
+          }}
         >
-          {t('language.title')}
+          Language
         </Typography>
-        <Typography sx={{ color: alpha('#ffffff', 0.45), fontSize: 14, fontWeight: 500 }}>
+        <Typography
+          sx={{
+            color: alpha('#ffffff', 0.45),
+            fontSize: 14,
+            fontWeight: 500,
+          }}
+        >
           {data.length}
         </Typography>
       </Stack>
 
-      <Stack divider={<Box sx={{ height: 1, bgcolor: alpha('#ffffff', 0.06) }} />}>
+      <Stack divider={<Box sx={{ height: '1px', bgcolor: alpha('#ffffff', 0.06) }} />}>
         {data.map((option) => {
           const isSelected = option.value === currentLang?.value;
 
@@ -114,6 +123,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                   sx={{
                     width: 36,
                     height: 24,
+                    borderRadius: 0,
                     overflow: 'hidden',
                     flexShrink: 0,
                     boxShadow: `0 1px 4px ${alpha('#000000', 0.35)}`,
@@ -153,6 +163,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                   sx={{
                     width: 28,
                     height: 28,
+                    borderRadius: 0,
                     bgcolor: GOLD,
                     display: 'grid',
                     placeItems: 'center',
@@ -174,10 +185,6 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
   return (
     <>
       <ButtonBase
-        component={m.button}
-        whileTap={varTap(0.96)}
-        whileHover={varHover(1.03)}
-        transition={transitionTap()}
         aria-label="Languages button"
         onClick={onOpen}
         sx={[
@@ -193,11 +200,13 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
             border: '2px solid',
             borderColor: open ? alpha(GOLD, 0.5) : alpha('#ffffff', 0.18),
             boxShadow: `inset 0 0 0 1px ${alpha('#000000', 0.25)}`,
-            transition: 'all 0.2s ease',
+            transition: 'transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease',
             '&:hover': {
               bgcolor: alpha('#0c121c', 0.7),
               borderColor: alpha(GOLD, 0.45),
+              transform: 'scale(1.03)',
             },
+            '&:active': { transform: 'scale(0.96)' },
           },
           ...(Array.isArray(sx) ? sx : [sx]),
         ]}

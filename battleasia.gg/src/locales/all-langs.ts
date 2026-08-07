@@ -1,77 +1,45 @@
-// core (MUI)
-import {
-  zhCN as zhCNCore,
-} from '@mui/material/locale';
-// date pickers (MUI)
-import {
-  enUS as enUSDate,
-  zhCN as zhCNDate,
-} from '@mui/x-date-pickers/locales';
-// data grid (MUI)
-import {
-  enUS as enUSDataGrid,
-  zhCN as zhCNDataGrid,
-} from '@mui/x-data-grid/locales';
-
-// ----------------------------------------------------------------------
+// Slim locales — avoid pulling @mui/x-data-grid into every page (TBT).
+// Date-picker locales load only via LocalizationProvider when needed.
 
 export const allLangs = [
   {
     value: 'en',
     label: 'English',
-    countryCode: 'GB', // or 'US' for American English
+    countryCode: 'GB',
     adapterLocale: 'en',
     numberFormat: { code: 'en-US', currency: 'USD' },
-    systemValue: {
-      components: { ...enUSDate.components, ...enUSDataGrid.components },
-    },
+    systemValue: { components: {} },
   },
   {
     value: 'bn',
     label: 'বাংলা',
-    countryCode: 'BD', // Bangladesh flag
+    countryCode: 'BD',
     adapterLocale: 'bn',
     numberFormat: { code: 'bn-BD', currency: 'BDT' },
-    systemValue: {
-      components: { ...enUSDate.components, ...enUSDataGrid.components }, // Fallback to English for MUI
-    },
+    systemValue: { components: {} },
   },
   {
     value: 'zh',
     label: '中文',
-    countryCode: 'CN', // China flag
+    countryCode: 'CN',
     adapterLocale: 'zh-cn',
     numberFormat: { code: 'zh-CN', currency: 'CNY' },
-    systemValue: {
-      components: { ...zhCNCore.components, ...zhCNDate.components, ...zhCNDataGrid.components },
-    },
+    systemValue: { components: {} },
   },
   {
     value: 'hi',
     label: 'हिन्दी',
-    countryCode: 'IN', // India flag
+    countryCode: 'IN',
     adapterLocale: 'hi',
     numberFormat: { code: 'hi-IN', currency: 'INR' },
-    systemValue: {
-      components: { ...enUSDate.components, ...enUSDataGrid.components }, // Fallback to English for MUI
-    },
+    systemValue: { components: {} },
   },
   {
     value: 'ur',
     label: 'اردو',
-    countryCode: 'PK', // Pakistan flag
+    countryCode: 'PK',
     adapterLocale: 'ur',
     numberFormat: { code: 'ur-PK', currency: 'PKR' },
-    systemValue: {
-      components: { ...enUSDate.components, ...enUSDataGrid.components }, // Fallback to English for MUI
-    },
+    systemValue: { components: {} },
   },
 ];
-
-/**
- * Country code:
- * https://flagcdn.com/en/codes.json
- *
- * Number format code:
- * https://gist.github.com/raushankrjha/d1c7e35cf87e69aa8b4208a8171a8416
- */

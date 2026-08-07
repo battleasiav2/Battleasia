@@ -8,13 +8,12 @@ import { ApiProvider } from 'src/contexts/ApiContext';
 import { SocketProvider } from 'src/contexts/SocketContext';
 import { themeConfig, ThemeProvider } from 'src/theme';
 
-import { ProgressBar } from 'src/components/progress-bar';
 import { MotionLazy } from 'src/components/animate/motion-lazy';
-import { SettingsDrawer, defaultSettings, SettingsProvider } from 'src/components/settings';
+import { defaultSettings, SettingsProvider } from 'src/components/settings';
+import { DeferredSettingsDrawer } from 'src/components/settings/deferred-settings-drawer';
 import { Toaster } from 'react-hot-toast';
 
 import { AuthConsumer } from './utils/authcheck';
-
 
 // ----------------------------------------------------------------------
 
@@ -35,7 +34,6 @@ export default function App({ children }: AppProps) {
             modeStorageKey={themeConfig.modeStorageKey}
           >
             <MotionLazy>
-              <ProgressBar />
               <Toaster
                 position="top-center"
                 reverseOrder={false}
@@ -43,11 +41,8 @@ export default function App({ children }: AppProps) {
                   duration: 4000,
                 }}
               />
-              <SettingsDrawer defaultSettings={defaultSettings} />
-              <AuthConsumer>
-                {children}
-              </AuthConsumer>
-              {/* <SocialLinksFab /> */}
+              <DeferredSettingsDrawer defaultSettings={defaultSettings} />
+              <AuthConsumer>{children}</AuthConsumer>
             </MotionLazy>
           </ThemeProvider>
         </SettingsProvider>
@@ -55,8 +50,6 @@ export default function App({ children }: AppProps) {
     </ApiProvider>
   );
 }
-
-// ----------------------------------------------------------------------
 
 function useScrollToTop() {
   const pathname = usePathname();

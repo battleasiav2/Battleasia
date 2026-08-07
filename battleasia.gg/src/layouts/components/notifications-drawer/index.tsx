@@ -1,6 +1,5 @@
 import type { IconButtonProps } from '@mui/material/IconButton';
 
-import { m } from 'framer-motion';
 import { useMemo, useState, useCallback } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
 
@@ -20,7 +19,6 @@ import { useRouter } from 'src/routes/hooks';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { PlayTabs } from 'src/components/play-tabs';
-import { varTap, varHover, transitionTap } from 'src/components/animate';
 import { useNotificationsPolling } from 'src/hooks/use-notifications-polling';
 import { useTranslate } from 'src/locales/use-locales';
 import {
@@ -165,10 +163,6 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
   return (
     <>
       <IconButton
-        component={m.button}
-        whileTap={varTap(0.96)}
-        whileHover={varHover(1.04)}
-        transition={transitionTap()}
         aria-label="Notifications button"
         onClick={onOpen}
         sx={[
@@ -181,11 +175,13 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
             border: '1.5px solid',
             borderColor: open ? alpha(USER_COLORS.gold, 0.55) : alpha('#ffffff', 0.18),
             boxShadow: `inset 0 0 0 1px ${alpha('#000000', 0.25)}`,
-            transition: 'background-color 0.2s ease, border-color 0.2s ease',
+            transition: 'transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease',
             '&:hover': {
               bgcolor: alpha('#0c121c', 0.72),
               borderColor: alpha(USER_COLORS.gold, 0.45),
+              transform: 'scale(1.04)',
             },
+            '&:active': { transform: 'scale(0.96)' },
           },
           ...(Array.isArray(sx) ? sx : [sx]),
         ]}

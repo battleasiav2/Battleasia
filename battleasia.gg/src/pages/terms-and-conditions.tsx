@@ -1,18 +1,18 @@
-import { Helmet } from 'react-helmet-async';
+import { PageMeta } from 'src/perf';
 import { List, ListItem, Typography, ListItemText } from '@mui/material';
 
-import { CONFIG } from 'src/global-config';
 import { LegalPageShell, LegalSection } from 'src/sections/legal/legal-page-shell';
-
-const metadata = { title: `${CONFIG.appName} | Terms & Conditions` };
 
 export default function TermsAndConditionsPage() {
   return (
     <>
-      <Helmet>
-        <title>{metadata.title}</title>
-      </Helmet>
+      <PageMeta
+        title="Terms & Conditions"
+        description="BattleAsia terms of use for accounts, tournaments, deposits, and payouts."
+        path="/terms-and-conditions"
+      />
 
+      <main>
       <LegalPageShell title="Terms & Conditions" updatedAt="1/2/2026" artIndex={0}>
         <LegalSection title="1) About BattleAsia">
           <Typography>
@@ -176,6 +176,7 @@ export default function TermsAndConditionsPage() {
           <Typography>Questions about these Terms: support@battleasia.net</Typography>
         </LegalSection>
       </LegalPageShell>
+      </main>
     </>
   );
 }

@@ -5,26 +5,24 @@ import 'dayjs/locale/hi';
 import 'dayjs/locale/ur';
 
 import dayjs from 'dayjs';
-
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { LocalizationProvider as Provider } from '@mui/x-date-pickers/LocalizationProvider';
+import { useEffect, type ReactNode } from 'react';
 
 import { useTranslate } from './use-locales';
 
 // ----------------------------------------------------------------------
+// App-wide: only sync dayjs locale (no @mui/x-date-pickers on critical path).
+// Screens that need DatePicker should wrap with DatePickerLocalization locally.
 
 type Props = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export function LocalizationProvider({ children }: Props) {
   const { currentLang } = useTranslate();
 
-  dayjs.locale(currentLang.adapterLocale);
+  useEffect(() => {
+    dayjs.locale(currentLang.adapterLocale);
+  }, [currentLang.adapterLocale]);
 
-  return (
-    <Provider dateAdapter={AdapterDayjs} adapterLocale={currentLang.adapterLocale}>
-      {children}
-    </Provider>
-  );
+  return children;
 }

@@ -1,20 +1,11 @@
-import { Helmet } from 'react-helmet-async';
-
-import { CONFIG } from 'src/global-config';
+import { PageMeta } from 'src/perf';
 
 import { ResetPasswordView } from 'src/sections/auth';
-
-// ----------------------------------------------------------------------
-
-const metadata = { title: `${CONFIG.appName} | Reset Password` };
 
 export default function Page() {
   return (
     <>
-      <Helmet>
-        <title> {metadata.title}</title>
-      </Helmet>
-
+      <PageMeta title="Reset Password" description="Set a new BattleAsia password." path="/auth/reset-password" noIndex />
       <ResetPasswordView />
     </>
   );

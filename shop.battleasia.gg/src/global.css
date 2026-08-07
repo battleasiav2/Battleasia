@@ -1,39 +1,37 @@
 /** **************************************
-* Fonts: app
+* Fonts: critical only (CLS + LCP)
+* Unused settings fonts removed — load on demand later if needed
 *************************************** */
-@import '@fontsource-variable/public-sans';
+@import '@fontsource-variable/public-sans/wght.css';
 
 @import '@fontsource/barlow/400.css';
-@import '@fontsource/barlow/500.css';
-@import '@fontsource/barlow/600.css';
 @import '@fontsource/barlow/700.css';
 @import '@fontsource/barlow/800.css';
 
-/** **************************************
-* Fonts: options
-*************************************** */
-@import '@fontsource-variable/dm-sans';
-@import '@fontsource-variable/inter';
-@import '@fontsource-variable/nunito-sans';
+/** Brand wordmark — system stack first; optional local Orbitron later */
+/* Google CSS removed (render-blocking + CLS). Use Barlow for brand until self-hosted. */
 
 /** **************************************
 * Plugins
 *************************************** */
-/* scrollbar */
 @import './components/scrollbar/styles.css';
 
-/** Legacy display font hooks — use app default typography (Public Sans). */
 .font-tr,
 .font-tm,
 .font-an {
   font-family: inherit !important;
 }
 
-/** **************************************
-* Baseline
-*************************************** */
+.font-brand-gaming {
+  font-family: 'Barlow', 'Public Sans Variable', sans-serif !important;
+  font-weight: 800 !important;
+  font-style: italic;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase;
+  font-display: swap;
+}
+
 html {
-  height: 100%;
   -webkit-overflow-scrolling: touch;
   scroll-behavior: smooth;
 }
@@ -43,18 +41,35 @@ html {
     scroll-behavior: auto;
   }
 }
-body,
+
+.home-scroll-story {
+  scroll-padding-top: 108px;
+}
+
+@media (min-width: 900px) {
+  .home-scroll-story > * {
+    scroll-margin-top: 108px;
+  }
+}
+
+body {
+  min-height: 100vh;
+}
 #root,
 #root__layout {
   display: flex;
-  flex: 1 1 auto;
-  min-height: 100%;
+  flex: 1 0 auto;
+  min-height: 100vh;
   flex-direction: column;
 }
+
+/* CLS: never let late images expand layout without reserved box */
 img {
   max-width: 100%;
+  height: auto;
   vertical-align: middle;
 }
+
 ul {
   margin: 0;
   padding: 0;

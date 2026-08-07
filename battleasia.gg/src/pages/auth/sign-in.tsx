@@ -1,20 +1,16 @@
-import { Helmet } from 'react-helmet-async';
-
-import { CONFIG } from 'src/global-config';
+import { PageMeta } from 'src/perf';
 
 import { SignInView } from 'src/sections/auth';
-
-// ----------------------------------------------------------------------
-
-const metadata = { title: `${CONFIG.appName} | Sign in` };
 
 export default function Page() {
   return (
     <>
-      <Helmet>
-        <title> {metadata.title}</title>
-      </Helmet>
-
+      <PageMeta
+        title="Sign in"
+        description="Sign in to BattleAsia to join mobile esports tournaments and manage your account."
+        path="/auth/sign-in"
+        noIndex
+      />
       <SignInView />
     </>
   );

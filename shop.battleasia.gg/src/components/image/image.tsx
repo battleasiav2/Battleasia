@@ -1,9 +1,9 @@
-import type { UseInViewOptions } from 'framer-motion';
 import type { Breakpoint } from '@mui/material/styles';
 
-import { useInView } from 'framer-motion';
 import { mergeRefs, mergeClasses } from 'minimal-shared/utils';
 import { useRef, useState, forwardRef, useCallback, startTransition } from 'react';
+
+import { useInView } from 'src/perf/use-in-view';
 
 import { imageClasses } from './classes';
 import { ImageImg, ImageRoot, ImageOverlay, ImagePlaceholder } from './styles';
@@ -34,7 +34,8 @@ export type ImageProps = React.ComponentProps<typeof ImageRoot> & {
   effect?: EffectsType;
   visibleByDefault?: boolean;
   disablePlaceholder?: boolean;
-  viewportOptions?: UseInViewOptions;
+  /** Kept for API compat — mapped to native IntersectionObserver (no framer-motion) */
+  viewportOptions?: { once?: boolean; rootMargin?: string; amount?: number | 'some' | 'all' };
   ratio?: AspectRatioType | Partial<Record<Breakpoint, AspectRatioType>>;
   slotProps?: {
     img?: Omit<React.ComponentProps<typeof ImageImg>, 'src' | 'alt'>;
@@ -70,9 +71,10 @@ export const Image = forwardRef<HTMLSpanElement, ImageProps>((props, ref) => {
   const localRef = useRef<HTMLSpanElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Native IO — never import framer-motion here (blocks LCP when Image is above-fold)
   const isInView = useInView(localRef, {
-    once: true,
-    ...viewportOptions,
+    once: viewportOptions?.once ?? true,
+    rootMargin: viewportOptions?.rootMargin ?? '200px 0px',
   });
 
   const handleImageLoad = useCallback(() => {

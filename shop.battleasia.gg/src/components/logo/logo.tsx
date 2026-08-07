@@ -1,8 +1,9 @@
 import type { LinkProps } from '@mui/material/Link';
 
-import { forwardRef } from 'react';
+import { memo, forwardRef } from 'react';
 import { mergeClasses } from 'minimal-shared/utils';
 
+import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import { styled } from '@mui/material/styles';
 
@@ -14,12 +15,15 @@ import { logoClasses } from './classes';
 
 // ----------------------------------------------------------------------
 
+/** Same asset as nixbazar.com — public/logo/logo.webp */
+const LOGO_SRC = `${CONFIG.assetsDir}/logo/logo.webp`;
+
 export type LogoProps = LinkProps & {
   isSingle?: boolean;
   disabled?: boolean;
 };
 
-export const Logo = forwardRef<HTMLAnchorElement, LogoProps>((props, ref) => {
+const LogoComponent = forwardRef<HTMLAnchorElement, LogoProps>((props, ref) => {
   const { className, href = '/', isSingle = true, disabled, sx, ...other } = props;
 
   return (
@@ -42,16 +46,28 @@ export const Logo = forwardRef<HTMLAnchorElement, LogoProps>((props, ref) => {
       ]}
       {...other}
     >
-      <img
+      <Box
+        component="img"
         alt="BattleAsia"
-        src={`${CONFIG.assetsDir}/logo/logo.webp`}
-        width="100%"
-        height="100%"
-        style={{ display: 'block', objectFit: 'contain', objectPosition: 'center' }}
+        src={LOGO_SRC}
+        width={64}
+        height={64}
+        loading="eager"
+        decoding="async"
+        sx={{
+          width: 1,
+          height: 1,
+          aspectRatio: '1 / 1',
+          objectFit: 'contain',
+          objectPosition: 'center',
+          display: 'block',
+        }}
       />
     </LogoRoot>
   );
 });
+
+export const Logo = memo(LogoComponent);
 
 // ----------------------------------------------------------------------
 

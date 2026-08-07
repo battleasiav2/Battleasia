@@ -1,20 +1,11 @@
-import { Helmet } from 'react-helmet-async';
+import { PageMeta } from 'src/perf';
 
-import { CONFIG } from 'src/global-config';
-
-import { EmailVerificationView } from 'src/sections/auth/email-verification-view';
-
-// ----------------------------------------------------------------------
-
-const metadata = { title: `Email Verification - ${CONFIG.appName}` };
+import { EmailVerificationView } from 'src/sections/auth';
 
 export default function Page() {
   return (
     <>
-      <Helmet>
-        <title>{metadata.title}</title>
-      </Helmet>
-
+      <PageMeta title="Email Verification" description="Verify your BattleAsia email address." path="/auth/email-verification" noIndex />
       <EmailVerificationView />
     </>
   );

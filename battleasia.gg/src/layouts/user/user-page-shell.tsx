@@ -2,13 +2,18 @@ import type { ReactNode } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
 
 import Box from '@mui/material/Box';
-import { m, useReducedMotion } from 'framer-motion';
+import { keyframes } from '@mui/material/styles';
 
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { USER_COLORS, getUserPageShellOverlays } from './user-theme';
 
 // ----------------------------------------------------------------------
+
+const pageEnter = keyframes`
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+`;
 
 type UserPageShellProps = {
   children: ReactNode;
@@ -18,6 +23,7 @@ type UserPageShellProps = {
   contentSx?: SxProps<Theme>;
 };
 
+/** CSS enter animation — no framer-motion on every user page */
 export function UserPageShell({
   children,
   disablePadding,
@@ -26,7 +32,6 @@ export function UserPageShell({
   contentSx,
 }: UserPageShellProps) {
   const overlays = getUserPageShellOverlays();
-  const reduceMotion = useReducedMotion();
 
   return (
     <Box
@@ -68,17 +73,13 @@ export function UserPageShell({
         ]}
       >
         <Box
-          component={reduceMotion ? 'div' : m.div}
-          initial={reduceMotion ? undefined : { opacity: 0, y: 18 }}
-          animate={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-          transition={
-            reduceMotion ? undefined : { duration: 0.55, ease: [0.22, 1, 0.36, 1] }
-          }
           sx={{
             display: 'flex',
             flexDirection: 'column',
             flex: '1 1 auto',
             width: '100%',
+            animation: `${pageEnter} 0.45s cubic-bezier(0.22, 1, 0.36, 1) both`,
+            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
           }}
         >
           {children}

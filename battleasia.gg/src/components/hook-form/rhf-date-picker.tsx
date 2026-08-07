@@ -6,6 +6,8 @@ import type { MobileDateTimePickerProps } from '@mui/x-date-pickers/MobileDateTi
 import dayjs from 'dayjs';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { MobileDateTimePicker } from '@mui/x-date-pickers/MobileDateTimePicker';
 
@@ -21,28 +23,30 @@ export function RHFDatePicker({ name, slotProps, ...other }: RHFDatePickerProps)
   const { control } = useFormContext();
 
   return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field, fieldState: { error } }) => (
-        <DatePicker
-          {...field}
-          value={dayjs(field.value)}
-          onChange={(newValue) => field.onChange(dayjs(newValue).format())}
-          format={formatPatterns.split.date}
-          slotProps={{
-            ...slotProps,
-            textField: {
-              fullWidth: true,
-              error: !!error,
-              helperText: error?.message ?? (slotProps?.textField as TextFieldProps)?.helperText,
-              ...slotProps?.textField,
-            },
-          }}
-          {...other}
-        />
-      )}
-    />
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Controller
+        name={name}
+        control={control}
+        render={({ field, fieldState: { error } }) => (
+          <DatePicker
+            {...field}
+            value={dayjs(field.value)}
+            onChange={(newValue) => field.onChange(dayjs(newValue).format())}
+            format={formatPatterns.split.date}
+            slotProps={{
+              ...slotProps,
+              textField: {
+                fullWidth: true,
+                error: !!error,
+                helperText: error?.message ?? (slotProps?.textField as TextFieldProps)?.helperText,
+                ...slotProps?.textField,
+              },
+            }}
+            {...other}
+          />
+        )}
+      />
+    </LocalizationProvider>
   );
 }
 
@@ -60,27 +64,29 @@ export function RHFMobileDateTimePicker({
   const { control } = useFormContext();
 
   return (
-    <Controller
-      name={name}
-      control={control}
-      render={({ field, fieldState: { error } }) => (
-        <MobileDateTimePicker
-          {...field}
-          value={dayjs(field.value)}
-          onChange={(newValue) => field.onChange(dayjs(newValue).format())}
-          format={formatPatterns.split.dateTime}
-          slotProps={{
-            textField: {
-              fullWidth: true,
-              error: !!error,
-              helperText: error?.message ?? (slotProps?.textField as TextFieldProps)?.helperText,
-              ...slotProps?.textField,
-            },
-            ...slotProps,
-          }}
-          {...other}
-        />
-      )}
-    />
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Controller
+        name={name}
+        control={control}
+        render={({ field, fieldState: { error } }) => (
+          <MobileDateTimePicker
+            {...field}
+            value={dayjs(field.value)}
+            onChange={(newValue) => field.onChange(dayjs(newValue).format())}
+            format={formatPatterns.split.dateTime}
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                error: !!error,
+                helperText: error?.message ?? (slotProps?.textField as TextFieldProps)?.helperText,
+                ...slotProps?.textField,
+              },
+              ...slotProps,
+            }}
+            {...other}
+          />
+        )}
+      />
+    </LocalizationProvider>
   );
 }

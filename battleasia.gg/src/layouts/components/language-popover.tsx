@@ -1,6 +1,5 @@
 import type { IconButtonProps } from '@mui/material/IconButton';
 
-import { m } from 'framer-motion';
 import { usePopover } from 'minimal-shared/hooks';
 
 import Box from '@mui/material/Box';
@@ -12,7 +11,6 @@ import { alpha } from '@mui/material/styles';
 import { FlagIcon } from 'src/components/flag-icon';
 import { Iconify } from 'src/components/iconify/iconify';
 import { CustomPopover } from 'src/components/custom-popover';
-import { varTap, varHover, transitionTap } from 'src/components/animate';
 import { useTranslate } from 'src/locales/use-locales';
 import { USER_COLORS } from 'src/layouts/user/user-theme';
 
@@ -187,10 +185,6 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
   return (
     <>
       <ButtonBase
-        component={m.button}
-        whileTap={varTap(0.96)}
-        whileHover={varHover(1.03)}
-        transition={transitionTap()}
         aria-label="Languages button"
         onClick={onOpen}
         sx={[
@@ -206,11 +200,13 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
             border: '2px solid',
             borderColor: open ? alpha(GOLD, 0.5) : alpha('#ffffff', 0.18),
             boxShadow: `inset 0 0 0 1px ${alpha('#000000', 0.25)}`,
-            transition: 'all 0.2s ease',
+            transition: 'transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease',
             '&:hover': {
               bgcolor: alpha('#0c121c', 0.7),
               borderColor: alpha(GOLD, 0.45),
+              transform: 'scale(1.03)',
             },
+            '&:active': { transform: 'scale(0.96)' },
           },
           ...(Array.isArray(sx) ? sx : [sx]),
         ]}
