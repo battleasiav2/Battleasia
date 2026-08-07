@@ -13,12 +13,14 @@ import { HeroMeshButtons } from 'src/components/mesh-buttons';
 import { LazySection } from 'src/perf';
 import { HOME_GAME_ARTS } from './home-game-arts';
 import { homeMobileScrollGridSx, homeMobileScrollItemSx } from './home-horizontal-scroll';
-import { HeroFxOverlay } from './hero-fx-overlay';
 import { HeroRotatingBanner } from './hero-rotating-banner';
 import { HOME_HERO_SLIDES } from './hero-slides';
 import { useTranslate } from 'src/locales/use-locales';
 
-// Below-fold: code-split + viewport gate (never block LCP)
+// Below-fold + non-LCP FX: code-split (never block hero paint)
+const HeroFxOverlay = lazy(() =>
+  import('./hero-fx-overlay').then((m) => ({ default: m.HeroFxOverlay }))
+);
 const LandingDashboardSection = lazy(() =>
   import('./dashboard-widgets').then((m) => ({ default: m.LandingDashboardSection }))
 );
@@ -125,8 +127,8 @@ function blackGamingSectionSx(art?: string) {
 // ----------------------------------------------------------------------
 // Preload hero slides + title logo — mode/game cards lazy-load on scroll.
 const imagePaths = [
-  ...HOME_HERO_SLIDES.map((slide) => slide.src),
-  HOME_IMAGE_PATHS.heroTitleLogo,
+  // Preload LCP hero only — title logo loads with page, not competing preload queue
+  ...HOME_HERO_SLIDES.slice(0, 1).map((slide) => slide.src),
 ];
 
 export function HomeView() {
@@ -213,7 +215,9 @@ export function HomeView() {
       {/* Full hero image — 5 premium game slides, rotate every ~90s */}
       <HeroRotatingBanner />
 
-      <HeroFxOverlay />
+      <Suspense fallback={null}>
+        <HeroFxOverlay />
+      </Suspense>
 
       {/* Copy + mobile CTAs — mid-hero cluster (not stuck in the black fade) */}
       <Stack
@@ -258,6 +262,8 @@ export function HomeView() {
             display: 'flex',
             justifyContent: { xs: 'center', md: 'flex-end' },
             overflow: 'hidden',
+            // CLS: reserved box before logo image loads
+            minHeight: { xs: 56, sm: 68, md: 84 },
             animation: `${logoEnter} 1s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both`,
             '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
           }}
@@ -266,8 +272,9 @@ export function HomeView() {
             component="img"
             src={HOME_IMAGE_PATHS.heroTitleLogo}
             alt="Battle Asia"
+            width={840}
+            height={168}
             loading="eager"
-            fetchPriority="high"
             decoding="async"
             sx={{
               position: 'relative',
@@ -275,6 +282,7 @@ export function HomeView() {
               width: { xs: 'min(100%, 280px)', sm: 'min(100%, 340px)', md: '100%' },
               maxWidth: { xs: 280, sm: 340, md: 420 },
               height: 'auto',
+              aspectRatio: '5 / 1',
               display: 'block',
               objectFit: 'contain',
               objectPosition: { xs: 'center', md: 'right' },

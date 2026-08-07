@@ -171,15 +171,18 @@ function PlayYourGameCard({ game, index }: PlayYourGameCardProps) {
           component="img"
           src={game.art}
           alt={t(`home.playYourGame.games.${game.key}`)}
+          width={480}
+          height={640}
           loading="lazy"
+          decoding="async"
           sx={{
             width: 1,
             height: 1,
             objectFit: 'cover',
             objectPosition: 'center top',
             display: 'block',
+            aspectRatio: '3 / 4',
             transition: 'transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)',
-            willChange: 'transform',
           }}
         />
 

@@ -1,29 +1,39 @@
-/** Wide cinematic hero slides — distant establishing shots, not close-up portraits. */
+/** Wide cinematic hero slides — compressed WebP only (LCP-critical). */
 export const HOME_HERO_SLIDES = [
   {
     key: 'pubgMobile',
     src: '/assets/images/hero/hero-pubg-wide.webp',
     label: 'PUBG Mobile',
+    width: 1600,
+    height: 900,
   },
   {
     key: 'freeFire',
-    src: '/assets/images/hero/hero-free-fire-wide.png',
+    src: '/assets/images/hero/hero-free-fire-wide.webp',
     label: 'Free Fire',
+    width: 1600,
+    height: 900,
   },
   {
     key: 'codMobile',
-    src: '/assets/images/hero/hero-cod-mobile-wide.png',
+    src: '/assets/images/hero/hero-cod-mobile-wide.webp',
     label: 'Call of Duty Mobile',
+    width: 1600,
+    height: 900,
   },
   {
     key: 'valorant',
-    src: '/assets/images/hero/hero-valorant-wide.png',
+    src: '/assets/images/hero/hero-valorant-wide.webp',
     label: 'Valorant',
+    width: 1600,
+    height: 900,
   },
   {
     key: 'mobileLegends',
-    src: '/assets/images/hero/hero-mobile-legends-wide.png',
+    src: '/assets/images/hero/hero-mobile-legends-wide.webp',
     label: 'Mobile Legends',
+    width: 1600,
+    height: 900,
   },
 ] as const;
 

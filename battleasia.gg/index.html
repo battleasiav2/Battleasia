@@ -11,7 +11,7 @@
     <link rel="icon" href="/logo/logo.webp" type="image/webp" />
     <link rel="apple-touch-icon" href="/logo/logo.webp" />
 
-    <!-- LCP: preload ONLY the first hero image (fixed dimensions via width/height on img) -->
+    <!-- LCP only: do not preload logo (competes with hero bandwidth) -->
     <link
       rel="preload"
       as="image"
@@ -19,15 +19,6 @@
       type="image/webp"
       fetchpriority="high"
     />
-    <link rel="preload" as="image" href="/logo/logo.webp" type="image/webp" />
-
-    <!-- Avoid stale HTML after deploys (hashed assets still cache long-term) -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-
-    <!-- Optional API hints — remove if no backend on this package -->
-    <link rel="dns-prefetch" href="https://battleasia.gg" />
 
     <title>BattleAsia | Mobile Esports Tournaments</title>
   </head>

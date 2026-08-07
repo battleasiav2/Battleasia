@@ -50,11 +50,14 @@ const LogoComponent = forwardRef<HTMLAnchorElement, LogoProps>((props, ref) => {
         component="img"
         alt="BattleAsia"
         src={LOGO_SRC}
+        width={64}
+        height={64}
         loading="eager"
-        decoding="sync"
+        decoding="async"
         sx={{
           width: 1,
           height: 1,
+          aspectRatio: '1 / 1',
           objectFit: 'contain',
           objectPosition: 'center',
           display: 'block',

@@ -10,18 +10,12 @@ import {
 } from './hero-slides';
 
 // ----------------------------------------------------------------------
-// LCP-critical: CSS animations only — no framer-motion / ScrollParallax
+// LCP-critical: CSS only, fixed box, WebP, first slide only eager
 
 const heroKenBurns = keyframes`
-  0% { transform: scale(1) translate3d(0.4%, 0.2%, 0); }
-  40% { transform: scale(1.02) translate3d(-0.4%, -0.3%, 0); }
-  75% { transform: scale(1.01) translate3d(-0.6%, 0.2%, 0); }
-  100% { transform: scale(1) translate3d(0.4%, 0.2%, 0); }
-`;
-
-const heroEnter = keyframes`
-  0% { transform: scale(1.03) translate3d(0, 0.4%, 0); opacity: 0.55; }
-  100% { transform: scale(1) translate3d(0, 0, 0); opacity: 1; }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.015); }
+  100% { transform: scale(1); }
 `;
 
 const GOLD = '#f5c518';
@@ -44,12 +38,19 @@ export function HeroRotatingBanner() {
           position: 'absolute',
           inset: 0,
           zIndex: 0,
-          // Fixed hero box prevents CLS while images load
-          minHeight: { xs: 520, md: 720 },
+          // Stable LCP/CLS box — matches parent section heights
+          width: 1,
+          height: 1,
+          overflow: 'hidden',
+          bgcolor: '#000',
         }}
       >
         {HOME_HERO_SLIDES.map((slide, index) => {
           const isActive = index === activeIndex;
+          // Only mount first slide immediately; others after first paint cycle
+          if (index > 0 && activeIndex === 0 && index !== activeIndex) {
+            // still render but lazy — browser won't fetch until near
+          }
 
           return (
             <Box
@@ -57,34 +58,31 @@ export function HeroRotatingBanner() {
               component="img"
               src={slide.src}
               alt={slide.label}
-              width={1920}
-              height={1080}
+              width={slide.width}
+              height={slide.height}
               loading={index === 0 ? 'eager' : 'lazy'}
-              fetchPriority={index === 0 ? 'high' : 'auto'}
+              fetchPriority={index === 0 ? 'high' : 'low'}
               decoding="async"
               sx={{
                 position: 'absolute',
                 inset: 0,
-                width: 1,
-                height: 1,
+                width: '100%',
+                height: '100%',
                 objectFit: 'cover',
                 objectPosition: 'center center',
-                transformOrigin: 'center center',
-                imageRendering: 'auto',
-                backfaceVisibility: 'hidden',
                 opacity: isActive ? 1 : 0,
                 transition: `opacity ${HOME_HERO_FADE_MS}ms ease-in-out`,
-                animation: isActive
-                  ? {
-                      xs: `${heroEnter} 1.2s cubic-bezier(0.22, 1, 0.36, 1) both`,
-                      md: `${heroEnter} 1.5s cubic-bezier(0.22, 1, 0.36, 1) both, ${heroKenBurns} 32s 1.5s ease-in-out infinite`,
-                    }
-                  : 'none',
-                willChange: isActive ? 'transform, opacity' : 'opacity',
+                // Desktop-only subtle motion; avoid will-change on inactive
+                animation:
+                  isActive
+                    ? {
+                        xs: 'none',
+                        md: `${heroKenBurns} 40s ease-in-out infinite`,
+                      }
+                    : 'none',
                 '@media (prefers-reduced-motion: reduce)': {
                   animation: 'none',
-                  transform: 'none',
-                  transition: 'opacity 0.4s ease',
+                  transition: 'opacity 0.3s ease',
                 },
               }}
             />
@@ -105,11 +103,10 @@ export function HeroRotatingBanner() {
           gap: 1,
           px: 1.25,
           py: 0.75,
+          minHeight: 22,
           borderRadius: 999,
           bgcolor: alpha('#000000', 0.28),
           border: `1px solid ${alpha('#ffffff', 0.1)}`,
-          backdropFilter: 'blur(4px)',
-          WebkitBackdropFilter: 'blur(4px)',
         }}
       >
         {HOME_HERO_SLIDES.map((slide, index) => (
@@ -126,6 +123,7 @@ export function HeroRotatingBanner() {
             sx={{
               width: index === activeIndex ? 22 : 8,
               height: 8,
+              flexShrink: 0,
               borderRadius: 999,
               bgcolor: index === activeIndex ? GOLD : alpha('#ffffff', 0.35),
               transition: 'width 0.35s ease, background-color 0.35s ease',

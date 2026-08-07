@@ -195,9 +195,7 @@ export function SettingsDrawer({ sx, defaultSettings }: SettingsDrawerProps) {
           <FontFamilyOptions
             options={[
               themeConfig.fontFamily.primary,
-              'Inter Variable',
-              'DM Sans Variable',
-              'Nunito Sans Variable',
+              themeConfig.fontFamily.secondary,
             ]}
             value={settings.state.fontFamily}
             onChangeOption={(newOption) => settings.setState({ fontFamily: newOption })}
