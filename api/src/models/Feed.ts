@@ -63,4 +63,10 @@ const feedSchema = new Schema<IFeed>(
   { timestamps: true }
 );
 
+// Hot paths: feed lists (latest / popular) + author timelines
+feedSchema.index({ status: 1, createdAt: -1 });
+feedSchema.index({ status: 1, totalViews: -1 });
+feedSchema.index({ authorId: 1, createdAt: -1 });
+feedSchema.index({ visibility: 1, status: 1, createdAt: -1 });
+
 export const Feed = mongoose.model<IFeed>('Feed', feedSchema);

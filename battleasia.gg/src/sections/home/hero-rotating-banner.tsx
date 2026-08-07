@@ -10,7 +10,8 @@ import {
 } from './hero-slides';
 
 // ----------------------------------------------------------------------
-// LCP-critical: CSS only, fixed box, WebP, first slide only eager
+// LCP-critical: CSS only, fixed box, WebP, first slide only in DOM
+// (HTML boot-shell owns early LCP; this remounts after shell dismisses)
 
 const heroKenBurns = keyframes`
   0% { transform: scale(1); }
@@ -22,13 +23,26 @@ const GOLD = '#f5c518';
 
 export function HeroRotatingBanner() {
   const [activeIndex, setActiveIndex] = useState(0);
+  /** Only mount slides that have been shown — never idle-prefetch all (LCP bandwidth) */
+  const [mounted, setMounted] = useState<ReadonlySet<number>>(() => new Set([0]));
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % HOME_HERO_SLIDES.length);
+      setActiveIndex((prev) => {
+        const next = (prev + 1) % HOME_HERO_SLIDES.length;
+        setMounted((m) => {
+          if (m.has(next)) return m;
+          const copy = new Set(m);
+          copy.add(next);
+          return copy;
+        });
+        return next;
+      });
     }, HOME_HERO_ROTATE_MS);
 
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearInterval(timer);
+    };
   }, []);
 
   return (
@@ -38,7 +52,6 @@ export function HeroRotatingBanner() {
           position: 'absolute',
           inset: 0,
           zIndex: 0,
-          // Stable LCP/CLS box — matches parent section heights
           width: 1,
           height: 1,
           overflow: 'hidden',
@@ -46,11 +59,9 @@ export function HeroRotatingBanner() {
         }}
       >
         {HOME_HERO_SLIDES.map((slide, index) => {
+          if (!mounted.has(index)) return null;
+
           const isActive = index === activeIndex;
-          // Only mount first slide immediately; others after first paint cycle
-          if (index > 0 && activeIndex === 0 && index !== activeIndex) {
-            // still render but lazy — browser won't fetch until near
-          }
 
           return (
             <Box
@@ -72,14 +83,12 @@ export function HeroRotatingBanner() {
                 objectPosition: 'center center',
                 opacity: isActive ? 1 : 0,
                 transition: `opacity ${HOME_HERO_FADE_MS}ms ease-in-out`,
-                // Desktop-only subtle motion; avoid will-change on inactive
-                animation:
-                  isActive
-                    ? {
-                        xs: 'none',
-                        md: `${heroKenBurns} 40s ease-in-out infinite`,
-                      }
-                    : 'none',
+                animation: isActive
+                  ? {
+                      xs: 'none',
+                      md: `${heroKenBurns} 40s ease-in-out infinite`,
+                    }
+                  : 'none',
                 '@media (prefers-reduced-motion: reduce)': {
                   animation: 'none',
                   transition: 'opacity 0.3s ease',
@@ -116,18 +125,34 @@ export function HeroRotatingBanner() {
             aria-selected={index === activeIndex}
             tabIndex={0}
             aria-label={slide.label}
-            onClick={() => setActiveIndex(index)}
+            onClick={() => {
+              setMounted((m) => {
+                if (m.has(index)) return m;
+                const copy = new Set(m);
+                copy.add(index);
+                return copy;
+              });
+              setActiveIndex(index);
+            }}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') setActiveIndex(index);
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setMounted((m) => {
+                  if (m.has(index)) return m;
+                  const copy = new Set(m);
+                  copy.add(index);
+                  return copy;
+                });
+                setActiveIndex(index);
+              }
             }}
             sx={{
-              width: index === activeIndex ? 22 : 8,
+              width: 8,
               height: 8,
-              flexShrink: 0,
-              borderRadius: 999,
-              bgcolor: index === activeIndex ? GOLD : alpha('#ffffff', 0.35),
-              transition: 'width 0.35s ease, background-color 0.35s ease',
+              borderRadius: '50%',
               cursor: 'pointer',
+              bgcolor: index === activeIndex ? GOLD : alpha('#ffffff', 0.35),
+              transition: 'background-color 0.25s ease',
             }}
           />
         ))}

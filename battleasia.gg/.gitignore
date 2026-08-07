@@ -35,3 +35,6 @@ build
 .vscode
 tsconfig.tsbuildinfo
 .ncurc.js
+lh-*.json
+lh-tmp/
+lh-chrome-profile/

@@ -1,6 +1,7 @@
 import type { Breakpoint } from '@mui/material/styles';
 import type { NavSectionProps } from 'src/components/nav-section';
 
+import { useEffect, useState } from 'react';
 import { merge } from 'es-toolkit';
 
 import { useTheme, alpha } from '@mui/material/styles';
@@ -303,7 +304,35 @@ export function DashboardLayout({
 
   const isHomePage = pathname === paths.dashboard.root;
 
-  const renderFooter = () => <FooterSection />;
+  // Defer real footer until after first content paint — avoids footer CLS while route mounts
+  const [footerReady, setFooterReady] = useState(false);
+  useEffect(() => {
+    let idleId: number | undefined;
+    let timeoutId: number | undefined;
+    const reveal = () => setFooterReady(true);
+    if (typeof window.requestIdleCallback === 'function') {
+      idleId = window.requestIdleCallback(reveal, { timeout: 2500 });
+    } else {
+      timeoutId = window.setTimeout(reveal, 1200);
+    }
+    return () => {
+      if (idleId !== undefined && typeof window.cancelIdleCallback === 'function') {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+    };
+  }, [pathname]);
+
+  const renderFooter = () =>
+    footerReady ? (
+      <FooterSection />
+    ) : (
+      <Box
+        component="footer"
+        aria-hidden
+        sx={{ minHeight: { xs: 640, md: 520 }, bgcolor: '#0a0a0a' }}
+      />
+    );
 
   const renderMain = () => (
     <MainSection

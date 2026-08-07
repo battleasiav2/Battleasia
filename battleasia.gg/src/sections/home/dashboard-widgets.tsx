@@ -580,6 +580,8 @@ export function LandingDashboardSection() {
                 overflowX: 'hidden',
                 bgcolor: '#0a0a0a',
                 py: { xs: 4.5, md: 6 },
+                // Lock approximate final height so API/skeleton swap does not shove the footer
+                minHeight: { xs: 1200, md: 980 },
                 color: '#f5f5f5',
                 '&:before': {
                     content: "''",

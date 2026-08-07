@@ -59,6 +59,20 @@ Fail any budget → not ready to ship.
 9. **SEO** = semantic landmarks (`header`, `main`, `nav`, `footer`), unique title/description per page, sitemap entry for public URLs.
 10. **QA** = Lighthouse mobile + desktop + GTmetrix before release.
 
+## CDN / cache (Phase E)
+
+| Layer | Policy |
+|-------|--------|
+| Hashed `/assets/*` | `public, max-age=31536000, immutable` |
+| Static media (webp/png/woff2) | `public, max-age=2592000` |
+| HTML (`index.html`) | `no-cache` |
+| `/uploads/*` | `public, max-age=604800` (7d) |
+| `GET /api/v3/public/dashboard` | In-memory 45s + `max-age=30, s-maxage=45, stale-while-revalidate=60` |
+
+Enable Cloudflare/Hostinger CDN on apex + www + shop. Bypass `/api/*` (or honor Cache-Control). Purge CDN after each FE deploy.
+
+**DB indexes:** Match (`status` + schedule/entryFee/createdAt, `gameId` + createdAt), Feed (`status` + createdAt/views, author timelines), MatchParticipant (`userId` + createdAt).
+
 ## Auth & security (public package)
 
 - Public routes only in this package.

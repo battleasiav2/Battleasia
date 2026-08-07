@@ -106,4 +106,11 @@ const matchSchema = new Schema<IMatch>(
   { timestamps: true }
 );
 
+// Hot paths: public dashboard, game match lists, schedule sorts
+matchSchema.index({ status: 1, matchSchedule: 1 });
+matchSchema.index({ status: 1, entryFee: -1, totalPlayer: -1 });
+matchSchema.index({ status: 1, createdAt: -1 });
+matchSchema.index({ gameId: 1, createdAt: -1 });
+matchSchema.index({ gameId: 1, status: 1, matchSchedule: -1 });
+
 export const Match = mongoose.model<IMatch>('Match', matchSchema);

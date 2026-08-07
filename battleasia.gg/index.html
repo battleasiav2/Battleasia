@@ -11,7 +11,7 @@
     <link rel="icon" href="/logo/logo.webp" type="image/webp" />
     <link rel="apple-touch-icon" href="/logo/logo.webp" />
 
-    <!-- LCP only: do not preload logo (competes with hero bandwidth) -->
+    <!-- LCP: hero image must win the network race before JS -->
     <link
       rel="preload"
       as="image"
@@ -20,10 +20,56 @@
       fetchpriority="high"
     />
 
+    <style id="boot-shell-css">
+      html,
+      body {
+        margin: 0;
+        background: #000;
+      }
+      /* Fixed overlay — removing it cannot cause CLS */
+      #boot-shell {
+        position: fixed;
+        inset: 0;
+        z-index: 2147483000;
+        background: #000;
+        pointer-events: none;
+      }
+      #boot-shell img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
+        display: block;
+      }
+      #boot-shell[hidden] {
+        display: none !important;
+      }
+    </style>
+
     <title>BattleAsia | Mobile Esports Tournaments</title>
   </head>
 
   <body>
+    <!-- Instant LCP paint on home before React boots (fixed → no CLS on dismiss) -->
+    <div id="boot-shell" hidden>
+      <img
+        src="/assets/images/hero/hero-pubg-wide.webp"
+        width="1920"
+        height="1080"
+        alt="BattleAsia"
+        fetchpriority="high"
+        decoding="sync"
+      />
+    </div>
+    <script>
+      (function () {
+        var p = location.pathname;
+        if (p === '/' || p === '/dashboard' || p === '/dashboard/') {
+          var el = document.getElementById('boot-shell');
+          if (el) el.hidden = false;
+        }
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

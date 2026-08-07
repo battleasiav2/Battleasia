@@ -84,6 +84,8 @@ export function FooterSection() {
         position: 'relative',
         overflowX: 'hidden',
         bgcolor: '#0a0a0a',
+        // Reserve footer footprint early — reduces attributed CLS when main grows
+        minHeight: { xs: 640, md: 520 },
         borderTop: `1px solid ${alpha('#ffffff', 0.06)}`,
         '&::before': {
           content: '""',
@@ -300,6 +302,8 @@ export function FooterSection() {
                   component="img"
                   src={partner.icon}
                   alt=""
+                  width={22}
+                  height={22}
                   loading="lazy"
                   decoding="async"
                   sx={{

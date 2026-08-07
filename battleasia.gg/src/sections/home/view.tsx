@@ -10,7 +10,6 @@ import { useAppDownload } from 'src/hooks/use-app-download';
 import { Image } from 'src/components/image';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { HeroMeshButtons } from 'src/components/mesh-buttons';
-import { LazySection } from 'src/perf';
 import { HOME_GAME_ARTS } from './home-game-arts';
 import { homeMobileScrollGridSx, homeMobileScrollItemSx } from './home-horizontal-scroll';
 import { HeroRotatingBanner } from './hero-rotating-banner';
@@ -1045,21 +1044,22 @@ export function HomeView() {
       {/* LCP: hero only — no framer-motion */}
       {sectionSlide}
 
-      <LazySection minHeight={{ xs: 420, md: 520 }}>
-        <Suspense fallback={<Box sx={{ minHeight: { xs: 420, md: 520 } }} />}>
+      {/* Code-split only — mount ASAP with reserved height (no IO gate → less footer CLS) */}
+      <Suspense fallback={<Box sx={{ minHeight: { xs: 1200, md: 980 } }} />}>
+        <Box sx={{ minHeight: { xs: 1200, md: 980 } }}>
           <LandingDashboardSection />
-        </Suspense>
-      </LazySection>
+        </Box>
+      </Suspense>
 
-      <LazySection minHeight={{ xs: 480, md: 560 }}>
-        <Suspense fallback={<Box sx={{ minHeight: { xs: 480, md: 560 } }} />}>
+      <Suspense fallback={<Box sx={{ minHeight: { xs: 720, md: 640 } }} />}>
+        <Box sx={{ minHeight: { xs: 720, md: 640 } }}>
           <PlayYourGameSection />
-        </Suspense>
-      </LazySection>
+        </Box>
+      </Suspense>
 
-      <LazySection minHeight={{ xs: 640, md: 720 }}>{sectionAbout}</LazySection>
-      <LazySection minHeight={{ xs: 720, md: 800 }}>{sectionHowToPlay}</LazySection>
-      <LazySection minHeight={{ xs: 640, md: 720 }}>{sectionRoules}</LazySection>
+      {sectionAbout}
+      {sectionHowToPlay}
+      {sectionRoules}
     </Box>
   );
 }

@@ -4,6 +4,10 @@ import { Match } from '../models/Match.js';
 import { MatchParticipant } from '../models/MatchParticipant.js';
 import { User } from '../models/User.js';
 
+/** In-memory + CDN-friendly TTL for GET /api/v3/public/dashboard */
+export const PUBLIC_DASHBOARD_CACHE_KEY = 'public-dashboard';
+export const PUBLIC_DASHBOARD_CACHE_TTL_MS = 45_000;
+
 type TopPlayerRow = {
   userId: Types.ObjectId;
   username: string;

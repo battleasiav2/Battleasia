@@ -147,6 +147,12 @@ export function createApp() {
     express.static(uploadsRoot, {
       maxAge: env.isProduction ? '7d' : 0,
       etag: true,
+      setHeaders(res) {
+        if (env.isProduction) {
+          // Uploads are content-stable URLs; allow CDN/browser cache for a week
+          res.setHeader('Cache-Control', 'public, max-age=604800');
+        }
+      },
     })
   );
 

@@ -32,6 +32,14 @@ export function LazySection({
       sx={{
         minHeight,
         width: 1,
+        contentVisibility: 'auto',
+        containIntrinsicSize:
+          typeof minHeight === 'number'
+            ? `auto ${minHeight}px`
+            : {
+                xs: minHeight.xs ? `auto ${minHeight.xs}px` : undefined,
+                md: minHeight.md ? `auto ${minHeight.md}px` : undefined,
+              },
       }}
     >
       {visible ? children : fallback ?? null}

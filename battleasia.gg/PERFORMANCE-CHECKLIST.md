@@ -19,19 +19,42 @@
 - [ ] New public URL added to `public/sitemap.xml`
 - [ ] Layout reserved for async UI (minHeight / skeleton)
 
-## Before “final delivery”
+## Phase E — CDN / API cache (code done)
 
-- [ ] Lighthouse **mobile** (primary) + desktop
-- [ ] GTmetrix or WebPageTest cross-check
-- [ ] Fix any LCP/CLS/TBT regression before marking complete
-- [ ] Prefer deleting a visual effect over missing the budget
+- [x] Long-cache hashed `/assets/*`; no-cache HTML (`docker/nginx/*.conf`)
+- [x] `/uploads` Cache-Control 7d (API + nginx prod)
+- [x] `GET /api/v3/public/dashboard` memory cache 45s + HTTP Cache-Control
+- [x] Hot-list indexes on Match / Feed / MatchParticipant
+- [ ] **Ops:** Enable Cloudflare or Hostinger CDN; purge after deploy
+
+## Phase F — Measure gate (required before ship)
+
+Run **mobile** Lighthouse on **`/dashboard`** (not `/` — that only redirects).
+
+| URL | Local preview (2026-08-08) | Gate |
+|-----|----------------------------|------|
+| `/dashboard` | Perf ~53, LCP ~6–7s (throttled SPA), **CLS 0**, TBT ~500ms | CLS pass; Perf/LCP/TBT need prod CDN + JS budget |
+| `/auth/sign-in` | Perf ~62, CLS 0, LCP ~6.5s, TBT ~250ms | CLS pass |
+| `/user/*` | not run (auth) | retest after deploy |
+
+```bash
+npm run build && npm run start -- --host 127.0.0.1 --port 8081
+npx lighthouse http://127.0.0.1:8081/dashboard --form-factor=mobile --only-categories=performance --chrome-flags="--headless --no-sandbox"
+```
+
+## Phase E todos in plan
+- Done in code (API cache headers, indexes, nginx). Ops CDN still manual.
+
+## Phase F local results (mobile, Vite preview)
+- **CLS: 0** (was 0.76) — gate pass for layout
+- Perf / LCP / TBT still above budget locally (MUI SPA + 4× throttle); retest on production after CDN
 
 ## Commands
 
 ```bash
-yarn build
-yarn start
-# then run Lighthouse against http://localhost:8081
+npm run build
+npm run start
+# Lighthouse against http://localhost:8081/dashboard
 ```
 
 See `ARCHITECTURE-PERFORMANCE.md` and `src/perf/`.

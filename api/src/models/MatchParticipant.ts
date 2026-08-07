@@ -34,5 +34,6 @@ const participantSchema = new Schema<IMatchParticipant>(
 );
 
 participantSchema.index({ matchId: 1, userId: 1 }, { unique: true });
+participantSchema.index({ userId: 1, createdAt: -1 });
 
 export const MatchParticipant = mongoose.model<IMatchParticipant>('MatchParticipant', participantSchema);
