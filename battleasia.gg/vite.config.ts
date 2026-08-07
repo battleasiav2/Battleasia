@@ -153,9 +153,12 @@ export default defineConfig(({ mode }) => {
               'i18next-resources-to-backend',
             ],
             
-            // Animation & UI
             'animation-vendor': [
               'framer-motion',
+            ],
+
+            // Carousel — shop only; keep out of home critical path
+            'carousel-vendor': [
               'embla-carousel',
               'embla-carousel-react',
               'embla-carousel-autoplay',
@@ -163,12 +166,11 @@ export default defineConfig(({ mode }) => {
               'embla-carousel-auto-scroll',
               'embla-carousel-fade',
             ],
-            
-            // Miscellaneous
+
+            // Miscellaneous (socket.io loaded via dynamic import — not listed here)
             'misc-vendor': [
               'react-helmet-async',
               'react-hot-toast',
-              'socket.io-client',
               'simplebar-react',
               'react-dropzone',
               'react-phone-number-input',

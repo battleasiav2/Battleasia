@@ -1,6 +1,16 @@
 import type { Socket } from 'socket.io-client';
-import { io } from 'socket.io-client';
 import { store } from 'src/store';
+
+type IoFn = typeof import('socket.io-client').io;
+
+let ioLoader: Promise<IoFn> | null = null;
+
+function loadIo(): Promise<IoFn> {
+  if (!ioLoader) {
+    ioLoader = import('socket.io-client').then((mod) => mod.io);
+  }
+  return ioLoader;
+}
 
 function resolveSocketUrl(serverUrl: string) {
   if (serverUrl && serverUrl.length > 0) {
@@ -109,6 +119,10 @@ class SocketService {
   }
 
   connect(serverUrl: string) {
+    void this.connectAsync(serverUrl);
+  }
+
+  private async connectAsync(serverUrl: string) {
     const state = store.getState() as any;
     const token = state.auth.token;
 
@@ -135,35 +149,41 @@ class SocketService {
     this.isConnecting = true;
     this.coreHandlersAttached = false;
 
-    this.socket = io(url, {
-      path: resolveSocketPath(serverUrl),
-      auth: { token },
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      reconnectionAttempts: this.maxReconnectAttempts,
-    });
+    try {
+      const io = await loadIo();
+      this.socket = io(url, {
+        path: resolveSocketPath(serverUrl),
+        auth: { token },
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 5000,
+        reconnectionAttempts: this.maxReconnectAttempts,
+      });
 
-    this.attachCoreHandlers();
+      this.attachCoreHandlers();
 
-    this.socket.on('connect', () => {
-      this.reconnectAttempts = 0;
+      this.socket.on('connect', () => {
+        this.reconnectAttempts = 0;
+        this.isConnecting = false;
+
+        if (this.currentGameRoom && this.socket) {
+          this.socket.emit('join-game', this.currentGameRoom);
+        }
+      });
+
+      this.socket.on('disconnect', () => {
+        this.isConnecting = false;
+      });
+
+      this.socket.on('connect_error', () => {
+        this.reconnectAttempts += 1;
+        this.isConnecting = false;
+      });
+    } catch (error) {
       this.isConnecting = false;
-
-      if (this.currentGameRoom && this.socket) {
-        this.socket.emit('join-game', this.currentGameRoom);
-      }
-    });
-
-    this.socket.on('disconnect', () => {
-      this.isConnecting = false;
-    });
-
-    this.socket.on('connect_error', () => {
-      this.reconnectAttempts += 1;
-      this.isConnecting = false;
-    });
+      console.error('[SocketService] Failed to load socket.io-client:', error);
+    }
   }
 
   disconnect() {
@@ -338,6 +358,10 @@ class SocketService {
   }
 
   connectPublic(serverUrl: string) {
+    void this.connectPublicAsync(serverUrl);
+  }
+
+  private async connectPublicAsync(serverUrl: string) {
     if (this.publicSocket?.connected) {
       return;
     }
@@ -349,20 +373,25 @@ class SocketService {
 
     const url = resolveSocketUrl(serverUrl);
 
-    this.publicSocket = io(url, {
-      path: resolveSocketPath(serverUrl),
-      transports: ['websocket', 'polling'],
-      reconnection: true,
-      reconnectionDelay: 2000,
-      reconnectionDelayMax: 10000,
-      reconnectionAttempts: this.maxReconnectAttempts,
-    });
+    try {
+      const io = await loadIo();
+      this.publicSocket = io(url, {
+        path: resolveSocketPath(serverUrl),
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionDelay: 2000,
+        reconnectionDelayMax: 10000,
+        reconnectionAttempts: this.maxReconnectAttempts,
+      });
 
-    this.publicSocket.on('connect', () => {
+      this.publicSocket.on('connect', () => {
+        this.wirePublicDashboardListener();
+      });
+
       this.wirePublicDashboardListener();
-    });
-
-    this.wirePublicDashboardListener();
+    } catch (error) {
+      console.error('[SocketService] Failed to load socket.io-client (public):', error);
+    }
   }
 
   private wirePublicDashboardListener() {
