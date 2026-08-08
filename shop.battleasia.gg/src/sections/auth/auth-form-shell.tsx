@@ -4,7 +4,6 @@ import { Box, Stack, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
 import { Logo } from 'src/components/logo';
-import { AuthHomeLink } from 'src/components/mesh-buttons/auth-home-link';
 import { GlassPanelCard, getDefaultGlassTokens } from 'src/components/battle-glass-card';
 import { useTranslate } from 'src/locales/use-locales';
 
@@ -42,10 +41,6 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
         animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) both`,
       }}
     >
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: compact ? 0.75 : 1 }}>
-        <AuthHomeLink label={t('auth.home')} />
-      </Box>
-
       <GlassPanelCard
         sx={{
           width: 1,

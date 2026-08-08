@@ -98,8 +98,13 @@ export const authFieldSlotProps = {
       color: alpha('#ffffff', 0.82),
       mb: 0.75,
       textTransform: 'uppercase' as const,
+      // Match theme's `.shrink.focused` specificity so the label never turns dark on focus
+      '&.MuiInputLabel-shrink': {
+        transform: 'none',
+        color: alpha('#ffffff', 0.82),
+        '&.Mui-focused': { color: '#f59e0b' },
+      },
       '&.Mui-focused': { color: '#f59e0b' },
-      '&.MuiInputLabel-shrink': { transform: 'none' },
     },
   },
   input: {
