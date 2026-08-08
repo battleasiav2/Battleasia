@@ -25,10 +25,10 @@ export function AuthHeroPanel() {
 
   return (
     <Stack
-      spacing={2.5}
+      spacing={3}
       sx={{
         width: 1,
-        maxWidth: 460,
+        maxWidth: 480,
         px: { md: 2 },
         animation: `${fadeUp} 0.7s cubic-bezier(0.22, 1, 0.36, 1) both`,
         animationDelay: '0.12s',
@@ -42,7 +42,7 @@ export function AuthHeroPanel() {
             letterSpacing: 1.8,
             textTransform: 'uppercase',
             color: alpha('#f5c518', 0.9),
-            mb: 1.25,
+            mb: 1.5,
           }}
         >
           {t('shop.authHeroTagline')}
@@ -50,10 +50,10 @@ export function AuthHeroPanel() {
         <Typography
           className="font-tr"
           sx={{
-            fontSize: { md: 30, lg: 36 },
+            fontSize: { md: 40, lg: 48 },
             fontWeight: 800,
             color: '#ffffff',
-            lineHeight: 1.1,
+            lineHeight: 1.05,
             textShadow: '0 2px 16px rgba(0, 0, 0, 0.85)',
           }}
         >
@@ -61,17 +61,17 @@ export function AuthHeroPanel() {
         </Typography>
         <Typography
           sx={{
-            mt: 1.25,
-            fontSize: { md: 14.5, lg: 15 },
+            mt: 1.75,
+            fontSize: { md: 16, lg: 17 },
             color: alpha('#ffffff', 0.86),
             lineHeight: 1.5,
-            maxWidth: 400,
+            maxWidth: 420,
             textShadow: '0 1px 8px rgba(0, 0, 0, 0.8)',
           }}
         >
           {t('shop.authHeroSubtitle')}
         </Typography>
-        <Box sx={{ ...userPageDividerSx, mt: 2, width: 170 }} />
+        <Box sx={{ ...userPageDividerSx, mt: 2.5, width: 200 }} />
       </Box>
 
       <Stack direction="row" spacing={1.25} useFlexGap sx={{ flexWrap: 'wrap' }}>
@@ -105,9 +105,9 @@ export function AuthHeroPanel() {
           gap: 1.5,
         }}
       >
-        <GlassStatTile label={t('shop.authStatCoins')} value="BAC" tokens={glassTokens} />
-        <GlassStatTile label={t('shop.authStatMethods')} value="5+" tokens={glassTokens} />
-        <GlassStatTile label={t('shop.authStatDelivery')} value="24/7" tokens={glassTokens} />
+        <GlassStatTile icon="solar:wallet-money-bold" label={t('shop.authStatCoins')} value="BAC" tokens={glassTokens} />
+        <GlassStatTile icon="solar:card-transfer-bold" label={t('shop.authStatMethods')} value="5+" tokens={glassTokens} />
+        <GlassStatTile icon="solar:clock-circle-bold" label={t('shop.authStatDelivery')} value="24/7" tokens={glassTokens} />
       </Box>
     </Stack>
   );

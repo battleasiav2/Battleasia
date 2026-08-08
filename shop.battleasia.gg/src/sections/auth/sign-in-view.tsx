@@ -89,7 +89,7 @@ export function SignInView() {
   });
 
   return (
-    <AuthFormShell mark="01" title={t('auth.signInToAccount')} description={t('shop.bacDescription')}>
+    <AuthFormShell title={t('auth.signInToAccount')} description={t('shop.bacDescription')}>
       {!!errorMessage && (
         <Alert severity="error" sx={{ ...authAlertSx, mb: 2.5 }}>
           {errorMessage}
@@ -97,7 +97,7 @@ export function SignInView() {
       )}
 
       <Form methods={methods} onSubmit={onSubmit}>
-        <Stack spacing={1.75}>
+        <Stack spacing={2.5}>
           <Field.Text
             name="email"
             label={t('auth.emailAddress')}

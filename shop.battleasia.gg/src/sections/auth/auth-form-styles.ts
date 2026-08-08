@@ -11,13 +11,9 @@ export const authFieldSlotProps = {
     sx: {
       position: 'relative' as const,
       transform: 'none',
-      maxWidth: 'none',
-      whiteSpace: 'nowrap' as const,
-      overflow: 'visible',
-      textOverflow: 'clip',
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: 600,
-      letterSpacing: 0.2,
+      letterSpacing: 0.4,
       color: alpha('#ffffff', 0.82),
       mb: 0.75,
       textTransform: 'uppercase' as const,
@@ -31,7 +27,7 @@ export const authFieldSlotProps = {
       bgcolor: AUTH_INPUT_BG,
       borderRadius: '2px',
       fontSize: 14,
-      minHeight: 44,
+      minHeight: 48,
       transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease',
       '& input::placeholder': {
         color: alpha('#ffffff', 0.55),
@@ -138,7 +134,7 @@ export const authSelectSx = {
   bgcolor: AUTH_INPUT_BG,
   borderRadius: '2px',
   fontSize: 14,
-  minHeight: 44,
+  minHeight: 48,
   '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
   '& fieldset': {
     border: `1px solid ${alpha('#ffffff', 0.22)}`,
@@ -155,7 +151,7 @@ export const authSelectSx = {
     borderWidth: '1px',
   },
   '& .MuiSelect-select': {
-    py: 1.15,
+    py: 1.35,
   },
 };
 
