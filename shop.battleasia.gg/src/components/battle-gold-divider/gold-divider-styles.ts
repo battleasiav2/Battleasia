@@ -38,6 +38,24 @@ export function getGoldDividerSx(options?: GoldDividerOptions): SxProps<Theme> {
   const showCenterGem = options?.showCenterGem ?? preset.showCenterGem;
   const gold = BRAND_GOLD;
 
+  // Auth-style diamond divider: two gradient segments with a gap + a glowing center gem.
+  const gemBackground = `linear-gradient(90deg,
+    transparent 0%,
+    ${alpha(gold, 0.12)} 14%,
+    ${alpha(gold, 0.6)} 44%,
+    transparent 47%,
+    transparent 53%,
+    ${alpha(gold, 0.6)} 56%,
+    ${alpha(gold, 0.12)} 86%,
+    transparent 100%)`;
+
+  const solidBackground = `linear-gradient(90deg,
+    transparent 0%,
+    ${alpha(gold, 0.28)} 25%,
+    ${alpha(gold, 0.75)} 50%,
+    ${alpha(gold, 0.28)} 75%,
+    transparent 100%)`;
+
   return {
     position: 'relative',
     mt,
@@ -46,13 +64,8 @@ export function getGoldDividerSx(options?: GoldDividerOptions): SxProps<Theme> {
     borderRadius: 999,
     overflow: 'visible',
     flexShrink: 0,
-    background: `linear-gradient(90deg,
-      transparent 0%,
-      ${alpha(gold, 0.28)} 25%,
-      ${alpha(gold, 0.75)} 50%,
-      ${alpha(gold, 0.28)} 75%,
-      transparent 100%)`,
-    boxShadow: `0 0 8px ${alpha(gold, 0.18)}`,
+    background: showCenterGem ? gemBackground : solidBackground,
+    boxShadow: showCenterGem ? 'none' : `0 0 8px ${alpha(gold, 0.18)}`,
     ...(showCenterGem
       ? {
           '&::after': {
@@ -61,11 +74,11 @@ export function getGoldDividerSx(options?: GoldDividerOptions): SxProps<Theme> {
             left: '50%',
             top: '50%',
             transform: 'translate(-50%, -50%) rotate(45deg)',
-            width: 4,
-            height: 4,
-            borderRadius: '0.5px',
-            bgcolor: alpha(gold, 0.9),
-            boxShadow: `0 0 6px ${alpha(gold, 0.4)}`,
+            width: 7,
+            height: 7,
+            borderRadius: '1px',
+            bgcolor: gold,
+            boxShadow: `0 0 8px ${alpha(gold, 0.65)}`,
             pointerEvents: 'none',
           },
         }
