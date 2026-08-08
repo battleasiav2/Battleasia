@@ -9,7 +9,6 @@ import {
   Box,
   Link,
   Alert,
-  Stack,
   Select,
   MenuItem,
   InputLabel,
@@ -189,7 +188,14 @@ export function SignUpView() {
   });
 
   const renderForm = () => (
-    <Stack gap={2}>
+    <Box
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+        columnGap: 1.75,
+        rowGap: 1.75,
+      }}
+    >
       {/* In Game User Name */}
       <Field.Text
         name="inGameUserName"
@@ -201,23 +207,6 @@ export function SignUpView() {
         slotProps={{
           ...authFieldSlotProps,
           input: { ...authFieldSlotProps.input, sx: { ...authFieldSlotProps.input.sx } },
-        }}
-      />
-
-      {/* Mobile No with Country Code */}
-      <Field.Phone
-        name="mobile"
-        label={
-          <>
-            Country Code & Mobile No <Box component="span" sx={{ color: 'error.main' }}>*</Box>
-          </>
-        }
-        slotProps={{
-          ...authFieldSlotProps,
-          input: {
-            ...authFieldSlotProps.input,
-            sx: { ...authFieldSlotProps.input.sx, ...authPhoneInputSx },
-          },
         }}
       />
 
@@ -234,6 +223,25 @@ export function SignUpView() {
           input: { ...authFieldSlotProps.input, sx: { ...authFieldSlotProps.input.sx } },
         }}
       />
+
+      {/* Mobile No with Country Code — full width */}
+      <Box sx={{ gridColumn: '1 / -1' }}>
+        <Field.Phone
+          name="mobile"
+          label={
+            <>
+              Country Code & Mobile No <Box component="span" sx={{ color: 'error.main' }}>*</Box>
+            </>
+          }
+          slotProps={{
+            ...authFieldSlotProps,
+            input: {
+              ...authFieldSlotProps.input,
+              sx: { ...authFieldSlotProps.input.sx, ...authPhoneInputSx },
+            },
+          }}
+        />
+      </Box>
 
       {/* Game Server */}
       <FormControl fullWidth>
@@ -290,16 +298,6 @@ export function SignUpView() {
         }}
       />
 
-      {/* Referral Code (optional) */}
-      {/* <Field.Text
-        name="referralCode"
-        label="Referral Code (optional)"
-        slotProps={{
-          ...authFieldSlotProps,
-          input: { ...authFieldSlotProps.input, sx: { ...authFieldSlotProps.input.sx } },
-        }}
-      /> */}
-
       {/* Password */}
       <Field.Text
         name="password"
@@ -350,10 +348,12 @@ export function SignUpView() {
         }}
       />
 
-      <AuthSubmitButton loading={isSubmitting} loadingIndicator="Create account...">
-        Create account
-      </AuthSubmitButton>
-    </Stack>
+      <Box sx={{ gridColumn: '1 / -1', mt: 0.5 }}>
+        <AuthSubmitButton loading={isSubmitting} loadingIndicator="Create account...">
+          Create account
+        </AuthSubmitButton>
+      </Box>
+    </Box>
   );
 
   return (

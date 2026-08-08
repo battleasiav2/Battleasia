@@ -33,11 +33,11 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
     <Box
       sx={{
         width: 1,
-        maxWidth: wide ? { xs: 1, sm: 580, md: 620 } : { xs: 1, sm: 500, md: 520 },
+        maxWidth: wide ? { xs: 1, sm: 540, md: 560 } : { xs: 1, sm: 420, md: 440 },
         animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) both`,
       }}
     >
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1.5 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
         <AuthHomeLink label={t('auth.home')} />
       </Box>
 
@@ -45,18 +45,18 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
         sx={{
           width: 1,
           borderRadius: 0,
-          p: wide ? { xs: 3, sm: 4, md: 4.5 } : { xs: 3.25, sm: 4.5 },
+          p: wide ? { xs: 2.5, sm: 3, md: 3.5 } : { xs: 2.75, sm: 3.25 },
           boxShadow: `
-            0 28px 60px ${alpha('#000000', 0.65)},
-            0 0 40px ${alpha('#f5c518', 0.08)}
+            0 24px 50px ${alpha('#000000', 0.6)},
+            0 0 32px ${alpha('#f5c518', 0.07)}
           `,
         }}
       >
-        <Stack alignItems="center" spacing={1.25} sx={{ mb: 3 }}>
+        <Stack alignItems="center" spacing={0.75} sx={{ mb: 2.25 }}>
           <Logo
             disabled
             sx={{
-              width: { xs: 132, sm: 156 },
+              width: { xs: 88, sm: 100 },
               height: 'auto',
               pointerEvents: 'none',
               '& img': { objectFit: 'contain', width: '100%', height: 'auto' },
@@ -64,7 +64,7 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
           />
           <Typography
             sx={{
-              fontSize: 10,
+              fontSize: 9,
               fontWeight: 700,
               letterSpacing: 1.6,
               textTransform: 'uppercase',
@@ -74,15 +74,15 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
             {t('shop.bacShopName')}
           </Typography>
           <Typography
-            variant="h5"
+            variant="h6"
             className="font-tr"
             sx={{
               fontWeight: 800,
               color: glassTokens.titleColor,
               textAlign: 'center',
-              fontSize: { xs: 20, sm: 24 },
-              lineHeight: 1.25,
-              letterSpacing: 0.4,
+              fontSize: { xs: 18, sm: 20 },
+              lineHeight: 1.2,
+              letterSpacing: 0.3,
             }}
           >
             {title}
@@ -93,15 +93,15 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
               sx={{
                 color: glassTokens.subtitleColor,
                 textAlign: 'center',
-                fontSize: 13,
-                lineHeight: 1.55,
-                maxWidth: wide ? 480 : 380,
+                fontSize: 12.5,
+                lineHeight: 1.5,
+                maxWidth: wide ? 440 : 340,
               }}
             >
               {description}
             </Typography>
           ) : null}
-          <Box sx={{ ...userPageDividerSx, mt: 0.75, width: { xs: 150, sm: 200 } }} />
+          <Box sx={{ ...userPageDividerSx, mt: 0.5, width: { xs: 120, sm: 150 } }} />
         </Stack>
 
         {children}
