@@ -9,7 +9,6 @@ import {
   Box,
   Link,
   Alert,
-  Stack,
   Select,
   MenuItem,
   InputLabel,
@@ -39,7 +38,7 @@ import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
 import {
   authAlertSx,
-  authFieldSlotProps,
+  authFieldSlotPropsCompact,
   authLinkSx,
   authPhoneCountrySx,
   authPhoneInputSx,
@@ -170,9 +169,11 @@ export function SignUpView() {
 
   const fieldIcon = (icon: string) => (
     <InputAdornment position="start">
-      <Iconify icon={icon} width={20} sx={{ color: alpha('#f59e0b', 0.85) }} />
+      <Iconify icon={icon} width={18} sx={{ color: '#f5c518' }} />
     </InputAdornment>
   );
+
+  const compactSelectSx = { ...authSelectSx, minHeight: 40, '& .MuiSelect-select': { py: 1 } };
 
   return (
     <AuthFormShell wide title={t('auth.signUpTitle')} description={t('auth.signUpDescription')}>
@@ -182,33 +183,36 @@ export function SignUpView() {
         </Alert>
       )}
 
-      <Box
-        sx={{
-          maxHeight: { xs: 'none', md: '58vh' },
-          overflowY: { md: 'auto' },
-          pr: { md: 0.5 },
-          '&::-webkit-scrollbar': { width: 6 },
-          '&::-webkit-scrollbar-thumb': {
-            bgcolor: alpha('#f59e0b', 0.35),
-            borderRadius: 3,
-          },
-          '&::-webkit-scrollbar-track': {
-            bgcolor: alpha('#ffffff', 0.06),
-          },
-        }}
-      >
-        <Form methods={methods} onSubmit={onSubmit}>
-          <Stack spacing={2.5}>
-            <Field.Text
-              name="inGameUserName"
-              label={t('auth.inGameUserName')}
-              placeholder={t('auth.inGameUserNamePlaceholder')}
-              slotProps={{
-                ...authFieldSlotProps,
-                input: { ...authFieldSlotProps.input, startAdornment: fieldIcon('solar:user-bold-duotone') },
-              }}
-            />
+      <Form methods={methods} onSubmit={onSubmit}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+            columnGap: 1.5,
+            rowGap: 1.5,
+          }}
+        >
+          <Field.Text
+            name="inGameUserName"
+            label={t('auth.inGameUserName')}
+            placeholder={t('auth.inGameUserNamePlaceholder')}
+            slotProps={{
+              ...authFieldSlotPropsCompact,
+              input: { ...authFieldSlotPropsCompact.input, startAdornment: fieldIcon('solar:user-bold-duotone') },
+            }}
+          />
 
+          <Field.Text
+            name="pubgId"
+            label={t('auth.enterPubgId')}
+            placeholder={t('auth.pubgIdPlaceholder')}
+            slotProps={{
+              ...authFieldSlotPropsCompact,
+              input: { ...authFieldSlotPropsCompact.input, startAdornment: fieldIcon('solar:gamepad-bold-duotone') },
+            }}
+          />
+
+          <Box sx={{ gridColumn: '1 / -1' }}>
             <Field.Phone
               name="mobile"
               label={t('auth.countryCodeMobile')}
@@ -216,111 +220,105 @@ export function SignUpView() {
               country="BD"
               countrySelectorSx={authPhoneCountrySx}
               sx={authPhoneInputSx}
-              slotProps={authFieldSlotProps}
+              slotProps={authFieldSlotPropsCompact}
             />
+          </Box>
 
-            <Field.Text
-              name="pubgId"
-              label={t('auth.enterPubgId')}
-              placeholder={t('auth.pubgIdPlaceholder')}
-              slotProps={{
-                ...authFieldSlotProps,
-                input: { ...authFieldSlotProps.input, startAdornment: fieldIcon('solar:gamepad-bold-duotone') },
-              }}
-            />
-
-            <FormControl fullWidth>
-              <InputLabel shrink sx={authFieldSlotProps.inputLabel.sx}>
-                {t('auth.gameServer')}
-              </InputLabel>
-              <Controller
-                name="gameServer"
-                control={control}
-                render={({ field, fieldState: { error } }) => (
-                  <>
-                    <Select {...field} displayEmpty error={!!error} MenuProps={authSelectMenuProps} sx={authSelectSx}>
-                      <MenuItem value="" disabled>
-                        {t('auth.select')}
+          <FormControl fullWidth>
+            <InputLabel shrink sx={authFieldSlotPropsCompact.inputLabel.sx}>
+              {t('auth.gameServer')}
+            </InputLabel>
+            <Controller
+              name="gameServer"
+              control={control}
+              render={({ field, fieldState: { error } }) => (
+                <>
+                  <Select {...field} displayEmpty error={!!error} MenuProps={authSelectMenuProps} sx={compactSelectSx}>
+                    <MenuItem value="" disabled>
+                      {t('auth.select')}
+                    </MenuItem>
+                    {GAME_SERVERS.map((server) => (
+                      <MenuItem key={server.value} value={server.value}>
+                        {server.label}
                       </MenuItem>
-                      {GAME_SERVERS.map((server) => (
-                        <MenuItem key={server.value} value={server.value}>
-                          {server.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {error && (
-                      <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 0.5 }}>
-                        {error.message}
-                      </Typography>
-                    )}
-                  </>
-                )}
-              />
-            </FormControl>
-
-            <Field.Text
-              name="email"
-              label={t('auth.emailAddress')}
-              placeholder={t('auth.emailPlaceholder')}
-              slotProps={{
-                ...authFieldSlotProps,
-                input: { ...authFieldSlotProps.input, startAdornment: fieldIcon('solar:letter-bold-duotone') },
-              }}
+                    ))}
+                  </Select>
+                  {error && (
+                    <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 0.5 }}>
+                      {error.message}
+                    </Typography>
+                  )}
+                </>
+              )}
             />
+          </FormControl>
 
-            <Field.Text
-              name="password"
-              label={t('auth.password')}
-              placeholder={t('auth.passwordPlaceholder')}
-              type={showPassword.value ? 'text' : 'password'}
-              slotProps={{
-                ...authFieldSlotProps,
-                input: {
-                  ...authFieldSlotProps.input,
-                  startAdornment: fieldIcon('solar:lock-password-bold-duotone'),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={showPassword.onToggle} edge="end" sx={{ color: alpha('#fff', 0.7) }}>
-                        <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
+          <Field.Text
+            name="email"
+            label={t('auth.emailAddress')}
+            placeholder={t('auth.emailPlaceholder')}
+            slotProps={{
+              ...authFieldSlotPropsCompact,
+              input: { ...authFieldSlotPropsCompact.input, startAdornment: fieldIcon('solar:letter-bold-duotone') },
+            }}
+          />
 
-            <Field.Text
-              name="confirmPassword"
-              label={t('auth.confirmPassword')}
-              placeholder={t('auth.confirmYourPassword')}
-              type={showConfirmPassword.value ? 'text' : 'password'}
-              slotProps={{
-                ...authFieldSlotProps,
-                input: {
-                  ...authFieldSlotProps.input,
-                  startAdornment: fieldIcon('solar:lock-password-bold-duotone'),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={showConfirmPassword.onToggle} edge="end" sx={{ color: alpha('#fff', 0.7) }}>
-                        <Iconify icon={showConfirmPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
+          <Field.Text
+            name="password"
+            label={t('auth.password')}
+            placeholder={t('auth.passwordPlaceholder')}
+            type={showPassword.value ? 'text' : 'password'}
+            slotProps={{
+              ...authFieldSlotPropsCompact,
+              input: {
+                ...authFieldSlotPropsCompact.input,
+                startAdornment: fieldIcon('solar:lock-password-bold-duotone'),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: alpha('#fff', 0.7) }}>
+                      <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={18} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
 
-            <AuthSubmitButton loading={isSubmitting} loadingIndicator={t('auth.creatingAccount')}>
+          <Field.Text
+            name="confirmPassword"
+            label={t('auth.confirmPassword')}
+            placeholder={t('auth.confirmYourPassword')}
+            type={showConfirmPassword.value ? 'text' : 'password'}
+            slotProps={{
+              ...authFieldSlotPropsCompact,
+              input: {
+                ...authFieldSlotPropsCompact.input,
+                startAdornment: fieldIcon('solar:lock-password-bold-duotone'),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={showConfirmPassword.onToggle} edge="end" size="small" sx={{ color: alpha('#fff', 0.7) }}>
+                      <Iconify icon={showConfirmPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={18} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+
+          <Box sx={{ gridColumn: '1 / -1', mt: 0.25 }}>
+            <AuthSubmitButton loading={isSubmitting} loadingIndicator={t('auth.creatingAccount')} sx={{ py: 1.1 }}>
               {t('auth.createAccount')}
             </AuthSubmitButton>
+          </Box>
 
+          <Box sx={{ gridColumn: '1 / -1' }}>
             <AuthFooterLinks
               prefix={t('auth.alreadyHaveAccount')}
               links={[{ label: t('auth.signIn'), href: paths.auth.signIn }]}
             />
-          </Stack>
-        </Form>
-      </Box>
+          </Box>
+        </Box>
+      </Form>
 
       <Box sx={{ mt: 2, textAlign: 'center', fontSize: 11, color: alpha('#fff', 0.5), lineHeight: 1.6 }}>
         {`${t('auth.termsAgreement')} `}
@@ -334,7 +332,7 @@ export function SignUpView() {
         .
       </Box>
 
-      <AuthNavButtons homeLabel={t('footer.home')} joinLabel={t('home.joinNow')} />
+      <AuthNavButtons compact homeLabel={t('footer.home')} joinLabel={t('home.joinNow')} />
     </AuthFormShell>
   );
 }
