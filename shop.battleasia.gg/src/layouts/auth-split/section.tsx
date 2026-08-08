@@ -45,13 +45,14 @@ export function AuthSplitSection({
           // bgcolor: '#0a0a0a',
           // width: 1,
           // pt: 'var(--layout-header-desktop-height)',
+          display: 'flex',
+          alignItems: 'center',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          width: '100%',
           [theme.breakpoints.up(layoutQuery)]: {
-            display: 'flex',
-            alignItems: 'center',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            maxWidth: '50%',
-            flex: '0 0 50%',
+            maxWidth: '100%',
+            flex: '1 1 100%',
           },
           // Filter background with animation
           // '&::before': {
@@ -90,10 +91,10 @@ export function AuthSplitSection({
           position: 'relative',
           zIndex: 2,
           width: 1,
-          maxWidth: 480,
-          height: { xs: 1, md: "auto" },
-          px: 3,
-          pb: 3,
+          maxWidth: 'var(--layout-auth-content-width)',
+          height: { xs: 1, md: 'auto' },
+          px: { xs: 2, sm: 3 },
+          py: { xs: 2, md: 0 },
           alignItems: 'center',
           justifyContent: 'center',
           gap: 4,
@@ -106,6 +107,7 @@ export function AuthSplitSection({
               width: 1,
               display: 'flex',
               flexDirection: 'column',
+              alignItems: 'center',
               maxWidth: 'var(--layout-auth-content-width)',
             }}
           >

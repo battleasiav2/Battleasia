@@ -8,8 +8,6 @@ import { AuthHomeLink } from 'src/components/mesh-buttons/auth-home-link';
 import { GlassPanelCard, getDefaultGlassTokens } from 'src/components/battle-glass-card';
 import { useTranslate } from 'src/locales/use-locales';
 
-import { userPageDividerSx } from 'src/layouts/user/user-theme';
-
 // ----------------------------------------------------------------------
 
 const cardReveal = keyframes`
@@ -28,6 +26,7 @@ type AuthFormShellProps = {
 export function AuthFormShell({ title, description, children, wide }: AuthFormShellProps) {
   const { t } = useTranslate();
   const glassTokens = getDefaultGlassTokens();
+  const gold = '#f5c518';
 
   return (
       <Box
@@ -45,10 +44,12 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
         sx={{
           width: 1,
           borderRadius: 0,
-          p: wide ? { xs: 2.5, sm: 3, md: 3.5 } : { xs: 2.75, sm: 3.25 },
+          border: `1px solid ${alpha(gold, 0.32)}`,
+          p: wide ? { xs: 2.75, sm: 3.5, md: 4 } : { xs: 3, sm: 3.75 },
           boxShadow: `
-            0 24px 50px ${alpha('#000000', 0.6)},
-            0 0 32px ${alpha('#f5c518', 0.07)}
+            0 24px 60px ${alpha('#000000', 0.65)},
+            0 0 0 1px ${alpha(gold, 0.06)},
+            0 0 36px ${alpha(gold, 0.1)}
           `,
         }}
       >
@@ -101,7 +102,29 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
               {description}
             </Typography>
           ) : null}
-          <Box sx={{ ...userPageDividerSx, mt: 0.5, width: { xs: 120, sm: 150 } }} />
+          <Box
+            sx={{
+              mt: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 1,
+              width: { xs: 180, sm: 220 },
+            }}
+          >
+            <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, transparent, ${alpha(gold, 0.55)})` }} />
+            <Box
+              sx={{
+                width: 6,
+                height: 6,
+                flexShrink: 0,
+                transform: 'rotate(45deg)',
+                bgcolor: gold,
+                boxShadow: `0 0 8px ${alpha(gold, 0.6)}`,
+              }}
+            />
+            <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${alpha(gold, 0.55)}, transparent)` }} />
+          </Box>
         </Stack>
 
         {children}
