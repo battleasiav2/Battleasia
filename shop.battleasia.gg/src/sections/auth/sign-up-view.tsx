@@ -286,15 +286,7 @@ export function SignUpView() {
         }
         slotProps={{
           ...authFieldSlotProps,
-          input: {
-            ...authFieldSlotProps.input,
-            sx: { ...authFieldSlotProps.input.sx },
-            startAdornment: (
-              <InputAdornment position="start">
-                <Iconify icon="solar:letter-bold-duotone" width={20} sx={{ color: '#f5c518' }} />
-              </InputAdornment>
-            ),
-          },
+          input: { ...authFieldSlotProps.input, sx: { ...authFieldSlotProps.input.sx } },
         }}
       />
 
@@ -321,11 +313,6 @@ export function SignUpView() {
           ...authFieldSlotProps,
           input: {
             ...authFieldSlotProps.input,
-            startAdornment: (
-              <InputAdornment position="start">
-                <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: '#f5c518' }} />
-              </InputAdornment>
-            ),
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton onClick={showPassword.onToggle} edge="end" sx={{ color: 'rgba(255,255,255,0.7)' }}>
@@ -350,11 +337,6 @@ export function SignUpView() {
           ...authFieldSlotProps,
           input: {
             ...authFieldSlotProps.input,
-            startAdornment: (
-              <InputAdornment position="start">
-                <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: '#f5c518' }} />
-              </InputAdornment>
-            ),
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton onClick={showConfirmPassword.onToggle} edge="end" sx={{ color: 'rgba(255,255,255,0.7)' }}>
@@ -377,7 +359,6 @@ export function SignUpView() {
   return (
     <AuthFormShell
       wide
-      mark="02"
       title="Sign Up"
       description={
         <>

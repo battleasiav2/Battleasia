@@ -89,7 +89,7 @@ export function SignInView() {
   });
 
   return (
-    <AuthFormShell mark="01" title={t('auth.signInToAccount')} description={t('shop.bacDescription')}>
+    <AuthFormShell title={t('auth.signInToAccount')} description={t('shop.bacDescription')}>
       {!!errorMessage && (
         <Alert severity="error" sx={{ ...authAlertSx, mb: 2.5 }}>
           {errorMessage}

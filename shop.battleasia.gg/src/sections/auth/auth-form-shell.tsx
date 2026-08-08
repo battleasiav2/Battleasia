@@ -8,7 +8,7 @@ import { AuthHomeLink } from 'src/components/mesh-buttons/auth-home-link';
 import { GlassPanelCard, getDefaultGlassTokens } from 'src/components/battle-glass-card';
 import { useTranslate } from 'src/locales/use-locales';
 
-import { USER_COLORS, userPageDividerSx } from 'src/layouts/user/user-theme';
+import { userPageDividerSx } from 'src/layouts/user/user-theme';
 
 // ----------------------------------------------------------------------
 
@@ -23,11 +23,9 @@ type AuthFormShellProps = {
   children: ReactNode;
   /** Use on sign-up — more fields need a wider card */
   wide?: boolean;
-  /** Ghost step number rendered behind the heading (e.g. "01", "02") */
-  mark?: string;
 };
 
-export function AuthFormShell({ title, description, children, wide, mark }: AuthFormShellProps) {
+export function AuthFormShell({ title, description, children, wide }: AuthFormShellProps) {
   const { t } = useTranslate();
   const glassTokens = getDefaultGlassTokens();
 
@@ -39,65 +37,12 @@ export function AuthFormShell({ title, description, children, wide, mark }: Auth
         animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) both`,
       }}
     >
-      {/* Top bar — brand (left) + back to home (right) */}
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 1.5,
-          mb: 2,
-        }}
-      >
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0 }}>
-          <Logo
-            disabled
-            sx={{
-              width: { xs: 44, sm: 52 },
-              height: 'auto',
-              flexShrink: 0,
-              pointerEvents: 'none',
-              '& img': { objectFit: 'contain', width: '100%', height: 'auto' },
-            }}
-          />
-          <Stack spacing={0.15} sx={{ minWidth: 0 }}>
-            <Typography
-              className="font-brand-gaming"
-              sx={{
-                fontSize: { xs: 15, sm: 17 },
-                fontWeight: 800,
-                lineHeight: 1,
-                whiteSpace: 'nowrap',
-                background: `linear-gradient(180deg, #ffe08a 0%, ${USER_COLORS.gold} 48%, #d4a017 100%)`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
-              BattleAsia
-            </Typography>
-            <Typography
-              sx={{
-                fontSize: 9,
-                fontWeight: 700,
-                letterSpacing: 1.4,
-                textTransform: 'uppercase',
-                color: alpha('#ffffff', 0.6),
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {t('shop.bacShopName')}
-            </Typography>
-          </Stack>
-        </Stack>
-
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1.5 }}>
         <AuthHomeLink label={t('auth.home')} />
       </Box>
 
       <GlassPanelCard
         sx={{
-          position: 'relative',
-          overflow: 'hidden',
           width: 1,
           borderRadius: 0,
           p: wide ? { xs: 3, sm: 4, md: 4.5 } : { xs: 3.25, sm: 4.5 },
@@ -107,39 +52,37 @@ export function AuthFormShell({ title, description, children, wide, mark }: Auth
           `,
         }}
       >
-        {/* Ghost step number behind heading */}
-        {mark ? (
-          <Typography
-            aria-hidden
-            className="font-tr"
+        <Stack alignItems="center" spacing={1.25} sx={{ mb: 3 }}>
+          <Logo
+            disabled
             sx={{
-              position: 'absolute',
-              top: { xs: -14, sm: -20 },
-              right: { xs: 4, sm: 18 },
-              fontSize: { xs: 96, sm: 132 },
-              fontWeight: 800,
-              lineHeight: 1,
-              color: alpha('#f5c518', 0.08),
+              width: { xs: 132, sm: 156 },
+              height: 'auto',
               pointerEvents: 'none',
-              userSelect: 'none',
-              zIndex: 0,
+              '& img': { objectFit: 'contain', width: '100%', height: 'auto' },
+            }}
+          />
+          <Typography
+            sx={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: 1.6,
+              textTransform: 'uppercase',
+              color: alpha('#f5c518', 0.85),
             }}
           >
-            {mark}
+            {t('shop.bacShopName')}
           </Typography>
-        ) : null}
-
-        {/* Heading block — left aligned (zip style) */}
-        <Box sx={{ position: 'relative', zIndex: 1, mb: 3 }}>
           <Typography
+            variant="h5"
             className="font-tr"
             sx={{
               fontWeight: 800,
               color: glassTokens.titleColor,
-              fontSize: { xs: 26, sm: 32 },
-              lineHeight: 1.1,
+              textAlign: 'center',
+              fontSize: { xs: 20, sm: 24 },
+              lineHeight: 1.25,
               letterSpacing: 0.4,
-              textTransform: 'uppercase',
             }}
           >
             {title}
@@ -148,20 +91,20 @@ export function AuthFormShell({ title, description, children, wide, mark }: Auth
             <Typography
               variant="body2"
               sx={{
-                mt: 1.25,
                 color: glassTokens.subtitleColor,
-                fontSize: 13.5,
+                textAlign: 'center',
+                fontSize: 13,
                 lineHeight: 1.55,
-                maxWidth: wide ? 480 : 400,
+                maxWidth: wide ? 480 : 380,
               }}
             >
               {description}
             </Typography>
           ) : null}
-          <Box sx={{ ...userPageDividerSx, mt: 2, width: 120 }} />
-        </Box>
+          <Box sx={{ ...userPageDividerSx, mt: 0.75, width: { xs: 150, sm: 200 } }} />
+        </Stack>
 
-        <Box sx={{ position: 'relative', zIndex: 1 }}>{children}</Box>
+        {children}
       </GlassPanelCard>
     </Box>
   );
