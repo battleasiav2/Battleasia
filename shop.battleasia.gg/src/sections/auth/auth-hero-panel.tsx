@@ -59,18 +59,55 @@ export function AuthHeroPanel() {
         >
           {t('shop.authHeroTitle')}
         </Typography>
-        <Typography
+
+        {/* Cinematic testimonial quote */}
+        <Box
+          component="blockquote"
           sx={{
-            mt: 1.75,
-            fontSize: { md: 16, lg: 17 },
-            color: alpha('#ffffff', 0.86),
-            lineHeight: 1.5,
-            maxWidth: 420,
-            textShadow: '0 1px 8px rgba(0, 0, 0, 0.8)',
+            m: 0,
+            mt: 2.25,
+            pl: 2.25,
+            position: 'relative',
+            borderLeft: `2px solid ${alpha('#f5c518', 0.55)}`,
+            '&::before': {
+              content: '"\\201C"',
+              position: 'absolute',
+              top: -18,
+              left: 6,
+              fontSize: 56,
+              lineHeight: 1,
+              fontWeight: 800,
+              color: alpha('#f5c518', 0.35),
+              pointerEvents: 'none',
+            },
           }}
         >
-          {t('shop.authHeroSubtitle')}
-        </Typography>
+          <Typography
+            sx={{
+              fontSize: { md: 16, lg: 17 },
+              color: alpha('#ffffff', 0.9),
+              lineHeight: 1.5,
+              maxWidth: 420,
+              fontStyle: 'italic',
+              textShadow: '0 1px 8px rgba(0, 0, 0, 0.8)',
+            }}
+          >
+            {t('shop.authHeroSubtitle')}
+          </Typography>
+          <Typography
+            sx={{
+              mt: 1,
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: 1.4,
+              textTransform: 'uppercase',
+              color: alpha('#f5c518', 0.85),
+            }}
+          >
+            {t('shop.bacShopName')}
+          </Typography>
+        </Box>
+
         <Box sx={{ ...userPageDividerSx, mt: 2.5, width: 200 }} />
       </Box>
 
