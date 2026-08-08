@@ -23,7 +23,7 @@ import { AuthNavButtons } from 'src/components/mesh-buttons/auth-nav-buttons';
 import { AuthFormShell } from './auth-form-shell';
 import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
-import { authAlertSx, authFieldSlotProps, authLinkSx } from './auth-form-styles';
+import { authAlertSx, authFieldSlotPropsCompact, authLinkSx } from './auth-form-styles';
 
 // ----------------------------------------------------------------------
 
@@ -91,26 +91,26 @@ export function SignInView() {
   });
 
   return (
-    <AuthFormShell title={t('auth.signInToAccount')} description={t('home.subtitle')}>
+    <AuthFormShell compact title={t('auth.signInToAccount')} description={t('home.subtitle')}>
       {!!errorMessage && (
-        <Alert severity="error" sx={{ ...authAlertSx, mb: 2.5 }}>
+        <Alert severity="error" sx={{ ...authAlertSx, mb: 2 }}>
           {errorMessage}
         </Alert>
       )}
 
       <Form methods={methods} onSubmit={onSubmit}>
-        <Stack spacing={2.5}>
+        <Stack spacing={1.25}>
           <Field.Text
             name="email"
             label={t('auth.emailAddress')}
             placeholder={t('auth.emailPlaceholder')}
             slotProps={{
-              ...authFieldSlotProps,
+              ...authFieldSlotPropsCompact,
               input: {
-                ...authFieldSlotProps.input,
+                ...authFieldSlotPropsCompact.input,
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="solar:letter-bold-duotone" width={20} sx={{ color: '#f59e0b' }} />
+                    <Iconify icon="solar:letter-bold-duotone" width={18} sx={{ color: '#f5c518' }} />
                   </InputAdornment>
                 ),
               },
@@ -118,8 +118,8 @@ export function SignInView() {
           />
 
           <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 0.75 }}>
-              <Link component={RouterLink} href={paths.auth.forgotPassword} sx={authLinkSx}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 0.5 }}>
+              <Link component={RouterLink} href={paths.auth.forgotPassword} sx={{ ...authLinkSx, fontSize: 12.5 }}>
                 {t('auth.forgotPassword')}
               </Link>
             </Box>
@@ -129,18 +129,18 @@ export function SignInView() {
               placeholder={t('auth.passwordPlaceholder')}
               type={showPassword.value ? 'text' : 'password'}
               slotProps={{
-                ...authFieldSlotProps,
+                ...authFieldSlotPropsCompact,
                 input: {
-                  ...authFieldSlotProps.input,
+                  ...authFieldSlotPropsCompact.input,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: '#f59e0b' }} />
+                      <Iconify icon="solar:lock-password-bold-duotone" width={18} sx={{ color: '#f5c518' }} />
                     </InputAdornment>
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={showPassword.onToggle} edge="end" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                        <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
+                      <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                        <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={18} />
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -149,7 +149,11 @@ export function SignInView() {
             />
           </Box>
 
-          <AuthSubmitButton loading={isSubmitting} loadingIndicator={`${t('auth.signIn')}...`}>
+          <AuthSubmitButton
+            loading={isSubmitting}
+            loadingIndicator={`${t('auth.signIn')}...`}
+            sx={{ py: 1.1, mt: 0.25 }}
+          >
             {t('auth.signIn')}
           </AuthSubmitButton>
 
@@ -160,7 +164,7 @@ export function SignInView() {
         </Stack>
       </Form>
 
-      <AuthNavButtons homeLabel={t('footer.home')} joinLabel={t('home.joinNow')} />
+      <AuthNavButtons compact homeLabel={t('footer.home')} joinLabel={t('home.joinNow')} />
     </AuthFormShell>
   );
 }

@@ -1,7 +1,7 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { useEffect } from 'react';
 import { merge } from 'es-toolkit';
 
-import { Alert, Box, useMediaQuery } from '@mui/material';
+import { Alert } from '@mui/material';
 import { alpha, useTheme, type Breakpoint } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
@@ -10,7 +10,6 @@ import { useRouter } from 'src/routes/hooks';
 import { useSelector } from 'src/store';
 
 import { AuthSplitSection } from './section';
-import { AuthSplitContent } from './content';
 import { HOME_GAME_ARTS } from 'src/sections/home/home-game-arts';
 import { MainSection } from '../core/main-section';
 import { LayoutSection } from '../core/layout-section';
@@ -21,10 +20,6 @@ import type { AuthSplitContentProps } from './content';
 import type { MainSectionProps } from '../core/main-section';
 import type { HeaderSectionProps } from '../core/header-section';
 import type { LayoutSectionProps } from '../core/layout-section';
-
-const AuthHeroPanel = lazy(() =>
-  import('src/sections/auth/auth-hero-panel').then((m) => ({ default: m.AuthHeroPanel }))
-);
 
 // ----------------------------------------------------------------------
 
@@ -52,7 +47,6 @@ export function AuthSplitLayout({
 }: AuthSplitLayoutProps) {
   const theme = useTheme();
   const router = useRouter();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const { isLoggedIn } = useSelector((state) => state.auth);
 
@@ -103,7 +97,11 @@ export function AuthSplitLayout({
       {...slotProps?.main}
       sx={[
         () => ({
-          [theme.breakpoints.up(layoutQuery)]: { flexDirection: 'row' },
+          [theme.breakpoints.up(layoutQuery)]: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
         }),
         ...(Array.isArray(slotProps?.main?.sx)
           ? (slotProps?.main?.sx ?? [])
@@ -121,8 +119,8 @@ export function AuthSplitLayout({
             position: 'absolute',
             inset: 0,
             background: `
-              linear-gradient(90deg, ${alpha('#0a0a0a', 0.88)} 0%, ${alpha('#0a0a0a', 0.62)} 48%, ${alpha('#0a0a0a', 0.78)} 100%),
-              radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(GOLD, 0.08)} 0%, transparent 55%)
+              radial-gradient(ellipse 55% 50% at 50% 45%, ${alpha(GOLD, 0.12)} 0%, transparent 62%),
+              linear-gradient(180deg, ${alpha('#070708', 0.9)} 0%, ${alpha('#070708', 0.95)} 100%)
             `,
             zIndex: 0,
           },
@@ -130,7 +128,7 @@ export function AuthSplitLayout({
             content: "''",
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(180deg, ${alpha('#0a0a0a', 0.35)} 0%, transparent 40%, ${alpha('#0a0a0a', 0.88)} 100%)`,
+            background: `radial-gradient(ellipse 120% 80% at 50% 50%, transparent 40%, ${alpha('#050506', 0.85)} 100%)`,
             zIndex: 0,
           },
         },
@@ -142,25 +140,16 @@ export function AuthSplitLayout({
         sx={{
           position: 'relative',
           zIndex: 1,
-          minHeight: { xs: '100vh', md: '100vh' },
-          ...(isMobile && {
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            overflow: 'auto',
-            py: 3,
-          }),
+          minHeight: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: { xs: 'flex-start', md: 'center' },
+          overflow: 'auto',
+          py: { xs: 3, md: 4 },
         }}
       >
         {children}
       </AuthSplitSection>
-      {!isMobile && (
-        <AuthSplitContent layoutQuery={layoutQuery} {...slotProps?.content} sx={{ position: 'relative', zIndex: 1 }}>
-          <Suspense fallback={<BoxMinHeight />}>
-            <AuthHeroPanel />
-          </Suspense>
-        </AuthSplitContent>
-      )}
     </MainSection>
   );
 
@@ -174,8 +163,4 @@ export function AuthSplitLayout({
       {renderMain()}
     </LayoutSection>
   );
-}
-
-function BoxMinHeight() {
-  return <Box sx={{ minHeight: 420, width: 1 }} aria-hidden />;
 }

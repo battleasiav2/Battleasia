@@ -139,6 +139,40 @@ export const authFieldSlotProps = {
   },
 };
 
+// Compact variant — used on sign-in for a tighter, smaller card
+export const authFieldSlotPropsCompact = {
+  inputLabel: {
+    ...authFieldSlotProps.inputLabel,
+    sx: {
+      ...authFieldSlotProps.inputLabel.sx,
+      fontSize: 10,
+      letterSpacing: 0.2,
+      mb: 0.5,
+    },
+  },
+  input: {
+    ...authFieldSlotProps.input,
+    sx: {
+      ...authFieldSlotProps.input.sx,
+      minHeight: 36,
+      fontSize: 13,
+      '& input': {
+        paddingTop: '7px',
+        paddingBottom: '7px',
+      },
+      // Keep browser autofill on-brand (dark box, white text)
+      '& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active':
+        {
+          WebkitTextFillColor: '#ffffff',
+          WebkitBoxShadow: '0 0 0 1000px #14121a inset',
+          caretColor: '#ffffff',
+          borderRadius: 'inherit',
+          transition: 'background-color 600000s 0s, color 600000s 0s',
+        },
+    },
+  },
+};
+
 /** Phone field — country flag + dial code sits inside the input row */
 export const authPhoneInputSx = {
   '--popover-button-width': '108px',

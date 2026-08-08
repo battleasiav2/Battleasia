@@ -1,3 +1,5 @@
+import type { SxProps, Theme } from '@mui/material/styles';
+
 import LoadingButton from '@mui/lab/LoadingButton';
 
 import { Iconify } from 'src/components/iconify/iconify';
@@ -13,6 +15,7 @@ type AuthSubmitButtonProps = {
   type?: 'submit' | 'button';
   onClick?: () => void;
   disabled?: boolean;
+  sx?: SxProps<Theme>;
 };
 
 export function AuthSubmitButton({
@@ -22,6 +25,7 @@ export function AuthSubmitButton({
   type = 'submit',
   onClick,
   disabled,
+  sx,
 }: AuthSubmitButtonProps) {
   return (
     <LoadingButton
@@ -37,14 +41,17 @@ export function AuthSubmitButton({
       startIcon={
         <Iconify icon="game-icons:crossed-swords" width={22} />
       }
-      sx={{
-        ...authSubmitButtonSx,
-        '&.Mui-disabled': {
-          bgcolor: 'rgba(0,0,0,0.35)',
-          color: 'rgba(245, 197, 24, 0.35)',
-          borderColor: 'rgba(245, 197, 24, 0.22)',
+      sx={[
+        authSubmitButtonSx,
+        {
+          '&.Mui-disabled': {
+            bgcolor: 'rgba(0,0,0,0.35)',
+            color: 'rgba(245, 197, 24, 0.35)',
+            borderColor: 'rgba(245, 197, 24, 0.22)',
+          },
         },
-      }}
+        ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
+      ]}
     >
       {children}
     </LoadingButton>
