@@ -175,6 +175,15 @@ export function SignUpView() {
 
   const compactSelectSx = { ...authSelectSx, minHeight: 40, '& .MuiSelect-select': { py: 1 } };
 
+  // Phone needs a taller row so the absolute-positioned country selector fits cleanly
+  const phoneSlotProps = {
+    inputLabel: authFieldSlotPropsCompact.inputLabel,
+    input: {
+      ...authFieldSlotPropsCompact.input,
+      sx: { ...authFieldSlotPropsCompact.input.sx, minHeight: 44, '& input': { paddingTop: '9px', paddingBottom: '9px' } },
+    },
+  };
+
   return (
     <AuthFormShell wide title={t('auth.signUpTitle')} description={t('auth.signUpDescription')}>
       {!!errorMessage && (
@@ -220,7 +229,7 @@ export function SignUpView() {
               country="BD"
               countrySelectorSx={authPhoneCountrySx}
               sx={authPhoneInputSx}
-              slotProps={authFieldSlotPropsCompact}
+              slotProps={phoneSlotProps}
             />
           </Box>
 

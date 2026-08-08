@@ -141,14 +141,12 @@ export function AuthSplitLayout({
         sx={{
           position: 'relative',
           zIndex: 1,
-          minHeight: { xs: '100vh', md: '100vh' },
-          ...(isMobile && {
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            overflow: 'auto',
-            py: 3,
-          }),
+          minHeight: '100vh',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: { xs: 'flex-start', md: 'center' },
+          overflowY: 'auto',
+          py: { xs: 3, md: 4 },
         }}
       >
         {children}
