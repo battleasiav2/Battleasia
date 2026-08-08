@@ -97,7 +97,7 @@ export function SignInView() {
       )}
 
       <Form methods={methods} onSubmit={onSubmit}>
-        <Stack spacing={2.5}>
+        <Stack spacing={1.75}>
           <Field.Text
             name="email"
             label={t('auth.emailAddress')}

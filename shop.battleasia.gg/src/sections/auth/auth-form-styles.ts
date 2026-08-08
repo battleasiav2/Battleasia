@@ -11,9 +11,13 @@ export const authFieldSlotProps = {
     sx: {
       position: 'relative' as const,
       transform: 'none',
-      fontSize: 12,
+      maxWidth: 'none',
+      whiteSpace: 'nowrap' as const,
+      overflow: 'visible',
+      textOverflow: 'clip',
+      fontSize: 11,
       fontWeight: 600,
-      letterSpacing: 0.4,
+      letterSpacing: 0.2,
       color: alpha('#ffffff', 0.82),
       mb: 0.75,
       textTransform: 'uppercase' as const,
@@ -27,12 +31,21 @@ export const authFieldSlotProps = {
       bgcolor: AUTH_INPUT_BG,
       borderRadius: '2px',
       fontSize: 14,
-      minHeight: 48,
+      minHeight: 46,
       transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease',
       '& input::placeholder': {
         color: alpha('#ffffff', 0.55),
         opacity: 1,
       },
+      // Keep browser autofill on-brand (dark box, white text) instead of Chrome's white/black
+      '& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active':
+        {
+          WebkitTextFillColor: '#ffffff',
+          WebkitBoxShadow: '0 0 0 1000px #14121a inset',
+          caretColor: '#ffffff',
+          borderRadius: 'inherit',
+          transition: 'background-color 600000s 0s, color 600000s 0s',
+        },
       '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
       '& fieldset': {
         border: `1px solid ${alpha('#ffffff', 0.22)}`,
@@ -134,7 +147,7 @@ export const authSelectSx = {
   bgcolor: AUTH_INPUT_BG,
   borderRadius: '2px',
   fontSize: 14,
-  minHeight: 48,
+  minHeight: 46,
   '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
   '& fieldset': {
     border: `1px solid ${alpha('#ffffff', 0.22)}`,
