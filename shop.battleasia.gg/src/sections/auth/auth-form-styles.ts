@@ -71,6 +71,26 @@ export const authFieldSlotProps = {
   },
 };
 
+// Compact variant — used on sign-in for a tighter, smaller card
+export const authFieldSlotPropsCompact = {
+  inputLabel: {
+    ...authFieldSlotProps.inputLabel,
+    sx: {
+      ...authFieldSlotProps.inputLabel.sx,
+      fontSize: 10,
+      mb: 0.5,
+    },
+  },
+  input: {
+    ...authFieldSlotProps.input,
+    sx: {
+      ...authFieldSlotProps.input.sx,
+      minHeight: 40,
+      fontSize: 13.5,
+    },
+  },
+};
+
 export const authPhoneInputSx = {
   '--popover-button-width': '80px',
   '--popover-button-height': '28px',

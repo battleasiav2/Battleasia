@@ -9,6 +9,7 @@ import { userGhostButtonSx, userGoldButtonSx } from 'src/layouts/user/user-theme
 type AuthNavButtonsProps = {
   homeLabel: string;
   joinLabel: string;
+  compact?: boolean;
 };
 
 const baseButtonSx = {
@@ -21,9 +22,11 @@ const baseButtonSx = {
   boxShadow: 'none',
 };
 
-export function AuthNavButtons({ homeLabel, joinLabel }: AuthNavButtonsProps) {
+export function AuthNavButtons({ homeLabel, joinLabel, compact }: AuthNavButtonsProps) {
+  const buttonSx = compact ? { ...baseButtonSx, py: 0.9 } : baseButtonSx;
+
   return (
-    <Stack direction="row" spacing={1.25} sx={{ width: 1, mt: 3 }}>
+    <Stack direction="row" spacing={1.25} sx={{ width: 1, mt: compact ? 2 : 3 }}>
       <Button
         component={RouterLink}
         href={paths.dashboard.root}
@@ -32,7 +35,7 @@ export function AuthNavButtons({ homeLabel, joinLabel }: AuthNavButtonsProps) {
         }
         sx={{
           ...userGhostButtonSx,
-          ...baseButtonSx,
+          ...buttonSx,
         }}
       >
         {homeLabel}
@@ -46,7 +49,7 @@ export function AuthNavButtons({ homeLabel, joinLabel }: AuthNavButtonsProps) {
         }
         sx={{
           ...userGoldButtonSx,
-          ...baseButtonSx,
+          ...buttonSx,
         }}
       >
         {joinLabel}

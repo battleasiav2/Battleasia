@@ -21,9 +21,11 @@ type AuthFormShellProps = {
   children: ReactNode;
   /** Use on sign-up — more fields need a wider card */
   wide?: boolean;
+  /** Tighter card + header for a smaller footprint (sign-in) */
+  compact?: boolean;
 };
 
-export function AuthFormShell({ title, description, children, wide }: AuthFormShellProps) {
+export function AuthFormShell({ title, description, children, wide, compact }: AuthFormShellProps) {
   const { t } = useTranslate();
   const glassTokens = getDefaultGlassTokens();
   const gold = '#f5c518';
@@ -32,11 +34,15 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
       <Box
       sx={{
         width: 1,
-        maxWidth: wide ? { xs: 1, sm: 540, md: 560 } : { xs: 1, sm: 420, md: 440 },
+        maxWidth: wide
+          ? { xs: 1, sm: 540, md: 560 }
+          : compact
+            ? { xs: 1, sm: 380, md: 396 }
+            : { xs: 1, sm: 420, md: 440 },
         animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) both`,
       }}
     >
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: compact ? 0.75 : 1 }}>
         <AuthHomeLink label={t('auth.home')} />
       </Box>
 
@@ -45,7 +51,7 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
           width: 1,
           borderRadius: 0,
           border: `1px solid ${alpha(gold, 0.32)}`,
-          p: wide ? { xs: 2.75, sm: 3.5, md: 4 } : { xs: 3, sm: 3.75 },
+          p: wide ? { xs: 2.75, sm: 3.5, md: 4 } : compact ? { xs: 2.25, sm: 2.75 } : { xs: 3, sm: 3.75 },
           boxShadow: `
             0 24px 60px ${alpha('#000000', 0.65)},
             0 0 0 1px ${alpha(gold, 0.06)},
@@ -53,11 +59,11 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
           `,
         }}
       >
-        <Stack alignItems="center" spacing={0.75} sx={{ mb: 2.25 }}>
+        <Stack alignItems="center" spacing={compact ? 0.5 : 0.75} sx={{ mb: compact ? 1.75 : 2.25 }}>
           <Logo
             disabled
             sx={{
-              width: { xs: 92, sm: 104 },
+              width: compact ? { xs: 74, sm: 82 } : { xs: 92, sm: 104 },
               height: 'auto',
               pointerEvents: 'none',
               '& img': { objectFit: 'contain', width: '100%', height: 'auto' },
@@ -81,7 +87,7 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
               fontWeight: 800,
               color: glassTokens.titleColor,
               textAlign: 'center',
-              fontSize: { xs: 18, sm: 20 },
+              fontSize: compact ? { xs: 16, sm: 18 } : { xs: 18, sm: 20 },
               lineHeight: 1.2,
               letterSpacing: 0.3,
             }}
@@ -94,9 +100,9 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
               sx={{
                 color: glassTokens.subtitleColor,
                 textAlign: 'center',
-                fontSize: 12.5,
-                lineHeight: 1.5,
-                maxWidth: wide ? 440 : 340,
+                fontSize: compact ? 11.5 : 12.5,
+                lineHeight: 1.45,
+                maxWidth: wide ? 440 : compact ? 300 : 340,
               }}
             >
               {description}
@@ -104,12 +110,12 @@ export function AuthFormShell({ title, description, children, wide }: AuthFormSh
           ) : null}
           <Box
             sx={{
-              mt: 1,
+              mt: compact ? 0.75 : 1,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: 1,
-              width: { xs: 180, sm: 220 },
+              width: compact ? { xs: 150, sm: 180 } : { xs: 180, sm: 220 },
             }}
           >
             <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, transparent, ${alpha(gold, 0.55)})` }} />
