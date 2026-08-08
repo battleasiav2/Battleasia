@@ -85,8 +85,12 @@ export const authFieldSlotPropsCompact = {
     ...authFieldSlotProps.input,
     sx: {
       ...authFieldSlotProps.input.sx,
-      minHeight: 40,
-      fontSize: 13.5,
+      minHeight: 36,
+      fontSize: 13,
+      '& input': {
+        paddingTop: '7px',
+        paddingBottom: '7px',
+      },
     },
   },
 };
