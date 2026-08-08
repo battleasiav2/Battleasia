@@ -17,7 +17,7 @@ export const authFieldSlotProps = {
       color: alpha('#ffffff', 0.82),
       mb: 0.75,
       textTransform: 'uppercase' as const,
-      '&.Mui-focused': { color: '#f59e0b' },
+      '&.Mui-focused': { color: '#f5c518' },
       '&.MuiInputLabel-shrink': { transform: 'none' },
     },
   },
@@ -42,10 +42,10 @@ export const authFieldSlotProps = {
       },
       '&.Mui-focused': {
         bgcolor: alpha('#000000', 0.58),
-        boxShadow: `0 0 0 3px ${alpha('#f59e0b', 0.18)}`,
+        boxShadow: `0 0 0 3px ${alpha('#f5c518', 0.18)}`,
       },
       '&.Mui-focused fieldset': {
-        borderColor: '#f59e0b',
+        borderColor: '#f5c518',
         borderWidth: '1px',
       },
       '& .MuiSelect-select': {
@@ -111,11 +111,11 @@ export const authSelectMenuProps = {
         py: 1.1,
         px: 1.5,
         borderRadius: 0,
-        '&:hover': { bgcolor: alpha('#f59e0b', 0.12) },
+        '&:hover': { bgcolor: alpha('#f5c518', 0.12) },
         '&.Mui-selected': {
-          bgcolor: alpha('#f59e0b', 0.18),
+          bgcolor: alpha('#f5c518', 0.18),
           color: '#ffffff',
-          '&:hover': { bgcolor: alpha('#f59e0b', 0.24) },
+          '&:hover': { bgcolor: alpha('#f5c518', 0.24) },
         },
         '&.Mui-disabled': {
           color: alpha('#ffffff', 0.35),
@@ -144,10 +144,10 @@ export const authSelectSx = {
   },
   '&.Mui-focused': {
     bgcolor: alpha('#000000', 0.58),
-    boxShadow: `0 0 0 3px ${alpha('#f59e0b', 0.18)}`,
+    boxShadow: `0 0 0 3px ${alpha('#f5c518', 0.18)}`,
   },
   '&.Mui-focused fieldset': {
-    borderColor: '#f59e0b',
+    borderColor: '#f5c518',
     borderWidth: '1px',
   },
   '& .MuiSelect-select': {
@@ -164,12 +164,12 @@ export const authSubmitButtonSx = {
   textTransform: 'uppercase' as const,
   color: '#111111',
   boxShadow: 'none',
-  background: 'linear-gradient(180deg, #f59e0b 0%, #ea8c00 52%, #d97706 100%)',
+  background: 'linear-gradient(180deg, #f5c518 0%, #d4a017 52%, #d97706 100%)',
   border: `1px solid ${alpha('#fbbf24', 0.9)}`,
   transition: 'transform 0.2s ease, box-shadow 0.2s ease',
   '&:hover': {
-    background: 'linear-gradient(180deg, #fbbf24 0%, #f59e0b 52%, #ea8c00 100%)',
-    boxShadow: `0 8px 28px ${alpha('#f59e0b', 0.4)}`,
+    background: 'linear-gradient(180deg, #fbbf24 0%, #f5c518 52%, #d4a017 100%)',
+    boxShadow: `0 8px 28px ${alpha('#f5c518', 0.4)}`,
     transform: 'translateY(-1px)',
   },
   '&:active': {
@@ -178,7 +178,7 @@ export const authSubmitButtonSx = {
 };
 
 export const authLinkSx = {
-  color: '#f59e0b',
+  color: '#f5c518',
   fontWeight: 600,
   textDecoration: 'none',
   transition: 'color 0.2s ease',

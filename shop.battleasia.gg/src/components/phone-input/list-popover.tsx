@@ -22,7 +22,7 @@ import type { CountryListProps } from './types';
 
 // ----------------------------------------------------------------------
 
-const GOLD = '#f59e0b';
+const GOLD = '#f5c518';
 
 export function CountryListPopover({
   sx,

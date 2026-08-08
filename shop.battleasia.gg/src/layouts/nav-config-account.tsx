@@ -7,9 +7,15 @@ import type { AccountDrawerProps } from './components/account-drawer';
 // ----------------------------------------------------------------------
 
 export const _account: AccountDrawerProps['data'] = [
-  { label: 'Home', href: '/', icon: <Iconify icon="solar:home-angle-bold-duotone" /> },
   {
-    label: 'Profile',
+    label: 'navigation.home',
+    labelKey: 'navigation.home',
+    href: '/',
+    icon: <Iconify icon="solar:home-angle-bold-duotone" />,
+  },
+  {
+    label: 'navigation.profile',
+    labelKey: 'navigation.profile',
     href: '#',
     icon: (
       <SvgIcon>
@@ -26,12 +32,14 @@ export const _account: AccountDrawerProps['data'] = [
     ),
   },
   {
-    label: 'Projects',
+    label: 'navigation.projects',
+    labelKey: 'navigation.projects',
     href: '#',
     icon: <Iconify icon="solar:notes-bold-duotone" />,
   },
   {
-    label: 'Subscription',
+    label: 'navigation.subscription',
+    labelKey: 'navigation.subscription',
     href: '#',
     icon: (
       <SvgIcon>
@@ -53,6 +61,16 @@ export const _account: AccountDrawerProps['data'] = [
       </SvgIcon>
     ),
   },
-  { label: 'Security', href: '#', icon: <Iconify icon="solar:shield-keyhole-bold-duotone" /> },
-  { label: 'Account settings', href: '#', icon: <Iconify icon="solar:settings-bold-duotone" /> },
+  {
+    label: 'navigation.security',
+    labelKey: 'navigation.security',
+    href: '#',
+    icon: <Iconify icon="solar:shield-keyhole-bold-duotone" />,
+  },
+  {
+    label: 'navigation.accountSettings',
+    labelKey: 'navigation.accountSettings',
+    href: '#',
+    icon: <Iconify icon="solar:settings-bold-duotone" />,
+  },
 ];

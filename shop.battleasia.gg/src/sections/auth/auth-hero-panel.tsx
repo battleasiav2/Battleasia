@@ -90,7 +90,7 @@ export function AuthHeroPanel() {
               backdropFilter: 'blur(8px)',
             }}
           >
-            <Iconify icon={item.icon} width={18} sx={{ color: '#f59e0b' }} />
+            <Iconify icon={item.icon} width={18} sx={{ color: '#f5c518' }} />
             <Typography sx={{ fontSize: 12, fontWeight: 600, color: alpha('#fff', 0.9) }}>
               {item.text}
             </Typography>

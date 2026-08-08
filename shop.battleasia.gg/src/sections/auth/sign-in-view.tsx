@@ -108,7 +108,7 @@ export function SignInView() {
                 ...authFieldSlotProps.input,
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="solar:letter-bold-duotone" width={20} sx={{ color: '#f59e0b' }} />
+                    <Iconify icon="solar:letter-bold-duotone" width={20} sx={{ color: '#f5c518' }} />
                   </InputAdornment>
                 ),
               },
@@ -137,7 +137,7 @@ export function SignInView() {
                   ...authFieldSlotProps.input,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: '#f59e0b' }} />
+                      <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: '#f5c518' }} />
                     </InputAdornment>
                   ),
                   endAdornment: (

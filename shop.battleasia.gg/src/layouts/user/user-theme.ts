@@ -1,6 +1,6 @@
 import type { SxProps, Theme } from '@mui/material/styles';
 
-import { alpha } from '@mui/material/styles';
+import { alpha, keyframes } from '@mui/material/styles';
 
 import {
   GLASS_CARD_RADIUS,
@@ -69,7 +69,7 @@ export function getUserChipSx(tone: UserChipTone = 'gold'): SxProps<Theme> {
   };
   const c = tones[tone];
   return {
-    borderRadius: 0,
+    borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
     fontWeight: 700,
     bgcolor: c.bg,
     color: `${c.fg} !important`,
@@ -130,57 +130,89 @@ export const userMutedTextSx: SxProps<Theme> = {
   lineHeight: 1.6,
 };
 
-/** Shared glass-gold chrome — Button #2 "Glass Gold Edge" */
+/** Shared glass-gold chrome — secondary / tone buttons (success, error, ghost) */
 const userGlassButtonBaseSx: SxProps<Theme> = {
-  borderRadius: 0,
+  borderRadius: `${GLASS_CARD_RADIUS}px`,
   fontWeight: 800,
   letterSpacing: 0.6,
   textTransform: 'uppercase',
   backdropFilter: 'blur(14px)',
   WebkitBackdropFilter: 'blur(14px)',
+  backgroundImage: 'none',
   transition:
     'background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, color 0.25s ease, transform 0.2s ease',
   '& .MuiButton-startIcon, & .MuiButton-endIcon, & .MuiLoadingButton-loadingIndicator': {
     color: 'inherit',
   },
+  /** MUI dark mode paints contained/inherit buttons white — block that */
+  '&.MuiButton-contained, &.MuiButton-outlined, &.MuiButton-text': {
+    backgroundImage: 'none',
+  },
+  '&.MuiButton-containedInherit': {
+    backgroundColor: `${alpha('#000000', 0.52)} !important`,
+  },
 };
 
-/** Primary CTA — dark glass + gold border + gold text */
-export const userGoldButtonSx: SxProps<Theme> = {
-  ...userGlassButtonBaseSx,
-  color: USER_COLORS.gold,
-  bgcolor: alpha('#000000', 0.52),
-  border: `1px solid ${alpha(USER_COLORS.gold, 0.58)}`,
-  boxShadow: `
-    inset 0 1px 0 ${alpha('#ffffff', 0.07)},
-    0 0 0 1px ${alpha(USER_COLORS.gold, 0.06)},
-    0 8px 28px ${alpha('#000000', 0.45)}
-  `,
-  '&:hover': {
-    bgcolor: alpha(USER_COLORS.gold, 0.14),
-    borderColor: USER_COLORS.gold,
-    color: USER_COLORS.goldLight,
-    backgroundColor: alpha(USER_COLORS.gold, 0.14),
+function createUserGlassToneButtonSx(accent: string, accentLight: string): SxProps<Theme> {
+  return {
+    ...userGlassButtonBaseSx,
+    color: accent,
+    bgcolor: alpha('#000000', 0.52),
+    backgroundColor: alpha('#000000', 0.52),
+    border: `1px solid ${alpha(accent, 0.58)}`,
     boxShadow: `
-      inset 0 0 28px ${alpha(USER_COLORS.gold, 0.16)},
-      0 0 24px ${alpha(USER_COLORS.gold, 0.24)},
-      0 12px 36px ${alpha('#000000', 0.55)}
+      inset 0 1px 0 ${alpha('#ffffff', 0.06)},
+      0 0 0 1px ${alpha(accent, 0.06)},
+      0 8px 28px ${alpha('#000000', 0.45)}
     `,
-    transform: 'translateY(-1px)',
-  },
-  '&:active': {
-    transform: 'translateY(0)',
-  },
-  '&.Mui-disabled': {
-    bgcolor: alpha('#000000', 0.35),
-    color: alpha(USER_COLORS.gold, 0.35),
-    borderColor: alpha(USER_COLORS.gold, 0.22),
-    boxShadow: 'none',
-  },
-};
+    '&:hover': {
+      bgcolor: alpha(accent, 0.14),
+      backgroundColor: `${alpha(accent, 0.14)} !important`,
+      borderColor: accent,
+      color: accentLight,
+      boxShadow: `
+        inset 0 0 28px ${alpha(accent, 0.16)},
+        0 0 24px ${alpha(accent, 0.22)},
+        0 12px 36px ${alpha('#000000', 0.55)}
+      `,
+      transform: 'translateY(-1px)',
+    },
+    '&:active': {
+      transform: 'translateY(0)',
+    },
+    '&.Mui-disabled': {
+      bgcolor: alpha('#000000', 0.35),
+      backgroundColor: `${alpha('#000000', 0.35)} !important`,
+      color: alpha(accent, 0.35),
+      borderColor: alpha(accent, 0.22),
+      boxShadow: 'none',
+    },
+  };
+}
+
+/** Primary CTA — dark glass + gold border + gold text */
+export const userGoldButtonSx: SxProps<Theme> = createUserGlassToneButtonSx(
+  USER_COLORS.gold,
+  USER_COLORS.goldLight
+);
 
 /** @deprecated Alias — same as userGoldButtonSx (Glass Gold Edge) */
 export const userMeshButtonSx: SxProps<Theme> = userGoldButtonSx;
+
+/** Win / success actions — green glass (same shape as gold) */
+export const userSuccessButtonSx: SxProps<Theme> = createUserGlassToneButtonSx(
+  USER_COLORS.success,
+  '#4ade80'
+);
+
+/** Lose / destructive — red glass (logout, close ticket, etc.) */
+export const userErrorButtonSx: SxProps<Theme> = createUserGlassToneButtonSx(
+  USER_COLORS.error,
+  '#f87171'
+);
+
+/** Logout — alias of error glass */
+export const userLogoutButtonSx: SxProps<Theme> = userErrorButtonSx;
 
 /** Secondary CTA — muted glass, gold edge on hover */
 export const userGhostButtonSx: SxProps<Theme> = {
@@ -215,31 +247,27 @@ export const userGhostButtonSx: SxProps<Theme> = {
   },
 };
 
-/** Logout only — red glass edge (same family as gold buttons) */
-export const userLogoutButtonSx: SxProps<Theme> = {
-  ...userGlassButtonBaseSx,
-  color: USER_COLORS.error,
-  bgcolor: alpha('#000000', 0.52),
-  border: `1px solid ${alpha(USER_COLORS.error, 0.58)}`,
-  boxShadow: `
-    inset 0 1px 0 ${alpha('#ffffff', 0.05)},
-    0 0 0 1px ${alpha(USER_COLORS.error, 0.06)},
-    0 8px 28px ${alpha('#000000', 0.45)}
-  `,
-  '&:hover': {
-    bgcolor: alpha(USER_COLORS.error, 0.14),
-    borderColor: USER_COLORS.error,
-    color: '#f87171',
-    backgroundColor: alpha(USER_COLORS.error, 0.14),
-    boxShadow: `
-      inset 0 0 28px ${alpha(USER_COLORS.error, 0.16)},
-      0 0 24px ${alpha(USER_COLORS.error, 0.22)},
-      0 12px 36px ${alpha('#000000', 0.55)}
-    `,
-    transform: 'translateY(-1px)',
-  },
-  '&:active': {
-    transform: 'translateY(0)',
+const watchLiveGlowPulse = keyframes`
+  0%, 100% {
+    box-shadow:
+      inset 0 0 16px ${alpha('#ef4444', 0.1)},
+      0 0 12px ${alpha('#ef4444', 0.28)};
+    border-color: ${alpha('#ef4444', 0.55)};
+  }
+  50% {
+    box-shadow:
+      inset 0 0 26px ${alpha('#ef4444', 0.18)},
+      0 0 28px ${alpha('#ef4444', 0.52)};
+    border-color: ${USER_COLORS.error};
+  }
+`;
+
+/** Watch Live only — red glass + pulsing live glow */
+export const userWatchLiveButtonSx: SxProps<Theme> = {
+  ...createUserGlassToneButtonSx(USER_COLORS.error, '#fca5a5'),
+  animation: `${watchLiveGlowPulse} 2.2s ease-in-out infinite`,
+  '@media (prefers-reduced-motion: reduce)': {
+    animation: 'none',
   },
 };
 

@@ -16,6 +16,7 @@ type Router = {
 
 export type MenuItem = {
   label: string;
+  labelKey: string;
   href: string;
   scrollTarget: string;
   isActive: (currentPath: string) => boolean;
@@ -24,16 +25,20 @@ export type MenuItem = {
 export const menuItems: MenuItem[] = [
   {
     label: 'Shop',
+    labelKey: 'nav.shop',
     href: paths.user.shop,
     scrollTarget: '',
-    isActive: (currentPath: string) => currentPath.startsWith(paths.user.shop) || currentPath === paths.user.root,
+    isActive: (currentPath: string) =>
+      currentPath.startsWith(paths.user.shop) || currentPath === paths.user.root,
   },
-] as const;
+];
 
 // ----------------------------------------------------------------------
 
 export type AccountMenuItem = {
+  /** i18n key (account drawer calls t(label)) */
   label: string;
+  labelKey: string;
   href?: string;
   icon: React.ReactNode;
   mobileMenu?: boolean;
@@ -43,18 +48,21 @@ export type AccountMenuItem = {
 export const accountMenuItems: AccountMenuItem[] = [
   {
     label: 'nav.shop',
+    labelKey: 'nav.shop',
     href: paths.user.shop,
     icon: <Iconify icon="solar:shop-bold" />,
     mobileMenu: true,
   },
   {
     label: 'nav.wallet',
+    labelKey: 'nav.wallet',
     href: paths.user.account.wallet,
     icon: <Iconify icon="solar:wallet-bold" />,
     mobileMenu: true,
   },
   {
     label: 'nav.withdrawal',
+    labelKey: 'nav.withdrawal',
     href: paths.user.account.withdrawal,
     icon: <Iconify icon="solar:card-send-bold" />,
     mobileMenu: true,
@@ -63,61 +71,21 @@ export const accountMenuItems: AccountMenuItem[] = [
 
 // ----------------------------------------------------------------------
 
-/**
- * Shared menu click handler for both dashboard and user layouts
- * Handles navigation to dashboard and scrolling to target section
- */
 export function createMenuClickHandler(
   pathname: string,
   router?: Router
 ): (e: React.MouseEvent<HTMLAnchorElement>, item: MenuItem) => void {
   return (e: React.MouseEvent<HTMLAnchorElement>, item: MenuItem) => {
-    const isHomePage = pathname === '/dashboard' || pathname === '/dashboard/';
+    if (!item.scrollTarget) return;
 
-    if (item.scrollTarget) {
-      e.preventDefault();
-
-      const scrollToTarget = (scrollTarget: string) => {
-        const targetElement = document.getElementById(scrollTarget);
-        if (targetElement) {
-          const headerOffset = 100; // Adjust based on your header height
-          const elementPosition = targetElement.getBoundingClientRect().top;
-          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-          window.scrollTo({
-            top: offsetPosition,
-            behavior: 'smooth'
-          });
-        }
-      };
-
-      // If not on dashboard page, navigate first then scroll
-      if (!isHomePage && router) {
-        router.push(paths.dashboard.root);
-        
-        // Wait for navigation and DOM to be ready, then scroll
-        // Use multiple attempts to ensure the element is available
-        let attempts = 0;
-        const maxAttempts = 20; // Try for up to 2 seconds (20 * 100ms)
-        
-        const tryScroll = () => {
-          attempts++;
-          const targetElement = document.getElementById(item.scrollTarget);
-          
-          if (targetElement) {
-            scrollToTarget(item.scrollTarget);
-          } else if (attempts < maxAttempts) {
-            setTimeout(tryScroll, 100);
-          }
-        };
-        
-        // Start trying after a short delay
-        setTimeout(tryScroll, 200);
-      } else {
-        // Already on dashboard, just scroll
-        scrollToTarget(item.scrollTarget);
-      }
+    e.preventDefault();
+    const targetElement = document.getElementById(item.scrollTarget);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    if (router && item.href) {
+      router.push(item.href);
     }
   };
 }
-

@@ -1,24 +1,28 @@
-import type { IconProps } from '@iconify/react';
+import type { IconProps } from '@iconify/react/offline';
 
 import { forwardRef } from 'react';
-import { Icon, disableCache } from '@iconify/react';
+import { Icon } from '@iconify/react/offline';
 import { mergeClasses } from 'minimal-shared/utils';
 
 import { styled } from '@mui/material/styles';
 
+import { resolveIconName } from './icon-aliases';
 import { iconifyClasses } from './classes';
+import './iconify-offline';
 
 // ----------------------------------------------------------------------
 
 export type IconifyProps = React.ComponentProps<typeof IconRoot> & IconProps;
 
 export const Iconify = forwardRef<SVGSVGElement, IconifyProps>((props, ref) => {
-  const { className, width = 20, sx, ...other } = props;
+  const { className, width = 20, sx, icon, ...other } = props;
+  const resolvedIcon = typeof icon === 'string' ? resolveIconName(icon) : icon;
 
   return (
     <IconRoot
       // CSR app — `ssr` causes removeChild crashes on remount
       ref={ref}
+      icon={resolvedIcon}
       className={mergeClasses([iconifyClasses.root, className])}
       sx={[
         {
@@ -33,9 +37,6 @@ export const Iconify = forwardRef<SVGSVGElement, IconifyProps>((props, ref) => {
     />
   );
 });
-
-// https://iconify.design/docs/iconify-icon/disable-cache.html
-disableCache('local');
 
 // ----------------------------------------------------------------------
 

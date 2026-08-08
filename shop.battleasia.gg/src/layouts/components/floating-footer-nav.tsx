@@ -5,118 +5,119 @@ import { Box, alpha } from '@mui/material';
 import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
-import { USER_COLORS } from 'src/layouts/user/user-theme';
-import { useTranslate } from 'src/locales/use-locales';
+import { useTranslate } from 'src/locales';
+import { GLASS_CARD_RADIUS } from 'src/components/battle-glass-card';
 
+import { USER_COLORS } from 'src/layouts/user/user-theme';
 import { accountMenuItems } from '../menu-items-config';
 
 // ----------------------------------------------------------------------
 
 type NavItem = {
-  label: string;
-  href: string;
-  icon: React.ReactNode;
-  isActive: (pathname: string) => boolean;
+    labelKey: string;
+    href: string;
+    icon: React.ReactNode;
+    isActive: (pathname: string) => boolean;
 };
 
 // ----------------------------------------------------------------------
 
 export function FloatingFooterNav() {
-  const pathname = usePathname();
-  const { t } = useTranslate();
+    const pathname = usePathname();
+    const { t } = useTranslate();
 
-  const navItems: NavItem[] = useMemo(
-    () =>
-      accountMenuItems
+    const navItems: NavItem[] = useMemo(() => accountMenuItems
         .filter((item) => item.mobileMenu === true && item.href)
         .map((item) => ({
-          label: item.label,
-          href: item.href!,
-          icon: item.icon,
-          isActive: (currentPath: string) => currentPath.startsWith(item.href!),
-        })),
-    []
-  );
+            labelKey: item.labelKey,
+            href: item.href!,
+            icon: item.icon,
+            isActive: (currentPath: string) => currentPath.startsWith(item.href!),
+        }))
+        , []
+    );
 
-  return (
-    <Box
-      sx={{
-        display: { xs: 'flex', md: 'none' },
-        position: 'fixed',
-        bottom: 12,
-        left: 12,
-        right: 12,
-        zIndex: 1300,
-        gap: 0.5,
-        alignItems: 'stretch',
-        justifyContent: 'space-between',
-        px: 1,
-        py: 0.75,
-        borderRadius: 0,
-        bgcolor: alpha('#000000', 0.82),
-        border: `1px solid ${alpha('#ffffff', 0.12)}`,
-        boxShadow: `0 12px 40px ${alpha('#000000', 0.55)}`,
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-      }}
-    >
-      {navItems.map((item) => {
-        const isActive = item.isActive(pathname);
-
-        return (
-          <Box
-            key={item.href}
-            component={RouterLink}
-            href={item.href}
+    return (
+        <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textDecoration: 'none',
-              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-              cursor: 'pointer',
-              flex: isActive ? 1.4 : 1,
-              ...(isActive
-                ? {
-                    bgcolor: alpha(USER_COLORS.gold, 0.18),
-                    color: USER_COLORS.gold,
-                    borderRadius: 0,
-                    border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
-                    px: 1.5,
-                    py: 1,
-                    gap: 0.75,
-                  }
-                : {
-                    color: alpha('#ffffff', 0.55),
-                    borderRadius: 0,
-                    border: '1px solid transparent',
-                    px: 1,
-                    py: 1,
-                    '&:hover': {
-                      color: '#ffffff',
-                      bgcolor: alpha('#ffffff', 0.06),
-                    },
-                  }),
+                display: { xs: 'flex', md: 'none' },
+                position: 'fixed',
+                bottom: 12,
+                left: 12,
+                right: 12,
+                zIndex: 1300,
+                gap: 0.5,
+                alignItems: 'stretch',
+                justifyContent: 'space-between',
+                px: 1,
+                py: 0.75,
+                borderRadius: `${GLASS_CARD_RADIUS + 4}px`,
+                bgcolor: alpha('#000000', 0.82),
+                border: `1px solid ${alpha('#ffffff', 0.12)}`,
+                boxShadow: `0 12px 40px ${alpha('#000000', 0.7)}, inset 0 1px 0 ${alpha('#ffffff', 0.08)}`,
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
             }}
-          >
-            <Box sx={{ display: 'flex', '& svg': { width: 22, height: 22 } }}>{item.icon}</Box>
-            {isActive ? (
-              <Box
-                component="span"
-                sx={{
-                  fontSize: 11,
-                  fontWeight: 800,
-                  letterSpacing: 0.6,
-                  textTransform: 'uppercase',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {t(item.label)}
-              </Box>
-            ) : null}
-          </Box>
-        );
-      })}
-    </Box>
-  );
+        >
+            {navItems.map((item) => {
+                const isActive = item.isActive(pathname);
+
+                return (
+                    <Box
+                        key={item.href}
+                        component={RouterLink}
+                        href={item.href}
+                        sx={{
+                            flex: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 0.35,
+                            py: 0.75,
+                            textDecoration: 'none',
+                            borderRadius: `${GLASS_CARD_RADIUS}px`,
+                            transition: 'all 0.22s cubic-bezier(0.22, 1, 0.36, 1)',
+                            color: isActive ? USER_COLORS.gold : alpha('#ffffff', 0.5),
+                            bgcolor: isActive ? alpha(USER_COLORS.gold, 0.12) : 'transparent',
+                            border: `1px solid ${isActive ? alpha(USER_COLORS.gold, 0.28) : 'transparent'}`,
+                            '&:hover': {
+                                color: USER_COLORS.gold,
+                                bgcolor: alpha(USER_COLORS.gold, 0.08),
+                            },
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: 22,
+                                height: 22,
+                                '& svg': {
+                                    width: 22,
+                                    height: 22,
+                                    color: 'inherit',
+                                },
+                            }}
+                        >
+                            {item.icon}
+                        </Box>
+                        <Box
+                            component="span"
+                            sx={{
+                                fontSize: 10,
+                                fontWeight: 600,
+                                letterSpacing: 0.02,
+                                textTransform: 'none',
+                                lineHeight: 1,
+                            }}
+                        >
+                            {t(item.labelKey)}
+                        </Box>
+                    </Box>
+                );
+            })}
+        </Box>
+    );
 }

@@ -22,10 +22,9 @@ import { useImagePreloader } from 'src/hooks';
 import { layoutClasses } from '../core/classes';
 import { MainSection } from '../core/main-section';
 import { HeaderSection } from '../core/header-section';
-import { FooterSection } from '../core/footer-section';
 import { LayoutSection } from '../core/layout-section';
 import { AccountDrawer } from '../components/account-drawer';
-import { USER_COLORS, userGoldButtonSx, userHeaderPillSx } from './user-theme';
+import { USER_COLORS, userGoldButtonSx, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
 import { userLayoutVars, userNavColorVars } from './css-vars';
 import { LanguagePopover } from '../components/language-popover';
 import { FloatingFooterNav } from '../components/floating-footer-nav';
@@ -138,19 +137,76 @@ export function UserLayout({
         </Alert>
       ),
       leftArea: (
-        <Logo
-          href={paths.user.shop}
-          sx={{
-            width: { xs: 56, sm: 72, md: 80 },
-            height: { xs: 56, sm: 72, md: 80 },
-            flexShrink: 0,
-            mt: { xs: 2, sm: 0 },
-            '& img': {
-              borderRadius: 0.5,
-              objectFit: 'contain',
-            },
-          }}
-        />
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={{ xs: 1, sm: 1.25 }}
+          sx={{ flexShrink: 0, minWidth: 0 }}
+        >
+          <Logo
+            href={paths.user.shop}
+            sx={{
+              width: { xs: 52, sm: 64, md: 72 },
+              height: { xs: 52, sm: 64, md: 72 },
+              flexShrink: 0,
+              '& img': {
+                borderRadius: 0.5,
+                objectFit: 'contain',
+              },
+            }}
+          />
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={0.65}
+            sx={{ display: { xs: 'flex', md: 'none' }, minWidth: 0 }}
+          >
+            <Typography
+              component={RouterLink}
+              href={paths.user.shop}
+              className="font-brand-gaming"
+              sx={{
+                fontSize: { xs: 16, sm: 18 },
+                fontWeight: 800,
+                color: USER_COLORS.gold,
+                textDecoration: 'none',
+                whiteSpace: 'nowrap',
+                lineHeight: 1,
+                background: `linear-gradient(180deg, #ffe08a 0%, ${USER_COLORS.gold} 48%, #d4a017 100%)`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
+            >
+              BattleAsia
+            </Typography>
+            <Box
+              sx={{
+                px: 0.55,
+                py: 0.15,
+                borderRadius: '3px',
+                border: `1px solid ${alpha(USER_COLORS.gold, 0.65)}`,
+                bgcolor: alpha(USER_COLORS.gold, 0.08),
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Typography
+                className="font-tr"
+                sx={{
+                  fontSize: 10,
+                  fontWeight: 800,
+                  letterSpacing: 0.5,
+                  color: USER_COLORS.gold,
+                  lineHeight: 1.2,
+                }}
+              >
+                2.0
+              </Typography>
+            </Box>
+          </Stack>
+        </Stack>
       ),
       centerArea: (
         <Stack
@@ -187,7 +243,7 @@ export function UserLayout({
                   },
                 }}
               >
-                {item.label}
+                {t(item.labelKey)}
               </Typography>
             );
           })}
@@ -284,20 +340,6 @@ export function UserLayout({
     );
   };
 
-  const renderFooter = () => (
-    <Box
-      sx={{
-        width: 1,
-        // Remove footer offset to make it full-width
-        // [theme.breakpoints.up(layoutQuery)]: footerOffset
-        //   ? { pl: footerOffset }
-        //   : undefined,
-      }}
-    >
-      <FooterSection />
-    </Box>
-  );
-
   const renderMain = () => <MainSection {...slotProps?.main}>{children}</MainSection>;
 
   return (
@@ -306,21 +348,23 @@ export function UserLayout({
        * @Header
        *************************************** */
       headerSection={renderHeader()}
-      /** **************************************
-      //  * @Sidebar
-      //  *************************************** */
-      // sidebarSection={isNavVertical ? renderSidebar() : null}
-      /** **************************************
-       * @Footer
-       *************************************** */
-      footerSection={renderFooter()}
+      /** Logged-in area: no site footer (mobile uses FloatingFooterNav) */
+      footerSection={null}
       /** **************************************
        * @Styles
        *************************************** */
       cssVars={{ ...userLayoutVars(theme), ...navVars.layout, ...cssVars }}
       sx={[
         {
+          minHeight: '100vh',
+          bgcolor: USER_COLORS.pageBg,
+          [`& .${layoutClasses.root}`]: {
+            minHeight: '100vh',
+            bgcolor: USER_COLORS.pageBg,
+          },
           [`& .${layoutClasses.sidebarContainer}`]: {
+            minHeight: '100vh',
+            bgcolor: USER_COLORS.pageBg,
             [theme.breakpoints.up(layoutQuery)]: {
               pl: isNavMini ? 'var(--layout-nav-mini-width)' : 'var(--layout-nav-vertical-width)',
               transition: theme.transitions.create(['padding-left'], {
@@ -329,8 +373,20 @@ export function UserLayout({
               }),
             },
           },
-          // Add bottom padding on mobile for floating footer
           [`& .${layoutClasses.main}`]: {
+            display: 'flex',
+            flex: '1 1 auto',
+            flexDirection: 'column',
+            bgcolor: USER_COLORS.pageBg,
+            ...getUserLayoutMainSx(),
+            [`& .MuiCard-root`]: {
+              backgroundImage: 'none',
+              backgroundColor: alpha('#0a0a0a', 0.94),
+              color: USER_COLORS.textBody,
+            },
+            [`& .MuiPaper-root:not(.MuiDrawer-paper):not(.MuiPopover-paper):not(.MuiDialog-paper)`]: {
+              backgroundImage: 'none',
+            },
             [theme.breakpoints.down('md')]: {
               pb: 10,
             },
