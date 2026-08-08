@@ -359,6 +359,7 @@ export function SignUpView() {
   return (
     <AuthFormShell
       wide
+      mark="02"
       title="Sign Up"
       description={
         <>
