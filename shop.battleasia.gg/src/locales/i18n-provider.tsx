@@ -19,7 +19,13 @@ i18next
   .use(LanguageDetector)
   .use(initReactI18next)
   .use(resourcesToBackend((lang: string, ns: string) => import(`./langs/${lang}/${ns}.json`)))
-  .init({ ...i18nOptions(lng), detection: { caches: ['localStorage'] } });
+  .init({
+    ...i18nOptions(lng),
+    detection: { caches: ['localStorage'] },
+    react: {
+      useSuspense: false, // Disable Suspense to prevent "component suspended" errors
+    },
+  });
 
 // ----------------------------------------------------------------------
 
