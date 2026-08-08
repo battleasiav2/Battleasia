@@ -54,12 +54,8 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
             overflow: 'hidden',
             borderRadius: 0,
             bgcolor: alpha('#000000', 0.94),
-            border: `1px solid ${alpha(GOLD, 0.32)}`,
-            boxShadow: `
-              0 24px 60px ${alpha('#000000', 0.65)},
-              0 0 0 1px ${alpha(GOLD, 0.06)},
-              0 0 36px ${alpha(GOLD, 0.1)}
-            `,
+            border: `1px solid ${alpha('#ffffff', 0.08)}`,
+            boxShadow: `0 20px 50px ${alpha('#000000', 0.55)}`,
             backdropFilter: 'blur(16px)',
           },
         },
@@ -73,7 +69,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         sx={{
           px: 2,
           py: 1.75,
-          borderBottom: `1px solid ${alpha(GOLD, 0.18)}`,
+          borderBottom: `1px solid ${alpha('#ffffff', 0.07)}`,
         }}
       >
         <Typography
