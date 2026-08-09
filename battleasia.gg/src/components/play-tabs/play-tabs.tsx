@@ -48,6 +48,10 @@ export function PlayTabs({
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
         overflowX: 'auto',
+        WebkitOverflowScrolling: 'touch',
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+        '&::-webkit-scrollbar': { display: 'none' },
       }}
     >
       {tabs.map((tab) => {
@@ -57,12 +61,14 @@ export function PlayTabs({
             key={tab.value}
             onClick={() => handleTabChange(tab.value)}
             sx={{
-              px: { xs: 2, md: 3 },
-              py: 1.25,
+              px: { xs: 1.25, md: 3 },
+              py: { xs: 1, md: 1.25 },
               cursor: 'pointer',
               position: 'relative',
               borderRadius: `${GLASS_CARD_RADIUS - 2}px`,
-              flexShrink: 0,
+              flex: { xs: '1 1 0', md: '0 0 auto' },
+              minWidth: 0,
+              textAlign: 'center',
               bgcolor: isActive ? alpha(GOLD, 0.14) : 'transparent',
               border: isActive ? `1px solid ${alpha(GOLD, 0.35)}` : '1px solid transparent',
               transition: 'background-color 0.25s ease, border-color 0.25s ease',
@@ -77,9 +83,12 @@ export function PlayTabs({
               sx={{
                 color: isActive ? GOLD : alpha('#ffffff', 0.55),
                 fontWeight: isActive ? 800 : 500,
-                letterSpacing: 0.6,
+                letterSpacing: { xs: 0.2, md: 0.6 },
                 textTransform: 'uppercase',
-                fontSize: { xs: 12, md: 13 },
+                fontSize: { xs: 11, md: 13 },
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
               }}
             >
               {tab.label}

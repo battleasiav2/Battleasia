@@ -32,24 +32,37 @@ const GOLD = '#f5c518';
 const FAB_SIZE = 56;
 const POS_STORAGE_KEY = 'ba-support-chat-pos';
 const DRAG_THRESHOLD_PX = 8;
+/** Floating footer / public mobile nav sits ~bottom 12 + ~64 bar height */
+const MOBILE_BOTTOM_NAV_CLEARANCE = 84;
 
 type FabPos = { x: number; y: number };
 
+function getMobileBottomClearance() {
+  if (typeof window === 'undefined') return 0;
+  // Match PublicMobileNav (lg) and FloatingFooterNav (md) — use lg so both stay clear
+  return window.innerWidth < 1200 ? MOBILE_BOTTOM_NAV_CLEARANCE : 0;
+}
+
 function getDefaultFabPos(): FabPos {
   if (typeof window === 'undefined') return { x: 24, y: 24 };
-  const margin = window.innerWidth < 900 ? 16 : 28;
+  const margin = window.innerWidth < 1200 ? 16 : 28;
+  const bottomClearance = getMobileBottomClearance();
   return {
     x: window.innerWidth - FAB_SIZE - margin,
-    y: window.innerHeight - FAB_SIZE - margin,
+    y: window.innerHeight - FAB_SIZE - margin - bottomClearance,
   };
 }
 
 function clampFabPos(pos: FabPos): FabPos {
   if (typeof window === 'undefined') return pos;
   const pad = 8;
+  const bottomClearance = getMobileBottomClearance();
   return {
     x: Math.min(Math.max(pad, pos.x), window.innerWidth - FAB_SIZE - pad),
-    y: Math.min(Math.max(pad, pos.y), window.innerHeight - FAB_SIZE - pad),
+    y: Math.min(
+      Math.max(pad, pos.y),
+      window.innerHeight - FAB_SIZE - pad - bottomClearance
+    ),
   };
 }
 
