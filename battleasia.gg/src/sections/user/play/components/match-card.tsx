@@ -21,7 +21,6 @@ import {
 import { USER_COLORS, userGoldButtonSx } from 'src/layouts/user';
 
 import { MatchStatPill } from './match-stat-pill';
-import { MatchEntryWinTile } from './match-entry-win-tile';
 import { MatchRoomDialog } from './match-room-dialog';
 import { estimateMatchWinningPool } from '../match-prize-utils';
 import { getMatchBannerUrl, type MatchCardProps } from '../match-types';
@@ -156,19 +155,43 @@ export function MatchCard({
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'minmax(0, 1.65fr) minmax(0, 0.9fr)' },
-            gap: 1.25,
+            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+            gap: 1,
             alignItems: 'stretch',
           }}
         >
-          <MatchEntryWinTile entryFee={match.entryFee ?? 0} winningAmount={winningPool} />
-          <MatchStatPill label={t('match.perKill')} minHeight={88} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <CoinValue
-              value={match.perKill ?? 0}
-              size={15}
-              textSx={{ fontSize: 14, fontWeight: 700, color: USER_COLORS.textPrimary }}
-            />
-          </MatchStatPill>
+          {(
+            [
+              { label: t('match.entryFee'), value: match.entryFee ?? 0 },
+              { label: t('match.prizePool'), value: winningPool },
+              { label: t('match.perKill'), value: match.perKill ?? 0 },
+            ] as const
+          ).map((stat) => (
+            <MatchStatPill
+              key={stat.label}
+              label={stat.label}
+              minHeight={72}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                minWidth: 0,
+              }}
+            >
+              <CoinValue
+                value={stat.value}
+                size={14}
+                spacing={0.4}
+                textSx={{
+                  fontSize: 13,
+                  fontWeight: 700,
+                  color: USER_COLORS.textPrimary,
+                  whiteSpace: 'nowrap',
+                  lineHeight: 1.15,
+                }}
+              />
+            </MatchStatPill>
+          ))}
         </Box>
 
         {!isResult ? (

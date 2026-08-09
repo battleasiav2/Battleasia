@@ -18,7 +18,14 @@ export function MatchStatPill({ label, children, minHeight = 64, sx }: MatchStat
   const tokens = getDefaultGlassTokens();
 
   return (
-    <Box sx={getGlassInnerSx(tokens, { p: 1.25, minHeight, ...((sx as object) || {}) })}>
+    <Box
+      sx={getGlassInnerSx(tokens, {
+        p: 1.25,
+        minHeight,
+        boxSizing: 'border-box',
+        ...((sx as object) || {}),
+      })}
+    >
       <Typography
         sx={{
           fontSize: 9,
@@ -26,12 +33,25 @@ export function MatchStatPill({ label, children, minHeight = 64, sx }: MatchStat
           letterSpacing: 0.7,
           color: USER_COLORS.textMuted,
           textTransform: 'uppercase',
-          mb: 0.5,
+          lineHeight: 1.2,
+          mb: 0.75,
+          minHeight: 14,
         }}
       >
         {label}
       </Typography>
-      <Box sx={{ fontSize: 13, fontWeight: 700, color: USER_COLORS.textPrimary }}>{children}</Box>
+      <Box
+        sx={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: USER_COLORS.textPrimary,
+          display: 'flex',
+          alignItems: 'center',
+          minHeight: 20,
+        }}
+      >
+        {children}
+      </Box>
     </Box>
   );
 }
