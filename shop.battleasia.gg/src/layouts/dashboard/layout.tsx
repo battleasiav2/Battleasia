@@ -12,6 +12,7 @@ import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
 import { useSelector } from 'src/store';
+import { allLangs } from 'src/locales';
 
 import { Logo } from 'src/components/logo';
 import { SiteScrollProgress } from 'src/components/animate';
@@ -209,15 +210,7 @@ export function DashboardLayout({
           )}
 
           {/** @slot Language popover */}
-          <LanguagePopover
-            data={[
-              { value: 'en', label: 'English', countryCode: 'GB' },
-              { value: 'fr', label: 'French', countryCode: 'FR' },
-              { value: 'vi', label: 'Vietnamese', countryCode: 'VN' },
-              { value: 'cn', label: 'Chinese', countryCode: 'CN' },
-              { value: 'ar', label: 'Arabic', countryCode: 'SA' },
-            ]}
-          />
+          <LanguagePopover data={allLangs} />
 
           {/** @slot Settings button */}
           {/* <SettingsButton /> */}

@@ -12,7 +12,7 @@ import { useRouter, usePathname } from 'src/routes/hooks';
 
 import { useSelector } from 'src/store';
 import { CONFIG } from 'src/global-config';
-import { useTranslate } from 'src/locales/use-locales';
+import { allLangs, useTranslate } from 'src/locales';
 
 import { Logo } from 'src/components/logo';
 import { AnimatedBalance } from 'src/components/animated-balance';
@@ -307,15 +307,7 @@ export function UserLayout({
           )}
 
           {/** @slot Language popover */}
-          <LanguagePopover
-            data={[
-              { value: 'en', label: 'English', countryCode: 'GB' },
-              { value: 'fr', label: 'French', countryCode: 'FR' },
-              { value: 'vi', label: 'Vietnamese', countryCode: 'VN' },
-              { value: 'cn', label: 'Chinese', countryCode: 'CN' },
-              { value: 'ar', label: 'Arabic', countryCode: 'SA' },
-            ]}
-          />
+          <LanguagePopover data={allLangs} />
         </Box>
       ),
     };
