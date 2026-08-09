@@ -25,10 +25,9 @@ import {
 import { Image } from 'src/components/image';
 import { Iconify } from 'src/components/iconify';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
-import { useSelector } from 'src/store';
 
 import { ShopHero, ShopDetailSkeleton } from './components';
-import { buildBacShopUrl } from './shop-constants';
+import { getBacShopEntryUrl } from './shop-constants';
 
 // ----------------------------------------------------------------------
 
@@ -54,34 +53,8 @@ export function ShopDetailView() {
   const navigate = useNavigate();
   const api = useApi();
   const { t } = useTranslate();
-  const { token, isLoggedIn } = useSelector((state) => state.auth);
-  const [shopHref, setShopHref] = useState(() => buildBacShopUrl(token));
+  const shopHref = useMemo(() => getBacShopEntryUrl(), []);
   const tokens = getDefaultGlassTokens();
-
-  useEffect(() => {
-    let cancelled = false;
-    const resolveHref = async () => {
-      if (token) {
-        if (!cancelled) setShopHref(buildBacShopUrl(token));
-        return;
-      }
-      if (!isLoggedIn) {
-        if (!cancelled) setShopHref(buildBacShopUrl(null));
-        return;
-      }
-      try {
-        const res = await api.shopHandoffApi();
-        const handoffToken = res?.data?.session?.accessToken as string | undefined;
-        if (!cancelled) setShopHref(buildBacShopUrl(handoffToken));
-      } catch {
-        if (!cancelled) setShopHref(buildBacShopUrl(null));
-      }
-    };
-    resolveHref();
-    return () => {
-      cancelled = true;
-    };
-  }, [api, isLoggedIn, token]);
 
   const [item, setItem] = useState<ShopItemData | null>(null);
   const [loading, setLoading] = useState(true);

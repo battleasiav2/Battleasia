@@ -40,7 +40,6 @@ export type IFeedsParams = {
 
 export type ApiContextType = {
     initialize: () => Promise<any>;
-    shopHandoffApi: () => Promise<any>;
     registerApi: (data: RegisterData) => Promise<any>;
     loginApi: (data: LoginData) => Promise<any>;
     

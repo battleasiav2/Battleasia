@@ -1,13 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { merge } from 'es-toolkit';
 
 import { Alert } from '@mui/material';
 import { alpha, useTheme, type Breakpoint } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
-import { useRouter } from 'src/routes/hooks';
+import { useRouter, useSearchParams } from 'src/routes/hooks';
 
-import { useSelector } from 'src/store';
+import { useSelector, useDispatch } from 'src/store';
+import { logoutAction } from 'src/store/reducers/auth';
+import axios from 'src/lib/axios';
 
 import { AuthSplitSection } from './section';
 import { AUTH_BG_IMAGE } from 'src/sections/auth/auth-form-styles';
@@ -46,16 +48,43 @@ export function AuthSplitLayout({
 }: AuthSplitLayoutProps) {
   const theme = useTheme();
   const router = useRouter();
-
+  const dispatch = useDispatch();
+  const searchParams = useSearchParams();
   const { isLoggedIn } = useSelector((state) => state.auth);
+  const [reauthDone, setReauthDone] = useState(() => searchParams.get('reauth') !== '1');
+
+  // Main app / Docker entry: always force a fresh shop login
+  useEffect(() => {
+    if (searchParams.get('reauth') !== '1') {
+      setReauthDone(true);
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        await axios.post('api/v2/users/logout').catch(() => undefined);
+      } finally {
+        if (!cancelled) {
+          dispatch(logoutAction());
+          router.replace(paths.auth.signIn);
+          setReauthDone(true);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [dispatch, router, searchParams]);
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (reauthDone && isLoggedIn) {
       router.replace(paths.user.shop);
     }
-  }, [isLoggedIn, router]);
+  }, [isLoggedIn, reauthDone, router]);
 
-  if (isLoggedIn) {
+  if (!reauthDone || isLoggedIn) {
     return null;
   }
 

@@ -1,19 +1,17 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo } from 'react';
 
 import { alpha } from '@mui/material/styles';
 import { Box, Stack, Typography, Grid2 as Grid } from '@mui/material';
 
 import { useTranslate } from 'src/locales/use-locales';
 import { useImagePreloader } from 'src/hooks';
-import useApi from 'src/hooks/use-api';
-import { useSelector } from 'src/store';
 import { USER_COLORS, UserPageShell, UserActionButton, UserGlassCard } from 'src/layouts/user';
 
 import { Iconify } from 'src/components/iconify';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
 import { ShopDetailsCarousel } from './shop-details-carousel';
-import { SHOP_HERO_IMAGE, SHOP_IMAGE_PATHS, SHOP_EXTERNAL_URL, buildBacShopUrl } from './shop-constants';
+import { SHOP_HERO_IMAGE, SHOP_IMAGE_PATHS, getBacShopEntryUrl } from './shop-constants';
 import { ShopFeatures, ShopArenaHero, ShopPageSkeleton } from './components';
 
 // ----------------------------------------------------------------------
@@ -24,41 +22,12 @@ export { SHOP_IMAGE_PATHS } from './shop-constants';
 
 export function ShopView() {
   const { t } = useTranslate();
-  const api = useApi();
-  const { token, isLoggedIn } = useSelector((state) => state.auth);
-  const [shopHref, setShopHref] = useState(() => buildBacShopUrl(token));
+  const shopHref = useMemo(() => getBacShopEntryUrl(), []);
 
   const { isLoaded } = useImagePreloader([SHOP_HERO_IMAGE], {
     delay: 200,
     continueOnError: true,
   });
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const resolveHref = async () => {
-      if (token) {
-        if (!cancelled) setShopHref(buildBacShopUrl(token));
-        return;
-      }
-      if (!isLoggedIn) {
-        if (!cancelled) setShopHref(SHOP_EXTERNAL_URL);
-        return;
-      }
-      try {
-        const res = await api.shopHandoffApi();
-        const handoffToken = res?.data?.session?.accessToken as string | undefined;
-        if (!cancelled) setShopHref(buildBacShopUrl(handoffToken));
-      } catch {
-        if (!cancelled) setShopHref(SHOP_EXTERNAL_URL);
-      }
-    };
-
-    resolveHref();
-    return () => {
-      cancelled = true;
-    };
-  }, [api, isLoggedIn, token]);
 
   const features = useMemo(
     () => [
