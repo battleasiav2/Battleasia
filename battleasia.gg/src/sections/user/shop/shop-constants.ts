@@ -17,3 +17,17 @@ export const SHOP_HERO_IMAGE = '/assets/images/shop/bac-store-hero.webp';
 export const SHOP_EXTERNAL_URL =
   import.meta.env.VITE_BAC_SHOP_URL ||
   (import.meta.env.DEV ? 'http://localhost:8082/user/shop' : '/store/user/shop');
+
+/** Append SSO handoff token so shop opens already signed in (hash — not sent as Referer path). */
+export function buildBacShopUrl(accessToken?: string | null) {
+  if (!accessToken) return SHOP_EXTERNAL_URL;
+
+  try {
+    const url = new URL(SHOP_EXTERNAL_URL, typeof window !== 'undefined' ? window.location.origin : 'http://localhost');
+    url.hash = `ba_handoff=${encodeURIComponent(accessToken)}`;
+    return url.toString();
+  } catch {
+    const joiner = SHOP_EXTERNAL_URL.includes('#') ? '&' : '#';
+    return `${SHOP_EXTERNAL_URL}${joiner}ba_handoff=${encodeURIComponent(accessToken)}`;
+  }
+}

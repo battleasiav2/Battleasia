@@ -388,7 +388,7 @@ export function UserLayout({
               backgroundImage: 'none',
             },
             [theme.breakpoints.down('md')]: {
-              pb: 10,
+              pb: 14,
             },
           },
         },

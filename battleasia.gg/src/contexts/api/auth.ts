@@ -4,6 +4,9 @@ import type { LoginData, RegisterData } from '../type';
 
 export const initialize = () => axios.get('api/v2/users/me');
 
+/** Mint a Bearer token from the current cookie/session for shop SSO handoff */
+export const shopHandoffApi = () => axios.post('api/v2/users/shop-handoff');
+
 export const loginApi = (data: LoginData) => axios.post('api/v2/users/signin', data);
 
 export const registerApi = (data: RegisterData) => axios.post('api/v2/users/signup', data);

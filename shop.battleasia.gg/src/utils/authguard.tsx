@@ -6,6 +6,8 @@ import { useRouter } from 'src/routes/hooks';
 
 import { useSelector, useDispatch } from 'src/store';
 
+import { hasPendingAuthHandoff } from './auth-handoff';
+
 type GuardProps = {
   children: ReactElement | null;
 };
@@ -14,12 +16,13 @@ const AuthGuard = ({ children }: GuardProps) => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { isLoggedIn } = useSelector((state) => state.auth);
+  const handoffPending = hasPendingAuthHandoff();
 
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn && !handoffPending) {
       router.push(paths.auth.signIn);
     }
-  }, [isLoggedIn, dispatch, router]);
+  }, [isLoggedIn, handoffPending, dispatch, router]);
 
   if (!isLoggedIn) {
     return null;

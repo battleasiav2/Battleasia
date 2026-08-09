@@ -25,9 +25,10 @@ import {
 import { Image } from 'src/components/image';
 import { Iconify } from 'src/components/iconify';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
+import { useSelector } from 'src/store';
 
 import { ShopHero, ShopDetailSkeleton } from './components';
-import { SHOP_EXTERNAL_URL } from './shop-constants';
+import { buildBacShopUrl } from './shop-constants';
 
 // ----------------------------------------------------------------------
 
@@ -53,7 +54,34 @@ export function ShopDetailView() {
   const navigate = useNavigate();
   const api = useApi();
   const { t } = useTranslate();
+  const { token, isLoggedIn } = useSelector((state) => state.auth);
+  const [shopHref, setShopHref] = useState(() => buildBacShopUrl(token));
   const tokens = getDefaultGlassTokens();
+
+  useEffect(() => {
+    let cancelled = false;
+    const resolveHref = async () => {
+      if (token) {
+        if (!cancelled) setShopHref(buildBacShopUrl(token));
+        return;
+      }
+      if (!isLoggedIn) {
+        if (!cancelled) setShopHref(buildBacShopUrl(null));
+        return;
+      }
+      try {
+        const res = await api.shopHandoffApi();
+        const handoffToken = res?.data?.session?.accessToken as string | undefined;
+        if (!cancelled) setShopHref(buildBacShopUrl(handoffToken));
+      } catch {
+        if (!cancelled) setShopHref(buildBacShopUrl(null));
+      }
+    };
+    resolveHref();
+    return () => {
+      cancelled = true;
+    };
+  }, [api, isLoggedIn, token]);
 
   const [item, setItem] = useState<ShopItemData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -137,7 +165,7 @@ export function ShopDetailView() {
         subtitle={t('shop.detailSubtitle')}
         action={
           <UserActionButton
-            href={SHOP_EXTERNAL_URL}
+            href={shopHref}
             target="_blank"
             rel="noopener noreferrer"
             actionVariant="gold"
@@ -151,7 +179,7 @@ export function ShopDetailView() {
 
       <Stack sx={{ mb: 2.5, display: { xs: 'flex', md: 'none' } }}>
         <UserActionButton
-          href={SHOP_EXTERNAL_URL}
+          href={shopHref}
           target="_blank"
           rel="noopener noreferrer"
           actionVariant="gold"
@@ -302,7 +330,7 @@ export function ShopDetailView() {
             ) : null}
 
             <UserActionButton
-              href={SHOP_EXTERNAL_URL}
+              href={shopHref}
               target="_blank"
               rel="noopener noreferrer"
               actionVariant="gold"

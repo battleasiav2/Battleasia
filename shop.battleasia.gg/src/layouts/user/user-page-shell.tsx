@@ -45,7 +45,7 @@ export function UserPageShell({
           bgcolor: USER_COLORS.pageBg,
           color: USER_COLORS.textBody,
           pt: disablePadding ? 0 : { xs: 12, sm: 14, md: 16 },
-          pb: disablePadding ? 0 : { xs: 12, sm: 12, md: 6 },
+          pb: disablePadding ? 0 : { xs: 16, sm: 14, md: 6 },
           minHeight: '100%',
           overflow: 'clip',
           '&::before': overlays.before,

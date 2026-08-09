@@ -1,17 +1,19 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 import { alpha } from '@mui/material/styles';
 import { Box, Stack, Typography, Grid2 as Grid } from '@mui/material';
 
 import { useTranslate } from 'src/locales/use-locales';
 import { useImagePreloader } from 'src/hooks';
+import useApi from 'src/hooks/use-api';
+import { useSelector } from 'src/store';
 import { USER_COLORS, UserPageShell, UserActionButton, UserGlassCard } from 'src/layouts/user';
 
 import { Iconify } from 'src/components/iconify';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
 import { ShopDetailsCarousel } from './shop-details-carousel';
-import { SHOP_HERO_IMAGE, SHOP_IMAGE_PATHS, SHOP_EXTERNAL_URL } from './shop-constants';
+import { SHOP_HERO_IMAGE, SHOP_IMAGE_PATHS, SHOP_EXTERNAL_URL, buildBacShopUrl } from './shop-constants';
 import { ShopFeatures, ShopArenaHero, ShopPageSkeleton } from './components';
 
 // ----------------------------------------------------------------------
@@ -22,11 +24,41 @@ export { SHOP_IMAGE_PATHS } from './shop-constants';
 
 export function ShopView() {
   const { t } = useTranslate();
+  const api = useApi();
+  const { token, isLoggedIn } = useSelector((state) => state.auth);
+  const [shopHref, setShopHref] = useState(() => buildBacShopUrl(token));
 
   const { isLoaded } = useImagePreloader([SHOP_HERO_IMAGE], {
     delay: 200,
     continueOnError: true,
   });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const resolveHref = async () => {
+      if (token) {
+        if (!cancelled) setShopHref(buildBacShopUrl(token));
+        return;
+      }
+      if (!isLoggedIn) {
+        if (!cancelled) setShopHref(SHOP_EXTERNAL_URL);
+        return;
+      }
+      try {
+        const res = await api.shopHandoffApi();
+        const handoffToken = res?.data?.session?.accessToken as string | undefined;
+        if (!cancelled) setShopHref(buildBacShopUrl(handoffToken));
+      } catch {
+        if (!cancelled) setShopHref(SHOP_EXTERNAL_URL);
+      }
+    };
+
+    resolveHref();
+    return () => {
+      cancelled = true;
+    };
+  }, [api, isLoggedIn, token]);
 
   const features = useMemo(
     () => [
@@ -71,7 +103,7 @@ export function ShopView() {
         imageUrl={SHOP_HERO_IMAGE}
         verifiedLabel={t('shop.badgeVerified')}
         ctaLabel={t('shop.goToBacShop')}
-        ctaHref={SHOP_EXTERNAL_URL}
+        ctaHref={shopHref}
         stats={[
           { label: t('shop.currency'), value: 'BAC' },
           { label: t('shop.settlement'), value: t('common.instant') },
@@ -148,82 +180,82 @@ export function ShopView() {
                 }}
               >
                 <Stack spacing={2} sx={{ height: 1 }}>
-                <Typography
-                  className="font-tr"
-                  sx={{
-                    fontSize: 16,
-                    fontWeight: 800,
-                    textTransform: 'uppercase',
-                    color: USER_COLORS.textPrimary,
-                    letterSpacing: 0.4,
-                  }}
-                >
-                  {t('shop.officialPartner')}
-                </Typography>
-
-                <Typography sx={{ fontSize: 13, color: USER_COLORS.textMuted, lineHeight: 1.65 }}>
-                  {t('shop.bacDescription')}
-                </Typography>
-
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  spacing={1.25}
-                  sx={{
-                    p: 1.5,
-                    border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
-                    bgcolor: alpha(USER_COLORS.gold, 0.06),
-                  }}
-                >
-                  <Box
+                  <Typography
+                    className="font-tr"
                     sx={{
-                      width: 44,
-                      height: 44,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      bgcolor: alpha(USER_COLORS.gold, 0.12),
-                      border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
-                      color: USER_COLORS.gold,
+                      fontSize: 16,
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      color: USER_COLORS.textPrimary,
+                      letterSpacing: 0.4,
                     }}
                   >
-                    <Iconify icon="solar:wallet-money-bold-duotone" width={22} />
-                  </Box>
-                  <Box>
-                    <Typography
+                    {t('shop.officialPartner')}
+                  </Typography>
+
+                  <Typography sx={{ fontSize: 13, color: USER_COLORS.textMuted, lineHeight: 1.65 }}>
+                    {t('shop.partnerBlurb')}
+                  </Typography>
+
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={1.25}
+                    sx={{
+                      p: 1.5,
+                      border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
+                      bgcolor: alpha(USER_COLORS.gold, 0.06),
+                    }}
+                  >
+                    <Box
                       sx={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        letterSpacing: 0.6,
-                        textTransform: 'uppercase',
-                        color: USER_COLORS.textMuted,
+                        width: 44,
+                        height: 44,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        bgcolor: alpha(USER_COLORS.gold, 0.12),
+                        border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
+                        color: USER_COLORS.gold,
                       }}
                     >
-                      {t('shop.currency')}
-                    </Typography>
-                    <Typography sx={{ fontSize: 15, fontWeight: 800, color: USER_COLORS.gold }}>
-                      BAC
-                    </Typography>
-                  </Box>
-                </Stack>
+                      <Iconify icon="solar:wallet-money-bold-duotone" width={22} />
+                    </Box>
+                    <Box>
+                      <Typography
+                        sx={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          letterSpacing: 0.6,
+                          textTransform: 'uppercase',
+                          color: USER_COLORS.textMuted,
+                        }}
+                      >
+                        {t('shop.currency')}
+                      </Typography>
+                      <Typography sx={{ fontSize: 15, fontWeight: 800, color: USER_COLORS.gold }}>
+                        BAC
+                      </Typography>
+                    </Box>
+                  </Stack>
 
-                <UserActionButton
-                  href={SHOP_EXTERNAL_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  actionVariant="gold"
-                  size="large"
-                  fullWidth
-                  startIcon={<Iconify icon="solar:arrow-right-up-bold" width={18} />}
-                  sx={{
-                    mt: 'auto',
-                    height: { xs: 48, md: 52 },
-                    fontSize: { xs: 13, md: 14 },
-                    borderRadius: 0,
-                  }}
-                >
-                  {t('shop.goToBacShop')}
-                </UserActionButton>
+                  <UserActionButton
+                    href={shopHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    actionVariant="gold"
+                    size="large"
+                    fullWidth
+                    startIcon={<Iconify icon="solar:arrow-right-up-bold" width={18} />}
+                    sx={{
+                      mt: 'auto',
+                      height: { xs: 48, md: 52 },
+                      fontSize: { xs: 13, md: 14 },
+                      borderRadius: 0,
+                    }}
+                  >
+                    {t('shop.goToBacShop')}
+                  </UserActionButton>
                 </Stack>
               </UserGlassCard>
             </Grid>

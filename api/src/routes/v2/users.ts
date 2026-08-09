@@ -601,6 +601,20 @@ router.get('/me', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
+/** Short-lived SSO token for opening shop.battleasia in a new tab (cookie session → Bearer handoff). */
+router.post('/shop-handoff', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    if (!req.userId) {
+      return res.status(401).json({ status: false, message: 'Unauthorized' });
+    }
+    const accessToken = signToken(req.userId);
+    return res.json({ status: true, session: { accessToken } });
+  } catch (error) {
+    console.error('shop-handoff error:', error);
+    return res.status(500).json({ status: false, message: 'Shop handoff failed' });
+  }
+});
+
 router.put('/me', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const user = await User.findById(req.userId);
