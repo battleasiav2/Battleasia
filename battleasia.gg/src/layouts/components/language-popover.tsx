@@ -50,13 +50,13 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         paper: {
           sx: {
             p: 0,
-            width: 280,
+            width: 196,
             overflow: 'hidden',
             borderRadius: 0,
             bgcolor: alpha('#000000', 0.94),
             border: `1px solid ${alpha('#ffffff', 0.08)}`,
-            boxShadow: `0 20px 50px ${alpha('#000000', 0.55)}`,
-            backdropFilter: 'blur(16px)',
+            boxShadow: `0 12px 32px ${alpha('#000000', 0.45)}`,
+            backdropFilter: 'blur(12px)',
           },
         },
         arrow: { hide: true },
@@ -67,26 +67,28 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         alignItems="center"
         justifyContent="space-between"
         sx={{
-          px: 2,
-          py: 1.75,
+          px: 1.25,
+          py: 0.75,
           borderBottom: `1px solid ${alpha('#ffffff', 0.07)}`,
         }}
       >
         <Typography
           className="font-tr"
           sx={{
-            color: GOLD,
-            fontWeight: 700,
-            fontSize: 22,
+            color: alpha(GOLD, 0.9),
+            fontWeight: 600,
+            fontSize: 11,
             lineHeight: 1,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
           }}
         >
           Language
         </Typography>
         <Typography
           sx={{
-            color: alpha('#ffffff', 0.45),
-            fontSize: 14,
+            color: alpha('#ffffff', 0.35),
+            fontSize: 10,
             fontWeight: 500,
           }}
         >
@@ -97,6 +99,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
       <Stack divider={<Box sx={{ height: '1px', bgcolor: alpha('#ffffff', 0.06) }} />}>
         {data.map((option) => {
           const isSelected = option.value === currentLang?.value;
+          const meta = getLangMeta(option.value);
 
           return (
             <ButtonBase
@@ -107,9 +110,9 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                gap: 1.5,
-                px: 2,
-                py: 1.35,
+                gap: 1,
+                px: 1.25,
+                py: 0.75,
                 textAlign: 'left',
                 bgcolor: isSelected ? alpha(GOLD, 0.1) : 'transparent',
                 transition: 'background-color 0.2s ease',
@@ -118,62 +121,52 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                 },
               }}
             >
-              <Stack direction="row" alignItems="center" spacing={1.5} sx={{ minWidth: 0 }}>
+              <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0 }}>
                 <Box
                   sx={{
-                    width: 36,
-                    height: 24,
+                    width: 22,
+                    height: 15,
                     borderRadius: 0,
                     overflow: 'hidden',
                     flexShrink: 0,
-                    boxShadow: `0 1px 4px ${alpha('#000000', 0.35)}`,
+                    boxShadow: `0 1px 3px ${alpha('#000000', 0.3)}`,
                   }}
                 >
-                  <FlagIcon code={option.countryCode} sx={{ width: 36, height: 24 }} />
+                  <FlagIcon code={option.countryCode} sx={{ width: 22, height: 15 }} />
                 </Box>
 
-                <Box sx={{ minWidth: 0 }}>
+                <Box sx={{ minWidth: 0, display: 'flex', alignItems: 'baseline', gap: 0.5 }}>
                   <Typography
                     className="font-tr"
+                    noWrap
                     sx={{
                       color: isSelected ? GOLD : '#f3f3f3',
-                      fontSize: 16,
-                      fontWeight: isSelected ? 700 : 500,
+                      fontSize: 13,
+                      fontWeight: isSelected ? 600 : 500,
                       lineHeight: 1.2,
                     }}
                   >
                     {option.label}
                   </Typography>
                   <Typography
+                    component="span"
                     sx={{
-                      color: alpha('#ffffff', 0.42),
-                      fontSize: 12,
+                      color: alpha('#ffffff', 0.35),
+                      fontSize: 10,
                       fontWeight: 500,
                       letterSpacing: '0.04em',
-                      mt: 0.2,
+                      flexShrink: 0,
                     }}
                   >
-                    {getLangMeta(option.value)}
+                    {meta}
                   </Typography>
                 </Box>
               </Stack>
 
               {isSelected ? (
-                <Box
-                  sx={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 0,
-                    bgcolor: GOLD,
-                    display: 'grid',
-                    placeItems: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Iconify icon="eva:checkmark-fill" width={18} sx={{ color: '#111' }} />
-                </Box>
+                <Iconify icon="eva:checkmark-fill" width={14} sx={{ color: GOLD, flexShrink: 0 }} />
               ) : (
-                <Box sx={{ width: 28, height: 28, flexShrink: 0 }} />
+                <Box sx={{ width: 14, flexShrink: 0 }} />
               )}
             </ButtonBase>
           );
