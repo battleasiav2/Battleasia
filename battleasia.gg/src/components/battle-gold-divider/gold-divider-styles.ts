@@ -58,7 +58,9 @@ export function getGoldDividerSx(options?: GoldDividerOptions): SxProps<Theme> {
 
   return {
     position: 'relative',
+    display: 'block',
     mt,
+    mx: 'auto',
     width,
     height: 1.5,
     borderRadius: 999,
