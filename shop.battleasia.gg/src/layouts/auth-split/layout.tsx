@@ -9,7 +9,6 @@ import { useRouter, useSearchParams } from 'src/routes/hooks';
 
 import { useSelector, useDispatch } from 'src/store';
 import { logoutAction } from 'src/store/reducers/auth';
-import axios from 'src/lib/axios';
 
 import { AuthSplitSection } from './section';
 import { AUTH_BG_IMAGE } from 'src/sections/auth/auth-form-styles';
@@ -53,29 +52,23 @@ export function AuthSplitLayout({
   const { isLoggedIn } = useSelector((state) => state.auth);
   const [reauthDone, setReauthDone] = useState(() => searchParams.get('reauth') !== '1');
 
-  // Main app / Docker entry: always force a fresh shop login
+  // Main app / Docker / domain entry: always force a fresh shop login.
+  // Clear shop Redux only — do NOT hit API logout (same-domain `/store`
+  // shares the auth cookie with the main app).
   useEffect(() => {
     if (searchParams.get('reauth') !== '1') {
       setReauthDone(true);
       return;
     }
 
-    let cancelled = false;
-    (async () => {
-      try {
-        await axios.post('api/v2/users/logout').catch(() => undefined);
-      } finally {
-        if (!cancelled) {
-          dispatch(logoutAction());
-          router.replace(paths.auth.signIn);
-          setReauthDone(true);
-        }
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
+    dispatch(logoutAction());
+    try {
+      localStorage.removeItem('persist:battleasia-shop');
+    } catch {
+      // ignore storage errors
+    }
+    router.replace(paths.auth.signIn);
+    setReauthDone(true);
   }, [dispatch, router, searchParams]);
 
   useEffect(() => {

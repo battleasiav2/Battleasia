@@ -10,8 +10,10 @@ const stripTokenTransform = createTransform(
   { whitelist: ['auth'] }
 );
 
+// Separate from main app (`battleasia`) so same-domain `/store` deploy
+// does not inherit main-site login and skip shop sign-in.
 const persistConfig = {
-  key: 'battleasia',
+  key: 'battleasia-shop',
   storage,
   whitelist: ['auth'],
   transforms: [stripTokenTransform],
