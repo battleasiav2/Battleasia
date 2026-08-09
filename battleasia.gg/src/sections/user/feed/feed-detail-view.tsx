@@ -32,7 +32,13 @@ import {
   UserEmptyState,
   USER_COLORS,
   userMutedTextSx,
-  userGlassDialogPaperSx,
+  userMenuPaperSx,
+  userPolishedDialogPaperSx,
+  userPolishedDialogRailSx,
+  userPolishedDialogTitleSx,
+  userPolishedDialogEyebrowSx,
+  userPolishedDialogHeadingSx,
+  userPolishedDialogCloseButtonSx,
 } from 'src/layouts/user';
 
 import { Image } from 'src/components/image';
@@ -685,32 +691,20 @@ export function FeedDetailView() {
             fullWidth
             PaperProps={{
               sx: {
-                ...(userGlassDialogPaperSx as object),
+                ...userPolishedDialogPaperSx,
                 maxHeight: '90vh',
                 height: '90vh',
-                borderRadius: 2,
-                display: 'flex',
-                flexDirection: 'column',
               },
             }}
           >
-            <DialogTitle
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                pb: 1,
-                borderBottom: `1px solid ${USER_COLORS.border}`,
-              }}
-            >
-              <Typography variant="h6" sx={{ fontWeight: 700, color: USER_COLORS.textPrimary }}>
-                Comments
-              </Typography>
-              <IconButton
-                onClick={() => setCommentsOpen(false)}
-                sx={feedIconButtonSx}
-              >
-                <Iconify icon="eva:close-fill" width={24} />
+            <Box sx={userPolishedDialogRailSx} />
+            <DialogTitle sx={userPolishedDialogTitleSx}>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography sx={userPolishedDialogEyebrowSx}>Feed</Typography>
+                <Typography sx={userPolishedDialogHeadingSx}>Comments</Typography>
+              </Box>
+              <IconButton onClick={() => setCommentsOpen(false)} sx={userPolishedDialogCloseButtonSx}>
+                <Iconify icon="eva:close-fill" width={20} />
               </IconButton>
             </DialogTitle>
 
@@ -722,6 +716,7 @@ export function FeedDetailView() {
                 p: 0,
                 display: 'flex',
                 flexDirection: 'column',
+                borderColor: alpha('#ffffff', 0.08),
               }}
             >
               {commentLoading ? (
@@ -839,13 +834,11 @@ export function FeedDetailView() {
                 slotProps={{
                   paper: {
                     sx: {
+                      ...userMenuPaperSx,
                       width: 320,
                       maxHeight: 400,
                       overflow: 'auto',
                       p: 1.5,
-                      bgcolor: alpha(USER_COLORS.surface, 0.96),
-                      border: `1px solid ${USER_COLORS.border}`,
-                      backdropFilter: 'blur(16px)',
                     },
                   },
                 }}

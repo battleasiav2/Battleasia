@@ -27,6 +27,8 @@ import {
   UserEmptyState,
   USER_COLORS,
   userMutedTextSx,
+  userPolishedDialogRailSx,
+  userPolishedDialogEyebrowSx,
 } from 'src/layouts/user';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
@@ -645,7 +647,11 @@ export function ShopView() {
                     </Grid>
 
             <Dialog open={!!selectedItem} onClose={handleCloseModal} maxWidth="md" fullWidth PaperProps={{ sx: SHOP_DIALOG_PAPER_SX }}>
-                <DialogTitle sx={SHOP_DIALOG_TITLE_SX}>Security Payment</DialogTitle>
+                <Box sx={userPolishedDialogRailSx} />
+                <DialogTitle sx={{ px: { xs: 2.5, md: 3 }, pt: { xs: 2.25, md: 2.75 }, pb: 1.25 }}>
+                    <Typography sx={userPolishedDialogEyebrowSx}>Shop</Typography>
+                    <Typography sx={SHOP_DIALOG_TITLE_SX}>Security Payment</Typography>
+                </DialogTitle>
                 <DialogContent dividers sx={SHOP_DIALOG_CONTENT_SX}>
                     {selectedItem && (
                         <MuiGrid container spacing={3}>
@@ -970,7 +976,11 @@ export function ShopView() {
                 fullWidth
                 PaperProps={{ sx: SHOP_DIALOG_PAPER_SX }}
             >
-                <DialogTitle sx={SHOP_DIALOG_TITLE_SX}>Payment Details</DialogTitle>
+                <Box sx={userPolishedDialogRailSx} />
+                <DialogTitle sx={{ px: { xs: 2.5, md: 3 }, pt: { xs: 2.25, md: 2.75 }, pb: 1.25 }}>
+                    <Typography sx={userPolishedDialogEyebrowSx}>Shop</Typography>
+                    <Typography sx={SHOP_DIALOG_TITLE_SX}>Payment Details</Typography>
+                </DialogTitle>
                 <DialogContent dividers sx={SHOP_DIALOG_CONTENT_SX}>
                     {selectedWallet && (
                         <Stack spacing={3} alignItems="center">

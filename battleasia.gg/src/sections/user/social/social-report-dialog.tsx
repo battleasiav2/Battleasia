@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import {
+  Box,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -14,7 +15,18 @@ import { toast } from 'react-hot-toast';
 
 import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
-import { UserActionButton, USER_COLORS, userFieldSx, userGlassDialogPaperSx } from 'src/layouts/user';
+import {
+  UserActionButton,
+  userFieldSx,
+  userSelectMenuProps,
+  userPolishedDialogPaperSx,
+  userPolishedDialogRailSx,
+  userPolishedDialogTitleSx,
+  userPolishedDialogEyebrowSx,
+  userPolishedDialogHeadingSx,
+  userPolishedDialogContentSx,
+  userPolishedDialogCloseButtonSx,
+} from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
@@ -54,16 +66,27 @@ export function SocialReportDialog({ open, onClose, targetType, targetId }: Soci
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: userGlassDialogPaperSx }}>
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography sx={{ fontWeight: 800, color: USER_COLORS.textPrimary }}>{t('report.title')}</Typography>
-        <IconButton onClick={onClose} sx={{ color: USER_COLORS.textMuted }}>
-          <Iconify icon="eva:close-fill" width={22} />
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: userPolishedDialogPaperSx }}>
+      <Box sx={userPolishedDialogRailSx} />
+      <DialogTitle sx={userPolishedDialogTitleSx}>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography sx={userPolishedDialogEyebrowSx}>Safety</Typography>
+          <Typography sx={userPolishedDialogHeadingSx}>{t('report.title')}</Typography>
+        </Box>
+        <IconButton onClick={onClose} sx={userPolishedDialogCloseButtonSx}>
+          <Iconify icon="eva:close-fill" width={20} />
         </IconButton>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent sx={{ ...userPolishedDialogContentSx, pt: 0 }}>
         <Stack spacing={2}>
-          <TextField select fullWidth value={reason} onChange={(e) => setReason(e.target.value as typeof reason)} sx={userFieldSx}>
+          <TextField
+            select
+            fullWidth
+            value={reason}
+            onChange={(e) => setReason(e.target.value as typeof reason)}
+            sx={userFieldSx}
+            SelectProps={{ MenuProps: userSelectMenuProps }}
+          >
             {REPORT_REASONS.map((item) => (
               <MenuItem key={item} value={item}>
                 {t(`report.reasons.${item}`)}

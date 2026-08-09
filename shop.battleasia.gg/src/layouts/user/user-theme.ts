@@ -113,6 +113,66 @@ export const userGlassDialogPaperSx: SxProps<Theme> = getGlassShellSx(getDefault
   p: 0,
 });
 
+/** Match-join / match-room chrome — gold edge wash + glass shell (use with gold rail). */
+export const userPolishedDialogPaperSx: SxProps<Theme> = {
+  ...userGlassDialogPaperSx,
+  overflow: 'hidden',
+  display: 'flex',
+  flexDirection: 'column',
+  border: `1px solid ${alpha(USER_COLORS.gold, 0.26)}`,
+  backgroundImage: `
+    linear-gradient(180deg, ${alpha(USER_COLORS.gold, 0.07)} 0%, transparent 24%),
+    linear-gradient(180deg, ${alpha('#0a0a0a', 0.97)} 0%, #050505 100%)
+  `,
+};
+
+export const userPolishedDialogRailSx: SxProps<Theme> = {
+  height: 3,
+  flexShrink: 0,
+  background: `linear-gradient(90deg, transparent, ${USER_COLORS.gold}, transparent)`,
+};
+
+export const userPolishedDialogTitleSx: SxProps<Theme> = {
+  display: 'flex',
+  alignItems: 'flex-start',
+  justifyContent: 'space-between',
+  gap: 1.5,
+  px: { xs: 2.5, md: 3 },
+  pt: { xs: 2.25, md: 2.75 },
+  pb: 1.25,
+};
+
+export const userPolishedDialogEyebrowSx: SxProps<Theme> = {
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: 1.1,
+  textTransform: 'uppercase',
+  color: alpha(USER_COLORS.gold, 0.9),
+  mb: 0.5,
+};
+
+export const userPolishedDialogHeadingSx: SxProps<Theme> = {
+  fontSize: { xs: 18, sm: 22 },
+  fontWeight: 800,
+  textTransform: 'uppercase',
+  color: USER_COLORS.textPrimary,
+  lineHeight: 1.15,
+};
+
+export const userPolishedDialogContentSx: SxProps<Theme> = {
+  px: { xs: 2.5, md: 3 },
+  py: 2,
+  borderColor: alpha('#ffffff', 0.08),
+};
+
+export const userPolishedDialogCloseButtonSx: SxProps<Theme> = {
+  color: USER_COLORS.textMuted,
+  mt: -0.25,
+  mr: -0.25,
+  border: `1px solid ${alpha('#ffffff', 0.12)}`,
+  borderRadius: `${GLASS_CARD_RADIUS}px`,
+};
+
 export const userPageTitleSx: SxProps<Theme> = {
   fontSize: { xs: 26, sm: 32, md: 40 },
   fontWeight: 800,
@@ -426,38 +486,41 @@ export const userFieldSx: SxProps<Theme> = {
   },
 };
 
+/** Dark glass menu / select paper (portaled overlays). */
+export const userMenuPaperSx: SxProps<Theme> = {
+  mt: 0.75,
+  maxHeight: 320,
+  borderRadius: 0,
+  bgcolor: alpha('#0a0a0a', 0.98),
+  border: `1px solid ${alpha('#ffffff', 0.14)}`,
+  backdropFilter: 'blur(14px)',
+  boxShadow: `0 16px 40px ${alpha('#000000', 0.65)}`,
+  '& .MuiMenuItem-root': {
+    color: alpha('#ffffff', 0.9),
+    fontSize: 14,
+    minHeight: 44,
+    py: 1.1,
+    px: 1.5,
+    borderRadius: 0,
+    '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.12) },
+    '&.Mui-selected': {
+      bgcolor: alpha(USER_COLORS.gold, 0.18),
+      color: '#ffffff',
+      '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.24) },
+    },
+    '&.Mui-disabled': {
+      color: alpha('#ffffff', 0.35),
+    },
+  },
+  '& .MuiList-root': {
+    py: 0.5,
+  },
+};
+
 /** Dark glass select menus that escape the user layout (portaled to document root). */
 export const userSelectMenuProps = {
   PaperProps: {
-    sx: {
-      mt: 0.75,
-      maxHeight: 320,
-      borderRadius: 0,
-      bgcolor: alpha('#0a0a0a', 0.98),
-      border: `1px solid ${alpha('#ffffff', 0.14)}`,
-      backdropFilter: 'blur(14px)',
-      boxShadow: `0 16px 40px ${alpha('#000000', 0.65)}`,
-      '& .MuiMenuItem-root': {
-        color: alpha('#ffffff', 0.9),
-        fontSize: 14,
-        minHeight: 44,
-        py: 1.1,
-        px: 1.5,
-        borderRadius: 0,
-        '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.12) },
-        '&.Mui-selected': {
-          bgcolor: alpha(USER_COLORS.gold, 0.18),
-          color: '#ffffff',
-          '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.24) },
-        },
-        '&.Mui-disabled': {
-          color: alpha('#ffffff', 0.35),
-        },
-      },
-      '& .MuiList-root': {
-        py: 0.5,
-      },
-    },
+    sx: userMenuPaperSx,
   },
 };
 

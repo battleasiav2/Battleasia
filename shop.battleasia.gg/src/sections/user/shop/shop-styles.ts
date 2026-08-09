@@ -1,6 +1,11 @@
 import { alpha } from '@mui/material/styles';
 
-import { userMutedTextSx, USER_COLORS, userGlassDialogPaperSx } from 'src/layouts/user';
+import {
+  userMutedTextSx,
+  USER_COLORS,
+  userPolishedDialogPaperSx,
+  userPolishedDialogContentSx,
+} from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
@@ -116,22 +121,20 @@ export const SHOP_SELECT_MENU_PROPS = {
   },
 };
 
-export const SHOP_DIALOG_PAPER_SX = userGlassDialogPaperSx;
+export const SHOP_DIALOG_PAPER_SX = userPolishedDialogPaperSx;
 
 export const SHOP_DIALOG_TITLE_SX = {
   color: USER_COLORS.textPrimary,
   fontWeight: 800,
   textTransform: 'uppercase' as const,
   letterSpacing: 0.6,
-  fontSize: { xs: 16, md: 18 },
+  fontSize: { xs: 18, md: 22 },
+  lineHeight: 1.15,
 };
 
 export const SHOP_DIALOG_CONTENT_SX = {
+  ...userPolishedDialogContentSx,
   color: USER_COLORS.textBody,
-  borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
-  borderBottom: `1px solid ${alpha('#ffffff', 0.08)}`,
-  px: { xs: 2, md: 3 },
-  py: { xs: 2, md: 2.5 },
   '& .MuiDivider-root': { borderColor: alpha('#ffffff', 0.1) },
 };
 

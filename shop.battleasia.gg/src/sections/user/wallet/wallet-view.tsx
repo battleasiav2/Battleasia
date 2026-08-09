@@ -32,7 +32,12 @@ import {
     UserActionButton,
     USER_COLORS,
     userMutedTextSx,
-    userGlassDialogPaperSx,
+    userPolishedDialogPaperSx,
+    userPolishedDialogRailSx,
+    userPolishedDialogTitleSx,
+    userPolishedDialogEyebrowSx,
+    userPolishedDialogHeadingSx,
+    userPolishedDialogContentSx,
 } from 'src/layouts/user';
 import { SHOP_FIELD_SX, SHOP_FIELD_LABEL_PROPS, SHOP_SELECT_MENU_PROPS } from '../shop/shop-styles';
 import { WalletHero } from './wallet-hero';
@@ -805,15 +810,16 @@ export function WalletView() {
                 onClose={handleCloseWithdrawalModal}
                 maxWidth="sm"
                 fullWidth
-                PaperProps={{ sx: userGlassDialogPaperSx }}
+                PaperProps={{ sx: userPolishedDialogPaperSx }}
             >
-                <DialogTitle>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <Iconify icon="solar:transfer-horizontal-bold" width={24} sx={{ color: USER_COLORS.gold }} />
-                        <Typography variant="h6" sx={{ color: USER_COLORS.textPrimary }}>Request Withdrawal</Typography>
+                <Box sx={userPolishedDialogRailSx} />
+                <DialogTitle sx={userPolishedDialogTitleSx}>
+                    <Box sx={{ minWidth: 0 }}>
+                        <Typography sx={userPolishedDialogEyebrowSx}>Wallet</Typography>
+                        <Typography sx={userPolishedDialogHeadingSx}>Request Withdrawal</Typography>
                     </Box>
                 </DialogTitle>
-                <DialogContent dividers sx={{ borderColor: USER_COLORS.border }}>
+                <DialogContent dividers sx={userPolishedDialogContentSx}>
                     <Stack spacing={3} sx={{ pt: 1 }}>
                         {/* Pending Withdrawal Warning */}
                         {hasPendingWithdrawal && (
@@ -1004,9 +1010,15 @@ export function WalletView() {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={openConfirmModal} onClose={handleCloseConfirmModal} maxWidth="sm" fullWidth PaperProps={{ sx: userGlassDialogPaperSx }}>
-                <DialogTitle sx={{ color: USER_COLORS.textPrimary }}>Confirm Withdrawal</DialogTitle>
-                <DialogContent dividers>
+            <Dialog open={openConfirmModal} onClose={handleCloseConfirmModal} maxWidth="sm" fullWidth PaperProps={{ sx: userPolishedDialogPaperSx }}>
+                <Box sx={userPolishedDialogRailSx} />
+                <DialogTitle sx={userPolishedDialogTitleSx}>
+                    <Box sx={{ minWidth: 0 }}>
+                        <Typography sx={userPolishedDialogEyebrowSx}>Wallet</Typography>
+                        <Typography sx={userPolishedDialogHeadingSx}>Confirm Withdrawal</Typography>
+                    </Box>
+                </DialogTitle>
+                <DialogContent dividers sx={userPolishedDialogContentSx}>
                     <Stack spacing={3}>
                         <UserGlassCard sx={{ p: 2, bgcolor: alpha('#000000', 0.35) }}>
                             <Stack spacing={1.5}>

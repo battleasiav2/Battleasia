@@ -17,7 +17,7 @@ import {
 import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
 import { getImageUrl } from 'src/utils/get-image-url';
-import { USER_COLORS, userFieldSx, userGlassDialogPaperSx } from 'src/layouts/user';
+import { USER_COLORS, userFieldSx, userPolishedDialogPaperSx, userPolishedDialogRailSx, userPolishedDialogTitleSx, userPolishedDialogEyebrowSx, userPolishedDialogHeadingSx, userPolishedDialogContentSx, userPolishedDialogCloseButtonSx } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
@@ -71,17 +71,19 @@ export function NewChatDialog({ open, onClose, onSelectUser }: NewChatDialogProp
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth PaperProps={{ sx: userGlassDialogPaperSx }}>
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography sx={{ fontWeight: 800, color: USER_COLORS.textPrimary, textTransform: 'uppercase' }}>
-          {t('messages.newChat')}
-        </Typography>
-        <IconButton onClick={handleClose} sx={{ color: USER_COLORS.textMuted }}>
-          <Iconify icon="eva:close-fill" width={22} />
+    <Dialog open={open} onClose={handleClose} maxWidth="xs" fullWidth PaperProps={{ sx: userPolishedDialogPaperSx }}>
+      <Box sx={userPolishedDialogRailSx} />
+      <DialogTitle sx={userPolishedDialogTitleSx}>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography sx={userPolishedDialogEyebrowSx}>Messages</Typography>
+          <Typography sx={userPolishedDialogHeadingSx}>{t('messages.newChat')}</Typography>
+        </Box>
+        <IconButton onClick={handleClose} sx={userPolishedDialogCloseButtonSx}>
+          <Iconify icon="eva:close-fill" width={20} />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent>
+      <DialogContent sx={userPolishedDialogContentSx}>
         <Stack spacing={2}>
           <TextField
             fullWidth

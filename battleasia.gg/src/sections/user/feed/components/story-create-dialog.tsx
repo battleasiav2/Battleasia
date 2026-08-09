@@ -19,7 +19,13 @@ import {
   UserActionButton,
   USER_COLORS,
   userFieldSx,
-  userGlassDialogPaperSx,
+  userPolishedDialogPaperSx,
+  userPolishedDialogRailSx,
+  userPolishedDialogTitleSx,
+  userPolishedDialogEyebrowSx,
+  userPolishedDialogHeadingSx,
+  userPolishedDialogContentSx,
+  userPolishedDialogCloseButtonSx,
 } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 import { Image } from 'src/components/image';
@@ -104,18 +110,20 @@ export function StoryCreateDialog({ open, onClose, onCreated }: StoryCreateDialo
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
-      PaperProps={{ sx: userGlassDialogPaperSx }}
+      PaperProps={{ sx: userPolishedDialogPaperSx }}
     >
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography sx={{ fontWeight: 800, color: USER_COLORS.textPrimary, textTransform: 'uppercase' }}>
-          {t('feed.createStory')}
-        </Typography>
-        <IconButton onClick={handleClose} disabled={submitting} sx={{ color: USER_COLORS.textMuted }}>
-          <Iconify icon="eva:close-fill" width={22} />
+      <Box sx={userPolishedDialogRailSx} />
+      <DialogTitle sx={userPolishedDialogTitleSx}>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography sx={userPolishedDialogEyebrowSx}>Feed</Typography>
+          <Typography sx={userPolishedDialogHeadingSx}>{t('feed.createStory')}</Typography>
+        </Box>
+        <IconButton onClick={handleClose} disabled={submitting} sx={userPolishedDialogCloseButtonSx}>
+          <Iconify icon="eva:close-fill" width={20} />
         </IconButton>
       </DialogTitle>
 
-      <DialogContent>
+      <DialogContent sx={userPolishedDialogContentSx}>
         <Stack spacing={2}>
           <input
             ref={fileInputRef}

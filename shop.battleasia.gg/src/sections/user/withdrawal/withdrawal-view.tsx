@@ -29,7 +29,12 @@ import {
   UserStatTile,
   USER_COLORS,
   userMutedTextSx,
-  userGlassDialogPaperSx,
+  userPolishedDialogPaperSx,
+  userPolishedDialogRailSx,
+  userPolishedDialogTitleSx,
+  userPolishedDialogEyebrowSx,
+  userPolishedDialogHeadingSx,
+  userPolishedDialogContentSx,
 } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 import { WalletHero } from '../wallet/wallet-hero';
@@ -418,12 +423,16 @@ export function WithdrawalView() {
         onClose={() => !submitting && setOpenConfirmModal(false)}
         maxWidth="sm"
         fullWidth
-        PaperProps={{ sx: { ...userGlassDialogPaperSx, m: { xs: 1.5, sm: 2 } } }}
+        PaperProps={{ sx: { ...userPolishedDialogPaperSx, m: { xs: 1.5, sm: 2 } } }}
       >
-        <DialogTitle sx={{ color: USER_COLORS.textPrimary, fontWeight: 800 }}>
-          {t('wallet.confirmWithdrawal')}
+        <Box sx={userPolishedDialogRailSx} />
+        <DialogTitle sx={userPolishedDialogTitleSx}>
+          <Box sx={{ minWidth: 0 }}>
+            <Typography sx={userPolishedDialogEyebrowSx}>Wallet</Typography>
+            <Typography sx={userPolishedDialogHeadingSx}>{t('wallet.confirmWithdrawal')}</Typography>
+          </Box>
         </DialogTitle>
-        <DialogContent dividers sx={{ borderColor: USER_COLORS.border }}>
+        <DialogContent dividers sx={userPolishedDialogContentSx}>
           <Box sx={{ p: 2, bgcolor: alpha('#000000', 0.35), border: `1px solid ${USER_COLORS.border}` }}>
             <Stack spacing={1.5}>
               <Typography sx={userMutedTextSx}>Withdraw Amount</Typography>

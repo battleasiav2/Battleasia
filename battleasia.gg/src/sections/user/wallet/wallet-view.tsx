@@ -9,6 +9,7 @@ import {
   MenuItem,
   TextField,
   Typography,
+  IconButton,
   DialogTitle,
   Grid2 as Grid,
   DialogContent,
@@ -28,7 +29,13 @@ import {
   UserStatTile,
   USER_COLORS,
   userMutedTextSx,
-  userGlassDialogPaperSx,
+  userPolishedDialogPaperSx,
+  userPolishedDialogRailSx,
+  userPolishedDialogTitleSx,
+  userPolishedDialogEyebrowSx,
+  userPolishedDialogHeadingSx,
+  userPolishedDialogContentSx,
+  userPolishedDialogCloseButtonSx,
   userFieldSx,
   userFieldLabelProps,
   userSelectMenuProps,
@@ -68,6 +75,34 @@ const PAYMENT_CHANNELS = [
 ];
 
 const walletFieldSx = userFieldSx;
+
+function mapBalanceHistoryItems(results: any[]): BalanceHistoryItem[] {
+  return results.map((item: any) => ({
+    id: item.id || item._id,
+    amount: Number(item.amount) || 0,
+    type: item.type === 'withdraw' ? 'withdraw' : item.type === 'earning' ? 'earning' : 'deposit',
+    balanceBefore: Number(item.balanceBefore) || 0,
+    balanceAfter: Number(item.balanceAfter) || 0,
+    performedBy: item.performedBy || '',
+    detail: item.detail && typeof item.detail === 'object' ? item.detail : {},
+    createdAt: item.createdAt ? new Date(item.createdAt) : null,
+  }));
+}
+
+function getApiErrorMessage(error: unknown, fallback: string): string {
+  if (!error) return fallback;
+  if (typeof error === 'string' && error.trim()) return error;
+  if (typeof error === 'object') {
+    const err = error as {
+      message?: unknown;
+      response?: { data?: { message?: unknown } };
+    };
+    const nested = err.response?.data?.message;
+    if (typeof nested === 'string' && nested.trim()) return nested;
+    if (typeof err.message === 'string' && err.message.trim()) return err.message;
+  }
+  return fallback;
+}
 
 // ----------------------------------------------------------------------
 
@@ -111,6 +146,8 @@ export function WalletView() {
   }, [getWithdrawableAmountApi, user?._id, user?.balance]);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchBalanceHistory = async () => {
       if (!user?._id) {
         setLoading(false);
@@ -120,66 +157,49 @@ export function WalletView() {
       try {
         setLoading(true);
         const response = await getBalanceHistoryApi({ page: 1, limit: 100 });
-        const responseData = response?.data;
+        if (cancelled) return;
 
+        const responseData = response?.data;
         if (responseData?.status && Array.isArray(responseData?.data?.results)) {
-          setTransactions(
-            responseData.data.results.map((item: any) => ({
-              id: item.id || item._id,
-              amount: Number(item.amount) || 0,
-              type: item.type === 'withdraw' ? 'withdraw' : item.type === 'earning' ? 'earning' : 'deposit',
-              balanceBefore: Number(item.balanceBefore) || 0,
-              balanceAfter: Number(item.balanceAfter) || 0,
-              performedBy: item.performedBy || '',
-              detail: item.detail || {},
-              createdAt: item.createdAt ? new Date(item.createdAt) : null,
-            }))
+          setTransactions(mapBalanceHistoryItems(responseData.data.results));
+        } else if (responseData?.status === false) {
+          toast.error(
+            getApiErrorMessage(responseData, t('wallet.failedToLoadHistory')),
+            { id: 'wallet-history-error' }
           );
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
+        if (cancelled) return;
         console.error('Failed to fetch balance history:', error);
-        const errorMsg =
-          error?.response?.data?.message ||
-          error?.message ||
-          t('wallet.failedToLoadHistory');
-        toast.error(errorMsg);
+        toast.error(getApiErrorMessage(error, t('wallet.failedToLoadHistory')), {
+          id: 'wallet-history-error',
+        });
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchBalanceHistory();
+    return () => {
+      cancelled = true;
+    };
   }, [getBalanceHistoryApi, user?._id, t]);
 
   const refreshBalanceHistory = useCallback(async () => {
     if (!user?._id) return;
 
     try {
-      setLoading(true);
       const response = await getBalanceHistoryApi({ page: 1, limit: 100 });
       const responseData = response?.data;
 
       if (responseData?.status && Array.isArray(responseData?.data?.results)) {
-        setTransactions(
-          responseData.data.results.map((item: any) => ({
-            id: item.id || item._id,
-            amount: Number(item.amount) || 0,
-            type: item.type === 'withdraw' ? 'withdraw' : item.type === 'earning' ? 'earning' : 'deposit',
-            balanceBefore: Number(item.balanceBefore) || 0,
-            balanceAfter: Number(item.balanceAfter) || 0,
-            performedBy: item.performedBy || '',
-            detail: item.detail || {},
-            createdAt: item.createdAt ? new Date(item.createdAt) : null,
-          }))
-        );
+        setTransactions(mapBalanceHistoryItems(responseData.data.results));
       }
-    } catch (error: any) {
-      console.error('Failed to fetch balance history:', error);
-      toast.error(error?.response?.data?.message || t('wallet.failedToLoadHistory'));
-    } finally {
-      setLoading(false);
+    } catch (error: unknown) {
+      // Background live-sync refresh — keep current list, don't spam toasts
+      console.error('Failed to refresh balance history:', error);
     }
-  }, [getBalanceHistoryApi, user?._id, t]);
+  }, [getBalanceHistoryApi, user?._id]);
 
   useLiveSync(refreshBalanceHistory, LIVE_SYNC_TOPICS.wallet);
 
@@ -376,18 +396,22 @@ export function WalletView() {
       onClose={handleCloseWithdrawalDialog}
       maxWidth="sm"
       fullWidth
-      PaperProps={{ sx: { ...(userGlassDialogPaperSx as object), borderRadius: 2 } }}
+      PaperProps={{ sx: userPolishedDialogPaperSx }}
     >
-      <DialogTitle sx={{ pb: 1, color: USER_COLORS.textPrimary }}>
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <Iconify icon="solar:card-send-bold" width={24} sx={{ color: USER_COLORS.gold }} />
-          <Typography variant="h6" sx={{ fontWeight: 700, color: USER_COLORS.textPrimary }}>
+      <Box sx={userPolishedDialogRailSx} />
+      <DialogTitle sx={userPolishedDialogTitleSx}>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography sx={userPolishedDialogEyebrowSx}>Wallet</Typography>
+          <Typography sx={userPolishedDialogHeadingSx}>
             {withdrawalStep === 'form' ? t('wallet.requestWithdrawal') : t('wallet.confirmWithdrawal')}
           </Typography>
-        </Stack>
+        </Box>
+        <IconButton onClick={handleCloseWithdrawalDialog} sx={userPolishedDialogCloseButtonSx}>
+          <Iconify icon="eva:close-fill" width={20} />
+        </IconButton>
       </DialogTitle>
 
-      <DialogContent dividers sx={{ borderColor: USER_COLORS.border }}>
+      <DialogContent dividers sx={userPolishedDialogContentSx}>
         {hasPendingWithdrawal && (
           <UserGlassCard sx={{ p: 2, mb: 3, bgcolor: alpha(USER_COLORS.gold, 0.1), border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}` }}>
             <Stack direction="row" alignItems="center" spacing={1}>

@@ -18,7 +18,7 @@ import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
 import { getImageUrl } from 'src/utils/get-image-url';
 import { paths } from 'src/routes/paths';
-import { USER_COLORS, userGlassDialogPaperSx, UserActionButton } from 'src/layouts/user';
+import { USER_COLORS, userPolishedDialogPaperSx, userPolishedDialogRailSx, userPolishedDialogTitleSx, userPolishedDialogEyebrowSx, userPolishedDialogHeadingSx, userPolishedDialogContentSx, userPolishedDialogCloseButtonSx, UserActionButton } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 
@@ -84,14 +84,18 @@ export function FollowListDialog({ open, onClose, userId, mode, onFollowChange }
   const title = mode === 'followers' ? t('profile.followers') : t('profile.following');
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: userGlassDialogPaperSx }}>
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography sx={{ fontWeight: 800, color: USER_COLORS.textPrimary, textTransform: 'uppercase' }}>{title}</Typography>
-        <IconButton onClick={onClose} sx={{ color: USER_COLORS.textMuted }}>
-          <Iconify icon="eva:close-fill" width={22} />
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth PaperProps={{ sx: userPolishedDialogPaperSx }}>
+      <Box sx={userPolishedDialogRailSx} />
+      <DialogTitle sx={userPolishedDialogTitleSx}>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography sx={userPolishedDialogEyebrowSx}>Profile</Typography>
+          <Typography sx={userPolishedDialogHeadingSx}>{title}</Typography>
+        </Box>
+        <IconButton onClick={onClose} sx={userPolishedDialogCloseButtonSx}>
+          <Iconify icon="eva:close-fill" width={20} />
         </IconButton>
       </DialogTitle>
-      <DialogContent sx={{ px: 2, pb: 2 }}>
+      <DialogContent sx={{ ...userPolishedDialogContentSx, pt: 0 }}>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
             <CircularProgress size={28} sx={{ color: USER_COLORS.gold }} />
@@ -113,6 +117,10 @@ export function FollowListDialog({ open, onClose, userId, mode, onFollowChange }
                     p: 1.25,
                     border: `1px solid ${alpha('#ffffff', 0.1)}`,
                     bgcolor: alpha('#000000', 0.25),
+                    '&:hover': {
+                      borderColor: alpha(USER_COLORS.gold, 0.28),
+                      bgcolor: alpha(USER_COLORS.gold, 0.06),
+                    },
                   }}
                 >
                   <Avatar

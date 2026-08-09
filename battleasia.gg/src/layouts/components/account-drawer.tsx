@@ -23,8 +23,6 @@ import { getImageUrl } from 'src/utils/get-image-url';
 import { useSelector } from 'src/store';
 import { useTranslate } from 'src/locales';
 
-import { useAppDownload } from 'src/hooks/use-app-download';
-
 import { Iconify } from 'src/components/iconify';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { Scrollbar } from 'src/components/scrollbar';
@@ -36,6 +34,7 @@ import {
 
 import { AccountButton } from './account-button';
 import { SignOutButton } from './sign-out-button';
+import { NavApkBanner } from './nav-apk-banner';
 
 import type { AccountMenuItem } from '../menu-items-config';
 
@@ -169,7 +168,6 @@ function MenuCard({
 export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
   const pathname = usePathname();
   const { t } = useTranslate();
-  const appDownload = useAppDownload();
 
   const storeUser = useSelector((state) => state.auth.user);
 
@@ -300,16 +298,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
         );
       })}
 
-      {appDownload.enabled && appDownload.href ? (
-        <Box onClick={onClose}>
-          <MenuCard
-            label={t('navigation.downloadApk')}
-            icon={<Iconify icon="solar:download-bold-duotone" />}
-            href={appDownload.href}
-            downloadFileName={appDownload.fileName}
-          />
-        </Box>
-      ) : null}
+      <NavApkBanner onNavigate={onClose} />
     </Stack>
   );
 

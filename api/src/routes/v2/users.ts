@@ -299,27 +299,36 @@ router.get('/withdrawable-amount', requireAuth, async (req: AuthedRequest, res) 
 router.get('/balance-history', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const { skip, limit } = parsePagination(req);
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ status: false, message: 'Unauthorized' });
+    }
+
     const [records, count] = await Promise.all([
-      BalanceHistory.find({ userId: req.userId }).sort({ createdAt: -1 }).skip(skip).limit(limit),
-      BalanceHistory.countDocuments({ userId: req.userId }),
+      BalanceHistory.find({ userId }).sort({ createdAt: -1 }).skip(skip).limit(limit).lean(),
+      BalanceHistory.countDocuments({ userId }),
     ]);
 
     const results = records.map((item) => {
-      const reason = (item.detail as Record<string, unknown> | undefined)?.reason;
+      const detail = (item.detail && typeof item.detail === 'object' ? item.detail : {}) as Record<
+        string,
+        unknown
+      >;
+      const reason = detail.reason;
       let type: string = item.type;
-      if (reason === 'match_winnings' || reason === 'match_result_update') {
+      if (reason === 'match_winnings' || reason === 'match_result_update' || reason === 'match_reward') {
         type = 'earning';
       }
 
       return {
-        _id: item._id.toString(),
-        id: item._id.toString(),
-        amount: item.amount,
+        _id: String(item._id),
+        id: String(item._id),
+        amount: item.amount ?? 0,
         type,
-        balanceBefore: item.balanceBefore,
-        balanceAfter: item.balanceAfter,
-        performedBy: item.performedBy?.toString() || '',
-        detail: item.detail || {},
+        balanceBefore: item.balanceBefore ?? 0,
+        balanceAfter: item.balanceAfter ?? 0,
+        performedBy: item.performedBy ? String(item.performedBy) : '',
+        detail,
         createdAt: item.createdAt,
       };
     });

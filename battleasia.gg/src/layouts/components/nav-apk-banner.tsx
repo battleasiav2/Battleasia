@@ -1,3 +1,5 @@
+import type { SxProps, Theme } from '@mui/material/styles';
+
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
@@ -15,13 +17,15 @@ import { USER_COLORS } from '../user/user-theme';
 const LOGO_SRC = `${CONFIG.assetsDir}/logo/logo.webp`;
 
 type NavApkBannerProps = {
-  compact?: boolean;
+  /** Close parent drawer/menu after tap */
+  onNavigate?: () => void;
+  sx?: SxProps<Theme>;
 };
 
 /**
- * Sidebar APK promo — only renders when app download is enabled in settings.
+ * APK promo banner — only renders when app download is enabled in settings.
  */
-export function NavApkBanner({ compact = false }: NavApkBannerProps) {
+export function NavApkBanner({ onNavigate, sx }: NavApkBannerProps) {
   const { t } = useTranslate();
   const appDownload = useAppDownload();
 
@@ -29,52 +33,24 @@ export function NavApkBanner({ compact = false }: NavApkBannerProps) {
     return null;
   }
 
-  if (compact) {
-    return (
-      <Box sx={{ px: 0.75, pb: 1.5, display: 'flex', justifyContent: 'center' }}>
-        <Button
-          component="a"
-          href={appDownload.href}
-          download={appDownload.fileName}
-          aria-label={t('navigation.downloadApk')}
-          sx={{
-            minWidth: 44,
-            width: 44,
-            height: 44,
-            p: 0,
-            borderRadius: `${GLASS_CARD_RADIUS}px`,
-            border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}`,
-            bgcolor: alpha(USER_COLORS.gold, 0.12),
-            color: USER_COLORS.gold,
-            '&:hover': {
-              bgcolor: alpha(USER_COLORS.gold, 0.22),
-              borderColor: alpha(USER_COLORS.gold, 0.7),
-            },
-          }}
-        >
-          <Iconify icon="solar:download-bold" width={20} />
-        </Button>
-      </Box>
-    );
-  }
-
   return (
     <Box
-      sx={{
-        mx: 2,
-        mb: 1.5,
-        position: 'relative',
-        overflow: 'hidden',
-        borderRadius: `${GLASS_CARD_RADIUS}px`,
-        border: `1px solid ${alpha(USER_COLORS.gold, 0.32)}`,
-        background: `
-          linear-gradient(145deg, ${alpha(USER_COLORS.gold, 0.16)} 0%, ${alpha('#000000', 0.55)} 42%, ${alpha('#0a0a0a', 0.92)} 100%)
-        `,
-        boxShadow: `
-          inset 0 1px 0 ${alpha('#ffffff', 0.08)},
-          0 10px 28px ${alpha('#000000', 0.45)}
-        `,
-      }}
+      sx={[
+        {
+          position: 'relative',
+          overflow: 'hidden',
+          borderRadius: `${GLASS_CARD_RADIUS}px`,
+          border: `1px solid ${alpha(USER_COLORS.gold, 0.32)}`,
+          background: `
+            linear-gradient(145deg, ${alpha(USER_COLORS.gold, 0.16)} 0%, ${alpha('#000000', 0.55)} 42%, ${alpha('#0a0a0a', 0.92)} 100%)
+          `,
+          boxShadow: `
+            inset 0 1px 0 ${alpha('#ffffff', 0.08)},
+            0 10px 28px ${alpha('#000000', 0.45)}
+          `,
+        },
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
     >
       <Box
         aria-hidden
@@ -160,6 +136,7 @@ export function NavApkBanner({ compact = false }: NavApkBannerProps) {
           href={appDownload.href}
           download={appDownload.fileName}
           fullWidth
+          onClick={onNavigate}
           startIcon={<Iconify icon="solar:download-bold" width={16} />}
           sx={{
             py: 1,

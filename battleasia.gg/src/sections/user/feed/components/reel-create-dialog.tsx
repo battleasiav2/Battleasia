@@ -22,7 +22,13 @@ import {
   UserActionButton,
   USER_COLORS,
   userFieldSx,
-  userGlassDialogPaperSx,
+  userPolishedDialogPaperSx,
+  userPolishedDialogRailSx,
+  userPolishedDialogTitleSx,
+  userPolishedDialogEyebrowSx,
+  userPolishedDialogHeadingSx,
+  userPolishedDialogContentSx,
+  userPolishedDialogCloseButtonSx,
 } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 
@@ -99,14 +105,18 @@ export function ReelCreateDialog({ open, onClose, onCreated }: ReelCreateDialogP
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth PaperProps={{ sx: userGlassDialogPaperSx }}>
-      <DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography sx={{ fontWeight: 800, color: USER_COLORS.textPrimary }}>{t('reels.createReel')}</Typography>
-        <IconButton onClick={handleClose} sx={{ color: USER_COLORS.textMuted }}>
-          <Iconify icon="eva:close-fill" width={22} />
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth PaperProps={{ sx: userPolishedDialogPaperSx }}>
+      <Box sx={userPolishedDialogRailSx} />
+      <DialogTitle sx={userPolishedDialogTitleSx}>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography sx={userPolishedDialogEyebrowSx}>Reels</Typography>
+          <Typography sx={userPolishedDialogHeadingSx}>{t('reels.createReel')}</Typography>
+        </Box>
+        <IconButton onClick={handleClose} sx={userPolishedDialogCloseButtonSx}>
+          <Iconify icon="eva:close-fill" width={20} />
         </IconButton>
       </DialogTitle>
-      <DialogContent>
+      <DialogContent sx={userPolishedDialogContentSx}>
         <Stack spacing={2}>
           <Box
             onClick={() => fileInputRef.current?.click()}

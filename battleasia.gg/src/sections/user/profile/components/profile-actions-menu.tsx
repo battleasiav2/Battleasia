@@ -7,7 +7,7 @@ import { toast } from 'react-hot-toast';
 import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
 import { Iconify } from 'src/components/iconify';
-import { USER_COLORS } from 'src/layouts/user';
+import { USER_COLORS, userMenuPaperSx } from 'src/layouts/user';
 
 import { SocialReportDialog } from '../../social/social-report-dialog';
 
@@ -57,20 +57,25 @@ export function ProfileActionsMenu({ userId, isBlocked = false, onBlockChange }:
         <Iconify icon="eva:more-vertical-fill" width={20} />
       </IconButton>
 
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={() => setAnchorEl(null)}>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={() => setAnchorEl(null)}
+        slotProps={{ paper: { sx: userMenuPaperSx } }}
+      >
         <MenuItem
           onClick={() => {
             setAnchorEl(null);
             setReportOpen(true);
           }}
         >
-          <ListItemIcon>
+          <ListItemIcon sx={{ color: 'inherit', minWidth: 36 }}>
             <Iconify icon="solar:flag-bold" width={18} />
           </ListItemIcon>
           <ListItemText primary={t('report.title')} />
         </MenuItem>
         <MenuItem onClick={() => void handleBlockToggle()} disabled={loading}>
-          <ListItemIcon>
+          <ListItemIcon sx={{ color: 'inherit', minWidth: 36 }}>
             <Iconify icon={isBlocked ? 'solar:user-check-bold' : 'solar:user-block-bold'} width={18} />
           </ListItemIcon>
           <ListItemText primary={isBlocked ? t('profile.unblock') : t('profile.block')} />
