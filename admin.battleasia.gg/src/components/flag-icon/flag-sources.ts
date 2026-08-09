@@ -35,5 +35,5 @@ export function getFlagSources(code?: string): string[] {
     `https://purecatamphetamine.github.io/country-flag-icons/3x2/${upper}.svg`
   );
 
-  return [...new Set(sources)];
+  return Array.from(new Set(sources));
 }
