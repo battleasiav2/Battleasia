@@ -15,6 +15,7 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import { layoutClasses } from '../core/classes';
 import { NavToggleButton } from '../components/nav-toggle-button';
+import { NavApkBanner } from '../components/nav-apk-banner';
 import { USER_COLORS } from './user-theme';
 
 // ----------------------------------------------------------------------
@@ -129,6 +130,8 @@ export function UserNavVertical({
         <NavSectionVertical data={data} cssVars={cssVars} sx={{ px: 1.5, py: 1.5, flex: '1 1 auto' }} />
       </Scrollbar>
 
+      <NavApkBanner />
+
       <Box
         sx={{
           mx: 2,
@@ -168,6 +171,8 @@ export function UserNavVertical({
           }),
         ]}
       />
+
+      <NavApkBanner compact />
     </>
   );
 
