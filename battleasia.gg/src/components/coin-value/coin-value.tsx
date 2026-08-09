@@ -31,7 +31,7 @@ export function CoinValue({
       alignItems="center" 
       spacing={spacing}
       component="span"
-      sx={{ display: 'inline-flex', ...sx }}
+      sx={{ display: 'inline-flex', flexWrap: 'nowrap', minWidth: 0, ...sx }}
     >
       <Box
         component="img"
@@ -44,7 +44,14 @@ export function CoinValue({
           ...iconSx,
         }}
       />
-      <Box component="span" sx={textSx}>
+      <Box
+        component="span"
+        sx={{
+          whiteSpace: 'nowrap',
+          lineHeight: 1.2,
+          ...textSx,
+        }}
+      >
         {formattedValue}
       </Box>
     </Stack>

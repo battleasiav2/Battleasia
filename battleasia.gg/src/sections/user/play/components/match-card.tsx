@@ -156,13 +156,18 @@ export function MatchCard({
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+            gridTemplateColumns: { xs: '1fr', sm: 'minmax(0, 1.65fr) minmax(0, 0.9fr)' },
             gap: 1.25,
+            alignItems: 'stretch',
           }}
         >
           <MatchEntryWinTile entryFee={match.entryFee ?? 0} winningAmount={winningPool} />
           <MatchStatPill label={t('match.perKill')} minHeight={88} sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <CoinValue value={match.perKill ?? 0} size={18} />
+            <CoinValue
+              value={match.perKill ?? 0}
+              size={15}
+              textSx={{ fontSize: 14, fontWeight: 700, color: USER_COLORS.textPrimary }}
+            />
           </MatchStatPill>
         </Box>
 
