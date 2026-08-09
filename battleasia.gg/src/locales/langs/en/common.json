@@ -164,6 +164,7 @@
     "howToPlaySubtitle": "Solo 1 · Duo 2 · Squad 4 · TDM 6–8 — pick your team size.",
     "gameModes": {
       "solo": {
+        "playersLabel": "1 Player",
         "title": "Solo Mode",
         "description": "Play alone and test your skills against other players",
         "feature1": "Maps: Karakin, Nusa, Erangel, Miramar, Sanhok, Vikendi, Rondo",
@@ -172,6 +173,7 @@
         "feature4": "Your history & stats depend on your own performance"
       },
       "duo": {
+        "playersLabel": "2 Players",
         "title": "Duo Mode",
         "description": "Team up with a partner for double the action",
         "feature1": "Invite a friend or get paired with a random teammate",
@@ -180,6 +182,7 @@
         "feature4": "Split earnings with your partner"
       },
       "squad": {
+        "playersLabel": "4 Players",
         "title": "Squad Mode",
         "description": "Form a team of four and dominate the battlefield",
         "feature1": "Play with 3 random teammates",
@@ -188,6 +191,7 @@
         "feature4": "Higher rewards for squad victories"
       },
       "tdm": {
+        "playersLabel": "6–8 Players",
         "title": "TDM Mode",
         "description": "Fast-paced Team Deathmatch action",
         "feature1": "Fast-paced 4v4 Team Deathmatch",

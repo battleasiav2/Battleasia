@@ -432,25 +432,70 @@ export function LandingDashboardSection() {
     };
 
     useEffect(() => {
-        loadStats();
+        // Scalability: a live socket + polling are only held while the tab is
+        // actually visible. Backgrounded / idle tabs (the vast majority at any
+        // moment) keep NO socket and do NO polling, so millions of anonymous
+        // visitors cost the server almost nothing when they are not looking.
+        let pollTimer: ReturnType<typeof setTimeout> | null = null;
+        let stopped = false;
 
-        // Connect an anonymous socket so the dashboard can receive global events
-        // (no auth token needed — the server now allows public connections).
-        socketService.connectPublic(CONFIG.serverUrl);
+        // Fallback poll only — jittered so clients never sync into a thundering herd.
+        const POLL_BASE_MS = 90_000;
+        const POLL_JITTER_MS = 30_000;
 
-        // Re-fetch leaderboard whenever match results change and balances are updated.
+        const stopPolling = () => {
+            if (pollTimer) {
+                clearTimeout(pollTimer);
+                pollTimer = null;
+            }
+        };
+
+        const scheduleNextPoll = () => {
+            if (stopped || document.hidden) return;
+            const delay = POLL_BASE_MS + Math.random() * POLL_JITTER_MS;
+            pollTimer = setTimeout(async () => {
+                await refreshStats();
+                scheduleNextPoll();
+            }, delay);
+        };
+
         const handleDashboardUpdate = () => {
             refreshStats();
         };
-        socketService.onDashboardStatsUpdated(handleDashboardUpdate);
 
-        // Fallback: periodic refresh every 60 s in case the socket is unavailable.
-        const pollInterval = setInterval(refreshStats, 60_000);
+        const startLive = () => {
+            // Anonymous socket for global events (no auth token needed).
+            socketService.connectPublic(CONFIG.serverUrl);
+            socketService.onDashboardStatsUpdated(handleDashboardUpdate);
+            stopPolling();
+            scheduleNextPoll();
+        };
 
-        return () => {
+        const stopLive = () => {
             socketService.offDashboardStatsUpdated(handleDashboardUpdate);
             socketService.disconnectPublic();
-            clearInterval(pollInterval);
+            stopPolling();
+        };
+
+        const handleVisibility = () => {
+            if (document.hidden) {
+                stopLive();
+            } else {
+                refreshStats(); // instant catch-up when the user returns
+                startLive();
+            }
+        };
+
+        loadStats();
+        if (!document.hidden) {
+            startLive();
+        }
+        document.addEventListener('visibilitychange', handleVisibility);
+
+        return () => {
+            stopped = true;
+            document.removeEventListener('visibilitychange', handleVisibility);
+            stopLive();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);

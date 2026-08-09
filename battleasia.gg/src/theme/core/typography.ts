@@ -41,8 +41,28 @@ function responsiveFontSizes(obj: ResponsiveFontSizesInput): ResponsiveFontSizes
 
 // ----------------------------------------------------------------------
 
-const primaryFont = setFont(themeConfig.fontFamily.primary);
-const secondaryFont = setFont(themeConfig.fontFamily.secondary);
+/**
+ * Non-Latin fallbacks appended after the Latin brand font. The browser only
+ * reaches these for glyphs the Latin fonts don't cover (Bengali/Hindi/Urdu are
+ * self-hosted and script-scoped; Chinese uses the always-present system CJK
+ * stack), so the English critical path downloads zero extra font bytes.
+ */
+const NON_LATIN_STACK = [
+  '"Noto Sans Bengali"',
+  '"Noto Sans Devanagari"',
+  '"Noto Sans Arabic"',
+  '"PingFang SC"',
+  '"Hiragino Sans GB"',
+  '"Microsoft YaHei"',
+  '"Noto Sans SC"',
+  '"Noto Sans CJK SC"',
+].join(', ');
+
+export const withNonLatin = (font: string) =>
+  font.replace(/^("[^"]+"|[^,]+)/, `$1, ${NON_LATIN_STACK}`);
+
+const primaryFont = withNonLatin(setFont(themeConfig.fontFamily.primary));
+const secondaryFont = withNonLatin(setFont(themeConfig.fontFamily.secondary));
 
 export const typography: TypographyOptions = {
   fontFamily: primaryFont,

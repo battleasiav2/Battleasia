@@ -3,6 +3,7 @@ import type { SettingsState } from 'src/components/settings';
 
 import { setFont, hexToRgbChannel, createPaletteChannel } from 'minimal-shared/utils';
 
+import { withNonLatin } from '../core/typography';
 import { primaryColorPresets } from './color-presets';
 import { createShadowColor } from '../core/custom-shadows';
 
@@ -79,7 +80,7 @@ export function updateCoreWithSettings(
     },
     typography: {
       ...theme.typography,
-      fontFamily: setFont(fontFamily),
+      fontFamily: withNonLatin(setFont(fontFamily)),
     },
   };
 }

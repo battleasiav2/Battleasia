@@ -15,6 +15,13 @@ export type ConfigValue = {
     skip: boolean;
     redirectPath: string;
   };
+  /** Home "About" headline figures — overridable via env, no code change needed. */
+  homeStats: {
+    activePlayers: string;
+    prizeMoney: string;
+    gamesSupported: string;
+    tournaments: string;
+  };
 };
 
 // ----------------------------------------------------------------------
@@ -34,6 +41,18 @@ function resolveAssetsDir() {
   return assets;
 }
 
+// Headline About figures. Set VITE_STAT_* in env to override without a rebuild
+// of the code; sensible marketing defaults keep the section looking strong.
+function resolveHomeStats(): ConfigValue['homeStats'] {
+  const env = import.meta.env;
+  return {
+    activePlayers: env.VITE_STAT_ACTIVE_PLAYERS ?? '500K+',
+    prizeMoney: env.VITE_STAT_PRIZE_MONEY ?? '$2M+',
+    gamesSupported: env.VITE_STAT_GAMES_SUPPORTED ?? '15+',
+    tournaments: env.VITE_STAT_TOURNAMENTS ?? '24/7',
+  };
+}
+
 export const CONFIG: ConfigValue = {
   appName: 'BattleAsia',
   appVersion: packageJson.version,
@@ -49,6 +68,7 @@ export const CONFIG: ConfigValue = {
     skip: false,
     redirectPath: paths.dashboard.root,
   },
+  homeStats: resolveHomeStats(),
 
 };
 

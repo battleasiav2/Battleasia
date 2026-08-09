@@ -157,6 +157,7 @@
     "howToPlaySubtitle": "单人 1 · 双人 2 · 四人 4 · 团队死斗 6–8 — 选择你的队伍规模。",
     "gameModes": {
       "solo": {
+        "playersLabel": "1 名玩家",
         "title": "单人模式",
         "description": "独自游戏，测试你对其他玩家的技能",
         "feature1": "地图: Karakin, Nusa, Erangel, Miramar, Sanhok, Vikendi, Rondo",
@@ -165,6 +166,7 @@
         "feature4": "你的历史和统计数据取决于你自己的表现"
       },
       "duo": {
+        "playersLabel": "2 名玩家",
         "title": "双人模式",
         "description": "与伙伴组队，双倍行动",
         "feature1": "邀请朋友或与随机队友配对",
@@ -173,6 +175,7 @@
         "feature4": "与伙伴分享收益"
       },
       "squad": {
+        "playersLabel": "4 名玩家",
         "title": "小队模式",
         "description": "组建四人小队，主宰战场",
         "feature1": "与3名随机队友一起玩",
@@ -181,6 +184,7 @@
         "feature4": "小队胜利获得更高奖励"
       },
       "tdm": {
+        "playersLabel": "6–8 名玩家",
         "title": "TDM模式",
         "description": "快节奏的团队死斗",
         "feature1": "快节奏的4v4团队死斗",
