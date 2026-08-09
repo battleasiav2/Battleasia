@@ -88,7 +88,7 @@ export function MatchJoinDialog({
         { label: t('match.teamType'), value: match.teamType || '-' },
         { label: t('match.players'), value: String(match.totalPlayer ?? '-') },
         { label: t('match.map'), value: match.map || '-' },
-        { label: t('match.type'), value: match.matchType || '-' },
+        { label: t('match.typeLabel'), value: match.matchType || '-' },
       ]
     : [];
 

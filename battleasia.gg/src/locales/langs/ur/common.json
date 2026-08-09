@@ -556,6 +556,7 @@
       "paid": "پیڈ",
       "free": "فری"
     },
+    "typeLabel": "قسم",
     "map": "نقشہ",
     "mode": "موڈ",
     "kills": "کِلز",
@@ -683,7 +684,7 @@
   "play": {
     "title": "کھیلیں",
     "battlemania": "بیٹل مینیا",
-    "bannerDescription": "PUBG، FreeFire، Pubg Lite، COD، Fortnite اور مزید کے لیے ای سپورٹس ٹورنامنٹ ایپ",
+    "bannerDescription": "PUBG Mobile، Free Fire، COD اور مزید میں لائیو موبائل ای-اسپورٹس ٹورنامنٹس میں شامل ہوں — اصلی BAC انعامات جیتیں۔",
     "tournament": "ٹورنامنٹ",
     "selectGame": "Select Game",
     "availableMatches": "Available Matches",
@@ -827,6 +828,7 @@
   },
   "myOrders": {
     "title": "میرے آرڈرز",
+    "orderItem": "شاپ آرڈر",
     "all": "سب",
     "pending": "زیر التواء",
     "paid": "ادا شدہ",

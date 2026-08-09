@@ -537,7 +537,7 @@
     "prize": "পুরস্কার",
     "players": "খেলোয়াড়",
     "game": "গেম",
-    "type": "ধরন",
+    "typeLabel": "ধরন",
     "team": "টিম",
     "premiumMatch": "প্রিমিয়াম ম্যাচ",
     "premiumOnlyDescription": "এই ম্যাচ শুধুমাত্র প্রিমিয়াম সদস্যদের জন্য উপলব্ধ।",
@@ -596,7 +596,7 @@
   "play": {
     "title": "খেলুন",
     "battlemania": "ব্যাটলম্যানিয়া",
-    "bannerDescription": "PUBG, FreeFire, Pubg Lite, COD, Fortnite এবং আরও অনেক কিছুর জন্য ইস্পোর্টস টুর্নামেন্ট অ্যাপ",
+    "bannerDescription": "PUBG Mobile, Free Fire, COD সহ লাইভ মোবাইল ই-স্পোর্টস টুর্নামেন্টে যোগ দিন — জিতুন আসল BAC পুরস্কার।",
     "tournament": "টুর্নামেন্ট",
     "selectGame": "গেম নির্বাচন করুন",
     "availableMatches": "উপলব্ধ ম্যাচ",
@@ -865,6 +865,7 @@
   },
   "myOrders": {
     "title": "আমার অর্ডার",
+    "orderItem": "শপ অর্ডার",
     "all": "সব",
     "pending": "অপেক্ষমাণ",
     "paid": "পরিশোধিত",

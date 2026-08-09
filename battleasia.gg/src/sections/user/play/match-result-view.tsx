@@ -161,7 +161,7 @@ export function MatchResultView() {
           }}
         >
           <MatchStatPill label={t('match.game')}>{matchResult.gameName || '-'}</MatchStatPill>
-          <MatchStatPill label={t('match.type')}>{matchResult.matchType?.toUpperCase() || '-'}</MatchStatPill>
+          <MatchStatPill label={t('match.typeLabel')}>{matchResult.matchType?.toUpperCase() || '-'}</MatchStatPill>
           <MatchStatPill label={t('match.map')}>{matchResult.map || '-'}</MatchStatPill>
           <MatchStatPill label={t('match.team')}>{matchResult.teamType?.toUpperCase() || '-'}</MatchStatPill>
           <MatchStatPill label={t('match.perKill')}>

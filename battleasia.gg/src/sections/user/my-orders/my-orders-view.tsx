@@ -216,7 +216,7 @@ export function MyOrdersView() {
                         <Stack direction="row" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" spacing={2}>
                           <Box sx={{ minWidth: 0 }}>
                             <Typography className="font-tr" sx={{ mb: 0.75, fontWeight: 800, fontSize: 18, color: USER_COLORS.textPrimary, textTransform: 'uppercase' }}>
-                              {firstItem?.name || t('myOrders.title')}
+                              {firstItem?.name || t('myOrders.orderItem')}
                             </Typography>
                             <Typography sx={{ ...userMutedTextSx, fontSize: 12, mb: 0.5 }}>
                               {t('myOrders.orderId')}: {order._id}

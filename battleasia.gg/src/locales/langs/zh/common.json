@@ -556,6 +556,7 @@
       "paid": "付费",
       "free": "免费"
     },
+    "typeLabel": "类型",
     "map": "地图",
     "mode": "模式",
     "kills": "击杀",
@@ -683,7 +684,7 @@
   "play": {
     "title": "玩",
     "battlemania": "战斗狂潮",
-    "bannerDescription": "适用于PUBG、FreeFire、Pubg Lite、COD、Fortnite等游戏的电竞锦标赛应用",
+    "bannerDescription": "参加 PUBG Mobile、Free Fire、COD 等实时移动电竞锦标赛，赢取真实 BAC 奖励。",
     "tournament": "锦标赛",
     "selectGame": "Select Game",
     "availableMatches": "Available Matches",
@@ -827,6 +828,7 @@
   },
   "myOrders": {
     "title": "我的订单",
+    "orderItem": "商店订单",
     "all": "全部",
     "pending": "待处理",
     "paid": "已支付",

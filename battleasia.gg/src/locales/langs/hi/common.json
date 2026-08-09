@@ -556,6 +556,7 @@
       "paid": "पेड",
       "free": "फ्री"
     },
+    "typeLabel": "प्रकार",
     "map": "मानचित्र",
     "mode": "मोड",
     "kills": "किल",
@@ -683,7 +684,7 @@
   "play": {
     "title": "खेलें",
     "battlemania": "बैटलमेनिया",
-    "bannerDescription": "PUBG, FreeFire, Pubg Lite, COD, Fortnite और अन्य के लिए ईस्पोर्ट्स टूर्नामेंट ऐप",
+    "bannerDescription": "PUBG Mobile, Free Fire, COD और अन्य में लाइव मोबाइल ई-स्पोर्ट्स टूर्नामेंट में शामिल हों — असली BAC इनाम जीतें।",
     "tournament": "टूर्नामेंट",
     "selectGame": "Select Game",
     "availableMatches": "Available Matches",
@@ -827,6 +828,7 @@
   },
   "myOrders": {
     "title": "मेरे आदेश",
+    "orderItem": "शॉप ऑर्डर",
     "all": "सभी",
     "pending": "लंबित",
     "paid": "भुगतान किया",
