@@ -147,67 +147,30 @@ export function UserLayout({
                 <Stack
                     direction="row"
                     alignItems="center"
-                    spacing={{ xs: 1, sm: 1.25 }}
                     sx={{
                         display: { xs: 'flex', md: 'none' },
                         flexShrink: 0,
                         minWidth: 0,
+                        pl: { xs: 0.25, sm: 0.5 },
                     }}
                 >
+                    {/* Mobile-only: logo image — brand text lives in desktop sidebar */}
                     <Logo
                         sx={{
-                            width: { xs: 52, sm: 58 },
-                            height: { xs: 52, sm: 58 },
+                            width: { xs: 44, sm: 48 },
+                            height: { xs: 44, sm: 48 },
                             flexShrink: 0,
-                            '& img': { borderRadius: 0.5 },
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            '& img': {
+                                borderRadius: 0.75,
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'contain',
+                            },
                         }}
                     />
-                    <Stack direction="row" alignItems="center" spacing={0.65} sx={{ minWidth: 0 }}>
-                        <Typography
-                            component={RouterLink}
-                            href="/"
-                            className="font-brand-gaming"
-                            sx={{
-                                fontSize: { xs: 16, sm: 18 },
-                                fontWeight: 800,
-                                color: USER_COLORS.gold,
-                                textDecoration: 'none',
-                                whiteSpace: 'nowrap',
-                                lineHeight: 1,
-                                background: `linear-gradient(180deg, #ffe08a 0%, ${USER_COLORS.gold} 48%, #d4a017 100%)`,
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                                backgroundClip: 'text',
-                            }}
-                        >
-                            BattleAsia
-                        </Typography>
-                        <Box
-                            sx={{
-                                px: 0.55,
-                                py: 0.15,
-                                borderRadius: '3px',
-                                border: `1px solid ${alpha(USER_COLORS.gold, 0.65)}`,
-                                bgcolor: alpha(USER_COLORS.gold, 0.08),
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
-                        >
-                            <Typography
-                                className="font-tr"
-                                sx={{
-                                    fontSize: 10,
-                                    fontWeight: 800,
-                                    letterSpacing: 0.5,
-                                    color: USER_COLORS.gold,
-                                    lineHeight: 1.2,
-                                }}
-                            >
-                                2.0
-                            </Typography>
-                        </Box>
-                    </Stack>
                 </Stack>
             ),
             centerArea: (
