@@ -14,7 +14,7 @@ import { HeroMeshButtons } from 'src/components/mesh-buttons';
 import { HOME_GAME_ARTS } from './home-game-arts';
 import { homeMobileScrollGridSx, homeMobileScrollItemSx } from './home-horizontal-scroll';
 import { HeroRotatingBanner } from './hero-rotating-banner';
-import { HOME_HERO_SLIDES } from './hero-slides';
+import { HOME_HERO_SLIDES, readHeroSlideIndex } from './hero-slides';
 import { useTranslate } from 'src/locales/use-locales';
 
 // Below-fold + non-LCP FX: code-split (never block hero paint)
@@ -62,6 +62,19 @@ const logoShimmer = keyframes`
 const copyEnter = keyframes`
   0% { opacity: 0; transform: translateY(12px); }
   100% { opacity: 1; transform: translateY(0); }
+`;
+
+/** Tiny top-of-hero gold sweep — opacity/transform only, no layout cost */
+const heroTopSweep = keyframes`
+  0% { transform: translate3d(-40%, 0, 0); opacity: 0; }
+  18% { opacity: 0.85; }
+  42% { opacity: 0.35; }
+  55%, 100% { transform: translate3d(140%, 0, 0); opacity: 0; }
+`;
+
+const heroTopGlow = keyframes`
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.7; }
 `;
 
 const HOME_IMAGE_PATHS = {
@@ -125,11 +138,8 @@ function blackGamingSectionSx(art?: string) {
 }
 
 // ----------------------------------------------------------------------
-// Preload hero slides + title logo — mode/game cards lazy-load on scroll.
-const imagePaths = [
-  // Preload LCP hero only — title logo loads with page, not competing preload queue
-  ...HOME_HERO_SLIDES.slice(0, 1).map((slide) => slide.src),
-];
+// Preload active hero slide only (restored index if any) — avoid competing with LCP.
+const imagePaths = [HOME_HERO_SLIDES[readHeroSlideIndex()]?.src].filter(Boolean) as string[];
 
 export function HomeView() {
   const { t } = useTranslate();
@@ -212,8 +222,38 @@ export function HomeView() {
         zIndex: 1,
       },
     }}>
-      {/* Full hero image — 5 premium game slides, rotate every ~90s */}
+      {/* Full hero image — rotates every ~12s; last slide kept across reload */}
       <HeroRotatingBanner />
+
+      {/* Tiny gold sweep under nav — CSS only, md+, reduced-motion off */}
+      <Box
+        aria-hidden
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: { xs: 2, md: 3 },
+          zIndex: 3,
+          pointerEvents: 'none',
+          overflow: 'hidden',
+          background: `linear-gradient(90deg, transparent 0%, ${alpha(GOLD, 0.15)} 50%, transparent 100%)`,
+          animation: `${heroTopGlow} 4.5s ease-in-out infinite`,
+          '@media (prefers-reduced-motion: reduce)': { animation: 'none', opacity: 0.4 },
+          '&::after': {
+            content: "''",
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '42%',
+            height: '100%',
+            background: `linear-gradient(90deg, transparent, ${alpha('#fff', 0.55)}, ${GOLD}, ${alpha('#fff', 0.35)}, transparent)`,
+            animation: `${heroTopSweep} 5.5s 1.2s ease-in-out infinite`,
+            willChange: 'transform, opacity',
+            '@media (prefers-reduced-motion: reduce)': { display: 'none' },
+          },
+        }}
+      />
 
       <Suspense fallback={null}>
         <HeroFxOverlay />

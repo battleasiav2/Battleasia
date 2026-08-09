@@ -37,7 +37,30 @@ export const HOME_HERO_SLIDES = [
   },
 ] as const;
 
-/** Rotate hero every 90 seconds (between 1–2 min). */
-export const HOME_HERO_ROTATE_MS = 90_000;
+/** Rotate hero every 12s — snappy but still readable. */
+export const HOME_HERO_ROTATE_MS = 12_000;
 
-export const HOME_HERO_FADE_MS = 1800;
+export const HOME_HERO_FADE_MS = 900;
+
+/** sessionStorage key — survives reload, resets on new tab/session. */
+export const HOME_HERO_STORAGE_KEY = 'ba_hero_slide';
+
+export function readHeroSlideIndex(): number {
+  try {
+    const n = Number(sessionStorage.getItem(HOME_HERO_STORAGE_KEY));
+    if (Number.isInteger(n) && n >= 0 && n < HOME_HERO_SLIDES.length) {
+      return n;
+    }
+  } catch {
+    // ignore
+  }
+  return 0;
+}
+
+export function writeHeroSlideIndex(index: number) {
+  try {
+    sessionStorage.setItem(HOME_HERO_STORAGE_KEY, String(index));
+  } catch {
+    // ignore
+  }
+}

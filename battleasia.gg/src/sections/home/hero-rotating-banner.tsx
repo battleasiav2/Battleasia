@@ -7,10 +7,12 @@ import {
   HOME_HERO_FADE_MS,
   HOME_HERO_ROTATE_MS,
   HOME_HERO_SLIDES,
+  readHeroSlideIndex,
+  writeHeroSlideIndex,
 } from './hero-slides';
 
 // ----------------------------------------------------------------------
-// LCP-critical: CSS only, fixed box, WebP, first slide only in DOM
+// LCP-critical: CSS only, fixed box, WebP, restore last slide from sessionStorage
 // (HTML boot-shell owns early LCP; this remounts after shell dismisses)
 
 const heroKenBurns = keyframes`
@@ -22,9 +24,15 @@ const heroKenBurns = keyframes`
 const GOLD = '#f5c518';
 
 export function HeroRotatingBanner() {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(readHeroSlideIndex);
   /** Only mount slides that have been shown — never idle-prefetch all (LCP bandwidth) */
-  const [mounted, setMounted] = useState<ReadonlySet<number>>(() => new Set([0]));
+  const [mounted, setMounted] = useState<ReadonlySet<number>>(
+    () => new Set([readHeroSlideIndex()])
+  );
+
+  useEffect(() => {
+    writeHeroSlideIndex(activeIndex);
+  }, [activeIndex]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -44,6 +52,16 @@ export function HeroRotatingBanner() {
       window.clearInterval(timer);
     };
   }, []);
+
+  const selectSlide = (index: number) => {
+    setMounted((m) => {
+      if (m.has(index)) return m;
+      const copy = new Set(m);
+      copy.add(index);
+      return copy;
+    });
+    setActiveIndex(index);
+  };
 
   return (
     <>
@@ -71,8 +89,8 @@ export function HeroRotatingBanner() {
               alt={slide.label}
               width={slide.width}
               height={slide.height}
-              loading={index === 0 ? 'eager' : 'lazy'}
-              fetchPriority={index === 0 ? 'high' : 'low'}
+              loading={isActive ? 'eager' : 'lazy'}
+              fetchPriority={isActive ? 'high' : 'low'}
               decoding="async"
               sx={{
                 position: 'absolute',
@@ -125,25 +143,11 @@ export function HeroRotatingBanner() {
             aria-selected={index === activeIndex}
             tabIndex={0}
             aria-label={slide.label}
-            onClick={() => {
-              setMounted((m) => {
-                if (m.has(index)) return m;
-                const copy = new Set(m);
-                copy.add(index);
-                return copy;
-              });
-              setActiveIndex(index);
-            }}
+            onClick={() => selectSlide(index)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                setMounted((m) => {
-                  if (m.has(index)) return m;
-                  const copy = new Set(m);
-                  copy.add(index);
-                  return copy;
-                });
-                setActiveIndex(index);
+                selectSlide(index);
               }
             }}
             sx={{

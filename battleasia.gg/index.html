@@ -11,8 +11,9 @@
     <link rel="icon" href="/logo/logo.webp" type="image/webp" />
     <link rel="apple-touch-icon" href="/logo/logo.webp" />
 
-    <!-- LCP: hero image must win the network race before JS -->
+    <!-- LCP: hero image must win the network race before JS (src patched below if restored) -->
     <link
+      id="boot-hero-preload"
       rel="preload"
       as="image"
       href="/assets/images/hero/hero-pubg-wide.webp"
@@ -53,6 +54,7 @@
     <!-- Instant LCP paint on home before React boots (fixed → no CLS on dismiss) -->
     <div id="boot-shell" hidden>
       <img
+        id="boot-hero-img"
         src="/assets/images/hero/hero-pubg-wide.webp"
         width="1920"
         height="1080"
@@ -64,10 +66,29 @@
     <script>
       (function () {
         var p = location.pathname;
-        if (p === '/' || p === '/dashboard' || p === '/dashboard/') {
-          var el = document.getElementById('boot-shell');
-          if (el) el.hidden = false;
-        }
+        if (p !== '/' && p !== '/dashboard' && p !== '/dashboard/') return;
+
+        var slides = [
+          '/assets/images/hero/hero-pubg-wide.webp',
+          '/assets/images/hero/hero-free-fire-wide.webp',
+          '/assets/images/hero/hero-cod-mobile-wide.webp',
+          '/assets/images/hero/hero-valorant-wide.webp',
+          '/assets/images/hero/hero-mobile-legends-wide.webp',
+        ];
+        var idx = 0;
+        try {
+          var n = parseInt(sessionStorage.getItem('ba_hero_slide') || '', 10);
+          if (!isNaN(n) && n >= 0 && n < slides.length) idx = n;
+        } catch (e) {}
+
+        var src = slides[idx];
+        var preload = document.getElementById('boot-hero-preload');
+        if (preload) preload.setAttribute('href', src);
+        var img = document.getElementById('boot-hero-img');
+        if (img) img.src = src;
+
+        var el = document.getElementById('boot-shell');
+        if (el) el.hidden = false;
       })();
     </script>
     <div id="root"></div>
