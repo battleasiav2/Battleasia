@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { Box, Link, Stack, Alert, InputAdornment } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
@@ -96,7 +95,7 @@ export function ForgotPasswordView() {
                 ...authFieldSlotProps.input,
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="solar:letter-bold-duotone" width={20} sx={{ color: alpha('#f59e0b', 0.85) }} />
+                    <Iconify icon="solar:letter-bold-duotone" width={20} sx={{ color: '#f5c518' }} />
                   </InputAdornment>
                 ),
               },

@@ -32,7 +32,8 @@ export function AuthSplitContent({
           p: theme.spacing(3, 2, 10, 2),
           [theme.breakpoints.up(layoutQuery)]: {
             justifyContent: 'center',
-            p: theme.spacing(10, 2, 10, 2),
+            alignItems: 'flex-start',
+            p: theme.spacing(10, 2, 10, 5),
             maxWidth: '50%',
             flex: '0 0 50%',
           },

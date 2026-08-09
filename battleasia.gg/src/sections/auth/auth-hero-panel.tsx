@@ -1,6 +1,8 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
+import { CONFIG } from 'src/global-config';
+
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
 import { useTranslate } from 'src/locales/use-locales';
@@ -91,9 +93,21 @@ export function AuthHeroPanel() {
           gap: 1.5,
         }}
       >
-        <GlassStatTile label={t('home.stats.activePlayers')} value="10K+" tokens={glassTokens} />
-        <GlassStatTile label={t('home.stats.prizeMoney')} value="BAC" tokens={glassTokens} />
-        <GlassStatTile label={t('home.stats.gamesSupported')} value="5+" tokens={glassTokens} />
+        <GlassStatTile
+          label={t('home.stats.activePlayers')}
+          value={CONFIG.homeStats.activePlayers}
+          tokens={glassTokens}
+        />
+        <GlassStatTile
+          label={t('home.stats.prizeMoney')}
+          value={CONFIG.homeStats.prizeMoney}
+          tokens={glassTokens}
+        />
+        <GlassStatTile
+          label={t('home.stats.gamesSupported')}
+          value={CONFIG.homeStats.gamesSupported}
+          tokens={glassTokens}
+        />
       </Box>
     </Stack>
   );

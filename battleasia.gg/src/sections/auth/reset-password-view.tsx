@@ -4,22 +4,25 @@ import { useForm } from 'react-hook-form';
 import { useBoolean } from 'minimal-shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Box, Link, Stack, Alert, IconButton, Typography, InputAdornment } from '@mui/material';
+import { Box, Stack, Alert, IconButton, InputAdornment } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
-import { RouterLink } from 'src/routes/components';
 
 import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
+import { AuthNavButtons } from 'src/components/mesh-buttons/auth-nav-buttons';
 
 import { AuthFormShell } from './auth-form-shell';
+import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
-import { authAlertSx, authFieldSlotProps, authLinkSx } from './auth-form-styles';
+import { authAlertSx, authFieldSlotProps } from './auth-form-styles';
+
+const FIELD_ICON_COLOR = '#f5c518';
 
 export type ResetPasswordSchemaType = zod.infer<typeof ResetPasswordSchema>;
 
@@ -36,7 +39,7 @@ export const ResetPasswordSchema = zod
     newPassword: zod
       .string()
       .min(1, { message: 'Password is required!' })
-      .min(6, { message: 'Password must be at least 6 characters!' }),
+      .min(8, { message: 'Password must be at least 8 characters!' }),
     confirmPassword: zod.string().min(1, { message: 'Confirm Password is required!' }),
   })
   .refine((data) => data.newPassword === data.confirmPassword, {
@@ -145,7 +148,7 @@ export function ResetPasswordView() {
             ...authFieldSlotProps.input,
             startAdornment: (
               <InputAdornment position="start">
-                <Iconify icon="solar:letter-bold-duotone" width={20} sx={{ color: alpha('#f59e0b', 0.85) }} />
+                <Iconify icon="solar:letter-bold-duotone" width={20} sx={{ color: FIELD_ICON_COLOR }} />
               </InputAdornment>
             ),
           },
@@ -178,8 +181,8 @@ export function ResetPasswordView() {
         )}
 
         {codeVerified && (
-          <Alert severity="success" sx={{ mb: 2 }}>
-            ✓ {t('auth.codeVerifiedSuccess')}
+          <Alert severity="success" sx={{ ...authAlertSx, mb: 2 }}>
+            {t('auth.codeVerifiedSuccess')}
           </Alert>
         )}
       </Box>
@@ -197,7 +200,7 @@ export function ResetPasswordView() {
                 ...authFieldSlotProps.input,
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: alpha('#f59e0b', 0.85) }} />
+                    <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: FIELD_ICON_COLOR }} />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -224,7 +227,7 @@ export function ResetPasswordView() {
                 ...authFieldSlotProps.input,
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: alpha('#f59e0b', 0.85) }} />
+                    <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: FIELD_ICON_COLOR }} />
                   </InputAdornment>
                 ),
                 endAdornment: (
@@ -248,14 +251,10 @@ export function ResetPasswordView() {
         </>
       )}
 
-      <Stack direction="row" justifyContent="center" spacing={0.5}>
-        <Typography variant="body2" sx={{ color: alpha('#ffffff', 0.55) }}>
-          {t('auth.rememberPassword')}
-        </Typography>
-        <Link component={RouterLink} href={paths.auth.signIn} sx={authLinkSx}>
-          {t('auth.signIn')}
-        </Link>
-      </Stack>
+      <AuthFooterLinks
+        prefix={t('auth.rememberPassword')}
+        links={[{ label: t('auth.signIn'), href: paths.auth.signIn }]}
+      />
     </Stack>
   );
 
@@ -273,6 +272,8 @@ export function ResetPasswordView() {
       <Form methods={methods} onSubmit={onSubmit}>
         {renderForm()}
       </Form>
+
+      <AuthNavButtons homeLabel={t('footer.home')} joinLabel={t('home.joinNow')} />
     </AuthFormShell>
   );
 }

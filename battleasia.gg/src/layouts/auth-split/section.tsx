@@ -67,7 +67,8 @@ export function AuthSplitSection({
               width: 1,
               display: 'flex',
               flexDirection: 'column',
-              alignItems: 'center',
+              alignItems: { xs: 'center', [layoutQuery]: 'flex-end' },
+              pr: { [layoutQuery]: 5 },
             }}
           >
             {children}
