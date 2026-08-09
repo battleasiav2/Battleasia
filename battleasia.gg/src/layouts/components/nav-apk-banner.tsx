@@ -1,6 +1,7 @@
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
+import { CONFIG } from 'src/global-config';
 import { Iconify } from 'src/components/iconify';
 import { GLASS_CARD_RADIUS } from 'src/components/battle-glass-card';
 
@@ -10,6 +11,8 @@ import { useTranslate } from 'src/locales/use-locales';
 import { USER_COLORS } from '../user/user-theme';
 
 // ----------------------------------------------------------------------
+
+const LOGO_SRC = `${CONFIG.assetsDir}/logo/logo.webp`;
 
 type NavApkBannerProps = {
   compact?: boolean;
@@ -97,12 +100,20 @@ export function NavApkBanner({ compact = false }: NavApkBannerProps) {
               display: 'grid',
               placeItems: 'center',
               borderRadius: `${GLASS_CARD_RADIUS}px`,
-              bgcolor: alpha(USER_COLORS.gold, 0.16),
+              bgcolor: alpha(USER_COLORS.gold, 0.1),
               border: `1px solid ${alpha(USER_COLORS.gold, 0.4)}`,
-              color: USER_COLORS.gold,
+              overflow: 'hidden',
+              p: 0.4,
             }}
           >
-            <Iconify icon="solar:smartphone-2-bold" width={22} />
+            <Box
+              component="img"
+              src={LOGO_SRC}
+              alt="BattleAsia"
+              width={32}
+              height={32}
+              sx={{ width: 1, height: 1, objectFit: 'contain', display: 'block' }}
+            />
           </Box>
 
           <Box sx={{ minWidth: 0 }}>
