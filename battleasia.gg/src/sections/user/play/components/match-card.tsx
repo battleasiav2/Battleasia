@@ -194,7 +194,7 @@ export function MatchCard({
           ))}
         </Box>
 
-        {!isResult ? (
+        {!isResult && isJoined ? (
           <MatchRoomDialog
             match={match}
             trigger={
@@ -212,7 +212,7 @@ export function MatchCard({
                   '&:hover': { color: alpha(USER_COLORS.gold, 0.8) },
                 }}
               >
-                Room ID & Password
+                {t('match.roomIdPassword')}
               </Typography>
             }
           />

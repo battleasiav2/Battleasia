@@ -20,6 +20,9 @@ export const joinMatchApi = (matchId: string) => axios.post(`api/v2/games/matche
 
 export const checkMatchJoinApi = (matchId: string) => axios.post(`api/v2/games/matches/${matchId}/check-join`);
 
+export const getMatchRoomCredentialsApi = (matchId: string) =>
+  axios.get(`api/v2/games/matches/${matchId}/room`);
+
 export const getMatchHistoryApi = () => axios.get('api/v2/games/matches/history/me');
 
 export const getUserMatchHistoryApi = (userId: string) => axios.get(`api/v2/games/matches/history/user/${userId}`);

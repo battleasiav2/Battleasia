@@ -6,7 +6,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   Grid2 as Grid,
   IconButton,
   Typography,
@@ -55,7 +54,16 @@ function DetailGrid({ rows }: { rows: DetailRow[] }) {
     <Grid container spacing={1.25}>
       {rows.map((row) => (
         <Grid key={row.label} size={{ xs: 6 }}>
-          <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', color: USER_COLORS.textMuted, mb: 0.35 }}>
+          <Typography
+            sx={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: 0.8,
+              textTransform: 'uppercase',
+              color: USER_COLORS.textMuted,
+              mb: 0.35,
+            }}
+          >
             {row.label}
           </Typography>
           <Typography sx={{ fontSize: 13, fontWeight: 700, color: USER_COLORS.textPrimary, lineHeight: 1.35 }}>
@@ -107,11 +115,24 @@ export function MatchJoinDialog({
           display: 'flex',
           flexDirection: 'column',
           overflow: 'hidden',
+          border: `1px solid ${alpha(USER_COLORS.gold, 0.26)}`,
+          backgroundImage: `
+            linear-gradient(180deg, ${alpha(USER_COLORS.gold, 0.07)} 0%, transparent 24%),
+            linear-gradient(180deg, ${alpha('#0a0a0a', 0.97)} 0%, #050505 100%)
+          `,
         },
       }}
     >
       {match ? (
         <>
+          <Box
+            sx={{
+              height: 3,
+              flexShrink: 0,
+              background: `linear-gradient(90deg, transparent, ${USER_COLORS.gold}, transparent)`,
+            }}
+          />
+
           <DialogTitle
             sx={{
               display: 'flex',
@@ -119,11 +140,23 @@ export function MatchJoinDialog({
               justifyContent: 'space-between',
               gap: 1.5,
               px: { xs: 2.5, md: 3 },
-              pt: { xs: 2.5, md: 3 },
-              pb: 1.5,
+              pt: { xs: 2.25, md: 2.75 },
+              pb: 1.25,
             }}
           >
             <Box sx={{ minWidth: 0 }}>
+              <Typography
+                sx={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 1.1,
+                  textTransform: 'uppercase',
+                  color: alpha(USER_COLORS.gold, 0.9),
+                  mb: 0.5,
+                }}
+              >
+                {t('match.secureEntry')}
+              </Typography>
               <Typography
                 className="font-tr"
                 sx={{
@@ -147,8 +180,17 @@ export function MatchJoinDialog({
                 {t('match.joinMatchFor', { name: match.matchName })}
               </Typography>
             </Box>
-            <IconButton onClick={onClose} sx={{ color: USER_COLORS.textMuted, mt: -0.5, mr: -0.5 }}>
-              <Iconify icon="eva:close-fill" width={22} />
+            <IconButton
+              onClick={onClose}
+              sx={{
+                color: USER_COLORS.textMuted,
+                mt: -0.25,
+                mr: -0.25,
+                border: `1px solid ${alpha('#ffffff', 0.12)}`,
+                borderRadius: `${GLASS_CARD_RADIUS}px`,
+              }}
+            >
+              <Iconify icon="eva:close-fill" width={20} />
             </IconButton>
           </DialogTitle>
 
@@ -163,34 +205,49 @@ export function MatchJoinDialog({
             }}
           >
             <Scrollbar sx={{ maxHeight: { xs: 'calc(100vh - 280px)', sm: 420 } }}>
-              <Stack spacing={2}>
+              <Stack spacing={1.75}>
                 <Stack
                   direction="row"
                   alignItems="center"
                   justifyContent="space-between"
                   sx={{
                     px: 1.75,
-                    py: 1.25,
+                    py: 1.35,
                     borderRadius: `${GLASS_CARD_RADIUS}px`,
-                    bgcolor: alpha(USER_COLORS.gold, 0.1),
-                    border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
+                    bgcolor: alpha(USER_COLORS.gold, 0.12),
+                    border: `1px solid ${alpha(USER_COLORS.gold, 0.32)}`,
+                    boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.06)}`,
                   }}
                 >
-                  <Typography sx={{ fontSize: 12, fontWeight: 700, color: USER_COLORS.textMuted, textTransform: 'uppercase' }}>
-                    {t('match.entryFee')}
-                  </Typography>
-                  <CoinValue value={match.entryFee ?? 0} size={20} textSx={{ fontWeight: 800, color: USER_COLORS.gold, fontSize: 16 }} />
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Iconify icon="solar:ticket-bold" width={18} sx={{ color: USER_COLORS.gold }} />
+                    <Typography
+                      sx={{
+                        fontSize: 12,
+                        fontWeight: 700,
+                        color: USER_COLORS.textMuted,
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      {t('match.entryFee')}
+                    </Typography>
+                  </Stack>
+                  <CoinValue
+                    value={match.entryFee ?? 0}
+                    size={18}
+                    textSx={{ fontWeight: 800, color: USER_COLORS.gold, fontSize: 16 }}
+                  />
                 </Stack>
 
                 {match.map ? (
                   <Box
                     sx={{
                       width: 1,
-                      height: { xs: 150, sm: 168 },
+                      height: { xs: 140, sm: 158 },
                       borderRadius: `${GLASS_CARD_RADIUS}px`,
                       overflow: 'hidden',
                       position: 'relative',
-                      border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                      border: `1px solid ${alpha(USER_COLORS.gold, 0.18)}`,
                     }}
                   >
                     <Box
@@ -203,14 +260,24 @@ export function MatchJoinDialog({
                       sx={{
                         position: 'absolute',
                         inset: 0,
-                        background: `linear-gradient(180deg, transparent 45%, ${alpha('#000000', 0.82)} 100%)`,
+                        background: `linear-gradient(180deg, transparent 40%, ${alpha('#000000', 0.88)} 100%)`,
                       }}
                     />
-                    <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, px: 1.5, py: 1 }}>
-                      <Typography sx={{ fontSize: 11, fontWeight: 700, color: alpha('#ffffff', 0.72), textTransform: 'uppercase', letterSpacing: 0.8 }}>
+                    <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, px: 1.5, py: 1.1 }}>
+                      <Typography
+                        sx={{
+                          fontSize: 10,
+                          fontWeight: 700,
+                          color: alpha(USER_COLORS.gold, 0.85),
+                          textTransform: 'uppercase',
+                          letterSpacing: 0.9,
+                        }}
+                      >
                         {t('match.map')}
                       </Typography>
-                      <Typography sx={{ fontSize: 15, fontWeight: 800, color: '#fff', textTransform: 'uppercase' }}>
+                      <Typography
+                        sx={{ fontSize: 15, fontWeight: 800, color: '#fff', textTransform: 'uppercase' }}
+                      >
                         {match.map}
                       </Typography>
                     </Box>
@@ -222,35 +289,66 @@ export function MatchJoinDialog({
                 </Box>
 
                 <Stack
-                  spacing={1.25}
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
                   sx={{
-                    p: 1.75,
+                    px: 1.75,
+                    py: 1.25,
                     borderRadius: `${GLASS_CARD_RADIUS}px`,
                     bgcolor: alpha('#ffffff', 0.03),
                     border: `1px solid ${alpha('#ffffff', 0.08)}`,
                   }}
                 >
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography sx={{ fontSize: 12, fontWeight: 700, color: USER_COLORS.textMuted, textTransform: 'uppercase' }}>
-                      {t('match.perKill')}
-                    </Typography>
-                    <CoinValue value={match.perKill ?? 0} size={18} textSx={{ fontWeight: 700, color: USER_COLORS.textPrimary }} />
-                  </Stack>
-
-                  {match.prizeDescription ? (
-                    <>
-                      <Divider sx={{ borderColor: alpha('#ffffff', 0.08) }} />
-                      <Box>
-                        <Typography sx={{ fontSize: 12, fontWeight: 700, color: USER_COLORS.textMuted, textTransform: 'uppercase', mb: 0.5 }}>
-                          {t('match.prize')}
-                        </Typography>
-                        <Typography sx={{ fontSize: 13, color: USER_COLORS.textPrimary, lineHeight: 1.55, whiteSpace: 'pre-wrap' }}>
-                          {match.prizeDescription}
-                        </Typography>
-                      </Box>
-                    </>
-                  ) : null}
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      fontWeight: 700,
+                      color: USER_COLORS.textMuted,
+                      textTransform: 'uppercase',
+                    }}
+                  >
+                    {t('match.perKill')}
+                  </Typography>
+                  <CoinValue
+                    value={match.perKill ?? 0}
+                    size={16}
+                    textSx={{ fontWeight: 700, color: USER_COLORS.textPrimary, fontSize: 14 }}
+                  />
                 </Stack>
+
+                {match.prizeDescription ? (
+                  <Box
+                    sx={{
+                      p: 1.75,
+                      borderRadius: `${GLASS_CARD_RADIUS}px`,
+                      bgcolor: alpha('#ffffff', 0.03),
+                      border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                    }}
+                  >
+                    <Typography
+                      sx={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        color: USER_COLORS.textMuted,
+                        textTransform: 'uppercase',
+                        mb: 0.75,
+                      }}
+                    >
+                      {t('match.prize')}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        fontSize: 13,
+                        color: USER_COLORS.textPrimary,
+                        lineHeight: 1.55,
+                        whiteSpace: 'pre-wrap',
+                      }}
+                    >
+                      {match.prizeDescription}
+                    </Typography>
+                  </Box>
+                ) : null}
               </Stack>
             </Scrollbar>
           </DialogContent>
@@ -272,11 +370,22 @@ export function MatchJoinDialog({
                 px: 1.5,
                 py: 1.25,
                 borderRadius: `${GLASS_CARD_RADIUS}px`,
-                bgcolor: insufficient ? alpha(USER_COLORS.error, 0.12) : alpha(USER_COLORS.success, 0.12),
-                border: `1px solid ${insufficient ? alpha(USER_COLORS.error, 0.35) : alpha(USER_COLORS.success, 0.35)}`,
+                bgcolor: insufficient
+                  ? alpha(USER_COLORS.error, 0.12)
+                  : alpha(USER_COLORS.success, 0.12),
+                border: `1px solid ${
+                  insufficient ? alpha(USER_COLORS.error, 0.35) : alpha(USER_COLORS.success, 0.35)
+                }`,
               }}
             >
-              <Typography sx={{ fontSize: 12, fontWeight: 700, color: USER_COLORS.textMuted, textTransform: 'uppercase' }}>
+              <Typography
+                sx={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: USER_COLORS.textMuted,
+                  textTransform: 'uppercase',
+                }}
+              >
                 {t('match.yourBalance')}
               </Typography>
               <Stack direction="row" alignItems="center" spacing={0.75}>
@@ -300,7 +409,7 @@ export function MatchJoinDialog({
                 disabled={joining || insufficient}
                 sx={userGoldButtonSx}
               >
-                {t('match.joinMatch')}
+                {joining ? t('match.joining') : t('match.joinMatch')}
               </Button>
             </Stack>
           </DialogActions>

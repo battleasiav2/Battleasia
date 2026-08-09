@@ -38,8 +38,12 @@ async function enrichMatchesForUser(
 
   return matches.map((match) => {
     const base = serializeMatch(match, gameMap.get(match.gameId.toString()));
+    // Never expose room secrets on list payloads — fetch via /matches/:id/room after join.
     return {
       ...base,
+      roomId: undefined,
+      password: undefined,
+      matchPrivateDescription: '',
       participantsCount: countMap.get(match._id.toString()) || 0,
       isJoined: joinedSet.has(match._id.toString()),
     };
@@ -221,6 +225,44 @@ router.post('/matches/:id/check-join', requireAuth, async (req: AuthedRequest, r
   }
 });
 
+/** Joined players only — room id/password never returned on match list. */
+router.get('/matches/:id/room', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const match = await Match.findById(req.params.id).select(
+      'matchName map matchSchedule roomId password status'
+    );
+    if (!match) {
+      return res.status(404).json({ status: false, message: 'Match not found' });
+    }
+
+    const participant = await MatchParticipant.findOne({
+      matchId: match._id,
+      userId: req.userId,
+    }).select('_id');
+
+    if (!participant) {
+      return res.status(403).json({
+        status: false,
+        message: 'Join this match to view room credentials',
+      });
+    }
+
+    return res.json({
+      status: true,
+      data: {
+        matchName: match.matchName,
+        map: match.map || '',
+        matchSchedule: match.matchSchedule,
+        roomId: match.roomId || '',
+        password: match.password || '',
+      },
+    });
+  } catch (error) {
+    console.error('v2 match room credentials error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to fetch room credentials' });
+  }
+});
+
 router.post('/matches/:id/join', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const match = await Match.findById(req.params.id);
@@ -332,7 +374,8 @@ router.get('/matches/:id', requireAuth, async (req: AuthedRequest, res) => {
     ]);
 
     const isJoined = Boolean(userParticipant);
-    const showRoom = isJoined && (match.status === 'start' || match.status === 'active');
+    // Room secrets only for participants — never for spectators / non-joiners.
+    const showRoom = isJoined;
 
     return res.json({
       status: true,
