@@ -227,7 +227,7 @@
     "dashboard": {
       "liveDashboardChip": "Live dashboard",
       "battleAsiaPulse": "BattleAsia Pulse",
-      "pulseDescription": "Split hero layout: quick-glance platform numbers with a sleek glass finish. Track winnings, completed matches, and live action in real time.",
+      "pulseDescription": "Real-time platform stats at a glance — track total winnings, completed matches, and live action as it happens.",
       "platformTotalWinnings": "PLATFORM TOTAL WINNINGS",
       "processedMatches": "PROCESSED MATCHES",
       "ongoingMatches": "ONGOING MATCHES",

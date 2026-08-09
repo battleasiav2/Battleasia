@@ -103,7 +103,8 @@ export function LegalPageShell({
         overflowX: 'hidden',
         minHeight: '100vh',
         bgcolor: '#0a0a0a',
-        py: { xs: 4.5, md: 6 },
+        pt: { xs: 14, md: 18 },
+        pb: { xs: 4.5, md: 6 },
         px: { xs: 2, md: 4 },
         '&::before': {
           content: '""',

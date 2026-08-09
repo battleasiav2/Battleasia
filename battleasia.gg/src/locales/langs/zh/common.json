@@ -220,7 +220,7 @@
     "dashboard": {
       "liveDashboardChip": "实时仪表板",
       "battleAsiaPulse": "BattleAsia脉搏",
-      "pulseDescription": "分屏布局：快速查看平台数据，配以精美玻璃效果。实时追踪奖金、已完成比赛和正在进行的比赛。",
+      "pulseDescription": "一目了然的实时平台数据 —— 实时追踪总奖金、已完成比赛和正在进行的对战。",
       "platformTotalWinnings": "平台总奖金",
       "processedMatches": "已处理比赛",
       "ongoingMatches": "进行中比赛",

@@ -220,7 +220,7 @@
     "dashboard": {
       "liveDashboardChip": "लाइव डैशबोर्ड",
       "battleAsiaPulse": "BattleAsia पल्स",
-      "pulseDescription": "स्प्लिट हीरो लेआउट: एक चमकदार ग्लास फिनिश के साथ प्लेटफॉर्म नंबरों की त्वरित झलक। जीत, पूर्ण मैच और लाइव एक्शन को रियल टाइम में ट्रैक करें।",
+      "pulseDescription": "एक नज़र में रियल-टाइम प्लेटफ़ॉर्म आँकड़े — कुल जीत, पूर्ण मैच और लाइव एक्शन को सीधे ट्रैक करें।",
       "platformTotalWinnings": "प्लेटफॉर्म कुल जीत",
       "processedMatches": "प्रोसेस्ड मैच",
       "ongoingMatches": "चल रहे मैच",
