@@ -63,6 +63,10 @@ export function MatchCard({
       onClick={isResult ? handleCardClick : undefined}
       sx={getGoldTopLineShellSx({
         p: 0,
+        width: 1,
+        height: 1,
+        display: 'flex',
+        flexDirection: 'column',
         overflow: 'hidden',
         cursor: isResult ? 'pointer' : 'default',
         transition: 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease',
@@ -75,7 +79,7 @@ export function MatchCard({
       })}
     >
       {/* Banner */}
-      <Box sx={{ position: 'relative', height: 148, overflow: 'hidden' }}>
+      <Box sx={{ position: 'relative', height: 148, flexShrink: 0, overflow: 'hidden' }}>
         <Box
           component="img"
           src={bannerUrl}
@@ -118,9 +122,9 @@ export function MatchCard({
         </Stack>
       </Box>
 
-      {/* Body */}
-      <Stack spacing={1.5} sx={{ p: 2 }}>
-        <Box>
+      {/* Body — flex so footer buttons share one baseline across cards */}
+      <Stack spacing={1.5} sx={{ p: 2, flex: 1, minHeight: 0, display: 'flex' }}>
+        <Box sx={{ minHeight: 58 }}>
           <Typography
             className="font-tr"
             onClick={goToDetail}
@@ -130,6 +134,10 @@ export function MatchCard({
               color: USER_COLORS.textPrimary,
               textTransform: 'uppercase',
               lineHeight: 1.15,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
               cursor: isResult ? 'inherit' : 'pointer',
               '&:hover': isResult ? undefined : { color: USER_COLORS.gold },
             }}
@@ -194,29 +202,35 @@ export function MatchCard({
           ))}
         </Box>
 
-        {!isResult && isJoined ? (
-          <MatchRoomDialog
-            match={match}
-            trigger={
-              <Typography
-                component="span"
-                sx={{
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: 0.6,
-                  textTransform: 'uppercase',
-                  color: USER_COLORS.gold,
-                  textDecoration: 'underline',
-                  cursor: 'pointer',
-                  alignSelf: 'flex-start',
-                  '&:hover': { color: alpha(USER_COLORS.gold, 0.8) },
-                }}
-              >
-                {t('match.roomIdPassword')}
-              </Typography>
-            }
-          />
-        ) : null}
+        {/* Keep equal card height: always reserve room-link row (hidden when not joined) */}
+        {!isResult ? (
+          <Box sx={{ minHeight: 22, display: 'flex', alignItems: 'center', mt: 'auto' }}>
+            {isJoined ? (
+              <MatchRoomDialog
+                match={match}
+                trigger={
+                  <Typography
+                    component="span"
+                    sx={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 0.6,
+                      textTransform: 'uppercase',
+                      color: USER_COLORS.gold,
+                      textDecoration: 'underline',
+                      cursor: 'pointer',
+                      '&:hover': { color: alpha(USER_COLORS.gold, 0.8) },
+                    }}
+                  >
+                    {t('match.roomIdPassword')}
+                  </Typography>
+                }
+              />
+            ) : null}
+          </Box>
+        ) : (
+          <Box sx={{ mt: 'auto' }} />
+        )}
 
         {isResult ? (
           <Button
