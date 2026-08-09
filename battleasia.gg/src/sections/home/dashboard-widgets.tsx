@@ -1,7 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import {
     Box,
-    Card,
     Chip,
     Alert,
     Stack,
@@ -16,7 +15,6 @@ import { alpha } from '@mui/material/styles';
 
 import { CONFIG } from 'src/global-config';
 import useApi from 'src/hooks/use-api';
-import { Image } from 'src/components/image';
 import { fNumber, fShortenNumber } from 'src/utils/format-number';
 import { getAvatarUrl } from 'src/utils/get-image-url';
 import { useTranslate } from 'src/locales/use-locales';
@@ -205,6 +203,7 @@ function DashboardMatchTile({
     glassTokens: GlassTokens;
     platformTotalWinnings?: number;
 }) {
+    const { t } = useTranslate();
     const progressValue =
         variant === 'prize'
             ? Math.min(
@@ -221,7 +220,7 @@ function DashboardMatchTile({
             fShortenNumber(match.prizeEstimate || 0)
         ) : (
             <>
-                Spots {match.participantsCount}/{match.totalPlayer || '∞'}
+                {t('home.dashboard.spots')} {match.participantsCount}/{match.totalPlayer || '∞'}
             </>
         );
 
@@ -287,7 +286,7 @@ function DashboardMatchTile({
             </Stack>
             <Stack direction="row" spacing={{ xs: 1, sm: 2 }} sx={{ mt: 1, flexWrap: 'wrap' }}>
                 <Typography variant="caption" sx={{ color: '#ffffff', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
-                    {variant === 'prize' ? 'Entry: ' : 'Prize est. '}
+                    {variant === 'prize' ? `${t('home.dashboard.entry')}: ` : `${t('home.dashboard.prizeEst')} `}
                     {variant === 'prize' ? (
                         <CoinValue value={match.entryFee || 0} size={12} />
                     ) : (
@@ -300,12 +299,12 @@ function DashboardMatchTile({
                 >
                     {variant === 'prize' ? (
                         <>
-                            Spots: {match.participantsCount}/{match.totalPlayer || '∞'}
+                            {t('home.dashboard.spots')}: {match.participantsCount}/{match.totalPlayer || '∞'}
                         </>
                     ) : match.entryFee ? (
-                        <>Entry <CoinValue value={match.entryFee || 0} size={12} /></>
+                        <>{t('home.dashboard.entry')} <CoinValue value={match.entryFee || 0} size={12} /></>
                     ) : (
-                        'Entry Free'
+                        `${t('home.dashboard.entry')} ${t('home.dashboard.free')}`
                     )}
                 </Typography>
             </Stack>
@@ -375,94 +374,6 @@ function DashboardMatchPanel({
         </GlassPanelCard>
     );
 }
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const MatchCard = ({
-    match,
-    highlight,
-}: {
-    match: DashboardMatchSummary;
-    highlight?: boolean;
-}) => (
-    <Card
-        sx={{
-            p: 2,
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 1,
-            bgcolor: (theme) => alpha('#0b1224', 0.9),
-            border: (theme) =>
-                highlight
-                    ? `1px solid ${alpha(theme.palette.warning.main, 0.5)}`
-                    : `1px solid ${alpha(theme.palette.primary.main, 0.18)}`,
-            boxShadow: (theme) =>
-                highlight
-                    ? `0 16px 40px ${alpha(theme.palette.warning.main, 0.18)}`
-                    : `0 10px 26px ${alpha(theme.palette.primary.main, 0.12)}`,
-            backdropFilter: 'blur(8px)',
-        }}
-    >
-        <Stack direction="row" spacing={1} alignItems="center">
-            <Chip
-                label={match.status}
-                size="small"
-                color={match.status === 'start' ? 'warning' : 'success'}
-                variant="filled"
-            />
-            {match.gameName ? (
-                <Chip label={match.gameName} size="small" variant="outlined" />
-            ) : null}
-        </Stack>
-
-        <Typography variant="subtitle1">{match.matchName}</Typography>
-        <Typography variant="caption" sx={{ color: alpha('#ffffff', 0.72) }}>
-            Starts: {formatDateTime(match.matchSchedule as unknown as string)}
-        </Typography>
-
-        {match.banner ? (
-            <Box
-                sx={{
-                    position: 'relative',
-                    borderRadius: 1.5,
-                    overflow: 'hidden',
-                    border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.25)}`,
-                }}
-            >
-                <Image
-                    alt={match.matchName}
-                    src={CONFIG.serverUrl + match.banner}
-                    ratio="16/9"
-                />
-            </Box>
-        ) : null}
-
-        <Stack direction="row" spacing={2} sx={{ mt: 'auto' }}>
-            <Stack>
-                <Typography variant="caption" sx={{ color: alpha('#ffffff', 0.72) }}>
-                    Prize est.
-                </Typography>
-                <Typography variant="subtitle2"><CoinValue value={match.prizeEstimate} size={14} /></Typography>
-            </Stack>
-            <Stack>
-                <Typography variant="caption" sx={{ color: alpha('#ffffff', 0.72) }}>
-                    Entry
-                </Typography>
-                <Typography variant="subtitle2">
-                    {match.entryFee > 0 ? <CoinValue value={match.entryFee} size={14} /> : 'Free'}
-                </Typography>
-            </Stack>
-            <Stack>
-                <Typography variant="caption" sx={{ color: alpha('#ffffff', 0.72) }}>
-                    Spots
-                </Typography>
-                <Typography variant="subtitle2">
-                    {match.participantsCount}/{match.totalPlayer || '∞'}
-                </Typography>
-            </Stack>
-        </Stack>
-    </Card>
-);
 
 export function LandingDashboardSection() {
     const { t } = useTranslate();

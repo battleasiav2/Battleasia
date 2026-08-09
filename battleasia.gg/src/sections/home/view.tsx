@@ -678,7 +678,7 @@ export function HomeView() {
               lineHeight: 1.6,
             }}
           >
-            Solo 1 · Duo 2 · Squad 4 · TDM 6–8 — pick your team size.
+            {t('home.howToPlaySubtitle')}
           </Typography>
           <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
         </Stack>

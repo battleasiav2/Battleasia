@@ -128,6 +128,7 @@
       "gamesSupported": "সমর্থিত গেম",
       "tournaments": "টুর্নামেন্ট"
     },
+    "howToPlaySubtitle": "সোলো ১ · ডুয়ো ২ · স্কোয়াড ৪ · TDM ৬–৮ — আপনার দলের আকার বেছে নিন।",
     "gameModes": {
       "solo": {
         "title": "সোলো মোড",

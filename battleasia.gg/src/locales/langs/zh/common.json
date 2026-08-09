@@ -154,6 +154,7 @@
       "gamesSupported": "支持的游戏",
       "tournaments": "锦标赛"
     },
+    "howToPlaySubtitle": "单人 1 · 双人 2 · 四人 4 · 团队死斗 6–8 — 选择你的队伍规模。",
     "gameModes": {
       "solo": {
         "title": "单人模式",
