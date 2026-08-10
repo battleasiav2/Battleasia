@@ -32,7 +32,7 @@ const feedIconButtonSx = {
   color: USER_COLORS.textMuted,
   p: 0.5,
   '&:hover': {
-    bgcolor: 'var(--ba-fg-06)',
+    bgcolor: alpha('#ffffff', 0.06),
     color: USER_COLORS.textSubtle,
   },
 };
@@ -79,7 +79,7 @@ export function FeedCard({ feed, publishedAtLabel, onLike, onSave }: FeedCardPro
             sx={{
               width: 1,
               height: 1,
-              bgcolor: 'var(--ba-fg-04)',
+              bgcolor: alpha('#ffffff', 0.04),
               backgroundImage: `linear-gradient(135deg, ${alpha(USER_COLORS.gold, 0.08)} 0%, transparent 60%)`,
             }}
           />
@@ -215,7 +215,7 @@ export function FeedCard({ feed, publishedAtLabel, onLike, onSave }: FeedCardPro
           spacing={1.5}
           sx={{
             pt: 1,
-            borderTop: `1px solid var(--ba-border-soft)`,
+            borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
           }}
         >
           <Stack direction="row" alignItems="center" spacing={0.5}>

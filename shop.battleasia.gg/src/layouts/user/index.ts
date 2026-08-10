@@ -9,8 +9,6 @@ export { UserEmptyState } from './user-empty-state';
 export { UserStatTile } from './user-stat-tile';
 export { UserArenaStrip, UserArenaChip } from './user-arena-strip';
 
-export { UserColorModeToggle } from './user-color-mode-toggle';
-
 export {
   USER_COLORS,
   USER_IMAGES,

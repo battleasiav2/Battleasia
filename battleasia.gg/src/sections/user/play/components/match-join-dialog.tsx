@@ -276,7 +276,7 @@ export function MatchJoinDialog({
                         {t('match.map')}
                       </Typography>
                       <Typography
-                        sx={{ fontSize: 15, fontWeight: 800, color: USER_COLORS.textPrimary, textTransform: 'uppercase' }}
+                        sx={{ fontSize: 15, fontWeight: 800, color: '#fff', textTransform: 'uppercase' }}
                       >
                         {match.map}
                       </Typography>

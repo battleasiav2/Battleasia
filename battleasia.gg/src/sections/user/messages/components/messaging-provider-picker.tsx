@@ -66,7 +66,7 @@ export function MessagingProviderPicker({
               sx={{
                 p: 1.25,
                 cursor: 'pointer',
-                border: `1px solid var(--ba-fg-10)`,
+                border: `1px solid ${alpha('#ffffff', 0.1)}`,
                 bgcolor: alpha('#000000', 0.25),
                 '&:hover': { borderColor: alpha(USER_COLORS.gold, 0.35), bgcolor: alpha(USER_COLORS.gold, 0.06) },
               }}

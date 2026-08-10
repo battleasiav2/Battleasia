@@ -53,9 +53,9 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
             width: 196,
             overflow: 'hidden',
             borderRadius: 0,
-            bgcolor: 'var(--ba-menu-bg)',
-            border: `1px solid var(--ba-fg-08)`,
-            boxShadow: `0 12px 32px var(--ba-shadow)`,
+            bgcolor: alpha('#000000', 0.94),
+            border: `1px solid ${alpha('#ffffff', 0.08)}`,
+            boxShadow: `0 12px 32px ${alpha('#000000', 0.45)}`,
             backdropFilter: 'blur(12px)',
           },
         },
@@ -69,7 +69,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         sx={{
           px: 1.25,
           py: 0.75,
-          borderBottom: `1px solid var(--ba-fg-07)`,
+          borderBottom: `1px solid ${alpha('#ffffff', 0.07)}`,
         }}
       >
         <Typography
@@ -87,7 +87,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         </Typography>
         <Typography
           sx={{
-            color: 'var(--ba-fg-35)',
+            color: alpha('#ffffff', 0.35),
             fontSize: 10,
             fontWeight: 500,
           }}
@@ -96,7 +96,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         </Typography>
       </Stack>
 
-      <Stack divider={<Box sx={{ height: '1px', bgcolor: 'var(--ba-fg-06)' }} />}>
+      <Stack divider={<Box sx={{ height: '1px', bgcolor: alpha('#ffffff', 0.06) }} />}>
         {data.map((option) => {
           const isSelected = option.value === currentLang?.value;
           const meta = getLangMeta(option.value);
@@ -117,7 +117,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                 bgcolor: isSelected ? alpha(GOLD, 0.1) : 'transparent',
                 transition: 'background-color 0.2s ease',
                 '&:hover': {
-                  bgcolor: isSelected ? alpha(GOLD, 0.14) : 'var(--ba-fg-04)',
+                  bgcolor: isSelected ? alpha(GOLD, 0.14) : alpha('#ffffff', 0.04),
                 },
               }}
             >
@@ -129,7 +129,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                     borderRadius: 0,
                     overflow: 'hidden',
                     flexShrink: 0,
-                    boxShadow: `0 1px 3px var(--ba-shadow)`,
+                    boxShadow: `0 1px 3px ${alpha('#000000', 0.3)}`,
                   }}
                 >
                   <FlagIcon code={option.countryCode} sx={{ width: 22, height: 15 }} />
@@ -140,7 +140,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                     className="font-tr"
                     noWrap
                     sx={{
-                      color: isSelected ? GOLD : USER_COLORS.textPrimary,
+                      color: isSelected ? GOLD : '#f3f3f3',
                       fontSize: 13,
                       fontWeight: isSelected ? 600 : 500,
                       lineHeight: 1.2,
@@ -151,7 +151,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                   <Typography
                     component="span"
                     sx={{
-                      color: 'var(--ba-fg-35)',
+                      color: alpha('#ffffff', 0.35),
                       fontSize: 10,
                       fontWeight: 500,
                       letterSpacing: '0.04em',
@@ -189,13 +189,13 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
             display: 'inline-flex',
             alignItems: 'center',
             justifyContent: 'center',
-            bgcolor: open ? alpha(GOLD, 0.12) : 'var(--ba-bg-55)',
+            bgcolor: open ? alpha(GOLD, 0.12) : alpha('#080c14', 0.55),
             border: '2px solid',
-            borderColor: open ? alpha(GOLD, 0.5) : 'var(--ba-fg-18)',
-            boxShadow: `inset 0 0 0 1px var(--ba-fg-06)`,
+            borderColor: open ? alpha(GOLD, 0.5) : alpha('#ffffff', 0.18),
+            boxShadow: `inset 0 0 0 1px ${alpha('#000000', 0.25)}`,
             transition: 'transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease',
             '&:hover': {
-              bgcolor: 'var(--ba-bg-65)',
+              bgcolor: alpha('#0c121c', 0.7),
               borderColor: alpha(GOLD, 0.45),
               transform: 'scale(1.03)',
             },
