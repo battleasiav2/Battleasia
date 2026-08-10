@@ -292,8 +292,12 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
     // Tear down any previous listener before connecting, so we never stack
     // duplicate callbacks when the user logs out and back in.
     SocketService.instance.offBalanceUpdated(_onSocketBalanceUpdated);
-    SocketService.instance.connect(serverUrl, token);
-    SocketService.instance.onBalanceUpdated(_onSocketBalanceUpdated);
+    // Defer past first frame so Play/auth UI paints before socket IO starts.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_isAuthenticated) return;
+      SocketService.instance.connect(serverUrl, token);
+      SocketService.instance.onBalanceUpdated(_onSocketBalanceUpdated);
+    });
   }
 
   /// Re-connect the socket if it is not currently connected.

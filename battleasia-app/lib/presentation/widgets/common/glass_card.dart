@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 
@@ -39,19 +37,15 @@ class GlassCard extends StatelessWidget {
             ),
         ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(borderRadius),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-          child: Container(
-            padding: padding,
-            decoration: BoxDecoration(
-              color: AppColors.surface.withValues(alpha: 0.82),
-              border: Border.all(color: AppColors.border(0.14)),
-            ),
-            child: child,
-          ),
+      child: Container(
+        padding: padding,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(borderRadius),
+          // Solid translucent fill — avoids per-frame BackdropFilter cost on scroll.
+          color: AppColors.surface.withValues(alpha: 0.94),
+          border: Border.all(color: AppColors.border(0.14)),
         ),
+        child: child,
       ),
     );
   }

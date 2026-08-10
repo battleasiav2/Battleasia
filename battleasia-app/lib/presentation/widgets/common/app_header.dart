@@ -1,10 +1,7 @@
-﻿import 'dart:ui';
-
-import 'package:easy_localization/easy_localization.dart';
+﻿import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
-import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/app_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
@@ -34,63 +31,59 @@ class AppHeader extends StatelessWidget {
     ).clamp(48.0, 80.0);
     final topInset = MediaQuery.of(context).padding.top;
 
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-        child: Container(
-          padding: EdgeInsets.fromLTRB(
-            horizontalPadding,
-            topInset + 8,
-            horizontalPadding,
-            10,
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        horizontalPadding,
+        topInset + 8,
+        horizontalPadding,
+        10,
+      ),
+      decoration: BoxDecoration(
+        // Opaque-enough bar — no BackdropFilter (major scroll GPU win).
+        color: const Color(0xF00B0204),
+        border: Border(
+          bottom: BorderSide(color: AppColors.border(0.1)),
+        ),
+      ),
+      child: Row(
+        children: [
+          BattleAsiaLogo(
+            isMobile: isMobile,
+            showText: !isMobile,
+            logoSize: logoSize,
           ),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.55),
-            border: Border(
-              bottom: BorderSide(color: AppColors.border(0.1)),
-            ),
+          const Spacer(),
+          const LocaleToggle(),
+          const SizedBox(width: 8),
+          Consumer<AuthProvider>(
+            builder: (context, authProvider, _) {
+              if (authProvider.isAuthenticated) {
+                return const AnimatedBalanceDisplay();
+              }
+              return const SizedBox.shrink();
+            },
           ),
-          child: Row(
-            children: [
-              BattleAsiaLogo(
-                isMobile: isMobile,
-                showText: !isMobile,
-                logoSize: logoSize,
-              ),
-              const Spacer(),
-              const LocaleToggle(),
-              const SizedBox(width: 8),
-              Consumer<AuthProvider>(
-                builder: (context, authProvider, _) {
-                  if (authProvider.isAuthenticated) {
-                    return const AnimatedBalanceDisplay();
-                  }
-                  return const SizedBox.shrink();
-                },
-              ),
-              const SizedBox(width: 8),
-              Consumer<AuthProvider>(
-                builder: (context, authProvider, _) {
-                  if (authProvider.isAuthenticated) {
-                    return const AccountDrawer();
-                  }
-                  return GoldButton(
-                    label: 'nav.login'.tr(),
-                    expanded: false,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const SignInScreen(),
-                        ),
-                      );
-                    },
+          const SizedBox(width: 8),
+          Consumer<AuthProvider>(
+            builder: (context, authProvider, _) {
+              if (authProvider.isAuthenticated) {
+                return const AccountDrawer();
+              }
+              return GoldButton(
+                label: 'nav.login'.tr(),
+                expanded: false,
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const SignInScreen(),
+                    ),
                   );
                 },
-              ),
-            ],
+              );
+            },
           ),
-        ),
+        ],
       ),
     );
   }

@@ -115,9 +115,7 @@ class _FeedExplorePanelState extends State<FeedExplorePanel> {
                     CircleAvatar(
                       radius: 28,
                       backgroundColor: AppColors.gold,
-                      backgroundImage: avatar != null && avatar.isNotEmpty
-                          ? NetworkImage(avatar)
-                          : null,
+                      backgroundImage: ImageUtils.networkProvider(avatar),
                       child: avatar == null || avatar.isEmpty
                           ? Text(
                               (c['username']?.toString() ?? 'U')[0]
@@ -157,18 +155,24 @@ class _FeedExplorePanelState extends State<FeedExplorePanel> {
             style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
           )
         else
-          ..._posts.map(
-            (feed) => FeedItem(
-              feed: feed,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => FeedDetailScreen(feedId: feed.id),
-                  ),
-                );
-              },
-            ),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _posts.length,
+            itemBuilder: (context, index) {
+              final feed = _posts[index];
+              return FeedItem(
+                feed: feed,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => FeedDetailScreen(feedId: feed.id),
+                    ),
+                  );
+                },
+              );
+            },
           ),
       ],
     );
@@ -388,22 +392,24 @@ class _FeedSavedPanelState extends State<FeedSavedPanel> {
         ),
       );
     }
-    return Column(
-      children: _feeds
-          .map(
-            (feed) => FeedItem(
-              feed: feed,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => FeedDetailScreen(feedId: feed.id),
-                  ),
-                );
-              },
-            ),
-          )
-          .toList(),
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: _feeds.length,
+      itemBuilder: (context, index) {
+        final feed = _feeds[index];
+        return FeedItem(
+          feed: feed,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => FeedDetailScreen(feedId: feed.id),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

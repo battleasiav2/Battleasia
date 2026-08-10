@@ -13,8 +13,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Short, static splash — no bounce/jank — then auth entry.
-    Future<void>.delayed(const Duration(milliseconds: 700), () {
+    // Brief brand flash — keep short so first paint reaches Play/Auth faster.
+    Future<void>.delayed(const Duration(milliseconds: 280), () {
       if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const AuthWrapper()),

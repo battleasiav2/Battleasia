@@ -77,5 +77,3 @@ flutter:
           weight: 700
         - asset: assets/fonts/Poppins/Poppins-Medium.ttf
           weight: 500
-        - asset: assets/fonts/Poppins/Poppins-Light.ttf
-          weight: 300

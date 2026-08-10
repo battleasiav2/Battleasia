@@ -38,9 +38,14 @@ class _StoriesBarState extends State<StoriesBar> {
 
   Future<void> _load() async {
     setState(() => _loading = true);
-    final user = await _authService.getUser();
-    final result = await _socialService.getStories();
+    final results = await Future.wait([
+      _authService.getUser(),
+      _socialService.getStories(),
+    ]);
     if (!mounted) return;
+
+    final user = results[0] as UserModel?;
+    final result = results[1] as Map<String, dynamic>;
 
     List<StoryGroup> groups = [];
     if (result['success'] == true && result['data'] is List) {
@@ -147,41 +152,48 @@ class _StoriesBarState extends State<StoriesBar> {
         const SizedBox(height: 10),
         SizedBox(
           height: 148,
-          child: ListView(
+          child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            children: [
-              _StoryCard(
-                label: 'Your story',
-                hasUnseen: myGroup?.hasUnseen ?? false,
-                createCard: true,
-                avatarUrl: _me?.avatar,
-                onTap: _createStory,
-                onLongPress: myGroup != null && myGroup.stories.isNotEmpty
-                    ? () {
-                        final idx = _groups.indexWhere((g) => g.userId == _me!.id);
-                        if (idx >= 0) _openViewer(idx);
-                      }
-                    : null,
-              ),
-              ...others.map((group) {
-                final preview = group.previewStory;
+            itemCount: 1 + others.length,
+            itemBuilder: (context, index) {
+              if (index == 0) {
                 return Padding(
-                  padding: const EdgeInsets.only(left: 10),
+                  padding: EdgeInsets.only(right: others.isEmpty ? 0 : 10),
                   child: _StoryCard(
-                    label: group.username,
-                    hasUnseen: group.hasUnseen,
-                    avatarUrl: group.avatar,
-                    previewUrl: preview?.mediaUrl,
-                    isVideo: preview?.mediaType == 'video',
-                    onTap: () {
-                      final idx =
-                          _groups.indexWhere((g) => g.userId == group.userId);
-                      if (idx >= 0) _openViewer(idx);
-                    },
+                    label: 'Your story',
+                    hasUnseen: myGroup?.hasUnseen ?? false,
+                    createCard: true,
+                    avatarUrl: _me?.avatar,
+                    onTap: _createStory,
+                    onLongPress: myGroup != null && myGroup.stories.isNotEmpty
+                        ? () {
+                            final idx =
+                                _groups.indexWhere((g) => g.userId == _me!.id);
+                            if (idx >= 0) _openViewer(idx);
+                          }
+                        : null,
                   ),
                 );
-              }),
-            ],
+              }
+
+              final group = others[index - 1];
+              final preview = group.previewStory;
+              return Padding(
+                padding: EdgeInsets.only(right: index == others.length ? 0 : 10),
+                child: _StoryCard(
+                  label: group.username,
+                  hasUnseen: group.hasUnseen,
+                  avatarUrl: group.avatar,
+                  previewUrl: preview?.mediaUrl,
+                  isVideo: preview?.mediaType == 'video',
+                  onTap: () {
+                    final idx =
+                        _groups.indexWhere((g) => g.userId == group.userId);
+                    if (idx >= 0) _openViewer(idx);
+                  },
+                ),
+              );
+            },
           ),
         ),
       ],

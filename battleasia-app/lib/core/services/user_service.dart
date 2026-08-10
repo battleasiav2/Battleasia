@@ -1,4 +1,5 @@
 ﻿import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:battleasia_app/core/utils/api_client.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
@@ -125,8 +126,10 @@ class UserService {
         }),
       );
 
-      print('response: $response');
-      print('---------------------------------');
+      if (kDebugMode) {
+        print('response: $response');
+        print('---------------------------------');
+      }
 
       final responseBody = response.body;
       if (responseBody.isEmpty) {
