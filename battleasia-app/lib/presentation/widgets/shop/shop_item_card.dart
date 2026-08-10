@@ -231,17 +231,11 @@ class ShopItemCard extends StatelessWidget {
       );
     }
 
-    if (ImageUtils.isBase64DataUri(fullUrl)) {
-      final bytes = ImageUtils.decodeBase64DataUri(fullUrl);
-      if (bytes != null) {
-        return Image.memory(bytes, fit: BoxFit.contain);
-      }
-    }
-
-    return Image.network(
+    return ImageUtils.networkImage(
       fullUrl,
       fit: BoxFit.contain,
-      errorBuilder: (_, __, ___) => const Center(
+      memCacheWidth: 600,
+      errorWidget: const Center(
         child: Icon(
           Icons.monetization_on_outlined,
           size: 64,

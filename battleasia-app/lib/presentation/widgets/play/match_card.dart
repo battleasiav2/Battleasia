@@ -41,19 +41,18 @@ class _MatchCardState extends State<MatchCard> {
       fit: StackFit.expand,
       children: [
         // Banner image
-        Image.network(
+        ImageUtils.networkImage(
           bannerUrl,
           fit: BoxFit.cover,
           width: double.infinity,
           height: double.infinity,
-          errorBuilder: (context, error, stackTrace) {
-            return Image.asset(
-              'assets/images/game.webp',
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: double.infinity,
-            );
-          },
+          memCacheWidth: 900,
+          errorWidget: Image.asset(
+            'assets/images/game.webp',
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+          ),
         ),
         // Mask image overlay - positioned on the right center (100% 50% like web version)
         // The mask creates the decorative edge effect on the right side

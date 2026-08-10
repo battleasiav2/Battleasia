@@ -10,13 +10,13 @@ import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
-/// Wide cinematic hero slides — distant establishing shots (not close-up portraits).
+/// Hero slides — WebP only (PNG wide demos removed from APK assets).
 const _heroSlides = [
   'assets/images/hero/hero-pubg-wide.webp',
-  'assets/images/hero/hero-free-fire-wide.png',
-  'assets/images/hero/hero-cod-mobile-wide.png',
-  'assets/images/hero/hero-valorant-wide.png',
-  'assets/images/hero/hero-mobile-legends-wide.png',
+  'assets/images/hero/hero-free-fire.webp',
+  'assets/images/hero/hero-cod-mobile.webp',
+  'assets/images/hero/hero-valorant.webp',
+  'assets/images/hero/hero-mobile-legends.webp',
 ];
 
 const _rotateEvery = Duration(seconds: 90);

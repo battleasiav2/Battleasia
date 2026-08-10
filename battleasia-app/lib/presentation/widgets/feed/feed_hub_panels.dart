@@ -315,10 +315,9 @@ class _FeedReelsPanelState extends State<FeedReelsPanel> {
                     fit: StackFit.expand,
                     children: [
                       ImageUtils.networkImage(
-                        reel.thumbnailUrl.isNotEmpty
-                            ? reel.thumbnailUrl
-                            : reel.videoUrl,
+                        reel.videoUrl,
                         fit: BoxFit.cover,
+                        memCacheWidth: 600,
                       ),
                       const Center(
                         child: Icon(Icons.play_circle_fill, color: Colors.white, size: 40),
@@ -603,11 +602,6 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
     await _loadConversations();
   }
 
-  String _resolveMediaUrl(String url) {
-    if (url.startsWith('http')) return url;
-    return '${AppConfig.serverUrl}$url';
-  }
-
   @override
   Widget build(BuildContext context) {
     if (_settingsLoading) {
@@ -665,11 +659,12 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(4),
-                        child: Image.network(
-                          _resolveMediaUrl(url),
+                        child: ImageUtils.networkImage(
+                          url,
                           width: 72,
                           height: 72,
                           fit: BoxFit.cover,
+                          memCacheWidth: 216,
                         ),
                       ),
                       Positioned(
@@ -816,11 +811,12 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
                     padding: const EdgeInsets.only(bottom: 4),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(4),
-                      child: Image.network(
-                        _resolveMediaUrl(url),
+                      child: ImageUtils.networkImage(
+                        url,
                         width: 200,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
+                        memCacheWidth: 600,
+                        errorWidget: const Icon(Icons.broken_image),
                       ),
                     ),
                   ),

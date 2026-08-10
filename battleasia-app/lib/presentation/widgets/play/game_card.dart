@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
@@ -192,59 +190,25 @@ class GameCard extends StatelessWidget {
       return Image.asset(_fallbackImage, fit: BoxFit.cover);
     }
 
-    if (ImageUtils.isBase64DataUri(url)) {
-      final bytes = ImageUtils.decodeBase64DataUri(url);
-      if (bytes != null) {
-        return Image.memory(bytes, fit: BoxFit.cover);
-      }
-      return Image.asset(_fallbackImage, fit: BoxFit.cover);
-    }
-
-    return Image.network(
+    return ImageUtils.networkImage(
       url,
       fit: BoxFit.cover,
-      errorBuilder: (_, __, ___) =>
-          Image.asset(_fallbackImage, fit: BoxFit.cover),
-      loadingBuilder: (context, child, progress) {
-        if (progress == null) return child;
-        return Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(_fallbackImage, fit: BoxFit.cover),
-            Center(
-              child: CircularProgressIndicator(
-                color: AppColors.gold,
-                strokeWidth: 2,
-                value: progress.expectedTotalBytes != null
-                    ? progress.cumulativeBytesLoaded /
-                        progress.expectedTotalBytes!
-                    : null,
-              ),
-            ),
-          ],
-        );
-      },
+      memCacheWidth: 800,
+      placeholder: Image.asset(_fallbackImage, fit: BoxFit.cover),
+      errorWidget: Image.asset(_fallbackImage, fit: BoxFit.cover),
     );
   }
 
   Widget _buildLogo(String url, double size) {
-    if (ImageUtils.isBase64DataUri(url)) {
-      final Uint8List? bytes = ImageUtils.decodeBase64DataUri(url);
-      if (bytes == null) return const SizedBox.shrink();
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(4),
-        child: Image.memory(bytes, width: size, height: size, fit: BoxFit.cover),
-      );
-    }
-
     return ClipRRect(
       borderRadius: BorderRadius.circular(4),
-      child: Image.network(
+      child: ImageUtils.networkImage(
         url,
         width: size,
         height: size,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+        memCacheWidth: (size * 3).round(),
+        errorWidget: const SizedBox.shrink(),
       ),
     );
   }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
@@ -12,6 +13,7 @@ import 'package:battleasia_app/data/models/feed_model.dart';
 import 'package:battleasia_app/presentation/screens/account/account_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FeedDetailScreen extends StatefulWidget {
   final String feedId;
@@ -720,22 +722,21 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(10),
-          child: Image.network(
-            ImageUtils.getImageUrl(_feed!.coverUrl) ?? '',
+          child: ImageUtils.networkImage(
+            _feed!.coverUrl,
             height: coverImageHeight,
             width: double.infinity,
             fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                height: coverImageHeight,
-                color: AppTheme.textSecondary.withOpacity(0.1),
-                child: Icon(
-                  Icons.image_not_supported,
-                  size: 48,
-                  color: AppTheme.textSecondary,
-                ),
-              );
-            },
+            memCacheWidth: 1080,
+            errorWidget: Container(
+              height: coverImageHeight,
+              color: AppTheme.textSecondary.withOpacity(0.1),
+              child: Icon(
+                Icons.image_not_supported,
+                size: 48,
+                color: AppTheme.textSecondary,
+              ),
+            ),
           ),
         ),
       ),
@@ -1057,123 +1058,72 @@ class _CommentsDialog extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HTML Content Widget — renders full HTML (including base64 images) via WebView
+// HTML Content Widget — native flutter_html (no WebView / Chromium)
 // ─────────────────────────────────────────────────────────────────────────────
 
-class _HtmlContentWidget extends StatefulWidget {
+class _HtmlContentWidget extends StatelessWidget {
   final String htmlContent;
 
   const _HtmlContentWidget({required this.htmlContent});
 
   @override
-  State<_HtmlContentWidget> createState() => _HtmlContentWidgetState();
-}
-
-class _HtmlContentWidgetState extends State<_HtmlContentWidget> {
-  late final WebViewController _controller;
-  double _height = 200;
-  bool _loaded = false;
-
-  static String _buildHtmlPage(String body) => '''
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
-  <style>
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0; padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      font-size: 16px; line-height: 1.8;
-      color: #1a1a1a;
-      background: transparent;
-      overflow-x: hidden;
-    }
-    img {
-      max-width: 100% !important;
-      height: auto !important;
-      display: block;
-      margin: 8px 0;
-      border-radius: 8px;
-    }
-    p  { margin: 0 0 10px 0; }
-    h1 { font-size: 1.6em; font-weight: 700; margin: 16px 0 8px; }
-    h2 { font-size: 1.4em; font-weight: 700; margin: 14px 0 8px; }
-    h3 { font-size: 1.2em; font-weight: 700; margin: 12px 0 6px; }
-    ul, ol { padding-left: 20px; margin: 0 0 10px; }
-    li { margin-bottom: 4px; }
-    a  { color: #FEAB02; text-decoration: underline; }
-    blockquote {
-      border-left: 3px solid #FEAB02;
-      margin: 10px 0; padding: 4px 12px;
-      color: #555; font-style: italic;
-    }
-    table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-    td, th { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    th { background: #f5f5f5; font-weight: 700; }
-    pre, code { background: #f5f5f5; border-radius: 4px; padding: 2px 4px; font-size: 0.9em; }
-    pre { padding: 12px; overflow-x: auto; }
-  </style>
-</head>
-<body>$body</body>
-</html>''';
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.transparent)
-      ..setNavigationDelegate(NavigationDelegate(
-        onPageFinished: (_) => _updateHeight(),
-      ))
-      ..loadHtmlString(_buildHtmlPage(widget.htmlContent));
-  }
-
-  Future<void> _updateHeight() async {
-    // First pass — layout may not include decoded base64 images yet
-    await Future.delayed(const Duration(milliseconds: 300));
-    if (!mounted) return;
-    final r1 = await _controller.runJavaScriptReturningResult(
-        'document.documentElement.scrollHeight');
-    final h1 = double.tryParse(r1.toString()) ?? 200;
-    if (mounted && h1 > 0) {
-      setState(() {
-        _height = h1 + 32;
-        _loaded = true;
-      });
-    }
-    // Second pass — wait for heavy base64 images to finish rendering
-    await Future.delayed(const Duration(milliseconds: 900));
-    if (!mounted) return;
-    final r2 = await _controller.runJavaScriptReturningResult(
-        'document.documentElement.scrollHeight');
-    final h2 = double.tryParse(r2.toString()) ?? _height;
-    if (mounted && h2 + 32 > _height) {
-      setState(() => _height = h2 + 32);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: _height,
-      child: Stack(
-        children: [
-          WebViewWidget(controller: _controller),
-          if (!_loaded)
-            const Center(
-              child: Padding(
-                padding: EdgeInsets.all(48),
-                child: CircularProgressIndicator(
-                  color: Color(0xFFFEAB02),
-                  strokeWidth: 2,
+    return Html(
+      data: htmlContent,
+      style: {
+        'body': Style(
+          margin: Margins.zero,
+          padding: HtmlPaddings.zero,
+          color: const Color(0xFF1A1A1A),
+          fontSize: FontSize(16),
+          lineHeight: const LineHeight(1.8),
+        ),
+        'p': Style(margin: Margins.only(bottom: 10)),
+        'h1': Style(fontSize: FontSize(1.6, Unit.em), fontWeight: FontWeight.w700),
+        'h2': Style(fontSize: FontSize(1.4, Unit.em), fontWeight: FontWeight.w700),
+        'h3': Style(fontSize: FontSize(1.2, Unit.em), fontWeight: FontWeight.w700),
+        'a': Style(color: AppColors.gold, textDecoration: TextDecoration.underline),
+        'img': Style(
+          width: Width(100, Unit.percent),
+          margin: Margins.symmetric(vertical: 8),
+        ),
+        'blockquote': Style(
+          border: const Border(left: BorderSide(color: AppColors.gold, width: 3)),
+          padding: HtmlPaddings.only(left: 12),
+          fontStyle: FontStyle.italic,
+          color: const Color(0xFF555555),
+        ),
+      },
+      onLinkTap: (url, _, __) async {
+        if (url == null || url.isEmpty) return;
+        final uri = Uri.tryParse(url);
+        if (uri != null) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      },
+      extensions: [
+        TagExtension(
+          tagsToExtend: {'img'},
+          builder: (extensionContext) {
+            final src = extensionContext.attributes['src'];
+            if (src == null || src.isEmpty) {
+              return const SizedBox.shrink();
+            }
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: ImageUtils.networkImage(
+                  src,
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                  memCacheWidth: 1080,
                 ),
               ),
-            ),
-        ],
-      ),
+            );
+          },
+        ),
+      ],
     );
   }
 }

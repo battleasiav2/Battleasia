@@ -176,22 +176,21 @@ class FeedItem extends StatelessWidget {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(2),
-                        child: Image.network(
-                          ImageUtils.getImageUrl(feed.coverUrl) ?? '',
+                        child: ImageUtils.networkImage(
+                          feed.coverUrl,
                           height: coverImageHeight,
                           width: double.infinity,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: coverImageHeight,
-                              color: AppColors.surface,
-                              child: Icon(
-                                Icons.image_not_supported,
-                                size: iconSize * 2,
-                                color: AppColors.textMuted,
-                              ),
-                            );
-                          },
+                          memCacheWidth: 900,
+                          errorWidget: Container(
+                            height: coverImageHeight,
+                            color: AppColors.surface,
+                            child: Icon(
+                              Icons.image_not_supported,
+                              size: iconSize * 2,
+                              color: AppColors.textMuted,
+                            ),
+                          ),
                         ),
                       ),
                       if (feed.premiumOnly)

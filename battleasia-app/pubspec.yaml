@@ -20,6 +20,7 @@ dependencies:
   # Networking
   http: ^1.2.2
   socket_io_client: ^2.0.3+1
+  cached_network_image: ^3.4.1
   
   # Local Storage
   shared_preferences: ^2.3.2
@@ -27,45 +28,17 @@ dependencies:
   # Utils
   intl: ^0.20.2
   url_launcher: ^6.3.1
-  # package_info_plus: ^8.3.1
   intl_phone_field: ^3.2.0
-  # image_picker: ^1.1.2
   image_picker: ^1.2.1
   video_player: ^2.9.5
   chewie: ^1.11.3
+  flutter_html: ^3.0.0
   
   # Environment
   flutter_dotenv: ^5.1.0
   
   # Localization
   easy_localization: ^3.0.7+1
-
-  # firebase_core: ^3.15.0
-  # firebase_auth: ^5.6.1
-  # cloud_firestore: ^5.6.10
-  # firebase_storage: ^12.4.10
-  record: ^6.0.0
-  path_provider: ^2.1.1
-  flutter_sound: ^9.2.13
-  permission_handler: ^12.0.1
-  get_it: ^8.0.2
-  pulsator: ^1.0.0+2
-  path:
-  group_button: ^5.3.4
-  radio_group_v2: ^3.3.1
-  flutter_otp_text_field: ^1.5.1+1
-  dropdown_button2: ^2.3.9
-  string_to_hex: ^0.2.2
-  linear_progress_bar: ^1.2.0
-  # google_sign_in: ^7.1.0
-  # sign_in_with_apple: ^7.0.1
-  crypto: ^3.0.6
-  # in_app_purchase: ^3.2.3
-  # in_app_purchase_android: ^0.4.0+3
-  # in_app_purchase_storekit: ^0.4.4
-  webview_flutter: ^4.13.0
-  flutter_local_notifications: ^19.4.2
-  # flutter_inapp_purchase: ^7.1.0
 
 dev_dependencies:
   flutter_test:
@@ -97,15 +70,6 @@ flutter:
 
 
   fonts:
-    - family: NotoSansJP
-      fonts:
-        - asset: assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf
-        - asset: assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf
-          weight: 700
-        - asset: assets/fonts/NotoSansJP/NotoSansJP-Medium.ttf
-          weight: 500
-        - asset: assets/fonts/NotoSansJP/NotoSansJP-Light.ttf
-          weight: 300
     - family: Poppins
       fonts:
         - asset: assets/fonts/Poppins/Poppins-Regular.ttf
