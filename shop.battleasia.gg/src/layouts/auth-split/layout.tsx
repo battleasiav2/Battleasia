@@ -52,9 +52,7 @@ export function AuthSplitLayout({
   const { isLoggedIn } = useSelector((state) => state.auth);
   const [reauthDone, setReauthDone] = useState(() => searchParams.get('reauth') !== '1');
 
-  // Main app / Docker / domain entry: always force a fresh shop login.
-  // Clear shop Redux only — do NOT hit API logout (same-domain `/store`
-  // shares the auth cookie with the main app).
+  // Legacy `?reauth=1` still clears shop session once; normal visits keep login.
   useEffect(() => {
     if (searchParams.get('reauth') !== '1') {
       setReauthDone(true);

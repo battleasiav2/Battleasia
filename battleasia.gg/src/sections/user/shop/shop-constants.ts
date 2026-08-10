@@ -20,8 +20,8 @@ export const SHOP_EXTERNAL_URL =
 
 /**
  * Entry URL for “Go to BAC Shop”.
- * Always lands on shop sign-in with `reauth=1` so Docker/prod requires a fresh login
- * (no SSO handoff from the main app).
+ * Opens the storefront — AuthGuard sends guests to sign-in.
+ * Session persists (no forced reauth on every visit).
  */
 export function getBacShopEntryUrl() {
   try {
@@ -29,15 +29,10 @@ export function getBacShopEntryUrl() {
       SHOP_EXTERNAL_URL,
       typeof window !== 'undefined' ? window.location.origin : 'http://localhost'
     );
-    // …/user/shop → …/auth/sign-in
-    storeUrl.pathname = storeUrl.pathname.replace(/\/user\/shop\/?$/, '/auth/sign-in');
-    if (!storeUrl.pathname.includes('/auth/sign-in')) {
-      storeUrl.pathname = `${storeUrl.pathname.replace(/\/$/, '')}/auth/sign-in`;
-    }
-    storeUrl.search = 'reauth=1';
+    storeUrl.search = '';
     storeUrl.hash = '';
     return storeUrl.toString();
   } catch {
-    return SHOP_EXTERNAL_URL.replace(/\/user\/shop\/?$/, '/auth/sign-in') + '?reauth=1';
+    return SHOP_EXTERNAL_URL;
   }
 }

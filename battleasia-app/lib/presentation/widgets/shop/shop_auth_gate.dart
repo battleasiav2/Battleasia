@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
-import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
+import 'package:battleasia_app/core/utils/network_utils.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 
-/// Shop requires a valid login — mirrors web shop AuthGuard.
-///
-/// Re-validates the session every time a shop screen opens. Missing or expired
-/// tokens show [SignInScreen] instead of shop content.
+/// Shop access:
+/// - Logged in + online → enter (session persists, no repeat login)
+/// - Not logged in → sign-in
+/// - Offline → sign out + sign-in required
 class ShopAuthGate extends StatefulWidget {
   const ShopAuthGate({
     super.key,
@@ -19,38 +19,53 @@ class ShopAuthGate extends StatefulWidget {
   final Widget child;
   final Widget afterLoginScreen;
 
-  /// Validate session before entering shop. Returns false → caller should not proceed.
+  /// Returns true when shop may open. Offline clears the session.
   static Future<bool> ensureShopAccess(BuildContext context) async {
     final auth = context.read<AuthProvider>();
+    final online = await isNetworkOnline();
 
-    if (!auth.isAuthenticated) {
+    if (!online) {
+      if (auth.isAuthenticated) {
+        await auth.signOut();
+      }
       return false;
     }
 
-    final me = await UserService().getMe();
-    if (me['success'] == true) {
-      return true;
-    }
-
-    await auth.signOut();
-    return false;
+    return auth.isAuthenticated;
   }
 
   @override
   State<ShopAuthGate> createState() => _ShopAuthGateState();
 }
 
-class _ShopAuthGateState extends State<ShopAuthGate> {
+class _ShopAuthGateState extends State<ShopAuthGate> with WidgetsBindingObserver {
   bool _checking = true;
   bool _allowed = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _verify();
   }
 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _allowed) {
+      _verify();
+    }
+  }
+
   Future<void> _verify() async {
+    if (mounted && !_checking) {
+      setState(() => _checking = true);
+    }
     final allowed = await ShopAuthGate.ensureShopAccess(context);
     if (mounted) {
       setState(() {
