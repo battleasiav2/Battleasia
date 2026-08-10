@@ -14,6 +14,7 @@ import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_item_card.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_detail_screen.dart';
 
 /// Native BAC store — list + filters + buy, matching web shop.battleasia.gg /store.
@@ -236,6 +237,13 @@ class _ShopScreenState extends State<ShopScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return ShopAuthGate(
+      afterLoginScreen: const ShopScreen(),
+      child: _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     final headerHeight = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 100.0,

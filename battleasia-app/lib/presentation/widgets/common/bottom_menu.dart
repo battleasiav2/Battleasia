@@ -6,6 +6,7 @@ import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_screen.dart';
 import 'package:battleasia_app/presentation/screens/referral/referral_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_auth.dart';
 
 class FloatingBottomNav extends StatefulWidget {
   const FloatingBottomNav({super.key});
@@ -147,8 +148,8 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
         targetScreen = const PlayScreen();
         break;
       case '/shop':
-        targetScreen = const ShopScreen();
-        break;
+        openShopRoute(context, const ShopScreen(), routeName: '/shop');
+        return;
       case '/referral':
         targetScreen = const ReferralScreen();
         break;

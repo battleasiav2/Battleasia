@@ -14,6 +14,7 @@ import 'package:battleasia_app/presentation/screens/account/account_screen.dart'
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_auth.dart';
 import 'package:battleasia_app/presentation/screens/referral/referral_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
 import 'package:battleasia_app/presentation/screens/wallet/wallet_screen.dart';
@@ -328,12 +329,7 @@ class _AccountDrawerContent extends StatelessWidget {
                     label: 'nav.shop'.tr(),
                     onTap: () {
                       Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ShopScreen(),
-                        ),
-                      );
+                      openShopRoute(context, const ShopScreen(), routeName: '/shop');
                     },
                   ),
 
@@ -464,11 +460,10 @@ class _AccountDrawerContent extends StatelessWidget {
               nested: true,
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
+                openShopRoute(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const WalletScreen(fromShop: true),
-                  ),
+                  const WalletScreen(fromShop: true),
+                  routeName: '/shop/wallet',
                 );
               },
             ),
@@ -478,11 +473,10 @@ class _AccountDrawerContent extends StatelessWidget {
               nested: true,
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
+                openShopRoute(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const ShopWithdrawalScreen(),
-                  ),
+                  const ShopWithdrawalScreen(),
+                  routeName: '/shop/withdraw',
                 );
               },
             ),

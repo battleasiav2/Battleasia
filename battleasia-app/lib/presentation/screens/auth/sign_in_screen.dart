@@ -14,7 +14,19 @@ import 'package:battleasia_app/presentation/widgets/auth/auth_form_shell.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_text_field.dart';
 
 class SignInScreen extends StatefulWidget {
-  const SignInScreen({super.key});
+  const SignInScreen({
+    super.key,
+    this.afterLoginScreen,
+    this.titleKey = 'auth.signInTitle',
+    this.descriptionKey = 'auth.signInDesc',
+  });
+
+  /// Where to go after a successful sign-in (defaults to Play).
+  final Widget? afterLoginScreen;
+
+  /// Optional i18n keys — shop flow uses [shop.signInTitle] / [shop.signInDesc].
+  final String titleKey;
+  final String descriptionKey;
 
   @override
   State<SignInScreen> createState() => _SignInScreenState();
@@ -58,7 +70,9 @@ class _SignInScreenState extends State<SignInScreen> {
         return;
       }
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const PlayScreen()),
+        MaterialPageRoute(
+          builder: (_) => widget.afterLoginScreen ?? const PlayScreen(),
+        ),
       );
       return;
     }
@@ -71,8 +85,8 @@ class _SignInScreenState extends State<SignInScreen> {
     final authProvider = context.watch<AuthProvider>();
 
     return AuthFormShell(
-      title: 'auth.signInTitle'.tr(),
-      description: 'auth.signInDesc'.tr(),
+      title: widget.titleKey.tr(),
+      description: widget.descriptionKey.tr(),
       onHome: () => Navigator.of(context).maybePop(),
       child: Form(
         key: _formKey,

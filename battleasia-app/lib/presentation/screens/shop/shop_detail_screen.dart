@@ -10,6 +10,7 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/shop_item_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 
 // Badge colour map — mirrors BADGE_COLOR_MAP in the web shop frontend.
 const Map<String, Color> _kBadgeBgColor = {
@@ -988,6 +989,13 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return ShopAuthGate(
+      afterLoginScreen: ShopDetailScreen(itemId: widget.itemId),
+      child: _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     final headerHeight = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 100.0,

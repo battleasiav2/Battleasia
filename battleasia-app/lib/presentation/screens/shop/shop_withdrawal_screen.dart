@@ -11,6 +11,7 @@ import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 
 /// Native store withdrawal — mirrors web shop `/user/withdrawal` (Coingo payout).
 class ShopWithdrawalScreen extends StatefulWidget {
@@ -152,6 +153,13 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return ShopAuthGate(
+      afterLoginScreen: const ShopWithdrawalScreen(),
+      child: _buildBody(context),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
     final headerHeight = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 100.0,

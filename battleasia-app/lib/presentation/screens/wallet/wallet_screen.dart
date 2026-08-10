@@ -11,6 +11,7 @@ import 'package:battleasia_app/data/models/balance_history_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/withdraw_sheet.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
 
@@ -331,6 +332,16 @@ class _WalletScreenState extends State<WalletScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.fromShop) {
+      return ShopAuthGate(
+        afterLoginScreen: WalletScreen(fromShop: true),
+        child: _buildBody(context),
+      );
+    }
+    return _buildBody(context);
+  }
+
+  Widget _buildBody(BuildContext context) {
     // Responsive sizes
     final headerHeight = ResponsiveUtils.getResponsiveSpacing(
       context,

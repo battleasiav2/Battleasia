@@ -152,6 +152,8 @@
     "tabShop": "Shop",
     "tabWallet": "Wallet",
     "tabWithdraw": "Withdraw",
+    "signInTitle": "Sign in to BAC Store",
+    "signInDesc": "Shop, wallet and withdrawals require your BattleAsia account. Sign in to continue.",
     "heroTitle": "BAC STORE",
     "heroSubtitle": "Buy BattleAsia coins — pay with bKash, Nagad or crypto.",
     "statBalance": "Balance",

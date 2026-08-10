@@ -144,6 +144,8 @@
     "tabShop": "শপ",
     "tabWallet": "ওয়ালেট",
     "tabWithdraw": "উইথড্র",
+    "signInTitle": "BAC স্টোরে সাইন ইন",
+    "signInDesc": "শপ, ওয়ালেট ও উইথড্রয়ালের জন্য BattleAsia অ্যাকাউন্ট লাগবে। চালিয়ে যেতে সাইন ইন করুন।",
     "heroTitle": "BAC স্টোর",
     "heroSubtitle": "BattleAsia কয়েন কিনুন — bKash, Nagad বা ক্রিপ্টো দিয়ে পেমেন্ট।",
     "statBalance": "ব্যালেন্স",
