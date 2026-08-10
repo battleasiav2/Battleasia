@@ -6,8 +6,6 @@ import { lazy, Suspense } from 'react';
 import AuthGuard from 'src/utils/authguard';
 import { lazyRetry } from 'src/utils/lazy-retry';
 
-import { UserLayout } from 'src/layouts/user';
-
 import { LoadingScreen } from 'src/components/loading-screen';
 
 import { paths } from '../paths';
@@ -15,6 +13,10 @@ import { usePathname } from '../hooks';
 
 // ----------------------------------------------------------------------
 
+// Keep UserLayout (nav chrome) off anonymous home entry graph
+const UserLayout = lazy(() =>
+  lazyRetry(() => import('src/layouts/user').then((m) => ({ default: m.UserLayout })))
+);
 const ProfilePage = lazy(() => lazyRetry(() => import('src/pages/user/profile')));
 const WalletPage = lazy(() => lazyRetry(() => import('src/pages/user/wallet')));
 const MyMatchesPage = lazy(() => lazyRetry(() => import('src/pages/user/my-matches')));
@@ -47,9 +49,11 @@ function SuspenseOutlet() {
 
 const userLayout = () => (
   <AuthGuard>
-    <UserLayout>
-      <SuspenseOutlet />
-    </UserLayout>
+    <Suspense fallback={<LoadingScreen />}>
+      <UserLayout>
+        <SuspenseOutlet />
+      </UserLayout>
+    </Suspense>
   </AuthGuard>
 );
 

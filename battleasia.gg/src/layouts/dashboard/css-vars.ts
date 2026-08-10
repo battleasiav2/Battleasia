@@ -3,7 +3,7 @@ import type { Theme, CSSObject } from '@mui/material/styles';
 
 import { varAlpha } from 'minimal-shared/utils';
 
-import { bulletColor } from 'src/components/nav-section';
+import { bulletColor } from 'src/components/nav-section/styles';
 
 // ----------------------------------------------------------------------
 

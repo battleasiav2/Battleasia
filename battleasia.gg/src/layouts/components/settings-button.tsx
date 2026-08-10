@@ -7,7 +7,7 @@ import SvgIcon from '@mui/material/SvgIcon';
 import IconButton from '@mui/material/IconButton';
 
 import { useSettingsContext } from 'src/components/settings';
-import { varTap, varHover, transitionTap } from 'src/components/animate';
+import { varTap, varHover, transitionTap } from 'src/components/animate/variants';
 
 // ----------------------------------------------------------------------
 

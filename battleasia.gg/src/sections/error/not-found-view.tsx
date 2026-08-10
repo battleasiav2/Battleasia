@@ -9,7 +9,8 @@ import { RouterLink } from 'src/routes/components';
 import { SimpleLayout } from 'src/layouts/simple';
 import { PageNotFoundIllustration } from 'src/assets/illustrations';
 
-import { varBounce, MotionContainer } from 'src/components/animate';
+import { varBounce } from 'src/components/animate/variants/bounce';
+import { MotionContainer } from 'src/components/animate/motion-container';
 
 // ----------------------------------------------------------------------
 

@@ -153,11 +153,19 @@ export default defineConfig(({ mode }) => {
               'i18next-resources-to-backend',
             ],
             
-            'animation-vendor': [
-              'framer-motion',
-            ],
+            // Toast / helmet stay light; heavy widgets load only when imported
+            'toast-vendor': ['react-hot-toast'],
+            'helmet-vendor': ['react-helmet-async'],
 
-            // Carousel — shop only; keep out of home critical path
+            // Async-only heavy UI (must NOT be static-imported from layout entry)
+            'simplebar-vendor': ['simplebar-react'],
+            'dropzone-vendor': ['react-dropzone'],
+            'phone-vendor': ['react-phone-number-input'],
+
+            // Framer only when a route still imports it (404 / splash / optional FX)
+            'animation-vendor': ['framer-motion'],
+
+            // Carousel — shop / product only
             'carousel-vendor': [
               'embla-carousel',
               'embla-carousel-react',
@@ -165,15 +173,6 @@ export default defineConfig(({ mode }) => {
               'embla-carousel-auto-height',
               'embla-carousel-auto-scroll',
               'embla-carousel-fade',
-            ],
-
-            // Miscellaneous (socket.io loaded via dynamic import — not listed here)
-            'misc-vendor': [
-              'react-helmet-async',
-              'react-hot-toast',
-              'simplebar-react',
-              'react-dropzone',
-              'react-phone-number-input',
             ],
           },
           // Chunk filename pattern

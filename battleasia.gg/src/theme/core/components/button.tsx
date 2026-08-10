@@ -4,7 +4,6 @@ import type { Theme, CSSObject, Components, ComponentsVariants } from '@mui/mate
 import { varAlpha } from 'minimal-shared/utils';
 
 import { buttonClasses } from '@mui/material/Button';
-import { loadingButtonClasses } from '@mui/lab/LoadingButton';
 
 // ----------------------------------------------------------------------
 
@@ -16,6 +15,14 @@ import { loadingButtonClasses } from '@mui/lab/LoadingButton';
 export type ButtonExtendVariant = {
   soft: true;
 };
+
+// ----------------------------------------------------------------------
+
+/** Avoid importing `@mui/lab` on the critical path — class names are stable. */
+const loadingButtonClasses = {
+  loadingIndicatorStart: 'MuiLoadingButton-loadingIndicatorStart',
+  loadingIndicatorEnd: 'MuiLoadingButton-loadingIndicatorEnd',
+} as const;
 
 // ----------------------------------------------------------------------
 

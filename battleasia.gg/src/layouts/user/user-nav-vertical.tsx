@@ -7,7 +7,6 @@ import { styled, alpha } from '@mui/material/styles';
 import { Box, Stack, Typography, Divider } from '@mui/material';
 
 import { Logo } from 'src/components/logo';
-import { Scrollbar } from 'src/components/scrollbar';
 import { NavSectionMini, NavSectionVertical } from 'src/components/nav-section';
 import { GLASS_CARD_RADIUS } from 'src/components/battle-glass-card';
 
@@ -125,9 +124,16 @@ export function UserNavVertical({
 
       <Divider sx={{ mx: 2, borderColor: alpha('#ffffff', 0.08) }} />
 
-      <Scrollbar fillContent>
+      <Box
+        sx={(theme) => ({
+          flex: '1 1 auto',
+          minHeight: 0,
+          overflowY: 'auto',
+          ...theme.mixins.hideScrollY,
+        })}
+      >
         <NavSectionVertical data={data} cssVars={cssVars} sx={{ px: 1.5, py: 1.5, flex: '1 1 auto' }} />
-      </Scrollbar>
+      </Box>
 
       <Box
         sx={{

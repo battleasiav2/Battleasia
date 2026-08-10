@@ -8,10 +8,9 @@ import { ApiProvider } from 'src/contexts/ApiContext';
 import { themeConfig, ThemeProvider } from 'src/theme';
 import { I18nProvider, LocalizationProvider } from 'src/locales';
 
-import { MotionLazy } from 'src/components/animate/motion-lazy';
-import { defaultSettings, SettingsProvider } from 'src/components/settings';
 import { DeferredSettingsDrawer } from 'src/components/settings/deferred-settings-drawer';
 import { DeferredSupportChat } from 'src/components/deferred-support-chat';
+import { defaultSettings, SettingsProvider } from 'src/components/settings';
 
 import { AuthConsumer } from './utils/authcheck';
 import { LiveSyncProvider } from 'src/providers/live-sync-provider';
@@ -45,13 +44,11 @@ export default function App({ children }: AppProps) {
               defaultMode={themeConfig.defaultMode}
               modeStorageKey={themeConfig.modeStorageKey}
             >
-              <MotionLazy>
-                <DeferredSettingsDrawer defaultSettings={defaultSettings} />
-                <AuthConsumer>
-                  <LiveSyncProvider>{children}</LiveSyncProvider>
-                </AuthConsumer>
-                <DeferredSupportChat />
-              </MotionLazy>
+              <DeferredSettingsDrawer defaultSettings={defaultSettings} />
+              <AuthConsumer>
+                <LiveSyncProvider>{children}</LiveSyncProvider>
+              </AuthConsumer>
+              <DeferredSupportChat />
               <Toaster
                 position="top-center"
                 toastOptions={{

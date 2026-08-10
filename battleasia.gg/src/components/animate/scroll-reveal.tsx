@@ -1,53 +1,50 @@
-import type { MotionProps } from 'framer-motion';
 import type { BoxProps } from '@mui/material/Box';
 import type { SxProps, Theme } from '@mui/material/styles';
 
-import { m, useReducedMotion } from 'framer-motion';
-import { forwardRef } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 
 import Box from '@mui/material/Box';
-
-import { varFade, varContainer } from './variants';
-import {
-  varCinematicContainer,
-  varCinematicItem,
-  varCinematicReveal,
-  varCinematicSlide,
-} from './variants/cinematic';
+import { keyframes } from '@mui/material/styles';
 
 // ----------------------------------------------------------------------
 
 export type ScrollRevealPreset = 'soft' | 'cinematic' | 'cinematic-slide-left' | 'cinematic-slide-right';
 
-export type ScrollRevealProps = BoxProps &
-  MotionProps & {
-    direction?: 'in' | 'inUp' | 'inDown' | 'inLeft' | 'inRight';
-    preset?: ScrollRevealPreset;
-    stagger?: boolean;
-    amount?: number;
-    distance?: number;
-    disabled?: boolean;
-    /** Full-viewport section — PUBG Mobile panel feel */
-    fullViewport?: boolean;
-    sx?: SxProps<Theme>;
-  };
+export type ScrollRevealProps = BoxProps & {
+  direction?: 'in' | 'inUp' | 'inDown' | 'inLeft' | 'inRight';
+  preset?: ScrollRevealPreset;
+  stagger?: boolean;
+  amount?: number;
+  distance?: number;
+  disabled?: boolean;
+  /** Full-viewport section — PUBG Mobile panel feel */
+  fullViewport?: boolean;
+  sx?: SxProps<Theme>;
+};
 
-function resolveVariants(
-  preset: ScrollRevealPreset,
-  stagger: boolean,
-  direction: ScrollRevealProps['direction'],
-  distance: number
-) {
-  if (stagger) return varCinematicContainer();
-  if (preset === 'cinematic-slide-left') return varCinematicSlide('left', distance);
-  if (preset === 'cinematic-slide-right') return varCinematicSlide('right', distance);
-  if (preset === 'cinematic') return varCinematicReveal(distance);
-  return varFade(direction ?? 'inUp', { distance });
+const revealUp = keyframes`
+  from { opacity: 0; transform: translate3d(0, var(--ba-reveal-y, 28px), 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+`;
+
+const revealLeft = keyframes`
+  from { opacity: 0; transform: translate3d(calc(var(--ba-reveal-y, 28px) * -1), 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+`;
+
+const revealRight = keyframes`
+  from { opacity: 0; transform: translate3d(var(--ba-reveal-y, 28px), 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+`;
+
+function resolveAnimation(preset: ScrollRevealPreset, direction: ScrollRevealProps['direction']) {
+  if (preset === 'cinematic-slide-left' || direction === 'inLeft') return `${revealLeft} 0.55s ease both`;
+  if (preset === 'cinematic-slide-right' || direction === 'inRight') return `${revealRight} 0.55s ease both`;
+  return `${revealUp} 0.55s ease both`;
 }
 
 /**
- * Premium scroll-into-view reveal.
- * `preset="cinematic"` matches PUBG Mobile home section entrances.
+ * Scroll-into-view reveal — CSS + IntersectionObserver only (no framer-motion on critical path).
  */
 export const ScrollReveal = forwardRef<HTMLDivElement, ScrollRevealProps>((props, ref) => {
   const {
@@ -59,13 +56,38 @@ export const ScrollReveal = forwardRef<HTMLDivElement, ScrollRevealProps>((props
     distance = preset.startsWith('cinematic') ? 48 : 28,
     disabled = false,
     fullViewport = false,
-    viewport,
-    variants,
     sx,
     ...other
   } = props;
 
-  const reduceMotion = useReducedMotion();
+  const localRef = useRef<HTMLDivElement | null>(null);
+  const [visible, setVisible] = useState(disabled);
+  const reduceMotion =
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  useEffect(() => {
+    if (disabled || reduceMotion) {
+      setVisible(true);
+      return undefined;
+    }
+    const node = localRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      setVisible(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: amount, rootMargin: '0px 0px -8% 0px' }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [amount, disabled, reduceMotion]);
 
   const sectionSx: SxProps<Theme> = [
     fullViewport && {
@@ -76,32 +98,39 @@ export const ScrollReveal = forwardRef<HTMLDivElement, ScrollRevealProps>((props
       scrollSnapAlign: 'start',
       scrollSnapStop: 'normal',
     },
+    {
+      '--ba-reveal-y': `${distance}px`,
+      opacity: visible || reduceMotion || disabled ? 1 : 0,
+      animation: visible && !reduceMotion && !disabled ? resolveAnimation(preset, direction) : 'none',
+      '@media (prefers-reduced-motion: reduce)': {
+        opacity: 1,
+        animation: 'none',
+      },
+      ...(stagger
+        ? {
+            '& > *': {
+              opacity: visible ? 1 : 0,
+              animation: visible && !reduceMotion ? `${revealUp} 0.45s ease both` : 'none',
+            },
+            '& > *:nth-of-type(1)': { animationDelay: '0ms' },
+            '& > *:nth-of-type(2)': { animationDelay: '60ms' },
+            '& > *:nth-of-type(3)': { animationDelay: '120ms' },
+            '& > *:nth-of-type(4)': { animationDelay: '180ms' },
+            '& > *:nth-of-type(5)': { animationDelay: '240ms' },
+            '& > *:nth-of-type(6)': { animationDelay: '300ms' },
+          }
+        : null),
+    },
     ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
   ];
 
-  if (disabled || reduceMotion) {
-    return (
-      <Box ref={ref} sx={sectionSx} {...other}>
-        {children}
-      </Box>
-    );
-  }
-
-  const resolvedVariants = variants ?? resolveVariants(preset, stagger, direction, distance);
-
   return (
     <Box
-      ref={ref}
-      component={m.div}
-      initial="initial"
-      whileInView="animate"
-      viewport={{
-        once: true,
-        amount,
-        margin: preset.startsWith('cinematic') ? '0px 0px -6% 0px' : '0px 0px -8% 0px',
-        ...viewport,
+      ref={(node: HTMLDivElement | null) => {
+        localRef.current = node;
+        if (typeof ref === 'function') ref(node);
+        else if (ref) ref.current = node;
       }}
-      variants={resolvedVariants}
       sx={sectionSx}
       {...other}
     >
@@ -112,27 +141,11 @@ export const ScrollReveal = forwardRef<HTMLDivElement, ScrollRevealProps>((props
 
 ScrollReveal.displayName = 'ScrollReveal';
 
-/** Stagger child for use inside `<ScrollReveal preset="cinematic" stagger>` */
-export const ScrollRevealItem = forwardRef<HTMLDivElement, BoxProps & MotionProps>((props, ref) => {
+/** Stagger child — plain box (parent ScrollReveal handles stagger delays). */
+export const ScrollRevealItem = forwardRef<HTMLDivElement, BoxProps>((props, ref) => {
   const { children, sx, ...other } = props;
-  const reduceMotion = useReducedMotion();
-
-  if (reduceMotion) {
-    return (
-      <Box ref={ref} sx={sx} {...other}>
-        {children}
-      </Box>
-    );
-  }
-
   return (
-    <Box
-      ref={ref}
-      component={m.div}
-      variants={varCinematicItem()}
-      sx={sx}
-      {...other}
-    >
+    <Box ref={ref} sx={sx} {...other}>
       {children}
     </Box>
   );

@@ -1,7 +1,7 @@
 import type { Breakpoint } from '@mui/material/styles';
 import type { NavSectionProps } from 'src/components/nav-section';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { merge } from 'es-toolkit';
 
 import { useTheme, alpha } from '@mui/material/styles';
@@ -25,8 +25,6 @@ import { MainSection } from '../core/main-section';
 import { HeaderSection } from '../core/header-section';
 import { FooterSection } from '../core/footer-section';
 import { LayoutSection } from '../core/layout-section';
-import { AccountDrawer } from '../components/account-drawer';
-import { NotificationsDrawer } from '../components/notifications-drawer';
 import { LanguagePopover } from '../components/language-popover';
 import { navData as dashboardNavData } from '../nav-config-dashboard';
 import { dashboardLayoutVars, dashboardNavColorVars } from './css-vars';
@@ -36,6 +34,14 @@ import { menuItems, accountMenuItems, createMenuClickHandler } from '../menu-ite
 import type { MainSectionProps } from '../core/main-section';
 import type { HeaderSectionProps } from '../core/header-section';
 import type { LayoutSectionProps } from '../core/layout-section';
+
+// Logged-in chrome — keep simplebar / drawer JS off anonymous home LCP
+const AccountDrawer = lazy(() =>
+  import('../components/account-drawer').then((m) => ({ default: m.AccountDrawer }))
+);
+const NotificationsDrawer = lazy(() =>
+  import('../components/notifications-drawer').then((m) => ({ default: m.NotificationsDrawer }))
+);
 
 // ----------------------------------------------------------------------
 
@@ -250,10 +256,10 @@ export function DashboardLayout({
           sx={{ flexShrink: 0, height: 1, minWidth: { lg: 120 }, justifyContent: 'flex-end' }}
         >
           {isLoggedIn ? (
-            <>
+            <Suspense fallback={null}>
               <NotificationsDrawer />
               <AccountDrawer data={accountMenuItems} />
-            </>
+            </Suspense>
           ) : (
             <Button
               component={RouterLink}

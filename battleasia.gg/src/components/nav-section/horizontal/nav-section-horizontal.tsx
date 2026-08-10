@@ -1,9 +1,9 @@
 import { mergeClasses } from 'minimal-shared/utils';
 
+import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material/styles';
 
 import { NavList } from './nav-list';
-import { Scrollbar } from '../../scrollbar';
 import { Nav, NavUl, NavLi } from '../components';
 import { navSectionClasses, navSectionCssVars } from '../styles';
 
@@ -27,9 +27,14 @@ export function NavSectionHorizontal({
   const cssVars = { ...navSectionCssVars.horizontal(theme), ...overridesVars };
 
   return (
-    <Scrollbar
-      sx={{ height: 1 }}
-      slotProps={{ contentSx: { height: 1, display: 'flex', alignItems: 'center' } }}
+    <Box
+      sx={{
+        height: 1,
+        display: 'flex',
+        alignItems: 'center',
+        overflowX: 'auto',
+        ...theme.mixins.hideScrollY,
+      }}
     >
       <Nav
         className={mergeClasses([navSectionClasses.horizontal, className])}
@@ -60,7 +65,7 @@ export function NavSectionHorizontal({
           ))}
         </NavUl>
       </Nav>
-    </Scrollbar>
+    </Box>
   );
 }
 

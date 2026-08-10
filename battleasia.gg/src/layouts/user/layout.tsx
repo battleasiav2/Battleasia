@@ -2,6 +2,7 @@ import type { Breakpoint } from '@mui/material/styles';
 import type { NavSectionProps } from 'src/components/nav-section';
 
 import { merge } from 'es-toolkit';
+import { lazy, Suspense } from 'react';
 
 import { useTheme, alpha } from '@mui/material/styles';
 import { Box, Alert, Stack, Button, Typography } from '@mui/material';
@@ -25,8 +26,6 @@ import { MainSection } from '../core/main-section';
 import { HeaderSection } from '../core/header-section';
 import { LayoutSection } from '../core/layout-section';
 import { UserNavVertical } from './user-nav-vertical';
-import { AccountDrawer } from '../components/account-drawer';
-import { NotificationsDrawer } from '../components/notifications-drawer';
 import { userLayoutVars, userBattleNavColorVars } from './css-vars';
 import { USER_COLORS, userGoldButtonSx, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
 import { LanguagePopover } from '../components/language-popover';
@@ -36,6 +35,13 @@ import { menuItems, accountMenuItems, createMenuClickHandler } from '../menu-ite
 import type { MainSectionProps } from '../core/main-section';
 import type { HeaderSectionProps } from '../core/header-section';
 import type { LayoutSectionProps } from '../core/layout-section';
+
+const AccountDrawer = lazy(() =>
+  import('../components/account-drawer').then((m) => ({ default: m.AccountDrawer }))
+);
+const NotificationsDrawer = lazy(() =>
+  import('../components/notifications-drawer').then((m) => ({ default: m.NotificationsDrawer }))
+);
 
 // ----------------------------------------------------------------------
 
@@ -280,8 +286,10 @@ export function UserLayout({
                                     color={USER_COLORS.gold}
                                 />
                             </Stack>
-                            <NotificationsDrawer />
-                            <AccountDrawer data={accountMenuItems} />
+                            <Suspense fallback={null}>
+                              <NotificationsDrawer />
+                              <AccountDrawer data={accountMenuItems} />
+                            </Suspense>
                         </>
                     ) : (
                         <Button

@@ -1,21 +1,4 @@
-export * from './variants';
-
-export * from './animate-text';
-
-export * from './animate-logo';
-
-export * from './animate-border';
-
-export * from './motion-viewport';
-
-export * from './scroll-progress';
+// CSS / IO-only — safe on the critical path.
+// Framer motion modules: import from concrete files (animate-logo, motion-container, variants, …).
 
 export * from './scroll-reveal';
-
-export * from './scroll-parallax';
-
-export * from './site-scroll-progress';
-
-export * from './animate-count-up';
-
-export * from './motion-container';

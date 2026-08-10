@@ -5,7 +5,7 @@ import { Fragment } from 'react';
 import Portal from '@mui/material/Portal';
 import { styled } from '@mui/material/styles';
 
-import { AnimateLogoZoom } from 'src/components/animate';
+import { AnimateLogoZoom } from 'src/components/animate/animate-logo';
 
 // ----------------------------------------------------------------------
 

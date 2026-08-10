@@ -16,7 +16,7 @@ import { fToNow } from 'src/utils/format-time';
 
 import { Scrollbar } from 'src/components/scrollbar';
 import { CustomPopover } from 'src/components/custom-popover';
-import { varTap, varHover, transitionTap } from 'src/components/animate';
+import { varTap, varHover, transitionTap } from 'src/components/animate/variants';
 
 // ----------------------------------------------------------------------
 
