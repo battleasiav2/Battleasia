@@ -63,7 +63,7 @@ export function SupportComposer({
               px: 2,
               py: 1.1,
               color: USER_COLORS.textPrimary,
-              '& input::placeholder': { color: alpha('#ffffff', 0.4), opacity: 1 },
+              '& input::placeholder': { color: 'var(--ba-fg-40)', opacity: 1 },
             }}
           />
         </Box>

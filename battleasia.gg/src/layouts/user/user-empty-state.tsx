@@ -41,8 +41,8 @@ export function UserEmptyState({
           px: 3,
           textAlign: 'center',
           borderRadius: `${GLASS_CARD_RADIUS}px`,
-          border: `1px dashed ${alpha('#ffffff', 0.14)}`,
-          bgcolor: alpha('#000000', 0.28),
+          border: `1px dashed var(--ba-fg-14)`,
+          bgcolor: 'var(--ba-bg-28)',
         },
         ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
       ]}

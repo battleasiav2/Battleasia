@@ -13,6 +13,7 @@ import { CONFIG } from 'src/global-config';
 
 import { Label } from 'src/components/label';
 import { FileThumbnail } from 'src/components/file-thumbnail';
+import { USER_COLORS } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
@@ -103,7 +104,7 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
       }
       slotProps={{
         primary: {
-          sx: { mb: 0.5, color: 'common.white' },
+          sx: { mb: 0.5, color: USER_COLORS.textPrimary },
         },
         secondary: {
           sx: {
@@ -111,7 +112,7 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
             display: 'flex',
             alignItems: 'center',
             typography: 'caption',
-            color: alpha('#ffffff', 0.72),
+            color: 'var(--ba-fg-72)',
           },
         },
       }}
@@ -151,8 +152,8 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
           p: 1.5,
           my: 1.5,
           borderRadius: 1.5,
-          color: alpha('#ffffff', 0.78),
-          bgcolor: alpha('#ffffff', 0.06),
+          color: 'var(--ba-fg-78)',
+          bgcolor: 'var(--ba-fg-06)',
         }}
       >
         {readerContent(

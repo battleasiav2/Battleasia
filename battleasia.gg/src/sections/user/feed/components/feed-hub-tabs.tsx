@@ -34,11 +34,11 @@ export function FeedHubTabs({ active, onChange }: FeedHubTabsProps) {
         mx: { xs: -2, sm: -3, md: -5 },
         px: { xs: 1, sm: 2, md: 5 },
         py: 0.5,
-        bgcolor: alpha('#000000', 0.9),
+        bgcolor: 'var(--ba-bg-88)',
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         borderBottom: `1px solid ${alpha(USER_COLORS.gold, 0.22)}`,
-        boxShadow: `0 10px 28px ${alpha('#000000', 0.45)}`,
+        boxShadow: `0 10px 28px var(--ba-shadow)`,
       }}
     >
       <Stack
@@ -68,9 +68,9 @@ export function FeedHubTabs({ active, onChange }: FeedHubTabsProps) {
                 alignItems: 'center',
                 gap: 0.5,
                 borderBottom: `2px solid ${isActive ? USER_COLORS.gold : 'transparent'}`,
-                color: isActive ? USER_COLORS.gold : alpha('#ffffff', 0.5),
+                color: isActive ? USER_COLORS.gold : 'var(--ba-fg-50)',
                 transition: 'color 0.2s ease, border-color 0.2s ease',
-                '&:hover': { color: isActive ? USER_COLORS.gold : alpha('#ffffff', 0.78) },
+                '&:hover': { color: isActive ? USER_COLORS.gold : 'var(--ba-fg-78)' },
               }}
             >
               <Iconify icon={tab.icon} width={22} />

@@ -124,7 +124,7 @@ export function NavApkBanner({ onNavigate, sx }: NavApkBannerProps) {
         <Typography
           sx={{
             fontSize: 11,
-            color: alpha('#ffffff', 0.58),
+            color: 'var(--ba-fg-58)',
             lineHeight: 1.45,
           }}
         >

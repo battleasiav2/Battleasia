@@ -47,7 +47,7 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
             sx={{
               p: 1.25,
               cursor: 'pointer',
-              border: `1px solid ${selected ? alpha(USER_COLORS.gold, 0.35) : alpha('#ffffff', 0.08)}`,
+              border: `1px solid ${selected ? alpha(USER_COLORS.gold, 0.35) : 'var(--ba-fg-08)'}`,
               bgcolor: selected ? alpha(USER_COLORS.gold, 0.08) : alpha('#000000', 0.25),
               transition: 'border-color 0.2s, background-color 0.2s',
               '&:hover': {

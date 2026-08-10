@@ -171,13 +171,13 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
             height: { xs: 32, sm: 38 },
             p: 0,
             borderRadius: '6px',
-            bgcolor: open ? alpha(USER_COLORS.gold, 0.14) : alpha('#080c14', 0.55),
+            bgcolor: open ? alpha(USER_COLORS.gold, 0.14) : 'var(--ba-bg-55)',
             border: '1.5px solid',
-            borderColor: open ? alpha(USER_COLORS.gold, 0.55) : alpha('#ffffff', 0.18),
-            boxShadow: `inset 0 0 0 1px ${alpha('#000000', 0.25)}`,
+            borderColor: open ? alpha(USER_COLORS.gold, 0.55) : 'var(--ba-fg-18)',
+            boxShadow: `inset 0 0 0 1px var(--ba-fg-06)`,
             transition: 'transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease',
             '&:hover': {
-              bgcolor: alpha('#0c121c', 0.72),
+              bgcolor: 'var(--ba-bg-65)',
               borderColor: alpha(USER_COLORS.gold, 0.45),
               transform: 'scale(1.04)',
             },
@@ -200,7 +200,7 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
               px: 0.5,
               top: 2,
               right: 2,
-              border: `1.5px solid ${alpha('#000000', 0.85)}`,
+              border: `1.5px solid var(--ba-page-bg)`,
             },
           }}
         >
@@ -208,7 +208,7 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
             icon="solar:bell-bold"
             width={20}
             sx={{
-              color: open ? USER_COLORS.gold : alpha('#ffffff', 0.92),
+              color: open ? USER_COLORS.gold : 'var(--ba-fg-92)',
               transition: 'color 0.2s ease',
             }}
           />
@@ -225,7 +225,7 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
             ...(userGlassDialogPaperSx as object),
             width: 1,
             maxWidth: 420,
-            bgcolor: alpha('#000000', 0.94),
+            bgcolor: 'var(--ba-drawer-bg)',
             backgroundImage: 'none',
             color: USER_COLORS.textBody,
             borderLeft: `1px solid ${USER_COLORS.border}`,
