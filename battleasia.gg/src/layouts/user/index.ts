@@ -11,6 +11,8 @@ export { UserStatTile } from './user-stat-tile';
 export { UserAnimatedStat } from './user-animated-stat';
 export { UserNavVertical } from './user-nav-vertical';
 
+export { UserColorModeToggle } from './user-color-mode-toggle';
+
 export {
   USER_COLORS,
   USER_IMAGES,

@@ -1,0 +1,124 @@
+/**
+ * BattleAsia user/shop color scheme tokens.
+ * MUI sets `data-color-scheme` on <html>. Dark values match the current arena UI.
+ * Light values keep gold accents but flip surfaces/text so nothing is white-on-white.
+ */
+
+:root,
+[data-color-scheme='dark'] {
+  --ba-page-bg: #000000;
+  --ba-surface: #0a0a0a;
+  --ba-text-primary: #ffffff;
+  --ba-text-body: #f5f5f5;
+  --ba-text-muted: #c5ced9;
+  --ba-text-subtle: #e8eef5;
+  --ba-border: rgba(255, 255, 255, 0.12);
+  --ba-border-strong: rgba(255, 255, 255, 0.18);
+  --ba-border-soft: rgba(255, 255, 255, 0.08);
+  --ba-fg: #ffffff;
+  --ba-fg-72: rgba(255, 255, 255, 0.72);
+  --ba-fg-65: rgba(255, 255, 255, 0.65);
+  --ba-fg-50: rgba(255, 255, 255, 0.5);
+  --ba-fg-40: rgba(255, 255, 255, 0.4);
+  --ba-fg-35: rgba(255, 255, 255, 0.35);
+  --ba-fg-28: rgba(255, 255, 255, 0.28);
+  --ba-fg-22: rgba(255, 255, 255, 0.22);
+  --ba-fg-14: rgba(255, 255, 255, 0.14);
+  --ba-fg-12: rgba(255, 255, 255, 0.12);
+  --ba-fg-10: rgba(255, 255, 255, 0.1);
+  --ba-fg-08: rgba(255, 255, 255, 0.08);
+  --ba-fg-06: rgba(255, 255, 255, 0.06);
+  --ba-bg-98: rgba(10, 10, 10, 0.98);
+  --ba-bg-88: rgba(0, 0, 0, 0.88);
+  --ba-bg-65: rgba(0, 0, 0, 0.65);
+  --ba-bg-55: rgba(0, 0, 0, 0.55);
+  --ba-bg-52: rgba(0, 0, 0, 0.52);
+  --ba-bg-42: rgba(0, 0, 0, 0.42);
+  --ba-bg-40: rgba(0, 0, 0, 0.4);
+  --ba-bg-35: rgba(0, 0, 0, 0.35);
+  --ba-bg-28: rgba(0, 0, 0, 0.28);
+  --ba-shadow: rgba(0, 0, 0, 0.65);
+  --ba-glass-shell-bg: rgba(22, 22, 24, 0.98);
+  --ba-glass-shell-border: rgba(255, 255, 255, 0.08);
+  --ba-glass-shell-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
+  --ba-glass-stat-bg: rgba(10, 10, 10, 0.72);
+  --ba-glass-title: #ffffff;
+  --ba-glass-subtitle: rgba(255, 255, 255, 0.78);
+  --ba-glass-label: rgba(255, 255, 255, 0.72);
+  --ba-glass-value: #ffffff;
+  --ba-field-bg: rgba(0, 0, 0, 0.55);
+  --ba-field-bg-focus: rgba(0, 0, 0, 0.65);
+  --ba-field-border: rgba(255, 255, 255, 0.24);
+  --ba-field-border-hover: rgba(255, 255, 255, 0.4);
+  --ba-menu-bg: rgba(10, 10, 10, 0.98);
+  --ba-menu-item: rgba(255, 255, 255, 0.9);
+  --ba-dialog-bg: rgba(0, 0, 0, 0.88);
+  --ba-dialog-wash: linear-gradient(180deg, rgba(245, 197, 24, 0.07) 0%, transparent 24%),
+    linear-gradient(180deg, rgba(10, 10, 10, 0.97) 0%, #050505 100%);
+  --ba-page-overlay: radial-gradient(ellipse 90% 55% at 50% -5%, rgba(245, 166, 35, 0.09) 0%, transparent 58%),
+    radial-gradient(ellipse 50% 35% at 15% 95%, rgba(56, 189, 248, 0.06) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.88) 55%, #000000 100%);
+  --ba-page-bg-image-opacity: 0.32;
+  --ba-drawer-bg: rgba(6, 6, 8, 0.98);
+  --ba-drawer-overlay: linear-gradient(180deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.92) 72%);
+  color-scheme: dark;
+}
+
+[data-color-scheme='light'] {
+  --ba-page-bg: #f3f4f6;
+  --ba-surface: #ffffff;
+  --ba-text-primary: #111827;
+  --ba-text-body: #1f2937;
+  --ba-text-muted: #4b5563;
+  --ba-text-subtle: #374151;
+  --ba-border: rgba(17, 24, 39, 0.12);
+  --ba-border-strong: rgba(17, 24, 39, 0.18);
+  --ba-border-soft: rgba(17, 24, 39, 0.08);
+  --ba-fg: #111827;
+  --ba-fg-72: rgba(17, 24, 39, 0.72);
+  --ba-fg-65: rgba(17, 24, 39, 0.65);
+  --ba-fg-50: rgba(17, 24, 39, 0.5);
+  --ba-fg-40: rgba(17, 24, 39, 0.4);
+  --ba-fg-35: rgba(17, 24, 39, 0.35);
+  --ba-fg-28: rgba(17, 24, 39, 0.28);
+  --ba-fg-22: rgba(17, 24, 39, 0.22);
+  --ba-fg-14: rgba(17, 24, 39, 0.14);
+  --ba-fg-12: rgba(17, 24, 39, 0.12);
+  --ba-fg-10: rgba(17, 24, 39, 0.1);
+  --ba-fg-08: rgba(17, 24, 39, 0.08);
+  --ba-fg-06: rgba(17, 24, 39, 0.06);
+  --ba-bg-98: rgba(255, 255, 255, 0.98);
+  --ba-bg-88: rgba(255, 255, 255, 0.92);
+  --ba-bg-65: rgba(255, 255, 255, 0.86);
+  --ba-bg-55: rgba(243, 244, 246, 0.95);
+  --ba-bg-52: rgba(255, 255, 255, 0.9);
+  --ba-bg-42: rgba(243, 244, 246, 0.92);
+  --ba-bg-40: rgba(255, 255, 255, 0.88);
+  --ba-bg-35: rgba(243, 244, 246, 0.9);
+  --ba-bg-28: rgba(249, 250, 251, 0.95);
+  --ba-shadow: rgba(15, 23, 42, 0.18);
+  --ba-glass-shell-bg: rgba(255, 255, 255, 0.92);
+  --ba-glass-shell-border: rgba(17, 24, 39, 0.1);
+  --ba-glass-shell-shadow: 0 10px 28px rgba(15, 23, 42, 0.1);
+  --ba-glass-stat-bg: rgba(243, 244, 246, 0.95);
+  --ba-glass-title: #111827;
+  --ba-glass-subtitle: rgba(31, 41, 55, 0.78);
+  --ba-glass-label: rgba(75, 85, 99, 0.9);
+  --ba-glass-value: #111827;
+  --ba-field-bg: rgba(255, 255, 255, 0.96);
+  --ba-field-bg-focus: #ffffff;
+  --ba-field-border: rgba(17, 24, 39, 0.18);
+  --ba-field-border-hover: rgba(17, 24, 39, 0.32);
+  --ba-menu-bg: rgba(255, 255, 255, 0.98);
+  --ba-menu-item: rgba(17, 24, 39, 0.92);
+  --ba-dialog-bg: rgba(255, 255, 255, 0.96);
+  --ba-dialog-wash: linear-gradient(180deg, rgba(245, 197, 24, 0.1) 0%, transparent 28%),
+    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  --ba-page-overlay: radial-gradient(ellipse 90% 55% at 50% -5%, rgba(245, 166, 35, 0.08) 0%, transparent 58%),
+    radial-gradient(ellipse 50% 35% at 15% 95%, rgba(56, 189, 248, 0.05) 0%, transparent 50%),
+    linear-gradient(180deg, rgba(243, 244, 246, 0.55) 0%, rgba(243, 244, 246, 0.92) 55%, #f3f4f6 100%);
+  --ba-page-bg-image-opacity: 0.1;
+  --ba-drawer-bg: rgba(255, 255, 255, 0.98);
+  --ba-drawer-overlay: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(243, 244, 246, 0.96) 72%);
+  color-scheme: light;
+}

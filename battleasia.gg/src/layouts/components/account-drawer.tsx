@@ -31,6 +31,7 @@ import {
   USER_COLORS,
   USER_IMAGES,
 } from 'src/layouts/user/user-theme';
+import { UserColorModeToggle } from 'src/layouts/user/user-color-mode-toggle';
 
 import { AccountButton } from './account-button';
 import { SignOutButton } from './sign-out-button';
@@ -111,7 +112,7 @@ function MenuCard({
         <Iconify
           icon={chevronDown ? 'eva:arrow-ios-downward-fill' : 'eva:arrow-ios-forward-fill'}
           width={18}
-          sx={{ color: alpha('#ffffff', 0.4), flexShrink: 0 }}
+          sx={{ color: 'var(--ba-fg-40)', flexShrink: 0 }}
         />
       )}
     </>
@@ -129,9 +130,9 @@ function MenuCard({
       borderRadius: `${GLASS_CARD_RADIUS}px`,
       textDecoration: 'none',
       cursor: 'pointer',
-      color: isActive ? GOLD : alpha('#ffffff', 0.78),
-      bgcolor: isActive ? alpha(GOLD, 0.08) : alpha('#000000', 0.42),
-      border: `1px solid ${isActive ? alpha(GOLD, 0.32) : alpha('#ffffff', 0.08)}`,
+      color: isActive ? GOLD : 'var(--ba-fg-72)',
+      bgcolor: isActive ? alpha(GOLD, 0.08) : 'var(--ba-bg-42)',
+      border: `1px solid ${isActive ? alpha(GOLD, 0.32) : 'var(--ba-fg-08)'}`,
       boxShadow: isActive ? `0 4px 18px ${alpha(GOLD, 0.1)}` : 'none',
       transition: 'background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease',
       '&:hover': {
@@ -203,7 +204,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
           fontSize: 30,
           fontWeight: 800,
           color: GOLD,
-          bgcolor: alpha('#000000', 0.65),
+          bgcolor: 'var(--ba-bg-65)',
           border: `2px solid ${GOLD}`,
           boxShadow: `0 0 28px ${alpha(GOLD, 0.22)}`,
         }}
@@ -218,7 +219,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
           maxWidth: 1,
           fontWeight: 800,
           letterSpacing: 0.02,
-          color: '#ffffff',
+          color: USER_COLORS.textPrimary,
         }}
       >
         {user.displayName}
@@ -229,7 +230,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
         noWrap
         sx={{
           maxWidth: 1,
-          color: alpha('#ffffff', 0.5),
+          color: USER_COLORS.textMuted,
           fontSize: 13,
         }}
       >
@@ -329,15 +330,16 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
             width: { xs: 'min(320px, 90vw)', sm: 340 },
             display: 'flex',
             flexDirection: 'column',
-            bgcolor: alpha('#060608', 0.98),
+            bgcolor: 'var(--ba-drawer-bg)',
+            color: USER_COLORS.textBody,
             backgroundImage: `
-              linear-gradient(180deg, ${alpha('#000000', 0.55)} 0%, ${alpha('#000000', 0.92)} 72%),
+              var(--ba-drawer-overlay),
               url(${USER_IMAGES.pageBg})
             `,
             backgroundSize: 'cover',
             backgroundPosition: 'center top',
-            borderLeft: `1px solid ${alpha('#ffffff', 0.1)}`,
-            boxShadow: `-12px 0 48px ${alpha('#000000', 0.65)}`,
+            borderLeft: `1px solid var(--ba-fg-10)`,
+            boxShadow: `-12px 0 48px var(--ba-shadow)`,
           },
         }}
       >
@@ -351,9 +353,9 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
             position: 'absolute',
             width: 40,
             height: 40,
-            color: alpha('#ffffff', 0.75),
-            bgcolor: alpha('#ffffff', 0.06),
-            border: `1px solid ${alpha('#ffffff', 0.1)}`,
+            color: 'var(--ba-fg-72)',
+            bgcolor: 'var(--ba-fg-06)',
+            border: `1px solid var(--ba-fg-10)`,
             '&:hover': {
               bgcolor: alpha(GOLD, 0.12),
               borderColor: alpha(GOLD, 0.3),
@@ -374,44 +376,48 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
             px: 2,
             py: 2,
             mt: 'auto',
-            borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
-            bgcolor: alpha('#000000', 0.35),
+            borderTop: `1px solid var(--ba-border-soft)`,
+            bgcolor: 'var(--ba-bg-35)',
             backdropFilter: 'blur(8px)',
             mb: { xs: '72px', md: 0 },
           }}
         >
-          <Stack direction="row" spacing={1.25} alignItems="center">
-            <SignOutButton
-              onClose={onClose}
-              sx={{
-                flex: 1,
-                height: 48,
-                fontSize: 13,
-              }}
-            />
+          <Stack spacing={1.25}>
+            <UserColorModeToggle dense />
 
-            <IconButton
-              component={RouterLink}
-              href={paths.user.account.customerSupport}
-              onClick={onClose}
-              aria-label="Customer support"
-              sx={{
-                width: 48,
-                height: 48,
-                flexShrink: 0,
-                color: alpha('#ffffff', 0.8),
-                bgcolor: alpha('#ffffff', 0.06),
-                border: `1px solid ${alpha('#ffffff', 0.12)}`,
-                borderRadius: `${GLASS_CARD_RADIUS}px`,
-                '&:hover': {
-                  bgcolor: alpha(GOLD, 0.12),
-                  borderColor: alpha(GOLD, 0.32),
-                  color: GOLD,
-                },
-              }}
-            >
-              <Iconify icon="solar:headphones-round-sound-bold" width={22} />
-            </IconButton>
+            <Stack direction="row" spacing={1.25} alignItems="center">
+              <SignOutButton
+                onClose={onClose}
+                sx={{
+                  flex: 1,
+                  height: 48,
+                  fontSize: 13,
+                }}
+              />
+
+              <IconButton
+                component={RouterLink}
+                href={paths.user.account.customerSupport}
+                onClick={onClose}
+                aria-label="Customer support"
+                sx={{
+                  width: 48,
+                  height: 48,
+                  flexShrink: 0,
+                  color: 'var(--ba-fg-72)',
+                  bgcolor: 'var(--ba-fg-06)',
+                  border: `1px solid var(--ba-fg-12)`,
+                  borderRadius: `${GLASS_CARD_RADIUS}px`,
+                  '&:hover': {
+                    bgcolor: alpha(GOLD, 0.12),
+                    borderColor: alpha(GOLD, 0.32),
+                    color: GOLD,
+                  },
+                }}
+              >
+                <Iconify icon="solar:headphones-round-sound-bold" width={22} />
+              </IconButton>
+            </Stack>
           </Stack>
         </Box>
       </Drawer>

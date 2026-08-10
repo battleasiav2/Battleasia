@@ -1,4 +1,5 @@
 @import './components/scrollbar/styles.css';
+@import './layouts/user/user-scheme.css';
 
 /** **************************************
 * Fonts: self-hosted latin only, font-display:optional → zero swap CLS

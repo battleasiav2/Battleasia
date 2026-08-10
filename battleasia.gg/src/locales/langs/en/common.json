@@ -282,6 +282,9 @@
     "saved": "Saved",
     "messages": "Messages",
     "settings": "Settings",
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode",
+    "colorMode": "Color mode",
     "logout": "Logout",
     "login": "LOGIN"
   },
