@@ -46,6 +46,12 @@
   --ba-bg-35: rgba(0, 0, 0, 0.35);
   --ba-bg-28: rgba(0, 0, 0, 0.28);
   --ba-shadow: rgba(0, 0, 0, 0.65);
+  /* Action buttons keep dark glass so gold/red labels stay readable in both schemes */
+  --ba-btn-surface: rgba(0, 0, 0, 0.52);
+  --ba-btn-surface-disabled: rgba(0, 0, 0, 0.35);
+  --ba-btn-surface-ghost: rgba(0, 0, 0, 0.4);
+  --ba-btn-surface-ghost-disabled: rgba(0, 0, 0, 0.28);
+  --ba-btn-label-subtle: #e8eef5;
   --ba-glass-shell-bg: rgba(22, 22, 24, 0.98);
   --ba-glass-shell-border: rgba(255, 255, 255, 0.08);
   --ba-glass-shell-shadow: 0 10px 28px rgba(0, 0, 0, 0.5);
@@ -113,6 +119,12 @@
   --ba-bg-35: rgba(243, 244, 246, 0.9);
   --ba-bg-28: rgba(249, 250, 251, 0.95);
   --ba-shadow: rgba(15, 23, 42, 0.18);
+  /* Keep CTA chrome dark on light pages — gold/red text must not sit on white pills */
+  --ba-btn-surface: rgba(17, 24, 39, 0.92);
+  --ba-btn-surface-disabled: rgba(17, 24, 39, 0.45);
+  --ba-btn-surface-ghost: rgba(17, 24, 39, 0.86);
+  --ba-btn-surface-ghost-disabled: rgba(17, 24, 39, 0.4);
+  --ba-btn-label-subtle: #f8fafc;
   --ba-glass-shell-bg: rgba(255, 255, 255, 0.92);
   --ba-glass-shell-border: rgba(17, 24, 39, 0.1);
   --ba-glass-shell-shadow: 0 10px 28px rgba(15, 23, 42, 0.1);

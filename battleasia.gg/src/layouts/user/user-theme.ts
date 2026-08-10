@@ -209,7 +209,7 @@ const userGlassButtonBaseSx: SxProps<Theme> = {
     backgroundImage: 'none',
   },
   '&.MuiButton-containedInherit': {
-    backgroundColor: `var(--ba-bg-52) !important`,
+    backgroundColor: `var(--ba-btn-surface) !important`,
   },
 };
 
@@ -217,8 +217,8 @@ function createUserGlassToneButtonSx(accent: string, accentLight: string): SxPro
   return {
     ...userGlassButtonBaseSx,
     color: accent,
-    bgcolor: 'var(--ba-bg-52)',
-    backgroundColor: 'var(--ba-bg-52)',
+    bgcolor: 'var(--ba-btn-surface)',
+    backgroundColor: 'var(--ba-btn-surface)',
     border: `1px solid ${alpha(accent, 0.58)}`,
     boxShadow: `
       inset 0 1px 0 var(--ba-fg-06),
@@ -241,8 +241,8 @@ function createUserGlassToneButtonSx(accent: string, accentLight: string): SxPro
       transform: 'translateY(0)',
     },
     '&.Mui-disabled': {
-      bgcolor: 'var(--ba-bg-35)',
-      backgroundColor: `var(--ba-bg-35) !important`,
+      bgcolor: 'var(--ba-btn-surface-disabled)',
+      backgroundColor: `var(--ba-btn-surface-disabled) !important`,
       color: alpha(accent, 0.35),
       borderColor: alpha(accent, 0.22),
       boxShadow: 'none',
@@ -277,13 +277,13 @@ export const userLogoutButtonSx: SxProps<Theme> = userErrorButtonSx;
 /** Secondary CTA — muted glass, gold edge on hover */
 export const userGhostButtonSx: SxProps<Theme> = {
   ...userGlassButtonBaseSx,
-  color: USER_COLORS.textSubtle,
+  color: 'var(--ba-btn-label-subtle)',
   fontWeight: 700,
   letterSpacing: 0.5,
-  border: `1px solid var(--ba-fg-22)`,
-  bgcolor: 'var(--ba-bg-40)',
+  border: `1px solid rgba(255, 255, 255, 0.2)`,
+  bgcolor: 'var(--ba-btn-surface-ghost)',
   boxShadow: `
-    inset 0 1px 0 var(--ba-fg-06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 6px 20px var(--ba-shadow)
   `,
   '&:hover': {
@@ -301,9 +301,9 @@ export const userGhostButtonSx: SxProps<Theme> = {
     transform: 'translateY(0)',
   },
   '&.Mui-disabled': {
-    bgcolor: 'var(--ba-bg-28)',
-    color: 'var(--ba-fg-28)',
-    borderColor: 'var(--ba-fg-10)',
+    bgcolor: 'var(--ba-btn-surface-ghost-disabled)',
+    color: 'rgba(255, 255, 255, 0.28)',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
 };
 
