@@ -943,4 +943,60 @@ class UserService {
       };
     }
   }
+
+  Future<Map<String, dynamic>> getFollowers(String userId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/users/$userId/followers'),
+        headers: headers,
+      );
+      return _parseListResponse(response, 'Failed to fetch followers');
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> getFollowing(String userId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/users/$userId/following'),
+        headers: headers,
+      );
+      return _parseListResponse(response, 'Failed to fetch following');
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> getSuggestedFollows({String? contextUserId}) async {
+    try {
+      final headers = await _getHeaders();
+      final uri = Uri.parse('$_baseUrl/api/v2/users/suggested-follows').replace(
+        queryParameters: contextUserId != null && contextUserId.isNotEmpty
+            ? {'contextUserId': contextUserId}
+            : null,
+      );
+      final response = await ApiClient.get(uri, headers: headers);
+      return _parseListResponse(response, 'Failed to fetch suggestions');
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Map<String, dynamic> _parseListResponse(dynamic response, String fallback) {
+    final body = response.body as String;
+    if (body.isEmpty) {
+      return {'success': false, 'message': 'Empty response from server'};
+    }
+    final data = jsonDecode(body) as Map<String, dynamic>;
+    if (response.statusCode == 200 && data['status'] == true) {
+      return {'success': true, 'data': data['data']};
+    }
+    return {
+      'success': false,
+      'message': data['message'] as String? ?? fallback,
+    };
+  }
 }

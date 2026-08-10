@@ -222,6 +222,40 @@
     "confirm": "Confirm",
     "error": "Error: {error}"
   },
+  "reels": {
+    "createReel": "Create Reel",
+    "pickVideo": "Pick video",
+    "videoSelected": "Video selected",
+    "caption": "Caption",
+    "musicTitle": "Music title (optional)",
+    "publish": "Publish reel"
+  },
+  "messages": {
+    "newChat": "New chat",
+    "searchUsers": "Search users…",
+    "externalTitle": "Messages on external app",
+    "externalDesc": "In-app DMs are disabled. Open your preferred app below.",
+    "externalUnavailable": "Messaging is unavailable right now.",
+    "openProvider": "Open {{provider}}",
+    "attachImage": "Attach image"
+  },
+  "profile": {
+    "followers": "Followers",
+    "following": "Following",
+    "noFollowList": "No users yet",
+    "suggestedForYou": "Suggested for you",
+    "follow": "Follow",
+    "message": "Message",
+    "block": "Block",
+    "unblock": "Unblock",
+    "reportUser": "Report user",
+    "reportReason": "Reason",
+    "reportDetails": "Details (optional)",
+    "submitReport": "Submit report",
+    "blocked": "User blocked",
+    "unblocked": "User unblocked",
+    "reportSubmitted": "Report submitted"
+  },
   "footer": {
     "home": "Home"
   }

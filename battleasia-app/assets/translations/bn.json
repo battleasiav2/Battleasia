@@ -212,6 +212,40 @@
     "confirm": "নিশ্চিত",
     "error": "ত্রুটি: {error}"
   },
+  "reels": {
+    "createReel": "রিল তৈরি",
+    "pickVideo": "ভিডিও বেছে নিন",
+    "videoSelected": "ভিডিও নির্বাচিত",
+    "caption": "ক্যাপশন",
+    "musicTitle": "মিউজিক (ঐচ্ছিক)",
+    "publish": "রিল পাবলিশ"
+  },
+  "messages": {
+    "newChat": "নতুন চ্যাট",
+    "searchUsers": "ইউজার খুঁজুন…",
+    "externalTitle": "বাহিরের অ্যাপে মেসেজ",
+    "externalDesc": "অ্যাপের ভিতরে DM বন্ধ। নিচের অ্যাপ খুলুন।",
+    "externalUnavailable": "মেসেজিং এখন unavailable।",
+    "openProvider": "{{provider}} খুলুন",
+    "attachImage": "ছবি সংযুক্ত"
+  },
+  "profile": {
+    "followers": "ফলোয়ার",
+    "following": "ফলোইং",
+    "noFollowList": "এখনো কেউ নেই",
+    "suggestedForYou": "আপনার জন্য সাজেশন",
+    "follow": "ফলো",
+    "message": "মেসেজ",
+    "block": "ব্লক",
+    "unblock": "আনব্লক",
+    "reportUser": "রিপোর্ট",
+    "reportReason": "কারণ",
+    "reportDetails": "বিস্তারিত (ঐচ্ছিক)",
+    "submitReport": "রিপোর্ট জমা",
+    "blocked": "ব্লক করা হয়েছে",
+    "unblocked": "আনব্লক করা হয়েছে",
+    "reportSubmitted": "রিপোর্ট জমা হয়েছে"
+  },
   "footer": {
     "home": "হোম"
   }

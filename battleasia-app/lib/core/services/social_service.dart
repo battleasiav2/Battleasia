@@ -165,14 +165,19 @@ class SocialService {
 
   Future<Map<String, dynamic>> sendDirectMessage(
     String conversationId,
-    String body,
-  ) async {
+    String body, {
+    List<String>? attachments,
+  }) async {
     try {
       final headers = await _getHeaders();
       final response = await ApiClient.post(
         Uri.parse('$_baseUrl/api/v2/social/messages/$conversationId'),
         headers: headers,
-        body: jsonEncode({'body': body}),
+        body: jsonEncode({
+          'body': body,
+          if (attachments != null && attachments.isNotEmpty)
+            'attachments': attachments,
+        }),
       );
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       if (response.statusCode == 200 && data['status'] == true) {
@@ -185,6 +190,136 @@ class SocialService {
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
+  }
+
+  Future<Map<String, dynamic>> createReel({
+    required String videoUrl,
+    String? caption,
+    String? musicTitle,
+  }) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/social/reels'),
+        headers: headers,
+        body: jsonEncode({
+          'videoUrl': videoUrl,
+          if (caption != null && caption.isNotEmpty) 'caption': caption,
+          if (musicTitle != null && musicTitle.isNotEmpty)
+            'musicTitle': musicTitle,
+        }),
+      );
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> createConversation(String participantId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/social/messages/conversations'),
+        headers: headers,
+        body: jsonEncode({'participantId': participantId}),
+      );
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> globalSearch(String query) async {
+    try {
+      final headers = await _getHeaders();
+      final uri = Uri.parse('$_baseUrl/api/v2/social/search').replace(
+        queryParameters: {'q': query},
+      );
+      final response = await ApiClient.get(uri, headers: headers);
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> getMessagingSettings() async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/social/messaging-settings'),
+        headers: headers,
+      );
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> blockUser(String userId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/users/$userId/block'),
+        headers: headers,
+        body: '{}',
+      );
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> unblockUser(String userId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.delete(
+        Uri.parse('$_baseUrl/api/v2/users/$userId/block'),
+        headers: headers,
+      );
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> submitReport({
+    required String targetType,
+    required String targetId,
+    required String reason,
+    String? details,
+  }) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/social/reports'),
+        headers: headers,
+        body: jsonEncode({
+          'targetType': targetType,
+          'targetId': targetId,
+          'reason': reason,
+          if (details != null && details.isNotEmpty) 'details': details,
+        }),
+      );
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Map<String, dynamic> _parseBody(dynamic response) {
+    final responseBody = response.body as String;
+    if (responseBody.isEmpty) {
+      return {'success': false, 'message': 'Empty response from server'};
+    }
+    final data = jsonDecode(responseBody) as Map<String, dynamic>;
+    if ((response.statusCode == 200 || response.statusCode == 201) &&
+        data['status'] == true) {
+      return {'success': true, 'data': data['data']};
+    }
+    return {
+      'success': false,
+      'message': data['message'] as String? ?? 'Request failed',
+    };
   }
 
   Map<String, dynamic> _parsePaginated(dynamic response) {

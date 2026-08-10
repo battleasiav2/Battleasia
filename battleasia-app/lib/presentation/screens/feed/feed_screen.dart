@@ -19,7 +19,14 @@ import 'package:battleasia_app/presentation/widgets/feed/stories_bar.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
 
 class FeedScreen extends StatefulWidget {
-  const FeedScreen({super.key});
+  const FeedScreen({
+    super.key,
+    this.initialMessageUserId,
+    this.initialHubSection,
+  });
+
+  final String? initialMessageUserId;
+  final FeedHubSection? initialHubSection;
 
   @override
   State<FeedScreen> createState() => _FeedScreenState();
@@ -50,6 +57,12 @@ class _FeedScreenState extends State<FeedScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.initialHubSection != null) {
+      _hubSection = widget.initialHubSection!;
+    } else if (widget.initialMessageUserId != null &&
+        widget.initialMessageUserId!.isNotEmpty) {
+      _hubSection = FeedHubSection.messages;
+    }
     _fetchCategories();
     _fetchFeeds();
   }
@@ -728,7 +741,7 @@ class _FeedScreenState extends State<FeedScreen> {
       case FeedHubSection.saved:
         return const FeedSavedPanel();
       case FeedHubSection.messages:
-        return const FeedMessagesPanel();
+        return FeedMessagesPanel(initialUserId: widget.initialMessageUserId);
       case FeedHubSection.feed:
         return const SizedBox.shrink();
     }

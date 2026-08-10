@@ -11,6 +11,11 @@ import 'package:battleasia_app/data/models/reel_model.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/reel_player_screen.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_item.dart';
+import 'package:battleasia_app/presentation/widgets/social/external_messaging_panel.dart';
+import 'package:battleasia_app/presentation/widgets/social/new_chat_sheet.dart';
+import 'package:battleasia_app/presentation/widgets/social/reel_create_sheet.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:battleasia_app/core/config/app_config.dart';
 
 class FeedExplorePanel extends StatefulWidget {
   const FeedExplorePanel({super.key});
@@ -233,107 +238,98 @@ class _FeedReelsPanelState extends State<FeedReelsPanel> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) {
-      return const Padding(
-        padding: EdgeInsets.all(32),
-        child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
-      );
-    }
-    if (_error != null) {
-      return Padding(
-        padding: const EdgeInsets.all(32),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                _error!,
-                textAlign: TextAlign.center,
-                style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: () async {
+              final ok = await ReelCreateSheet.show(context);
+              if (ok) _load();
+            },
+            icon: const Icon(Icons.add_circle_outline, color: AppColors.gold),
+            label: Text(
+              'reels.createReel'.tr(),
+              style: AppTheme.bodyMedium.copyWith(
+                color: AppColors.gold,
+                fontWeight: FontWeight.w700,
               ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: _load,
-                child: Text('common.retry'.tr()),
-              ),
-            ],
+            ),
           ),
         ),
-      );
-    }
-    if (_reels.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(32),
-        child: Center(
-          child: Text(
-            'feedHub.noReels'.tr(),
-            style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
-          ),
-        ),
-      );
-    }
-
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.72,
-      ),
-      itemCount: _reels.length,
-      itemBuilder: (context, index) {
-        final reel = _reels[index];
-        return Material(
-          color: AppColors.surfaceElevated,
-          borderRadius: BorderRadius.circular(2),
-          child: InkWell(
-            onTap: () => _openReel(reel),
-            borderRadius: BorderRadius.circular(2),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
+        if (_loading)
+          const Padding(
+            padding: EdgeInsets.all(32),
+            child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
+          )
+        else if (_error != null)
+          Padding(
+            padding: const EdgeInsets.all(32),
+            child: Center(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.play_circle_fill, color: AppColors.gold),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          reel.username,
-                          style: AppTheme.bodyMedium.copyWith(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: Text(
-                      reel.caption.isNotEmpty ? reel.caption : reel.musicTitle,
-                      style: AppTheme.bodySmall.copyWith(
-                        color: AppColors.textMuted,
-                      ),
-                      maxLines: 4,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
                   Text(
-                    '${reel.totalViews} views',
-                    style: AppTheme.bodySmall.copyWith(color: AppColors.gold),
+                    _error!,
+                    textAlign: TextAlign.center,
+                    style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: _load,
+                    child: Text('common.retry'.tr()),
                   ),
                 ],
               ),
             ),
+          )
+        else if (_reels.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(32),
+            child: Center(
+              child: Text(
+                'feedHub.noReels'.tr(),
+                style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
+              ),
+            ),
+          )
+        else
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 0.72,
+            ),
+            itemCount: _reels.length,
+            itemBuilder: (context, index) {
+              final reel = _reels[index];
+              return GestureDetector(
+                onTap: () => _openReel(reel),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      ImageUtils.networkImage(
+                        reel.thumbnailUrl.isNotEmpty
+                            ? reel.thumbnailUrl
+                            : reel.videoUrl,
+                        fit: BoxFit.cover,
+                      ),
+                      const Center(
+                        child: Icon(Icons.play_circle_fill, color: Colors.white, size: 40),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
-        );
-      },
+      ],
     );
   }
 }
@@ -414,7 +410,9 @@ class _FeedSavedPanelState extends State<FeedSavedPanel> {
 }
 
 class FeedMessagesPanel extends StatefulWidget {
-  const FeedMessagesPanel({super.key});
+  const FeedMessagesPanel({super.key, this.initialUserId});
+
+  final String? initialUserId;
 
   @override
   State<FeedMessagesPanel> createState() => _FeedMessagesPanelState();
@@ -422,22 +420,67 @@ class FeedMessagesPanel extends StatefulWidget {
 
 class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
   final SocialService _socialService = SocialService();
+  final FeedService _feedService = FeedService();
+  final ImagePicker _picker = ImagePicker();
+
   bool _loading = true;
+  bool _settingsLoading = true;
+  MessagingSettingsModel? _messagingSettings;
   List<ConversationModel> _conversations = [];
   ConversationModel? _active;
   List<DirectMessageModel> _messages = [];
   final TextEditingController _composer = TextEditingController();
+  List<String> _pendingAttachments = [];
+  bool _uploading = false;
+  bool _initialUserHandled = false;
 
   @override
   void initState() {
     super.initState();
-    _loadConversations();
+    _bootstrap();
   }
 
   @override
   void dispose() {
     _composer.dispose();
     super.dispose();
+  }
+
+  Future<void> _bootstrap() async {
+    await _loadMessagingSettings();
+    if (!mounted) return;
+
+    final builtinEnabled = _messagingSettings?.builtinEnabled ?? true;
+    if (!builtinEnabled) {
+      setState(() => _loading = false);
+      return;
+    }
+
+    await _loadConversations();
+    final initialUserId = widget.initialUserId;
+    if (initialUserId != null && initialUserId.isNotEmpty && !_initialUserHandled) {
+      _initialUserHandled = true;
+      await _startConversationWithUser(initialUserId);
+    }
+  }
+
+  Future<void> _loadMessagingSettings() async {
+    setState(() => _settingsLoading = true);
+    final result = await _socialService.getMessagingSettings();
+    if (!mounted) return;
+    setState(() {
+      if (result['success'] == true) {
+        _messagingSettings = MessagingSettingsModel.fromJson(
+          result['data'] as Map<String, dynamic>?,
+        );
+      } else {
+        _messagingSettings = MessagingSettingsModel(
+          builtinEnabled: true,
+          providers: const [],
+        );
+      }
+      _settingsLoading = false;
+    });
   }
 
   Future<void> _loadConversations() async {
@@ -458,10 +501,43 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
     }
   }
 
+  Future<void> _startConversationWithUser(String participantId) async {
+    final existing = _conversations.where((c) => c.otherUserId == participantId);
+    if (existing.isNotEmpty) {
+      await _openConversation(existing.first);
+      return;
+    }
+
+    final result = await _socialService.createConversation(participantId);
+    if (!mounted || result['success'] != true) return;
+
+    final data = result['data'] as Map<String, dynamic>? ?? {};
+    final conversationId = data['id']?.toString() ?? '';
+    if (conversationId.isEmpty) return;
+
+    final participant = data['participant'] as Map<String, dynamic>?;
+    final conversation = ConversationModel(
+      id: conversationId,
+      otherUserId: participant?['id']?.toString() ?? participantId,
+      otherUsername: participant?['username']?.toString() ?? 'User',
+      otherAvatar: participant?['avatar']?.toString() ?? '',
+      lastMessagePreview: '',
+    );
+
+    setState(() {
+      _conversations = [
+        conversation,
+        ..._conversations.where((c) => c.id != conversationId),
+      ];
+    });
+    await _openConversation(conversation);
+  }
+
   Future<void> _openConversation(ConversationModel conversation) async {
     setState(() {
       _active = conversation;
       _messages = [];
+      _pendingAttachments = [];
     });
     final result = await _socialService.getDirectMessages(conversation.id);
     if (!mounted) return;
@@ -476,17 +552,75 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
     }
   }
 
+  Future<void> _openNewChat() async {
+    final userId = await NewChatSheet.show(context);
+    if (userId != null && userId.isNotEmpty) {
+      await _startConversationWithUser(userId);
+    }
+  }
+
+  Future<void> _attachImage() async {
+    if (_uploading || _active == null) return;
+    final picked = await _picker.pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+
+    setState(() => _uploading = true);
+    final upload = await _feedService.uploadMedia(picked.path, folder: 'messages');
+    if (!mounted) return;
+    setState(() => _uploading = false);
+
+    if (upload['success'] == true) {
+      var url = upload['data']?['url']?.toString() ?? '';
+      if (url.isNotEmpty && !url.startsWith('http')) {
+        url = '${AppConfig.serverUrl}$url';
+      }
+      if (url.isNotEmpty) {
+        setState(() => _pendingAttachments = [..._pendingAttachments, url]);
+      }
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(upload['message']?.toString() ?? 'Upload failed')),
+      );
+    }
+  }
+
   Future<void> _sendMessage() async {
     final text = _composer.text.trim();
     final active = _active;
-    if (text.isEmpty || active == null) return;
+    if (active == null) return;
+    if (text.isEmpty && _pendingAttachments.isEmpty) return;
+
+    final attachments = List<String>.from(_pendingAttachments);
     _composer.clear();
-    await _socialService.sendDirectMessage(active.id, text);
+    setState(() => _pendingAttachments = []);
+
+    await _socialService.sendDirectMessage(
+      active.id,
+      text,
+      attachments: attachments.isEmpty ? null : attachments,
+    );
     await _openConversation(active);
+    await _loadConversations();
+  }
+
+  String _resolveMediaUrl(String url) {
+    if (url.startsWith('http')) return url;
+    return '${AppConfig.serverUrl}$url';
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_settingsLoading) {
+      return const Padding(
+        padding: EdgeInsets.all(32),
+        child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
+      );
+    }
+
+    if (_messagingSettings?.builtinEnabled == false) {
+      return ExternalMessagingPanel(settings: _messagingSettings!);
+    }
+
     if (_loading) {
       return const Padding(
         padding: EdgeInsets.all(32),
@@ -501,7 +635,10 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
           Row(
             children: [
               IconButton(
-                onPressed: () => setState(() => _active = null),
+                onPressed: () => setState(() {
+                  _active = null;
+                  _pendingAttachments = [];
+                }),
                 icon: const Icon(Icons.arrow_back, color: AppColors.gold),
               ),
               Expanded(
@@ -513,31 +650,63 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
             ],
           ),
           const SizedBox(height: 8),
-          ..._messages.map(
-            (m) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceElevated,
-                    borderRadius: BorderRadius.circular(2),
-                    border: Border.all(color: AppColors.border(0.12)),
-                  ),
-                  child: Text(
-                    m.body,
-                    style: AppTheme.bodyMedium.copyWith(
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
+          ..._messages.map(_buildMessageBubble),
+          if (_pendingAttachments.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 72,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: _pendingAttachments.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  final url = _pendingAttachments[index];
+                  return Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: Image.network(
+                          _resolveMediaUrl(url),
+                          width: 72,
+                          height: 72,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(Icons.close, size: 18, color: Colors.white),
+                          onPressed: () {
+                            setState(() {
+                              _pendingAttachments = List<String>.from(_pendingAttachments)
+                                ..removeAt(index);
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
-          ),
+          ],
           const SizedBox(height: 8),
           Row(
             children: [
+              IconButton(
+                onPressed: _uploading ? null : _attachImage,
+                icon: _uploading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.image_outlined, color: AppColors.gold),
+                tooltip: 'messages.attachImage'.tr(),
+              ),
               Expanded(
                 child: TextField(
                   controller: _composer,
@@ -559,21 +728,35 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
       );
     }
 
-    if (_conversations.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.all(32),
-        child: Center(
-          child: Text(
-            'feedHub.noConversations'.tr(),
-            style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Align(
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            onPressed: _openNewChat,
+            icon: const Icon(Icons.add_comment_outlined, color: AppColors.gold),
+            label: Text(
+              'messages.newChat'.tr(),
+              style: AppTheme.bodyMedium.copyWith(
+                color: AppColors.gold,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
           ),
         ),
-      );
-    }
-
-    return Column(
-      children: _conversations
-          .map(
+        if (_conversations.isEmpty)
+          Padding(
+            padding: const EdgeInsets.all(32),
+            child: Center(
+              child: Text(
+                'feedHub.noConversations'.tr(),
+                style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
+              ),
+            ),
+          )
+        else
+          ..._conversations.map(
             (c) => ListTile(
               leading: CircleAvatar(
                 backgroundColor: AppColors.gold,
@@ -600,8 +783,53 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
               trailing: const Icon(Icons.chevron_right, color: AppColors.textMuted),
               onTap: () => _openConversation(c),
             ),
-          )
-          .toList(),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildMessageBubble(DirectMessageModel message) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 320),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceElevated,
+            borderRadius: BorderRadius.circular(2),
+            border: Border.all(color: AppColors.border(0.12)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (message.body.isNotEmpty)
+                Text(
+                  message.body,
+                  style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
+                ),
+              if (message.attachments.isNotEmpty) ...[
+                if (message.body.isNotEmpty) const SizedBox(height: 8),
+                ...message.attachments.map(
+                  (url) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Image.network(
+                        _resolveMediaUrl(url),
+                        width: 200,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

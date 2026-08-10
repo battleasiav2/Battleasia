@@ -1,12 +1,19 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/core/services/social_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/public_user_model.dart';
+import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/profile/public_profile_info.dart';
+import 'package:battleasia_app/presentation/widgets/social/follow_list_sheet.dart';
+import 'package:battleasia_app/presentation/widgets/social/social_report_sheet.dart';
+import 'package:battleasia_app/presentation/widgets/social/suggested_follows_strip.dart';
 
 class PublicProfileScreen extends StatefulWidget {
   final String userId;
@@ -20,9 +27,12 @@ class PublicProfileScreen extends StatefulWidget {
 class _PublicProfileScreenState extends State<PublicProfileScreen> {
   final ScrollController _scrollController = ScrollController();
   final UserService _userService = UserService();
+  final SocialService _socialService = SocialService();
 
   PublicUserModel? _viewingUser;
   bool _isFollowing = false;
+  bool _isBlocked = false;
+  bool _blockLoading = false;
   bool _followLoading = false;
   int _followersCount = 0;
   int _followingCount = 0;
@@ -58,6 +68,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
         setState(() {
           _viewingUser = user;
           _isFollowing = userData['isFollowing'] ?? false;
+          _isBlocked = userData['isBlocked'] == true;
           _followersCount = userData['followersCount'] ?? 0;
           _followingCount = userData['followingCount'] ?? 0;
         });
@@ -216,6 +227,71 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     }
   }
 
+  Future<void> _handleBlockToggle() async {
+    if (_viewingUser == null || _blockLoading) return;
+
+    setState(() => _blockLoading = true);
+    try {
+      final result = _isBlocked
+          ? await _socialService.unblockUser(_viewingUser!.id)
+          : await _socialService.blockUser(_viewingUser!.id);
+
+      if (!mounted) return;
+      if (result['success'] == true) {
+        setState(() => _isBlocked = !_isBlocked);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              _isBlocked ? 'profile.blocked'.tr() : 'profile.unblocked'.tr(),
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message']?.toString() ?? 'Failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _blockLoading = false);
+    }
+  }
+
+  Future<void> _handleReport() async {
+    if (_viewingUser == null) return;
+    final ok = await SocialReportSheet.show(
+      context,
+      targetType: 'user',
+      targetId: _viewingUser!.id,
+    );
+    if (ok && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('profile.reportSubmitted'.tr())),
+      );
+    }
+  }
+
+  void _openMessage() {
+    if (_viewingUser == null) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => FeedScreen(initialMessageUserId: _viewingUser!.id),
+      ),
+    );
+  }
+
+  void _openFollowList(FollowListType type) {
+    FollowListSheet.show(
+      context,
+      userId: widget.userId,
+      type: type,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -256,6 +332,16 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
 
                         if (!isOwnProfile) ...[
                           _buildFollowButton(),
+                          SizedBox(height: spacing16),
+                          _buildSocialActions(isLoggedIn: authProvider.isAuthenticated),
+                          SizedBox(height: spacing24),
+                        ],
+
+                        if (authProvider.isAuthenticated) ...[
+                          SuggestedFollowsStrip(
+                            contextUserId: widget.userId,
+                            onFollowChange: _fetchUserProfile,
+                          ),
                           SizedBox(height: spacing24),
                         ],
 
@@ -335,9 +421,17 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildStatItem('Followers', _followersCount.toString()),
+                _buildStatItem(
+                  'profile.followers'.tr(),
+                  _followersCount.toString(),
+                  onTap: () => _openFollowList(FollowListType.followers),
+                ),
                 const SizedBox(width: 24),
-                _buildStatItem('Following', _followingCount.toString()),
+                _buildStatItem(
+                  'profile.following'.tr(),
+                  _followingCount.toString(),
+                  onTap: () => _openFollowList(FollowListType.following),
+                ),
               ],
             ),
           ],
@@ -346,8 +440,8 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     );
   }
 
-  Widget _buildStatItem(String label, String value) {
-    return Column(
+  Widget _buildStatItem(String label, String value, {VoidCallback? onTap}) {
+    final content = Column(
       children: [
         Text(
           value,
@@ -363,6 +457,47 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
             color: Colors.grey.shade600,
             fontSize: 12,
           ),
+        ),
+      ],
+    );
+
+    if (onTap == null) return content;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        child: content,
+      ),
+    );
+  }
+
+  Widget _buildSocialActions({required bool isLoggedIn}) {
+    if (!isLoggedIn) return const SizedBox.shrink();
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        OutlinedButton.icon(
+          onPressed: _openMessage,
+          icon: const Icon(Icons.chat_bubble_outline, size: 18),
+          label: Text('profile.message'.tr()),
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.gold,
+            side: BorderSide(color: AppColors.gold.withValues(alpha: 0.5)),
+          ),
+        ),
+        OutlinedButton.icon(
+          onPressed: _blockLoading ? null : _handleBlockToggle,
+          icon: Icon(_isBlocked ? Icons.lock_open : Icons.block, size: 18),
+          label: Text(_isBlocked ? 'profile.unblock'.tr() : 'profile.block'.tr()),
+        ),
+        OutlinedButton.icon(
+          onPressed: _handleReport,
+          icon: const Icon(Icons.flag_outlined, size: 18),
+          label: Text('profile.reportUser'.tr()),
         ),
       ],
     );

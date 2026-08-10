@@ -39,20 +39,27 @@ class DirectMessageModel {
   final String body;
   final String senderId;
   final String? createdAt;
+  final List<String> attachments;
 
   DirectMessageModel({
     required this.id,
     required this.body,
     required this.senderId,
     this.createdAt,
+    this.attachments = const [],
   });
 
   factory DirectMessageModel.fromJson(Map<String, dynamic> json) {
+    final raw = json['attachments'];
+    final urls = raw is List
+        ? raw.map((e) => e.toString()).where((e) => e.isNotEmpty).toList()
+        : <String>[];
     return DirectMessageModel(
       id: json['id']?.toString() ?? '',
       body: json['body']?.toString() ?? '',
       senderId: json['senderId']?.toString() ?? '',
       createdAt: json['createdAt']?.toString(),
+      attachments: urls,
     );
   }
 }
