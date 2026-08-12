@@ -56,6 +56,10 @@ Output:
 
 Full Hostinger setup: **`deploy/HOSTINGER-SETUP.md`**
 
+**Webuzo panel (single domain, বাংলা):** **`deploy/WEBUZO-SINGLE-DOMAIN-BN.md`**
+
+Git push + auto live: **`deploy/GIT-DEPLOY-BN.md`**
+
 ## Server deploy (SSH)
 
 ```bash
