@@ -6,7 +6,11 @@ REPO_DIR="${REPO_DIR:-/home/nixbazar/Battleasia}"
 CRON_SCRIPT="$REPO_DIR/deploy/webuzo-cron-deploy.sh"
 CRON_LINE="*/5 * * * * /bin/bash $CRON_SCRIPT"
 
-chmod +x "$REPO_DIR/deploy/webuzo-git-deploy.sh" "$CRON_SCRIPT" "$REPO_DIR/deploy/seed-all.sh" "$REPO_DIR/deploy/webuzo-seed-demo.sh"
+chmod +x "$REPO_DIR/deploy/webuzo-git-deploy.sh" \
+  "$REPO_DIR/deploy/webuzo-passenger-deploy.sh" \
+  "$CRON_SCRIPT" \
+  "$REPO_DIR/deploy/seed-all.sh" \
+  "$REPO_DIR/deploy/webuzo-seed-demo.sh"
 
 mkdir -p /home/nixbazar/logs
 

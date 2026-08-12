@@ -28,7 +28,7 @@ Apache/LiteSpeed (domain root + .htaccess)
    ├── /uploads/      → proxy → Node :5050
    └── /socket.io/    → proxy → Node :5050
 
-Node API (PM2, ~/api)
+Node API (PM2 **or** Passenger — see WEBUZO-PASSENGER-BN.md)
    └── MongoDB (Atlas / Webuzo / external)
 ```
 
@@ -310,6 +310,7 @@ bash /home/nixbazar/Battleasia/deploy/webuzo-git-deploy.sh
 
 | File | Purpose |
 |------|---------|
+| **`deploy/WEBUZO-PASSENGER-BN.md`** | **Passenger — কম RAM API setup** |
 | `deploy/GIT-DEPLOY-BN.md` | Git push + cron auto deploy |
 | `deploy/WEB-HOSTING-GUIDE-BN.md` | Hostinger ZIP upload (no git) |
 | `deploy/HOSTINGER-SETUP.md` | Hostinger English setup |

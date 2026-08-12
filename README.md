@@ -1,29 +1,41 @@
 # BattleAsia — Full Stack (battleasia.gg)
 
-Monorepo for **single-domain** production on Hostinger. Each app lives in its domain-named folder; deploy merges them into one `public_html`.
+Monorepo for production on **Hostinger KVM + Coolify** (recommended) or Webuzo/Hostinger shared.
 
-## Live URLs (one domain)
+## Live URLs (Coolify — ৩ subdomain + API folder)
 
 | URL | App |
 |-----|-----|
 | `https://battleasia.gg/` | Player site |
-| `https://battleasia.gg/store/` | Coin shop |
-| `https://battleasia.gg/admin/` | Admin panel |
-| `https://battleasia.gg/api/` | API |
+| `https://shop.battleasia.gg/` | Coin shop |
+| `https://admin.battleasia.gg/` | Admin panel |
+| `https://battleasia.gg/api/` | API (folder — no api subdomain) |
 
 **GitHub:** [battleasiav2/Battleasia](https://github.com/battleasiav2/Battleasia)
+
+## Coolify deploy (recommended)
+
+1. Coolify → New Resource → **Docker Compose**
+2. Repo: `battleasiav2/Battleasia` · Branch: `main`
+3. Compose file: **`docker-compose.coolify.yml`**
+4. Env: `JWT_SECRET`, `ADMIN_PASSWORD` (Mongo = local container by default)
+5. Domains: `fe` → battleasia.gg · `shop` → shop. · `admin` → admin. · `api` → battleasia.gg/api
+
+**বাংলা step-by-step:** **`deploy/COOLIFY-BN.md`**
 
 ## Repository layout
 
 ```
 Battleasia/
-├── battleasia.gg/        # Player site (React/Vite)
-├── shop.battleasia.gg/   # Coin shop → /store/
-├── admin.battleasia.gg/  # Admin panel → /admin/
-├── api/                  # Node.js API → ~/api/ on server
-├── battleasia-app/       # Flutter mobile app (build APK separately)
-├── deploy/               # build, assemble, deploy scripts
-├── docker/               # Optional Docker (VPS)
+├── battleasia.gg/              # Player site (React/Vite)
+├── shop.battleasia.gg/         # Coin shop
+├── admin.battleasia.gg/        # Admin panel
+├── api/                        # Node.js API
+├── battleasia-app/             # Flutter mobile (APK separate)
+├── docker/                     # Dockerfiles
+├── docker-compose.coolify.yml  # Coolify (no nginx — Coolify proxy)
+├── docker-compose.prod.yml     # Manual VPS + nginx
+├── deploy/                     # Guides + scripts
 └── .env.production.example
 ```
 
@@ -43,30 +55,16 @@ Open http://localhost:8080 — one proxy serves player, shop, admin, and API.
 | `/admin/` | http://localhost:3000 |
 | `/api/` | http://localhost:5050 |
 
-## Production build (Hostinger)
+## Alternative: single-domain Hostinger / Webuzo
+
+Path-based: `/store/` + `/admin/` on one domain.
 
 ```powershell
 npm run build
 ```
 
-Output:
-
-- `deploy/output/public_html/` → `~/domains/battleasia.gg/public_html/`
-- `api/dist/` + `api/package.json` → `~/api/`
-
-Full Hostinger setup: **`deploy/HOSTINGER-SETUP.md`**
-
-**Webuzo panel (single domain, বাংলা):** **`deploy/WEBUZO-SINGLE-DOMAIN-BN.md`**
-
-Git push + auto live: **`deploy/GIT-DEPLOY-BN.md`**
-
-## Server deploy (SSH)
-
-```bash
-git clone https://github.com/battleasiav2/Battleasia.git ~/Battleasia
-nano ~/api/.env
-bash ~/Battleasia/deploy/deploy.sh
-```
+- `deploy/output/public_html/` → site root
+- Guides: `deploy/HOSTINGER-SETUP.md`, `deploy/WEBUZO-SINGLE-DOMAIN-BN.md`, `deploy/WEBUZO-PASSENGER-BN.md`
 
 ## Security
 

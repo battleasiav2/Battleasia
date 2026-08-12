@@ -1,0 +1,110 @@
+# BattleAsia — Coolify deploy (no bundled nginx; Coolify proxy handles SSL + domains)
+#
+# Coolify → New Resource → Docker Compose → compose file: docker-compose.coolify.yml
+# Domains (see deploy/COOLIFY-BN.md):
+#   fe    → https://battleasia.gg
+#   shop  → https://shop.battleasia.gg
+#   admin → https://admin.battleasia.gg
+#   api   → https://battleasia.gg/api  (+ optional /api on shop & admin)
+#
+# MongoDB: default = local container `mongo` (host VPS DB).
+# Override MONGODB_URI only if you use Atlas or OS-installed Mongo.
+#
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes:
+      - mongo_data:/data/db
+    # Not exposed publicly — only other containers in this stack can reach it
+    expose:
+      - "27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile.prod
+    restart: unless-stopped
+    expose:
+      - "5050"
+    environment:
+      NODE_ENV: production
+      PORT: 5050
+      # Default: same-stack Mongo. Coolify env can override (e.g. Atlas).
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/battleasia}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@battleasia.gg}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://battleasia.gg,https://www.battleasia.gg,https://shop.battleasia.gg,https://admin.battleasia.gg}
+      APP_URL: ${APP_URL:-https://battleasia.gg}
+      CDN_URL: ${CDN_URL:-}
+      COINGO_MOCK: "false"
+      LOG_AUTH_CODES: "false"
+    volumes:
+      - api_uploads:/app/uploads
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:5050/ready',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  fe:
+    build:
+      context: .
+      dockerfile: docker/fe/Dockerfile.prod
+      args:
+        VITE_SERVER_URL: ${VITE_SERVER_URL:-}
+        VITE_CDN_URL: ${VITE_CDN_URL:-}
+        VITE_BAC_SHOP_URL: ${VITE_BAC_SHOP_URL:-https://shop.battleasia.gg/user/shop}
+    restart: unless-stopped
+    expose:
+      - "80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  shop:
+    build:
+      context: .
+      dockerfile: docker/shop/Dockerfile.prod
+      args:
+        VITE_SERVER_URL: ${VITE_SERVER_URL:-}
+        VITE_CDN_URL: ${VITE_CDN_URL:-}
+        VITE_MAIN_APP_URL: ${VITE_MAIN_APP_URL:-https://battleasia.gg}
+        VITE_BASE_PATH: ${VITE_BASE_PATH:-/}
+    restart: unless-stopped
+    expose:
+      - "80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  admin:
+    build:
+      context: .
+      dockerfile: docker/admin/Dockerfile.prod
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-https://battleasia.gg}
+        REACT_APP_BASENAME: ${REACT_APP_BASENAME:-}
+        PUBLIC_URL: ${PUBLIC_URL:-}
+    restart: unless-stopped
+    expose:
+      - "80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  api_uploads:
+  mongo_data:

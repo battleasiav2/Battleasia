@@ -1,0 +1,30 @@
+# Example Apache vhost snippet for Webuzo + Passenger (BattleAsia)
+# Paste into Webuzo → Domains → battleasia.gg → Custom Apache config
+# Adjust paths if your username is not nixbazar.
+
+DocumentRoot /home/nixbazar/battleasia.gg
+
+<Directory /home/nixbazar/battleasia.gg>
+    Options -Indexes +FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+
+# ── Passenger: Node API (low RAM) ─────────────────────────────────────────
+PassengerEnabled on
+PassengerAppRoot /home/nixbazar/api
+PassengerAppType node
+PassengerStartupFile dist/index.js
+# Use full path from: which node
+PassengerNodejs /usr/bin/node
+PassengerAppEnv production
+
+# RAM savings — single worker, idle after 5 min
+PassengerMaxPoolSize 1
+PassengerPoolIdleTime 300
+
+# Serve API under https://battleasia.gg/api/
+PassengerBaseURI /api
+
+# Uploads + socket.io: same app handles /uploads and /socket.io routes
+# Ensure .htaccess in domain root does NOT double-proxy these paths.

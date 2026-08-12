@@ -49,7 +49,8 @@ fi
 log "START deploy $LOCAL_SHA -> $REMOTE_SHA"
 
 export REPO_DIR LIVE_MAIN LIVE_API MAIN_DOMAIN
-if bash "$REPO_DIR/deploy/webuzo-git-deploy.sh" >>"$LOG_FILE" 2>&1; then
+DEPLOY_SCRIPT="${DEPLOY_SCRIPT:-webuzo-git-deploy.sh}"
+if bash "$REPO_DIR/deploy/$DEPLOY_SCRIPT" >>"$LOG_FILE" 2>&1; then
   log "DONE: deploy success — $MAIN_DOMAIN"
   exit 0
 fi
