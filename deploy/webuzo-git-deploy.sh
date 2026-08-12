@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Webuzo / single-server deploy — git pull, build, sync to public_html + api.
+# Webuzo / single-server deploy — git pull, build, sync to domain root + api.
 #
-# First time:
+# Webuzo document root (no public_html subfolder):
+#   LIVE_MAIN=/home/nixbazar/battleasia.gg
 #   git clone https://github.com/battleasiav2/Battleasia.git /home/nixbazar/Battleasia
 #   cp .env.production.example /home/nixbazar/api/.env   # edit MONGODB_URI, JWT, etc.
 #   chmod +x /home/nixbazar/Battleasia/deploy/webuzo-git-deploy.sh
@@ -10,7 +11,7 @@
 set -euo pipefail
 
 REPO_DIR="${REPO_DIR:-/home/nixbazar/Battleasia}"
-LIVE_MAIN="${LIVE_MAIN:-/home/nixbazar/battleasia.gg/public_html}"
+LIVE_MAIN="${LIVE_MAIN:-/home/nixbazar/battleasia.gg}"
 LIVE_API="${LIVE_API:-/home/nixbazar/api}"
 MAIN_DOMAIN="${MAIN_DOMAIN:-https://battleasia.gg}"
 

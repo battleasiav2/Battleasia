@@ -20,7 +20,7 @@
 Browser
    │
    ▼
-Apache/LiteSpeed (public_html + .htaccess)
+Apache/LiteSpeed (domain root + .htaccess)
    ├── /              → static React (player)
    ├── /store/        → static React (shop)
    ├── /admin/        → static React (admin)
@@ -47,14 +47,16 @@ Node API (PM2, ~/api)
 | PM2 | `npm i -g pm2` |
 | Git | repo clone করতে |
 
-**Path convention (এই repo):**
+**Path convention (Webuzo — সরাসরি domain folder, `public_html` নেই):**
 
 | Path | Meaning |
 |------|---------|
 | `/home/nixbazar/Battleasia` | Git repo |
-| `/home/nixbazar/battleasia.gg/public_html` | Live site |
+| `/home/nixbazar/battleasia.gg` | **Live site** (index.html, store/, admin/) |
 | `/home/nixbazar/api` | API + `.env` |
 | `/home/nixbazar/logs/battleasia-deploy.log` | Auto deploy log |
+
+> **Hostinger** আলাদা: সেখানে path হয় `~/domains/battleasia.gg/public_html/` — Webuzo-তে `public_html` subfolder **নেই**।
 
 আপনার username `nixbazar` না হলে নিচের commands-এ path বদলান।
 
@@ -64,7 +66,7 @@ Node API (PM2, ~/api)
 
 1. **Webuzo → Domains → Add Domain**
    - Domain: `battleasia.gg` (অথবা আপনার domain)
-   - Document root: `/home/nixbazar/battleasia.gg/public_html`
+   - Document root: **`/home/nixbazar/battleasia.gg`** (সরাসরি — `public_html` নয়)
 
 2. **DNS** (domain registrar):
    - `A` record → server IP
@@ -154,7 +156,7 @@ bash /home/nixbazar/Battleasia/deploy/webuzo-git-deploy.sh
 
 1. `git pull`
 2. সব app build (`deploy/build.sh`)
-3. `public_html`-এ sync
+3. `/home/nixbazar/battleasia.gg`-এ sync
 4. `~/api`-তে API sync + `npm install`
 5. PM2 restart
 6. প্রথমবার demo MongoDB seed (optional marker)
@@ -172,7 +174,7 @@ curl -sI https://battleasia.gg/admin/
 
 ## ধাপ ৬ — `.htaccess` API proxy
 
-`public_html/.htaccess`-এ **uncomment** করুন (LiteSpeed/Apache proxy support লাগে):
+`/home/nixbazar/battleasia.gg/.htaccess`-এ **uncomment** করুন (LiteSpeed/Apache proxy support লাগে):
 
 ```apache
 RewriteRule ^api/(.*)$ http://127.0.0.1:5050/$1 [P,L]

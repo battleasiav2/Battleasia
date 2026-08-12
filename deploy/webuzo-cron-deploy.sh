@@ -10,7 +10,7 @@
 set -euo pipefail
 
 REPO_DIR="${REPO_DIR:-/home/nixbazar/Battleasia}"
-LIVE_MAIN="${LIVE_MAIN:-/home/nixbazar/battleasia.gg/public_html}"
+LIVE_MAIN="${LIVE_MAIN:-/home/nixbazar/battleasia.gg}"
 LIVE_API="${LIVE_API:-/home/nixbazar/api}"
 MAIN_DOMAIN="${MAIN_DOMAIN:-https://battleasia.gg}"
 BRANCH="${BRANCH:-main}"

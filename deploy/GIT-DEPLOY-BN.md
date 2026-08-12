@@ -76,7 +76,7 @@ tail -30 /home/nixbazar/logs/battleasia-deploy.log
 | ধাপ | কাজ |
 |-----|-----|
 | প্রতি ৫ মিনিট | `git fetch` — GitHub-এ নতুন commit আছে কিনা |
-| নতুন commit থাকলে | build + `public_html` sync + API restart |
+| নতুন commit থাকলে | build + domain folder sync + API restart |
 | না থাকলে | `no new commits` লগ করে exit (হালকা) |
 | একসাথে ২টা run | lock file দিয়ে ব্লক |
 
@@ -130,7 +130,7 @@ RUN_SEED=1 bash /home/nixbazar/Battleasia/deploy/webuzo-git-deploy.sh
 
 ## ৭. `.htaccess` API proxy
 
-`public_html/.htaccess`-এ uncomment:
+`/home/nixbazar/battleasia.gg/.htaccess`-এ uncomment:
 
 ```apache
 RewriteRule ^api/(.*)$ http://127.0.0.1:5050/$1 [P,L]
