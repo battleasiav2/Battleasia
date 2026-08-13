@@ -2,7 +2,9 @@
 
 | File | Purpose |
 |------|---------|
-| **`PC-GIT-COOLIFY-AUTO-BN.md`** | **PC Auto Save → Git ship → Coolify auto deploy (বাংলা)** |
+| **`PC-GIT-COOLIFY-AUTO-BN.md`** | **PC Auto Save → auto-ship-watch → Coolify (বাংলা)** |
+| `ship.ps1` | একবারে commit + push |
+| `auto-ship-watch.ps1` | প্রতি ৩ মিনিট অটো Git (window খোলা রাখুন) |
 | **`COOLIFY-BN.md`** | **Coolify — নতুনদের জন্য বাংলা step-by-step (৩ domain + local Mongo)** |
 | **`HOSTINGER-KVM2-BN.md`** | **Hostinger KVM 2 VPS — শূন্য থেকে full setup (বাংলা)** |
 | **`WEBUZO-PASSENGER-BN.md`** | **Passenger (কম RAM) — Webuzo Node API setup** |
