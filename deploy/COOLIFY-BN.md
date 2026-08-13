@@ -70,7 +70,7 @@ RAM ~৮ GB দেখতে পাবেন। তারপর বাম দি�
 
 4. **Save** চাপুন
 
-> ⚠️ ফাইল নাম ঠিক লিখুন: `docker-compose.coolify.yml`  
+> ⚠️ Compose file: **`/docker-compose.yaml`** (শুরুতে `/` থাকতে হবে)  
 > `docker-compose.prod.yml` দিবেন **না**।
 
 Private repo হলে আগে: বাম মেনু → **Sources** → GitHub connect → Authorize।
