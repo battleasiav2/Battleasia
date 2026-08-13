@@ -1086,16 +1086,12 @@ export function HomeView() {
       {sectionSlide}
 
       {/* Code-split only — mount ASAP with reserved height (no IO gate → less footer CLS) */}
-      <Suspense fallback={<Box sx={{ minHeight: { xs: 1200, md: 980 } }} />}>
-        <Box sx={{ minHeight: { xs: 1200, md: 980 } }}>
-          <LandingDashboardSection />
-        </Box>
+      <Suspense fallback={<Box sx={{ minHeight: { xs: 520, md: 440 } }} />}>
+        <LandingDashboardSection />
       </Suspense>
 
-      <Suspense fallback={<Box sx={{ minHeight: { xs: 720, md: 640 } }} />}>
-        <Box sx={{ minHeight: { xs: 720, md: 640 } }}>
-          <PlayYourGameSection />
-        </Box>
+      <Suspense fallback={<Box sx={{ minHeight: { xs: 420, md: 380 } }} />}>
+        <PlayYourGameSection />
       </Suspense>
 
       {sectionAbout}

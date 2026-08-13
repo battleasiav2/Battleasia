@@ -139,8 +139,11 @@ router.get('/app-download', async (_req, res) => {
     const settings = await getAppSettings();
     const appDownload = normalizeAppDownloadSettings(settings.appDownload);
     const fileExists = fs.existsSync(appDownloadPath);
+    const stat = fileExists ? fs.statSync(appDownloadPath) : null;
 
-    if (!appDownload.enabled || !fileExists) {
+    // Keep the homepage CTA visible when download is enabled in settings,
+    // even if the APK has not been uploaded yet.
+    if (!appDownload.enabled) {
       return res.json({
         status: true,
         data: {
@@ -154,7 +157,6 @@ router.get('/app-download', async (_req, res) => {
       });
     }
 
-    const stat = fs.statSync(appDownloadPath);
     return res.json({
       status: true,
       data: normalizeAppDownloadSettings({
@@ -162,7 +164,7 @@ router.get('/app-download', async (_req, res) => {
         enabled: true,
         downloadUrl: '/uploads/app/BattleAsia.apk',
         fileName: appDownloadFileName,
-        fileSize: stat.size,
+        fileSize: stat?.size || 0,
       }),
     });
   } catch (error) {

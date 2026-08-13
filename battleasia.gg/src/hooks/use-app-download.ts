@@ -10,9 +10,11 @@ export type AppDownloadState = {
   loading: boolean;
 };
 
+const DEFAULT_HREF = '/uploads/app/BattleAsia.apk';
+
 const DEFAULT_STATE: AppDownloadState = {
-  enabled: false,
-  href: '',
+  enabled: true,
+  href: DEFAULT_HREF,
   fileName: 'BattleAsia.apk',
   loading: true,
 };
@@ -29,17 +31,17 @@ export function useAppDownload() {
         if (!active) return;
 
         const data = response?.data?.data;
-        if (data?.enabled && data?.downloadUrl) {
-          setState({
-            enabled: true,
-            href: resolveAppDownloadHref(data.downloadUrl),
-            fileName: data.fileName || 'BattleAsia.apk',
-            loading: false,
-          });
+        if (data?.enabled === false) {
+          setState({ enabled: false, href: '', fileName: data.fileName || 'BattleAsia.apk', loading: false });
           return;
         }
 
-        setState({ ...DEFAULT_STATE, loading: false });
+        setState({
+          enabled: true,
+          href: resolveAppDownloadHref(data?.downloadUrl || DEFAULT_HREF),
+          fileName: data?.fileName || 'BattleAsia.apk',
+          loading: false,
+        });
       })
       .catch(() => {
         if (active) {
