@@ -88,7 +88,7 @@ export function PlayView() {
     <UserPageShell>
       <PlayArenaHero
         badge={t('play.badgeTournamentHub')}
-        title={t('play.battlemania')}
+        title={t('play.battleasia')}
         description={t('play.bannerDescription')}
         imageUrl={PLAY_IMAGE_PATHS.heroBanner}
         liveLabel={t('play.watchLive')}

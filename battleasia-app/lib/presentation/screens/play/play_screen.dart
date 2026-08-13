@@ -200,13 +200,13 @@ class _PlayScreenState extends State<PlayScreen> {
                   child: PlayHeroBanner(
                     slides: const [
                       {
-                        'title': 'BATTLEMANIA',
+                        'title': 'BATTLEASIA',
                         'description':
                             'eSports Tournament App for PUBG, FreeFire, Pubg Lite, COD, Fortnite & more + Admin panel + Website',
                         'imageUrl': 'assets/images/banner2.webp',
                       },
                       {
-                        'title': 'BATTLEMANIA',
+                        'title': 'BATTLEASIA',
                         'description':
                             'eSports Tournament App for PUBG, FreeFire, Pubg Lite, COD, Fortnite & more + Admin panel + Website',
                         'imageUrl': 'assets/images/banner4.webp',
