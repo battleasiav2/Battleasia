@@ -4,7 +4,7 @@ WORKDIR /app
 COPY admin.battleasia.gg/package.json admin.battleasia.gg/package-lock.json ./
 RUN npm ci --legacy-peer-deps
 COPY admin.battleasia.gg/ .
-ARG REACT_APP_API_URL=
+ARG REACT_APP_API_URL=https://battleasia.gg
 ARG REACT_APP_BASENAME=
 ARG PUBLIC_URL=
 ENV REACT_APP_API_URL=$REACT_APP_API_URL

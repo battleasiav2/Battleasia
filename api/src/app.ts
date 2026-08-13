@@ -127,6 +127,20 @@ export function createApp() {
     })
   );
 
+  // Coolify/Traefik domain path `/api` often strips the prefix before Node.
+  // Restore `/api` so `/v3/...` still hits `/api/v3/...`.
+  app.use((req, _res, next) => {
+    const pathOnly = req.path || '';
+    if (pathOnly.startsWith('/api/') || pathOnly === '/api') {
+      next();
+      return;
+    }
+    if (/^\/v\d+\//.test(pathOnly)) {
+      req.url = `/api${req.url}`;
+    }
+    next();
+  });
+
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
