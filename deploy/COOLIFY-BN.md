@@ -66,7 +66,7 @@ RAM ~৮ GB দেখতে পাবেন। তারপর বাম দি�
 |-------|-------|
 | Repository URL | `https://github.com/battleasiav2/Battleasia` |
 | Branch | `main` |
-| Docker Compose Location | `docker-compose.coolify.yml` |
+| Docker Compose Location | `/docker-compose.yaml` (Coolify default — leading `/` required) |
 
 4. **Save** চাপুন
 
