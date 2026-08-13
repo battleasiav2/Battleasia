@@ -2,6 +2,7 @@
 
 | File | Purpose |
 |------|---------|
+| **`PC-GIT-COOLIFY-AUTO-BN.md`** | **PC Auto Save → Git ship → Coolify auto deploy (বাংলা)** |
 | **`COOLIFY-BN.md`** | **Coolify — নতুনদের জন্য বাংলা step-by-step (৩ domain + local Mongo)** |
 | **`HOSTINGER-KVM2-BN.md`** | **Hostinger KVM 2 VPS — শূন্য থেকে full setup (বাংলা)** |
 | **`WEBUZO-PASSENGER-BN.md`** | **Passenger (কম RAM) — Webuzo Node API setup** |
