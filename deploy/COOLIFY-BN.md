@@ -225,7 +225,10 @@ mkdir -p /tmp && # APK আপনার PC থেকে scp করে আনু�
 # docker cp BattleAsia.apk CONTAINER_ID:/app/uploads/app/
 ```
 
-Download URL: `https://battleasia.gg/uploads/app/BattleAsia.apk`
+Download URL (কাজ করে এখনই): `https://battleasia.gg/api/uploads/app/BattleAsia.apk`
+
+`/uploads/...` খুললে ~5KB HTML আসে — মানে Coolify-তে `api` service-এ domain path `/uploads` নেই।
+অবশ্যই যোগ করুন: `https://battleasia.gg/uploads` → service **api** (port 5050)।
 
 ---
 

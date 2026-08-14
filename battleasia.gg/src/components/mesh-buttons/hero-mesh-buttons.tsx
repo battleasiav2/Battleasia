@@ -26,7 +26,7 @@ export function HeroMeshButtons({
   joinLabel,
   downloadLabel,
   joinHref = '/dashboard/play',
-  downloadHref = '/uploads/app/BattleAsia.apk',
+  downloadHref = '/api/uploads/app/BattleAsia.apk',
   downloadFileName = 'BattleAsia.apk',
   showDownload = true,
 }: HeroMeshButtonsProps) {

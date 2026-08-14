@@ -156,19 +156,20 @@ export function createApp() {
 
   app.use(express.urlencoded({ extended: true }));
 
-  app.use(
-    '/uploads',
-    express.static(uploadsRoot, {
-      maxAge: env.isProduction ? '7d' : 0,
-      etag: true,
-      setHeaders(res) {
-        if (env.isProduction) {
-          // Uploads are content-stable URLs; allow CDN/browser cache for a week
-          res.setHeader('Cache-Control', 'public, max-age=604800');
-        }
-      },
-    })
-  );
+  const uploadsStatic = express.static(uploadsRoot, {
+    maxAge: env.isProduction ? '7d' : 0,
+    etag: true,
+    setHeaders(res) {
+      if (env.isProduction) {
+        // Uploads are content-stable URLs; allow CDN/browser cache for a week
+        res.setHeader('Cache-Control', 'public, max-age=604800');
+      }
+    },
+  });
+  // Direct path (nginx /uploads proxy, Coolify domain path /uploads)
+  app.use('/uploads', uploadsStatic);
+  // Coolify path /api keeps prefix for some routes — APK/media via /api/uploads/*
+  app.use('/api/uploads', uploadsStatic);
 
 
 

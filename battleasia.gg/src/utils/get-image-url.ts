@@ -25,8 +25,21 @@ export const getImageUrl = (image?: string | null): string | undefined => {
     }
 
     const baseUrl = CONFIG.serverUrl?.replace(/\/$/, '') || '';
+
+    // Same-origin Coolify: /uploads hits the SPA; API serves files under /api/uploads
+    if (!baseUrl && (normalized.startsWith('/uploads/') || normalized === '/uploads')) {
+        return `/api${normalized}`;
+    }
+
     if (!baseUrl) {
         return normalized;
+    }
+
+    if (
+        (normalized.startsWith('/uploads/') || normalized === '/uploads') &&
+        !baseUrl.endsWith('/api')
+    ) {
+        return `${baseUrl}/api${normalized}`;
     }
 
     return `${baseUrl}${normalized}`;

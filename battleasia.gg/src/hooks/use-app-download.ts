@@ -10,7 +10,7 @@ export type AppDownloadState = {
   loading: boolean;
 };
 
-const DEFAULT_HREF = '/uploads/app/BattleAsia.apk';
+const DEFAULT_HREF = '/api/uploads/app/BattleAsia.apk';
 
 const DEFAULT_STATE: AppDownloadState = {
   enabled: true,

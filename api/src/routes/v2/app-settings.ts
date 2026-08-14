@@ -162,7 +162,7 @@ router.get('/app-download', async (_req, res) => {
       data: normalizeAppDownloadSettings({
         ...appDownload,
         enabled: true,
-        downloadUrl: '/uploads/app/BattleAsia.apk',
+        downloadUrl: '/api/uploads/app/BattleAsia.apk',
         fileName: appDownloadFileName,
         fileSize: stat?.size || 0,
       }),
@@ -185,7 +185,7 @@ router.put('/app-download', requireAuth, requireAdmin, async (req, res) => {
       ...current,
       enabled: body.enabled,
       version: body.version,
-      downloadUrl: '/uploads/app/BattleAsia.apk',
+      downloadUrl: '/api/uploads/app/BattleAsia.apk',
       fileName: appDownloadFileName,
       fileSize: stat?.size || current.fileSize,
       updatedAt: current.updatedAt,
@@ -222,7 +222,7 @@ router.post('/app-download/upload', requireAuth, requireAdmin, handleApkUpload, 
 
     settings.appDownload = normalizeAppDownloadSettings({
       enabled: true,
-      downloadUrl: '/uploads/app/BattleAsia.apk',
+      downloadUrl: '/api/uploads/app/BattleAsia.apk',
       fileName: appDownloadFileName,
       fileSize: file.size,
       version,

@@ -87,7 +87,7 @@ export const DEFAULT_MAIL_SETTINGS: MailSettings = {
 
 export const DEFAULT_APP_DOWNLOAD_SETTINGS: AppDownloadSettings = {
   enabled: true,
-  downloadUrl: '/uploads/app/BattleAsia.apk',
+  downloadUrl: '/api/uploads/app/BattleAsia.apk',
   fileName: 'BattleAsia.apk',
   fileSize: 0,
   version: '',
