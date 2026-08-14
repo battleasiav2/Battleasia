@@ -159,7 +159,13 @@ export function createApp() {
   const uploadsStatic = express.static(uploadsRoot, {
     maxAge: env.isProduction ? '7d' : 0,
     etag: true,
-    setHeaders(res) {
+    setHeaders(res, filePath) {
+      if (String(filePath).toLowerCase().endsWith('.apk')) {
+        res.setHeader('Content-Type', 'application/vnd.android.package-archive');
+        res.setHeader('Content-Disposition', 'attachment; filename="BattleAsia.apk"');
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+        return;
+      }
       if (env.isProduction) {
         // Uploads are content-stable URLs; allow CDN/browser cache for a week
         res.setHeader('Cache-Control', 'public, max-age=604800');

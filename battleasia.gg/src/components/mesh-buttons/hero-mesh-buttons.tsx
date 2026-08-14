@@ -2,6 +2,7 @@ import { Stack, Button } from '@mui/material';
 
 import { Iconify } from 'src/components/iconify/iconify';
 import { userGhostButtonSx, userGoldButtonSx } from 'src/layouts/user/user-theme';
+import { startAppDownload } from 'src/utils/app-download-url';
 
 type HeroMeshButtonsProps = {
   joinLabel: string;
@@ -64,6 +65,10 @@ export function HeroMeshButtons({
           download={downloadFileName}
           variant="outlined"
           disableElevation
+          onClick={(event) => {
+            event.preventDefault();
+            startAppDownload(downloadHref, downloadFileName);
+          }}
           startIcon={
             <Iconify icon="solar:download-bold-duotone" width={22} sx={{ flexShrink: 0 }} />
           }

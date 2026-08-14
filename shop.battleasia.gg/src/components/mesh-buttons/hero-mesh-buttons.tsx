@@ -50,6 +50,18 @@ export function HeroMeshButtons({
         component="a"
         href={downloadHref}
         download="BattleAsia.apk"
+        onClick={(event) => {
+          event.preventDefault();
+          const a = document.createElement('a');
+          a.href = downloadHref.startsWith('/uploads/')
+            ? `/api${downloadHref}`
+            : downloadHref;
+          a.download = 'BattleAsia.apk';
+          a.rel = 'noopener';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }}
         startIcon={
           <Iconify icon="solar:download-bold-duotone" width={22} sx={{ flexShrink: 0 }} />
         }

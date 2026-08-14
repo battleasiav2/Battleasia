@@ -19,6 +19,7 @@ import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
 import { getImageUrl } from 'src/utils/get-image-url';
+import { startAppDownload } from 'src/utils/app-download-url';
 
 import { useSelector } from 'src/store';
 import { useTranslate } from 'src/locales';
@@ -144,7 +145,16 @@ function MenuCard({
 
   if (href && downloadFileName) {
     return (
-      <Box component="a" href={href} download={downloadFileName} sx={cardSx}>
+      <Box
+        component="a"
+        href={href}
+        download={downloadFileName}
+        onClick={(event) => {
+          event.preventDefault();
+          startAppDownload(href, downloadFileName);
+        }}
+        sx={cardSx}
+      >
         {content}
       </Box>
     );

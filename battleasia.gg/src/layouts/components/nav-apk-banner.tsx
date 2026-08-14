@@ -9,6 +9,7 @@ import { GLASS_CARD_RADIUS } from 'src/components/battle-glass-card';
 
 import { useAppDownload } from 'src/hooks/use-app-download';
 import { useTranslate } from 'src/locales/use-locales';
+import { startAppDownload } from 'src/utils/app-download-url';
 
 import { USER_COLORS } from '../user/user-theme';
 
@@ -136,7 +137,11 @@ export function NavApkBanner({ onNavigate, sx }: NavApkBannerProps) {
           href={appDownload.href}
           download={appDownload.fileName}
           fullWidth
-          onClick={onNavigate}
+          onClick={(event) => {
+            event.preventDefault();
+            startAppDownload(appDownload.href, appDownload.fileName);
+            onNavigate?.();
+          }}
           startIcon={<Iconify icon="solar:download-bold" width={16} />}
           sx={{
             py: 1,
