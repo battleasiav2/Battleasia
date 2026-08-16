@@ -33,7 +33,7 @@ router.get('/', requireAuth, async (req, res) => {
     }
 
     const [items, count] = await Promise.all([
-      ShopItem.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      ShopItem.find(filter).sort({ amount: 1 }).skip(skip).limit(limit),
       ShopItem.countDocuments(filter),
     ]);
 

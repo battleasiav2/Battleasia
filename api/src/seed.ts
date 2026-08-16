@@ -184,24 +184,47 @@ async function seed() {
     console.log('Coin rate created: bangladesh/BDT');
   }
 
-  const existingShopItem = await ShopItem.findOne({ amount: 100 });
-  if (!existingShopItem) {
-    await ShopItem.create({
-      amount: 100,
-      badge: 'Popular',
-      price: 1,
-      originalPrice: 1,
-      discountPercent: 0,
-      symbol: 'BAC',
-      paymentOptions: ['bkash', 'nagad'],
-      image: '/assets/images/currency.webp',
-      isActive: true,
-      status: 'available',
-    });
-    console.log('Shop item created: 100 BAC pack');
-  } else if (existingShopItem.image !== '/assets/images/currency.webp') {
-    existingShopItem.image = '/assets/images/currency.webp';
-    await existingShopItem.save();
+  const demoCoinPacks: Array<{
+    amount: number;
+    badge: 'Popular' | 'New' | 'Hot' | 'Best';
+    price: number;
+    originalPrice: number;
+    discountPercent: number;
+  }> = [
+    { amount: 100, badge: 'Popular', price: 1, originalPrice: 1, discountPercent: 0 },
+    { amount: 300, badge: 'New', price: 2.7, originalPrice: 3, discountPercent: 10 },
+    { amount: 500, badge: 'Hot', price: 4, originalPrice: 5, discountPercent: 20 },
+    { amount: 1000, badge: 'Best', price: 7.5, originalPrice: 10, discountPercent: 25 },
+  ];
+
+  for (const pack of demoCoinPacks) {
+    const existing = await ShopItem.findOne({ amount: pack.amount, symbol: 'BAC' });
+    if (!existing) {
+      await ShopItem.create({
+        amount: pack.amount,
+        badge: pack.badge,
+        price: pack.price,
+        originalPrice: pack.originalPrice,
+        discountPercent: pack.discountPercent,
+        symbol: 'BAC',
+        paymentOptions: ['bkash', 'nagad', 'crypto'],
+        image: '/assets/images/currency.webp',
+        isActive: true,
+        status: 'available',
+      });
+      console.log(`Shop item created: ${pack.amount} BAC pack`);
+    } else {
+      let dirty = false;
+      if (existing.image !== '/assets/images/currency.webp') {
+        existing.image = '/assets/images/currency.webp';
+        dirty = true;
+      }
+      if (!existing.isActive) {
+        existing.isActive = true;
+        dirty = true;
+      }
+      if (dirty) await existing.save();
+    }
   }
 
   await ShopItem.updateMany(

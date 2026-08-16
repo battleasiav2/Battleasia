@@ -174,11 +174,14 @@ export function ShopView() {
 
     const filteredShopItems = useMemo(
         () =>
-            shopItems.filter((shopItem) => {
-                const withinMin = minPrice ? shopItem.price >= Number(minPrice) : true;
-                const withinMax = maxPrice ? shopItem.price <= Number(maxPrice) : true;
-                return withinMin && withinMax;
-            }),
+            shopItems
+                .filter((shopItem) => {
+                    const withinMin = minPrice ? shopItem.price >= Number(minPrice) : true;
+                    const withinMax = maxPrice ? shopItem.price <= Number(maxPrice) : true;
+                    return withinMin && withinMax;
+                })
+                .slice()
+                .sort((a, b) => a.amount - b.amount),
         [shopItems, minPrice, maxPrice]
     );
 
@@ -564,83 +567,158 @@ export function ShopView() {
                                     }}
                                 />
                             ) : (
-                                <Grid container spacing={3}>
-                                    {filteredShopItems.map((shopItem) => (
-                                        <Grid key={`${shopItem.amount}-${shopItem.symbol}`} size={{ xs: 12, sm: 6, md: 4 }}>
+                                <Grid container spacing={{ xs: 2, md: 2.5 }}>
+                                    {filteredShopItems.map((shopItem) => {
+                                        const badgeLabel = shopItem.badge?.trim() || '';
+                                        const showBadge = Boolean(badgeLabel) && badgeLabel.toLowerCase() !== 'none';
+                                        const hasDiscount = Number(shopItem.discountPercent) > 0;
+                                        const isFeatured = ['popular', 'best', 'hot'].includes(badgeLabel.toLowerCase());
+
+                                        return (
+                                        <Grid key={`${shopItem.amount}-${shopItem.symbol}`} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
                                             <UserGlassCard
                                                 sx={{
-                                                    p: 2,
+                                                    position: 'relative',
+                                                    p: { xs: 2, md: 2.25 },
+                                                    pt: showBadge ? 2.75 : 2.25,
                                                     height: '100%',
                                                     display: 'flex',
                                                     flexDirection: 'column',
-                                                    gap: 1.5,
-                                                    transition: 'border-color 0.2s ease, transform 0.2s ease',
+                                                    alignItems: 'center',
+                                                    textAlign: 'center',
+                                                    gap: 1.25,
+                                                    overflow: 'hidden',
+                                                    borderColor: isFeatured
+                                                        ? alpha(USER_COLORS.gold, 0.38)
+                                                        : alpha('#ffffff', 0.1),
+                                                    background: isFeatured
+                                                        ? `linear-gradient(165deg, ${alpha(USER_COLORS.gold, 0.12)} 0%, ${alpha('#000000', 0.55)} 48%, ${alpha('#050505', 0.92)} 100%)`
+                                                        : undefined,
+                                                    transition: 'border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
                                                     '&:hover': {
-                                                        borderColor: alpha(USER_COLORS.gold, 0.35),
-                                                        transform: 'translateY(-2px)',
+                                                        borderColor: alpha(USER_COLORS.gold, 0.5),
+                                                        transform: 'translateY(-3px)',
+                                                        boxShadow: `0 12px 28px ${alpha('#000000', 0.45)}`,
                                                     },
                                                 }}
                                             >
-                                                {shopItem.badge && (
+                                                {showBadge && (
                                                     <Chip
-                                                        label={shopItem.badge}
+                                                        label={badgeLabel}
                                                         size="small"
                                                         sx={{
-                                                            alignSelf: 'flex-start',
-                                                            visibility: shopItem.badge.toLowerCase() !== 'none' ? 'visible' : 'hidden',
-                                                            bgcolor: alpha(USER_COLORS.gold, 0.16),
+                                                            position: 'absolute',
+                                                            top: 12,
+                                                            left: 12,
+                                                            height: 24,
+                                                            bgcolor: alpha('#0a0a0a', 0.72),
                                                             color: `${USER_COLORS.gold} !important`,
-                                                            border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}`,
-                                                            fontWeight: 700,
+                                                            border: `1px solid ${alpha(USER_COLORS.gold, 0.5)}`,
+                                                            fontWeight: 800,
+                                                            letterSpacing: 0.4,
                                                             '& .MuiChip-label': {
                                                               color: `${USER_COLORS.gold} !important`,
-                                                              fontWeight: 700,
+                                                              fontWeight: 800,
+                                                              px: 1,
+                                                              fontSize: 11,
                                                             },
                                                         }}
                                                     />
                                                 )}
-                                                <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'center' }} spacing={1}>
-                                                     <Image draggable="false" src={resolveItemImage(shopItem.image)} alt="BAC coins" ratio="1/1" sx={{ borderRadius: 1, width: 120, height: 120, objectFit: 'contain', mx: 'auto' }} />
-                                                </Stack>
+                                                <Box
+                                                    sx={{
+                                                        width: { xs: 112, md: 128 },
+                                                        height: { xs: 112, md: 128 },
+                                                        display: 'grid',
+                                                        placeItems: 'center',
+                                                        borderRadius: '50%',
+                                                        background: `radial-gradient(circle, ${alpha(USER_COLORS.gold, 0.18)} 0%, transparent 68%)`,
+                                                    }}
+                                                >
+                                                    <Image
+                                                        draggable="false"
+                                                        src={resolveItemImage(shopItem.image)}
+                                                        alt={`${shopItem.amount} ${shopItem.symbol}`}
+                                                        ratio="1/1"
+                                                        sx={{
+                                                            width: { xs: 96, md: 112 },
+                                                            height: { xs: 96, md: 112 },
+                                                            objectFit: 'contain',
+                                                        }}
+                                                    />
+                                                </Box>
 
-                                                <Typography className="font-tr" sx={{ fontSize: 18, fontWeight: 800, color: USER_COLORS.textPrimary }}>
-                                                    {shopItem.amount} {shopItem.symbol}
+                                                <Typography
+                                                    className="font-tr"
+                                                    sx={{
+                                                        mt: 0.25,
+                                                        fontSize: { xs: 20, md: 22 },
+                                                        fontWeight: 800,
+                                                        letterSpacing: 0.3,
+                                                        color: USER_COLORS.textPrimary,
+                                                        lineHeight: 1.15,
+                                                    }}
+                                                >
+                                                    {fNumber(shopItem.amount)} {shopItem.symbol}
                                                 </Typography>
-                                                <Stack direction="row" alignItems="center" spacing={1}>
-                                                    <Typography sx={{ fontSize: 18, fontWeight: 800, color: USER_COLORS.gold }}>
+
+                                                <Stack direction="row" alignItems="baseline" justifyContent="center" spacing={0.75}>
+                                                    <Typography
+                                                        sx={{
+                                                            fontSize: { xs: 20, md: 22 },
+                                                            fontWeight: 800,
+                                                            color: USER_COLORS.gold,
+                                                            lineHeight: 1,
+                                                        }}
+                                                    >
                                                         ${Number(shopItem.price).toFixed(2)}
                                                     </Typography>
-                                                    {shopItem.discountPercent > 0 && (
-                                                        <Typography sx={{ ...userMutedTextSx, textDecoration: 'line-through' }}>
-                                                            {Number(shopItem.originalPrice).toFixed(2)}
+                                                    {hasDiscount && (
+                                                        <Typography
+                                                            sx={{
+                                                                ...userMutedTextSx,
+                                                                fontSize: 13,
+                                                                textDecoration: 'line-through',
+                                                            }}
+                                                        >
+                                                            ${Number(shopItem.originalPrice).toFixed(2)}
                                                         </Typography>
                                                     )}
                                                 </Stack>
-                                                {shopItem.discountPercent > 0 && (
+
+                                                {hasDiscount && (
                                                     <Chip
-                                                        label={`-${shopItem.discountPercent}% premium`}
+                                                        label={`Save ${shopItem.discountPercent}%`}
                                                         size="small"
                                                         sx={{
-                                                            alignSelf: 'flex-start',
-                                                            bgcolor: alpha(USER_COLORS.gold, 0.16),
+                                                            height: 22,
+                                                            bgcolor: alpha(USER_COLORS.gold, 0.14),
                                                             color: `${USER_COLORS.gold} !important`,
                                                             fontWeight: 700,
-                                                            border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}`,
+                                                            border: `1px solid ${alpha(USER_COLORS.gold, 0.4)}`,
                                                             '& .MuiChip-label': {
                                                               color: `${USER_COLORS.gold} !important`,
                                                               fontWeight: 700,
+                                                              fontSize: 11,
+                                                              px: 1,
                                                             },
                                                         }}
                                                     />
                                                 )}
-                                                <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mt: 'auto' }}>
-                                                    <UserActionButton size="small" actionVariant="gold" onClick={() => handleOpenModal(shopItem)}>
-                                                        {t('shop.buy')}
-                                                    </UserActionButton>
-                                                </Stack>
+
+                                                <UserActionButton
+                                                    fullWidth
+                                                    size="medium"
+                                                    actionVariant="gold"
+                                                    onClick={() => handleOpenModal(shopItem)}
+                                                    sx={{ mt: 'auto', minHeight: 40, fontWeight: 800, letterSpacing: 0.8 }}
+                                                >
+                                                    {t('shop.buy')}
+                                                </UserActionButton>
                                             </UserGlassCard>
                                         </Grid>
-                                    ))}
+                                        );
+                                    })}
                                 </Grid>
                             )}
                         </Grid>
