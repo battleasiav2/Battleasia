@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { merge } from 'es-toolkit';
 
-import { Alert } from '@mui/material';
+import { Alert, Button } from '@mui/material';
 import { alpha, useTheme, type Breakpoint } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
@@ -9,6 +9,8 @@ import { useRouter, useSearchParams } from 'src/routes/hooks';
 
 import { useSelector, useDispatch } from 'src/store';
 import { logoutAction } from 'src/store/reducers/auth';
+import { Iconify } from 'src/components/iconify';
+import { useTranslate } from 'src/locales/use-locales';
 
 import { AuthSplitSection } from './section';
 import { AUTH_BG_IMAGE } from 'src/sections/auth/auth-form-styles';
@@ -49,6 +51,7 @@ export function AuthSplitLayout({
   const router = useRouter();
   const dispatch = useDispatch();
   const searchParams = useSearchParams();
+  const { t } = useTranslate();
   const { isLoggedIn } = useSelector((state) => state.auth);
   const [reauthDone, setReauthDone] = useState(() => searchParams.get('reauth') !== '1');
 
@@ -81,8 +84,10 @@ export function AuthSplitLayout({
 
   const renderHeader = () => {
     const headerSlotProps: HeaderSectionProps['slotProps'] = {
-      container: { maxWidth: false },
+      container: { maxWidth: false, sx: { px: { xs: 2, md: 3 } } },
     };
+
+    const mainAppUrl = (import.meta.env.VITE_MAIN_APP_URL as string | undefined) || 'https://battleasia.gg';
 
     const headerSlots: HeaderSectionProps['slots'] = {
       topArea: (
@@ -90,7 +95,33 @@ export function AuthSplitLayout({
           This is an info Alert.
         </Alert>
       ),
-      leftArea: null,
+      leftArea: (
+        <Button
+          href={`${mainAppUrl.replace(/\/$/, '')}/dashboard`}
+          startIcon={<Iconify icon="solar:arrow-left-bold" width={16} />}
+          sx={{
+            minHeight: 36,
+            px: 1.5,
+            py: 0.75,
+            borderRadius: 0,
+            fontSize: 13,
+            fontWeight: 700,
+            letterSpacing: 0.4,
+            textTransform: 'none',
+            color: GOLD,
+            bgcolor: alpha('#000000', 0.45),
+            border: `1px solid ${alpha(GOLD, 0.4)}`,
+            boxShadow: 'none',
+            '&:hover': {
+              bgcolor: alpha(GOLD, 0.12),
+              borderColor: GOLD,
+              boxShadow: `0 0 12px ${alpha(GOLD, 0.18)}`,
+            },
+          }}
+        >
+          {t('auth.backHome')}
+        </Button>
+      ),
     };
 
     return (
@@ -102,7 +133,10 @@ export function AuthSplitLayout({
         slots={{ ...headerSlots, ...slotProps?.header?.slots }}
         slotProps={merge(headerSlotProps, slotProps?.header?.slotProps ?? {})}
         sx={[
-          { position: { [layoutQuery]: 'fixed' } },
+          {
+            position: 'sticky',
+            bgcolor: 'transparent',
+          },
           ...(Array.isArray(slotProps?.header?.sx)
             ? (slotProps?.header?.sx ?? [])
             : [slotProps?.header?.sx]),
@@ -132,7 +166,10 @@ export function AuthSplitLayout({
           backgroundPosition: 'center top',
           backgroundRepeat: 'no-repeat',
           position: 'relative',
-          minHeight: '100vh',
+          minHeight: {
+            xs: 'calc(100dvh - var(--layout-header-mobile-height, 52px))',
+            md: 'calc(100dvh - var(--layout-header-desktop-height, 56px))',
+          },
           '&::before': {
             content: "''",
             position: 'absolute',
@@ -159,7 +196,7 @@ export function AuthSplitLayout({
         sx={{
           position: 'relative',
           zIndex: 1,
-          minHeight: '100vh',
+          minHeight: { xs: 'auto', md: 'calc(100dvh - var(--layout-header-desktop-height, 56px))' },
           display: 'flex',
           justifyContent: 'center',
           alignItems: { xs: 'flex-start', md: 'center' },
@@ -176,7 +213,14 @@ export function AuthSplitLayout({
     <LayoutSection
       headerSection={renderHeader()}
       footerSection={null}
-      cssVars={{ '--layout-auth-content-width': '620px', ...cssVars }}
+      cssVars={{
+        '--layout-auth-content-width': '620px',
+        '--layout-header-desktop-height': '56px',
+        '--layout-header-mobile-height': '52px',
+        '--layout-main-margin-top': '0px',
+        '--layout-main-mobile-margin-top': '0px',
+        ...cssVars,
+      }}
       sx={sx}
     >
       {renderMain()}

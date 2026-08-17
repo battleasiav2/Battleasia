@@ -1,13 +1,9 @@
 import type { ReactNode } from 'react';
 
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
-import { paths } from 'src/routes/paths';
-import { RouterLink } from 'src/routes/components';
-
 import { Logo } from 'src/components/logo';
-import { Iconify } from 'src/components/iconify';
 import { GlassPanelCard, getDefaultGlassTokens } from 'src/components/battle-glass-card';
 import { useTranslate } from 'src/locales/use-locales';
 
@@ -48,35 +44,6 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
         '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
       }}
     >
-      <Button
-        component={RouterLink}
-        href={paths.dashboard.root}
-        startIcon={<Iconify icon="solar:arrow-left-bold" width={14} />}
-        sx={{
-          alignSelf: 'flex-start',
-          mb: 1,
-          minHeight: 32,
-          px: 1.25,
-          py: 0.5,
-          borderRadius: 0,
-          fontSize: 12,
-          fontWeight: 700,
-          letterSpacing: 0.4,
-          textTransform: 'none',
-          color: gold,
-          bgcolor: alpha('#000000', 0.35),
-          border: `1px solid ${alpha(gold, 0.35)}`,
-          boxShadow: 'none',
-          '&:hover': {
-            bgcolor: alpha(gold, 0.1),
-            borderColor: gold,
-            boxShadow: `0 0 12px ${alpha(gold, 0.18)}`,
-          },
-        }}
-      >
-        {t('auth.backHome')}
-      </Button>
-
       <GlassPanelCard
         sx={{
           width: 1,
