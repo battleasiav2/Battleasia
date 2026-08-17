@@ -37,9 +37,7 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
         width: 1,
         maxWidth: wide
           ? { xs: 1, sm: 500, md: 520 }
-          : compact
-            ? { xs: 1, sm: 352, md: 366 }
-            : { xs: 1, sm: 390, md: 408 },
+          : { xs: 1, sm: 480, md: 500 },
         display: 'flex',
         flexDirection: 'column',
         animation: `${cardReveal} 0.28s ease-out both`,

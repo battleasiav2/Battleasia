@@ -12,8 +12,14 @@ export function AuthSubmitButton({ sx, ...other }: LoadingButtonProps) {
       size="large"
       type="submit"
       variant="contained"
-      sx={[authSubmitButtonSx, ...(Array.isArray(sx) ? sx : sx ? [sx] : [])]}
+      disableElevation
+      sx={[
+        authSubmitButtonSx,
+        { overflow: 'hidden', '& .MuiLoadingButton-loadingIndicatorCenter': { display: 'none' } },
+        ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
+      ]}
       {...other}
+      loadingPosition="start"
     />
   );
 }

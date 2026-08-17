@@ -28,14 +28,26 @@ export const authCardSx = {
 };
 
 const authInputAutofillSx = {
-  '& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active':
+  '& input::selection, & .MuiInputBase-input::selection': {
+    backgroundColor: alpha('#f5c518', 0.28),
+    color: '#ffffff',
+  },
+  '& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active, & input:autofill, & .MuiInputBase-input:-webkit-autofill, & .MuiInputBase-input:autofill':
     {
-      WebkitTextFillColor: '#ffffff',
-      WebkitBoxShadow: `0 0 0 1000px ${AUTH_INPUT_BG} inset`,
+      WebkitTextFillColor: '#ffffff !important',
       caretColor: '#ffffff',
       borderRadius: 'inherit',
-      transition: 'background-color 600000s 0s, color 600000s 0s',
+      WebkitBoxShadow: `0 0 0 1000px ${AUTH_INPUT_BG} inset !important`,
+      boxShadow: `0 0 0 1000px ${AUTH_INPUT_BG} inset !important`,
+      backgroundColor: `${AUTH_INPUT_BG} !important`,
+      backgroundImage: 'none !important',
+      filter: 'none',
+      transition: 'background-color 99999s ease-out 0s',
     },
+  '&:has(input:-webkit-autofill), &:has(input:autofill)': {
+    bgcolor: AUTH_INPUT_BG,
+    backgroundColor: AUTH_INPUT_BG,
+  },
 };
 
 export const authFieldSlotProps = {
@@ -228,11 +240,15 @@ export const authSubmitButtonSx = {
   boxShadow: `0 0 16px ${alpha('#f5c518', 0.18)}`,
   background: 'linear-gradient(180deg, #f5c518 0%, #d4a017 52%, #d97706 100%)',
   border: `1px solid ${alpha('#fbbf24', 0.9)}`,
-  transition: 'transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease',
+  backdropFilter: 'none',
+  WebkitBackdropFilter: 'none',
+  filter: 'none',
+  textShadow: 'none',
+  transition: 'transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease',
   '&:hover': {
     background: 'linear-gradient(180deg, #fbbf24 0%, #f5c518 52%, #d4a017 100%)',
     boxShadow: `0 0 22px ${alpha('#f5c518', 0.38)}, 0 8px 28px ${alpha('#f5c518', 0.28)}`,
-    filter: 'brightness(1.04)',
+    filter: 'none',
     transform: 'translateY(-1px)',
   },
   '&:active': {

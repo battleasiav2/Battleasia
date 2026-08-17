@@ -21,7 +21,7 @@ type AuthSubmitButtonProps = {
 export function AuthSubmitButton({
   children,
   loading,
-  loadingIndicator,
+  loadingIndicator: _loadingIndicator,
   type = 'submit',
   onClick,
   disabled,
@@ -32,27 +32,19 @@ export function AuthSubmitButton({
       fullWidth
       size="large"
       type={type}
-      variant="outlined"
+      variant="contained"
       disableElevation
       loading={loading}
-      loadingIndicator={loadingIndicator}
-      loadingPosition="center"
+      loadingPosition="start"
       disabled={disabled}
       onClick={onClick}
-      startIcon={<Iconify icon="game-icons:crossed-swords" width={22} />}
+      startIcon={<Iconify icon="game-icons:crossed-swords" width={18} />}
       sx={[
         authSubmitButtonSx,
         {
-          height: 56,
-          minHeight: 56,
+          overflow: 'hidden',
           '& .MuiButton-startIcon': { m: 0, mr: 1 },
-          '&.Mui-disabled': {
-            bgcolor: 'rgba(0,0,0,0.35)',
-            color: 'rgba(245, 197, 24, 0.35)',
-            borderColor: 'rgba(245, 197, 24, 0.22)',
-            boxShadow: 'none',
-            filter: 'none',
-          },
+          '& .MuiLoadingButton-loadingIndicatorCenter': { display: 'none' },
         },
         ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
       ]}
