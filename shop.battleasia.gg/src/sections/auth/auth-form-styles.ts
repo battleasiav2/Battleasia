@@ -37,7 +37,8 @@ export const authFieldSlotProps = {
       borderRadius: '2px',
       fontSize: 14,
       minHeight: 46,
-      transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease',
+      boxShadow: `0 0 10px ${alpha('#f5c518', 0.1)}`,
+      transition: 'border-color 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease',
       '& input::placeholder': {
         color: alpha('#ffffff', 0.55),
         opacity: 1,
@@ -53,14 +54,17 @@ export const authFieldSlotProps = {
         },
       '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
       '& fieldset': {
-        border: `1px solid ${alpha('#ffffff', 0.22)}`,
+        border: `1px solid ${alpha('#f5c518', 0.28)}`,
       },
       '&:hover fieldset': {
-        borderColor: alpha('#ffffff', 0.38),
+        borderColor: alpha('#f5c518', 0.5),
+      },
+      '&:hover': {
+        boxShadow: `0 0 14px ${alpha('#f5c518', 0.18)}`,
       },
       '&.Mui-focused': {
         bgcolor: alpha('#000000', 0.58),
-        boxShadow: `0 0 0 3px ${alpha('#f5c518', 0.18)}`,
+        boxShadow: `0 0 0 2px ${alpha('#f5c518', 0.32)}, 0 0 18px ${alpha('#f5c518', 0.28)}`,
       },
       '&.Mui-focused fieldset': {
         borderColor: '#f5c518',
@@ -205,17 +209,18 @@ export const authSubmitButtonSx = {
   letterSpacing: 1,
   textTransform: 'uppercase' as const,
   color: '#111111',
-  boxShadow: 'none',
+  boxShadow: `0 0 16px ${alpha('#f5c518', 0.18)}`,
   background: 'linear-gradient(180deg, #f5c518 0%, #d4a017 52%, #d97706 100%)',
   border: `1px solid ${alpha('#fbbf24', 0.9)}`,
-  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+  transition: 'transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease',
   '&:hover': {
     background: 'linear-gradient(180deg, #fbbf24 0%, #f5c518 52%, #d4a017 100%)',
-    boxShadow: `0 8px 28px ${alpha('#f5c518', 0.4)}`,
+    boxShadow: `0 0 22px ${alpha('#f5c518', 0.38)}, 0 8px 28px ${alpha('#f5c518', 0.28)}`,
+    filter: 'brightness(1.04)',
     transform: 'translateY(-1px)',
   },
   '&:active': {
-    transform: 'translateY(0)',
+    transform: 'scale(0.985) translateY(1px)',
   },
 };
 

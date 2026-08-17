@@ -1,10 +1,20 @@
 import { z as zod } from 'zod';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useBoolean } from 'minimal-shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { Box, Link, Alert, Stack, IconButton, InputAdornment } from '@mui/material';
+import {
+  Box,
+  Link,
+  Alert,
+  Stack,
+  Checkbox,
+  IconButton,
+  InputAdornment,
+  FormControlLabel,
+} from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -18,14 +28,15 @@ import { loginAction } from 'src/store/reducers/auth';
 
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
-import { AuthNavButtons } from 'src/components/mesh-buttons/auth-nav-buttons';
 
 import { AuthFormShell } from './auth-form-shell';
+import { AuthTrustRow } from './auth-trust-row';
 import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
+import { AuthSocialButtons } from './auth-social-buttons';
 import { authAlertSx, authFieldSlotPropsCompact, authLinkSx } from './auth-form-styles';
 
-// ----------------------------------------------------------------------
+const REMEMBER_EMAIL_KEY = 'ba_remember_email';
 
 export type SignInSchemaType = zod.infer<typeof SignInSchema>;
 
@@ -43,6 +54,7 @@ export function SignInView() {
   const { t } = useTranslate();
   const showPassword = useBoolean();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [rememberMe, setRememberMe] = useState(false);
 
   const methods = useForm<SignInSchemaType>({
     resolver: zodResolver(SignInSchema),
@@ -51,8 +63,21 @@ export function SignInView() {
 
   const {
     handleSubmit,
+    setValue,
     formState: { isSubmitting },
   } = methods;
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(REMEMBER_EMAIL_KEY);
+      if (saved) {
+        setValue('email', saved);
+        setRememberMe(true);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [setValue]);
 
   const onSubmit = handleSubmit(async (data) => {
     try {
@@ -62,6 +87,13 @@ export function SignInView() {
 
       if (!status || !session?.accessToken) {
         throw new Error(res.data?.message || 'Access token not found in response');
+      }
+
+      try {
+        if (rememberMe) localStorage.setItem(REMEMBER_EMAIL_KEY, data.email);
+        else localStorage.removeItem(REMEMBER_EMAIL_KEY);
+      } catch {
+        /* ignore */
       }
 
       dispatch(
@@ -88,15 +120,15 @@ export function SignInView() {
   });
 
   return (
-    <AuthFormShell compact title={t('auth.signInToAccount')} description={t('home.subtitle')}>
+    <AuthFormShell compact title={t('auth.signInToAccount')} description={t('auth.heroLine')}>
       {!!errorMessage && (
-        <Alert severity="error" sx={{ ...authAlertSx, mb: 2 }}>
+        <Alert severity="error" sx={{ ...authAlertSx, mb: 1.5 }}>
           {errorMessage}
         </Alert>
       )}
 
       <Form methods={methods} onSubmit={onSubmit}>
-        <Stack spacing={1.25}>
+        <Stack spacing={1.1}>
           <Field.Text
             name="email"
             label={t('auth.emailAddress')}
@@ -114,45 +146,66 @@ export function SignInView() {
             }}
           />
 
-          <Box>
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 0.5 }}>
-              <Link component={RouterLink} href={paths.auth.forgotPassword} sx={{ ...authLinkSx, fontSize: 12.5 }}>
-                {t('auth.forgotPassword')}
-              </Link>
-            </Box>
-            <Field.Text
-              name="password"
-              label={t('auth.password')}
-              placeholder={t('auth.passwordPlaceholder')}
-              type={showPassword.value ? 'text' : 'password'}
-              slotProps={{
-                ...authFieldSlotPropsCompact,
-                input: {
-                  ...authFieldSlotPropsCompact.input,
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Iconify icon="solar:lock-password-bold-duotone" width={18} sx={{ color: '#f5c518' }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                        <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={18} />
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
+          <Field.Text
+            name="password"
+            label={t('auth.password')}
+            placeholder={t('auth.passwordPlaceholder')}
+            type={showPassword.value ? 'text' : 'password'}
+            slotProps={{
+              ...authFieldSlotPropsCompact,
+              input: {
+                ...authFieldSlotPropsCompact.input,
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Iconify icon="solar:lock-password-bold-duotone" width={18} sx={{ color: '#f5c518' }} />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                      <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={18} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ minHeight: 28, mt: -0.25 }}>
+            <FormControlLabel
+              sx={{ mr: 0, ml: -0.5 }}
+              control={
+                <Checkbox
+                  size="small"
+                  checked={rememberMe}
+                  onChange={(event) => setRememberMe(event.target.checked)}
+                  sx={{
+                    color: alpha('#f5c518', 0.55),
+                    p: 0.5,
+                    '&.Mui-checked': { color: '#f5c518' },
+                  }}
+                />
+              }
+              label={
+                <Box sx={{ fontSize: 12, fontWeight: 600, color: alpha('#fff', 0.72) }}>
+                  {t('auth.rememberMe')}
+                </Box>
+              }
             />
-          </Box>
+            <Link component={RouterLink} href={paths.auth.forgotPassword} sx={{ ...authLinkSx, fontSize: 12.5, lineHeight: 1 }}>
+              {t('auth.forgotPassword')}
+            </Link>
+          </Stack>
 
           <AuthSubmitButton
             loading={isSubmitting}
             loadingIndicator={`${t('auth.signIn')}...`}
-            sx={{ py: 1.1, mt: 0.25 }}
+            sx={{ py: 1.1 }}
           >
             {t('auth.signIn')}
           </AuthSubmitButton>
+
+          <AuthSocialButtons />
 
           <AuthFooterLinks
             prefix={t('auth.dontHaveAccount')}
@@ -161,7 +214,7 @@ export function SignInView() {
         </Stack>
       </Form>
 
-      <AuthNavButtons compact homeLabel={t('footer.home')} joinLabel={t('home.joinNow')} />
+      <AuthTrustRow />
     </AuthFormShell>
   );
 }

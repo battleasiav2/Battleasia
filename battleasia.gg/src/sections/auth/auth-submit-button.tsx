@@ -36,6 +36,7 @@ export function AuthSubmitButton({
       disableElevation
       loading={loading}
       loadingIndicator={loadingIndicator}
+      loadingPosition="center"
       disabled={disabled}
       onClick={onClick}
       startIcon={
@@ -48,6 +49,8 @@ export function AuthSubmitButton({
             bgcolor: 'rgba(0,0,0,0.35)',
             color: 'rgba(245, 197, 24, 0.35)',
             borderColor: 'rgba(245, 197, 24, 0.22)',
+            boxShadow: 'none',
+            filter: 'none',
           },
         },
         ...(Array.isArray(sx) ? sx : sx ? [sx] : []),

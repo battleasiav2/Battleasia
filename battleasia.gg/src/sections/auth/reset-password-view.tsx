@@ -15,9 +15,9 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
-import { AuthNavButtons } from 'src/components/mesh-buttons/auth-nav-buttons';
 
 import { AuthFormShell } from './auth-form-shell';
+import { AuthTrustRow } from './auth-trust-row';
 import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
 import { authAlertSx, authFieldSlotProps } from './auth-form-styles';
@@ -273,7 +273,7 @@ export function ResetPasswordView() {
         {renderForm()}
       </Form>
 
-      <AuthNavButtons homeLabel={t('footer.home')} joinLabel={t('home.joinNow')} />
+      <AuthTrustRow />
     </AuthFormShell>
   );
 }

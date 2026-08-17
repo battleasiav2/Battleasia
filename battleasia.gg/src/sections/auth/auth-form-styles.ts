@@ -114,24 +114,28 @@ export const authFieldSlotProps = {
       borderRadius: '2px',
       fontSize: 14,
       minHeight: 48,
-      transition: 'border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease',
+      boxShadow: `0 0 10px ${alpha('#f5c518', 0.1)}`,
+      transition: 'border-color 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease',
       '& input::placeholder': {
         color: alpha('#ffffff', 0.55),
         opacity: 1,
       },
       '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
       '& fieldset': {
-        border: `1px solid ${alpha('#ffffff', 0.22)}`,
+        border: `1px solid ${alpha('#f5c518', 0.28)}`,
       },
       '&:hover fieldset': {
-        borderColor: alpha('#ffffff', 0.38),
+        borderColor: alpha('#f5c518', 0.5),
+      },
+      '&:hover': {
+        boxShadow: `0 0 14px ${alpha('#f5c518', 0.18)}`,
       },
       '&.Mui-focused': {
         bgcolor: alpha('#000000', 0.58),
-        boxShadow: `0 0 0 3px ${alpha('#f59e0b', 0.18)}`,
+        boxShadow: `0 0 0 2px ${alpha('#f5c518', 0.32)}, 0 0 18px ${alpha('#f5c518', 0.28)}`,
       },
       '&.Mui-focused fieldset': {
-        borderColor: '#f59e0b',
+        borderColor: '#f5c518',
         borderWidth: '1px',
       },
       '& .MuiSelect-select': {
@@ -255,7 +259,7 @@ export const authSelectSx = {
   },
   '&.Mui-focused': {
     bgcolor: alpha('#000000', 0.58),
-    boxShadow: `0 0 0 3px ${alpha('#f59e0b', 0.18)}`,
+    boxShadow: `0 0 0 2px ${alpha('#f5c518', 0.32)}, 0 0 18px ${alpha('#f5c518', 0.28)}`,
   },
   '&.Mui-focused fieldset': {
     borderColor: '#f59e0b',
@@ -274,6 +278,15 @@ export const authSubmitButtonSx = {
   fontSize: 14,
   letterSpacing: 1,
   width: '100%',
+  boxShadow: `0 0 16px ${alpha('#f5c518', 0.18)}`,
+  transition: 'transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease, border-color 0.2s ease, background-color 0.2s ease',
+  '&:hover': {
+    filter: 'brightness(1.06)',
+    boxShadow: `0 0 22px ${alpha('#f5c518', 0.38)}, 0 10px 28px ${alpha('#000000', 0.45)}`,
+  },
+  '&:active': {
+    transform: 'scale(0.985) translateY(1px)',
+  },
 };
 
 export const authLinkSx = {

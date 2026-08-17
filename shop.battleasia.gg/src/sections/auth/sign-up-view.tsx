@@ -31,7 +31,9 @@ import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 
 import { AuthFormShell } from './auth-form-shell';
+import { AuthTrustRow } from './auth-trust-row';
 import { AuthSubmitButton } from './auth-submit-button';
+import { AuthSocialButtons } from './auth-social-buttons';
 import {
   authAlertSx,
   authFieldSlotProps,
@@ -384,6 +386,10 @@ export function SignUpView() {
           Create account
         </AuthSubmitButton>
       </Box>
+
+      <Box sx={{ gridColumn: '1 / -1' }}>
+        <AuthSocialButtons />
+      </Box>
     </Box>
   );
 
@@ -421,6 +427,8 @@ export function SignUpView() {
         </Link>
         .
       </Box>
+
+      <AuthTrustRow />
     </AuthFormShell>
   );
 }

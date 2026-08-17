@@ -31,11 +31,12 @@ import { GAME_SERVERS } from 'src/global-config';
 
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
-import { AuthNavButtons } from 'src/components/mesh-buttons/auth-nav-buttons';
 
 import { AuthFormShell } from './auth-form-shell';
+import { AuthTrustRow } from './auth-trust-row';
 import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
+import { AuthSocialButtons } from './auth-social-buttons';
 import {
   authAlertSx,
   authFieldSlotPropsCompact,
@@ -198,7 +199,7 @@ export function SignUpView() {
             display: 'grid',
             gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
             columnGap: 1.5,
-            rowGap: 1.5,
+            rowGap: 1.25,
           }}
         >
           <Field.Text
@@ -321,6 +322,10 @@ export function SignUpView() {
           </Box>
 
           <Box sx={{ gridColumn: '1 / -1' }}>
+            <AuthSocialButtons />
+          </Box>
+
+          <Box sx={{ gridColumn: '1 / -1' }}>
             <AuthFooterLinks
               prefix={t('auth.alreadyHaveAccount')}
               links={[{ label: t('auth.signIn'), href: paths.auth.signIn }]}
@@ -341,7 +346,7 @@ export function SignUpView() {
         .
       </Box>
 
-      <AuthNavButtons compact homeLabel={t('footer.home')} joinLabel={t('home.joinNow')} />
+      <AuthTrustRow />
     </AuthFormShell>
   );
 }

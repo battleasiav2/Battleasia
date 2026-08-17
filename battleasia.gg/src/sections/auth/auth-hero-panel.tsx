@@ -34,7 +34,7 @@ export function AuthHeroPanel() {
             mb: 1.5,
           }}
         >
-          {t('common.brandTagline')}
+          {t('auth.brandTagline')}
         </Typography>
         <Typography
           className="font-tr"
@@ -57,7 +57,7 @@ export function AuthHeroPanel() {
             textShadow: '0 1px 8px rgba(0, 0, 0, 0.8)',
           }}
         >
-          {t('home.subtitle')}
+          {t('auth.heroLine')}
         </Typography>
         <BattleGoldDivider variant="hero" sx={{ mt: 2.5, width: 200 }} />
       </Box>

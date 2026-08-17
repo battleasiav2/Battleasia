@@ -10,8 +10,8 @@ import { useTranslate } from 'src/locales/use-locales';
 // ----------------------------------------------------------------------
 
 const cardReveal = keyframes`
-  from { opacity: 0; transform: translateY(24px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 `;
 
 type AuthFormShellProps = {
@@ -38,7 +38,8 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
           : compact
             ? { xs: 1, sm: 380, md: 396 }
             : { xs: 1, sm: 420, md: 440 },
-        animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) both`,
+        animation: `${cardReveal} 0.28s ease-out both`,
+        '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
       }}
     >
       <GlassPanelCard
@@ -46,7 +47,7 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
           width: 1,
           borderRadius: 0,
           border: `1px solid ${alpha(gold, 0.32)}`,
-          p: wide ? { xs: 2.75, sm: 3.5, md: 4 } : compact ? { xs: 2.25, sm: 2.75 } : { xs: 3, sm: 3.75 },
+          p: wide ? { xs: 2.25, sm: 2.75, md: 3 } : compact ? { xs: 2, sm: 2.25 } : { xs: 2.25, sm: 2.75 },
           boxShadow: `
             0 24px 60px ${alpha('#000000', 0.65)},
             0 0 0 1px ${alpha(gold, 0.06)},
@@ -54,11 +55,11 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
           `,
         }}
       >
-        <Stack alignItems="center" spacing={compact ? 0.5 : 0.75} sx={{ mb: compact ? 1.75 : 2.25 }}>
+        <Stack alignItems="center" spacing={compact ? 0.35 : 0.5} sx={{ mb: compact ? 1.25 : 1.5 }}>
           <Logo
             disabled
             sx={{
-              width: compact ? { xs: 74, sm: 82 } : { xs: 92, sm: 104 },
+              width: compact ? { xs: 93, sm: 103 } : { xs: 115, sm: 130 },
               height: 'auto',
               pointerEvents: 'none',
               '& img': { objectFit: 'contain', width: '100%', height: 'auto' },
@@ -105,7 +106,7 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
           ) : null}
           <Box
             sx={{
-              mt: compact ? 0.75 : 1,
+              mt: compact ? 0.5 : 0.75,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

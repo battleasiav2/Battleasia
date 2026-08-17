@@ -13,12 +13,12 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
-import { AuthNavButtons } from 'src/components/mesh-buttons/auth-nav-buttons';
 
 import { AuthFormShell } from './auth-form-shell';
+import { AuthTrustRow } from './auth-trust-row';
 import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
-import { authAlertSx, authFieldSlotProps, authLinkSx } from './auth-form-styles';
+import { authAlertSx, authFieldSlotPropsCompact, authLinkSx } from './auth-form-styles';
 
 // ----------------------------------------------------------------------
 
@@ -65,17 +65,17 @@ export function ForgotPasswordView() {
   });
 
   return (
-    <AuthFormShell title={t('auth.forgotPasswordTitle')} description={t('auth.forgotPasswordDescription')}>
+    <AuthFormShell compact title={t('auth.forgotPasswordTitle')} description={t('auth.forgotPasswordDescription')}>
       {!!errorMessage && (
-        <Alert severity="error" sx={{ ...authAlertSx, mb: 2.5 }}>
+        <Alert severity="error" sx={{ ...authAlertSx, mb: 1.5 }}>
           {errorMessage}
         </Alert>
       )}
 
       {!!successMessage && (
-        <Alert severity="success" sx={{ ...authAlertSx, mb: 2.5 }}>
+        <Alert severity="success" sx={{ ...authAlertSx, mb: 1.5 }}>
           {successMessage}
-          <Box sx={{ mt: 1.5 }}>
+          <Box sx={{ mt: 1.25 }}>
             <Link component={RouterLink} href={paths.auth.resetPassword} sx={authLinkSx}>
               {t('auth.clickToEnterCode')}
             </Link>
@@ -84,25 +84,25 @@ export function ForgotPasswordView() {
       )}
 
       <Form methods={methods} onSubmit={onSubmit}>
-        <Stack spacing={2.5}>
+        <Stack spacing={1.25}>
           <Field.Text
             name="email"
             label={t('auth.emailAddress')}
             placeholder={t('auth.emailPlaceholder')}
             slotProps={{
-              ...authFieldSlotProps,
+              ...authFieldSlotPropsCompact,
               input: {
-                ...authFieldSlotProps.input,
+                ...authFieldSlotPropsCompact.input,
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="solar:letter-bold-duotone" width={20} sx={{ color: '#f5c518' }} />
+                    <Iconify icon="solar:letter-bold-duotone" width={18} sx={{ color: '#f5c518' }} />
                   </InputAdornment>
                 ),
               },
             }}
           />
 
-          <AuthSubmitButton loading={isSubmitting} loadingIndicator={`${t('common.sending')}...`}>
+          <AuthSubmitButton loading={isSubmitting} loadingIndicator={`${t('common.sending')}...`} sx={{ py: 1.1 }}>
             {t('auth.sendResetCode')}
           </AuthSubmitButton>
 
@@ -113,7 +113,7 @@ export function ForgotPasswordView() {
         </Stack>
       </Form>
 
-      <AuthNavButtons homeLabel={t('footer.home')} joinLabel={t('home.joinNow')} />
+      <AuthTrustRow />
     </AuthFormShell>
   );
 }
