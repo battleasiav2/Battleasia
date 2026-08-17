@@ -34,7 +34,7 @@ export function AuthTrustRow() {
           <Iconify icon={item.icon} width={13} sx={{ color: GOLD }} />
           <Typography
             sx={{
-              fontSize: 13,
+              fontSize: 10,
               fontWeight: 700,
               letterSpacing: 0.2,
               color: alpha('#fff', 0.62),

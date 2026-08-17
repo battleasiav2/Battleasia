@@ -95,7 +95,7 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
               sx={{
                 color: glassTokens.subtitleColor,
                 textAlign: 'center',
-                fontSize: compact ? 11.5 : 12.5,
+                fontSize: compact ? 12 : 12.5,
                 lineHeight: 1.45,
                 maxWidth: wide ? 440 : compact ? 300 : 340,
               }}

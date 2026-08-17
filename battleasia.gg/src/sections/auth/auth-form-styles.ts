@@ -86,7 +86,6 @@ export const baccoinSubmitButtonSx = {
 
 export const AUTH_CARD_BG = '#181614';
 export const AUTH_INPUT_BG = '#0e0e0e';
-const AUTH_LABEL = '#e0e0e0';
 const AUTH_PLACEHOLDER = '#808080';
 const AUTH_BORDER = '#2b2b2b';
 
@@ -127,18 +126,20 @@ export const authFieldSlotProps = {
     sx: {
       position: 'relative' as const,
       transform: 'none',
-      fontSize: 13,
+      fontSize: 10,
       fontWeight: 700,
-      letterSpacing: 0.9,
-      color: AUTH_LABEL,
-      mb: 1,
+      letterSpacing: 1.2,
+      lineHeight: 1.2,
+      color: alpha('#e8e0d0', 0.72),
+      mb: 0.5,
       textTransform: 'uppercase' as const,
       '&.MuiInputLabel-shrink': {
         transform: 'none',
-        color: AUTH_LABEL,
-        '&.Mui-focused': { color: AUTH_LABEL },
+        fontSize: 10,
+        color: alpha('#e8e0d0', 0.72),
+        '&.Mui-focused': { color: alpha('#f5c518', 0.85) },
       },
-      '&.Mui-focused': { color: AUTH_LABEL },
+      '&.Mui-focused': { color: alpha('#f5c518', 0.85) },
     },
   },
   input: {
@@ -324,7 +325,7 @@ export const authAlertSx = {
 
 export const authFooterTextSx = {
   textAlign: 'center' as const,
-  fontSize: 14,
+  fontSize: 12.5,
   color: alpha('#ffffff', 0.5),
-  lineHeight: 1.6,
+  lineHeight: 1.55,
 };

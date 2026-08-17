@@ -129,7 +129,7 @@ export function SignInView() {
 
       <Form methods={methods} onSubmit={onSubmit}>
         <Stack spacing={1.5}>
-          <Stack spacing={2.5}>
+          <Stack spacing={1.75}>
           <Field.Text
             name="email"
             label={t('auth.emailAddress')}
@@ -202,7 +202,7 @@ export function SignInView() {
                 />
               }
               label={
-                <Box sx={{ fontSize: 14, fontWeight: 600, color: '#e0e0e0', lineHeight: 1 }}>
+                <Box sx={{ fontSize: 12, fontWeight: 600, color: '#e0e0e0', lineHeight: 1 }}>
                   {t('auth.rememberMe')}
                 </Box>
               }
@@ -212,7 +212,7 @@ export function SignInView() {
               href={paths.auth.forgotPassword}
               sx={{
                 ...authLinkSx,
-                fontSize: 14,
+                fontSize: 12,
                 lineHeight: 1,
                 display: 'inline-flex',
                 alignItems: 'center',
