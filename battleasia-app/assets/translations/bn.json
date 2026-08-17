@@ -47,7 +47,16 @@
     "emailRequired": "ইমেইল প্রয়োজন",
     "emailInvalid": "সঠিক ইমেইল দিন",
     "passwordRequired": "পাসওয়ার্ড প্রয়োজন",
-    "passwordMin": "পাসওয়ার্ড কমপক্ষে ৬ অক্ষর"
+    "passwordMin": "পাসওয়ার্ড কমপক্ষে ৬ অক্ষর",
+    "backHome": "হোমে ফিরুন",
+    "rememberMe": "মনে রাখুন",
+    "orContinueWith": "অথবা চালিয়ে যান",
+    "continueWithGoogle": "Google",
+    "continueWithDiscord": "Discord",
+    "socialComingSoon": "শীঘ্রই আসছে",
+    "featureSecure": "১০০% নিরাপদ",
+    "featureFairPlay": "ফেয়ার প্লে",
+    "featureCashPrizes": "আসল ক্যাশ প্রাইজ"
   },
   "support": {
     "title": "কাস্টমার সাপোর্ট",

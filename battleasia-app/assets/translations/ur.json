@@ -47,7 +47,16 @@
     "emailRequired": "ای میل درکار ہے",
     "emailInvalid": "درست ای میل درج کریں",
     "passwordRequired": "پاس ورڈ درکار ہے",
-    "passwordMin": "پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے"
+    "passwordMin": "پاس ورڈ کم از کم 6 حروف کا ہونا چاہیے",
+    "backHome": "Back Home",
+    "rememberMe": "Remember Me",
+    "orContinueWith": "Or continue with",
+    "continueWithGoogle": "Google",
+    "continueWithDiscord": "Discord",
+    "socialComingSoon": "Coming soon",
+    "featureSecure": "100% Secure",
+    "featureFairPlay": "Fair Play",
+    "featureCashPrizes": "Real Cash Prizes"
   },
   "support": {
     "title": "کسٹمر سپورٹ",

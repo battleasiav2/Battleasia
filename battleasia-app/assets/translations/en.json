@@ -48,7 +48,16 @@
     "emailRequired": "Email is required",
     "emailInvalid": "Enter a valid email",
     "passwordRequired": "Password is required",
-    "passwordMin": "Password must be at least 6 characters"
+    "passwordMin": "Password must be at least 6 characters",
+    "backHome": "Back Home",
+    "rememberMe": "Remember Me",
+    "orContinueWith": "Or continue with",
+    "continueWithGoogle": "Google",
+    "continueWithDiscord": "Discord",
+    "socialComingSoon": "Coming soon",
+    "featureSecure": "100% Secure",
+    "featureFairPlay": "Fair Play",
+    "featureCashPrizes": "Real Cash Prizes"
   },
   "support": {
     "title": "Customer Support",

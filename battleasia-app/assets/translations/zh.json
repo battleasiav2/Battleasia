@@ -47,7 +47,16 @@
     "emailRequired": "需要电子邮箱",
     "emailInvalid": "请输入有效邮箱",
     "passwordRequired": "需要密码",
-    "passwordMin": "密码至少6个字符"
+    "passwordMin": "密码至少6个字符",
+    "backHome": "Back Home",
+    "rememberMe": "Remember Me",
+    "orContinueWith": "Or continue with",
+    "continueWithGoogle": "Google",
+    "continueWithDiscord": "Discord",
+    "socialComingSoon": "Coming soon",
+    "featureSecure": "100% Secure",
+    "featureFairPlay": "Fair Play",
+    "featureCashPrizes": "Real Cash Prizes"
   },
   "support": {
     "title": "客户支持",

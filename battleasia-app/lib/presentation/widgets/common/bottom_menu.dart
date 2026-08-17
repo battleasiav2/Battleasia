@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
@@ -137,7 +138,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
   }
 
   void _handleNavigation(BuildContext context, String route) {
-    // Update current route immediately
+    HapticFeedback.selectionClick();
     setState(() {
       _currentRoute = route;
     });
@@ -183,36 +184,32 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
       _updateCurrentRoute();
     });
 
-    // Bottom offset = system navigation bar height + 5 px spacing.
-    // This keeps the pill above the device's launch bar on all devices
-    // (physical buttons, gesture bar, or tall virtual nav bars).
     final bottomInset = MediaQuery.of(context).padding.bottom;
 
     return Positioned(
-      bottom: bottomInset + 5,
       left: 0,
       right: 0,
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-          decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.92),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.border(0.14)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.45),
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
+      bottom: 0,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: const Color(0xF2141414),
+          border: Border(
+            top: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.45),
+              blurRadius: 16,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(6, 8, 6, 8 + bottomInset),
           child: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
             children: navItems(context).map((item) {
               final isActive = _isActive(item.route, _currentRoute);
-              return _buildNavItem(context, item, isActive);
+              return Expanded(child: _buildNavItem(context, item, isActive));
             }).toList(),
           ),
         ),
@@ -222,42 +219,36 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
 
   Widget _buildNavItem(BuildContext context, NavItem item, bool isActive) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () => _handleNavigation(context, item.route),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        padding: EdgeInsets.symmetric(
-          horizontal: isActive ? 16 : 12,
-          vertical: isActive ? 8 : 12,
-        ),
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        decoration: BoxDecoration(
-          gradient: isActive ? AppColors.goldGradient : null,
-          color: isActive ? null : Colors.transparent,
-          borderRadius: BorderRadius.circular(isActive ? 10 : 22),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              item.icon,
-              size: isActive ? 18 : 22,
-              color: isActive ? Colors.black : AppColors.textMuted,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            item.icon,
+            size: 20,
+            color: isActive ? AppColors.gold : AppColors.textMuted,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            item.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTheme.bodySmall.copyWith(
+              color: isActive ? AppColors.gold : AppColors.textMuted,
+              fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+              fontSize: 10,
+              letterSpacing: 0.3,
             ),
-            if (isActive) ...[
-              const SizedBox(width: 6),
-              Text(
-                item.label,
-                style: AppTheme.bodySmall.copyWith(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 11,
-                ),
-              ),
-            ],
-          ],
-        ),
+          ),
+          const SizedBox(height: 5),
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            height: 2,
+            width: isActive ? 22 : 0,
+            color: AppColors.gold,
+          ),
+        ],
       ),
     );
   }

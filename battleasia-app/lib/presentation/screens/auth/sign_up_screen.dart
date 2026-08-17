@@ -144,7 +144,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               controller: _inGameUserNameController,
               label: 'auth.inGameName'.tr(),
               hint: 'Enter your in-game name',
-              prefix: const Icon(Icons.person_outline, color: AppColors.textMuted),
+              prefix: const Icon(Icons.person_outline, color: Colors.white),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return 'In-game username is required';
@@ -163,7 +163,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               controller: _pubgIdController,
               label: 'auth.pubgId'.tr(),
               hint: 'Optional',
-              prefix: const Icon(Icons.sports_esports, color: AppColors.textMuted),
+              prefix: const Icon(Icons.sports_esports, color: Colors.white),
             ),
             const SizedBox(height: 16),
             Column(
@@ -172,39 +172,56 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 Text(
                   'auth.gameServer'.tr().toUpperCase(),
                   style: AppTheme.bodySmall.copyWith(
-                    color: AppColors.textPrimary.withValues(alpha: 0.82),
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.4,
+                    color: const Color(0xC7E8E0D0),
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.1,
+                    fontSize: 12,
                   ),
                 ),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<String>(
+                const SizedBox(height: 6),
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.gold.withValues(alpha: 0.12),
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
+                  child: DropdownButtonFormField<String>(
                   value: _selectedGameServer != null &&
                           AppConstants.gameServers
                               .any((s) => s['value'] == _selectedGameServer)
                       ? _selectedGameServer
                       : null,
-                  dropdownColor: AppColors.surfaceElevated,
-                  style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
+                  dropdownColor: const Color(0xFF181614),
+                  style: AppTheme.bodyMedium.copyWith(
+                    color: AppColors.textPrimary,
+                    fontSize: 16,
+                  ),
                   decoration: InputDecoration(
                     hintText: 'Select server',
+                    hintStyle: AppTheme.bodyMedium.copyWith(
+                      color: const Color(0xFF808080),
+                      fontSize: 16,
+                    ),
                     filled: true,
-                    fillColor: const Color(0xFF1A1A1A),
+                    fillColor: const Color(0xFF0E0E0E),
+                    isDense: true,
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 14,
-                      vertical: 14,
+                      vertical: 13,
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(4),
                       borderSide: BorderSide(
-                        color: Colors.white.withValues(alpha: 0.08),
+                        color: AppColors.gold.withValues(alpha: 0.28),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: AppColors.gold,
-                        width: 1.2,
+                      borderRadius: BorderRadius.circular(4),
+                      borderSide: BorderSide(
+                        color: AppColors.gold.withValues(alpha: 0.55),
                       ),
                     ),
                   ),
@@ -218,6 +235,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       .toList(),
                   onChanged: (value) => setState(() => _selectedGameServer = value),
                 ),
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -226,7 +244,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
               label: 'auth.email'.tr(),
               hint: 'example@domain.com',
               keyboardType: TextInputType.emailAddress,
-              prefix: const Icon(Icons.email_outlined, color: AppColors.textMuted),
+              prefix: const Icon(Icons.email_outlined, color: Colors.white),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return 'Email is required';
@@ -241,11 +259,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
               label: 'auth.password'.tr(),
               hint: '6+ characters',
               obscureText: _obscurePassword,
-              prefix: const Icon(Icons.lock_outline, color: AppColors.textMuted),
+              prefix: const Icon(Icons.lock_outline, color: Colors.white),
               suffix: IconButton(
                 icon: Icon(
                   _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                  color: AppColors.textMuted,
+                  color: Colors.white,
                 ),
                 onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
               ),
@@ -262,11 +280,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
               controller: _confirmPasswordController,
               label: 'auth.confirmPassword'.tr(),
               obscureText: _obscureConfirmPassword,
-              prefix: const Icon(Icons.lock_outline, color: AppColors.textMuted),
+              prefix: const Icon(Icons.lock_outline, color: Colors.white),
               suffix: IconButton(
                 icon: Icon(
                   _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
-                  color: AppColors.textMuted,
+                  color: Colors.white,
                 ),
                 onPressed: () => setState(
                   () => _obscureConfirmPassword = !_obscureConfirmPassword,

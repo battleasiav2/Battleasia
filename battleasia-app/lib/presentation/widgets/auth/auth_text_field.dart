@@ -34,65 +34,79 @@ class AuthTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final goldBorder = AppColors.gold.withValues(alpha: 0.28);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label.toUpperCase(),
           style: AppTheme.bodySmall.copyWith(
-            color: AppColors.textMuted,
+            color: const Color(0xC7E8E0D0),
             fontWeight: FontWeight.w700,
-            letterSpacing: 0.5,
-            fontSize: 11,
+            letterSpacing: 1.1,
+            fontSize: 12,
           ),
         ),
-        const SizedBox(height: 8),
-        TextFormField(
-          controller: controller,
-          obscureText: obscureText,
-          keyboardType: keyboardType,
-          maxLines: maxLines,
-          validator: validator,
-          textInputAction: textInputAction,
-          onEditingComplete: onEditingComplete,
-          style: AppTheme.bodyMedium.copyWith(
-            color: AppColors.textPrimary,
-            fontSize: 15,
+        const SizedBox(height: 6),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.gold.withValues(alpha: 0.12),
+                blurRadius: 10,
+              ),
+            ],
           ),
-          cursorColor: AppColors.gold,
-          decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: AppTheme.bodyMedium.copyWith(
-              color: Colors.white.withValues(alpha: 0.35),
-              fontSize: 14,
+          child: TextFormField(
+            controller: controller,
+            obscureText: obscureText,
+            keyboardType: keyboardType,
+            maxLines: maxLines,
+            validator: validator,
+            textInputAction: textInputAction,
+            onEditingComplete: onEditingComplete,
+            style: AppTheme.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+              fontSize: 16,
             ),
-            filled: true,
-            fillColor: const Color(0xFF1A1A1A),
-            isDense: true,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 15,
-            ),
-            prefixIcon: prefix ??
-                (prefixIcon != null
-                    ? Icon(prefixIcon, color: AppColors.gold, size: 20)
-                    : null),
-            suffixIcon: suffix,
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.gold, width: 1.2),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.error),
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.error, width: 1.2),
+            cursorColor: AppColors.gold,
+            decoration: InputDecoration(
+              hintText: hint,
+              hintStyle: AppTheme.bodyMedium.copyWith(
+                color: const Color(0xFF808080),
+                fontSize: 16,
+              ),
+              filled: true,
+              fillColor: const Color(0xFF0E0E0E),
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 13,
+              ),
+              prefixIcon: prefix ??
+                  (prefixIcon != null
+                      ? Icon(prefixIcon, color: Colors.white, size: 18)
+                      : null),
+              suffixIcon: suffix,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: BorderSide(color: goldBorder),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: BorderSide(
+                  color: AppColors.gold.withValues(alpha: 0.55),
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: const BorderSide(color: AppColors.error),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: const BorderSide(color: AppColors.error, width: 1.2),
+              ),
             ),
           ),
         ),

@@ -1,9 +1,11 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/utils/date_utils.dart' as date_utils;
 import 'package:battleasia_app/data/models/match_model.dart';
+import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
 class MatchCard extends StatefulWidget {
   final MatchModel match;
@@ -35,7 +37,41 @@ class MatchCard extends StatefulWidget {
   State<MatchCard> createState() => _MatchCardState();
 }
 
-class _MatchCardState extends State<MatchCard> {
+class _MatchCardState extends State<MatchCard>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _livePulse;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.showLive) {
+      _livePulse = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 1400),
+      )..repeat(reverse: true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(MatchCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.showLive && _livePulse == null) {
+      _livePulse = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 1400),
+      )..repeat(reverse: true);
+    } else if (!widget.showLive && _livePulse != null) {
+      _livePulse!.dispose();
+      _livePulse = null;
+    }
+  }
+
+  @override
+  void dispose() {
+    _livePulse?.dispose();
+    super.dispose();
+  }
+
   Widget _buildMaskedBanner(String bannerUrl) {
     return Stack(
       fit: StackFit.expand,
@@ -162,6 +198,33 @@ class _MatchCardState extends State<MatchCard> {
                 ],
               ),
             ),
+
+            if (widget.showLive && _livePulse != null)
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: AnimatedBuilder(
+                  animation: _livePulse!,
+                  builder: (context, _) {
+                    return Opacity(
+                      opacity: 0.28 + (_livePulse!.value * 0.42),
+                      child: Container(
+                        height: 3,
+                        decoration: BoxDecoration(
+                          color: AppColors.gold,
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.gold.withValues(alpha: 0.35),
+                              blurRadius: 8,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
 
             // Kill icon at top - positioned outside card bounds
             Positioned(
@@ -301,18 +364,6 @@ class _MatchCardState extends State<MatchCard> {
       max: 16.0,
     );
 
-    final buttonFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 13.0,
-      min: 11.0,
-      max: 15.0,
-    );
-
-    final buttonPadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 12.0,
-    ).clamp(8.0, 12.0);
-
     final bulletSize = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 6.0,
@@ -332,16 +383,6 @@ class _MatchCardState extends State<MatchCard> {
       context,
       baseSize: 12.0,
     ).clamp(8.0, 12.0);
-
-    final currencyIconSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(14.0, 16.0);
-
-    final loadingIndicatorSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 20.0,
-    ).clamp(18.0, 20.0);
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -389,18 +430,25 @@ class _MatchCardState extends State<MatchCard> {
               ),
               SizedBox(height: spacing8),
 
-              // ID & Password link
-              GestureDetector(
-                onTap: widget.onShowRoomDetails,
-                child: Text(
-                  'ID & PASSWORD',
-                  style: AppTheme.bodySmall.copyWith(
-                    color: Colors.blue,
-                    decoration: TextDecoration.underline,
-                    fontSize: linkFontSize,
+              if (widget.isJoined &&
+                  (widget.match.roomId?.isNotEmpty ?? false))
+                _RoomTicketStub(
+                  roomId: widget.match.roomId!,
+                  password: widget.match.password,
+                  onTap: widget.onShowRoomDetails,
+                )
+              else
+                GestureDetector(
+                  onTap: widget.onShowRoomDetails,
+                  child: Text(
+                    'ID & PASSWORD',
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppColors.gold,
+                      decoration: TextDecoration.underline,
+                      fontSize: linkFontSize,
+                    ),
                   ),
                 ),
-              ),
               SizedBox(height: spacing4),
 
               // Date and time
@@ -478,63 +526,105 @@ class _MatchCardState extends State<MatchCard> {
             ],
           ),
 
-          // Join button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: buttonDisabled ? null : widget.onJoin,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFff6b7a),
-                padding: EdgeInsets.symmetric(vertical: buttonPadding),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                disabledBackgroundColor: Colors.grey,
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: widget.joining
-                  ? SizedBox(
-                      height: loadingIndicatorSize,
-                      width: loadingIndicatorSize,
-                      child: const CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    )
-                  : widget.isJoined
-                  ? Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Image.asset(
-                          'assets/images/currency.webp',
-                          width: currencyIconSize,
-                          height: currencyIconSize,
-                          errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                        ),
-                        SizedBox(width: spacing8),
-                        Text(
-                          '${widget.match.entryFee.toStringAsFixed(0)} SPECTATE',
-                          style: AppTheme.bodyMedium.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: buttonFontSize,
-                          ),
-                        ),
-                      ],
-                    )
-                  : Text(
-                      'JOIN MATCH',
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: buttonFontSize,
-                      ),
-                    ),
-            ),
+          GoldButton(
+            label: widget.isJoined
+                ? '${widget.match.entryFee.toStringAsFixed(0)} SPECTATE'
+                : 'JOIN MATCH',
+            loading: widget.joining,
+            onPressed: buttonDisabled ? null : widget.onJoin,
           ),
         ],
       ),
     );
   }
+}
+
+class _RoomTicketStub extends StatelessWidget {
+  final String roomId;
+  final String? password;
+  final VoidCallback? onTap;
+
+  const _RoomTicketStub({
+    required this.roomId,
+    this.password,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: CustomPaint(
+        painter: _DashedBorderPainter(
+          color: AppColors.gold.withValues(alpha: 0.45),
+        ),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          color: Colors.black.withValues(alpha: 0.35),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'ROOM ID',
+                style: AppTheme.bodySmall.copyWith(
+                  color: AppColors.gold,
+                  fontSize: 8,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              Text(
+                roomId,
+                style: AppTheme.bodySmall.copyWith(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              if (password != null && password!.isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  'PASS  $password',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: Colors.white.withValues(alpha: 0.85),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DashedBorderPainter extends CustomPainter {
+  final Color color;
+  const _DashedBorderPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+    const dash = 4.0;
+    const gap = 3.0;
+    final path = Path()..addRect(Rect.fromLTWH(0.5, 0.5, size.width - 1, size.height - 1));
+    for (final metric in path.computeMetrics()) {
+      var distance = 0.0;
+      while (distance < metric.length) {
+        final next = (distance + dash).clamp(0, metric.length).toDouble();
+        canvas.drawPath(metric.extractPath(distance, next), paint);
+        distance += dash + gap;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedBorderPainter oldDelegate) =>
+      oldDelegate.color != color;
 }

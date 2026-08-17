@@ -47,7 +47,16 @@
     "emailRequired": "ईमेल आवश्यक है",
     "emailInvalid": "मान्य ईमेल दर्ज करें",
     "passwordRequired": "पासवर्ड आवश्यक है",
-    "passwordMin": "पासवर्ड कम से कम 6 अक्षर का होना चाहिए"
+    "passwordMin": "पासवर्ड कम से कम 6 अक्षर का होना चाहिए",
+    "backHome": "Back Home",
+    "rememberMe": "Remember Me",
+    "orContinueWith": "Or continue with",
+    "continueWithGoogle": "Google",
+    "continueWithDiscord": "Discord",
+    "socialComingSoon": "Coming soon",
+    "featureSecure": "100% Secure",
+    "featureFairPlay": "Fair Play",
+    "featureCashPrizes": "Real Cash Prizes"
   },
   "support": {
     "title": "कस्टमर सपोर्ट",

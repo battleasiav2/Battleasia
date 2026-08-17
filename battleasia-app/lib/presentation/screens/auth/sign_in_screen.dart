@@ -2,6 +2,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
@@ -13,6 +14,8 @@ import 'package:battleasia_app/presentation/widgets/auth/auth_alert.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_form_shell.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_text_field.dart';
 
+const _rememberEmailKey = 'ba_remember_email';
+
 class SignInScreen extends StatefulWidget {
   const SignInScreen({
     super.key,
@@ -21,10 +24,7 @@ class SignInScreen extends StatefulWidget {
     this.descriptionKey = 'auth.signInDesc',
   });
 
-  /// Where to go after a successful sign-in (defaults to Play).
   final Widget? afterLoginScreen;
-
-  /// Optional i18n keys — shop flow uses [shop.signInTitle] / [shop.signInDesc].
   final String titleKey;
   final String descriptionKey;
 
@@ -37,7 +37,26 @@ class _SignInScreenState extends State<SignInScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _rememberMe = false;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRememberedEmail();
+  }
+
+  Future<void> _loadRememberedEmail() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final saved = prefs.getString(_rememberEmailKey);
+      if (!mounted || saved == null || saved.isEmpty) return;
+      setState(() {
+        _emailController.text = saved;
+        _rememberMe = true;
+      });
+    } catch (_) {}
+  }
 
   @override
   void dispose() {
@@ -46,25 +65,39 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
+  Future<void> _persistRememberedEmail(String email) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      if (_rememberMe) {
+        await prefs.setString(_rememberEmailKey, email);
+      } else {
+        await prefs.remove(_rememberEmailKey);
+      }
+    } catch (_) {}
+  }
+
   Future<void> _handleSignIn() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _errorMessage = null);
 
+    final email = _emailController.text.trim();
     final authProvider = context.read<AuthProvider>();
     final result = await authProvider.signIn(
-      email: _emailController.text.trim(),
+      email: email,
       password: _passwordController.text,
     );
 
     if (!mounted) return;
 
     if (result['success'] == true) {
+      await _persistRememberedEmail(email);
+      if (!mounted) return;
       if (result['emailVerificationRequired'] == true) {
-        final email = result['email'] as String? ?? _emailController.text.trim();
+        final verifyEmail = result['email'] as String? ?? email;
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (_) => EmailVerificationScreen(email: email),
+            builder: (_) => EmailVerificationScreen(email: verifyEmail),
           ),
         );
         return;
@@ -80,6 +113,15 @@ class _SignInScreenState extends State<SignInScreen> {
     setState(() => _errorMessage = result['message'] ?? 'Sign in failed');
   }
 
+  void _comingSoon() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('auth.socialComingSoon'.tr()),
+        backgroundColor: const Color(0xFF181614),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
@@ -87,7 +129,6 @@ class _SignInScreenState extends State<SignInScreen> {
     return AuthFormShell(
       title: widget.titleKey.tr(),
       description: widget.descriptionKey.tr(),
-      onHome: () => Navigator.of(context).maybePop(),
       child: Form(
         key: _formKey,
         child: Column(
@@ -95,7 +136,7 @@ class _SignInScreenState extends State<SignInScreen> {
           children: [
             if (_errorMessage != null) ...[
               AuthAlert(message: _errorMessage!),
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
             ],
             AuthTextField(
               controller: _emailController,
@@ -103,6 +144,7 @@ class _SignInScreenState extends State<SignInScreen> {
               hint: 'auth.emailPlaceholder'.tr(),
               keyboardType: TextInputType.emailAddress,
               prefixIcon: Icons.mail_outline,
+              textInputAction: TextInputAction.next,
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return 'auth.emailRequired'.tr();
@@ -111,33 +153,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 18),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const ForgotPasswordScreen(),
-                    ),
-                  );
-                },
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.zero,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: Text(
-                  'auth.forgotPassword'.tr(),
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: AppColors.goldAccent,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 14),
             AuthTextField(
               controller: _passwordController,
               label: 'auth.password'.tr(),
@@ -146,9 +162,11 @@ class _SignInScreenState extends State<SignInScreen> {
               prefixIcon: Icons.lock_outline,
               suffix: IconButton(
                 icon: Icon(
-                  _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                  color: Colors.white.withValues(alpha: 0.7),
-                  size: 20,
+                  _obscurePassword
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                  color: Colors.white,
+                  size: 18,
                 ),
                 onPressed: () =>
                     setState(() => _obscurePassword = !_obscurePassword),
@@ -163,20 +181,128 @@ class _SignInScreenState extends State<SignInScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 22),
+            const SizedBox(height: 12),
+            SizedBox(
+              height: 22,
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: Checkbox(
+                      value: _rememberMe,
+                      onChanged: (v) =>
+                          setState(() => _rememberMe = v ?? false),
+                      side: BorderSide(
+                        color: AppColors.gold.withValues(alpha: 0.55),
+                      ),
+                      activeColor: AppColors.gold,
+                      checkColor: const Color(0xFF111111),
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'auth.rememberMe'.tr(),
+                    style: const TextStyle(
+                      color: Color(0xFFE0E0E0),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const ForgotPasswordScreen(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'auth.forgotPassword'.tr(),
+                      style: AppTheme.bodyMedium.copyWith(
+                        color: AppColors.goldAccent,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        height: 1,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
             AuthPrimaryButton(
               label: 'auth.signIn'.tr(),
               icon: Icons.login_rounded,
               loading: authProvider.isLoading,
               onPressed: authProvider.isLoading ? null : _handleSignIn,
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 1,
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    'auth.orContinueWith'.tr().toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.42),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 10,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    height: 1,
+                    color: Colors.white.withValues(alpha: 0.1),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(
+                  child: _SocialBtn(
+                    label: 'auth.continueWithGoogle'.tr(),
+                    onTap: _comingSoon,
+                    child: const Icon(
+                      Icons.g_mobiledata,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _SocialBtn(
+                    label: 'auth.continueWithDiscord'.tr(),
+                    onTap: _comingSoon,
+                    child: const Icon(
+                      Icons.discord,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 14),
             Text.rich(
               TextSpan(
                 text: '${'auth.dontHaveAccount'.tr()} ',
                 style: AppTheme.bodyMedium.copyWith(
                   color: Colors.white.withValues(alpha: 0.5),
-                  fontSize: 13,
+                  fontSize: 12.5,
                 ),
                 children: [
                   TextSpan(
@@ -184,11 +310,14 @@ class _SignInScreenState extends State<SignInScreen> {
                     style: AppTheme.bodyMedium.copyWith(
                       color: AppColors.goldAccent,
                       fontWeight: FontWeight.w700,
+                      fontSize: 12.5,
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                          MaterialPageRoute(
+                            builder: (_) => const SignUpScreen(),
+                          ),
                         );
                       },
                   ),
@@ -197,6 +326,54 @@ class _SignInScreenState extends State<SignInScreen> {
               textAlign: TextAlign.center,
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SocialBtn extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+  final Widget child;
+
+  const _SocialBtn({
+    required this.label,
+    required this.onTap,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.black.withValues(alpha: 0.42),
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
+          height: 44,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              child,
+              const SizedBox(width: 6),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 11.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

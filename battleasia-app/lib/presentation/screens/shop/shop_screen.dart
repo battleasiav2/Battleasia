@@ -155,6 +155,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
     // Channel filter preselects buy flow; packs themselves are not channel-bound
     // on the API, so we only store the preference for detail navigation.
+    list.sort((a, b) => a.amount.compareTo(b.amount));
     return list;
   }
 
@@ -309,14 +310,8 @@ class _ShopScreenState extends State<ShopScreen> {
                     sliver: Builder(
                       builder: (context) {
                         final w = MediaQuery.of(context).size.width;
-                        final imageH = w < 600
-                            ? w * 0.42
-                            : w < 900
-                                ? 180.0
-                                : 220.0;
-                        const contentH = 96.0;
                         final crossAxisCount =
-                            w < 600 ? 1 : (w < 900 ? 2 : 3);
+                            w < 340 ? 1 : (w < 900 ? 2 : 4);
 
                         return SliverGrid(
                           gridDelegate:
@@ -324,7 +319,7 @@ class _ShopScreenState extends State<ShopScreen> {
                             crossAxisCount: crossAxisCount,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 12,
-                            mainAxisExtent: imageH + contentH,
+                            mainAxisExtent: 320,
                           ),
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {

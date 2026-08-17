@@ -17,9 +17,10 @@ class AuthPhoneField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final goldBorder = AppColors.gold.withValues(alpha: 0.28);
     final border = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+      borderRadius: BorderRadius.circular(4),
+      borderSide: BorderSide(color: goldBorder),
     );
 
     return Column(
@@ -28,46 +29,62 @@ class AuthPhoneField extends StatelessWidget {
         Text(
           'MOBILE NUMBER',
           style: AppTheme.bodySmall.copyWith(
-            color: AppColors.textMuted,
+            color: const Color(0xC7E8E0D0),
             fontWeight: FontWeight.w700,
-            letterSpacing: 0.5,
-            fontSize: 11,
+            letterSpacing: 1.1,
+            fontSize: 12,
           ),
         ),
-        const SizedBox(height: 8),
-        IntlPhoneField(
-          controller: controller,
-          initialCountryCode: 'BD',
-          disableLengthCheck: true,
-          dropdownTextStyle: AppTheme.bodyMedium.copyWith(
-            color: AppColors.textPrimary,
+        const SizedBox(height: 6),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.gold.withValues(alpha: 0.12),
+                blurRadius: 10,
+              ),
+            ],
           ),
-          style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
-          dropdownIcon: const Icon(
-            Icons.arrow_drop_down,
-            color: AppColors.textMuted,
+          child: IntlPhoneField(
+            controller: controller,
+            initialCountryCode: 'BD',
+            disableLengthCheck: true,
+            dropdownTextStyle: AppTheme.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+            ),
+            style: AppTheme.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+              fontSize: 16,
+            ),
+            dropdownIcon: const Icon(
+              Icons.arrow_drop_down,
+              color: Colors.white,
+            ),
+            decoration: InputDecoration(
+              hintText: 'Enter phone number',
+              hintStyle: AppTheme.bodyMedium.copyWith(
+                color: const Color(0xFF808080),
+                fontSize: 16,
+              ),
+              filled: true,
+              fillColor: const Color(0xFF0E0E0E),
+              isDense: true,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 13,
+              ),
+              enabledBorder: border,
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4),
+                borderSide: BorderSide(
+                  color: AppColors.gold.withValues(alpha: 0.55),
+                ),
+              ),
+              border: border,
+            ),
+            onChanged: (phone) => onNumberChanged(phone.number),
+            onCountryChanged: (country) => onCountryChanged(country.dialCode),
           ),
-          decoration: InputDecoration(
-            hintText: 'Enter phone number',
-            hintStyle: AppTheme.bodyMedium.copyWith(
-              color: Colors.white.withValues(alpha: 0.35),
-            ),
-            filled: true,
-            fillColor: const Color(0xFF1A1A1A),
-            isDense: true,
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 14,
-              vertical: 15,
-            ),
-            enabledBorder: border,
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: const BorderSide(color: AppColors.gold, width: 1.2),
-            ),
-            border: border,
-          ),
-          onChanged: (phone) => onNumberChanged(phone.number),
-          onCountryChanged: (country) => onCountryChanged(country.dialCode),
         ),
       ],
     );
