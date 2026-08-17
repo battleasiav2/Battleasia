@@ -170,18 +170,18 @@ export function SignUpView() {
 
   const fieldIcon = (icon: string) => (
     <InputAdornment position="start">
-      <Iconify icon={icon} width={18} sx={{ color: '#f5c518' }} />
+      <Iconify icon={icon} width={18} sx={{ color: '#ffffff' }} />
     </InputAdornment>
   );
 
-  const compactSelectSx = { ...authSelectSx, minHeight: 40, '& .MuiSelect-select': { py: 1 } };
+  const compactSelectSx = { ...authSelectSx, minHeight: 50, '& .MuiSelect-select': { py: 1.35 } };
 
   // Phone needs a taller row so the absolute-positioned country selector fits cleanly
   const phoneSlotProps = {
     inputLabel: authFieldSlotPropsCompact.inputLabel,
     input: {
       ...authFieldSlotPropsCompact.input,
-      sx: { ...authFieldSlotPropsCompact.input.sx, minHeight: 44, '& input': { paddingTop: '9px', paddingBottom: '9px' } },
+      sx: { ...authFieldSlotPropsCompact.input.sx, minHeight: 52 },
     },
   };
 
@@ -334,7 +334,7 @@ export function SignUpView() {
         </Box>
       </Form>
 
-      <Box sx={{ mt: 2, textAlign: 'center', fontSize: 11, color: alpha('#fff', 0.5), lineHeight: 1.6 }}>
+      <Box sx={{ mt: 2, textAlign: 'center', fontSize: 14, color: alpha('#fff', 0.5), lineHeight: 1.6 }}>
         {`${t('auth.termsAgreement')} `}
         <Link component={RouterLink} href={paths.termsOfService} sx={authLinkSx}>
           {t('auth.termsOfService')}

@@ -128,7 +128,8 @@ export function SignInView() {
       )}
 
       <Form methods={methods} onSubmit={onSubmit}>
-        <Stack spacing={1.1}>
+        <Stack spacing={1.5}>
+          <Stack spacing={2.5}>
           <Field.Text
             name="email"
             label={t('auth.emailAddress')}
@@ -139,7 +140,7 @@ export function SignInView() {
                 ...authFieldSlotPropsCompact.input,
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="solar:letter-bold-duotone" width={18} sx={{ color: '#f5c518' }} />
+                    <Iconify icon="solar:letter-bold-duotone" width={18} sx={{ color: '#ffffff' }} />
                   </InputAdornment>
                 ),
               },
@@ -157,12 +158,12 @@ export function SignInView() {
                 ...authFieldSlotPropsCompact.input,
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="solar:lock-password-bold-duotone" width={18} sx={{ color: '#f5c518' }} />
+                    <Iconify icon="solar:lock-password-bold-duotone" width={18} sx={{ color: '#ffffff' }} />
                   </InputAdornment>
                 ),
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                    <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: '#ffffff' }}>
                       <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={18} />
                     </IconButton>
                   </InputAdornment>
@@ -170,8 +171,9 @@ export function SignInView() {
               },
             }}
           />
+          </Stack>
 
-          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ minHeight: 28, mt: -0.25 }}>
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ minHeight: 28 }}>
             <FormControlLabel
               sx={{ mr: 0, ml: -0.5 }}
               control={
@@ -187,12 +189,12 @@ export function SignInView() {
                 />
               }
               label={
-                <Box sx={{ fontSize: 12, fontWeight: 600, color: alpha('#fff', 0.72) }}>
+                <Box sx={{ fontSize: 14, fontWeight: 600, color: '#e0e0e0' }}>
                   {t('auth.rememberMe')}
                 </Box>
               }
             />
-            <Link component={RouterLink} href={paths.auth.forgotPassword} sx={{ ...authLinkSx, fontSize: 12.5, lineHeight: 1 }}>
+            <Link component={RouterLink} href={paths.auth.forgotPassword} sx={{ ...authLinkSx, fontSize: 14, lineHeight: 1 }}>
               {t('auth.forgotPassword')}
             </Link>
           </Stack>

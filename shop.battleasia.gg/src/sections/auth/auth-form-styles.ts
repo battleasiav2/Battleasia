@@ -3,7 +3,41 @@ import { inputBaseClasses } from '@mui/material/InputBase';
 
 export const AUTH_BG_IMAGE = '/assets/images/shop/bac-store-hero.webp';
 
-export const AUTH_INPUT_BG = alpha('#000000', 0.5);
+export const AUTH_CARD_BG = '#181614';
+export const AUTH_INPUT_BG = '#0e0e0e';
+const AUTH_LABEL = '#e0e0e0';
+const AUTH_PLACEHOLDER = '#808080';
+const AUTH_BORDER = '#2b2b2b';
+
+export const authCardSx = {
+  bgcolor: AUTH_CARD_BG,
+  backgroundColor: AUTH_CARD_BG,
+  backgroundImage: `linear-gradient(180deg, #1c1a16 0%, ${AUTH_CARD_BG} 42%, #141210 100%)`,
+  border: `1px solid ${AUTH_BORDER}`,
+  boxShadow: `0 24px 60px ${alpha('#000000', 0.65)}`,
+  backdropFilter: 'none',
+  WebkitBackdropFilter: 'none',
+  '&:before': {
+    content: "''",
+    position: 'absolute',
+    inset: 0,
+    pointerEvents: 'none',
+    zIndex: 0,
+    background: `linear-gradient(180deg, ${alpha('#f5c518', 0.045)} 0%, transparent 48%)`,
+    animation: 'none',
+  },
+};
+
+const authInputAutofillSx = {
+  '& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active':
+    {
+      WebkitTextFillColor: '#ffffff',
+      WebkitBoxShadow: `0 0 0 1000px ${AUTH_INPUT_BG} inset`,
+      caretColor: '#ffffff',
+      borderRadius: 'inherit',
+      transition: 'background-color 600000s 0s, color 600000s 0s',
+    },
+};
 
 export const authFieldSlotProps = {
   inputLabel: {
@@ -15,94 +49,73 @@ export const authFieldSlotProps = {
       whiteSpace: 'nowrap' as const,
       overflow: 'visible',
       textOverflow: 'clip',
-      fontSize: 11,
+      fontSize: 14,
       fontWeight: 600,
-      letterSpacing: 0.2,
-      color: alpha('#ffffff', 0.82),
-      mb: 0.75,
-      textTransform: 'uppercase' as const,
-      // Match theme's `.shrink.focused` specificity so the label never turns dark on focus
+      letterSpacing: 0,
+      color: AUTH_LABEL,
+      mb: 1,
+      textTransform: 'none' as const,
       '&.MuiInputLabel-shrink': {
         transform: 'none',
-        color: alpha('#ffffff', 0.82),
-        '&.Mui-focused': { color: '#f5c518' },
+        color: AUTH_LABEL,
+        '&.Mui-focused': { color: AUTH_LABEL },
       },
-      '&.Mui-focused': { color: '#f5c518' },
+      '&.Mui-focused': { color: AUTH_LABEL },
     },
   },
   input: {
     sx: {
       color: '#ffffff',
       bgcolor: AUTH_INPUT_BG,
-      borderRadius: '2px',
-      fontSize: 14,
-      minHeight: 46,
-      boxShadow: `0 0 10px ${alpha('#f5c518', 0.1)}`,
-      transition: 'border-color 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease',
-      '& input::placeholder': {
-        color: alpha('#ffffff', 0.55),
-        opacity: 1,
+      borderRadius: '4px',
+      fontSize: 16,
+      minHeight: 50,
+      boxShadow: 'none',
+      transition: 'border-color 0.2s ease, background-color 0.2s ease',
+      '& input': {
+        fontSize: 16,
+        paddingTop: '13px',
+        paddingBottom: '13px',
       },
-      // Keep browser autofill on-brand (dark box, white text) instead of Chrome's white/black
-      '& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active':
-        {
-          WebkitTextFillColor: '#ffffff',
-          WebkitBoxShadow: '0 0 0 1000px #14121a inset',
-          caretColor: '#ffffff',
-          borderRadius: 'inherit',
-          transition: 'background-color 600000s 0s, color 600000s 0s',
-        },
+      '& input::placeholder': {
+        color: AUTH_PLACEHOLDER,
+        opacity: 1,
+        fontSize: 16,
+      },
       '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
       '& fieldset': {
-        border: `1px solid ${alpha('#f5c518', 0.28)}`,
+        border: `1px solid ${AUTH_BORDER}`,
       },
       '&:hover fieldset': {
-        borderColor: alpha('#f5c518', 0.5),
+        borderColor: '#3a3a3a',
       },
       '&:hover': {
-        boxShadow: `0 0 14px ${alpha('#f5c518', 0.18)}`,
+        boxShadow: 'none',
       },
       '&.Mui-focused': {
-        bgcolor: alpha('#000000', 0.58),
-        boxShadow: `0 0 0 2px ${alpha('#f5c518', 0.32)}, 0 0 18px ${alpha('#f5c518', 0.28)}`,
+        bgcolor: AUTH_INPUT_BG,
+        boxShadow: 'none',
       },
       '&.Mui-focused fieldset': {
-        borderColor: '#f5c518',
+        borderColor: alpha('#f5c518', 0.42),
         borderWidth: '1px',
       },
       '& .MuiSelect-select': {
         color: '#ffffff',
+        fontSize: 16,
       },
       '& .MuiSelect-icon': {
-        color: alpha('#ffffff', 0.65),
+        color: '#ffffff',
       },
+      '& .MuiInputAdornment-root .iconify': {
+        color: '#ffffff',
+      },
+      ...authInputAutofillSx,
     },
   },
 };
 
-// Compact variant — used on sign-in for a tighter, smaller card
-export const authFieldSlotPropsCompact = {
-  inputLabel: {
-    ...authFieldSlotProps.inputLabel,
-    sx: {
-      ...authFieldSlotProps.inputLabel.sx,
-      fontSize: 10,
-      mb: 0.5,
-    },
-  },
-  input: {
-    ...authFieldSlotProps.input,
-    sx: {
-      ...authFieldSlotProps.input.sx,
-      minHeight: 36,
-      fontSize: 13,
-      '& input': {
-        paddingTop: '7px',
-        paddingBottom: '7px',
-      },
-    },
-  },
-};
+export const authFieldSlotPropsCompact = authFieldSlotProps;
 
 export const authPhoneInputSx = {
   '--popover-button-width': '80px',
@@ -110,8 +123,8 @@ export const authPhoneInputSx = {
   '--popover-button-mr': '10px',
   [`& .${inputBaseClasses.input}`]: {
     pl: 'calc(var(--popover-button-width) + var(--popover-button-mr) + 2px) !important',
-    fontSize: 14,
-    letterSpacing: 0.3,
+    fontSize: 16,
+    letterSpacing: 0,
   },
   '& .MuiFormHelperText-root': {
     color: alpha('#ffffff', 0.55),
@@ -152,7 +165,7 @@ export const authSelectMenuProps = {
       boxShadow: `0 16px 40px ${alpha('#000000', 0.65)}`,
       '& .MuiMenuItem-root': {
         color: alpha('#ffffff', 0.9),
-        fontSize: 14,
+        fontSize: 16,
         minHeight: 44,
         py: 1.1,
         px: 1.5,
@@ -178,26 +191,27 @@ export const authSelectSx = {
   mt: 0,
   color: '#ffffff',
   bgcolor: AUTH_INPUT_BG,
-  borderRadius: '2px',
-  fontSize: 14,
-  minHeight: 46,
+  borderRadius: '4px',
+  fontSize: 16,
+  minHeight: 50,
   '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
   '& fieldset': {
-    border: `1px solid ${alpha('#ffffff', 0.22)}`,
+    border: `1px solid ${AUTH_BORDER}`,
   },
   '&:hover fieldset': {
-    borderColor: alpha('#ffffff', 0.38),
+    borderColor: '#3a3a3a',
   },
   '&.Mui-focused': {
-    bgcolor: alpha('#000000', 0.58),
-    boxShadow: `0 0 0 3px ${alpha('#f5c518', 0.18)}`,
+    bgcolor: AUTH_INPUT_BG,
+    boxShadow: 'none',
   },
   '&.Mui-focused fieldset': {
-    borderColor: '#f5c518',
+    borderColor: alpha('#f5c518', 0.42),
     borderWidth: '1px',
   },
   '& .MuiSelect-select': {
     py: 1.35,
+    fontSize: 16,
   },
 };
 
@@ -242,7 +256,7 @@ export const authAlertSx = {
 
 export const authFooterTextSx = {
   textAlign: 'center' as const,
-  fontSize: 13,
+  fontSize: 14,
   color: alpha('#ffffff', 0.5),
   lineHeight: 1.6,
 };

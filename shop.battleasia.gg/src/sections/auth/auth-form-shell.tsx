@@ -7,6 +7,8 @@ import { Logo } from 'src/components/logo';
 import { GlassPanelCard, getDefaultGlassTokens } from 'src/components/battle-glass-card';
 import { useTranslate } from 'src/locales/use-locales';
 
+import { authCardSx } from './auth-form-styles';
+
 // ----------------------------------------------------------------------
 
 const cardReveal = keyframes`
@@ -48,13 +50,8 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
         sx={{
           width: 1,
           borderRadius: 0,
-          border: `1px solid ${alpha(gold, 0.32)}`,
           p: wide ? { xs: 2.25, sm: 2.75, md: 3 } : compact ? { xs: 2, sm: 2.25 } : { xs: 2.25, sm: 2.75 },
-          boxShadow: `
-            0 24px 60px ${alpha('#000000', 0.65)},
-            0 0 0 1px ${alpha(gold, 0.06)},
-            0 0 36px ${alpha(gold, 0.1)}
-          `,
+          ...authCardSx,
         }}
       >
         <Stack alignItems="center" spacing={compact ? 0.35 : 0.5} sx={{ mb: compact ? 1.25 : 1.5 }}>

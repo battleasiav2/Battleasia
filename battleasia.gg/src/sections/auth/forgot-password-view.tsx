@@ -95,7 +95,7 @@ export function ForgotPasswordView() {
                 ...authFieldSlotPropsCompact.input,
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="solar:letter-bold-duotone" width={18} sx={{ color: '#f5c518' }} />
+                    <Iconify icon="solar:letter-bold-duotone" width={18} sx={{ color: '#ffffff' }} />
                   </InputAdornment>
                 ),
               },

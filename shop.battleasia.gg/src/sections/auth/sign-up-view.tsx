@@ -212,7 +212,7 @@ export function SignUpView() {
             ...authFieldSlotProps.input,
             startAdornment: (
               <InputAdornment position="start">
-                <Iconify icon="solar:user-bold-duotone" width={20} sx={{ color: '#f5c518' }} />
+                <Iconify icon="solar:user-bold-duotone" width={20} sx={{ color: '#ffffff' }} />
               </InputAdornment>
             ),
           },
@@ -233,7 +233,7 @@ export function SignUpView() {
             ...authFieldSlotProps.input,
             startAdornment: (
               <InputAdornment position="start">
-                <Iconify icon="solar:gamepad-bold-duotone" width={20} sx={{ color: '#f5c518' }} />
+                <Iconify icon="solar:gamepad-bold-duotone" width={20} sx={{ color: '#ffffff' }} />
               </InputAdornment>
             ),
           },
@@ -314,7 +314,7 @@ export function SignUpView() {
             ...authFieldSlotProps.input,
             startAdornment: (
               <InputAdornment position="start">
-                <Iconify icon="solar:letter-bold-duotone" width={20} sx={{ color: '#f5c518' }} />
+                <Iconify icon="solar:letter-bold-duotone" width={20} sx={{ color: '#ffffff' }} />
               </InputAdornment>
             ),
           },
@@ -336,7 +336,7 @@ export function SignUpView() {
             ...authFieldSlotProps.input,
             startAdornment: (
               <InputAdornment position="start">
-                <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: '#f5c518' }} />
+                <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: '#ffffff' }} />
               </InputAdornment>
             ),
             endAdornment: (
@@ -365,7 +365,7 @@ export function SignUpView() {
             ...authFieldSlotProps.input,
             startAdornment: (
               <InputAdornment position="start">
-                <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: '#f5c518' }} />
+                <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: '#ffffff' }} />
               </InputAdornment>
             ),
             endAdornment: (

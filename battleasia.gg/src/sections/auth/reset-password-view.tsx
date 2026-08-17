@@ -22,7 +22,7 @@ import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
 import { authAlertSx, authFieldSlotProps } from './auth-form-styles';
 
-const FIELD_ICON_COLOR = '#f5c518';
+const FIELD_ICON_COLOR = '#ffffff';
 
 export type ResetPasswordSchemaType = zod.infer<typeof ResetPasswordSchema>;
 
