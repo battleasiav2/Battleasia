@@ -227,7 +227,6 @@ export function SignInView() {
           <AuthSubmitButton
             loading={isSubmitting}
             loadingIndicator={`${t('auth.signIn')}...`}
-            sx={{ py: 1.1 }}
           >
             {t('auth.signIn')}
           </AuthSubmitButton>

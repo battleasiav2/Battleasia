@@ -231,8 +231,10 @@ export const authSelectSx = {
 
 export const authSubmitButtonSx = {
   borderRadius: 0,
-  py: 1.45,
-  fontSize: 14,
+  py: 0,
+  minHeight: 44,
+  height: 44,
+  fontSize: 13,
   fontWeight: 800,
   letterSpacing: 1,
   textTransform: 'uppercase' as const,

@@ -30,7 +30,7 @@ export function AuthSubmitButton({
   return (
     <LoadingButton
       fullWidth
-      size="large"
+      size="medium"
       type={type}
       variant="contained"
       disableElevation
@@ -38,7 +38,7 @@ export function AuthSubmitButton({
       loadingPosition="start"
       disabled={disabled}
       onClick={onClick}
-      startIcon={<Iconify icon="game-icons:crossed-swords" width={18} />}
+      startIcon={<Iconify icon="game-icons:crossed-swords" width={16} />}
       sx={[
         authSubmitButtonSx,
         {

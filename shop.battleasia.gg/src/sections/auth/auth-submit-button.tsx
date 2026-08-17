@@ -9,7 +9,7 @@ export function AuthSubmitButton({ sx, ...other }: LoadingButtonProps) {
   return (
     <LoadingButton
       fullWidth
-      size="large"
+      size="medium"
       type="submit"
       variant="contained"
       disableElevation

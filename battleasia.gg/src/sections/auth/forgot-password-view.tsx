@@ -102,7 +102,7 @@ export function ForgotPasswordView() {
             }}
           />
 
-          <AuthSubmitButton loading={isSubmitting} loadingIndicator={`${t('common.sending')}...`} sx={{ py: 1.1 }}>
+          <AuthSubmitButton loading={isSubmitting} loadingIndicator={`${t('common.sending')}...`}>
             {t('auth.sendResetCode')}
           </AuthSubmitButton>
 
