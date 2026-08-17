@@ -127,12 +127,12 @@ export const authFieldSlotProps = {
     sx: {
       position: 'relative' as const,
       transform: 'none',
-      fontSize: 14,
-      fontWeight: 600,
-      letterSpacing: 0,
+      fontSize: 13,
+      fontWeight: 700,
+      letterSpacing: 0.9,
       color: AUTH_LABEL,
       mb: 1,
-      textTransform: 'none' as const,
+      textTransform: 'uppercase' as const,
       '&.MuiInputLabel-shrink': {
         transform: 'none',
         color: AUTH_LABEL,
@@ -148,8 +148,8 @@ export const authFieldSlotProps = {
       borderRadius: '4px',
       fontSize: 16,
       minHeight: 50,
-      boxShadow: 'none',
-      transition: 'border-color 0.2s ease, background-color 0.2s ease',
+      boxShadow: `0 0 0 1px ${alpha('#f5c518', 0.14)}, 0 0 10px ${alpha('#f5c518', 0.12)}`,
+      transition: 'border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease',
       '& input': {
         fontSize: 16,
         paddingTop: '13px',
@@ -162,20 +162,20 @@ export const authFieldSlotProps = {
       },
       '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
       '& fieldset': {
-        border: `1px solid ${AUTH_BORDER}`,
+        border: `1px solid ${alpha('#f5c518', 0.28)}`,
       },
       '&:hover fieldset': {
-        borderColor: '#3a3a3a',
+        borderColor: alpha('#f5c518', 0.48),
       },
       '&:hover': {
-        boxShadow: 'none',
+        boxShadow: `0 0 0 1px ${alpha('#f5c518', 0.2)}, 0 0 14px ${alpha('#f5c518', 0.18)}`,
       },
       '&.Mui-focused': {
         bgcolor: AUTH_INPUT_BG,
-        boxShadow: 'none',
+        boxShadow: `0 0 0 1px ${alpha('#f5c518', 0.32)}, 0 0 16px ${alpha('#f5c518', 0.22)}`,
       },
       '&.Mui-focused fieldset': {
-        borderColor: alpha('#f5c518', 0.42),
+        borderColor: alpha('#f5c518', 0.55),
         borderWidth: '1px',
       },
       '& .MuiSelect-select': {
@@ -263,19 +263,20 @@ export const authSelectSx = {
   borderRadius: '4px',
   fontSize: 16,
   minHeight: 50,
+  boxShadow: `0 0 0 1px ${alpha('#f5c518', 0.14)}, 0 0 10px ${alpha('#f5c518', 0.12)}`,
   '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
   '& fieldset': {
-    border: `1px solid ${AUTH_BORDER}`,
+    border: `1px solid ${alpha('#f5c518', 0.28)}`,
   },
   '&:hover fieldset': {
-    borderColor: '#3a3a3a',
+    borderColor: alpha('#f5c518', 0.48),
   },
   '&.Mui-focused': {
     bgcolor: AUTH_INPUT_BG,
-    boxShadow: 'none',
+    boxShadow: `0 0 0 1px ${alpha('#f5c518', 0.32)}, 0 0 16px ${alpha('#f5c518', 0.22)}`,
   },
   '&.Mui-focused fieldset': {
-    borderColor: alpha('#f5c518', 0.42),
+    borderColor: alpha('#f5c518', 0.55),
     borderWidth: '1px',
   },
   '& .MuiSelect-select': {

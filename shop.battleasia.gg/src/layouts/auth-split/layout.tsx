@@ -98,24 +98,27 @@ export function AuthSplitLayout({
       leftArea: (
         <Button
           href={`${mainAppUrl.replace(/\/$/, '')}/dashboard`}
-          startIcon={<Iconify icon="solar:arrow-left-bold" width={16} />}
+          startIcon={<Iconify icon="solar:arrow-left-bold" width={12} />}
           sx={{
-            minHeight: 36,
-            px: 1.5,
-            py: 0.75,
+            minHeight: 26,
+            height: 26,
+            px: 1,
+            py: 0,
             borderRadius: 0,
-            fontSize: 13,
+            fontSize: 11,
             fontWeight: 700,
-            letterSpacing: 0.4,
+            letterSpacing: 0.3,
             textTransform: 'none',
+            lineHeight: 1,
             color: GOLD,
             bgcolor: alpha('#000000', 0.45),
             border: `1px solid ${alpha(GOLD, 0.4)}`,
             boxShadow: 'none',
+            '& .MuiButton-startIcon': { mr: 0.5, ml: 0 },
             '&:hover': {
               bgcolor: alpha(GOLD, 0.12),
               borderColor: GOLD,
-              boxShadow: `0 0 12px ${alpha(GOLD, 0.18)}`,
+              boxShadow: `0 0 8px ${alpha(GOLD, 0.16)}`,
             },
           }}
         >
@@ -167,8 +170,8 @@ export function AuthSplitLayout({
           backgroundRepeat: 'no-repeat',
           position: 'relative',
           minHeight: {
-            xs: 'calc(100dvh - var(--layout-header-mobile-height, 52px))',
-            md: 'calc(100dvh - var(--layout-header-desktop-height, 56px))',
+            xs: 'calc(100dvh - var(--layout-header-mobile-height, 36px))',
+            md: 'calc(100dvh - var(--layout-header-desktop-height, 40px))',
           },
           '&::before': {
             content: "''",
@@ -196,7 +199,7 @@ export function AuthSplitLayout({
         sx={{
           position: 'relative',
           zIndex: 1,
-          minHeight: { xs: 'auto', md: 'calc(100dvh - var(--layout-header-desktop-height, 56px))' },
+          minHeight: { xs: 'auto', md: 'calc(100dvh - var(--layout-header-desktop-height, 40px))' },
           display: 'flex',
           justifyContent: 'center',
           alignItems: { xs: 'flex-start', md: 'center' },
@@ -215,8 +218,8 @@ export function AuthSplitLayout({
       footerSection={null}
       cssVars={{
         '--layout-auth-content-width': '620px',
-        '--layout-header-desktop-height': '56px',
-        '--layout-header-mobile-height': '52px',
+        '--layout-header-desktop-height': '40px',
+        '--layout-header-mobile-height': '36px',
         '--layout-main-margin-top': '0px',
         '--layout-main-mobile-margin-top': '0px',
         ...cssVars,

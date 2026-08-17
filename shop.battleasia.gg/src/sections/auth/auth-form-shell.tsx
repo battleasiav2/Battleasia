@@ -58,7 +58,7 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
           <Logo
             disabled
             sx={{
-              width: compact ? { xs: 93, sm: 103 } : { xs: 115, sm: 130 },
+              width: compact ? { xs: 112, sm: 124 } : { xs: 138, sm: 156 },
               height: 'auto',
               pointerEvents: 'none',
               '& img': { objectFit: 'contain', width: '100%', height: 'auto' },

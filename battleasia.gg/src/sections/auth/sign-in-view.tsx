@@ -173,9 +173,21 @@ export function SignInView() {
           />
           </Stack>
 
-          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ minHeight: 28 }}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="space-between"
+            sx={{ minHeight: 22, height: 22 }}
+          >
             <FormControlLabel
-              sx={{ mr: 0, ml: -0.5 }}
+              sx={{
+                mr: 0,
+                ml: -0.5,
+                my: 0,
+                height: 22,
+                alignItems: 'center',
+                '& .MuiFormControlLabel-label': { lineHeight: 1, display: 'flex', alignItems: 'center' },
+              }}
               control={
                 <Checkbox
                   size="small"
@@ -183,18 +195,30 @@ export function SignInView() {
                   onChange={(event) => setRememberMe(event.target.checked)}
                   sx={{
                     color: alpha('#f5c518', 0.55),
-                    p: 0.5,
+                    p: 0,
+                    mr: 0.75,
                     '&.Mui-checked': { color: '#f5c518' },
                   }}
                 />
               }
               label={
-                <Box sx={{ fontSize: 14, fontWeight: 600, color: '#e0e0e0' }}>
+                <Box sx={{ fontSize: 14, fontWeight: 600, color: '#e0e0e0', lineHeight: 1 }}>
                   {t('auth.rememberMe')}
                 </Box>
               }
             />
-            <Link component={RouterLink} href={paths.auth.forgotPassword} sx={{ ...authLinkSx, fontSize: 14, lineHeight: 1 }}>
+            <Link
+              component={RouterLink}
+              href={paths.auth.forgotPassword}
+              sx={{
+                ...authLinkSx,
+                fontSize: 14,
+                lineHeight: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                height: 22,
+              }}
+            >
               {t('auth.forgotPassword')}
             </Link>
           </Stack>
