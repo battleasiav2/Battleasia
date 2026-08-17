@@ -114,8 +114,8 @@ export const authFieldSlotProps = {
       borderRadius: '2px',
       fontSize: 14,
       minHeight: 48,
-      boxShadow: `0 0 10px ${alpha('#f5c518', 0.1)}`,
-      transition: 'border-color 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease',
+      boxShadow: `inset 0 0 0 1px ${alpha('#f5c518', 0.12)}, 0 0 10px ${alpha('#f5c518', 0.1)}`,
+      transition: 'border-color 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease',
       '& input::placeholder': {
         color: alpha('#ffffff', 0.55),
         opacity: 1,
@@ -125,14 +125,14 @@ export const authFieldSlotProps = {
         border: `1px solid ${alpha('#f5c518', 0.28)}`,
       },
       '&:hover fieldset': {
-        borderColor: alpha('#f5c518', 0.5),
+        borderColor: alpha('#f5c518', 0.55),
       },
       '&:hover': {
-        boxShadow: `0 0 14px ${alpha('#f5c518', 0.18)}`,
+        boxShadow: `inset 0 0 0 1px ${alpha('#f5c518', 0.2)}, 0 0 16px ${alpha('#f5c518', 0.2)}`,
       },
       '&.Mui-focused': {
-        bgcolor: alpha('#000000', 0.58),
-        boxShadow: `0 0 0 2px ${alpha('#f5c518', 0.32)}, 0 0 18px ${alpha('#f5c518', 0.28)}`,
+        bgcolor: alpha('#000000', 0.62),
+        boxShadow: `0 0 0 2px ${alpha('#f5c518', 0.5)}, 0 0 22px ${alpha('#f5c518', 0.38)}`,
       },
       '&.Mui-focused fieldset': {
         borderColor: '#f5c518',
@@ -163,7 +163,7 @@ export const authFieldSlotPropsCompact = {
     ...authFieldSlotProps.input,
     sx: {
       ...authFieldSlotProps.input.sx,
-      minHeight: 36,
+      minHeight: 42,
       fontSize: 13,
       '& input': {
         paddingTop: '7px',
@@ -274,7 +274,9 @@ import { userGoldButtonSx } from 'src/layouts/user/user-theme';
 
 export const authSubmitButtonSx = {
   ...userGoldButtonSx,
-  py: 1.45,
+  py: 0,
+  minHeight: 56,
+  height: 56,
   fontSize: 14,
   letterSpacing: 1,
   width: '100%',

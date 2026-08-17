@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { merge } from 'es-toolkit';
 
-import { Alert, Box, useMediaQuery } from '@mui/material';
+import { Alert, Box } from '@mui/material';
 import { alpha, useTheme, type Breakpoint } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
@@ -51,9 +51,20 @@ export function AuthSplitLayout({
 }: AuthSplitLayoutProps) {
   const theme = useTheme();
   const router = useRouter();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const { isLoggedIn } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = AUTH_BG;
+    link.type = 'image/webp';
+    document.head.appendChild(link);
+    return () => {
+      link.remove();
+    };
+  }, []);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -120,7 +131,7 @@ export function AuthSplitLayout({
             position: 'absolute',
             inset: 0,
             background: `
-              linear-gradient(90deg, ${alpha('#0a0a0a', 0.88)} 0%, ${alpha('#0a0a0a', 0.62)} 48%, ${alpha('#0a0a0a', 0.78)} 100%),
+              linear-gradient(90deg, ${alpha('#0a0a0a', 0.9)} 0%, ${alpha('#0a0a0a', 0.7)} 48%, ${alpha('#0a0a0a', 0.82)} 100%),
               radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(GOLD, 0.08)} 0%, transparent 55%)
             `,
             zIndex: 0,
@@ -141,23 +152,39 @@ export function AuthSplitLayout({
         sx={{
           position: 'relative',
           zIndex: 1,
-          minHeight: '100vh',
+          minHeight: { xs: 'auto', md: '100vh' },
           display: 'flex',
           justifyContent: 'center',
           alignItems: { xs: 'flex-start', md: 'center' },
-          overflowY: 'auto',
-          py: { xs: 3, md: 4 },
+          overflowY: 'visible',
+          py: { xs: 2, md: 4 },
         }}
       >
         {children}
       </AuthSplitSection>
-      {!isMobile && (
-        <AuthSplitContent layoutQuery={layoutQuery} {...slotProps?.content} sx={{ position: 'relative', zIndex: 1 }}>
-          <Suspense fallback={<BoxMinHeight />}>
-            <AuthHeroPanel />
-          </Suspense>
-        </AuthSplitContent>
-      )}
+      <AuthSplitContent
+        layoutQuery={layoutQuery}
+        {...slotProps?.content}
+        sx={{
+          position: 'relative',
+          zIndex: 1,
+          '&::before': {
+            content: "''",
+            position: 'absolute',
+            inset: 0,
+            zIndex: 0,
+            pointerEvents: 'none',
+            background: {
+              xs: `linear-gradient(180deg, ${alpha('#0a0a0a', 0.55)} 0%, ${alpha('#0a0a0a', 0.72)} 100%)`,
+              md: `linear-gradient(90deg, ${alpha('#0a0a0a', 0.28)} 0%, ${alpha('#0a0a0a', 0.58)} 55%, ${alpha('#0a0a0a', 0.7)} 100%)`,
+            },
+          },
+        }}
+      >
+        <Suspense fallback={<BoxMinHeight />}>
+          <AuthHeroPanel />
+        </Suspense>
+      </AuthSplitContent>
     </MainSection>
   );
 
@@ -174,5 +201,5 @@ export function AuthSplitLayout({
 }
 
 function BoxMinHeight() {
-  return <Box sx={{ minHeight: 420, width: 1 }} aria-hidden />;
+  return <Box sx={{ minHeight: { xs: 180, md: 420 }, width: 1 }} aria-hidden />;
 }

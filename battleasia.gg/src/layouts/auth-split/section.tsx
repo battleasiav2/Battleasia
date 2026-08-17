@@ -9,7 +9,7 @@ import { Box, Stack } from '@mui/material';
 const fadeInUpAnimation = keyframes`
   from {
     opacity: 0;
-    transform: translateY(30px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -51,14 +51,15 @@ export function AuthSplitSection({
           zIndex: 2,
           width: 1,
           maxWidth: 'var(--layout-auth-content-width, 620px)',
-          minHeight: { xs: '100dvh', md: 'auto' },
+          minHeight: { xs: 'auto', md: 'auto' },
           mx: 'auto',
           px: { xs: 2, sm: 3 },
-          pt: { xs: 3, sm: 4, md: 3 },
-          pb: { xs: 4, md: 3 },
+          pt: { xs: 2, sm: 3, md: 3 },
+          pb: { xs: 2, md: 3 },
           alignItems: 'center',
           justifyContent: 'center',
-          animation: `${fadeInUpAnimation} 0.8s ease-out`,
+          animation: `${fadeInUpAnimation} 0.28s ease-out`,
+          '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
         }}
       >
         {children && (

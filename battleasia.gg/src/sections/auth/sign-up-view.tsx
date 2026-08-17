@@ -316,7 +316,7 @@ export function SignUpView() {
           />
 
           <Box sx={{ gridColumn: '1 / -1', mt: 0.25 }}>
-            <AuthSubmitButton loading={isSubmitting} loadingIndicator={t('auth.creatingAccount')} sx={{ py: 1.1 }}>
+            <AuthSubmitButton loading={isSubmitting} loadingIndicator={t('auth.creatingAccount')}>
               {t('auth.createAccount')}
             </AuthSubmitButton>
           </Box>

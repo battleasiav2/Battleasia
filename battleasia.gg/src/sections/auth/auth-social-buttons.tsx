@@ -37,17 +37,28 @@ function GoogleMark() {
 }
 
 const socialBtnSx = {
-  py: 0.85,
-  minHeight: 40,
+  height: 44,
+  minHeight: 44,
+  maxHeight: 44,
+  py: 0,
+  px: 1.25,
   borderRadius: 0,
   textTransform: 'none' as const,
-  fontSize: 12.5,
+  fontSize: 12,
   fontWeight: 700,
+  lineHeight: 1,
+  whiteSpace: 'nowrap' as const,
   color: alpha('#fff', 0.92),
   bgcolor: alpha('#000', 0.42),
   border: `1px solid ${alpha('#fff', 0.14)}`,
   boxShadow: 'none',
+  overflow: 'hidden',
   transition: 'border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease',
+  '& .MuiButton-startIcon': {
+    margin: 0,
+    marginRight: 8,
+    '& > *': { width: 16, height: 16 },
+  },
   '&:hover': {
     bgcolor: alpha('#000', 0.55),
     borderColor: alpha(GOLD, 0.45),
@@ -75,7 +86,13 @@ export function AuthSocialButtons() {
         <Box sx={{ flex: 1, height: '1px', bgcolor: alpha('#fff', 0.1) }} />
       </Stack>
 
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+          gap: 1,
+        }}
+      >
         <Button fullWidth variant="outlined" disableElevation onClick={comingSoon} startIcon={<GoogleMark />} sx={socialBtnSx}>
           {t('auth.continueWithGoogle')}
         </Button>
@@ -89,7 +106,7 @@ export function AuthSocialButtons() {
         >
           {t('auth.continueWithDiscord')}
         </Button>
-      </Stack>
+      </Box>
     </Stack>
   );
 }

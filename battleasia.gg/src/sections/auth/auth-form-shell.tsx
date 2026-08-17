@@ -34,10 +34,10 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
       sx={{
         width: 1,
         maxWidth: wide
-          ? { xs: 1, sm: 540, md: 560 }
+          ? { xs: 1, sm: 500, md: 520 }
           : compact
-            ? { xs: 1, sm: 380, md: 396 }
-            : { xs: 1, sm: 420, md: 440 },
+            ? { xs: 1, sm: 352, md: 366 }
+            : { xs: 1, sm: 390, md: 408 },
         animation: `${cardReveal} 0.28s ease-out both`,
         '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
       }}
@@ -47,7 +47,7 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
           width: 1,
           borderRadius: 0,
           border: `1px solid ${alpha(gold, 0.32)}`,
-          p: wide ? { xs: 2.25, sm: 2.75, md: 3 } : compact ? { xs: 2, sm: 2.25 } : { xs: 2.25, sm: 2.75 },
+          p: wide ? { xs: 2, sm: 2.5, md: 2.75 } : compact ? { xs: 1.75, sm: 1.9 } : { xs: 2, sm: 2.4 },
           boxShadow: `
             0 24px 60px ${alpha('#000000', 0.65)},
             0 0 0 1px ${alpha(gold, 0.06)},
@@ -55,7 +55,7 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
           `,
         }}
       >
-        <Stack alignItems="center" spacing={compact ? 0.35 : 0.5} sx={{ mb: compact ? 1.25 : 1.5 }}>
+        <Stack alignItems="center" spacing={compact ? 0.3 : 0.45} sx={{ mb: compact ? 1 : 1.25 }}>
           <Logo
             disabled
             sx={{

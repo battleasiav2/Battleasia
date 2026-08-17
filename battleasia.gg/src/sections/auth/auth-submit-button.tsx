@@ -39,12 +39,13 @@ export function AuthSubmitButton({
       loadingPosition="center"
       disabled={disabled}
       onClick={onClick}
-      startIcon={
-        <Iconify icon="game-icons:crossed-swords" width={22} />
-      }
+      startIcon={<Iconify icon="game-icons:crossed-swords" width={22} />}
       sx={[
         authSubmitButtonSx,
         {
+          height: 56,
+          minHeight: 56,
+          '& .MuiButton-startIcon': { m: 0, mr: 1 },
           '&.Mui-disabled': {
             bgcolor: 'rgba(0,0,0,0.35)',
             color: 'rgba(245, 197, 24, 0.35)',

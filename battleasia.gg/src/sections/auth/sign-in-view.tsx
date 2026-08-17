@@ -197,19 +197,15 @@ export function SignInView() {
             </Link>
           </Stack>
 
-          <AuthSubmitButton
-            loading={isSubmitting}
-            loadingIndicator={`${t('auth.signIn')}...`}
-            sx={{ py: 1.1 }}
-          >
+          <AuthSubmitButton loading={isSubmitting} loadingIndicator={`${t('auth.signIn')}...`}>
             {t('auth.signIn')}
           </AuthSubmitButton>
 
           <AuthSocialButtons />
 
           <AuthFooterLinks
-            prefix={t('auth.dontHaveAccount')}
-            links={[{ label: t('auth.signUp'), href: paths.auth.signUp }]}
+            prefix={t('auth.newToBattleAsia')}
+            links={[{ label: t('auth.createYourAccount'), href: paths.auth.signUp }]}
           />
         </Stack>
       </Form>
