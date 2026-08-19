@@ -258,7 +258,7 @@ export const userGoldButtonSx: SxProps<Theme> = createUserGlassToneButtonSx(
 
 /** Solid filled gold CTA — hero + auth primary actions (44px) */
 export const userSolidGoldButtonSx: SxProps<Theme> = {
-  borderRadius: 0,
+  borderRadius: '6px',
   py: 0,
   minHeight: 44,
   height: 44,
