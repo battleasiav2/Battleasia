@@ -1,6 +1,9 @@
+import { useEffect, useState } from 'react';
+
 import { Box, Stack, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
+import { CONFIG } from 'src/global-config';
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 
@@ -21,48 +24,85 @@ export { HOME_GAME_ARTS, PLAY_YOUR_GAME_IMAGE_PATHS };
 
 const GOLD = HOME_SCROLL_GOLD;
 
-const GAMES = [
+type GameDef = {
+  key: string;
+  art: string;
+  genreKey: string;
+  liveCount: number;
+  available: boolean;
+  platforms: readonly string[];
+  mobileOnly: boolean;
+};
+
+const GAMES: GameDef[] = [
   {
     key: 'pubgMobile',
     art: PLAY_YOUR_GAME_IMAGE_PATHS.pubgMobile,
     genreKey: 'battleRoyale',
-    liveCount: 8,
+    liveCount: 0,
     available: true,
-    platforms: ['mdi:android', 'mdi:apple', 'mdi:cellphone'] as const,
+    platforms: ['mdi:android', 'mdi:apple', 'mdi:cellphone'],
+    mobileOnly: true,
   },
   {
     key: 'freeFire',
     art: PLAY_YOUR_GAME_IMAGE_PATHS.freeFire,
     genreKey: 'survival',
-    liveCount: 1,
+    liveCount: 0,
     available: true,
-    platforms: ['mdi:android', 'mdi:apple'] as const,
+    platforms: ['mdi:android', 'mdi:apple'],
+    mobileOnly: true,
   },
   {
     key: 'codMobile',
     art: PLAY_YOUR_GAME_IMAGE_PATHS.codMobile,
     genreKey: 'fps',
-    liveCount: 1,
+    liveCount: 0,
     available: true,
-    platforms: ['mdi:android', 'mdi:apple'] as const,
-  },
-  {
-    key: 'valorant',
-    art: PLAY_YOUR_GAME_IMAGE_PATHS.valorant,
-    genreKey: 'tactical',
-    liveCount: 1,
-    available: true,
-    platforms: ['mdi:microsoft-windows', 'mdi:sony-playstation', 'mdi:monitor'] as const,
+    platforms: ['mdi:android', 'mdi:apple'],
+    mobileOnly: true,
   },
   {
     key: 'mobileLegends',
     art: PLAY_YOUR_GAME_IMAGE_PATHS.mobileLegends,
     genreKey: 'moba',
-    liveCount: 1,
+    liveCount: 0,
     available: true,
-    platforms: ['mdi:android', 'mdi:apple'] as const,
+    platforms: ['mdi:android', 'mdi:apple'],
+    mobileOnly: true,
   },
-] as const;
+  {
+    key: 'valorant',
+    art: PLAY_YOUR_GAME_IMAGE_PATHS.valorant,
+    genreKey: 'tactical',
+    liveCount: 0,
+    available: false,
+    platforms: ['mdi:microsoft-windows', 'mdi:sony-playstation', 'mdi:monitor'],
+    mobileOnly: false,
+  },
+];
+
+const GAME_NAME_TO_KEY: Record<string, string> = {
+  'PUBG Mobile': 'pubgMobile',
+  'Free Fire': 'freeFire',
+  'Call of Duty Mobile': 'codMobile',
+  'COD Mobile': 'codMobile',
+  'Mobile Legends': 'mobileLegends',
+  Valorant: 'valorant',
+};
+
+export function applyLiveCountsToGames(
+  liveCountByGame: Record<string, number> | undefined
+): GameDef[] {
+  if (!liveCountByGame) return GAMES;
+  return GAMES.map((game) => {
+    const apiKey = Object.entries(GAME_NAME_TO_KEY).find(([, v]) => v === game.key)?.[0];
+    const count = apiKey ? liveCountByGame[apiKey] ?? 0 : 0;
+    return { ...game, liveCount: count };
+  });
+}
+
+// ----------------------------------------------------------------------
 
 const cardReveal = keyframes`
   from { opacity: 0; transform: translateY(28px) scale(0.96); }
@@ -92,20 +132,15 @@ const titleGlow = keyframes`
 
 // ----------------------------------------------------------------------
 
-type PlayYourGameCardProps = {
-  game: (typeof GAMES)[number];
-  index: number;
-};
-
-function PlayYourGameCard({ game, index }: PlayYourGameCardProps) {
+function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
   const { t } = useTranslate();
   const isAvailable = game.available;
-  const liveCount = game.liveCount;
+  const { liveCount } = game;
 
   return (
     <Box
       component={RouterLink}
-      href={paths.user.play}
+      href={isAvailable ? `${paths.user.play}?game=${game.key}` : paths.user.play}
       sx={{
         position: 'relative',
         display: 'flex',
@@ -122,7 +157,7 @@ function PlayYourGameCard({ game, index }: PlayYourGameCardProps) {
         border: `1px solid ${alpha('#ffffff', 0.08)}`,
         isolation: 'isolate',
         animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.1}s both`,
-        opacity: isAvailable ? 1 : 0.85,
+        opacity: isAvailable ? 1 : 0.65,
         transition:
           'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, border-color 0.35s ease',
         boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
@@ -149,10 +184,7 @@ function PlayYourGameCard({ game, index }: PlayYourGameCardProps) {
           '& .game-card-scan': { opacity: 1 },
           '& .game-card-bar': { transform: 'scaleX(1)' },
           '& .game-card-title': { color: GOLD },
-          '& .game-card-play': {
-            opacity: 1,
-            transform: 'translateY(0)',
-          },
+          '& .game-card-play': { opacity: 1, transform: 'translateY(0)' },
         },
       }}
     >
@@ -186,7 +218,6 @@ function PlayYourGameCard({ game, index }: PlayYourGameCardProps) {
           }}
         />
 
-        {/* Scan light on hover */}
         <Box
           className="game-card-scan"
           sx={{
@@ -222,7 +253,6 @@ function PlayYourGameCard({ game, index }: PlayYourGameCardProps) {
           }}
         />
 
-        {/* Hover play cue */}
         <Stack
           className="game-card-play"
           direction="row"
@@ -308,7 +338,6 @@ function PlayYourGameCard({ game, index }: PlayYourGameCardProps) {
         )}
       </Box>
 
-      {/* Gold accent line */}
       <Box
         className="game-card-bar"
         sx={{
@@ -321,7 +350,6 @@ function PlayYourGameCard({ game, index }: PlayYourGameCardProps) {
         }}
       />
 
-      {/* Clean info panel */}
       <Stack
         spacing={0.75}
         sx={{
@@ -389,6 +417,28 @@ function PlayYourGameCard({ game, index }: PlayYourGameCardProps) {
 
 export function PlayYourGameSection() {
   const { t } = useTranslate();
+  const [liveCountByGame, setLiveCountByGame] = useState<Record<string, number> | undefined>();
+
+  useEffect(() => {
+    const base = (CONFIG.serverUrl || '').replace(/\/$/, '');
+    fetch(`${base}/api/v3/public/dashboard`, {
+      credentials: 'same-origin',
+      headers: { Accept: 'application/json' },
+    })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => {
+        const counts = json?.data?.liveCountByGame || json?.liveCountByGame;
+        if (counts) setLiveCountByGame(counts);
+      })
+      .catch(() => {});
+  }, []);
+
+  const games = applyLiveCountsToGames(liveCountByGame);
+  const sorted = [...games].sort((a, b) => {
+    if (a.available !== b.available) return a.available ? -1 : 1;
+    if (a.mobileOnly !== b.mobileOnly) return a.mobileOnly ? -1 : 1;
+    return b.liveCount - a.liveCount;
+  });
 
   return (
     <Box
@@ -467,7 +517,7 @@ export function PlayYourGameSection() {
             { xs: 1.25, md: 2 }
           )}
         >
-          {GAMES.map((game, index) => (
+          {sorted.map((game, index) => (
             <PlayYourGameCard key={game.key} game={game} index={index} />
           ))}
         </Box>

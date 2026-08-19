@@ -178,12 +178,30 @@ export async function getPublicDashboardStats() {
     buildMatchSummaries(highPrizeList),
   ]);
 
+  const liveByGame = await Match.aggregate<{ _id: string; count: number }>([
+    { $match: { status: 'start' } },
+    { $group: { _id: '$gameId', count: { $sum: 1 } } },
+  ]);
+  const gameIds = liveByGame.map((r) => r._id).filter((id) => Types.ObjectId.isValid(id));
+  const liveGameNames = gameIds.length
+    ? await Game.find({ _id: { $in: gameIds.map((id) => new Types.ObjectId(id)) } })
+        .select('name')
+        .lean()
+    : [];
+  const gameNameMap = new Map(liveGameNames.map((g) => [g._id.toString(), g.name]));
+  const liveCountByGame: Record<string, number> = {};
+  for (const row of liveByGame) {
+    const name = gameNameMap.get(row._id.toString());
+    if (name) liveCountByGame[name] = row.count;
+  }
+
   return {
     platform: {
       totalWinnings: Math.round(totalWinnings * 10) / 10,
       processedMatches,
       ongoingMatches: ongoingMatchesCount,
     },
+    liveCountByGame,
     topProfitPlayers,
     topPlayers,
     ongoingMatches,
