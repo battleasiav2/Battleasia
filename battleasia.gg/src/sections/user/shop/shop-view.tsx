@@ -225,6 +225,25 @@ export function ShopView() {
                   >
                     {t('shop.goToBacShop')}
                   </UserActionButton>
+
+                  <Stack
+                    direction="row"
+                    justifyContent="center"
+                    spacing={1.5}
+                    sx={{ pt: 0.5 }}
+                  >
+                    {[
+                      { icon: 'solar:shield-check-bold', label: t('shop.trustSecure') },
+                      { icon: 'solar:clock-circle-bold', label: t('shop.trustInstant') },
+                    ].map((item) => (
+                      <Stack key={item.label} direction="row" alignItems="center" spacing={0.4}>
+                        <Iconify icon={item.icon} width={12} sx={{ color: alpha(USER_COLORS.gold, 0.7) }} />
+                        <Typography sx={{ fontSize: 9.5, fontWeight: 700, color: alpha('#ffffff', 0.45), letterSpacing: 0.2 }}>
+                          {item.label}
+                        </Typography>
+                      </Stack>
+                    ))}
+                  </Stack>
                 </Stack>
               </UserGlassCard>
             </Grid>

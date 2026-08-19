@@ -51,6 +51,12 @@ export function ShopFeatures({ title, features }: ShopFeaturesProps) {
             sx={getGoldTopLineCardSx({
               p: { xs: 1.75, md: 2 },
               pt: { xs: 2.25, md: 2.5 },
+              transition: 'transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
+              '&:hover': {
+                transform: 'translateY(-4px)',
+                borderColor: alpha(USER_COLORS.gold, 0.35),
+                boxShadow: `0 12px 32px ${alpha('#000000', 0.5)}, 0 0 16px ${alpha(USER_COLORS.gold, 0.08)}`,
+              },
               '& > *': { position: 'relative', zIndex: 1 },
             })}
           >

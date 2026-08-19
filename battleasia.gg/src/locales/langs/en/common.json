@@ -469,6 +469,8 @@
     "suffixCoin": "coin",
     "suffixSecure": "secure",
     "suffixOnline": "online",
+    "trustSecure": "Secure",
+    "trustInstant": "Instant",
     "whyBac": "Why BAC?",
     "officialPartner": "Official Partner",
     "features": {
