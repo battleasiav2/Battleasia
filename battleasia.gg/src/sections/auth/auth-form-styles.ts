@@ -144,7 +144,7 @@ export const authFieldSlotProps = {
       letterSpacing: 1.1,
       lineHeight: 1.2,
       color: alpha('#e8e0d0', 0.78),
-      mb: 0.65,
+      mb: 0.5,
       textTransform: 'uppercase' as const,
       '&.MuiInputLabel-shrink': {
         transform: 'none',
@@ -160,19 +160,19 @@ export const authFieldSlotProps = {
       color: '#ffffff',
       bgcolor: AUTH_INPUT_BG,
       borderRadius: '4px',
-      fontSize: 16,
-      minHeight: 50,
+      fontSize: 14.5,
+      minHeight: 44,
       boxShadow: `0 0 0 1px ${alpha('#f5c518', 0.14)}, 0 0 10px ${alpha('#f5c518', 0.12)}`,
       transition: 'border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease',
       '& input': {
-        fontSize: 16,
-        paddingTop: '13px',
-        paddingBottom: '13px',
+        fontSize: 14.5,
+        paddingTop: '11px',
+        paddingBottom: '11px',
       },
       '& input::placeholder': {
         color: AUTH_PLACEHOLDER,
         opacity: 1,
-        fontSize: 16,
+        fontSize: 14.5,
       },
       '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
       '& fieldset': {
@@ -194,7 +194,7 @@ export const authFieldSlotProps = {
       },
       '& .MuiSelect-select': {
         color: '#ffffff',
-        fontSize: 16,
+        fontSize: 14.5,
       },
       '& .MuiSelect-icon': {
         color: '#ffffff',
@@ -275,8 +275,8 @@ export const authSelectSx = {
   color: '#ffffff',
   bgcolor: AUTH_INPUT_BG,
   borderRadius: '4px',
-  fontSize: 16,
-  minHeight: 50,
+  fontSize: 14.5,
+  minHeight: 44,
   boxShadow: `0 0 0 1px ${alpha('#f5c518', 0.14)}, 0 0 10px ${alpha('#f5c518', 0.12)}`,
   '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
   '& fieldset': {

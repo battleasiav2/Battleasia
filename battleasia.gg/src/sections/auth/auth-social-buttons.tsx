@@ -37,8 +37,8 @@ function GoogleMark() {
 }
 
 const socialBtnSx = {
-  height: 48,
-  minHeight: 48,
+  height: 42,
+  minHeight: 42,
   py: 0,
   px: 1,
   borderRadius: 0,
