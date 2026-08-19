@@ -1,7 +1,7 @@
 import { Stack, Button } from '@mui/material';
 
 import { Iconify } from 'src/components/iconify/iconify';
-import { userGhostButtonSx, userGoldButtonSx } from 'src/layouts/user/user-theme';
+import { userGhostButtonSx, userSolidGoldButtonSx } from 'src/layouts/user/user-theme';
 import { startAppDownload } from 'src/utils/app-download-url';
 
 type HeroMeshButtonsProps = {
@@ -16,11 +16,12 @@ type HeroMeshButtonsProps = {
 const baseButtonSx = {
   flex: 1,
   minWidth: 0,
-  py: { xs: 1.15, sm: 1.35, md: 1.5 },
+  minHeight: 44,
+  height: 44,
+  py: 0,
   px: { xs: 1.25, sm: 2, md: 2.5 },
-  fontSize: { xs: 11, sm: 13, md: 15 },
+  fontSize: { xs: 11, sm: 12, md: 13 },
   whiteSpace: 'nowrap' as const,
-  boxShadow: 'none',
 };
 
 export function HeroMeshButtons({
@@ -44,14 +45,15 @@ export function HeroMeshButtons({
       <Button
         component="a"
         href={joinHref}
-        variant="outlined"
+        variant="contained"
         disableElevation
         startIcon={
-          <Iconify icon="game-icons:crossed-swords" width={22} sx={{ flexShrink: 0 }} />
+          <Iconify icon="game-icons:crossed-swords" width={18} sx={{ flexShrink: 0, color: 'inherit' }} />
         }
         sx={{
-          ...userGoldButtonSx,
+          ...userSolidGoldButtonSx,
           ...baseButtonSx,
+          boxShadow: 'none',
           ...(showDownload ? {} : { flex: 'none', minWidth: { xs: 220, sm: 260 } }),
         }}
       >
@@ -70,7 +72,7 @@ export function HeroMeshButtons({
             startAppDownload(downloadHref, downloadFileName);
           }}
           startIcon={
-            <Iconify icon="solar:download-bold-duotone" width={22} sx={{ flexShrink: 0 }} />
+            <Iconify icon="solar:download-bold-duotone" width={18} sx={{ flexShrink: 0 }} />
           }
           sx={{
             ...userGhostButtonSx,

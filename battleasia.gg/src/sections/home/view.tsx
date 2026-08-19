@@ -11,6 +11,8 @@ import { useAppDownload } from 'src/hooks/use-app-download';
 import { Image } from 'src/components/image';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { HeroMeshButtons } from 'src/components/mesh-buttons';
+import { HeroStickyCta } from './hero-sticky-cta';
+import { HeroTrustRow } from './hero-trust-row';
 import { HOME_GAME_ARTS } from './home-game-arts';
 import { homeMobileScrollGridSx, homeMobileScrollItemSx } from './home-horizontal-scroll';
 import { HeroRotatingBanner } from './hero-rotating-banner';
@@ -196,7 +198,7 @@ export function HomeView() {
   const sectionSlide = (
     <Box id="home" sx={{
       scrollMarginTop: { xs: '80px', md: '100px' },
-      height: { xs: 560, sm: 680, md: 860, lg: 920 },
+      height: { xs: 520, sm: 680, md: 860, lg: 920 },
       bgcolor: '#000000',
       position: 'relative',
       overflow: 'hidden',
@@ -315,6 +317,7 @@ export function HomeView() {
             width={840}
             height={168}
             loading="eager"
+            fetchPriority="high"
             decoding="async"
             sx={{
               position: 'relative',
@@ -396,11 +399,13 @@ export function HomeView() {
             downloadFileName={appDownload.fileName}
             showDownload={appDownload.enabled}
           />
+          <HeroTrustRow align="center" />
         </Box>
       </Stack>
 
       {/* Desktop CTAs — anchored lower */}
       <Stack
+        spacing={1.25}
         sx={{
           display: { xs: 'none', md: 'flex' },
           position: 'absolute',
@@ -421,7 +426,18 @@ export function HomeView() {
           downloadFileName={appDownload.fileName}
           showDownload={appDownload.enabled}
         />
+        <Box sx={{ width: '100%', maxWidth: 640 }}>
+          <HeroTrustRow align="center" />
+        </Box>
       </Stack>
+
+      <HeroStickyCta
+        joinLabel={t('home.joinTournament')}
+        downloadLabel={t('home.downloadApkButton')}
+        downloadHref={appDownload.href}
+        downloadFileName={appDownload.fileName}
+        showDownload={appDownload.enabled}
+      />
 
       <Box
         sx={{
