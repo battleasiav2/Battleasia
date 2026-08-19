@@ -167,14 +167,18 @@
         "mobileLegends": "Mobile Legends"
       }
     },
-    "aboutDescription1": "BattleAsia is a premier mobile gaming tournament platform where players compete in exciting tournaments and win real cash prizes. Our platform brings together the best mobile gamers from around the world to participate in competitive gaming events.",
-    "aboutDescription2": "We support popular mobile games including PUBG Mobile, Free Fire, Mobile Legends, and many more. Whether you're a casual player or a competitive pro, BattleAsia offers tournaments suitable for all skill levels.",
-    "aboutDescription3": "With secure payment systems, fair play policies, and a thriving community of gamers, BattleAsia is the ultimate destination for mobile esports. Join thousands of players who are already competing and winning on our platform!",
+    "aboutBullet1": "Join free — no hidden fees, no pay-to-win. Create your account and enter any tournament in seconds.",
+    "aboutBullet2": "Win BAC — compete in PUBG, Free Fire, COD Mobile & more. Every kill, every win earns real BAC coins.",
+    "aboutBullet3": "Withdraw via bKash / Nagad — cash out your winnings directly to your mobile wallet, anytime.",
+    "testimonial": {
+      "quote": "First tournament I joined, I won 350 BAC and withdrew to bKash within 10 minutes. Legit platform!",
+      "author": "ShadowKing47 — ৳2,400+ won"
+    },
     "stats": {
-      "activePlayers": "Active Players",
-      "prizeMoney": "Prize Money",
-      "gamesSupported": "Games Supported",
-      "tournaments": "Tournaments"
+      "totalWon": "Total Won",
+      "matchesPlayed": "Matches Played",
+      "liveNow": "Live Now",
+      "gamesSupported": "Games Supported"
     },
     "howToPlaySubtitle": "Solo 1 · Duo 2 · Squad 4 · TDM 6–8 — pick your team size.",
     "gameModes": {

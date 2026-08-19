@@ -1,5 +1,5 @@
 
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 
 import { Box, Stack, SvgIcon, Accordion, Typography, AccordionSummary, AccordionDetails } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
@@ -9,6 +9,7 @@ import { useImagePreloader } from 'src/hooks';
 import { useAppDownload } from 'src/hooks/use-app-download';
 
 import { Image } from 'src/components/image';
+import { Iconify } from 'src/components/iconify/iconify';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { HeroMeshButtons } from 'src/components/mesh-buttons';
 import { HeroStickyCta } from './hero-sticky-cta';
@@ -18,6 +19,9 @@ import { homeMobileScrollGridSx, homeMobileScrollItemSx } from './home-horizonta
 import { HeroRotatingBanner } from './hero-rotating-banner';
 import { HOME_HERO_SLIDES, readHeroSlideIndex } from './hero-slides';
 import { useTranslate } from 'src/locales/use-locales';
+import { PulseCountUp } from './pulse-count-up';
+
+import type { PublicDashboardStats } from 'src/types';
 
 // Below-fold + non-LCP FX: code-split (never block hero paint)
 const HeroFxOverlay = lazy(() =>
@@ -457,15 +461,78 @@ export function HomeView() {
     </Box>
   );
 
-  const aboutStats = [
-    { value: CONFIG.homeStats.activePlayers, label: t('home.stats.activePlayers') },
-    { value: CONFIG.homeStats.prizeMoney, label: t('home.stats.prizeMoney') },
-    { value: CONFIG.homeStats.gamesSupported, label: t('home.stats.gamesSupported') },
-    { value: CONFIG.homeStats.tournaments, label: t('home.stats.tournaments') },
+  // ---------- About: Pulse API stats ----------
+  const [aboutPulse, setAboutPulse] = useState<PublicDashboardStats | null>(null);
+
+  useEffect(() => {
+    fetch(`${CONFIG.serverUrl}/api/v3/public/dashboard`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d: any) => { if (d?.data) setAboutPulse(d.data); })
+      .catch(() => {});
+  }, []);
+
+  const aboutStatItems = [
+    {
+      icon: 'solar:wallet-money-bold-duotone',
+      value: aboutPulse ? aboutPulse.platform.totalWinnings : undefined,
+      fallback: CONFIG.homeStats.prizeMoney,
+      label: t('home.stats.totalWon'),
+      prefix: '৳',
+    },
+    {
+      icon: 'solar:medal-ribbon-star-bold-duotone',
+      value: aboutPulse ? aboutPulse.platform.processedMatches : undefined,
+      fallback: CONFIG.homeStats.tournaments,
+      label: t('home.stats.matchesPlayed'),
+    },
+    {
+      icon: 'solar:play-bold',
+      value: aboutPulse ? aboutPulse.platform.ongoingMatches : undefined,
+      fallback: '—',
+      label: t('home.stats.liveNow'),
+    },
+    {
+      icon: 'solar:gamepad-bold-duotone',
+      value: undefined,
+      fallback: CONFIG.homeStats.gamesSupported,
+      label: t('home.stats.gamesSupported'),
+    },
   ];
 
+  const ABOUT_BULLETS = [
+    { icon: 'solar:user-plus-bold', key: 'home.aboutBullet1' },
+    { icon: 'solar:wallet-money-bold', key: 'home.aboutBullet2' },
+    { icon: 'solar:card-transfer-bold', key: 'home.aboutBullet3' },
+  ] as const;
+
   const sectionAbout = (
-    <Box id="about-us" sx={blackGamingSectionSx(HOME_GAME_ARTS[0])}>
+    <Box id="about-us" sx={{ ...blackGamingSectionSx(HOME_GAME_ARTS[0]), position: 'relative', overflow: 'hidden' }}>
+      {/* BD flag watermark */}
+      <Box
+        sx={{
+          position: 'absolute',
+          width: { xs: 260, md: 420 },
+          height: { xs: 260, md: 420 },
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${alpha('#006a4e', 0.08)} 35%, transparent 70%)`,
+          top: '50%',
+          right: { xs: -60, md: '8%' },
+          transform: 'translateY(-50%)',
+          pointerEvents: 'none',
+          zIndex: 0,
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            width: '40%',
+            height: '40%',
+            borderRadius: '50%',
+            bgcolor: alpha('#f42a41', 0.07),
+            top: '30%',
+            left: '30%',
+          },
+        }}
+      />
+
       <Stack
         spacing={{ xs: 3, md: 4 }}
         sx={{ position: 'relative', zIndex: 1, maxWidth: 1280, mx: 'auto' }}
@@ -508,6 +575,7 @@ export function HomeView() {
             alignItems: 'stretch',
           }}
         >
+          {/* Left: Bullets + Testimonial */}
           <Box
             sx={{
               position: 'relative',
@@ -517,55 +585,58 @@ export function HomeView() {
               boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
               animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) both`,
               transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.4s ease',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                inset: 0,
-                border: `1px solid ${alpha(GOLD, 0.55)}`,
-                opacity: 0,
-                pointerEvents: 'none',
-                transition: 'opacity 0.35s ease',
-              },
               '&:hover': {
                 transform: 'translateY(-6px)',
                 borderColor: alpha(GOLD, 0.45),
-                boxShadow: `
-                  0 22px 48px ${alpha('#000000', 0.7)},
-                  0 0 0 1px ${alpha(GOLD, 0.2)},
-                  0 0 32px ${alpha(GOLD, 0.12)}
-                `,
-                '&::before': { opacity: 1, animation: `${borderPulse} 1.8s ease-in-out infinite` },
+                boxShadow: `0 22px 48px ${alpha('#000000', 0.7)}, 0 0 32px ${alpha(GOLD, 0.12)}`,
               },
             }}
           >
+            <Box sx={{ height: 2, width: 48, bgcolor: GOLD, mb: 2, boxShadow: `0 0 12px ${alpha(GOLD, 0.45)}` }} />
+
+            <Stack spacing={1.75}>
+              {ABOUT_BULLETS.map((b) => (
+                <Stack key={b.key} direction="row" spacing={1.25} alignItems="flex-start">
+                  <Iconify icon={b.icon} width={20} sx={{ color: GOLD, mt: 0.25, flexShrink: 0 }} />
+                  <Typography
+                    className="font-tr"
+                    sx={{ fontSize: { xs: 13.5, md: 15 }, lineHeight: 1.7, color: alpha('#ffffff', 0.72) }}
+                  >
+                    {t(b.key)}
+                  </Typography>
+                </Stack>
+              ))}
+            </Stack>
+
+            {/* Testimonial strip */}
             <Box
               sx={{
-                height: 2,
-                width: 48,
-                bgcolor: GOLD,
-                mb: 2,
-                boxShadow: `0 0 12px ${alpha(GOLD, 0.45)}`,
+                mt: 3,
+                pt: 2,
+                borderTop: `1px solid ${alpha('#ffffff', 0.06)}`,
               }}
-            />
-            <Stack spacing={{ xs: 1.5, md: 2 }}>
-              {[t('home.aboutDescription1'), t('home.aboutDescription2'), t('home.aboutDescription3')].map(
-                (text) => (
-                  <Typography
-                    key={text.slice(0, 24)}
-                    className="font-tr"
-                    sx={{
-                      fontSize: { xs: 13, sm: 14, md: 15 },
-                      lineHeight: 1.7,
-                      color: alpha('#ffffff', 0.62),
-                    }}
-                  >
-                    {text}
-                  </Typography>
-                )
-              )}
-            </Stack>
+            >
+              <Typography
+                sx={{
+                  fontSize: { xs: 12.5, md: 14 },
+                  fontStyle: 'italic',
+                  color: alpha('#ffffff', 0.55),
+                  lineHeight: 1.65,
+                  mb: 1,
+                }}
+              >
+                &ldquo;{t('home.testimonial.quote')}&rdquo;
+              </Typography>
+              <Stack direction="row" spacing={0.75} alignItems="center">
+                <Iconify icon="solar:user-circle-bold" width={16} sx={{ color: GOLD }} />
+                <Typography sx={{ fontSize: 11, fontWeight: 700, color: alpha('#ffffff', 0.5), letterSpacing: 0.5 }}>
+                  {t('home.testimonial.author')}
+                </Typography>
+              </Stack>
+            </Box>
           </Box>
 
+          {/* Right: Stats grid (Pulse API) */}
           <Box
             sx={{
               display: 'grid',
@@ -573,7 +644,7 @@ export function HomeView() {
               gap: { xs: 1.25, sm: 1.5 },
             }}
           >
-            {aboutStats.map((stat, index) => (
+            {aboutStatItems.map((stat, index) => (
               <Box
                 key={stat.label}
                 sx={{
@@ -596,6 +667,7 @@ export function HomeView() {
                   },
                 }}
               >
+                <Iconify icon={stat.icon} width={22} sx={{ color: alpha(GOLD, 0.6), mb: 1 }} />
                 <Typography
                   className="about-stat-value font-tr"
                   sx={{
@@ -608,7 +680,14 @@ export function HomeView() {
                     mb: 0.75,
                   }}
                 >
-                  {stat.value}
+                  {stat.value != null ? (
+                    <>
+                      {stat.prefix}
+                      <PulseCountUp value={stat.value} duration={1800} />
+                    </>
+                  ) : (
+                    stat.fallback
+                  )}
                 </Typography>
                 <Typography
                   sx={{

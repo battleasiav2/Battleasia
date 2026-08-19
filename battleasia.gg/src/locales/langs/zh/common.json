@@ -160,14 +160,18 @@
         "mobileLegends": "Mobile Legends"
       }
     },
-    "aboutDescription1": "BattleAsia是一个顶级移动游戏锦标赛平台，玩家在这里参加激动人心的锦标赛并赢取真实现金奖励。我们的平台汇集了来自世界各地最优秀的移动游戏玩家参与竞技游戏赛事。",
-    "aboutDescription2": "我们支持包括PUBG Mobile、Free Fire、Mobile Legends等热门移动游戏。无论你是休闲玩家还是竞技高手，BattleAsia都提供适合各种技能水平的锦标赛。",
-    "aboutDescription3": "凭借安全的支付系统、公平竞技政策和蓬勃发展的游戏玩家社区，BattleAsia是移动电竞的终极目的地。加入已经在我们平台上竞技和获胜的数千名玩家！",
+    "aboutBullet1": "免费加入 — 没有隐藏费用。创建账户，几秒钟内参加任何锦标赛。",
+    "aboutBullet2": "赢取BAC — 在PUBG、Free Fire、COD Mobile中竞技。每次击杀、每次胜利都能赚取真实BAC币。",
+    "aboutBullet3": "通过bKash / Nagad提现 — 随时将奖金直接提取到手机钱包。",
+    "testimonial": {
+      "quote": "第一次参加锦标赛就赢了350 BAC，10分钟内提现到bKash。正规平台！",
+      "author": "ShadowKing47 — ৳2,400+已赢"
+    },
     "stats": {
-      "activePlayers": "活跃玩家",
-      "prizeMoney": "奖金",
-      "gamesSupported": "支持的游戏",
-      "tournaments": "锦标赛"
+      "totalWon": "总赢得",
+      "matchesPlayed": "已完成比赛",
+      "liveNow": "正在直播",
+      "gamesSupported": "支持的游戏"
     },
     "howToPlaySubtitle": "单人 1 · 双人 2 · 四人 4 · 团队死斗 6–8 — 选择你的队伍规模。",
     "gameModes": {
