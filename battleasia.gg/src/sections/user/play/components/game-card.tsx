@@ -49,6 +49,20 @@ export function GameCard(props: GameCardProps) {
         opacity: isDisabled ? 0.78 : 1,
         boxShadow: `0 8px 24px ${alpha('#000000', 0.45)}`,
         transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.3s ease',
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 3,
+          bgcolor: GOLD,
+          transform: 'scaleX(0)',
+          transformOrigin: 'left center',
+          transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
+          zIndex: 3,
+          boxShadow: `0 0 10px ${alpha(GOLD, 0.5)}`,
+        },
         '&:hover': isDisabled
           ? undefined
           : {
@@ -56,6 +70,7 @@ export function GameCard(props: GameCardProps) {
               borderColor: alpha(GOLD, 0.4),
               boxShadow: `0 20px 44px ${alpha('#000000', 0.65)}, 0 0 0 1px ${alpha(GOLD, 0.15)}`,
               '& .game-card-art': { transform: 'scale(1.06)' },
+              '&::after': { transform: 'scaleX(1)' },
             },
         '&:focus-visible': {
           outline: `2px solid ${alpha(GOLD, 0.7)}`,

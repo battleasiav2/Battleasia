@@ -7,7 +7,7 @@ import { alpha } from '@mui/material/styles';
 import { fDateTime } from 'src/utils/format-time';
 import { getImageUrl } from 'src/utils/get-image-url';
 
-import { _mock } from 'src/_mock';
+const DEFAULT_AVATAR = '/assets/images/avatar/default-avatar.webp';
 import { useSelector, useDispatch } from 'src/store';
 import { useTranslate } from 'src/locales/use-locales';
 import type { IFeedItem, IMatchHistory, IActivityCard, IMostPlayedInfo } from 'src/types';
@@ -312,7 +312,7 @@ export function ProfileView() {
     <UserPageShell>
       <ProfileBanner
         username={displayUser?.username || 'Guest'}
-        avatar={isOwnProfile ? (avatarPreview || user?.avatar || _mock.image.avatar(1)) : (displayUser?.avatar || _mock.image.avatar(1))}
+        avatar={isOwnProfile ? (avatarPreview || user?.avatar || DEFAULT_AVATAR) : (displayUser?.avatar || DEFAULT_AVATAR)}
         avatarPending={!!pendingAvatarFile}
         onSelectAvatar={handleAvatarSelect}
         isOwnProfile={isOwnProfile}
