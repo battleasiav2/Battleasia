@@ -16,7 +16,7 @@ import { useSelector } from 'src/store';
 
 import { Logo } from 'src/components/logo';
 import { useSettingsContext } from 'src/components/settings';
-import { userGoldButtonSx } from 'src/layouts/user/user-theme';
+import { userSolidGoldButtonSx } from 'src/layouts/user/user-theme';
 
 import { allLangs, useTranslate } from 'src/locales';
 import { layoutClasses } from '../core/classes';
@@ -264,12 +264,14 @@ export function DashboardLayout({
             <Button
               component={RouterLink}
               href={paths.auth.signIn}
+              variant="contained"
+              disableElevation
               sx={{
-                ...userGoldButtonSx,
-                height: { xs: 32, sm: 34 },
+                ...userSolidGoldButtonSx,
+                height: { xs: 34, sm: 38 },
+                minHeight: { xs: 34, sm: 38 },
                 px: { xs: 1.5, sm: 2 },
-                fontSize: { xs: 12, sm: 13 },
-                fontWeight: 600,
+                fontSize: { xs: 11, sm: 12 },
                 whiteSpace: 'nowrap',
                 minWidth: 'auto',
               }}
@@ -292,11 +294,11 @@ export function DashboardLayout({
         slots={{ ...headerSlots, ...slotProps?.header?.slots }}
         slotProps={merge(headerSlotProps, slotProps?.header?.slotProps ?? {})}
         sx={{
-          bgcolor: alpha('#0a0c10', 0.68),
-          backdropFilter: 'blur(10px) saturate(1.2)',
-          WebkitBackdropFilter: 'blur(10px) saturate(1.2)',
-          borderBottom: `1px solid ${alpha('#ffffff', 0.1)}`,
-          borderRadius: { xs: '0 0 12px 12px', md: '0 0 16px 16px' },
+          bgcolor: alpha('#0a0c10', 0.82),
+          backdropFilter: 'blur(14px) saturate(1.2)',
+          WebkitBackdropFilter: 'blur(14px) saturate(1.2)',
+          borderBottom: `1px solid ${alpha(GOLD, 0.18)}`,
+          borderRadius: 0,
           boxShadow: `
             inset 0 1px 0 ${alpha('#ffffff', 0.07)},
             0 1px 0 ${alpha(GOLD, 0.1)},

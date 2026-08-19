@@ -27,7 +27,7 @@ import { HeaderSection } from '../core/header-section';
 import { LayoutSection } from '../core/layout-section';
 import { UserNavVertical } from './user-nav-vertical';
 import { userLayoutVars, userBattleNavColorVars } from './css-vars';
-import { USER_COLORS, userGoldButtonSx, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
+import { USER_COLORS, userGoldButtonSx, userSolidGoldButtonSx, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
 import { LanguagePopover } from '../components/language-popover';
 import { FloatingFooterNav } from '../components/floating-footer-nav';
 import { menuItems, accountMenuItems, createMenuClickHandler } from '../menu-items-config';
@@ -295,16 +295,16 @@ export function UserLayout({
                         <Button
                             component={RouterLink}
                             href={paths.auth.signIn}
+                            variant="contained"
+                            disableElevation
                             sx={{
-                                ...userGoldButtonSx,
-                                height: { xs: 34, sm: 42, md: 48 },
-                                px: { xs: 1.75, sm: 2.75, md: 4 },
-                                minWidth: { xs: 0, sm: 'auto' },
-                                fontSize: { xs: 11, sm: 13, md: 15 },
-                                fontWeight: 800,
-                                letterSpacing: 0.8,
+                                ...userSolidGoldButtonSx,
+                                height: { xs: 34, sm: 38 },
+                                minHeight: { xs: 34, sm: 38 },
+                                px: { xs: 1.5, sm: 2 },
+                                fontSize: { xs: 11, sm: 12 },
                                 whiteSpace: 'nowrap',
-                                borderRadius: '6px',
+                                minWidth: 'auto',
                             }}
                         >
                             {t('auth.signIn')}

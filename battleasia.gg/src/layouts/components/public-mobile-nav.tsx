@@ -5,7 +5,6 @@ import { RouterLink } from 'src/routes/components';
 
 import { useTranslate } from 'src/locales';
 import { Iconify } from 'src/components/iconify';
-import { GLASS_CARD_RADIUS } from 'src/components/battle-glass-card';
 
 import { menuItems, createMenuClickHandler, type MenuItem } from '../menu-items-config';
 
@@ -38,21 +37,20 @@ export function PublicMobileNav() {
       sx={{
         display: { xs: 'flex', lg: 'none' },
         position: 'fixed',
-        bottom: 12,
-        left: 12,
-        right: 12,
+        bottom: 0,
+        left: 0,
+        right: 0,
         zIndex: 1300,
-        gap: 0.5,
         alignItems: 'stretch',
         justifyContent: 'space-between',
-        px: 1,
-        py: 0.75,
-        borderRadius: `${GLASS_CARD_RADIUS + 4}px`,
-        bgcolor: alpha('#000000', 0.72),
-        border: `1px solid ${alpha('#ffffff', 0.1)}`,
-        boxShadow: `0 12px 36px ${alpha('#000000', 0.55)}, inset 0 1px 0 ${alpha('#ffffff', 0.06)}`,
-        backdropFilter: 'blur(10px) saturate(1.15)',
-        WebkitBackdropFilter: 'blur(10px) saturate(1.15)',
+        px: 0.5,
+        pt: 1,
+        pb: 'max(8px, env(safe-area-inset-bottom))',
+        bgcolor: alpha('#141414', 0.96),
+        borderTop: `1px solid ${alpha(GOLD, 0.28)}`,
+        boxShadow: `0 -8px 24px ${alpha('#000000', 0.45)}`,
+        backdropFilter: 'blur(10px)',
+        WebkitBackdropFilter: 'blur(10px)',
       }}
     >
       {menuItems.map((item) => {
@@ -70,18 +68,12 @@ export function PublicMobileNav() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 0.35,
-              py: 0.75,
+              gap: 0.4,
+              py: 0.5,
               textDecoration: 'none',
-              borderRadius: `${GLASS_CARD_RADIUS}px`,
-              transition: 'all 0.22s cubic-bezier(0.22, 1, 0.36, 1)',
-              color: isActive ? GOLD : alpha('#ffffff', 0.55),
-              bgcolor: isActive ? alpha(GOLD, 0.1) : 'transparent',
-              border: `1px solid ${isActive ? alpha(GOLD, 0.25) : 'transparent'}`,
-              '&:hover': {
-                color: GOLD,
-                bgcolor: alpha(GOLD, 0.07),
-              },
+              transition: 'color 0.2s ease',
+              color: isActive ? GOLD : alpha('#ffffff', 0.5),
+              '&:hover': { color: GOLD },
             }}
           >
             <Iconify icon={getNavIcon(item)} width={20} />
@@ -89,8 +81,8 @@ export function PublicMobileNav() {
               component="span"
               sx={{
                 fontSize: 9.5,
-                fontWeight: 700,
-                letterSpacing: 0.02,
+                fontWeight: isActive ? 800 : 600,
+                letterSpacing: 0.3,
                 textTransform: 'uppercase',
                 lineHeight: 1,
                 textAlign: 'center',
@@ -98,6 +90,16 @@ export function PublicMobileNav() {
             >
               {t(item.labelKey)}
             </Box>
+            <Box
+              sx={{
+                mt: 0.25,
+                height: 2,
+                width: isActive ? 22 : 0,
+                bgcolor: GOLD,
+                transition: 'width 0.2s ease',
+                boxShadow: isActive ? `0 0 6px ${alpha(GOLD, 0.55)}` : 'none',
+              }}
+            />
           </Box>
         );
       })}
