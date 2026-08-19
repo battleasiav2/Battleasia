@@ -903,6 +903,25 @@ export function HomeView() {
                     pointerEvents: 'none',
                   }}
                 />
+                {/* Step number */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 10,
+                    right: 10,
+                    zIndex: 1,
+                    width: 28,
+                    height: 28,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: alpha(GOLD, 0.9),
+                  }}
+                >
+                  <Typography sx={{ fontSize: 13, fontWeight: 900, color: '#111', lineHeight: 1 }}>
+                    {index + 1}
+                  </Typography>
+                </Box>
                 <Box
                   sx={{
                     position: 'absolute',
@@ -1031,6 +1050,37 @@ export function HomeView() {
             </Box>
           ))}
         </Box>
+
+        <Stack alignItems="center" sx={{ pt: { xs: 1, md: 2 } }}>
+          <Box
+            component="a"
+            href="/play"
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 4,
+              minHeight: 44,
+              bgcolor: alpha(GOLD, 0.1),
+              border: `1px solid ${alpha(GOLD, 0.35)}`,
+              color: GOLD,
+              fontSize: 13,
+              fontWeight: 800,
+              letterSpacing: 1.2,
+              textTransform: 'uppercase',
+              textDecoration: 'none',
+              transition: 'background 0.2s, border-color 0.2s, box-shadow 0.2s',
+              '&:hover': {
+                bgcolor: alpha(GOLD, 0.18),
+                borderColor: alpha(GOLD, 0.55),
+                boxShadow: `0 0 20px ${alpha(GOLD, 0.15)}`,
+              },
+            }}
+          >
+            {t('home.startPlaying')}
+            <Iconify icon="solar:arrow-right-bold" width={16} />
+          </Box>
+        </Stack>
       </Stack>
     </Box>
   );
@@ -1110,9 +1160,7 @@ export function HomeView() {
             >
               <AccordionSummary
                 expandIcon={
-                  <SvgIcon sx={{ color: GOLD, fontSize: { xs: 20, sm: 22 } }}>
-                    <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z" />
-                  </SvgIcon>
+                  <Iconify icon="solar:alt-arrow-down-bold" width={20} sx={{ color: GOLD }} />
                 }
                 sx={{
                   py: { xs: 0.5, sm: 0.75 },
@@ -1123,19 +1171,33 @@ export function HomeView() {
                   '&.Mui-expanded': { bgcolor: 'transparent' },
                 }}
               >
-                <Typography
-                  className="font-tr"
-                  sx={{
-                    fontSize: { xs: 13, sm: 15, md: 16 },
-                    fontWeight: 700,
-                    color: '#ffffff',
-                    wordBreak: 'break-word',
-                    lineHeight: 1.35,
-                    letterSpacing: 0.2,
-                  }}
-                >
-                  {faq.question}
-                </Typography>
+                <Stack direction="row" spacing={1.25} alignItems="center">
+                  <Typography
+                    sx={{
+                      fontSize: 11,
+                      fontWeight: 900,
+                      color: GOLD,
+                      minWidth: 22,
+                      textAlign: 'center',
+                      opacity: 0.7,
+                    }}
+                  >
+                    {String(index + 1).padStart(2, '0')}
+                  </Typography>
+                  <Typography
+                    className="font-tr"
+                    sx={{
+                      fontSize: { xs: 13, sm: 15, md: 16 },
+                      fontWeight: 700,
+                      color: '#ffffff',
+                      wordBreak: 'break-word',
+                      lineHeight: 1.35,
+                      letterSpacing: 0.2,
+                    }}
+                  >
+                    {faq.question}
+                  </Typography>
+                </Stack>
               </AccordionSummary>
               <AccordionDetails
                 sx={{
@@ -1160,6 +1222,25 @@ export function HomeView() {
               </AccordionDetails>
             </Accordion>
           ))}
+        </Stack>
+
+        <Stack direction="row" justifyContent="center" spacing={1} alignItems="center" sx={{ pt: 1 }}>
+          <Iconify icon="solar:chat-round-dots-bold" width={16} sx={{ color: alpha('#ffffff', 0.4) }} />
+          <Typography sx={{ fontSize: 12, color: alpha('#ffffff', 0.4) }}>
+            {t('home.needHelp')}{' '}
+            <Box
+              component="a"
+              href="/support"
+              sx={{
+                color: GOLD,
+                fontWeight: 700,
+                textDecoration: 'none',
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              {t('home.contactSupport')}
+            </Box>
+          </Typography>
         </Stack>
       </Stack>
     </Box>

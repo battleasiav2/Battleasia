@@ -219,6 +219,9 @@
         "feature4": "Quick matches for instant rewards"
       }
     },
+    "startPlaying": "START PLAYING NOW",
+    "needHelp": "Questions?",
+    "contactSupport": "Contact Support",
     "tournamentRules": "Tournament Rules",
     "officialRegulations": "Official BattleAsia Tournament Regulations",
     "faq": {
