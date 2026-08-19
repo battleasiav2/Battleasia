@@ -24,14 +24,14 @@ export function AuthHeroPanel() {
   const glassTokens = getDefaultGlassTokens();
 
   const features = [
-    { icon: 'solar:cup-star-bold-duotone', text: t('home.stats.tournaments') },
-    { icon: 'solar:wallet-money-bold-duotone', text: t('home.stats.prizeMoney') },
-    { icon: 'solar:users-group-rounded-bold-duotone', text: t('home.stats.activePlayers') },
+    { icon: 'solar:cup-star-bold-duotone', text: t('home.stats.matchesPlayed') },
+    { icon: 'solar:wallet-money-bold-duotone', text: t('home.stats.totalWon') },
+    { icon: 'solar:gamepad-bold-duotone', text: t('home.stats.gamesSupported') },
   ];
 
   const stats = [
-    { label: t('home.stats.activePlayers'), value: CONFIG.homeStats.activePlayers },
-    { label: t('home.stats.prizeMoney'), value: CONFIG.homeStats.prizeMoney },
+    { label: t('home.stats.totalWon'), value: CONFIG.homeStats.prizeMoney },
+    { label: t('home.stats.matchesPlayed'), value: CONFIG.homeStats.tournaments },
     { label: t('home.stats.gamesSupported'), value: CONFIG.homeStats.gamesSupported },
   ];
 

@@ -42,6 +42,8 @@ const socialBtnSx = {
   py: 0,
   px: 1,
   borderRadius: 0,
+  position: 'relative' as const,
+  overflow: 'hidden' as const,
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -50,9 +52,9 @@ const socialBtnSx = {
   fontWeight: 700,
   lineHeight: 1.25,
   whiteSpace: 'nowrap' as const,
-  color: alpha('#fff', 0.92),
+  color: alpha('#fff', 0.52),
   bgcolor: alpha('#000', 0.42),
-  border: `1px solid ${alpha('#fff', 0.14)}`,
+  border: `1px solid ${alpha('#fff', 0.1)}`,
   boxShadow: 'none',
   transition: 'border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease',
   '& .MuiButton-startIcon': {
@@ -60,17 +62,43 @@ const socialBtnSx = {
     alignItems: 'center',
     m: 0,
     mr: 0.75,
+    opacity: 0.5,
     '& > *': { width: 16, height: 16, display: 'block' },
   },
   '&:hover': {
     bgcolor: alpha('#000', 0.55),
-    borderColor: alpha(GOLD, 0.45),
-    boxShadow: `0 0 14px ${alpha(GOLD, 0.12)}`,
+    borderColor: alpha(GOLD, 0.25),
+    boxShadow: `0 0 14px ${alpha(GOLD, 0.08)}`,
   },
   '&:active': {
     transform: 'scale(0.985)',
   },
 };
+
+function SoonBadge() {
+  return (
+    <Typography
+      component="span"
+      sx={{
+        position: 'absolute',
+        top: 4,
+        right: 4,
+        fontSize: 8,
+        fontWeight: 800,
+        letterSpacing: 0.8,
+        lineHeight: 1,
+        px: 0.6,
+        py: 0.3,
+        bgcolor: alpha(GOLD, 0.18),
+        color: alpha(GOLD, 0.85),
+        border: `1px solid ${alpha(GOLD, 0.25)}`,
+        textTransform: 'uppercase',
+      }}
+    >
+      SOON
+    </Typography>
+  );
+}
 
 export function AuthSocialButtons() {
   const { t } = useTranslate();
@@ -98,6 +126,7 @@ export function AuthSocialButtons() {
       >
         <Button fullWidth variant="outlined" disableElevation onClick={comingSoon} startIcon={<GoogleMark />} sx={socialBtnSx}>
           {t('auth.continueWithGoogle')}
+          <SoonBadge />
         </Button>
         <Button
           fullWidth
@@ -108,6 +137,7 @@ export function AuthSocialButtons() {
           sx={socialBtnSx}
         >
           {t('auth.continueWithDiscord')}
+          <SoonBadge />
         </Button>
       </Box>
     </Stack>

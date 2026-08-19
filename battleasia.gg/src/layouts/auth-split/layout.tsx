@@ -94,7 +94,7 @@ export function AuthSplitLayout({
       leftArea: (
         <Button
           component={RouterLink}
-          href={paths.dashboard.root}
+          href="/"
           startIcon={<Iconify icon="solar:arrow-left-bold" width={12} />}
           sx={{
             minHeight: 26,

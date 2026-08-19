@@ -89,13 +89,14 @@ export const AUTH_INPUT_BG = '#0e0e0e';
 const AUTH_PLACEHOLDER = '#808080';
 const AUTH_BORDER = '#2b2b2b';
 
-/** Neutral charcoal card — slight warm gold wash, no yellow glow */
+/** Neutral charcoal card — slight warm gold wash + subtle top border glow */
 export const authCardSx = {
   bgcolor: AUTH_CARD_BG,
   backgroundColor: AUTH_CARD_BG,
   backgroundImage: `linear-gradient(180deg, #1c1a16 0%, ${AUTH_CARD_BG} 42%, #141210 100%)`,
   border: `1px solid ${AUTH_BORDER}`,
-  boxShadow: `0 24px 60px ${alpha('#000000', 0.65)}`,
+  borderTop: `1px solid ${alpha('#f5c518', 0.22)}`,
+  boxShadow: `0 24px 60px ${alpha('#000000', 0.65)}, 0 -1px 12px ${alpha('#f5c518', 0.06)}`,
   backdropFilter: 'none',
   WebkitBackdropFilter: 'none',
   '&:before': {
@@ -104,7 +105,7 @@ export const authCardSx = {
     inset: 0,
     pointerEvents: 'none',
     zIndex: 0,
-    background: `linear-gradient(180deg, ${alpha('#f5c518', 0.045)} 0%, transparent 48%)`,
+    background: `linear-gradient(180deg, ${alpha('#f5c518', 0.055)} 0%, transparent 40%)`,
     animation: 'none',
   },
 };
