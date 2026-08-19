@@ -355,7 +355,13 @@
     "saving": "Saving...",
     "refresh": "Refresh",
     "goBack": "Go Back",
-    "instant": "Instant"
+    "instant": "فوری",
+    "searchCountry": "ملک تلاش کریں...",
+    "searchPlaceholder": "تلاش کریں...",
+    "dropOrSelectFile": "فائل ڈراپ یا منتخب کریں",
+    "liveChatOffline": "لائیو چیٹ فی الحال آف لائن ہے",
+    "failedToStartConversation": "بات چیت شروع کرنے میں ناکام",
+    "failedToSendMessage": "پیغام بھیجنے میں ناکام"
   },
   "wallet": {
     "title": "والیٹ",
@@ -808,6 +814,9 @@
     "networkError": "نیٹ ورک کی خرابی۔ دوبارہ کوشش کریں۔",
     "unauthorized": "غیر مجاز رسائی",
     "notFound": "صفحہ نہیں ملا",
+    "notFoundTitle": "معذرت، صفحہ نہیں ملا!",
+    "notFoundDescription": "معذرت، آپ جو صفحہ تلاش کر رہے ہیں وہ نہیں ملا۔ براہ کرم URL کی ہجے چیک کریں۔",
+    "goToHome": "ہوم پر جائیں",
     "emailRequired": "Email is required!",
     "passwordRequired": "Password is required!",
     "passwordMin": "Password must be at least 6 characters!",

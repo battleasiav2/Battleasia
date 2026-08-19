@@ -6,6 +6,7 @@ import match from 'autosuggest-highlight/match';
 import { varAlpha } from 'minimal-shared/utils';
 import { useBoolean } from 'minimal-shared/hooks';
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Box from '@mui/material/Box';
 import SvgIcon from '@mui/material/SvgIcon';
@@ -33,6 +34,7 @@ export type SearchbarProps = BoxProps & {
 
 export function Searchbar({ data: navItems = [], sx, ...other }: SearchbarProps) {
   const theme = useTheme();
+  const { t } = useTranslation();
 
   const { value: open, onFalse: onClose, onTrue: onOpen, onToggle } = useBoolean();
   const [searchQuery, setSearchQuery] = useState('');
@@ -177,7 +179,7 @@ export function Searchbar({ data: navItems = [], sx, ...other }: SearchbarProps)
           <InputBase
             fullWidth
             autoFocus={open}
-            placeholder="Search..."
+            placeholder={t('common.searchPlaceholder')}
             value={searchQuery}
             onChange={handleSearch}
             startAdornment={

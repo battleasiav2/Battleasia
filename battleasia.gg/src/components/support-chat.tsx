@@ -279,7 +279,7 @@ export function SupportChat() {
 
   const handleToggle = () => {
     if (!settings.enabled) {
-      toast('Live chat is currently offline', { id: 'live-chat-offline' });
+      toast(t('common.liveChatOffline'), { id: 'live-chat-offline' });
       return;
     }
     setOpen((prev) => !prev);
@@ -372,7 +372,7 @@ export function SupportChat() {
         const conversationResponse = await api.getOrCreateConversationApi();
         convId = conversationResponse?.data?.data?.id || null;
         if (!convId) {
-          toast.error('Failed to start conversation');
+          toast.error(t('common.failedToStartConversation'));
           return;
         }
         setConversationId(convId);
@@ -404,7 +404,7 @@ export function SupportChat() {
         setMessage('');
       }
     } catch {
-      toast.error('Failed to send message');
+      toast.error(t('common.failedToSendMessage'));
     } finally {
       setSending(false);
     }

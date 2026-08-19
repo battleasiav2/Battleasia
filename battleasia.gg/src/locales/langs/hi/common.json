@@ -355,7 +355,13 @@
     "saving": "Saving...",
     "refresh": "Refresh",
     "goBack": "Go Back",
-    "instant": "Instant"
+    "instant": "तुरंत",
+    "searchCountry": "देश खोजें...",
+    "searchPlaceholder": "खोजें...",
+    "dropOrSelectFile": "फ़ाइल ड्रॉप या चयन करें",
+    "liveChatOffline": "लाइव चैट वर्तमान में ऑफ़लाइन है",
+    "failedToStartConversation": "बातचीत शुरू करने में विफल",
+    "failedToSendMessage": "संदेश भेजने में विफल"
   },
   "wallet": {
     "title": "वॉलेट",
@@ -808,6 +814,9 @@
     "networkError": "नेटवर्क त्रुटि। कृपया पुनः प्रयास करें।",
     "unauthorized": "अनधिकृत पहुंच",
     "notFound": "पृष्ठ नहीं मिला",
+    "notFoundTitle": "क्षमा करें, पृष्ठ नहीं मिला!",
+    "notFoundDescription": "क्षमा करें, आप जो पृष्ठ खोज रहे हैं वह नहीं मिला। कृपया URL की वर्तनी जाँचें।",
+    "goToHome": "होम पर जाएं",
     "emailRequired": "Email is required!",
     "passwordRequired": "Password is required!",
     "passwordMin": "Password must be at least 6 characters!",

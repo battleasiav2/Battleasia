@@ -379,7 +379,13 @@
     "saveChanges": "Save Changes",
     "refresh": "Refresh",
     "goBack": "Go Back",
-    "instant": "Instant"
+    "instant": "Instant",
+    "searchCountry": "Search country...",
+    "searchPlaceholder": "Search...",
+    "dropOrSelectFile": "Drop or select file",
+    "liveChatOffline": "Live chat is currently offline",
+    "failedToStartConversation": "Failed to start conversation",
+    "failedToSendMessage": "Failed to send message"
   },
   "wallet": {
     "title": "Wallet",
@@ -973,6 +979,9 @@
     "networkError": "Network error. Please try again.",
     "unauthorized": "Unauthorized access",
     "notFound": "Page not found",
+    "notFoundTitle": "Sorry, page not found!",
+    "notFoundDescription": "Sorry, we couldn't find the page you're looking for. Perhaps you've mistyped the URL? Be sure to check your spelling.",
+    "goToHome": "Go to home",
     "invalidCredentials": "Invalid email or password",
     "accountNotFound": "Account not found",
     "serverError": "Server error. Please try again later."

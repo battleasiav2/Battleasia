@@ -86,7 +86,7 @@ export function useImagePreloader(
                         });
                         resolve();
                     } else {
-                        console.warn(`Failed to load image: ${src}`);
+                        onError?.(src);
                         resolve();
                     }
                 };
@@ -103,7 +103,7 @@ export function useImagePreloader(
                 }
             }, delay);
         } catch (error) {
-            console.error('Error loading images:', error);
+            // Silent fail — still show content
             // Still show content even if some images fail to load
             setIsLoaded(true);
             if (onComplete) {

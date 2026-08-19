@@ -457,8 +457,7 @@ class ProfileSidebar extends StatelessWidget {
       return;
     }
 
-    // TODO: Replace with actual profile URL when available
-    final profileUrl = 'https://battleasia.net/profile/$userId';
+    final profileUrl = 'https://battleasia.gg/user/profile/$userId';
     Clipboard.setData(ClipboardData(text: profileUrl));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(

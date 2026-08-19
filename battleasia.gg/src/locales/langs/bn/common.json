@@ -332,6 +332,12 @@
     "refresh": "রিফ্রেশ",
     "goBack": "ফিরে যান",
     "instant": "তাৎক্ষণিক",
+    "searchCountry": "দেশ খুঁজুন...",
+    "searchPlaceholder": "খুঁজুন...",
+    "dropOrSelectFile": "ফাইল ড্রপ করুন বা নির্বাচন করুন",
+    "liveChatOffline": "লাইভ চ্যাট বর্তমানে অফলাইন",
+    "failedToStartConversation": "কথোপকথন শুরু করতে ব্যর্থ",
+    "failedToSendMessage": "বার্তা পাঠাতে ব্যর্থ",
     "unknownGame": "অজানা গেম",
     "comingSoon": "শীঘ্রই আসছে",
     "sending": "পাঠানো হচ্ছে",
@@ -870,7 +876,10 @@
     "maxLength": "সর্বোচ্চ {{count}} টি অক্ষর অনুমোদিত",
     "networkError": "নেটওয়ার্ক ত্রুটি। আবার চেষ্টা করুন।",
     "unauthorized": "অননুমোদিত প্রবেশাধিকার",
-    "notFound": "পৃষ্ঠা পাওয়া যায়নি"
+    "notFound": "পৃষ্ঠা পাওয়া যায়নি",
+    "notFoundTitle": "দুঃখিত, পৃষ্ঠা পাওয়া যায়নি!",
+    "notFoundDescription": "দুঃখিত, আপনি যে পৃষ্ঠাটি খুঁজছেন তা পাওয়া যায়নি। URL সঠিকভাবে লেখা হয়েছে কিনা পরীক্ষা করুন।",
+    "goToHome": "হোমে যান"
   },
   "myStatistics": {
     "title": "আমার পরিসংখ্যান",

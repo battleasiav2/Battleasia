@@ -6,7 +6,6 @@ import { Grid2 as Grid, Stack } from '@mui/material';
 import { fDateTime } from 'src/utils/format-time';
 import { getImageUrl } from 'src/utils/get-image-url';
 
-import { _mock } from 'src/_mock';
 import { useSelector } from 'src/store';
 import type { IFeedItem, IPublicUser, IMatchHistory, IActivityCard, IMostPlayedInfo } from 'src/types';
 import { useApi } from 'src/hooks';
@@ -255,7 +254,7 @@ export function PublicProfileView() {
 
       <ProfileBanner
         username={viewingUser?.username || 'Guest'}
-        avatar={viewingUser?.avatar || _mock.image.avatar(1)}
+        avatar={viewingUser?.avatar || '/assets/images/avatar/default-avatar.webp'}
         isOwnProfile={isOwnProfile}
         isFollowing={isFollowing}
         onFollow={handleFollow}

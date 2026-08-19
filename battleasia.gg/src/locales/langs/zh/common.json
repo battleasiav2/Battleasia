@@ -355,7 +355,13 @@
     "saving": "Saving...",
     "refresh": "Refresh",
     "goBack": "Go Back",
-    "instant": "Instant"
+    "instant": "即时",
+    "searchCountry": "搜索国家...",
+    "searchPlaceholder": "搜索...",
+    "dropOrSelectFile": "拖放或选择文件",
+    "liveChatOffline": "在线聊天目前离线",
+    "failedToStartConversation": "无法开始对话",
+    "failedToSendMessage": "发送消息失败"
   },
   "wallet": {
     "title": "钱包",
@@ -808,6 +814,9 @@
     "networkError": "网络错误。请重试。",
     "unauthorized": "未授权访问",
     "notFound": "页面未找到",
+    "notFoundTitle": "抱歉，页面未找到！",
+    "notFoundDescription": "抱歉，我们找不到您要找的页面。请检查URL拼写是否正确。",
+    "goToHome": "返回首页",
     "emailRequired": "Email is required!",
     "passwordRequired": "Password is required!",
     "passwordMin": "Password must be at least 6 characters!",

@@ -28,12 +28,12 @@ export function lazyRetry<T extends React.ComponentType<any>>(
           if (isChunkError && retryCount < maxRetries) {
             // Wait before retrying
             setTimeout(() => {
-              console.log(`Retrying import... (${retryCount + 1}/${maxRetries})`);
+              // Retry silently
               attemptImport(retryCount + 1);
             }, delay);
           } else if (isChunkError) {
             // Max retries reached, reload the page
-            console.error('Max retries reached. Reloading page...');
+            // Max retries reached — attempt page reload
             const hasReloaded = sessionStorage.getItem('chunk-error-reload');
             if (!hasReloaded) {
               sessionStorage.setItem('chunk-error-reload', 'true');

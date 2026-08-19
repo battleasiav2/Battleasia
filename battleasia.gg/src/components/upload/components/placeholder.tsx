@@ -1,6 +1,7 @@
 import type { Theme, SxProps } from '@mui/material/styles';
 
 import { mergeClasses } from 'minimal-shared/utils';
+import { useTranslation } from 'react-i18next';
 
 import { styled } from '@mui/material/styles';
 
@@ -21,6 +22,7 @@ const uploadPlaceholderClasses = {
 };
 
 export function UploadPlaceholder({ sx, className, ...other }: UploadPlaceholderProps) {
+  const { t } = useTranslation();
   return (
     <PlaceholderRoot
       className={mergeClasses([uploadPlaceholderClasses.root, className])}
@@ -29,7 +31,7 @@ export function UploadPlaceholder({ sx, className, ...other }: UploadPlaceholder
     >
       <UploadIllustration hideBackground sx={{ width: 200 }} />
       <PlaceholderContent>
-        <div className={uploadPlaceholderClasses.title}>Drop or select file</div>
+        <div className={uploadPlaceholderClasses.title}>{t('common.dropOrSelectFile')}</div>
         <div className={uploadPlaceholderClasses.description}>
           Drop files here or click to
           <span>browse</span>

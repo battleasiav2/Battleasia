@@ -1,6 +1,7 @@
 import type { Country } from 'react-phone-number-input/input';
 
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { usePopover } from 'minimal-shared/hooks';
 
 import Box from '@mui/material/Box';
@@ -50,6 +51,7 @@ export function CountryListPopover({
   onSearchCountry,
 }: CountryListProps) {
   const { open, onClose, onOpen, anchorEl } = usePopover();
+  const { t } = useTranslation();
 
   const selectedCountry = useMemo(
     () => countries.find((country) => country.code === countryCode),
@@ -243,7 +245,7 @@ export function CountryListPopover({
             size="small"
             value={searchCountry}
             onChange={(event) => onSearchCountry(event.target.value)}
-            placeholder="Search country..."
+            placeholder={t('common.searchCountry')}
             slotProps={{
               input: {
                 sx: {
