@@ -85,9 +85,15 @@ async function aggregatePlayerStats(sortField: 'totalWinnings' | 'totalKills', l
   const users = await User.find({ _id: { $in: userIds } }).select('username avatar');
   const userMap = new Map(users.map((u) => [u._id.toString(), u]));
 
-  return rows.map((row) => {
-    const user = userMap.get(row.userId.toString());
-    return toTopPlayer(
+    return rows
+        .filter((row) => {
+            const user = userMap.get(row.userId.toString());
+            const username = (user?.username || row.username || '').trim().toLowerCase();
+            return username !== 'testplayer' && !username.startsWith('testplayer');
+        })
+        .map((row) => {
+            const user = userMap.get(row.userId.toString());
+            return toTopPlayer(
       {
         ...row,
         username: user?.username || row.username,

@@ -6,6 +6,10 @@ import { GLASS_CARD_RADIUS, GLASS_CARD_RADIUS_SM } from './glass-card-tokens';
 import { GlassStatTile } from './glass-stat-tile';
 import type { GlassCardVariant } from './types';
 import { GLASS_CARD_VARIANTS } from './variants';
+import {
+  homeMobileScrollFlexRowSx,
+  homeMobileScrollItemSx,
+} from 'src/sections/home/home-horizontal-scroll';
 
 export type PulseCardStats = {
   totalWinnings: React.ReactNode;
@@ -29,6 +33,7 @@ type PulseCardProps = {
   stats: PulseCardStats;
   loading?: boolean;
   showDemoLabel?: boolean;
+  lastUpdatedLabel?: string;
 };
 
 export function PulseCard({
@@ -41,8 +46,39 @@ export function PulseCard({
   stats,
   loading,
   showDemoLabel = false,
+  lastUpdatedLabel,
 }: PulseCardProps) {
   const tokens = GLASS_CARD_VARIANTS[variant];
+
+  const statTiles = [
+    {
+      key: 'winnings',
+      label: labels.platformTotalWinnings,
+      value: stats.totalWinnings,
+      suffix: undefined,
+      icon: 'solar:wallet-money-bold-duotone',
+      xs: 12,
+      md: 12,
+    },
+    {
+      key: 'matches',
+      label: labels.processedMatches,
+      value: stats.processedMatches,
+      suffix: undefined,
+      icon: 'solar:medal-ribbons-star-bold-duotone',
+      xs: 6,
+      md: 6,
+    },
+    {
+      key: 'live',
+      label: labels.ongoingMatches,
+      value: stats.ongoingMatches,
+      suffix: liveSuffix,
+      icon: 'solar:play-circle-bold-duotone',
+      xs: 6,
+      md: 6,
+    },
+  ] as const;
 
   return (
     <Box>
@@ -139,36 +175,64 @@ export function PulseCard({
               >
                 {description}
               </Typography>
+              {lastUpdatedLabel ? (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: alpha('#ffffff', 0.52),
+                    fontWeight: 600,
+                    letterSpacing: 0.3,
+                  }}
+                >
+                  {lastUpdatedLabel}
+                </Typography>
+              ) : null}
             </Stack>
           </Grid>
 
           <Grid item xs={12} md={5}>
-            <Grid container spacing={1.25}>
-              <Grid item xs={12} sm={4} md={12}>
-                <GlassStatTile
-                  label={labels.platformTotalWinnings}
-                  value={stats.totalWinnings}
-                  loading={loading}
-                  tokens={tokens}
-                />
-              </Grid>
-              <Grid item xs={6} sm={4} md={6}>
-                <GlassStatTile
-                  label={labels.processedMatches}
-                  value={stats.processedMatches}
-                  loading={loading}
-                  tokens={tokens}
-                />
-              </Grid>
-              <Grid item xs={6} sm={4} md={6}>
-                <GlassStatTile
-                  label={labels.ongoingMatches}
-                  value={stats.ongoingMatches}
-                  suffix={liveSuffix}
-                  loading={loading}
-                  tokens={tokens}
-                />
-              </Grid>
+            <Box
+              sx={{
+                gap: 1.25,
+                ...homeMobileScrollFlexRowSx,
+                display: { xs: 'flex', md: 'none' },
+              }}
+            >
+              {statTiles.map((tile) => (
+                <Box
+                  key={tile.key}
+                  sx={{
+                    ...homeMobileScrollItemSx,
+                    flex: '0 0 78%',
+                    minWidth: 220,
+                    maxWidth: 280,
+                  }}
+                >
+                  <GlassStatTile
+                    label={tile.label}
+                    value={tile.value}
+                    suffix={tile.suffix}
+                    icon={tile.icon}
+                    loading={loading}
+                    tokens={tokens}
+                  />
+                </Box>
+              ))}
+            </Box>
+
+            <Grid container spacing={1.25} sx={{ display: { xs: 'none', md: 'flex' } }}>
+              {statTiles.map((tile) => (
+                <Grid key={tile.key} item xs={tile.xs} md={tile.md}>
+                  <GlassStatTile
+                    label={tile.label}
+                    value={tile.value}
+                    suffix={tile.suffix}
+                    icon={tile.icon}
+                    loading={loading}
+                    tokens={tokens}
+                  />
+                </Grid>
+              ))}
             </Grid>
           </Grid>
         </Grid>

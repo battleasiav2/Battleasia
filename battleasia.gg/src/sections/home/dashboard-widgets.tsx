@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import {
     Box,
     Chip,
@@ -10,6 +10,7 @@ import {
     Container,
     Typography,
     LinearProgress,
+    Button,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
@@ -32,11 +33,16 @@ import {
 import { socketService } from 'src/lib/socket';
 import { HOME_GAME_ARTS } from './play-your-game-section';
 import {
-    homeMobileScrollGridSx,
     homeMobileScrollItemSx,
     homeMobileScrollFlexRowSx,
     homeMobileScrollFlexItemFullSx,
 } from './home-horizontal-scroll';
+import { AnimatedCoinValue } from './animated-coin-value';
+import { PulseCountUp } from './pulse-count-up';
+import {
+    formatPulseLastUpdated,
+    sanitizePublicDashboardData,
+} from './pulse-dashboard-utils';
 import type {
     DashboardTopPlayer,
     PublicDashboardStats,
@@ -379,6 +385,15 @@ export function LandingDashboardSection() {
     const { t } = useTranslate();
     const api = useApi();
     const [state, setState] = useState<SectionState>({ loading: true, data: null });
+    const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
+    const [refreshTick, setRefreshTick] = useState(0);
+
+    const applyPayload = useCallback((payload: PublicDashboardStats | undefined) => {
+        if (!payload?.platform) return false;
+        setState({ loading: false, data: sanitizePublicDashboardData(payload) });
+        setLastUpdatedAt(Date.now());
+        return true;
+    }, []);
 
     const loadStats = async () => {
         try {
@@ -403,17 +418,16 @@ export function LandingDashboardSection() {
                 payload = json?.data || json;
             }
 
-            if (payload?.platform) {
-                setState({ loading: false, data: payload });
-            } else {
-                setState({ loading: false, data: null, error: 'Unable to load stats' });
+            if (applyPayload(payload)) {
+                return;
             }
+            setState({ loading: false, data: null, error: t('home.dashboard.loadFailed') });
         } catch (error) {
             console.error('Failed to load landing stats', error);
             setState((prev) => ({
                 ...prev,
                 loading: false,
-                error: 'Unable to load stats right now. Please try again shortly.',
+                error: t('home.dashboard.loadFailedRetry'),
             }));
         }
     };
@@ -423,9 +437,7 @@ export function LandingDashboardSection() {
         try {
             const res = await api.getPublicDashboardStatsApi();
             const payload: PublicDashboardStats | undefined = res?.data?.data || res?.data;
-            if (payload?.platform) {
-                setState((prev) => ({ ...prev, data: payload }));
-            }
+            applyPayload(payload);
         } catch (error) {
             console.error('Failed to refresh landing stats', error);
         }
@@ -500,6 +512,12 @@ export function LandingDashboardSection() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        if (!lastUpdatedAt) return undefined;
+        const timer = window.setInterval(() => setRefreshTick((v) => v + 1), 1000);
+        return () => window.clearInterval(timer);
+    }, [lastUpdatedAt]);
+
     const { loading, data, error } = state;
 
     const stats = useMemo(() => {
@@ -510,21 +528,30 @@ export function LandingDashboardSection() {
                 ongoingMatches: '—',
             };
         }
+        const liveSuffix = ` ${t('home.dashboard.live')}`;
         return {
-            totalWinnings: <CoinValue value={data.platform.totalWinnings || 0} size={24} />,
-            processedMatches: fNumber(data.platform.processedMatches || 0),
-            ongoingMatches: fNumber(data.platform.ongoingMatches || 0),
+            totalWinnings: <AnimatedCoinValue value={data.platform.totalWinnings || 0} size={24} />,
+            processedMatches: <PulseCountUp value={data.platform.processedMatches || 0} />,
+            ongoingMatches: <PulseCountUp value={data.platform.ongoingMatches || 0} />,
         };
-    }, [data]);
+    }, [data, t]);
 
     const pulseLabels = useMemo(
         () => ({
-            platformTotalWinnings: t('home.dashboard.platformTotalWinnings'),
-            processedMatches: t('home.dashboard.processedMatches'),
-            ongoingMatches: t('home.dashboard.ongoingMatches'),
+            platformTotalWinnings: t('home.dashboard.totalWon'),
+            processedMatches: t('home.dashboard.matchesCompleted'),
+            ongoingMatches: t('home.dashboard.liveNow'),
         }),
         [t]
     );
+
+    const lastUpdatedLabel = useMemo(() => {
+        if (!lastUpdatedAt) return '';
+        const seconds = Math.max(0, Math.floor((Date.now() - lastUpdatedAt) / 1000));
+        return t('home.dashboard.lastUpdated', {
+            time: formatPulseLastUpdated(seconds),
+        });
+    }, [lastUpdatedAt, t, refreshTick]);
 
     const glassTokens = useMemo(() => getDefaultGlassTokens(), []);
 
@@ -573,20 +600,38 @@ export function LandingDashboardSection() {
                         labels={pulseLabels}
                         stats={stats}
                         loading={loading}
+                        lastUpdatedLabel={lastUpdatedLabel}
                     />
 
-                    {error && !loading ? <Alert severity="warning">{error}</Alert> : null}
+                    {error && !loading ? (
+                        <Alert
+                            severity="warning"
+                            action={
+                                <Button color="inherit" size="small" onClick={loadStats}>
+                                    {t('home.dashboard.retry')}
+                                </Button>
+                            }
+                        >
+                            {error}
+                        </Alert>
+                    ) : null}
 
                     <Box
-                        sx={homeMobileScrollGridSx(
-                            {
-                                xs: 'repeat(2, minmax(300px, 1fr))',
-                                md: 'repeat(2, minmax(0, 1fr))',
-                            },
-                            { xs: 2, md: 2 }
-                        )}
+                        sx={{
+                            gap: { xs: 1.25, md: 2.5 },
+                            gridTemplateColumns: { md: 'repeat(2, minmax(0, 1fr))' },
+                            ...homeMobileScrollFlexRowSx,
+                            display: { xs: 'flex', md: 'grid' },
+                            px: { xs: 0.5, md: 0 },
+                        }}
                     >
-                        <Box sx={{ ...homeMobileScrollItemSx, minWidth: { xs: 300, md: 0 } }}>
+                        <Box
+                            sx={{
+                                ...homeMobileScrollItemSx,
+                                flex: { xs: '0 0 88%', md: 'unset' },
+                                minWidth: { xs: 280, md: 0 },
+                            }}
+                        >
                             <PlayerListCard
                                 title={t('home.dashboard.topProfitGenerators')}
                                 hint={t('home.dashboard.mostWinningsHint')}
@@ -604,7 +649,13 @@ export function LandingDashboardSection() {
                                 }}
                             />
                         </Box>
-                        <Box sx={{ ...homeMobileScrollItemSx, minWidth: { xs: 300, md: 0 } }}>
+                        <Box
+                            sx={{
+                                ...homeMobileScrollItemSx,
+                                flex: { xs: '0 0 88%', md: 'unset' },
+                                minWidth: { xs: 280, md: 0 },
+                            }}
+                        >
                             <PlayerListCard
                                 title={t('home.dashboard.topPlayers')}
                                 hint={t('home.dashboard.topPlayersHint')}

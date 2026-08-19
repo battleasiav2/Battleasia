@@ -94,13 +94,13 @@ export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: G
     wordBreak: 'break-word' as const,
   };
 
-  const valueSx = {
+  const   valueSx = {
     display: 'flex',
     alignItems: 'baseline',
     flexWrap: 'wrap' as const,
     gap: 0.75,
     color: stat.valueColor,
-    fontSize: { xs: '1.15rem', sm: '1.35rem', md: '1.55rem' },
+    fontSize: { xs: '1.35rem', sm: '1.5rem', md: '1.65rem' },
     fontWeight: 800,
     lineHeight: 1.15,
   };
