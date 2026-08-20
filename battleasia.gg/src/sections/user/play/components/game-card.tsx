@@ -9,12 +9,19 @@ import { PLAY_IMAGE_PATHS } from '../play-constants';
 
 // ----------------------------------------------------------------------
 
-const GOLD = USER_COLORS.gold;
+const { gold: GOLD, goldGradient, success: LIVE_GREEN } = USER_COLORS;
 
 const livePulse = keyframes`
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 ${alpha('#22c55e', 0.55)}; }
-  50% { opacity: 0.75; box-shadow: 0 0 0 4px ${alpha('#22c55e', 0)}; }
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 ${alpha(LIVE_GREEN, 0.6)}; }
+  50% { opacity: 0.8; box-shadow: 0 0 0 6px ${alpha(LIVE_GREEN, 0)}; }
 `;
+
+const goldTextGradient = {
+  background: goldGradient,
+  backgroundClip: 'text',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+};
 
 type GameCardProps = {
   title: string;
@@ -30,7 +37,7 @@ type GameCardProps = {
   onClick?: () => void;
 };
 
-/** Tournament tile — art on top, title + live/upcoming counts below. */
+/** Premium tournament tile — ref-style gold border, gradient title, glass stat pills. */
 export function GameCard(props: GameCardProps) {
   const {
     title,
@@ -46,6 +53,7 @@ export function GameCard(props: GameCardProps) {
     onClick,
   } = props;
   const isDisabled = disabled || comingSoon;
+  const thumbSrc = logo || imageUrl || PLAY_IMAGE_PATHS.pubgCard;
 
   return (
     <Box
@@ -63,22 +71,29 @@ export function GameCard(props: GameCardProps) {
         width: 1,
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: '6px',
+        borderRadius: '10px',
         overflow: 'hidden',
-        bgcolor: '#111111',
-        border: `1px solid ${alpha('#ffffff', 0.1)}`,
+        bgcolor: '#0c0c0c',
+        border: `1px solid ${alpha(GOLD, 0.35)}`,
+        boxShadow: `
+          0 0 0 1px ${alpha(GOLD, 0.06)},
+          0 12px 32px ${alpha('#000000', 0.55)},
+          0 0 24px ${alpha(GOLD, 0.08)}
+        `,
         cursor: isDisabled ? 'not-allowed' : 'pointer',
-        opacity: isDisabled ? 0.78 : 1,
-        boxShadow: `0 8px 24px ${alpha('#000000', 0.45)}`,
+        opacity: isDisabled ? 0.72 : 1,
         transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.3s ease',
         '&:hover': isDisabled
           ? undefined
           : {
-              transform: 'translateY(-6px)',
-              borderColor: alpha(GOLD, 0.38),
-              boxShadow: `0 18px 40px ${alpha('#000000', 0.6)}, 0 0 0 1px ${alpha(GOLD, 0.12)}`,
-              '& .game-card-art': { transform: 'scale(1.05)' },
-              '& .game-card-gold-bar': { transform: 'scaleX(1)' },
+              transform: 'translateY(-8px)',
+              borderColor: alpha(GOLD, 0.55),
+              boxShadow: `
+                0 0 0 1px ${alpha(GOLD, 0.15)},
+                0 22px 48px ${alpha('#000000', 0.65)},
+                0 0 36px ${alpha(GOLD, 0.18)}
+              `,
+              '& .game-card-art': { transform: 'scale(1.06)' },
             },
         '&:focus-visible': {
           outline: `2px solid ${alpha(GOLD, 0.7)}`,
@@ -86,14 +101,14 @@ export function GameCard(props: GameCardProps) {
         },
       }}
     >
-      {/* Image */}
+      {/* Hero art */}
       <Box
         sx={{
           position: 'relative',
           width: 1,
-          aspectRatio: '16 / 10',
+          aspectRatio: '16 / 11',
           overflow: 'hidden',
-          bgcolor: '#0a0a0a',
+          bgcolor: '#050505',
         }}
       >
         <Box
@@ -108,178 +123,234 @@ export function GameCard(props: GameCardProps) {
             objectFit: 'cover',
             objectPosition: 'center center',
             display: 'block',
-            transition: 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)',
+            transition: 'transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)',
           }}
         />
 
-        {logo ? (
-          <Box
-            component="img"
-            src={logo}
-            alt=""
-            loading="lazy"
-            sx={{
-              position: 'absolute',
-              top: 8,
-              right: 8,
-              width: 36,
-              height: 36,
-              objectFit: 'cover',
-              borderRadius: '4px',
-              border: `1px solid ${alpha('#ffffff', 0.2)}`,
-              boxShadow: `0 4px 12px ${alpha('#000000', 0.5)}`,
-            }}
-          />
-        ) : null}
+        {/* Bottom fade into card body */}
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            background: `linear-gradient(180deg, transparent 55%, ${alpha('#0c0c0c', 0.92)} 100%)`,
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Inset thumbnail — ref top-right */}
+        <Box
+          component="img"
+          src={thumbSrc}
+          alt=""
+          loading="lazy"
+          sx={{
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            width: { xs: 44, sm: 48 },
+            height: { xs: 44, sm: 48 },
+            objectFit: 'cover',
+            borderRadius: '6px',
+            border: `1px solid ${alpha(GOLD, 0.4)}`,
+            boxShadow: `0 4px 16px ${alpha('#000000', 0.6)}, 0 0 12px ${alpha(GOLD, 0.15)}`,
+          }}
+        />
 
         {comingSoon ? (
           <Box
             sx={{
               position: 'absolute',
-              top: 8,
-              left: 8,
-              px: 0.85,
-              py: 0.35,
-              bgcolor: alpha('#000000', 0.72),
-              border: `1px solid ${alpha(GOLD, 0.45)}`,
-              borderRadius: '3px',
+              top: 10,
+              left: 10,
+              px: 1,
+              py: 0.4,
+              bgcolor: alpha('#000000', 0.75),
+              border: `1px solid ${alpha(GOLD, 0.5)}`,
+              borderRadius: '4px',
+              boxShadow: `0 0 10px ${alpha(GOLD, 0.2)}`,
             }}
           >
-            <Typography sx={{ fontSize: 9, fontWeight: 800, color: GOLD, letterSpacing: 0.8 }}>
+            <Typography sx={{ fontSize: 9, fontWeight: 800, color: GOLD, letterSpacing: 1 }}>
               SOON
             </Typography>
           </Box>
         ) : null}
-
-        <Box
-          className="game-card-gold-bar"
-          sx={{
-            position: 'absolute',
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: 2,
-            bgcolor: GOLD,
-            transform: 'scaleX(0)',
-            transformOrigin: 'left center',
-            transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
-            boxShadow: `0 0 8px ${alpha(GOLD, 0.45)}`,
-          }}
-        />
       </Box>
 
-      {/* Content */}
-      <Stack spacing={1.25} sx={{ p: { xs: 1.25, sm: 1.5 }, flex: 1 }}>
-        <Stack spacing={0.35}>
-          <Typography
-            className="font-tr"
-            sx={{
-              fontSize: { xs: 14, sm: 15 },
-              fontWeight: 800,
-              lineHeight: 1.2,
-              color: '#ffffff',
-            }}
-          >
-            {title}
-          </Typography>
-          {subTitle ? (
+      {/* Title block */}
+      <Stack
+        spacing={0.75}
+        sx={{
+          px: { xs: 1.25, sm: 1.5 },
+          pt: { xs: 1, sm: 1.25 },
+          pb: { xs: 0.5, sm: 0.75 },
+          alignItems: 'center',
+          textAlign: 'center',
+        }}
+      >
+        <Typography
+          className="font-tr"
+          sx={{
+            fontSize: { xs: 17, sm: 19 },
+            fontWeight: 900,
+            lineHeight: 1.15,
+            letterSpacing: 0.3,
+            ...goldTextGradient,
+          }}
+        >
+          {title}
+        </Typography>
+
+        {subTitle ? (
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ width: 1, maxWidth: 220 }}>
+            <Box
+              sx={{
+                flex: 1,
+                height: 1,
+                background: `linear-gradient(90deg, transparent, ${alpha('#ffffff', 0.22)})`,
+              }}
+            />
             <Typography
               sx={{
-                fontSize: { xs: 10, sm: 11 },
+                fontSize: { xs: 9, sm: 10 },
                 fontWeight: 600,
-                color: alpha(GOLD, 0.85),
-                letterSpacing: 0.15,
-                wordBreak: 'break-all',
+                color: alpha('#ffffff', 0.55),
+                letterSpacing: 0.2,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '55%',
               }}
             >
               {subTitle}
             </Typography>
-          ) : null}
-        </Stack>
+            <Box
+              sx={{
+                flex: 1,
+                height: 1,
+                background: `linear-gradient(90deg, ${alpha('#ffffff', 0.22)}, transparent)`,
+              }}
+            />
+          </Stack>
+        ) : null}
+      </Stack>
 
-        <Stack
-          direction="row"
-          spacing={1}
+      {/* Live / Upcoming pills */}
+      <Stack direction="row" spacing={1} sx={{ px: { xs: 1.25, sm: 1.5 }, pb: { xs: 1.25, sm: 1.5 }, pt: 0.5 }}>
+        {/* Live */}
+        <Box
           sx={{
-            pt: 0.5,
-            borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            px: 1.1,
+            py: 1,
+            borderRadius: '8px',
+            bgcolor: alpha('#000000', 0.45),
+            backdropFilter: 'blur(10px)',
+            border: `1px solid ${alpha(LIVE_GREEN, liveCount > 0 ? 0.45 : 0.18)}`,
+            boxShadow: liveCount > 0
+              ? `inset 0 1px 0 ${alpha('#ffffff', 0.06)}, 0 0 16px ${alpha(LIVE_GREEN, 0.12)}`
+              : `inset 0 1px 0 ${alpha('#ffffff', 0.04)}`,
           }}
         >
           <Box
             sx={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.75,
-              px: 1,
-              py: 0.65,
-              borderRadius: '4px',
-              bgcolor: alpha('#22c55e', liveCount > 0 ? 0.1 : 0.04),
-              border: `1px solid ${alpha('#22c55e', liveCount > 0 ? 0.28 : 0.12)}`,
+              width: 10,
+              height: 10,
+              borderRadius: '50%',
+              bgcolor: LIVE_GREEN,
+              flexShrink: 0,
+              boxShadow: `0 0 8px ${alpha(LIVE_GREEN, 0.7)}`,
+              animation: liveCount > 0 ? `${livePulse} 1.5s ease-in-out infinite` : 'none',
             }}
-          >
-            <Box
+          />
+          <Stack spacing={0.15} sx={{ minWidth: 0 }}>
+            <Typography
               sx={{
-                width: 7,
-                height: 7,
-                borderRadius: '50%',
-                bgcolor: '#22c55e',
-                flexShrink: 0,
-                animation: liveCount > 0 ? `${livePulse} 1.4s ease-in-out infinite` : 'none',
+                fontSize: 9,
+                fontWeight: 800,
+                color: alpha('#ffffff', 0.65),
+                textTransform: 'uppercase',
+                letterSpacing: 0.8,
+                lineHeight: 1,
               }}
-            />
-            <Stack spacing={0} sx={{ minWidth: 0 }}>
-              <Typography
-                sx={{
-                  fontSize: 9,
-                  fontWeight: 700,
-                  color: alpha('#ffffff', 0.55),
-                  textTransform: 'uppercase',
-                  letterSpacing: 0.5,
-                  lineHeight: 1.2,
-                }}
-              >
-                {liveLabel}
-              </Typography>
-              <Typography sx={{ fontSize: 15, fontWeight: 800, color: '#fff', lineHeight: 1.1 }}>
-                {liveCount}
-              </Typography>
-            </Stack>
-          </Box>
+            >
+              {liveLabel}
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: { xs: 20, sm: 22 },
+                fontWeight: 900,
+                lineHeight: 1,
+                ...goldTextGradient,
+              }}
+            >
+              {liveCount}
+            </Typography>
+          </Stack>
+        </Box>
 
+        {/* Upcoming */}
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            px: 1.1,
+            py: 1,
+            borderRadius: '8px',
+            bgcolor: alpha('#000000', 0.45),
+            backdropFilter: 'blur(10px)',
+            border: `1px solid ${alpha(GOLD, upcomingCount > 0 ? 0.42 : 0.18)}`,
+            boxShadow: upcomingCount > 0
+              ? `inset 0 1px 0 ${alpha('#ffffff', 0.06)}, 0 0 16px ${alpha(GOLD, 0.1)}`
+              : `inset 0 1px 0 ${alpha('#ffffff', 0.04)}`,
+          }}
+        >
           <Box
             sx={{
-              flex: 1,
+              width: 28,
+              height: 28,
+              flexShrink: 0,
               display: 'flex',
               alignItems: 'center',
-              gap: 0.75,
-              px: 1,
-              py: 0.65,
-              borderRadius: '4px',
-              bgcolor: alpha(GOLD, upcomingCount > 0 ? 0.08 : 0.04),
-              border: `1px solid ${alpha(GOLD, upcomingCount > 0 ? 0.22 : 0.1)}`,
+              justifyContent: 'center',
+              borderRadius: '6px',
+              bgcolor: alpha(GOLD, 0.12),
+              border: `1px solid ${alpha(GOLD, 0.28)}`,
+              color: GOLD,
             }}
           >
-            <Iconify icon="solar:calendar-bold" width={14} sx={{ color: GOLD, flexShrink: 0 }} />
-            <Stack spacing={0} sx={{ minWidth: 0 }}>
-              <Typography
-                sx={{
-                  fontSize: 9,
-                  fontWeight: 700,
-                  color: alpha('#ffffff', 0.55),
-                  textTransform: 'uppercase',
-                  letterSpacing: 0.5,
-                  lineHeight: 1.2,
-                }}
-              >
-                {upcomingLabel}
-              </Typography>
-              <Typography sx={{ fontSize: 15, fontWeight: 800, color: '#fff', lineHeight: 1.1 }}>
-                {upcomingCount}
-              </Typography>
-            </Stack>
+            <Iconify icon="solar:calendar-bold" width={16} />
           </Box>
-        </Stack>
+          <Stack spacing={0.15} sx={{ minWidth: 0 }}>
+            <Typography
+              sx={{
+                fontSize: 9,
+                fontWeight: 800,
+                color: alpha('#ffffff', 0.65),
+                textTransform: 'uppercase',
+                letterSpacing: 0.8,
+                lineHeight: 1,
+              }}
+            >
+              {upcomingLabel}
+            </Typography>
+            <Typography
+              sx={{
+                fontSize: { xs: 20, sm: 22 },
+                fontWeight: 900,
+                lineHeight: 1,
+                ...goldTextGradient,
+              }}
+            >
+              {upcomingCount}
+            </Typography>
+          </Stack>
+        </Box>
       </Stack>
     </Box>
   );
