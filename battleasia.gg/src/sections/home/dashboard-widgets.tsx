@@ -35,7 +35,6 @@ import { HOME_GAME_ARTS } from './play-your-game-section';
 import {
     homeMobileScrollItemSx,
     homeMobileScrollFlexRowSx,
-    homeMobileScrollFlexItemFullSx,
 } from './home-horizontal-scroll';
 import { AnimatedCoinValue } from './animated-coin-value';
 import { PulseCountUp } from './pulse-count-up';
@@ -358,20 +357,19 @@ function DashboardMatchPanel({
                     ))}
                 </Stack>
             ) : count ? (
-                <Box sx={homeMobileScrollFlexRowSx}>
+                <Stack spacing={1.25}>
                     {matches.map((match, index) => (
-                        <Box key={match.id || index} sx={homeMobileScrollFlexItemFullSx}>
-                            <DashboardMatchTile
-                                match={match}
-                                index={index}
-                                total={count}
-                                variant={variant}
-                                glassTokens={glassTokens}
-                                platformTotalWinnings={platformTotalWinnings}
-                            />
-                        </Box>
+                        <DashboardMatchTile
+                            key={match.id || index}
+                            match={match}
+                            index={index}
+                            total={count}
+                            variant={variant}
+                            glassTokens={glassTokens}
+                            platformTotalWinnings={platformTotalWinnings}
+                        />
                     ))}
-                </Box>
+                </Stack>
             ) : (
                 <Typography variant="body2" sx={{ color: glassTokens.subtitleColor }}>
                     {emptyLabel}
@@ -680,8 +678,8 @@ export function LandingDashboardSection() {
                     <Box
                         sx={{
                             display: 'grid',
-                            gridTemplateColumns: { xs: '1fr', md: '5fr 7fr' },
-                            gap: 2.5,
+                            gridTemplateColumns: { xs: '1fr', lg: '5fr 7fr' },
+                            gap: { xs: 1.5, lg: 2.5 },
                         }}
                     >
                         <DashboardMatchPanel
