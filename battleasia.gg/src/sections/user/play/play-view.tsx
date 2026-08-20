@@ -181,6 +181,7 @@ export function PlayView() {
                         subTitle={game.packageName || game.idPrefix}
                         logo={resolvePlayGameArt(game, 'logo')}
                         imageUrl={resolvePlayGameArt(game, 'image')}
+                        featured={game.idPrefix === 'PUBG'}
                         comingSoon={game.comingSoon}
                         disabled={game.comingSoon}
                         liveCount={countsByGameName.live[game.name] ?? 0}

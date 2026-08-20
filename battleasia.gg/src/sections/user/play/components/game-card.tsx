@@ -30,6 +30,7 @@ type GameCardProps = {
   subTitle?: string;
   imageUrl?: string;
   logo?: string;
+  featured?: boolean;
   comingSoon?: boolean;
   disabled?: boolean;
   liveCount?: number;
@@ -46,6 +47,7 @@ export function GameCard(props: GameCardProps) {
     subTitle,
     imageUrl,
     logo,
+    featured = false,
     comingSoon,
     disabled,
     liveCount = 0,
@@ -56,6 +58,16 @@ export function GameCard(props: GameCardProps) {
   } = props;
   const isDisabled = disabled || comingSoon;
   const thumbSrc = logo || imageUrl || PLAY_IMAGE_PATHS.pubgCard;
+  const accent =
+    title.includes('Free Fire')
+      ? '#a855f7'
+      : title.includes('Call of Duty')
+        ? '#60a5fa'
+        : title.includes('Valorant')
+          ? '#5eead4'
+          : title.includes('Legends')
+            ? '#facc15'
+            : GOLD;
 
   return (
     <Box
@@ -78,11 +90,11 @@ export function GameCard(props: GameCardProps) {
         borderRadius: '10px',
         overflow: 'hidden',
         bgcolor: '#0c0c0c',
-        border: `1px solid ${alpha(GOLD, 0.35)}`,
+        border: `1px solid ${alpha(accent, 0.4)}`,
         boxShadow: `
-          0 0 0 1px ${alpha(GOLD, 0.06)},
+          0 0 0 1px ${alpha(accent, 0.08)},
           0 12px 32px ${alpha('#000000', 0.55)},
-          0 0 24px ${alpha(GOLD, 0.08)}
+          0 0 24px ${alpha(accent, 0.12)}
         `,
         cursor: isDisabled ? 'not-allowed' : 'pointer',
         opacity: isDisabled ? 0.72 : 1,
@@ -91,16 +103,16 @@ export function GameCard(props: GameCardProps) {
           ? undefined
           : {
               transform: 'translateY(-8px)',
-              borderColor: alpha(GOLD, 0.55),
+              borderColor: alpha(accent, 0.6),
               boxShadow: `
-                0 0 0 1px ${alpha(GOLD, 0.15)},
+                0 0 0 1px ${alpha(accent, 0.18)},
                 0 22px 48px ${alpha('#000000', 0.65)},
-                0 0 36px ${alpha(GOLD, 0.18)}
+                0 0 36px ${alpha(accent, 0.22)}
               `,
               '& .game-card-art': { transform: 'scale(1.06)' },
             },
         '&:focus-visible': {
-          outline: `2px solid ${alpha(GOLD, 0.7)}`,
+          outline: `2px solid ${alpha(accent, 0.75)}`,
           outlineOffset: 2,
         },
       }}
@@ -154,12 +166,34 @@ export function GameCard(props: GameCardProps) {
             height: 34,
             objectFit: 'cover',
             borderRadius: '6px',
-            border: `1px solid ${alpha(GOLD, 0.4)}`,
-            boxShadow: `0 4px 16px ${alpha('#000000', 0.6)}, 0 0 12px ${alpha(GOLD, 0.15)}`,
+            border: `1px solid ${alpha(accent, 0.45)}`,
+            boxShadow: `0 4px 16px ${alpha('#000000', 0.6)}, 0 0 12px ${alpha(accent, 0.18)}`,
           }}
         />
 
-        {comingSoon ? (
+        {featured ? (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              px: 0.8,
+              py: 0.35,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.45,
+              bgcolor: alpha('#000000', 0.78),
+              border: `1px solid ${alpha(GOLD, 0.5)}`,
+              borderRadius: '999px',
+              boxShadow: `0 0 10px ${alpha(GOLD, 0.18)}`,
+            }}
+          >
+            <Iconify icon="solar:star-bold" width={11} sx={{ color: GOLD }} />
+            <Typography sx={{ fontSize: 8, fontWeight: 800, color: GOLD, letterSpacing: 0.7 }}>
+              FEATURED
+            </Typography>
+          </Box>
+        ) : comingSoon ? (
           <Box
             sx={{
               position: 'absolute',
@@ -206,7 +240,8 @@ export function GameCard(props: GameCardProps) {
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden',
-            ...goldTextGradient,
+            color: accent,
+            textShadow: `0 0 18px ${alpha(accent, 0.15)}`,
           }}
         >
           {title}
