@@ -11,7 +11,7 @@ import { PLAY_IMAGE_PATHS } from '../play-constants';
 
 const { gold: GOLD, goldGradient, success: LIVE_GREEN } = USER_COLORS;
 
-const CARD_MIN_HEIGHT = { xs: 320, sm: 340, md: 360 };
+const CARD_MIN_HEIGHT = { xs: 248, sm: 258, md: 268 };
 
 const livePulse = keyframes`
   0%, 100% { opacity: 1; box-shadow: 0 0 0 0 ${alpha(LIVE_GREEN, 0.6)}; }
@@ -71,8 +71,8 @@ export function GameCard(props: GameCardProps) {
       aria-disabled={isDisabled}
       sx={{
         width: 1,
-        height: 1,
         minHeight: CARD_MIN_HEIGHT,
+        maxHeight: CARD_MIN_HEIGHT,
         display: 'flex',
         flexDirection: 'column',
         borderRadius: '10px',
@@ -105,14 +105,13 @@ export function GameCard(props: GameCardProps) {
         },
       }}
     >
-      {/* Hero art — fixed flex slice so all cards share proportions */}
+      {/* Hero art */}
       <Box
         sx={{
           position: 'relative',
           width: 1,
-          flex: '0 0 42%',
-          minHeight: { xs: 120, sm: 130 },
-          maxHeight: { xs: 150, sm: 165, md: 175 },
+          flex: '0 0 auto',
+          aspectRatio: '16 / 10',
           overflow: 'hidden',
           bgcolor: '#050505',
         }}
@@ -151,8 +150,8 @@ export function GameCard(props: GameCardProps) {
             position: 'absolute',
             top: 8,
             right: 8,
-            width: 40,
-            height: 40,
+            width: 34,
+            height: 34,
             objectFit: 'cover',
             borderRadius: '6px',
             border: `1px solid ${alpha(GOLD, 0.4)}`,
@@ -180,29 +179,29 @@ export function GameCard(props: GameCardProps) {
         ) : null}
       </Box>
 
-      {/* Title — fixed height block */}
+      {/* Title */}
       <Stack
-        spacing={0.5}
+        spacing={0.35}
         sx={{
-          flex: '1 1 auto',
-          px: 1.25,
-          pt: 1,
-          pb: 0.75,
+          flex: '0 0 auto',
+          px: 1,
+          pt: 0.75,
+          pb: 0.5,
           alignItems: 'center',
           textAlign: 'center',
-          minHeight: 72,
+          minHeight: 52,
           justifyContent: 'center',
         }}
       >
         <Typography
           className="font-tr"
           sx={{
-            fontSize: { xs: 14, sm: 15, md: 16 },
+            fontSize: { xs: 13, sm: 14 },
             fontWeight: 900,
-            lineHeight: 1.2,
-            letterSpacing: 0.2,
+            lineHeight: 1.15,
+            letterSpacing: 0.15,
             width: 1,
-            minHeight: '2.4em',
+            minHeight: '2.3em',
             display: '-webkit-box',
             WebkitLineClamp: 2,
             WebkitBoxOrient: 'vertical',
@@ -249,13 +248,12 @@ export function GameCard(props: GameCardProps) {
       {/* Stats — equal height pills pinned to bottom */}
       <Stack
         direction="row"
-        spacing={0.75}
+        spacing={0.65}
         sx={{
           flex: '0 0 auto',
-          px: 1.25,
-          pb: 1.25,
+          px: 1,
+          pb: 1,
           pt: 0,
-          mt: 'auto',
         }}
       >
         <StatPill
@@ -306,14 +304,14 @@ function StatPill({ label, value, accent, active, icon }: StatPillProps) {
       sx={{
         flex: 1,
         minWidth: 0,
-        height: 68,
+        height: 54,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 0.35,
-        px: 0.5,
-        py: 0.75,
+        gap: 0.2,
+        px: 0.4,
+        py: 0.5,
         borderRadius: '8px',
         bgcolor: alpha('#000000', 0.45),
         backdropFilter: 'blur(10px)',
@@ -344,7 +342,7 @@ function StatPill({ label, value, accent, active, icon }: StatPillProps) {
         {icon}
         <Typography
           sx={{
-            fontSize: { xs: 18, sm: 20 },
+            fontSize: { xs: 16, sm: 17 },
             fontWeight: 900,
             lineHeight: 1,
             ...goldTextGradient,
