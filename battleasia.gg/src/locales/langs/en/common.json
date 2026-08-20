@@ -714,6 +714,7 @@
     "ongoing": "Ongoing",
     "upcoming": "Upcoming",
     "results": "Results",
+    "totalLiveMatches": "Total Live Match",
     "suffixScheduled": "scheduled",
     "suffixArchived": "archived",
     "selectTitleHint": "Select a title to view matches",

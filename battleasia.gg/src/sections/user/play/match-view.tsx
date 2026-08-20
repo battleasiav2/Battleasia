@@ -216,6 +216,7 @@ export function MatchView() {
 
   const gameName = matches[0]?.gameName ?? 'Matches';
   const activeList = categorizedMatches[activeTab];
+  const totalLiveMatches = categorizedMatches.ongoing.length + categorizedMatches.upcoming.length;
 
   const emptyMessages: Record<MatchTab, { title: string; description: string }> = {
     ongoing: {
@@ -249,15 +250,38 @@ export function MatchView() {
         <MatchPageSkeleton />
       ) : (
         <Stack spacing={3}>
-          <Grid container spacing={2}>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <UserStatTile label={t('play.ongoing')} value={categorizedMatches.ongoing.length} suffix={t('play.suffixLive')} />
+          <Grid container spacing={1.5} alignItems="stretch">
+            <Grid size={{ xs: 6, md: 3 }} sx={{ display: 'flex' }}>
+              <UserStatTile
+                label={t('play.ongoing')}
+                value={categorizedMatches.ongoing.length}
+                suffix={t('play.suffixLive')}
+                icon="solar:play-bold"
+              />
             </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <UserStatTile label={t('play.upcoming')} value={categorizedMatches.upcoming.length} suffix={t('play.suffixScheduled')} />
+            <Grid size={{ xs: 6, md: 3 }} sx={{ display: 'flex' }}>
+              <UserStatTile
+                label={t('play.upcoming')}
+                value={categorizedMatches.upcoming.length}
+                suffix={t('play.suffixScheduled')}
+                icon="solar:calendar-bold"
+              />
             </Grid>
-            <Grid size={{ xs: 12, sm: 4 }}>
-              <UserStatTile label={t('play.results')} value={categorizedMatches.results.length} suffix={t('play.suffixArchived')} />
+            <Grid size={{ xs: 6, md: 3 }} sx={{ display: 'flex' }}>
+              <UserStatTile
+                label={t('play.results')}
+                value={categorizedMatches.results.length}
+                suffix={t('play.suffixArchived')}
+                icon="solar:document-text-bold"
+              />
+            </Grid>
+            <Grid size={{ xs: 6, md: 3 }} sx={{ display: 'flex' }}>
+              <UserStatTile
+                label={t('play.totalLiveMatches')}
+                value={totalLiveMatches}
+                suffix={t('play.suffixQueued')}
+                icon="solar:bolt-bold"
+              />
             </Grid>
           </Grid>
 
