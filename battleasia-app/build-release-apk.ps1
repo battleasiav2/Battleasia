@@ -14,6 +14,10 @@ $Flutter = (Get-Command flutter -All -ErrorAction SilentlyContinue |
     Where-Object { $_.Source -like '*.bat' } |
     Select-Object -First 1).Source
 if (-not $Flutter) {
+    $Fallback = 'C:\Users\sumon\Downloads\flutter_windows_3.44.5-stable\flutter\bin\flutter.bat'
+    if (Test-Path $Fallback) { $Flutter = $Fallback }
+}
+if (-not $Flutter) {
     throw "flutter.bat not found on PATH. Install the Flutter SDK or add its bin folder to PATH."
 }
 

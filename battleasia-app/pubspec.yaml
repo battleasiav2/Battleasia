@@ -3,7 +3,7 @@ description: "BattleAsia Mobile Gaming Tournament Platform - Player Panel"
 
 publish_to: "none"
 
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: ">=3.8.1 <4.0.0"

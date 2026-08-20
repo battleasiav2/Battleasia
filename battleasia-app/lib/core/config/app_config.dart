@@ -15,6 +15,7 @@ class AppConfig {
   /// `--dart-define=API_BASE_URL=...` wins, then the bundled .env profile.
   static const String _serverUrlOverride =
       String.fromEnvironment('API_BASE_URL');
+  static const String _siteUrlOverride = String.fromEnvironment('SITE_URL');
 
   static String get serverUrl {
     if (_serverUrlOverride.isNotEmpty) {
@@ -29,9 +30,19 @@ class AppConfig {
     return defaultServerUrl;
   }
 
-  /// Frontend site URL (referral links)
-  static String get siteUrl =>
-      dotenv.env['SITE_URL'] ?? 'https://battleasia.gg';
+  /// Frontend site URL (referral + public profile links)
+  static String get siteUrl {
+    if (_siteUrlOverride.isNotEmpty) {
+      return _siteUrlOverride;
+    }
+
+    final fromEnv = dotenv.env['SITE_URL'];
+    if (fromEnv != null && fromEnv.isNotEmpty) {
+      return fromEnv;
+    }
+
+    return 'https://battleasia.gg';
+  }
 
   /// Assets directory path
   static String get assetsDir => dotenv.env['ASSETS_DIR'] ?? '';

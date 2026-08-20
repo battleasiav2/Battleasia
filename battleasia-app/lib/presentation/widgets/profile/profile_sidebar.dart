@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
@@ -457,7 +458,8 @@ class ProfileSidebar extends StatelessWidget {
       return;
     }
 
-    final profileUrl = 'https://battleasia.gg/user/profile/$userId';
+    final site = AppConfig.siteUrl.replaceAll(RegExp(r'/$'), '');
+    final profileUrl = '$site/profile/$userId';
     Clipboard.setData(ClipboardData(text: profileUrl));
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
