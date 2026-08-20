@@ -173,9 +173,9 @@ export function PlayView() {
                   onAction={fetchGames}
                 />
               ) : (
-                <Grid container spacing={{ xs: 1.5, sm: 2, md: 2.5 }}>
+                <Grid container spacing={{ xs: 1.5, sm: 2, md: 2 }} sx={{ alignItems: 'stretch' }}>
                   {games.map((game) => (
-                    <Grid key={game.id} size={{ xs: 6, sm: 4, md: 2.4 }}>
+                    <Grid key={game.id} size={{ xs: 6, sm: 4, md: 2.4 }} sx={{ display: 'flex' }}>
                       <GameCard
                         title={game.name}
                         subTitle={game.packageName || game.idPrefix}
