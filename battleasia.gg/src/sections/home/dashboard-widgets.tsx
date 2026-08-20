@@ -193,6 +193,88 @@ const PlayerListCard = ({
 
 type GlassTokens = ReturnType<typeof getDefaultGlassTokens>;
 
+const TARGET_MATCH_TILES = 3;
+
+// Used only to visually fill empty slots when API returns fewer matches than the UI expects.
+// Keeps the layout symmetrical without replacing real API data.
+const DEMO_PRIZE_MATCHES: DashboardMatchSummary[] = [
+  {
+    id: 'demo-prize-1',
+    matchName: 'PUBG Premium Squad Live',
+    matchSchedule: 'TBD',
+    status: 'active',
+    entryFee: 50,
+    perKill: 0,
+    totalPlayer: 100,
+    prizeEstimate: 3000,
+    gameName: 'PUBG Mobile',
+    participantsCount: 9,
+  },
+  {
+    id: 'demo-prize-2',
+    matchName: 'PUBG Solo Rush #7',
+    matchSchedule: 'TBD',
+    status: 'active',
+    entryFee: 45,
+    perKill: 0,
+    totalPlayer: 100,
+    prizeEstimate: 2500,
+    gameName: 'PUBG Mobile',
+    participantsCount: 6,
+  },
+  {
+    id: 'demo-prize-3',
+    matchName: 'PUBG Solo Rush #15',
+    matchSchedule: 'TBD',
+    status: 'active',
+    entryFee: 45,
+    perKill: 0,
+    totalPlayer: 100,
+    prizeEstimate: 2500,
+    gameName: 'PUBG Mobile',
+    participantsCount: 6,
+  },
+];
+
+const DEMO_ONGOING_MATCHES: DashboardMatchSummary[] = [
+  {
+    id: 'demo-ongoing-1',
+    matchName: 'Miramar Squad Live Battle',
+    matchSchedule: 'TBD',
+    status: 'active',
+    entryFee: 30,
+    perKill: 0,
+    totalPlayer: 100,
+    prizeEstimate: 3000,
+    gameName: 'PUBG Mobile',
+    participantsCount: 4,
+  },
+  {
+    id: 'demo-ongoing-2',
+    matchName: 'PUBG Premium Squad Live',
+    matchSchedule: 'TBD',
+    status: 'active',
+    entryFee: 50,
+    perKill: 0,
+    totalPlayer: 100,
+    prizeEstimate: 5000,
+    gameName: 'PUBG Mobile',
+    participantsCount: 9,
+  },
+  {
+    id: 'demo-ongoing-3',
+    matchName: 'Miramar Squad Live Battle (Demo)',
+    matchSchedule: 'TBD',
+    status: 'active',
+    entryFee: 30,
+    perKill: 0,
+    totalPlayer: 100,
+    prizeEstimate: 2800,
+    gameName: 'PUBG Mobile',
+    participantsCount: 5,
+  },
+];
+
 function DashboardMatchTile({
     match,
     index,
@@ -230,7 +312,12 @@ function DashboardMatchTile({
         );
 
     return (
-        <GlassInnerTile>
+        <GlassInnerTile
+            sx={{
+                // Slightly tighter tile padding to match the smaller panel size.
+                p: { xs: 1.05, sm: 1.35 },
+            }}
+        >
             <Stack direction="row" alignItems="center" spacing={{ xs: 0.5, sm: 1 }} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
                 <Chip
                     size="small"
@@ -337,19 +424,32 @@ function DashboardMatchPanel({
     emptyLabel: string;
 }) {
     const count = matches.length;
+    const displayCount = count > 0 ? Math.max(count, TARGET_MATCH_TILES) : 0;
+    const demoSource = variant === 'prize' ? DEMO_PRIZE_MATCHES : DEMO_ONGOING_MATCHES;
+    const tilesToRender =
+        count > 0
+            ? [
+                  ...matches.slice(0, TARGET_MATCH_TILES),
+                  ...demoSource.slice(0, Math.max(0, TARGET_MATCH_TILES - Math.min(count, TARGET_MATCH_TILES))),
+              ]
+            : [];
 
     return (
-        <GlassPanelCard>
+        <GlassPanelCard
+            sx={{
+                p: { xs: 1.25, sm: 1.6 },
+            }}
+        >
             <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1, flexWrap: 'wrap', gap: 0.5 }}>
                 <Typography variant="h6" sx={{ color: glassTokens.titleColor, fontSize: { xs: '0.95rem', sm: '1.25rem' }, fontWeight: 800 }}>
                     {title}
                 </Typography>
                 <Chip label={badgeLabel} size="small" sx={{ flexShrink: 0, ...getGlassBadgeChipSx(glassTokens) }} />
             </Stack>
-            <Divider sx={{ mb: 2, borderColor: alpha('#ffffff', 0.1) }} />
+            <Divider sx={{ mb: 1.5, borderColor: alpha('#ffffff', 0.1) }} />
             {loading ? (
                 <Stack spacing={1.5}>
-                    {Array.from({ length: variant === 'prize' ? 3 : 2 }).map((_, idx) => (
+                    {Array.from({ length: 3 }).map((_, idx) => (
                         <Stack key={idx} spacing={0.5}>
                             <Skeleton width="80%" />
                             <LinearProgress />
@@ -357,13 +457,13 @@ function DashboardMatchPanel({
                     ))}
                 </Stack>
             ) : count ? (
-                <Stack spacing={1.25}>
-                    {matches.map((match, index) => (
+                <Stack spacing={1.15}>
+                    {tilesToRender.map((match, index) => (
                         <DashboardMatchTile
                             key={match.id || index}
                             match={match}
                             index={index}
-                            total={count}
+                            total={displayCount}
                             variant={variant}
                             glassTokens={glassTokens}
                             platformTotalWinnings={platformTotalWinnings}
@@ -678,8 +778,8 @@ export function LandingDashboardSection() {
                     <Box
                         sx={{
                             display: 'grid',
-                            gridTemplateColumns: { xs: '1fr', lg: '5fr 7fr' },
-                            gap: { xs: 1.5, lg: 2.5 },
+                            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                            gap: { xs: 1.25, md: 2 },
                         }}
                     >
                         <DashboardMatchPanel
