@@ -105,9 +105,9 @@ export function PlayArenaHero({
         width: 'auto',
         mx: { xs: -2, sm: -3, md: -4 },
         // Tighten the gap left by the shell's fixed-header padding without sliding under the header
-        mt: { xs: -4, sm: -5, md: -6 },
-        mb: { xs: 2.25, md: 3.5 },
-        minHeight: { xs: 360, sm: 440, md: 520 },
+        mt: { xs: -4.75, sm: -5, md: -6 },
+        mb: { xs: 1.5, md: 3 },
+        minHeight: { xs: 312, sm: 410, md: 500 },
         display: 'flex',
         alignItems: 'flex-end',
         overflow: 'hidden',
@@ -180,22 +180,22 @@ export function PlayArenaHero({
       <Box sx={bracketSx('br')} />
 
       <Stack
-        spacing={{ xs: 1.5, md: 2 }}
+        spacing={{ xs: 1, md: 2 }}
         sx={{
           position: 'relative',
           zIndex: 3,
           width: 1,
-          px: { xs: 2.5, sm: 3.75, md: 6 },
-          py: { xs: 3, md: 4.5 },
+          px: { xs: 2.25, sm: 3.5, md: 6 },
+          py: { xs: 2.25, md: 4.25 },
           maxWidth: { md: 760 },
         }}
       >
         <Stack direction="row" alignItems="center" spacing={1.25} flexWrap="wrap" useFlexGap>
           <Typography
             sx={{
-              fontSize: 11,
+              fontSize: 10,
               fontWeight: 800,
-              letterSpacing: 1.8,
+              letterSpacing: 1.4,
               textTransform: 'uppercase',
               color: alpha(GOLD, 0.92),
             }}
@@ -208,8 +208,8 @@ export function PlayArenaHero({
             alignItems="center"
             spacing={0.75}
             sx={{
-              px: 1,
-              py: 0.4,
+              px: 0.85,
+              py: 0.3,
               border: `1px solid ${alpha(GOLD, 0.32)}`,
               bgcolor: alpha('#000000', 0.5),
               backdropFilter: 'blur(6px)',
@@ -225,7 +225,7 @@ export function PlayArenaHero({
                 animation: `${livePulse} 1.8s ease-in-out infinite`,
               }}
             />
-            <Typography sx={{ fontSize: 10, fontWeight: 800, letterSpacing: 1, color: '#ffffff' }}>
+            <Typography sx={{ fontSize: 9, fontWeight: 800, letterSpacing: 0.8, color: '#ffffff' }}>
               {liveLabel}
             </Typography>
           </Stack>
@@ -234,7 +234,7 @@ export function PlayArenaHero({
         <Typography
           className="font-tr"
           sx={{
-            fontSize: { xs: 28, sm: 40, md: 58 },
+            fontSize: { xs: 22, sm: 36, md: 56 },
             fontWeight: 800,
             lineHeight: 1.02,
             letterSpacing: { md: 0.5 },
@@ -249,19 +249,19 @@ export function PlayArenaHero({
         <Typography
           className="font-tr"
           sx={{
-            fontSize: { xs: 12.25, md: 15.25 },
-            lineHeight: 1.5,
+            fontSize: { xs: 11, md: 15 },
+            lineHeight: 1.45,
             color: alpha('#ffffff', 0.82),
-            maxWidth: 560,
+            maxWidth: 520,
             textShadow: `0 1px 8px ${alpha('#000000', 0.8)}`,
           }}
         >
           {description}
         </Typography>
 
-        <BattleGoldDivider variant="hero" sx={{ width: { xs: 125, md: 220 } }} />
+        <BattleGoldDivider variant="hero" sx={{ width: { xs: 100, md: 220 } }} />
 
-        <Stack direction="row" spacing={1.25} flexWrap="wrap" useFlexGap sx={{ pt: 0.5 }}>
+        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ pt: 0.15 }}>
           <Button
             variant="outlined"
             disableElevation
@@ -269,9 +269,9 @@ export function PlayArenaHero({
             startIcon={<Iconify icon="solar:gamepad-bold-duotone" />}
             sx={{
               ...userGoldButtonSx,
-              px: { xs: 2.5, md: 3.25 },
-                py: { xs: 1.0, md: 1.15 },
-                fontSize: { xs: 12.5, md: 13 },
+              px: { xs: 2.1, md: 3.25 },
+              py: { xs: 0.82, md: 1.1 },
+              fontSize: { xs: 11.5, md: 13 },
             }}
           >
             {secondaryLabel}
@@ -280,9 +280,9 @@ export function PlayArenaHero({
           <WatchLiveButton
             onClick={onPrimary}
             sx={{
-              px: { xs: 2.5, md: 3 },
-                py: { xs: 1.0, md: 1.15 },
-                fontSize: { xs: 12.5, md: 13 },
+              px: { xs: 2.1, md: 3 },
+              py: { xs: 0.82, md: 1.1 },
+              fontSize: { xs: 11.5, md: 13 },
             }}
           >
             {primaryLabel}
