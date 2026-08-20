@@ -6,6 +6,9 @@ import { alpha, keyframes } from '@mui/material/styles';
 const GOLD = '#f5c518';
 const GOLD_SOFT = '#ffe08a';
 const LIVE_GREEN = '#22c55e';
+const FIRE_ORANGE = '#ff6a12';
+const FIRE_CORE = '#ff3b00';
+const FIRE_TIP = '#ffd56a';
 
 /**
  * Performance rules for this overlay:
@@ -87,9 +90,21 @@ const bracketPulse = keyframes`
 `;
 
 const emberRise = keyframes`
-  0% { transform: translate3d(0, 0, 0) scale(0.6); opacity: 0; }
-  18% { opacity: 0.65; }
-  100% { transform: translate3d(var(--dx), -120px, 0) scale(1); opacity: 0; }
+  0% { transform: translate3d(0, 0, 0) scale(0.55); opacity: 0; }
+  12% { opacity: 0.9; }
+  100% { transform: translate3d(var(--dx), var(--rise, -220px), 0) scale(0.35); opacity: 0; }
+`;
+
+const fireBedPulse = keyframes`
+  0%, 100% { opacity: 0.55; transform: translate3d(0, 0, 0) scaleY(1); }
+  50% { opacity: 0.85; transform: translate3d(0, -2%, 0) scaleY(1.08); }
+`;
+
+const flameLick = keyframes`
+  0% { transform: translate3d(0, 18%, 0) scaleY(0.72) scaleX(0.92); opacity: 0; }
+  14% { opacity: var(--peak, 0.7); }
+  55% { opacity: calc(var(--peak, 0.7) * 0.55); }
+  100% { transform: translate3d(var(--dx), -42%, 0) scaleY(1.18) scaleX(0.78); opacity: 0; }
 `;
 
 /** Fewer, softer orbs — gradient falloff only, no live blur */
@@ -107,11 +122,23 @@ const MOTES = [
 ] as const;
 
 const EMBERS = [
-  { left: '12%', delay: '0s', duration: '7.5s', dx: '12px', size: 3 },
-  { left: '28%', delay: '1.8s', duration: '8.5s', dx: '-10px', size: 2 },
-  { left: '48%', delay: '0.6s', duration: '7s', dx: '14px', size: 3 },
-  { left: '66%', delay: '2.4s', duration: '9s', dx: '-8px', size: 2 },
-  { left: '82%', delay: '1.1s', duration: '8s', dx: '10px', size: 3 },
+  { left: '8%', delay: '0s', duration: '4.2s', dx: '10px', size: 3, rise: '-240px' },
+  { left: '18%', delay: '0.7s', duration: '5s', dx: '-14px', size: 2, rise: '-280px' },
+  { left: '32%', delay: '1.4s', duration: '4.6s', dx: '16px', size: 3, rise: '-260px' },
+  { left: '46%', delay: '0.3s', duration: '3.8s', dx: '-8px', size: 2, rise: '-220px' },
+  { left: '58%', delay: '1.1s', duration: '4.8s', dx: '12px', size: 4, rise: '-300px' },
+  { left: '72%', delay: '0.9s', duration: '5.2s', dx: '-16px', size: 2, rise: '-250px' },
+  { left: '84%', delay: '1.8s', duration: '4.4s', dx: '8px', size: 3, rise: '-270px' },
+  { left: '92%', delay: '0.5s', duration: '5.4s', dx: '-10px', size: 2, rise: '-230px' },
+] as const;
+
+const FLAMES = [
+  { left: '6%', width: 72, height: 160, delay: '0s', duration: '2.4s', dx: '8px', peak: 0.55 },
+  { left: '22%', width: 96, height: 210, delay: '0.4s', duration: '2.8s', dx: '-10px', peak: 0.7 },
+  { left: '38%', width: 80, height: 180, delay: '0.9s', duration: '2.2s', dx: '12px', peak: 0.62 },
+  { left: '52%', width: 110, height: 230, delay: '0.2s', duration: '3s', dx: '-8px', peak: 0.75 },
+  { left: '68%', width: 88, height: 190, delay: '0.7s', duration: '2.5s', dx: '10px', peak: 0.58 },
+  { left: '82%', width: 74, height: 165, delay: '1.1s', duration: '2.7s', dx: '-12px', peak: 0.5 },
 ] as const;
 
 function cornerBracket(position: 'tl' | 'tr' | 'bl' | 'br') {
@@ -234,23 +261,81 @@ export function HeroFxOverlay() {
         }}
       />
 
-      {/* Embers — light spark rise (all breakpoints, few nodes) */}
+      {/* Fire bed — rising flames + sparks (CSS only) */}
+      <Box
+        sx={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: { xs: '42%', md: '48%' },
+          overflow: 'hidden',
+          mixBlendMode: 'screen',
+        }}
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            left: '-8%',
+            right: '-8%',
+            bottom: '-18%',
+            height: { xs: '70%', md: '78%' },
+            background: `
+              radial-gradient(ellipse 80% 70% at 50% 100%, ${alpha(FIRE_CORE, 0.42)} 0%, transparent 62%),
+              radial-gradient(ellipse 50% 55% at 28% 100%, ${alpha(FIRE_ORANGE, 0.32)} 0%, transparent 58%),
+              radial-gradient(ellipse 46% 52% at 74% 100%, ${alpha(FIRE_TIP, 0.22)} 0%, transparent 55%)
+            `,
+            animation: `${fireBedPulse} 2.4s ease-in-out infinite`,
+            willChange: 'transform, opacity',
+          }}
+        />
+
+        {FLAMES.map((flame, i) => (
+          <Box
+            key={`flame-${i}`}
+            sx={{
+              position: 'absolute',
+              left: flame.left,
+              bottom: '-6%',
+              width: { xs: flame.width * 0.72, md: flame.width },
+              height: { xs: flame.height * 0.78, md: flame.height },
+              borderRadius: '50% 50% 42% 42%',
+              background: `
+                radial-gradient(ellipse 70% 90% at 50% 88%,
+                  ${alpha(FIRE_TIP, 0.85)} 0%,
+                  ${alpha(FIRE_ORANGE, 0.55)} 28%,
+                  ${alpha(FIRE_CORE, 0.28)} 58%,
+                  transparent 78%
+                )
+              `,
+              '--dx': flame.dx,
+              '--peak': flame.peak,
+              animation: `${flameLick} ${flame.duration} ${flame.delay} ease-out infinite`,
+              willChange: 'transform, opacity',
+              display: { xs: i % 2 === 0 ? 'block' : 'none', md: 'block' },
+            }}
+          />
+        ))}
+      </Box>
+
+      {/* Sparks rising from fire */}
       {EMBERS.map((ember, i) => (
         <Box
           key={`ember-${i}`}
           sx={{
             position: 'absolute',
             left: ember.left,
-            bottom: '8%',
+            bottom: { xs: '10%', md: '12%' },
             width: ember.size,
             height: ember.size,
             borderRadius: '50%',
-            bgcolor: alpha(GOLD, 0.8),
-            boxShadow: `0 0 6px ${alpha(GOLD, 0.5)}`,
+            bgcolor: i % 2 === 0 ? FIRE_TIP : FIRE_ORANGE,
+            boxShadow: `0 0 8px ${alpha(FIRE_ORANGE, 0.8)}`,
             '--dx': ember.dx,
+            '--rise': ember.rise,
             animation: `${emberRise} ${ember.duration} ${ember.delay} infinite linear`,
             willChange: 'transform, opacity',
-            display: { xs: i < 3 ? 'block' : 'none', md: 'block' },
+            display: { xs: i < 5 ? 'block' : 'none', md: 'block' },
           }}
         />
       ))}
