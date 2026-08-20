@@ -19,7 +19,6 @@ const FOOTER_PARTNERS = [
   { label: 'pubg.com', href: 'https://www.pubg.com', icon: '/assets/images/games/pubg-mobile.png' },
   { label: 'www.bkash.com', href: 'https://www.bkash.com', icon: '/assets/images/bkash.webp' },
   { label: 'nagadwallet.net', href: 'https://nagadwallet.net', icon: '/assets/images/nagad.webp' },
-  { label: 'coinremitter.com', href: 'https://coinremitter.com', icon: '/assets/images/currency.webp' },
 ] as const;
 
 const linkSx = {
