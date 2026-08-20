@@ -106,8 +106,8 @@ export function PlayArenaHero({
         mx: { xs: -2, sm: -3, md: -4 },
         // Tighten the gap left by the shell's fixed-header padding without sliding under the header
         mt: { xs: -4, sm: -5, md: -6 },
-        mb: { xs: 3, md: 4 },
-        minHeight: { xs: 420, sm: 470, md: 540 },
+        mb: { xs: 2.25, md: 3.5 },
+        minHeight: { xs: 360, sm: 440, md: 520 },
         display: 'flex',
         alignItems: 'flex-end',
         overflow: 'hidden',
@@ -185,8 +185,8 @@ export function PlayArenaHero({
           position: 'relative',
           zIndex: 3,
           width: 1,
-          px: { xs: 3, sm: 4, md: 6 },
-          py: { xs: 4, md: 5 },
+          px: { xs: 2.5, sm: 3.75, md: 6 },
+          py: { xs: 3, md: 4.5 },
           maxWidth: { md: 760 },
         }}
       >
@@ -234,7 +234,7 @@ export function PlayArenaHero({
         <Typography
           className="font-tr"
           sx={{
-            fontSize: { xs: 34, sm: 46, md: 62 },
+            fontSize: { xs: 28, sm: 40, md: 58 },
             fontWeight: 800,
             lineHeight: 1.02,
             letterSpacing: { md: 0.5 },
@@ -249,8 +249,8 @@ export function PlayArenaHero({
         <Typography
           className="font-tr"
           sx={{
-            fontSize: { xs: 13.5, md: 16 },
-            lineHeight: 1.55,
+            fontSize: { xs: 12.25, md: 15.25 },
+            lineHeight: 1.5,
             color: alpha('#ffffff', 0.82),
             maxWidth: 560,
             textShadow: `0 1px 8px ${alpha('#000000', 0.8)}`,
@@ -259,7 +259,7 @@ export function PlayArenaHero({
           {description}
         </Typography>
 
-        <BattleGoldDivider variant="hero" sx={{ width: { xs: 160, md: 220 } }} />
+        <BattleGoldDivider variant="hero" sx={{ width: { xs: 125, md: 220 } }} />
 
         <Stack direction="row" spacing={1.25} flexWrap="wrap" useFlexGap sx={{ pt: 0.5 }}>
           <Button
@@ -270,8 +270,8 @@ export function PlayArenaHero({
             sx={{
               ...userGoldButtonSx,
               px: { xs: 2.5, md: 3.25 },
-              py: 1.15,
-              fontSize: 13,
+                py: { xs: 1.0, md: 1.15 },
+                fontSize: { xs: 12.5, md: 13 },
             }}
           >
             {secondaryLabel}
@@ -281,8 +281,8 @@ export function PlayArenaHero({
             onClick={onPrimary}
             sx={{
               px: { xs: 2.5, md: 3 },
-              py: 1.15,
-              fontSize: 13,
+                py: { xs: 1.0, md: 1.15 },
+                fontSize: { xs: 12.5, md: 13 },
             }}
           >
             {primaryLabel}
@@ -293,7 +293,7 @@ export function PlayArenaHero({
           direction="row"
           spacing={0}
           sx={{
-            mt: { xs: 1, md: 1.5 },
+            mt: { xs: 0.75, md: 1.25 },
             border: `1px solid ${alpha('#ffffff', 0.1)}`,
             bgcolor: alpha('#000000', 0.55),
             backdropFilter: 'blur(10px)',
@@ -306,21 +306,21 @@ export function PlayArenaHero({
             <Stack
               key={stat.label}
               sx={{
-                px: { xs: 1.75, md: 2.5 },
-                py: { xs: 1, md: 1.25 },
+                px: { xs: 1.4, md: 2.25 },
+                py: { xs: 0.75, md: 1.05 },
                 borderLeft: index === 0 ? 'none' : `1px solid ${alpha('#ffffff', 0.1)}`,
-                minWidth: { xs: 88, md: 108 },
+                minWidth: { xs: 78, md: 108 },
               }}
             >
               <Typography
                 className="font-tr"
-                sx={{ fontSize: { xs: 20, md: 24 }, fontWeight: 800, color: GOLD, lineHeight: 1 }}
+                sx={{ fontSize: { xs: 18.5, md: 24 }, fontWeight: 800, color: GOLD, lineHeight: 1 }}
               >
                 {stat.value}
               </Typography>
               <Typography
                 sx={{
-                  mt: 0.4,
+                  mt: 0.35,
                   fontSize: 10,
                   fontWeight: 700,
                   letterSpacing: 0.9,
