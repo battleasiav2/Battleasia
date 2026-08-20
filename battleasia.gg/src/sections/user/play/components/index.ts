@@ -1,5 +1,5 @@
 export * from './game-card';
-export * from './play-arena-hero';
+export * from './play-watch-live-strip';
 export * from './play-hero-banner';
 export * from './play-page-skeleton';
 export * from './match-card';

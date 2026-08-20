@@ -8,7 +8,6 @@ import { useRouter } from 'src/routes/hooks';
 import useApi from 'src/hooks/use-api';
 
 import { CONFIG } from 'src/global-config';
-import { useImagePreloader } from 'src/hooks';
 import { useTranslate } from 'src/locales/use-locales';
 import { UserPageShell, UserEmptyState } from 'src/layouts/user';
 import { USER_COLORS } from 'src/layouts/user/user-theme';
@@ -18,15 +17,13 @@ import { ScrollReveal } from 'src/components/animate';
 
 import type { PublicDashboardStats } from 'src/types';
 
-import { GameCard, PlayArenaHero, PlayPageSkeleton } from './components';
-import { PLAY_IMAGE_PATHS, resolvePlayGameArt, sortGamesForArena } from './play-constants';
+import { GameCard, PlayWatchLiveStrip, PlayPageSkeleton } from './components';
+import { resolvePlayGameArt, sortGamesForArena } from './play-constants';
 
 // Re-export for backward compatibility
 export { PLAY_IMAGE_PATHS } from './play-constants';
 
 // ----------------------------------------------------------------------
-
-const imagePaths = [PLAY_IMAGE_PATHS.heroBanner];
 
 const GAMES_ANCHOR_ID = 'play-games';
 
@@ -49,11 +46,6 @@ export function PlayView() {
   const [games, setGames] = useState<IGame[]>([]);
   const [loading, setLoading] = useState(true);
   const [matchCounts, setMatchCounts] = useState<Pick<PublicDashboardStats, 'liveCountByGame' | 'upcomingCountByGame'>>({});
-
-  const { isLoaded } = useImagePreloader(imagePaths, {
-    delay: 300,
-    continueOnError: true,
-  });
 
   const fetchMatchCounts = async () => {
     try {
@@ -104,32 +96,11 @@ export function PlayView() {
     window.open('https://www.youtube.com/@BattleAsia', '_blank');
   };
 
-  const handleBrowseGames = () => {
-    document.getElementById(GAMES_ANCHOR_ID)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
-
-  const activeGames = games.filter((g) => !g.comingSoon).length;
-  const upcomingGames = games.filter((g) => g.comingSoon).length;
-  const isPageLoading = !isLoaded || loading;
+  const isPageLoading = loading;
 
   return (
     <UserPageShell>
-      <PlayArenaHero
-        badge={t('play.badgeTournamentHub')}
-        title={t('play.battleasia')}
-        description={t('play.bannerDescription')}
-        imageUrl={PLAY_IMAGE_PATHS.heroBanner}
-        liveLabel={t('play.watchLive')}
-        primaryLabel={t('play.watchLive')}
-        secondaryLabel={t('play.tournament')}
-        onPrimary={handleWatchLive}
-        onSecondary={handleBrowseGames}
-        stats={[
-          { label: t('play.totalGames'), value: games.length },
-          { label: t('play.playableNow'), value: activeGames },
-          { label: t('common.comingSoon'), value: upcomingGames },
-        ]}
-      />
+      <PlayWatchLiveStrip label={t('play.watchLive')} onWatchLive={handleWatchLive} />
 
       {isPageLoading ? (
         <PlayPageSkeleton />

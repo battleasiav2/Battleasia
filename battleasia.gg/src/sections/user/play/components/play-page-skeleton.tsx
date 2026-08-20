@@ -9,10 +9,10 @@ export function PlayPageSkeleton() {
   const tokens = getDefaultGlassTokens();
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={2.5}>
       <Box
         sx={getGlassShellSx(tokens, {
-          height: { xs: 300, md: 420 },
+          height: { xs: 96, md: 108 },
           p: 0,
         })}
       >
