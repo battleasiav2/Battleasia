@@ -288,51 +288,6 @@ export function PlayArenaHero({
             {primaryLabel}
           </WatchLiveButton>
         </Stack>
-
-        <Stack
-          direction="row"
-          spacing={0}
-          sx={{
-            mt: { xs: 0.75, md: 1.25 },
-            border: `1px solid ${alpha('#ffffff', 0.1)}`,
-            bgcolor: alpha('#000000', 0.55),
-            backdropFilter: 'blur(10px)',
-            width: 'fit-content',
-            maxWidth: 1,
-            flexWrap: 'wrap',
-          }}
-        >
-          {stats.map((stat, index) => (
-            <Stack
-              key={stat.label}
-              sx={{
-                px: { xs: 1.4, md: 2.25 },
-                py: { xs: 0.75, md: 1.05 },
-                borderLeft: index === 0 ? 'none' : `1px solid ${alpha('#ffffff', 0.1)}`,
-                minWidth: { xs: 78, md: 108 },
-              }}
-            >
-              <Typography
-                className="font-tr"
-                sx={{ fontSize: { xs: 18.5, md: 24 }, fontWeight: 800, color: GOLD, lineHeight: 1 }}
-              >
-                {stat.value}
-              </Typography>
-              <Typography
-                sx={{
-                  mt: 0.35,
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: 0.9,
-                  textTransform: 'uppercase',
-                  color: alpha('#ffffff', 0.6),
-                }}
-              >
-                {stat.label}
-              </Typography>
-            </Stack>
-          ))}
-        </Stack>
       </Stack>
     </Box>
   );
