@@ -1,7 +1,7 @@
 import { Stack, Button } from '@mui/material';
 
 import { Iconify } from 'src/components/iconify/iconify';
-import { userGhostButtonSx, userSolidGoldButtonSx } from 'src/layouts/user/user-theme';
+import { userGhostButtonSx } from 'src/layouts/user/user-theme';
 import { startAppDownload } from 'src/utils/app-download-url';
 
 type HeroMeshButtonsProps = {
