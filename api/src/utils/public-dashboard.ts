@@ -209,7 +209,13 @@ export async function getPublicDashboardStats() {
     { $match: { status: 'start' } },
     { $group: { _id: '$gameId', count: { $sum: 1 } } },
   ]);
-  const gameIds = liveByGame.map((r) => r._id).filter((id) => Types.ObjectId.isValid(id));
+  const upcomingByGame = await Match.aggregate<{ _id: string; count: number }>([
+    { $match: { status: 'active' } },
+    { $group: { _id: '$gameId', count: { $sum: 1 } } },
+  ]);
+  const gameIds = [...new Set([...liveByGame, ...upcomingByGame].map((r) => r._id))].filter((id) =>
+    Types.ObjectId.isValid(id)
+  );
   const liveGameNames = gameIds.length
     ? await Game.find({ _id: { $in: gameIds.map((id) => new Types.ObjectId(id)) } })
         .select('name')
@@ -221,6 +227,11 @@ export async function getPublicDashboardStats() {
     const name = gameNameMap.get(row._id.toString());
     if (name) liveCountByGame[name] = row.count;
   }
+  const upcomingCountByGame: Record<string, number> = {};
+  for (const row of upcomingByGame) {
+    const name = gameNameMap.get(row._id.toString());
+    if (name) upcomingCountByGame[name] = row.count;
+  }
 
   return {
     platform: {
@@ -230,6 +241,7 @@ export async function getPublicDashboardStats() {
       todayJoinedUsers,
     },
     liveCountByGame,
+    upcomingCountByGame,
     topProfitPlayers,
     topPlayers,
     ongoingMatches,

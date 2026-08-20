@@ -663,6 +663,8 @@
     "suffixScheduled": "নির্ধারিত",
     "suffixArchived": "আর্কাইভ",
     "selectTitleHint": "ম্যাচ দেখতে একটি টাইটেল নির্বাচন করুন",
+    "liveGames": "লাইভ",
+    "upcomingGames": "আসন্ন",
     "emptyOngoingTitle": "কোনো লাইভ ম্যাচ নেই",
     "emptyOngoingDescription": "এখন কোনো চলমান ম্যাচ নেই। আসন্ন ট্যাব দেখুন অথবা রিফ্রেশ করুন।",
     "emptyUpcomingTitle": "কোনো নির্ধারিত ম্যাচ নেই",

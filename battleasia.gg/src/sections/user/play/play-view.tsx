@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 import { Box, Stack, Typography, Grid2 as Grid } from '@mui/material';
 
@@ -7,6 +7,7 @@ import { useRouter } from 'src/routes/hooks';
 
 import useApi from 'src/hooks/use-api';
 
+import { CONFIG } from 'src/global-config';
 import { useImagePreloader } from 'src/hooks';
 import { useTranslate } from 'src/locales/use-locales';
 import { UserPageShell, UserEmptyState } from 'src/layouts/user';
@@ -14,6 +15,8 @@ import { USER_COLORS } from 'src/layouts/user/user-theme';
 
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { ScrollReveal } from 'src/components/animate';
+
+import type { PublicDashboardStats } from 'src/types';
 
 import { GameCard, PlayArenaHero, PlayPageSkeleton } from './components';
 import { PLAY_IMAGE_PATHS, resolvePlayGameArt, sortGamesForArena } from './play-constants';
@@ -45,11 +48,27 @@ export function PlayView() {
   const { getGamesApi } = useApi();
   const [games, setGames] = useState<IGame[]>([]);
   const [loading, setLoading] = useState(true);
+  const [matchCounts, setMatchCounts] = useState<Pick<PublicDashboardStats, 'liveCountByGame' | 'upcomingCountByGame'>>({});
 
   const { isLoaded } = useImagePreloader(imagePaths, {
     delay: 300,
     continueOnError: true,
   });
+
+  const fetchMatchCounts = async () => {
+    try {
+      const res = await fetch(`${CONFIG.serverUrl}/api/v3/public/dashboard`);
+      if (!res.ok) return;
+      const json = await res.json();
+      const data = json?.data ?? json;
+      setMatchCounts({
+        liveCountByGame: data?.liveCountByGame,
+        upcomingCountByGame: data?.upcomingCountByGame,
+      });
+    } catch {
+      // Non-blocking — cards still render without counts
+    }
+  };
 
   const fetchGames = async () => {
     setLoading(true);
@@ -65,8 +84,17 @@ export function PlayView() {
 
   useEffect(() => {
     fetchGames();
+    fetchMatchCounts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const countsByGameName = useMemo(
+    () => ({
+      live: matchCounts.liveCountByGame ?? {},
+      upcoming: matchCounts.upcomingCountByGame ?? {},
+    }),
+    [matchCounts]
+  );
 
   const handleGameClick = (gameId: string | number) => {
     router.push(paths.user.playDetail(gameId));
@@ -155,6 +183,10 @@ export function PlayView() {
                         imageUrl={resolvePlayGameArt(game, 'image')}
                         comingSoon={game.comingSoon}
                         disabled={game.comingSoon}
+                        liveCount={countsByGameName.live[game.name] ?? 0}
+                        upcomingCount={countsByGameName.upcoming[game.name] ?? 0}
+                        liveLabel={t('play.liveGames')}
+                        upcomingLabel={t('play.upcomingGames')}
                         onClick={() => handleGameClick(game.id)}
                       />
                     </Grid>
