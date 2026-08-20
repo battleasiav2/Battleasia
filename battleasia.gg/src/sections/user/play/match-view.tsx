@@ -280,7 +280,7 @@ export function MatchView() {
                 label={t('play.totalLiveMatches')}
                 value={totalLiveMatches}
                 suffix={t('play.suffixQueued')}
-                icon="solar:bolt-bold"
+                icon="solar:gamepad-bold-duotone"
               />
             </Grid>
           </Grid>
