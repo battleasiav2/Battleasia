@@ -106,6 +106,23 @@ async function aggregatePlayerStats(sortField: 'totalWinnings' | 'totalKills', l
   });
 }
 
+/** Start of calendar day in Asia/Dhaka (UTC+6). */
+function startOfTodayDhaka(): Date {
+  const offsetMs = 6 * 60 * 60 * 1000;
+  const shifted = new Date(Date.now() + offsetMs);
+  return new Date(
+    Date.UTC(shifted.getUTCFullYear(), shifted.getUTCMonth(), shifted.getUTCDate()) - offsetMs
+  );
+}
+
+async function countTodayJoinedUsers() {
+  return User.countDocuments({
+    createdAt: { $gte: startOfTodayDhaka() },
+    'role.type': 'player',
+    username: { $not: /^testplayer/i },
+  });
+}
+
 async function getGameNameMap(gameIds: string[]) {
   const validIds = gameIds
     .filter((id) => Types.ObjectId.isValid(id))
@@ -147,7 +164,16 @@ async function buildMatchSummaries(matches: Array<InstanceType<typeof Match>>) {
 }
 
 export async function getPublicDashboardStats() {
-  const [winningsAgg, processedMatches, ongoingMatchesCount, topProfitPlayers, topPlayers, ongoingList, highPrizeList] =
+  const [
+    winningsAgg,
+    processedMatches,
+    ongoingMatchesCount,
+    todayJoinedUsers,
+    topProfitPlayers,
+    topPlayers,
+    ongoingList,
+    highPrizeList,
+  ] =
     await Promise.all([
       Match.aggregate<{ total: number }>([
         { $match: { status: 'complete', 'results.0': { $exists: true } } },
@@ -163,6 +189,7 @@ export async function getPublicDashboardStats() {
       ]),
       Match.countDocuments({ status: 'complete' }),
       Match.countDocuments({ status: 'start' }),
+      countTodayJoinedUsers(),
       aggregatePlayerStats('totalWinnings', 5),
       aggregatePlayerStats('totalKills', 5),
       Match.find({ status: 'start' }).sort({ matchSchedule: 1 }).limit(5),
@@ -200,6 +227,7 @@ export async function getPublicDashboardStats() {
       totalWinnings: Math.round(totalWinnings * 10) / 10,
       processedMatches,
       ongoingMatches: ongoingMatchesCount,
+      todayJoinedUsers,
     },
     liveCountByGame,
     topProfitPlayers,

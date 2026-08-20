@@ -526,21 +526,23 @@ export function LandingDashboardSection() {
                 totalWinnings: '—',
                 processedMatches: '—',
                 ongoingMatches: '—',
+                todayJoinedUsers: '—',
             };
         }
-        const liveSuffix = ` ${t('home.dashboard.live')}`;
         return {
-            totalWinnings: <AnimatedCoinValue value={data.platform.totalWinnings || 0} size={24} />,
+            totalWinnings: <AnimatedCoinValue value={data.platform.totalWinnings || 0} size={20} />,
             processedMatches: <PulseCountUp value={data.platform.processedMatches || 0} />,
             ongoingMatches: <PulseCountUp value={data.platform.ongoingMatches || 0} />,
+            todayJoinedUsers: <PulseCountUp value={data.platform.todayJoinedUsers || 0} />,
         };
     }, [data, t]);
 
     const pulseLabels = useMemo(
         () => ({
-            platformTotalWinnings: t('home.dashboard.totalWon'),
-            processedMatches: t('home.dashboard.matchesCompleted'),
-            ongoingMatches: t('home.dashboard.liveNow'),
+            platformTotalWinnings: t('home.dashboard.platformTotalWinnings'),
+            processedMatches: t('home.dashboard.processedMatches'),
+            ongoingMatches: t('home.dashboard.ongoingMatches'),
+            todayJoinedUsers: t('home.dashboard.todayJoinUsers'),
         }),
         [t]
     );

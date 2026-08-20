@@ -6,21 +6,19 @@ import { GLASS_CARD_RADIUS, GLASS_CARD_RADIUS_SM } from './glass-card-tokens';
 import { GlassStatTile } from './glass-stat-tile';
 import type { GlassCardVariant } from './types';
 import { GLASS_CARD_VARIANTS } from './variants';
-import {
-  homeMobileScrollFlexRowSx,
-  homeMobileScrollItemSx,
-} from 'src/sections/home/home-horizontal-scroll';
 
 export type PulseCardStats = {
   totalWinnings: React.ReactNode;
   processedMatches: React.ReactNode;
   ongoingMatches: React.ReactNode;
+  todayJoinedUsers: React.ReactNode;
 };
 
 export type PulseCardLabels = {
   platformTotalWinnings: string;
   processedMatches: string;
   ongoingMatches: string;
+  todayJoinedUsers: string;
 };
 
 type PulseCardProps = {
@@ -57,8 +55,6 @@ export function PulseCard({
       value: stats.totalWinnings,
       suffix: undefined,
       icon: 'solar:wallet-money-bold-duotone',
-      xs: 12,
-      md: 12,
     },
     {
       key: 'matches',
@@ -66,8 +62,6 @@ export function PulseCard({
       value: stats.processedMatches,
       suffix: undefined,
       icon: 'solar:medal-ribbon-star-bold-duotone',
-      xs: 6,
-      md: 6,
     },
     {
       key: 'live',
@@ -75,8 +69,13 @@ export function PulseCard({
       value: stats.ongoingMatches,
       suffix: liveSuffix,
       icon: 'solar:play-bold',
-      xs: 6,
-      md: 6,
+    },
+    {
+      key: 'joined',
+      label: labels.todayJoinedUsers,
+      value: stats.todayJoinedUsers,
+      suffix: undefined,
+      icon: 'solar:user-plus-bold',
     },
   ] as const;
 
@@ -128,7 +127,7 @@ export function PulseCard({
         }}
       >
         <Grid container spacing={{ xs: 2, md: 3 }} alignItems="center">
-          <Grid item xs={12} md={7}>
+          <Grid item xs={12} md={6}>
             <Stack spacing={1.25}>
               <Chip
                 label={badgeLabel}
@@ -190,47 +189,20 @@ export function PulseCard({
             </Stack>
           </Grid>
 
-          <Grid item xs={12} md={5}>
-            <Box
-              sx={{
-                gap: 1.25,
-                ...homeMobileScrollFlexRowSx,
-                display: { xs: 'flex', md: 'none' },
-              }}
-            >
+          <Grid item xs={12} md={6}>
+            <Grid container spacing={1.25}>
               {statTiles.map((tile) => (
-                <Box
-                  key={tile.key}
-                  sx={{
-                    ...homeMobileScrollItemSx,
-                    flex: '0 0 78%',
-                    minWidth: 220,
-                    maxWidth: 280,
-                  }}
-                >
-                  <GlassStatTile
-                    label={tile.label}
-                    value={tile.value}
-                    suffix={tile.suffix}
-                    icon={tile.icon}
-                    loading={loading}
-                    tokens={tokens}
-                  />
-                </Box>
-              ))}
-            </Box>
-
-            <Grid container spacing={1.25} sx={{ display: { xs: 'none', md: 'flex' } }}>
-              {statTiles.map((tile) => (
-                <Grid key={tile.key} item xs={tile.xs} md={tile.md}>
-                  <GlassStatTile
-                    label={tile.label}
-                    value={tile.value}
-                    suffix={tile.suffix}
-                    icon={tile.icon}
-                    loading={loading}
-                    tokens={tokens}
-                  />
+                <Grid key={tile.key} item xs={6} sx={{ display: 'flex' }}>
+                  <Box sx={{ width: 1, '& > .MuiCard-root': { height: '100%' } }}>
+                    <GlassStatTile
+                      label={tile.label}
+                      value={tile.value}
+                      suffix={tile.suffix}
+                      icon={tile.icon}
+                      loading={loading}
+                      tokens={tokens}
+                    />
+                  </Box>
                 </Grid>
               ))}
             </Grid>

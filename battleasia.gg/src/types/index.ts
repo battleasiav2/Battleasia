@@ -111,6 +111,7 @@ export type DashboardPlatformStats = {
     totalWinnings: number;
     processedMatches: number;
     ongoingMatches: number;
+    todayJoinedUsers: number;
 };
 
 export type DashboardTopPlayer = {

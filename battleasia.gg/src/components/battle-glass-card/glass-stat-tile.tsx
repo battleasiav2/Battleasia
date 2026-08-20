@@ -25,6 +25,7 @@ export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: G
     color: 'inherit',
     p: { xs: 1.5, sm: 1.75 },
     minHeight: { xs: 96, sm: 108 },
+    height: '100%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
