@@ -397,7 +397,6 @@ export function HomeView() {
           }}
         >
           <HeroMeshButtons
-            joinLabel={t('home.joinTournament')}
             downloadLabel={t('home.downloadApkButton')}
             downloadHref={appDownload.href}
             downloadFileName={appDownload.fileName}
@@ -424,7 +423,6 @@ export function HomeView() {
         }}
       >
         <HeroMeshButtons
-          joinLabel={t('home.joinTournament')}
           downloadLabel={t('home.downloadApkButton')}
           downloadHref={appDownload.href}
           downloadFileName={appDownload.fileName}
@@ -436,7 +434,6 @@ export function HomeView() {
       </Stack>
 
       <HeroStickyCta
-        joinLabel={t('home.joinTournament')}
         downloadLabel={t('home.downloadApkButton')}
         downloadHref={appDownload.href}
         downloadFileName={appDownload.fileName}

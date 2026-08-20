@@ -5,9 +5,7 @@ import { userGhostButtonSx, userSolidGoldButtonSx } from 'src/layouts/user/user-
 import { startAppDownload } from 'src/utils/app-download-url';
 
 type HeroMeshButtonsProps = {
-  joinLabel: string;
   downloadLabel?: string;
-  joinHref?: string;
   downloadHref?: string;
   downloadFileName?: string;
   showDownload?: boolean;
@@ -25,9 +23,7 @@ const baseButtonSx = {
 };
 
 export function HeroMeshButtons({
-  joinLabel,
   downloadLabel,
-  joinHref = '/dashboard/play',
   downloadHref = '/api/uploads/app/BattleAsia.apk',
   downloadFileName = 'BattleAsia.apk',
   showDownload = true,
@@ -38,28 +34,11 @@ export function HeroMeshButtons({
       spacing={{ xs: 1, sm: 1.25, md: 1.5 }}
       sx={{
         width: '100%',
-        maxWidth: { xs: '100%', sm: 520, md: showDownload ? 640 : 320 },
+        // Only a single CTA remains (Join Tournament removed), so keep width comfortable.
+        maxWidth: { xs: '100%', sm: 520, md: 520 },
         mx: 'auto',
       }}
     >
-      <Button
-        component="a"
-        href={joinHref}
-        variant="contained"
-        disableElevation
-        startIcon={
-          <Iconify icon="game-icons:crossed-swords" width={18} sx={{ flexShrink: 0, color: 'inherit' }} />
-        }
-        sx={{
-          ...userSolidGoldButtonSx,
-          ...baseButtonSx,
-          boxShadow: 'none',
-          ...(showDownload ? {} : { flex: 'none', minWidth: { xs: 220, sm: 260 } }),
-        }}
-      >
-        {joinLabel}
-      </Button>
-
       {showDownload && downloadHref && downloadLabel ? (
         <Button
           component="a"

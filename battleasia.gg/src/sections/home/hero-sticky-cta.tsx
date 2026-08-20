@@ -6,9 +6,7 @@ import { alpha } from '@mui/material/styles';
 import { HeroMeshButtons } from 'src/components/mesh-buttons';
 
 type HeroStickyCtaProps = {
-  joinLabel: string;
   downloadLabel?: string;
-  joinHref?: string;
   downloadHref?: string;
   downloadFileName?: string;
   showDownload?: boolean;
@@ -16,9 +14,7 @@ type HeroStickyCtaProps = {
 
 /** Mobile-only sticky CTAs after hero scrolls away */
 export function HeroStickyCta({
-  joinLabel,
   downloadLabel,
-  joinHref,
   downloadHref,
   downloadFileName,
   showDownload = true,
@@ -62,9 +58,7 @@ export function HeroStickyCta({
       }}
     >
       <HeroMeshButtons
-        joinLabel={joinLabel}
         downloadLabel={downloadLabel}
-        joinHref={joinHref}
         downloadHref={downloadHref}
         downloadFileName={downloadFileName}
         showDownload={showDownload}
