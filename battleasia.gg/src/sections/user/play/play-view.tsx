@@ -19,7 +19,7 @@ import { ScrollReveal } from 'src/components/animate';
 import type { PublicDashboardStats } from 'src/types';
 
 import { GameCard, PlayArenaHero, PlayPageSkeleton } from './components';
-import { PLAY_IMAGE_PATHS, resolvePlayGameArt, sortGamesForArena } from './play-constants';
+import { PLAY_IMAGE_PATHS, resolvePlayGameArt, sortGamesForArena, getGameGenre } from './play-constants';
 
 // Re-export for backward compatibility
 export { PLAY_IMAGE_PATHS } from './play-constants';
@@ -178,8 +178,7 @@ export function PlayView() {
                     <Grid key={game.id} size={{ xs: 6, sm: 4, md: 2.4 }} sx={{ display: 'flex' }}>
                       <GameCard
                         title={game.name}
-                        subTitle={game.packageName || game.idPrefix}
-                        logo={resolvePlayGameArt(game, 'logo')}
+                        subTitle={getGameGenre(game.idPrefix)}
                         imageUrl={resolvePlayGameArt(game, 'image')}
                         featured={game.idPrefix === 'PUBG'}
                         comingSoon={game.comingSoon}

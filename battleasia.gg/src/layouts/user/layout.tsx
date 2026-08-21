@@ -257,7 +257,7 @@ export function UserLayout({
                 </Stack>
             ),
             rightArea: (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 2 }, flexShrink: 0 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, sm: 1.5 }, flexShrink: 0 }}>
                     {isLoggedIn ? (
                         <>
                             {/* Balance Display */}

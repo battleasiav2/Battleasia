@@ -40,9 +40,9 @@ export const GAME_ORDER_BY_PREFIX: Record<string, number> = {
 
 export const GAME_GENRE_BY_PREFIX: Record<string, string> = {
   PUBG: 'BATTLE ROYALE',
-  FF: 'SURVIVAL',
-  COD: 'FPS',
-  VAL: 'TACTICAL',
+  FF: 'BATTLE ROYALE',
+  COD: 'FPS ACTION',
+  VAL: 'TACTICAL FPS',
   ML: 'MOBA',
 };
 

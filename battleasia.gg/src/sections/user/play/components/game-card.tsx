@@ -46,7 +46,7 @@ export function GameCard(props: GameCardProps) {
     title,
     subTitle,
     imageUrl,
-    logo,
+    logo: _logo,
     featured = false,
     comingSoon,
     disabled,
@@ -57,7 +57,6 @@ export function GameCard(props: GameCardProps) {
     onClick,
   } = props;
   const isDisabled = disabled || comingSoon;
-  const thumbSrc = logo || imageUrl || PLAY_IMAGE_PATHS.pubgCard;
   const accent =
     title.includes('Free Fire')
       ? '#a855f7'
@@ -150,24 +149,6 @@ export function GameCard(props: GameCardProps) {
             inset: 0,
             background: `linear-gradient(180deg, transparent 55%, ${alpha('#0c0c0c', 0.92)} 100%)`,
             pointerEvents: 'none',
-          }}
-        />
-
-        <Box
-          component="img"
-          src={thumbSrc}
-          alt=""
-          loading="lazy"
-          sx={{
-            position: 'absolute',
-            top: 8,
-            right: 8,
-            width: 34,
-            height: 34,
-            objectFit: 'cover',
-            borderRadius: '6px',
-            border: `1px solid ${alpha(accent, 0.45)}`,
-            boxShadow: `0 4px 16px ${alpha('#000000', 0.6)}, 0 0 12px ${alpha(accent, 0.18)}`,
           }}
         />
 
@@ -299,11 +280,11 @@ export function GameCard(props: GameCardProps) {
           icon={
             <Box
               sx={{
-                width: 9,
-                height: 9,
+                width: 11,
+                height: 11,
                 borderRadius: '50%',
                 bgcolor: LIVE_GREEN,
-                boxShadow: `0 0 8px ${alpha(LIVE_GREEN, 0.7)}`,
+                boxShadow: `0 0 10px ${alpha(LIVE_GREEN, 0.85)}`,
                 animation: liveCount > 0 ? `${livePulse} 1.5s ease-in-out infinite` : 'none',
               }}
             />
@@ -315,7 +296,7 @@ export function GameCard(props: GameCardProps) {
           accent={GOLD}
           active={upcomingCount > 0}
           icon={
-            <Iconify icon="solar:calendar-bold" width={14} sx={{ color: GOLD }} />
+            <Iconify icon="solar:calendar-bold" width={16} sx={{ color: GOLD }} />
           }
         />
       </Stack>
@@ -339,30 +320,30 @@ function StatPill({ label, value, accent, active, icon }: StatPillProps) {
       sx={{
         flex: 1,
         minWidth: 0,
-        height: 54,
+        height: 56,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 0.2,
+        gap: 0.35,
         px: 0.4,
         py: 0.5,
         borderRadius: '8px',
         bgcolor: alpha('#000000', 0.45),
         backdropFilter: 'blur(10px)',
-        border: `1px solid ${alpha(accent, active ? 0.42 : 0.16)}`,
+        border: `1px solid ${alpha(accent, active ? 0.5 : 0.16)}`,
         boxShadow: active
-          ? `inset 0 1px 0 ${alpha('#ffffff', 0.06)}, 0 0 12px ${alpha(accent, 0.1)}`
+          ? `inset 0 1px 0 ${alpha('#ffffff', 0.06)}, 0 0 14px ${alpha(accent, 0.16)}`
           : `inset 0 1px 0 ${alpha('#ffffff', 0.04)}`,
       }}
     >
       <Typography
         sx={{
-          fontSize: 8,
+          fontSize: 9,
           fontWeight: 800,
-          color: alpha('#ffffff', 0.6),
+          color: alpha('#ffffff', active ? 0.78 : 0.55),
           textTransform: 'uppercase',
-          letterSpacing: 0.5,
+          letterSpacing: 0.7,
           lineHeight: 1,
           whiteSpace: 'nowrap',
           overflow: 'hidden',
@@ -373,13 +354,14 @@ function StatPill({ label, value, accent, active, icon }: StatPillProps) {
       >
         {label}
       </Typography>
-      <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.5}>
+      <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.55}>
         {icon}
         <Typography
           sx={{
-            fontSize: { xs: 16, sm: 17 },
+            fontSize: { xs: 18, sm: 20 },
             fontWeight: 900,
             lineHeight: 1,
+            letterSpacing: -0.3,
             ...goldTextGradient,
           }}
         >

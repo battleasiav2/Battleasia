@@ -49,4 +49,21 @@ class GameModel {
       'rules': rules,
     };
   }
+
+  /// Player-facing genre label (never show package names on cards).
+  String get genreLabel {
+    switch (idPrefix) {
+      case 'PUBG':
+      case 'FF':
+        return 'BATTLE ROYALE';
+      case 'COD':
+        return 'FPS ACTION';
+      case 'VAL':
+        return 'TACTICAL FPS';
+      case 'ML':
+        return 'MOBA';
+      default:
+        return 'ESPORTS';
+    }
+  }
 }

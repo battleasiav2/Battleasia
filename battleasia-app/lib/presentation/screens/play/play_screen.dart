@@ -290,9 +290,8 @@ class _PlayScreenState extends State<PlayScreen> {
                       final game = _games[index];
                       return GameCard(
                         title: game.name,
-                        subTitle: game.packageName,
+                        subTitle: game.genreLabel,
                         imageUrl: ImageUtils.getImageUrl(game.image),
-                        logo: ImageUtils.getImageUrl(game.logo),
                         comingSoon: game.comingSoon,
                         onTap: () => _handleGameClick(game.id),
                       );

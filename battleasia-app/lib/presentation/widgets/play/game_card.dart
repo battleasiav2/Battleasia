@@ -9,7 +9,6 @@ class GameCard extends StatelessWidget {
   final String title;
   final String? subTitle;
   final String? imageUrl;
-  final String? logo;
   final bool comingSoon;
   final VoidCallback? onTap;
 
@@ -18,7 +17,6 @@ class GameCard extends StatelessWidget {
     required this.title,
     this.subTitle,
     this.imageUrl,
-    this.logo,
     this.comingSoon = false,
     this.onTap,
   });
@@ -43,9 +41,9 @@ class GameCard extends StatelessWidget {
 
     final subtitleFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
-      baseSize: 14.0,
-      min: 11.0,
-      max: 16.0,
+      baseSize: 12.0,
+      min: 10.0,
+      max: 14.0,
     );
 
     final badgeFontSize = ResponsiveUtils.getResponsiveFontSize(
@@ -59,16 +57,6 @@ class GameCard extends StatelessWidget {
       context,
       baseSize: 12.0,
     ).clamp(8.0, 12.0);
-
-    final logoSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 30.0,
-    ).clamp(24.0, 30.0);
-
-    final logoPosition = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 10.0,
-    ).clamp(8.0, 10.0);
 
     final spacing = ResponsiveUtils.getResponsiveSpacing(
       context,
@@ -87,95 +75,90 @@ class GameCard extends StatelessWidget {
             child: Stack(
               fit: StackFit.expand,
               children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(2),
-            child: _buildCoverImage(),
-          ),
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(2),
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.transparent,
-                    Colors.black.withValues(alpha: 0.85),
-                  ],
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(2),
+                  child: _buildCoverImage(),
                 ),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: Padding(
-              padding: EdgeInsets.all(cardPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    title,
-                    style: AppTheme.bodyLarge.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                      fontSize: titleFontSize,
-                    ),
-                  ),
-                  if (subTitle != null) ...[
-                    SizedBox(height: spacing),
-                    Text(
-                      subTitle!,
-                      style: AppTheme.bodySmall.copyWith(
-                        color: AppColors.gold,
-                        fontSize: subtitleFontSize,
-                        fontWeight: FontWeight.w600,
+                Positioned.fill(
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withValues(alpha: 0.85),
+                        ],
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-          if (comingSoon)
-            Positioned(
-              top: badgePosition,
-              left: badgePosition,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.gold,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-                child: Text(
-                  'COMING SOON',
-                  style: AppTheme.bodySmall.copyWith(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w800,
-                    fontSize: badgeFontSize,
                   ),
                 ),
-              ),
-            ),
-          if (logo != null && logo!.isNotEmpty)
-            Positioned(
-              top: logoPosition,
-              right: logoPosition,
-              child: _buildLogo(logo!, logoSize),
-            ),
-          if (isDisabled)
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.35),
-                  borderRadius: BorderRadius.circular(2),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Padding(
+                    padding: EdgeInsets.all(cardPadding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          title,
+                          style: AppTheme.bodyLarge.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: titleFontSize,
+                          ),
+                        ),
+                        if (subTitle != null) ...[
+                          SizedBox(height: spacing),
+                          Text(
+                            subTitle!,
+                            style: AppTheme.bodySmall.copyWith(
+                              color: AppColors.gold,
+                              fontSize: subtitleFontSize,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.6,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
+                if (comingSoon)
+                  Positioned(
+                    top: badgePosition,
+                    left: badgePosition,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.gold,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                      child: Text(
+                        'COMING SOON',
+                        style: AppTheme.bodySmall.copyWith(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w800,
+                          fontSize: badgeFontSize,
+                        ),
+                      ),
+                    ),
+                  ),
+                if (isDisabled)
+                  Positioned.fill(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.35),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -196,20 +179,6 @@ class GameCard extends StatelessWidget {
       memCacheWidth: 800,
       placeholder: Image.asset(_fallbackImage, fit: BoxFit.cover),
       errorWidget: Image.asset(_fallbackImage, fit: BoxFit.cover),
-    );
-  }
-
-  Widget _buildLogo(String url, double size) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(4),
-      child: ImageUtils.networkImage(
-        url,
-        width: size,
-        height: size,
-        fit: BoxFit.cover,
-        memCacheWidth: (size * 3).round(),
-        errorWidget: const SizedBox.shrink(),
-      ),
     );
   }
 }
