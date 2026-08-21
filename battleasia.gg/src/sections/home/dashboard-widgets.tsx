@@ -628,7 +628,7 @@ export function LandingDashboardSection() {
             };
         }
         return {
-            totalWinnings: <AnimatedCoinValue value={data.platform.totalWinnings || 0} size={20} />,
+            totalWinnings: <AnimatedCoinValue value={data.platform.totalWinnings || 0} size={15} />,
             processedMatches: <PulseCountUp value={data.platform.processedMatches || 0} />,
             ongoingMatches: <PulseCountUp value={data.platform.ongoingMatches || 0} />,
             todayJoinedUsers: <PulseCountUp value={data.platform.todayJoinedUsers || 0} />,
@@ -718,18 +718,21 @@ export function LandingDashboardSection() {
 
                     <Box
                         sx={{
-                            gap: { xs: 1.25, md: 2.5 },
+                            gap: { xs: 1.5, md: 2.5 },
                             gridTemplateColumns: { md: 'repeat(2, minmax(0, 1fr))' },
                             ...homeMobileScrollFlexRowSx,
                             display: { xs: 'flex', md: 'grid' },
-                            px: { xs: 0.5, md: 0 },
+                            // Full-bleed swipe track so 100% cards don't leave a side peek
+                            px: { xs: 0, md: 0 },
                         }}
                     >
                         <Box
                             sx={{
                                 ...homeMobileScrollItemSx,
-                                flex: { xs: '0 0 88%', md: 'unset' },
-                                minWidth: { xs: 280, md: 0 },
+                                // One full card per viewport on mobile (no awkward "Top..." peek)
+                                flex: { xs: '0 0 100%', md: 'unset' },
+                                minWidth: { xs: 0, md: 0 },
+                                maxWidth: { xs: '100%', md: 'none' },
                             }}
                         >
                             <PlayerListCard
@@ -752,8 +755,9 @@ export function LandingDashboardSection() {
                         <Box
                             sx={{
                                 ...homeMobileScrollItemSx,
-                                flex: { xs: '0 0 88%', md: 'unset' },
-                                minWidth: { xs: 280, md: 0 },
+                                flex: { xs: '0 0 100%', md: 'unset' },
+                                minWidth: { xs: 0, md: 0 },
+                                maxWidth: { xs: '100%', md: 'none' },
                             }}
                         >
                             <PlayerListCard

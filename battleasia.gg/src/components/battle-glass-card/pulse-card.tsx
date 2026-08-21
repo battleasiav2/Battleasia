@@ -54,14 +54,14 @@ export function PulseCard({
       label: labels.platformTotalWinnings,
       value: stats.totalWinnings,
       suffix: undefined,
-      icon: 'solar:wallet-money-bold-duotone',
+      icon: 'solar:wallet-money-bold',
     },
     {
       key: 'matches',
       label: labels.processedMatches,
       value: stats.processedMatches,
       suffix: undefined,
-      icon: 'solar:medal-ribbon-star-bold-duotone',
+      icon: 'solar:medal-ribbon-star-bold',
     },
     {
       key: 'live',
@@ -75,7 +75,7 @@ export function PulseCard({
       label: labels.todayJoinedUsers,
       value: stats.todayJoinedUsers,
       suffix: undefined,
-      icon: 'solar:user-plus-bold',
+      icon: 'solar:user-plus-rounded-bold',
     },
   ] as const;
 

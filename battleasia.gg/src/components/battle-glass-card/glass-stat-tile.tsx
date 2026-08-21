@@ -72,38 +72,52 @@ export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: G
   };
 
   const iconBoxSx: SxProps<Theme> = {
-    width: { xs: 40, sm: 44 },
-    height: { xs: 40, sm: 44 },
+    width: { xs: 36, sm: 40 },
+    height: { xs: 36, sm: 40 },
     flexShrink: 0,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
-    bgcolor: alpha(gold, 0.1),
-    border: `1px solid ${alpha(gold, 0.32)}`,
-    boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.06)}`,
+    borderRadius: '50%',
+    bgcolor: alpha(gold, 0.08),
+    border: `1px solid ${alpha(gold, 0.22)}`,
     color: gold,
   };
 
   const labelSx = {
     letterSpacing: 0.7,
     color: stat.labelColor,
-    fontSize: { xs: '0.58rem', sm: '0.66rem' },
+    fontSize: { xs: '0.55rem', sm: '0.64rem' },
     lineHeight: 1.25,
     fontWeight: 700,
     textTransform: 'uppercase' as const,
     wordBreak: 'break-word' as const,
   };
 
-  const   valueSx = {
+  const valueSx = {
     display: 'flex',
-    alignItems: 'baseline',
-    flexWrap: 'wrap' as const,
-    gap: 0.75,
+    alignItems: 'center',
+    flexWrap: 'nowrap' as const,
+    gap: 0.5,
+    minWidth: 0,
+    maxWidth: '100%',
+    overflow: 'hidden',
     color: stat.valueColor,
-    fontSize: { xs: '1.35rem', sm: '1.5rem', md: '1.65rem' },
+    // Responsive clamp so long totals (e.g. 5,315,xxx) stay on one line
+    fontSize: {
+      xs: 'clamp(0.92rem, 3.6vw, 1.15rem)',
+      sm: '1.28rem',
+      md: '1.42rem',
+    },
     fontWeight: 800,
-    lineHeight: 1.15,
+    lineHeight: 1.1,
+    '& > *': {
+      minWidth: 0,
+      maxWidth: '100%',
+      overflow: 'hidden',
+      textOverflow: 'ellipsis',
+      whiteSpace: 'nowrap',
+    },
   };
 
   return (
@@ -117,9 +131,9 @@ export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: G
           </Stack>
         </Stack>
       ) : icon ? (
-        <Stack direction="row" spacing={1.25} alignItems="center">
+        <Stack direction="row" spacing={1.1} alignItems="center">
           <Box sx={iconBoxSx}>
-            <Iconify icon={icon} width={22} />
+            <Iconify icon={icon} width={20} />
           </Box>
           <Stack spacing={0.35} sx={{ flex: 1, minWidth: 0 }}>
             <Typography variant="overline" sx={labelSx}>

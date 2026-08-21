@@ -18,7 +18,7 @@ export function AnimatedCoinValue({ value, size = 24 }: AnimatedCoinValueProps) 
       alignItems="center"
       spacing={0.5}
       component="span"
-      sx={{ display: 'inline-flex', flexWrap: 'nowrap', minWidth: 0 }}
+      sx={{ display: 'inline-flex', flexWrap: 'nowrap', minWidth: 0, maxWidth: '100%' }}
     >
       <Box
         component="img"
@@ -30,7 +30,18 @@ export function AnimatedCoinValue({ value, size = 24 }: AnimatedCoinValueProps) 
         decoding="async"
         sx={{ width: size, height: size, flexShrink: 0 }}
       />
-      <PulseCountUp value={value} decimals={decimals} />
+      <Box
+        component="span"
+        sx={{
+          minWidth: 0,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        <PulseCountUp value={value} decimals={decimals} />
+      </Box>
     </Stack>
   );
 }

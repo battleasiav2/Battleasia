@@ -72,7 +72,7 @@ export function PublicMobileNav() {
               py: 0.5,
               textDecoration: 'none',
               transition: 'color 0.2s ease',
-              color: isActive ? GOLD : alpha('#ffffff', 0.5),
+              color: isActive ? GOLD : '#9CA3AF',
               '&:hover': { color: GOLD },
             }}
           >

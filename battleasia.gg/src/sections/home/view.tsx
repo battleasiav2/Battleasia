@@ -357,24 +357,46 @@ export function HomeView() {
           />
         </Box>
 
-        <Typography
-          className="font-tr"
+        <Box
           sx={{
-            fontSize: { xs: 13, sm: 15, md: 17, lg: 18 },
-            color: alpha('#ffffff', 0.9),
-            lineHeight: 1.4,
-            textShadow: '0 2px 12px rgba(0, 0, 0, 0.9)',
-            wordBreak: 'break-word',
-            overflowWrap: 'anywhere',
+            position: 'relative',
             width: 1,
             maxWidth: { xs: 340, sm: 400, md: '100%' },
-            px: { xs: 0.5, md: 0 },
+            px: { xs: 0.75, md: 0 },
+            py: { xs: 0.65, md: 0 },
+            borderRadius: { xs: 1, md: 0 },
+            // Soft dark plate behind subtitle so it stays readable on bright hero art
+            background: {
+              xs: `linear-gradient(180deg, ${alpha('#000000', 0.55)} 0%, ${alpha('#000000', 0.35)} 100%)`,
+              md: 'transparent',
+            },
+            boxShadow: {
+              xs: `0 0 24px ${alpha('#000000', 0.35)}`,
+              md: 'none',
+            },
             animation: `${copyEnter} 0.75s 0.55s cubic-bezier(0.22, 1, 0.36, 1) both`,
             '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
           }}
         >
-          {t('home.subtitle')}
-        </Typography>
+          <Typography
+            className="font-tr"
+            sx={{
+              fontSize: { xs: 13, sm: 15, md: 17, lg: 18 },
+              color: '#ffffff',
+              lineHeight: 1.4,
+              textShadow: `
+                0 1px 2px ${alpha('#000000', 0.95)},
+                0 2px 14px ${alpha('#000000', 0.9)},
+                0 0 20px ${alpha('#000000', 0.55)}
+              `,
+              wordBreak: 'break-word',
+              overflowWrap: 'anywhere',
+              width: 1,
+            }}
+          >
+            {t('home.subtitle')}
+          </Typography>
+        </Box>
 
         <BattleGoldDivider
           variant="hero"
