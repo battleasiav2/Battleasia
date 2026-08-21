@@ -86,7 +86,8 @@ export const baccoinSubmitButtonSx = {
 
 export const AUTH_CARD_BG = '#181614';
 export const AUTH_INPUT_BG = '#0e0e0e';
-const AUTH_PLACEHOLDER = '#808080';
+/** Brighter placeholder / adornment icons on dark inputs */
+export const AUTH_PLACEHOLDER = '#9CA3AF';
 const AUTH_BORDER = '#2b2b2b';
 
 /** Neutral charcoal card — slight warm gold wash + subtle top border glow */
@@ -197,10 +198,18 @@ export const authFieldSlotProps = {
         fontSize: 14.5,
       },
       '& .MuiSelect-icon': {
-        color: '#ffffff',
+        color: AUTH_PLACEHOLDER,
       },
-      '& .MuiInputAdornment-root .iconify': {
-        color: '#ffffff',
+      '& .MuiInputAdornment-root': {
+        color: AUTH_PLACEHOLDER,
+      },
+      '& .MuiInputAdornment-root .iconify, & .MuiInputAdornment-root svg': {
+        color: `${AUTH_PLACEHOLDER} !important`,
+        opacity: 1,
+      },
+      '& .MuiIconButton-root': {
+        color: AUTH_PLACEHOLDER,
+        '&:hover': { color: '#D1D5DB' },
       },
       ...authInputAutofillSx,
     },
@@ -318,29 +327,40 @@ export const authSubmitButtonSx = {
   background: 'linear-gradient(180deg, #f5c518 0%, #d4a017 52%, #d97706 100%)',
   border: `1px solid ${alpha('#fbbf24', 0.9)}`,
   boxShadow: `0 0 16px ${alpha('#f5c518', 0.18)}`,
-  transition: 'transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease',
-  '&:hover': {
-    filter: 'none',
-    background: 'linear-gradient(180deg, #fbbf24 0%, #f5c518 52%, #d4a017 100%)',
-    boxShadow: `0 0 22px ${alpha('#f5c518', 0.38)}, 0 10px 28px ${alpha('#000000', 0.45)}`,
+  transition:
+    'transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease, filter 0.15s ease',
+  '@media (hover: hover)': {
+    '&:hover': {
+      filter: 'brightness(1.06)',
+      background: 'linear-gradient(180deg, #ffe066 0%, #f5c518 48%, #eab308 100%)',
+      boxShadow: `0 0 26px ${alpha('#f5c518', 0.48)}, 0 12px 28px ${alpha('#000000', 0.45)}`,
+      transform: 'translateY(-1px)',
+    },
   },
-  '&:active': {
-    transform: 'scale(0.985) translateY(1px)',
+  '&:active, &.Mui-focusVisible': {
+    filter: 'brightness(0.96)',
+    background: 'linear-gradient(180deg, #eab308 0%, #d4a017 55%, #b45309 100%)',
+    boxShadow: `0 0 12px ${alpha('#f5c518', 0.28)}, inset 0 2px 4px ${alpha('#000000', 0.2)}`,
+    transform: 'scale(0.98) translateY(1px)',
   },
   '&.Mui-disabled': {
     background: alpha('#f5c518', 0.28),
     color: alpha('#111111', 0.45),
     borderColor: alpha('#f5c518', 0.22),
     boxShadow: 'none',
+    transform: 'none',
+    filter: 'none',
   },
 };
 
 export const authLinkSx = {
-  color: '#f59e0b',
-  fontWeight: 600,
-  textDecoration: 'none',
-  transition: 'color 0.2s ease',
-  '&:hover': { textDecoration: 'underline', color: '#fbbf24' },
+  color: '#f5c518',
+  fontWeight: 700,
+  textDecoration: 'underline',
+  textUnderlineOffset: '3px',
+  textDecorationThickness: '1.5px',
+  transition: 'color 0.2s ease, text-decoration-color 0.2s ease',
+  '&:hover': { color: '#ffe066', textDecorationColor: '#ffe066' },
 };
 
 export const authAlertSx = {

@@ -140,7 +140,7 @@ export function SignInView() {
                 ...authFieldSlotPropsCompact.input,
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="solar:letter-bold-duotone" width={18} sx={{ color: '#ffffff' }} />
+                    <Iconify icon="solar:letter-bold-duotone" width={18} sx={{ color: '#9CA3AF' }} />
                   </InputAdornment>
                 ),
               },
@@ -158,12 +158,12 @@ export function SignInView() {
                 ...authFieldSlotPropsCompact.input,
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Iconify icon="solar:lock-password-bold-duotone" width={18} sx={{ color: '#ffffff' }} />
+                    <Iconify icon="solar:lock-password-bold-duotone" width={18} sx={{ color: '#9CA3AF' }} />
                   </InputAdornment>
                 ),
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: '#ffffff' }}>
+                    <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: '#9CA3AF' }}>
                       <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={18} />
                     </IconButton>
                   </InputAdornment>
