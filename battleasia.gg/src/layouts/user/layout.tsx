@@ -27,7 +27,7 @@ import { HeaderSection } from '../core/header-section';
 import { LayoutSection } from '../core/layout-section';
 import { UserNavVertical } from './user-nav-vertical';
 import { userLayoutVars, userBattleNavColorVars } from './css-vars';
-import { USER_COLORS, userGoldButtonSx, userSolidGoldButtonSx, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
+import { USER_COLORS, userSolidGoldButtonSx, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
 import { LanguagePopover } from '../components/language-popover';
 import { Searchbar } from '../components/searchbar';
 import { FloatingFooterNav } from '../components/floating-footer-nav';
