@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 
-/// Solid gold primary CTA — filled, square. Used for Sign In / Join / Buy.
+/// Gold outline CTA — dark fill, gold border, gold text. Used for Sign In / Join / Buy.
 class GoldButton extends StatefulWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -35,6 +35,8 @@ class _GoldButtonState extends State<GoldButton> {
   Widget build(BuildContext context) {
     final enabled = widget.onPressed != null && !widget.loading;
     final text = widget.uppercase ? widget.label.toUpperCase() : widget.label;
+    final gold = AppColors.gold;
+    final goldLight = const Color(0xFFFBBF24);
 
     final button = Material(
       color: Colors.transparent,
@@ -48,46 +50,40 @@ class _GoldButtonState extends State<GoldButton> {
           height: widget.height,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            gradient: enabled
-                ? LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: _pressed
-                        ? const [
-                            Color(0xFFFBBF24),
-                            Color(0xFFF5C518),
-                            Color(0xFFD4A017),
-                          ]
-                        : const [
-                            Color(0xFFF5C518),
-                            Color(0xFFD4A017),
-                            Color(0xFFD97706),
-                          ],
-                  )
-                : null,
-            color: enabled ? null : AppColors.gold.withValues(alpha: 0.28),
+            color: enabled
+                ? (_pressed
+                    ? const Color(0xFF121214).withValues(alpha: 0.88)
+                    : const Color(0xFF0A0A0C).withValues(alpha: 0.72))
+                : Colors.black.withValues(alpha: 0.4),
             border: Border.all(
               color: enabled
-                  ? const Color(0xFFFBBF24).withValues(alpha: 0.9)
-                  : AppColors.gold.withValues(alpha: 0.22),
+                  ? (_pressed ? goldLight : gold)
+                  : gold.withValues(alpha: 0.22),
+              width: 1.5,
             ),
             boxShadow: enabled
                 ? [
                     BoxShadow(
-                      color: AppColors.gold.withValues(alpha: 0.28),
+                      color: Colors.black.withValues(alpha: 0.4),
                       blurRadius: 18,
+                      offset: const Offset(0, 6),
                     ),
+                    if (_pressed)
+                      BoxShadow(
+                        color: gold.withValues(alpha: 0.16),
+                        blurRadius: 16,
+                      ),
                   ]
                 : null,
           ),
           child: Center(
             child: widget.loading
-                ? const SizedBox(
+                ? SizedBox(
                     width: 18,
                     height: 18,
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: Color(0xFF111111),
+                      color: gold,
                     ),
                   )
                 : Row(
@@ -99,8 +95,8 @@ class _GoldButtonState extends State<GoldButton> {
                           widget.icon,
                           size: 16,
                           color: enabled
-                              ? const Color(0xFF111111)
-                              : const Color(0xFF111111).withValues(alpha: 0.45),
+                              ? (_pressed ? goldLight : gold)
+                              : gold.withValues(alpha: 0.35),
                         ),
                         const SizedBox(width: 8),
                       ],
@@ -108,8 +104,8 @@ class _GoldButtonState extends State<GoldButton> {
                         text,
                         style: TextStyle(
                           color: enabled
-                              ? const Color(0xFF111111)
-                              : const Color(0xFF111111).withValues(alpha: 0.45),
+                              ? (_pressed ? goldLight : gold)
+                              : gold.withValues(alpha: 0.35),
                           fontWeight: FontWeight.w800,
                           fontSize: widget.fontSize,
                           letterSpacing: 1.1,

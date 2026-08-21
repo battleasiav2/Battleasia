@@ -622,15 +622,20 @@ export function SupportChat() {
                   <Button
                     onClick={() => router.push(paths.auth.signIn)}
                     sx={{
-                      borderRadius: 0.75,
+                      borderRadius: 0,
                       px: 2,
                       py: 0.75,
                       fontWeight: 800,
                       fontSize: 12,
-                      color: '#111',
-                      bgcolor: GOLD,
+                      color: GOLD,
+                      bgcolor: alpha('#0a0a0c', 0.72),
+                      border: `1.5px solid ${GOLD}`,
                       textTransform: 'uppercase',
-                      '&:hover': { bgcolor: '#fbbf24' },
+                      '&:hover': {
+                        color: '#fbbf24',
+                        bgcolor: alpha('#121214', 0.88),
+                        borderColor: '#fbbf24',
+                      },
                     }}
                   >
                     {t('auth.signIn') || 'Sign In'}
@@ -895,19 +900,26 @@ export function SupportChat() {
                   sx={{
                     width: 34,
                     height: 34,
-                    borderRadius: 0.75,
-                    color: '#111',
-                    bgcolor: GOLD,
-                    transition: 'background-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease',
-                    '&:hover': { bgcolor: '#fbbf24', transform: 'scale(1.04)' },
+                    borderRadius: 0,
+                    color: GOLD,
+                    bgcolor: alpha('#0a0a0c', 0.72),
+                    border: `1.5px solid ${GOLD}`,
+                    transition: 'background-color 0.2s ease, transform 0.2s ease, opacity 0.2s ease, border-color 0.2s ease',
+                    '&:hover': {
+                      color: '#fbbf24',
+                      bgcolor: alpha('#121214', 0.88),
+                      borderColor: '#fbbf24',
+                      transform: 'scale(1.04)',
+                    },
                     '&.Mui-disabled': {
                       bgcolor: alpha('#ffffff', 0.08),
                       color: alpha('#ffffff', 0.3),
+                      borderColor: alpha('#ffffff', 0.12),
                     },
                   }}
                 >
                   {sending ? (
-                    <CircularProgress size={14} sx={{ color: '#111' }} />
+                    <CircularProgress size={14} sx={{ color: GOLD }} />
                   ) : (
                     <Iconify icon="solar:plain-bold" width={16} />
                   )}
