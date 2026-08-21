@@ -292,23 +292,12 @@ export function MatchCard({
             }}
             sx={
               showJoinCta
-                ? {
-                    ...userSolidGoldButtonSx,
-                    height: 'auto',
-                    minHeight: 52,
-                    py: 1.45,
-                    fontSize: 14,
-                    letterSpacing: 1.2,
-                    boxShadow: `0 0 22px ${alpha(USER_COLORS.gold, 0.35)}, 0 8px 24px ${alpha('#000000', 0.4)}`,
-                    '&:hover': {
-                      background: 'linear-gradient(180deg, #fbbf24 0%, #f5c518 52%, #d4a017 100%)',
-                      boxShadow: `0 0 28px ${alpha(USER_COLORS.gold, 0.5)}, 0 12px 28px ${alpha('#000000', 0.5)}`,
-                    },
-                  }
+                ? userSolidGoldButtonSx
                 : {
                     ...userGhostButtonSx,
                     minHeight: 40,
-                    py: 0.9,
+                    height: 40,
+                    py: 0,
                     fontSize: 12,
                     opacity: 0.92,
                   }

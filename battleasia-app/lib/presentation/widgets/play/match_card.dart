@@ -571,8 +571,6 @@ class _MatchCardState extends State<MatchCard>
               : GoldButton(
                   label: 'JOIN MATCH',
                   loading: widget.joining,
-                  height: 52,
-                  fontSize: 14,
                   onPressed: buttonDisabled ? null : widget.onJoin,
                 ),
         ],
