@@ -32,7 +32,7 @@ export function AuthSubmitButton({
       fullWidth
       size="medium"
       type={type}
-      variant="outlined"
+      variant="contained"
       disableElevation
       loading={loading}
       loadingPosition="start"
