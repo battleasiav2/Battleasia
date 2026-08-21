@@ -9,7 +9,7 @@ import { PLAY_IMAGE_PATHS } from '../play-constants';
 
 // ----------------------------------------------------------------------
 
-const { gold: GOLD, goldGradient, success: LIVE_GREEN } = USER_COLORS;
+const { gold: GOLD, success: LIVE_GREEN } = USER_COLORS;
 
 const CARD_MIN_HEIGHT = { xs: 248, sm: 258, md: 268 };
 
@@ -17,13 +17,6 @@ const livePulse = keyframes`
   0%, 100% { opacity: 1; box-shadow: 0 0 0 0 ${alpha(LIVE_GREEN, 0.6)}; }
   50% { opacity: 0.8; box-shadow: 0 0 0 6px ${alpha(LIVE_GREEN, 0)}; }
 `;
-
-const goldTextGradient = {
-  background: goldGradient,
-  backgroundClip: 'text',
-  WebkitBackgroundClip: 'text',
-  WebkitTextFillColor: 'transparent',
-};
 
 type GameCardProps = {
   title: string;
@@ -228,36 +221,27 @@ export function GameCard(props: GameCardProps) {
           {title}
         </Typography>
 
-        <Stack direction="row" alignItems="center" spacing={0.75} sx={{ width: 1, minHeight: 16 }}>
-          <Box
-            sx={{
-              flex: 1,
-              height: 1,
-              background: `linear-gradient(90deg, transparent, ${alpha('#ffffff', 0.2)})`,
-            }}
-          />
+        <Stack direction="row" alignItems="center" justifyContent="center" sx={{ width: 1, minHeight: 22 }}>
           <Typography
             sx={{
-              fontSize: 9,
-              fontWeight: 600,
-              color: alpha('#ffffff', 0.5),
-              letterSpacing: 0.1,
+              px: 1,
+              py: 0.35,
+              fontSize: { xs: 8.5, sm: 9 },
+              fontWeight: 800,
+              letterSpacing: 0.7,
+              textTransform: 'uppercase',
+              color: alpha('#ffffff', 0.78),
+              bgcolor: alpha('#ffffff', 0.06),
+              border: `1px solid ${alpha('#ffffff', 0.1)}`,
+              borderRadius: '999px',
               whiteSpace: 'nowrap',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
-              maxWidth: '58%',
-              flexShrink: 1,
+              maxWidth: '92%',
             }}
           >
             {subTitle || '\u00A0'}
           </Typography>
-          <Box
-            sx={{
-              flex: 1,
-              height: 1,
-              background: `linear-gradient(90deg, ${alpha('#ffffff', 0.2)}, transparent)`,
-            }}
-          />
         </Stack>
       </Stack>
 
@@ -320,30 +304,30 @@ function StatPill({ label, value, accent, active, icon }: StatPillProps) {
       sx={{
         flex: 1,
         minWidth: 0,
-        height: 56,
+        height: 58,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 0.35,
+        gap: 0.4,
         px: 0.4,
         py: 0.5,
         borderRadius: '8px',
-        bgcolor: alpha('#000000', 0.45),
+        bgcolor: alpha('#000000', 0.5),
         backdropFilter: 'blur(10px)',
-        border: `1px solid ${alpha(accent, active ? 0.5 : 0.16)}`,
+        border: `1px solid ${alpha(accent, active ? 0.55 : 0.18)}`,
         boxShadow: active
-          ? `inset 0 1px 0 ${alpha('#ffffff', 0.06)}, 0 0 14px ${alpha(accent, 0.16)}`
+          ? `inset 0 1px 0 ${alpha('#ffffff', 0.07)}, 0 0 16px ${alpha(accent, 0.2)}`
           : `inset 0 1px 0 ${alpha('#ffffff', 0.04)}`,
       }}
     >
       <Typography
         sx={{
-          fontSize: 9,
+          fontSize: 9.5,
           fontWeight: 800,
-          color: alpha('#ffffff', active ? 0.78 : 0.55),
+          color: alpha(accent, active ? 0.95 : 0.55),
           textTransform: 'uppercase',
-          letterSpacing: 0.7,
+          letterSpacing: 0.85,
           lineHeight: 1,
           whiteSpace: 'nowrap',
           overflow: 'hidden',
@@ -354,15 +338,16 @@ function StatPill({ label, value, accent, active, icon }: StatPillProps) {
       >
         {label}
       </Typography>
-      <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.55}>
+      <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.6}>
         {icon}
         <Typography
           sx={{
-            fontSize: { xs: 18, sm: 20 },
+            fontSize: { xs: 19, sm: 21 },
             fontWeight: 900,
             lineHeight: 1,
-            letterSpacing: -0.3,
-            ...goldTextGradient,
+            letterSpacing: -0.4,
+            color: accent,
+            textShadow: active ? `0 0 12px ${alpha(accent, 0.45)}` : 'none',
           }}
         >
           {value}
