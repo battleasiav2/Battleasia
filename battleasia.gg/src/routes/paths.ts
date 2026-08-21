@@ -39,7 +39,7 @@ export const paths = {
       root: `${ROOTS.USER}/account`,
       profile: `${ROOTS.USER}/account/profile`,
       profileDetail: (userId: string | number) => `${ROOTS.USER}/account/profile/${userId}`,
-      wallet: `${ROOTS.USER}/account/wallet`,
+      wallet: `${ROOTS.USER}/shop/wallet`,
       myMatches: `${ROOTS.USER}/account/my-matches`,
       myOrders: `${ROOTS.USER}/account/my-orders`,
       myStatistics: `${ROOTS.USER}/account/my-statistics`,
@@ -55,6 +55,8 @@ export const paths = {
     matchResult: (id: string | number) => `${ROOTS.USER}/play/${id}/result`,
     shop: `${ROOTS.USER}/shop`,
     shopDetail: (id: string | number) => `${ROOTS.USER}/shop/${id}`,
+    /** Wallet lives under Shop (not a standalone account nav item). */
+    shopWallet: `${ROOTS.USER}/shop/wallet`,
     referral: `${ROOTS.USER}/referral`,
     feed: `${ROOTS.USER}/feed`,
     feedTab: (tab: 'feed' | 'explore' | 'reels' | 'saved' | 'messages' = 'feed') =>

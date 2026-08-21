@@ -75,7 +75,7 @@ export const userRoutes: RouteObject[] = [
         children: [
           { path: 'profile/:userId', element: <ProfilePage /> },
           { path: 'profile', element: <ProfilePage /> },
-          { path: 'wallet', element: <WalletPage /> },
+          { path: 'wallet', element: <Navigate to={paths.user.shopWallet} replace /> },
           { path: 'my-matches', element: <MyMatchesPage /> },
           { path: 'my-orders', element: <MyOrdersPage /> },
           { path: 'my-statistics', element: <MyStatisticsPage /> },
@@ -90,6 +90,7 @@ export const userRoutes: RouteObject[] = [
       { path: 'play/:matchId/result', element: <MatchResultPage /> },
       { path: 'play/:gameId', element: <MatchPage /> },
       { path: 'shop', element: <ShopPage /> },
+      { path: 'shop/wallet', element: <WalletPage /> },
       { path: 'shop/:shopId', element: <ShopDetailPage /> },
       { path: 'earn', element: <Navigate to={paths.user.referral} replace /> },
       { path: 'referral', element: <ReferralPage /> },

@@ -70,11 +70,6 @@ export const accountMenuItems: AccountMenuItem[] = [
         icon: <Iconify icon="solar:user-bold" />,
       },
       {
-        labelKey: 'navigation.wallet',
-        href: paths.user.account.wallet,
-        icon: <Iconify icon="solar:wallet-money-bold" />,
-      },
-      {
         labelKey: 'navigation.myMatches',
         href: paths.user.account.myMatches,
         icon: <Iconify icon="solar:gamepad-bold" />,
@@ -145,11 +140,6 @@ export const accountMenuItems: AccountMenuItem[] = [
 /** Desktop sidebar extras — shown below primary arena links (fills empty sidebar height). */
 export const sidebarSecondaryItems: AccountMenuItem[] = [
   {
-    labelKey: 'navigation.wallet',
-    href: paths.user.account.wallet,
-    icon: <Iconify icon="solar:wallet-money-bold" />,
-  },
-  {
     labelKey: 'navigation.leaderboard',
     href: paths.user.account.leaderBoard,
     icon: <Iconify icon="game-icons:podium-winner" />,
@@ -157,7 +147,7 @@ export const sidebarSecondaryItems: AccountMenuItem[] = [
   {
     labelKey: 'navigation.settings',
     href: paths.user.account.profile,
-    icon: <Iconify icon="solar:settings-bold" />,
+    icon: <Iconify icon="solar:settings-bold-duotone" />,
   },
   {
     labelKey: 'navigation.customerSupport',
