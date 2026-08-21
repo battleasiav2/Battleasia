@@ -6,6 +6,7 @@ import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
+import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/referral_item_model.dart';
@@ -178,7 +179,7 @@ class _ReferralScreenState extends State<ReferralScreen>
             onRefresh: _fetchAll,
             child: CustomScrollView(
               controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(),
+              physics: appScrollPhysics,
               slivers: [
                 const SliverToBoxAdapter(child: SizedBox(height: 100)),
                 SliverToBoxAdapter(

@@ -37,41 +37,7 @@ class MatchCard extends StatefulWidget {
   State<MatchCard> createState() => _MatchCardState();
 }
 
-class _MatchCardState extends State<MatchCard>
-    with SingleTickerProviderStateMixin {
-  AnimationController? _livePulse;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.showLive) {
-      _livePulse = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 1400),
-      )..repeat(reverse: true);
-    }
-  }
-
-  @override
-  void didUpdateWidget(MatchCard oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.showLive && _livePulse == null) {
-      _livePulse = AnimationController(
-        vsync: this,
-        duration: const Duration(milliseconds: 1400),
-      )..repeat(reverse: true);
-    } else if (!widget.showLive && _livePulse != null) {
-      _livePulse!.dispose();
-      _livePulse = null;
-    }
-  }
-
-  @override
-  void dispose() {
-    _livePulse?.dispose();
-    super.dispose();
-  }
-
+class _MatchCardState extends State<MatchCard> {
   Widget _buildMaskedBanner(String bannerUrl) {
     return Stack(
       fit: StackFit.expand,
@@ -136,7 +102,7 @@ class _MatchCardState extends State<MatchCard>
 
   @override
   Widget build(BuildContext context) {
-    return _buildCard();
+    return RepaintBoundary(child: _buildCard());
   }
 
   Widget _buildCard() {
@@ -181,32 +147,17 @@ class _MatchCardState extends State<MatchCard>
               height: cardHeight,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: const Color(0xFF0A0A0C).withValues(alpha: 0.55),
+                color: const Color(0xFF161618),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.12),
-                ),
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.white.withValues(alpha: 0.06),
-                    Colors.transparent,
-                    AppColors.gold.withValues(alpha: 0.04),
-                  ],
+                  color: Colors.white.withValues(alpha: 0.10),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.45),
-                    blurRadius: 24,
-                    offset: const Offset(0, 10),
+                    color: Colors.black.withValues(alpha: 0.35),
+                    blurRadius: 12,
+                    offset: const Offset(0, 6),
                   ),
                 ],
-                image: DecorationImage(
-                  image: const AssetImage('assets/images/bounty-bg.webp'),
-                  fit: BoxFit.cover,
-                  opacity: const AlwaysStoppedAnimation(0.35),
-                  onError: (_, __) {},
-                ),
               ),
               child: Row(
                 children: [
@@ -221,30 +172,14 @@ class _MatchCardState extends State<MatchCard>
               ),
             ),
 
-            if (widget.showLive && _livePulse != null)
+            if (widget.showLive)
               Positioned(
                 top: 0,
                 left: 0,
                 right: 0,
-                child: AnimatedBuilder(
-                  animation: _livePulse!,
-                  builder: (context, _) {
-                    return Opacity(
-                      opacity: 0.28 + (_livePulse!.value * 0.42),
-                      child: Container(
-                        height: 3,
-                        decoration: BoxDecoration(
-                          color: AppColors.gold,
-                          boxShadow: [
-                            BoxShadow(
-                              color: AppColors.gold.withValues(alpha: 0.35),
-                              blurRadius: 8,
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+                child: Container(
+                  height: 3,
+                  color: AppColors.gold.withValues(alpha: 0.85),
                 ),
               ),
 

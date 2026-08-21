@@ -5,7 +5,7 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 
-/// Balance pill in header — gold accent, animated delta on change.
+/// Balance pill in header — gold accent, short delta flash on change only.
 class AnimatedBalanceDisplay extends StatefulWidget {
   const AnimatedBalanceDisplay({super.key});
 
@@ -14,55 +14,43 @@ class AnimatedBalanceDisplay extends StatefulWidget {
 }
 
 class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
-    with TickerProviderStateMixin {
+    with SingleTickerProviderStateMixin {
   late final AnimationController _deltaController;
   late final Animation<Offset> _deltaSlide;
   late final Animation<double> _deltaFade;
-  late final AnimationController _pulseController;
-  late final Animation<double> _pulseScale;
 
   double _previousBalance = 0.0;
   double _delta = 0.0;
   bool _showDelta = false;
+  bool _seeded = false;
 
   @override
   void initState() {
     super.initState();
     _deltaController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
-      reverseDuration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 320),
+      reverseDuration: const Duration(milliseconds: 220),
     );
     _deltaSlide = Tween<Offset>(
-      begin: const Offset(0, 0.8),
+      begin: const Offset(0, 0.6),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _deltaController, curve: Curves.easeOut));
     _deltaFade = CurvedAnimation(parent: _deltaController, curve: Curves.easeIn);
-
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 180),
-    );
-    _pulseScale = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween(begin: 1.0, end: 1.12).chain(CurveTween(curve: Curves.easeOut)),
-        weight: 50,
-      ),
-      TweenSequenceItem(
-        tween: Tween(begin: 1.12, end: 1.0).chain(CurveTween(curve: Curves.easeIn)),
-        weight: 50,
-      ),
-    ]).animate(_pulseController);
   }
 
   @override
   void dispose() {
     _deltaController.dispose();
-    _pulseController.dispose();
     super.dispose();
   }
 
   void _onBalanceChanged(double newBalance) {
+    if (!_seeded) {
+      _previousBalance = newBalance;
+      _seeded = true;
+      return;
+    }
     if (newBalance == _previousBalance) return;
     final delta = newBalance - _previousBalance;
     _previousBalance = newBalance;
@@ -71,13 +59,11 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
       _showDelta = true;
     });
     _deltaController.forward(from: 0);
-    _pulseController.forward(from: 0);
-    Future.delayed(const Duration(milliseconds: 2500), () {
-      if (mounted) {
-        _deltaController.reverse().then((_) {
-          if (mounted) setState(() => _showDelta = false);
-        });
-      }
+    Future.delayed(const Duration(milliseconds: 1800), () {
+      if (!mounted) return;
+      _deltaController.reverse().then((_) {
+        if (mounted) setState(() => _showDelta = false);
+      });
     });
   }
 
@@ -88,9 +74,11 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
         if (!authProvider.isAuthenticated) return const SizedBox.shrink();
 
         final balance = authProvider.user?.balance ?? 0.0;
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) _onBalanceChanged(balance);
-        });
+        if (!_seeded || balance != _previousBalance) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _onBalanceChanged(balance);
+          });
+        }
 
         final balanceFontSize = ResponsiveUtils.getResponsiveFontSize(
           context,
@@ -108,15 +96,9 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               decoration: BoxDecoration(
-                color: AppColors.surface.withValues(alpha: 0.85),
+                color: AppColors.surface.withValues(alpha: 0.92),
                 borderRadius: BorderRadius.circular(999),
                 border: Border.all(color: AppColors.gold.withValues(alpha: 0.45)),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.goldGlow(0.12),
-                    blurRadius: 12,
-                  ),
-                ],
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -132,15 +114,12 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
                     ),
                   ),
                   const SizedBox(width: 6),
-                  ScaleTransition(
-                    scale: _pulseScale,
-                    child: Text(
-                      balance.toStringAsFixed(2),
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: AppColors.gold,
-                        fontWeight: FontWeight.w700,
-                        fontSize: balanceFontSize,
-                      ),
+                  Text(
+                    balance.toStringAsFixed(2),
+                    style: AppTheme.bodyMedium.copyWith(
+                      color: AppColors.gold,
+                      fontWeight: FontWeight.w700,
+                      fontSize: balanceFontSize,
                     ),
                   ),
                 ],
