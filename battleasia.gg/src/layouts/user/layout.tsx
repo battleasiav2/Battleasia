@@ -29,8 +29,14 @@ import { UserNavVertical } from './user-nav-vertical';
 import { userLayoutVars, userBattleNavColorVars } from './css-vars';
 import { USER_COLORS, userGoldButtonSx, userSolidGoldButtonSx, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
 import { LanguagePopover } from '../components/language-popover';
+import { Searchbar } from '../components/searchbar';
 import { FloatingFooterNav } from '../components/floating-footer-nav';
-import { menuItems, accountMenuItems, createMenuClickHandler } from '../menu-items-config';
+import {
+    menuItems,
+    accountMenuItems,
+    sidebarSecondaryItems,
+    createMenuClickHandler,
+} from '../menu-items-config';
 
 import type { MainSectionProps } from '../core/main-section';
 import type { HeaderSectionProps } from '../core/header-section';
@@ -82,35 +88,23 @@ export function UserLayout({
 
     const navVars = userBattleNavColorVars(theme, settings.state.navLayout);
 
-    // Convert accountMenuItems to navData format with parent-child structure
+    // Convert accountMenuItems to navData — primary arena links + secondary utilities (no nested Account clutter)
+    const toNavItem = (item: (typeof accountMenuItems)[number]) => ({
+        title: t(item.labelKey),
+        path: item.href!,
+        icon: item.icon,
+    });
+
     const convertedNavData: NavSectionProps['data'] = [
         {
             subheader: '',
             items: accountMenuItems
-                .filter((item) => item.href || (item.children && item.children.length > 0)) // Include items with href or children
-                .map((item) => {
-                    // If item has children, preserve parent-child structure
-                    if (item.children && item.children.length > 0) {
-                        return {
-                            title: t(item.labelKey),
-                            path: item.href || item.children[0]?.href || '#', // Use href or first child's href as fallback
-                            icon: item.icon,
-                            children: item.children
-                                .filter((child) => child.href) // Only include children with href
-                                .map((child) => ({
-                                    title: t(child.labelKey),
-                                    path: child.href!,
-                                    icon: child.icon,
-                                })),
-                        };
-                    }
-                    // Regular item without children
-                    return {
-                        title: t(item.labelKey),
-                        path: item.href!,
-                        icon: item.icon,
-                    };
-                }),
+                .filter((item) => item.mobileMenu && item.href)
+                .map(toNavItem),
+        },
+        {
+            subheader: t('navigation.account'),
+            items: sidebarSecondaryItems.filter((item) => item.href).map(toNavItem),
         },
     ];
 
@@ -121,17 +115,6 @@ export function UserLayout({
 
     // Handle smooth scroll to section
     const handleMenuClick = createMenuClickHandler(pathname, router);
-
-    // Menu styling variables
-    const menuStyles = {
-        fontSize: { lg: 14, xl: 15 },
-        fontWeight: 700 as const,
-        activeColor: USER_COLORS.gold,
-        inactiveColor: alpha('#ffffff', 0.55),
-        transition: 'all 0.2s ease',
-    };
-
-    const userHeaderNavItems = accountMenuItems.filter((item) => item.href && item.mobileMenu);
 
     const renderHeader = () => {
         const headerSlotProps: HeaderSectionProps['slotProps'] = {
@@ -193,41 +176,34 @@ export function UserLayout({
                         px: { lg: 1, xl: 2 },
                     }}
                 >
-                    {isLoggedIn
-                        ? userHeaderNavItems.map((item) => {
-                            const isActive = item.href ? pathname.startsWith(item.href) : false;
-                            return (
-                                <Typography
-                                    key={item.href}
-                                    component={RouterLink}
-                                    href={item.href!}
-                                    sx={{
-                                        px: 1.75,
-                                        py: 0.75,
-                                        borderRadius: '4px',
-                                        textTransform: 'none',
-                                        fontSize: menuStyles.fontSize,
-                                        fontWeight: 600,
-                                        letterSpacing: 0.02,
-                                        color: isActive ? '#111111' : menuStyles.inactiveColor,
-                                        bgcolor: isActive ? USER_COLORS.gold : alpha('#000000', 0.35),
-                                        border: `1px solid ${isActive ? alpha(USER_COLORS.gold, 0.6) : alpha('#ffffff', 0.1)}`,
-                                        textDecoration: 'none',
-                                        cursor: 'pointer',
-                                        whiteSpace: 'nowrap',
-                                        transition: menuStyles.transition,
-                                        '&:hover': {
-                                            color: isActive ? '#111111' : USER_COLORS.gold,
-                                            borderColor: alpha(USER_COLORS.gold, 0.35),
-                                            bgcolor: isActive ? USER_COLORS.gold : alpha(USER_COLORS.gold, 0.1),
-                                        },
-                                    }}
-                                >
-                                    {t(item.labelKey)}
-                                </Typography>
-                            );
-                        })
-                        : menuItems.map((item) => {
+                    {isLoggedIn ? (
+                        <Searchbar
+                            data={navData}
+                            sx={{
+                                width: 1,
+                                maxWidth: 420,
+                                justifyContent: 'flex-start',
+                                bgcolor: alpha('#000000', 0.45),
+                                border: `1px solid ${alpha('#ffffff', 0.1)}`,
+                                borderRadius: '6px',
+                                px: 0.5,
+                                py: 0.15,
+                                transition: 'border-color 0.2s ease, background-color 0.2s ease',
+                                '&:hover': {
+                                    bgcolor: alpha('#000000', 0.55),
+                                    borderColor: alpha(USER_COLORS.gold, 0.35),
+                                },
+                                '& .MuiIconButton-root': { color: alpha('#ffffff', 0.7) },
+                                '& .MuiLabel-root, & .label': {
+                                    bgcolor: alpha(USER_COLORS.gold, 0.15),
+                                    color: USER_COLORS.gold,
+                                    border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
+                                    boxShadow: 'none',
+                                },
+                            }}
+                        />
+                    ) : (
+                        menuItems.map((item) => {
                             const isActive = item.isActive(pathname);
                             return (
                                 <Typography
@@ -253,7 +229,8 @@ export function UserLayout({
                                     {t(item.labelKey)}
                                 </Typography>
                             );
-                        })}
+                        })
+                    )}
                 </Stack>
             ),
             rightArea: (

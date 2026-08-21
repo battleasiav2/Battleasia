@@ -109,7 +109,8 @@ export function PlayArenaHero({
         mb: { xs: 1.5, md: 3 },
         minHeight: { xs: 312, sm: 410, md: 500 },
         display: 'flex',
-        alignItems: 'flex-end',
+        alignItems: { xs: 'flex-end', md: 'center' },
+        justifyContent: 'center',
         overflow: 'hidden',
         bgcolor: '#000000',
         borderTop: `1px solid ${alpha(GOLD, 0.16)}`,
@@ -137,11 +138,18 @@ export function PlayArenaHero({
         sx={{
           position: 'absolute',
           inset: 0,
-          background: `
-            linear-gradient(90deg, ${alpha('#000000', 0.9)} 0%, ${alpha('#000000', 0.62)} 45%, ${alpha('#000000', 0.35)} 100%),
-            linear-gradient(180deg, ${alpha('#000000', 0.6)} 0%, transparent 32%, ${alpha('#000000', 0.92)} 100%),
-            radial-gradient(ellipse 60% 45% at 20% 20%, ${alpha(GOLD, 0.12)} 0%, transparent 60%)
-          `,
+          background: {
+            xs: `
+              linear-gradient(90deg, ${alpha('#000000', 0.9)} 0%, ${alpha('#000000', 0.62)} 45%, ${alpha('#000000', 0.35)} 100%),
+              linear-gradient(180deg, ${alpha('#000000', 0.6)} 0%, transparent 32%, ${alpha('#000000', 0.92)} 100%),
+              radial-gradient(ellipse 60% 45% at 20% 20%, ${alpha(GOLD, 0.12)} 0%, transparent 60%)
+            `,
+            md: `
+              linear-gradient(180deg, ${alpha('#000000', 0.55)} 0%, ${alpha('#000000', 0.35)} 40%, ${alpha('#000000', 0.88)} 100%),
+              radial-gradient(ellipse 70% 55% at 50% 35%, ${alpha(GOLD, 0.14)} 0%, transparent 65%),
+              linear-gradient(90deg, ${alpha('#000000', 0.45)} 0%, transparent 28%, transparent 72%, ${alpha('#000000', 0.45)} 100%)
+            `,
+          },
         }}
       />
 
@@ -181,16 +189,26 @@ export function PlayArenaHero({
 
       <Stack
         spacing={{ xs: 1, md: 2 }}
+        alignItems={{ xs: 'flex-start', md: 'center' }}
         sx={{
           position: 'relative',
           zIndex: 3,
           width: 1,
-          px: { xs: 2.25, sm: 3.5, md: 6 },
+          mx: 'auto',
+          px: { xs: 2.25, sm: 3.5, md: 6, lg: 8 },
           py: { xs: 2.25, md: 4.25 },
-          maxWidth: { md: 760 },
+          maxWidth: { xs: 760, md: 920 },
+          textAlign: { xs: 'left', md: 'center' },
         }}
       >
-        <Stack direction="row" alignItems="center" spacing={1.25} flexWrap="wrap" useFlexGap>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent={{ xs: 'flex-start', md: 'center' }}
+          spacing={1.25}
+          flexWrap="wrap"
+          useFlexGap
+        >
           <Typography
             sx={{
               fontSize: 10,
@@ -252,16 +270,74 @@ export function PlayArenaHero({
             fontSize: { xs: 11, md: 15 },
             lineHeight: 1.45,
             color: alpha('#ffffff', 0.82),
-            maxWidth: 520,
+            maxWidth: { xs: 520, md: 640 },
+            mx: { md: 'auto' },
             textShadow: `0 1px 8px ${alpha('#000000', 0.8)}`,
           }}
         >
           {description}
         </Typography>
 
-        <BattleGoldDivider variant="hero" sx={{ width: { xs: 100, md: 220 } }} />
+        <BattleGoldDivider variant="hero" sx={{ width: { xs: 100, md: 220 }, mx: { md: 'auto' } }} />
 
-        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ pt: 0.15 }}>
+        {stats.length > 0 && (
+          <Box
+            sx={{
+              display: { xs: 'none', md: 'grid' },
+              gridTemplateColumns: `repeat(${Math.min(stats.length, 3)}, minmax(0, 1fr))`,
+              gap: 2,
+              width: 1,
+              maxWidth: 560,
+              pt: 0.5,
+            }}
+          >
+            {stats.map((stat) => (
+              <Box
+                key={stat.label}
+                sx={{
+                  px: 1.5,
+                  py: 1.25,
+                  border: `1px solid ${alpha(GOLD, 0.22)}`,
+                  bgcolor: alpha('#000000', 0.4),
+                  textAlign: 'center',
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: 22,
+                    fontWeight: 900,
+                    color: GOLD,
+                    lineHeight: 1.1,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {stat.value}
+                </Typography>
+                <Typography
+                  sx={{
+                    mt: 0.5,
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: 0.8,
+                    textTransform: 'uppercase',
+                    color: alpha('#ffffff', 0.55),
+                  }}
+                >
+                  {stat.label}
+                </Typography>
+              </Box>
+            ))}
+          </Box>
+        )}
+
+        <Stack
+          direction="row"
+          spacing={1}
+          flexWrap="wrap"
+          useFlexGap
+          justifyContent={{ xs: 'flex-start', md: 'center' }}
+          sx={{ pt: 0.15 }}
+        >
           <Button
             variant="outlined"
             disableElevation

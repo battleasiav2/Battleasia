@@ -142,6 +142,30 @@ export const accountMenuItems: AccountMenuItem[] = [
   },
 ];
 
+/** Desktop sidebar extras — shown below primary arena links (fills empty sidebar height). */
+export const sidebarSecondaryItems: AccountMenuItem[] = [
+  {
+    labelKey: 'navigation.wallet',
+    href: paths.user.account.wallet,
+    icon: <Iconify icon="solar:wallet-money-bold" />,
+  },
+  {
+    labelKey: 'navigation.leaderboard',
+    href: paths.user.account.leaderBoard,
+    icon: <Iconify icon="game-icons:podium-winner" />,
+  },
+  {
+    labelKey: 'navigation.settings',
+    href: paths.user.account.profile,
+    icon: <Iconify icon="solar:settings-bold" />,
+  },
+  {
+    labelKey: 'navigation.customerSupport',
+    href: paths.user.account.customerSupport,
+    icon: <Iconify icon="solar:chat-round-bold" />,
+  },
+];
+
 // ----------------------------------------------------------------------
 
 /**
