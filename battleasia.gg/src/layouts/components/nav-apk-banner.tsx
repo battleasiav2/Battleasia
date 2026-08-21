@@ -146,20 +146,18 @@ export function NavApkBanner({ onNavigate, sx }: NavApkBannerProps) {
           sx={{
             py: 1,
             minHeight: 36,
-            borderRadius: 0,
+            borderRadius: `${GLASS_CARD_RADIUS}px`,
             fontSize: 12,
             fontWeight: 800,
             letterSpacing: 0.6,
             textTransform: 'uppercase',
-            color: USER_COLORS.gold,
-            bgcolor: alpha('#0a0a0c', 0.72),
-            border: `1.5px solid ${USER_COLORS.gold}`,
-            boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.05)}, 0 6px 18px ${alpha('#000000', 0.35)}`,
+            color: '#111',
+            bgcolor: USER_COLORS.gold,
+            border: `1px solid ${alpha('#fff', 0.15)}`,
+            boxShadow: `0 6px 18px ${alpha(USER_COLORS.gold, 0.28)}`,
             '&:hover': {
-              color: USER_COLORS.goldLight,
-              bgcolor: alpha('#121214', 0.88),
-              borderColor: USER_COLORS.goldLight,
-              boxShadow: `0 0 18px ${alpha(USER_COLORS.gold, 0.18)}`,
+              bgcolor: USER_COLORS.goldLight,
+              boxShadow: `0 8px 22px ${alpha(USER_COLORS.gold, 0.38)}`,
             },
           }}
         >
