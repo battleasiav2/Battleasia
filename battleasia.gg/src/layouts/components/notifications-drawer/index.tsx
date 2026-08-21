@@ -205,8 +205,8 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
           }}
         >
           <Iconify
-            icon="solar:bell-bold"
-            width={20}
+            icon="solar:bell-bing-bold-duotone"
+            width={22}
             sx={{
               color: open ? USER_COLORS.gold : alpha('#ffffff', 0.92),
               transition: 'color 0.2s ease',

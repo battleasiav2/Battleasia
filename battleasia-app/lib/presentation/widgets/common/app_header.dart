@@ -54,7 +54,7 @@ class AppHeader extends StatelessWidget {
           ),
           const Spacer(),
           const LocaleToggle(),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Consumer<AuthProvider>(
             builder: (context, authProvider, _) {
               if (authProvider.isAuthenticated) {
@@ -63,7 +63,7 @@ class AppHeader extends StatelessWidget {
               return const SizedBox.shrink();
             },
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 16),
           Consumer<AuthProvider>(
             builder: (context, authProvider, _) {
               if (authProvider.isAuthenticated) {

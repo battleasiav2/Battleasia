@@ -51,7 +51,7 @@ class AppConfig {
   static const String currencyIcon = '/assets/images/currency.webp';
 
   /// Get full image URL
-  /// Handles both absolute URLs and relative paths
+  /// Handles both absolute URLs and relative paths (parity with web get-image-url.ts)
   static String? getImageUrl(String? image) {
     if (image == null || image.isEmpty) {
       return null;
@@ -65,13 +65,29 @@ class AppConfig {
       return image;
     }
 
-    // If no server URL configured, return the image path as is
-    final baseUrl = serverUrl;
-    if (baseUrl.isEmpty) {
-      return image;
+    final normalized = image.startsWith('/') ? image : '/$image';
+
+    // Frontend-bundled public assets stay relative / site-rooted
+    if (normalized.startsWith('/assets/') ||
+        normalized.startsWith('/logo/') ||
+        normalized.startsWith('/favicon')) {
+      return normalized;
     }
 
-    // Construct full URL with server base URL
-    return '$baseUrl${image.startsWith('/') ? image : '/$image'}';
+    final baseUrl = serverUrl.replaceAll(RegExp(r'/$'), '');
+    if (baseUrl.isEmpty) {
+      if (normalized.startsWith('/uploads/') || normalized == '/uploads') {
+        return '/api$normalized';
+      }
+      return normalized;
+    }
+
+    // Same-origin Coolify: /uploads hits SPA; API serves under /api/uploads
+    if ((normalized.startsWith('/uploads/') || normalized == '/uploads') &&
+        !baseUrl.endsWith('/api')) {
+      return '$baseUrl/api$normalized';
+    }
+
+    return '$baseUrl$normalized';
   }
 }

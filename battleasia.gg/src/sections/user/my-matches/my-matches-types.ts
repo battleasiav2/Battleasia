@@ -1,6 +1,6 @@
 import { fDateTime } from 'src/utils/format-time';
 
-import { CONFIG } from 'src/global-config';
+import { getImageUrl } from 'src/utils/get-image-url';
 
 import { PLAY_IMAGE_PATHS } from '../play/play-constants';
 
@@ -68,16 +68,8 @@ export type MyMatchTab = 'all' | 'win' | 'loss' | 'pending';
 // ----------------------------------------------------------------------
 
 export const getMyMatchBannerUrl = (path?: string) => {
-  if (!path) {
-    return PLAY_IMAGE_PATHS.game;
-  }
-  if (path.startsWith('http')) {
-    return path;
-  }
-  if (CONFIG.serverUrl) {
-    return `${CONFIG.serverUrl}${path}`;
-  }
-  return path;
+  const resolved = getImageUrl(path);
+  return resolved || PLAY_IMAGE_PATHS.game;
 };
 
 export const mapApiMatchToCard = (item: ApiMatchHistoryItem): MyMatchCardData => {

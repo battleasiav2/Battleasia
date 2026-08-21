@@ -169,7 +169,8 @@ class _MatchCardState extends State<MatchCard>
       // Add minimal top padding to accommodate the kill icon
       padding: EdgeInsets.only(top: topPadding),
       child: Card(
-        color: AppTheme.surfaceColor,
+        color: Colors.transparent,
+        elevation: 0,
         clipBehavior: Clip.none,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         child: Stack(
@@ -180,9 +181,30 @@ class _MatchCardState extends State<MatchCard>
               height: cardHeight,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
+                color: const Color(0xFF0A0A0C).withValues(alpha: 0.55),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.12),
+                ),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withValues(alpha: 0.06),
+                    Colors.transparent,
+                    AppColors.gold.withValues(alpha: 0.04),
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.45),
+                    blurRadius: 24,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
                 image: DecorationImage(
                   image: const AssetImage('assets/images/bounty-bg.webp'),
                   fit: BoxFit.cover,
+                  opacity: const AlwaysStoppedAnimation(0.35),
                   onError: (_, __) {},
                 ),
               ),
@@ -526,13 +548,33 @@ class _MatchCardState extends State<MatchCard>
             ],
           ),
 
-          GoldButton(
-            label: widget.isJoined
-                ? '${widget.match.entryFee.toStringAsFixed(0)} SPECTATE'
-                : 'JOIN MATCH',
-            loading: widget.joining,
-            onPressed: buttonDisabled ? null : widget.onJoin,
-          ),
+          widget.isJoined
+              ? OutlinedButton(
+                  onPressed: buttonDisabled ? null : widget.onJoin,
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 40),
+                    foregroundColor: AppColors.gold,
+                    side: BorderSide(
+                      color: AppColors.gold.withValues(alpha: 0.55),
+                    ),
+                    backgroundColor: Colors.black.withValues(alpha: 0.4),
+                  ),
+                  child: Text(
+                    '${widget.match.entryFee.toStringAsFixed(0)} SPECTATE',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                )
+              : GoldButton(
+                  label: 'JOIN MATCH',
+                  loading: widget.joining,
+                  height: 52,
+                  fontSize: 14,
+                  onPressed: buttonDisabled ? null : widget.onJoin,
+                ),
         ],
       ),
     );

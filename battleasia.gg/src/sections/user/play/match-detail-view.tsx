@@ -83,8 +83,8 @@ export function MatchDetailView() {
   useLiveSync(fetchMatchDetail, LIVE_SYNC_TOPICS.matches);
 
   const heroImage = useMemo(
-    () => getMatchBannerUrl(matchDetail?.banner),
-    [matchDetail?.banner]
+    () => getMatchBannerUrl(matchDetail?.banner, matchDetail?.map),
+    [matchDetail?.banner, matchDetail?.map]
   );
 
   const { isLoaded } = useImagePreloader([heroImage], {

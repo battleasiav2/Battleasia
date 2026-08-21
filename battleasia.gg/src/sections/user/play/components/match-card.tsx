@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import { Box, Stack, Button, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
@@ -5,8 +7,6 @@ import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 
 import { fDateTime } from 'src/utils/format-time';
-
-import { toast } from 'react-hot-toast';
 
 import { useTranslate } from 'src/locales/use-locales';
 
@@ -18,13 +18,16 @@ import {
   getGoldTopLineShellSx,
 } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, userGoldButtonSx } from 'src/layouts/user';
+import { USER_COLORS, userSolidGoldButtonSx, userGhostButtonSx } from 'src/layouts/user';
 
 import { MatchStatPill } from './match-stat-pill';
 import { MatchRoomDialog } from './match-room-dialog';
 import { estimateMatchWinningPool } from '../match-prize-utils';
-import { getMatchBannerUrl, type MatchCardProps } from '../match-types';
-
+import {
+  getMatchBannerUrl,
+  MATCH_BANNER_FALLBACK,
+  type MatchCardProps,
+} from '../match-types';
 
 // ----------------------------------------------------------------------
 
@@ -40,10 +43,17 @@ export function MatchCard({
   const { t } = useTranslate();
   const router = useRouter();
   const tokens = getDefaultGlassTokens();
-  const bannerUrl = getMatchBannerUrl(match.banner);
+  const primaryBanner = getMatchBannerUrl(match.banner, match.map);
+  const [bannerSrc, setBannerSrc] = useState(primaryBanner);
+
+  useEffect(() => {
+    setBannerSrc(primaryBanner);
+  }, [primaryBanner]);
+
   const isPremiumMatch = match.premiumOnly === true;
   const buttonDisabled = joining || isJoined || !canJoin || (isPremiumMatch && !isPremiumUser);
   const winningPool = estimateMatchWinningPool(match);
+  const showJoinCta = !isJoined && !(isPremiumMatch && !isPremiumUser) && !joining;
 
   const goToDetail = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -69,27 +79,50 @@ export function MatchCard({
         flexDirection: 'column',
         overflow: 'hidden',
         cursor: isResult ? 'pointer' : 'default',
+        // Soft glass-morphism over dark gaming surface
+        bgcolor: alpha('#0a0a0c', 0.55),
+        backgroundColor: alpha('#0a0a0c', 0.55),
+        backgroundImage: `
+          linear-gradient(145deg, ${alpha('#ffffff', 0.06)} 0%, transparent 42%, ${alpha(USER_COLORS.gold, 0.04)} 100%)
+        `,
+        backdropFilter: 'blur(18px) saturate(1.15)',
+        WebkitBackdropFilter: 'blur(18px) saturate(1.15)',
+        border: `1px solid ${alpha('#ffffff', 0.12)}`,
+        boxShadow: `
+          inset 0 1px 0 ${alpha('#ffffff', 0.08)},
+          0 12px 36px ${alpha('#000000', 0.45)},
+          0 0 0 1px ${alpha(USER_COLORS.gold, 0.06)}
+        `,
         transition: 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease',
-        '&:hover': isResult
-          ? {
-              transform: 'translateY(-4px)',
-              boxShadow: `0 20px 48px ${alpha('#000000', 0.75)}, 0 0 28px ${alpha(USER_COLORS.gold, 0.1)}`,
-            }
-          : undefined,
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          borderColor: alpha(USER_COLORS.gold, 0.35),
+          boxShadow: `
+            inset 0 1px 0 ${alpha('#ffffff', 0.1)},
+            0 20px 48px ${alpha('#000000', 0.65)},
+            0 0 28px ${alpha(USER_COLORS.gold, 0.12)}
+          `,
+        },
       })}
     >
       {/* Banner */}
       <Box sx={{ position: 'relative', height: 148, flexShrink: 0, overflow: 'hidden' }}>
         <Box
           component="img"
-          src={bannerUrl}
+          src={bannerSrc}
           alt={match.matchName}
+          loading="lazy"
+          decoding="async"
+          onError={() => {
+            setBannerSrc((prev) => (prev === MATCH_BANNER_FALLBACK ? prev : MATCH_BANNER_FALLBACK));
+          }}
           sx={{
             width: 1,
             height: 1,
             objectFit: 'cover',
             objectPosition: 'center',
             display: 'block',
+            bgcolor: '#0a0a0a',
           }}
         />
         <Box
@@ -122,7 +155,7 @@ export function MatchCard({
         </Stack>
       </Box>
 
-      {/* Body — flex so footer buttons share one baseline across cards */}
+      {/* Body */}
       <Stack spacing={1.5} sx={{ p: 2, flex: 1, minHeight: 0, display: 'flex' }}>
         <Box sx={{ minHeight: 58 }}>
           <Typography
@@ -202,7 +235,6 @@ export function MatchCard({
           ))}
         </Box>
 
-        {/* Keep equal card height: always reserve room-link row (hidden when not joined) */}
         {!isResult ? (
           <Box sx={{ minHeight: 22, display: 'flex', alignItems: 'center', mt: 'auto' }}>
             {isJoined ? (
@@ -242,7 +274,7 @@ export function MatchCard({
               router.push(paths.user.matchResult(match.id));
             }}
             sx={{
-              ...userGoldButtonSx,
+              ...userGhostButtonSx,
               py: 1.1,
             }}
           >
@@ -251,27 +283,46 @@ export function MatchCard({
         ) : (
           <Button
             fullWidth
-            variant="outlined"
+            variant={showJoinCta ? 'contained' : 'outlined'}
             disableElevation
-            disabled={buttonDisabled}
+            disabled={buttonDisabled && !isJoined}
             onClick={(e) => {
               e.stopPropagation();
               onJoin(match);
             }}
-            sx={{
-              ...userGoldButtonSx,
-              py: 1.1,
-            }}
+            sx={
+              showJoinCta
+                ? {
+                    ...userSolidGoldButtonSx,
+                    height: 'auto',
+                    minHeight: 52,
+                    py: 1.45,
+                    fontSize: 14,
+                    letterSpacing: 1.2,
+                    boxShadow: `0 0 22px ${alpha(USER_COLORS.gold, 0.35)}, 0 8px 24px ${alpha('#000000', 0.4)}`,
+                    '&:hover': {
+                      background: 'linear-gradient(180deg, #fbbf24 0%, #f5c518 52%, #d4a017 100%)',
+                      boxShadow: `0 0 28px ${alpha(USER_COLORS.gold, 0.5)}, 0 12px 28px ${alpha('#000000', 0.5)}`,
+                    },
+                  }
+                : {
+                    ...userGhostButtonSx,
+                    minHeight: 40,
+                    py: 0.9,
+                    fontSize: 12,
+                    opacity: 0.92,
+                  }
+            }
           >
             {isJoined ? (
               <Stack direction="row" alignItems="center" spacing={0.5}>
-                <CoinValue value={match.entryFee} size={16} />
-                <Typography sx={{ fontSize: 13, fontWeight: 800 }}>SPECTATE</Typography>
+                <CoinValue value={match.entryFee} size={14} />
+                <Typography sx={{ fontSize: 12, fontWeight: 800 }}>SPECTATE</Typography>
               </Stack>
             ) : isPremiumMatch && !isPremiumUser ? (
               <Stack direction="row" alignItems="center" spacing={0.5}>
                 <Iconify icon="solar:crown-bold" width={16} />
-                <Typography sx={{ fontSize: 13, fontWeight: 800 }}>PREMIUM ONLY</Typography>
+                <Typography sx={{ fontSize: 12, fontWeight: 800 }}>PREMIUM ONLY</Typography>
               </Stack>
             ) : joining ? (
               'JOINING...'

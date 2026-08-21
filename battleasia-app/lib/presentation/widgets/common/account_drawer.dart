@@ -533,7 +533,7 @@ class _AccountDrawerContent extends StatelessWidget {
               },
             ),
             AccountMenuTile(
-              icon: Icons.notifications,
+              icon: Icons.notifications_active_outlined,
               label: 'account.notifications'.tr(),
               nested: true,
               onTap: () {

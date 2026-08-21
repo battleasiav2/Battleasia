@@ -1,8 +1,12 @@
 import { CONFIG } from 'src/global-config';
+import { getImageUrl } from 'src/utils/get-image-url';
 
 import { PLAY_IMAGE_PATHS } from './play-constants';
 
 // ----------------------------------------------------------------------
+
+/** Default battle-ground art when match banner is missing or fails to load. */
+export const MATCH_BANNER_FALLBACK = PLAY_IMAGE_PATHS.game || '/assets/images/bounty-bg.avif';
 
 export type IMatch = {
   id: string;
@@ -131,21 +135,18 @@ export function formatResultAvatarUrl(path?: string) {
 }
 
 export function getMatchMapImageUrl(map?: string) {
-  return map ? `/assets/images/map/${map}.webp` : '/assets/images/bounty-bg.avif';
+  if (!map) return MATCH_BANNER_FALLBACK;
+  const trimmed = map.trim();
+  if (!trimmed) return MATCH_BANNER_FALLBACK;
+  // Public map assets use Title Case filenames (Erangel.webp, Livik.webp, …)
+  const fileName = trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+  return `/assets/images/map/${fileName}.webp`;
 }
 
-export function getMatchBannerUrl(path?: string) {
-  if (!path) {
-    return PLAY_IMAGE_PATHS.game;
-  }
-  if (path.startsWith('http')) {
-    return path;
-  }
-  if (path.startsWith('/assets/')) {
-    return path;
-  }
-  if (CONFIG.serverUrl) {
-    return `${CONFIG.serverUrl}${path}`;
-  }
-  return path;
+/** Resolve match banner via shared image URL rules; never return empty. */
+export function getMatchBannerUrl(path?: string, map?: string) {
+  const resolved = getImageUrl(path);
+  if (resolved) return resolved;
+  if (map) return getMatchMapImageUrl(map);
+  return MATCH_BANNER_FALLBACK;
 }

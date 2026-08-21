@@ -32,6 +32,7 @@ export {
   userPageDividerSx,
   userMutedTextSx,
   userGoldButtonSx,
+  userSolidGoldButtonSx,
   userMeshButtonSx,
   userGhostButtonSx,
   userSuccessButtonSx,

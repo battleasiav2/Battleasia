@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 
-/// Solid gold primary CTA — 44px, filled, square. Used for Sign In / Join / Buy.
+/// Solid gold primary CTA — filled, square. Used for Sign In / Join / Buy.
 class GoldButton extends StatefulWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -9,6 +9,8 @@ class GoldButton extends StatefulWidget {
   final bool expanded;
   final IconData? icon;
   final bool uppercase;
+  final double height;
+  final double fontSize;
 
   const GoldButton({
     super.key,
@@ -18,6 +20,8 @@ class GoldButton extends StatefulWidget {
     this.expanded = true,
     this.icon,
     this.uppercase = true,
+    this.height = 44,
+    this.fontSize = 13,
   });
 
   @override
@@ -41,7 +45,7 @@ class _GoldButtonState extends State<GoldButton> {
             : null,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          height: 44,
+          height: widget.height,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             gradient: enabled
@@ -70,8 +74,8 @@ class _GoldButtonState extends State<GoldButton> {
             boxShadow: enabled
                 ? [
                     BoxShadow(
-                      color: AppColors.gold.withValues(alpha: 0.18),
-                      blurRadius: 16,
+                      color: AppColors.gold.withValues(alpha: 0.28),
+                      blurRadius: 18,
                     ),
                   ]
                 : null,
@@ -107,7 +111,7 @@ class _GoldButtonState extends State<GoldButton> {
                               ? const Color(0xFF111111)
                               : const Color(0xFF111111).withValues(alpha: 0.45),
                           fontWeight: FontWeight.w800,
-                          fontSize: 13,
+                          fontSize: widget.fontSize,
                           letterSpacing: 1.1,
                           fontFamily: 'Poppins',
                         ),
