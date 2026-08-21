@@ -10,7 +10,6 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
-import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 
 /// Native store withdrawal — mirrors web shop `/user/withdrawal` (Coingo payout).
@@ -184,8 +183,6 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 12),
-                      const ShopSectionNav(current: ShopSectionTab.withdrawal),
-                      const SizedBox(height: 16),
                       Text(
                         'shop.withdrawTitle'.tr(),
                         style: AppTheme.heading2.copyWith(

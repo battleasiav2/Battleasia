@@ -54,7 +54,6 @@ import {
 import { toast } from 'react-hot-toast';
 import { Iconify } from 'src/components/iconify';
 import { CoinValue } from 'src/components/coin-value';
-import { ShopSectionNav } from 'src/sections/user/shop/components/shop-section-nav';
 
 // Currency rates (BAC to local currency)
 const CURRENCY_RATES: Record<string, number> = {
@@ -615,7 +614,6 @@ export function WalletView() {
 
   return (
     <UserPageShell>
-      <ShopSectionNav />
       <WalletHero
         title={t('wallet.title')}
         subtitle={t('wallet.subtitle')}

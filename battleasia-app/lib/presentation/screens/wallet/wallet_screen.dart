@@ -10,7 +10,6 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/balance_history_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
-import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/withdraw_sheet.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
@@ -396,12 +395,6 @@ class _WalletScreenState extends State<WalletScreen> {
                       return Column(
                         children: [
                           SizedBox(height: spacing16),
-                          if (widget.fromShop) ...[
-                            const ShopSectionNav(
-                              current: ShopSectionTab.wallet,
-                            ),
-                            SizedBox(height: spacing16),
-                          ],
                           // Main Balance Card
                           _buildBalanceCard(context, walletData),
                           SizedBox(height: spacing24),

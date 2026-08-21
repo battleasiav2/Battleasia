@@ -12,7 +12,7 @@ import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
 import { ShopDetailsCarousel } from './shop-details-carousel';
 import { SHOP_HERO_IMAGE, SHOP_IMAGE_PATHS, getBacShopEntryUrl } from './shop-constants';
-import { ShopFeatures, ShopArenaHero, ShopPageSkeleton, ShopSectionNav } from './components';
+import { ShopFeatures, ShopArenaHero, ShopPageSkeleton } from './components';
 
 // ----------------------------------------------------------------------
 
@@ -65,7 +65,6 @@ export function ShopView() {
 
   return (
     <UserPageShell>
-      <ShopSectionNav />
       <ShopArenaHero
         badge={t('shop.badgeOfficialStore')}
         title={t('shop.bacShopName')}
