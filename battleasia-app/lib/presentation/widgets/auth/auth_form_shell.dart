@@ -205,13 +205,14 @@ class _AuthPanel extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
       decoration: BoxDecoration(
-        color: const Color(0xFF181614),
-        border: Border.all(color: const Color(0xFF2B2B2B)),
+        // Match web home / auth cards (#161618)
+        color: const Color(0xFF161618),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         boxShadow: const [
           BoxShadow(
-            color: Color(0xA6000000),
-            blurRadius: 24,
-            offset: Offset(0, 16),
+            color: Color(0x80000000),
+            blurRadius: 28,
+            offset: Offset(0, 10),
           ),
         ],
       ),
@@ -219,6 +220,22 @@ class _AuthPanel extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Center(
+            child: Container(
+              width: 48,
+              height: 2,
+              decoration: BoxDecoration(
+                color: AppColors.gold,
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.gold.withValues(alpha: 0.45),
+                    blurRadius: 12,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
           const Center(
             child: BattleAsiaLogo(
               logoSize: 86,
@@ -243,6 +260,7 @@ class _AuthPanel extends StatelessWidget {
               fontSize: 18,
               height: 1.2,
               fontWeight: FontWeight.w800,
+              color: Colors.white,
             ),
             textAlign: TextAlign.center,
           ),
@@ -251,7 +269,7 @@ class _AuthPanel extends StatelessWidget {
             Text(
               description!,
               style: AppTheme.bodyMedium.copyWith(
-                color: AppColors.textMuted,
+                color: Colors.white.withValues(alpha: 0.62),
                 height: 1.45,
                 fontSize: 12,
               ),

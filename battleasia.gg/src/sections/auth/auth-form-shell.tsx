@@ -4,17 +4,18 @@ import { Box, Stack, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
 import { Logo } from 'src/components/logo';
-import { GlassPanelCard, getDefaultGlassTokens } from 'src/components/battle-glass-card';
 import { useTranslate } from 'src/locales/use-locales';
 
-import { authCardSx } from './auth-form-styles';
+import { AUTH_CARD_BG, authCardSx } from './auth-form-styles';
 
 // ----------------------------------------------------------------------
 
 const cardReveal = keyframes`
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
 `;
+
+const GOLD = '#f5c518';
 
 type AuthFormShellProps = {
   title: ReactNode;
@@ -28,8 +29,6 @@ type AuthFormShellProps = {
 
 export function AuthFormShell({ title, description, children, wide, compact }: AuthFormShellProps) {
   const { t } = useTranslate();
-  const glassTokens = getDefaultGlassTokens();
-  const gold = '#f5c518';
 
   return (
     <Box
@@ -40,18 +39,29 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
           : { xs: 1, sm: 480, md: 500 },
         display: 'flex',
         flexDirection: 'column',
-        animation: `${cardReveal} 0.28s ease-out both`,
+        animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) both`,
         '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
       }}
     >
-      <GlassPanelCard
+      <Box
         sx={{
           width: 1,
-          borderRadius: 0,
           p: wide ? { xs: 2, sm: 2.5, md: 2.75 } : compact ? { xs: 1.75, sm: 1.9 } : { xs: 2, sm: 2.4 },
           ...authCardSx,
         }}
       >
+        {/* Home-card gold accent bar */}
+        <Box
+          sx={{
+            height: 2,
+            width: 48,
+            bgcolor: GOLD,
+            mb: compact ? 1.5 : 2,
+            mx: 'auto',
+            boxShadow: `0 0 12px ${alpha(GOLD, 0.45)}`,
+          }}
+        />
+
         <Stack alignItems="center" spacing={compact ? 0.3 : 0.45} sx={{ mb: compact ? 1 : 1.25 }}>
           <Logo
             disabled
@@ -68,7 +78,7 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
               fontWeight: 700,
               letterSpacing: 1.6,
               textTransform: 'uppercase',
-              color: alpha(gold, 0.85),
+              color: alpha(GOLD, 0.85),
             }}
           >
             {t('auth.brandTagline')}
@@ -78,7 +88,7 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
             className="font-tr"
             sx={{
               fontWeight: 800,
-              color: glassTokens.titleColor,
+              color: '#ffffff',
               textAlign: 'center',
               fontSize: compact ? { xs: 16, sm: 18 } : { xs: 18, sm: 20 },
               lineHeight: 1.2,
@@ -91,7 +101,7 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
             <Typography
               variant="body2"
               sx={{
-                color: glassTokens.subtitleColor,
+                color: alpha('#ffffff', 0.62),
                 textAlign: 'center',
                 fontSize: compact ? 12 : 12.5,
                 lineHeight: 1.45,
@@ -111,23 +121,23 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
               width: compact ? { xs: 150, sm: 180 } : { xs: 180, sm: 220 },
             }}
           >
-            <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, transparent, ${alpha(gold, 0.55)})` }} />
+            <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, transparent, ${alpha(GOLD, 0.55)})` }} />
             <Box
               sx={{
                 width: 6,
                 height: 6,
                 flexShrink: 0,
                 transform: 'rotate(45deg)',
-                bgcolor: gold,
-                boxShadow: `0 0 8px ${alpha(gold, 0.6)}`,
+                bgcolor: GOLD,
+                boxShadow: `0 0 8px ${alpha(GOLD, 0.6)}`,
               }}
             />
-            <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${alpha(gold, 0.55)}, transparent)` }} />
+            <Box sx={{ flex: 1, height: '1px', background: `linear-gradient(90deg, ${alpha(GOLD, 0.55)}, transparent)` }} />
           </Box>
         </Stack>
 
-        {children}
-      </GlassPanelCard>
+        <Box sx={{ bgcolor: 'transparent', backgroundColor: AUTH_CARD_BG }}>{children}</Box>
+      </Box>
     </Box>
   );
 }

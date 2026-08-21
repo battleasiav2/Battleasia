@@ -165,7 +165,7 @@ class _SignInScreenState extends State<SignInScreen> {
                   _obscurePassword
                       ? Icons.visibility_off_outlined
                       : Icons.visibility_outlined,
-                  color: Colors.white,
+                  color: const Color(0xFF9CA3AF),
                   size: 18,
                 ),
                 onPressed: () =>
@@ -222,10 +222,12 @@ class _SignInScreenState extends State<SignInScreen> {
                     child: Text(
                       'auth.forgotPassword'.tr(),
                       style: AppTheme.bodyMedium.copyWith(
-                        color: AppColors.goldAccent,
-                        fontWeight: FontWeight.w600,
+                        color: AppColors.gold,
+                        fontWeight: FontWeight.w700,
                         fontSize: 12,
                         height: 1,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.gold,
                       ),
                     ),
                   ),
@@ -308,9 +310,12 @@ class _SignInScreenState extends State<SignInScreen> {
                   TextSpan(
                     text: 'auth.signUp'.tr(),
                     style: AppTheme.bodyMedium.copyWith(
-                      color: AppColors.goldAccent,
+                      color: AppColors.gold,
                       fontWeight: FontWeight.w700,
                       fontSize: 12.5,
+                      decoration: TextDecoration.underline,
+                      decorationColor: AppColors.gold,
+                      decorationThickness: 1.5,
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {

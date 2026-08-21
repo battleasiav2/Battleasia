@@ -84,30 +84,25 @@ export const baccoinSubmitButtonSx = {
   },
 };
 
-export const AUTH_CARD_BG = '#181614';
+export const AUTH_CARD_BG = '#161618';
 export const AUTH_INPUT_BG = '#0e0e0e';
 /** Brighter placeholder / adornment icons on dark inputs */
 export const AUTH_PLACEHOLDER = '#9CA3AF';
-const AUTH_BORDER = '#2b2b2b';
 
-/** Neutral charcoal card — slight warm gold wash + subtle top border glow */
+/** Same surface language as home About / Play Your Game cards */
 export const authCardSx = {
+  position: 'relative' as const,
+  overflow: 'hidden' as const,
   bgcolor: AUTH_CARD_BG,
   backgroundColor: AUTH_CARD_BG,
-  backgroundImage: `linear-gradient(180deg, #1c1a16 0%, ${AUTH_CARD_BG} 42%, #141210 100%)`,
-  border: `1px solid ${AUTH_BORDER}`,
-  borderTop: `1px solid ${alpha('#f5c518', 0.22)}`,
-  boxShadow: `0 24px 60px ${alpha('#000000', 0.65)}, 0 -1px 12px ${alpha('#f5c518', 0.06)}`,
+  backgroundImage: 'none',
+  border: `1px solid ${alpha('#ffffff', 0.08)}`,
+  borderRadius: 0,
+  boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
   backdropFilter: 'none',
   WebkitBackdropFilter: 'none',
   '&:before': {
-    content: "''",
-    position: 'absolute',
-    inset: 0,
-    pointerEvents: 'none',
-    zIndex: 0,
-    background: `linear-gradient(180deg, ${alpha('#f5c518', 0.055)} 0%, transparent 40%)`,
-    animation: 'none',
+    display: 'none',
   },
 };
 

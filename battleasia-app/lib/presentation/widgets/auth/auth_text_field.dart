@@ -74,7 +74,7 @@ class AuthTextField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: AppTheme.bodyMedium.copyWith(
-                color: const Color(0xFF808080),
+                color: const Color(0xFF9CA3AF),
                 fontSize: 16,
               ),
               filled: true,
@@ -86,7 +86,7 @@ class AuthTextField extends StatelessWidget {
               ),
               prefixIcon: prefix ??
                   (prefixIcon != null
-                      ? Icon(prefixIcon, color: Colors.white, size: 18)
+                      ? Icon(prefixIcon, color: const Color(0xFF9CA3AF), size: 18)
                       : null),
               suffixIcon: suffix,
               enabledBorder: OutlineInputBorder(
