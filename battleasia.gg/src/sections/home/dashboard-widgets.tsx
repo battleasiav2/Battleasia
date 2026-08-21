@@ -352,49 +352,87 @@ function DashboardMatchTile({
                     }}
                 />
             </Stack>
-            <Stack direction="row" alignItems="center" spacing={{ xs: 0.5, sm: 1 }} sx={{ mt: 1 }}>
+            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1.15 }}>
                 <LinearProgress
                     variant="determinate"
                     value={progressValue}
                     sx={{
                         flex: 1,
-                        height: { xs: 6, sm: 8 },
-                        borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
-                        bgcolor: alpha('#ffffff', 0.08),
-                        '& .MuiLinearProgress-bar': { bgcolor: glassTokens.stat.suffixColor },
+                        height: 8,
+                        borderRadius: 1,
+                        bgcolor: alpha('#ffffff', 0.12),
+                        '& .MuiLinearProgress-bar': {
+                            bgcolor: '#f5c518',
+                            borderRadius: 1,
+                            boxShadow: `0 0 8px ${alpha('#f5c518', 0.45)}`,
+                        },
                     }}
                 />
                 <Typography
                     variant="caption"
                     sx={{
-                        minWidth: { xs: 70, sm: 110 },
+                        flexShrink: 0,
+                        minWidth: { xs: 44, sm: 56 },
                         textAlign: 'right',
-                        fontSize: { xs: '0.65rem', sm: '0.75rem' },
+                        fontSize: { xs: '0.7rem', sm: '0.78rem' },
+                        fontWeight: 700,
                         color: '#ffffff',
+                        fontVariantNumeric: 'tabular-nums',
                     }}
                 >
                     {progressCaption}
                 </Typography>
             </Stack>
-            <Stack direction="row" spacing={{ xs: 1, sm: 2 }} sx={{ mt: 1, flexWrap: 'wrap' }}>
-                <Typography variant="caption" sx={{ color: '#ffffff', fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
-                    {variant === 'prize' ? `${t('home.dashboard.entry')}: ` : `${t('home.dashboard.prizeEst')} `}
+
+            {/* Meta row — clear 2-column / space-between (no cramped overlap) */}
+            <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+                spacing={1.5}
+                sx={{ mt: 1.1, gap: 1 }}
+            >
+                <Typography
+                    variant="caption"
+                    sx={{
+                        color: alpha('#ffffff', 0.88),
+                        fontSize: { xs: '0.7rem', sm: '0.78rem' },
+                        fontWeight: 600,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 0.5,
+                        minWidth: 0,
+                    }}
+                >
+                    {variant === 'prize' ? `${t('home.dashboard.entry')}:` : `${t('home.dashboard.prizeEst')}`}
                     {variant === 'prize' ? (
-                        <CoinValue value={match.entryFee || 0} size={12} />
+                        <CoinValue value={match.entryFee || 0} size={13} />
                     ) : (
-                        <CoinValue value={match.prizeEstimate || 0} size={12} />
+                        <CoinValue value={match.prizeEstimate || 0} size={13} />
                     )}
                 </Typography>
                 <Typography
                     variant="caption"
-                    sx={{ color: glassTokens.subtitleColor, fontSize: { xs: '0.65rem', sm: '0.75rem' } }}
+                    sx={{
+                        color: alpha('#ffffff', 0.72),
+                        fontSize: { xs: '0.7rem', sm: '0.78rem' },
+                        fontWeight: 600,
+                        textAlign: 'right',
+                        flexShrink: 0,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 0.5,
+                        fontVariantNumeric: 'tabular-nums',
+                    }}
                 >
                     {variant === 'prize' ? (
                         <>
                             {t('home.dashboard.spots')}: {match.participantsCount}/{match.totalPlayer || '∞'}
                         </>
                     ) : match.entryFee ? (
-                        <>{t('home.dashboard.entry')} <CoinValue value={match.entryFee || 0} size={12} /></>
+                        <>
+                            {t('home.dashboard.entry')} <CoinValue value={match.entryFee || 0} size={13} />
+                        </>
                     ) : (
                         `${t('home.dashboard.entry')} ${t('home.dashboard.free')}`
                     )}

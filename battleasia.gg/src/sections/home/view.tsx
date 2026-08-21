@@ -1,5 +1,5 @@
 
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense } from 'react';
 
 import { Box, Stack, SvgIcon, Accordion, Typography, AccordionSummary, AccordionDetails } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
@@ -19,9 +19,6 @@ import { homeMobileScrollGridSx, homeMobileScrollItemSx } from './home-horizonta
 import { HeroRotatingBanner } from './hero-rotating-banner';
 import { HOME_HERO_SLIDES, readHeroSlideIndex } from './hero-slides';
 import { useTranslate } from 'src/locales/use-locales';
-import { PulseCountUp } from './pulse-count-up';
-
-import type { PublicDashboardStats } from 'src/types';
 
 // Below-fold + non-LCP FX: code-split (never block hero paint)
 const HeroFxOverlay = lazy(() =>
@@ -480,44 +477,6 @@ export function HomeView() {
     </Box>
   );
 
-  // ---------- About: Pulse API stats ----------
-  const [aboutPulse, setAboutPulse] = useState<PublicDashboardStats | null>(null);
-
-  useEffect(() => {
-    fetch(`${CONFIG.serverUrl}/api/v3/public/dashboard`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d: any) => { if (d?.data) setAboutPulse(d.data); })
-      .catch(() => {});
-  }, []);
-
-  const aboutStatItems = [
-    {
-      icon: 'solar:wallet-money-bold-duotone',
-      value: aboutPulse ? aboutPulse.platform.totalWinnings : undefined,
-      fallback: CONFIG.homeStats.prizeMoney,
-      label: t('home.stats.totalWon'),
-      prefix: '৳',
-    },
-    {
-      icon: 'solar:medal-ribbon-star-bold-duotone',
-      value: aboutPulse ? aboutPulse.platform.processedMatches : undefined,
-      fallback: CONFIG.homeStats.tournaments,
-      label: t('home.stats.matchesPlayed'),
-    },
-    {
-      icon: 'solar:play-bold',
-      value: aboutPulse ? aboutPulse.platform.ongoingMatches : undefined,
-      fallback: '—',
-      label: t('home.stats.liveNow'),
-    },
-    {
-      icon: 'solar:gamepad-bold-duotone',
-      value: undefined,
-      fallback: CONFIG.homeStats.gamesSupported,
-      label: t('home.stats.gamesSupported'),
-    },
-  ];
-
   const ABOUT_BULLETS = [
     { icon: 'solar:user-plus-bold', key: 'home.aboutBullet1' },
     { icon: 'solar:wallet-money-bold', key: 'home.aboutBullet2' },
@@ -526,35 +485,9 @@ export function HomeView() {
 
   const sectionAbout = (
     <Box id="about-us" sx={{ ...blackGamingSectionSx(HOME_GAME_ARTS[0]), position: 'relative', overflow: 'hidden' }}>
-      {/* BD flag watermark */}
-      <Box
-        sx={{
-          position: 'absolute',
-          width: { xs: 260, md: 420 },
-          height: { xs: 260, md: 420 },
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha('#006a4e', 0.08)} 35%, transparent 70%)`,
-          top: '50%',
-          right: { xs: -60, md: '8%' },
-          transform: 'translateY(-50%)',
-          pointerEvents: 'none',
-          zIndex: 0,
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            width: '40%',
-            height: '40%',
-            borderRadius: '50%',
-            bgcolor: alpha('#f42a41', 0.07),
-            top: '30%',
-            left: '30%',
-          },
-        }}
-      />
-
       <Stack
         spacing={{ xs: 3, md: 4 }}
-        sx={{ position: 'relative', zIndex: 1, maxWidth: 1280, mx: 'auto' }}
+        sx={{ position: 'relative', zIndex: 1, maxWidth: 880, mx: 'auto' }}
       >
         <Stack spacing={1.25} alignItems="center">
           <Typography
@@ -588,139 +521,68 @@ export function HomeView() {
 
         <Box
           sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: '1.4fr 1fr' },
-            gap: { xs: 1.5, sm: 2, md: 2.5 },
-            alignItems: 'stretch',
+            position: 'relative',
+            bgcolor: '#161618',
+            border: `1px solid ${alpha('#ffffff', 0.08)}`,
+            p: { xs: 2.25, md: 3 },
+            boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
+            animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) both`,
+            transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.4s ease',
+            '&:hover': {
+              transform: 'translateY(-6px)',
+              borderColor: alpha(GOLD, 0.45),
+              boxShadow: `0 22px 48px ${alpha('#000000', 0.7)}, 0 0 32px ${alpha(GOLD, 0.12)}`,
+            },
           }}
         >
-          {/* Left: Bullets + Testimonial */}
-          <Box
-            sx={{
-              position: 'relative',
-              bgcolor: '#161618',
-              border: `1px solid ${alpha('#ffffff', 0.08)}`,
-              p: { xs: 2.25, md: 3 },
-              boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
-              animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) both`,
-              transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.4s ease',
-              '&:hover': {
-                transform: 'translateY(-6px)',
-                borderColor: alpha(GOLD, 0.45),
-                boxShadow: `0 22px 48px ${alpha('#000000', 0.7)}, 0 0 32px ${alpha(GOLD, 0.12)}`,
-              },
-            }}
-          >
-            <Box sx={{ height: 2, width: 48, bgcolor: GOLD, mb: 2, boxShadow: `0 0 12px ${alpha(GOLD, 0.45)}` }} />
+          <Box sx={{ height: 2, width: 48, bgcolor: GOLD, mb: 2, boxShadow: `0 0 12px ${alpha(GOLD, 0.45)}` }} />
 
-            <Stack spacing={1.75}>
-              {ABOUT_BULLETS.map((b) => (
-                <Stack key={b.key} direction="row" spacing={1.25} alignItems="flex-start">
-                  <Iconify icon={b.icon} width={20} sx={{ color: GOLD, mt: 0.25, flexShrink: 0 }} />
-                  <Typography
-                    className="font-tr"
-                    sx={{ fontSize: { xs: 13.5, md: 15 }, lineHeight: 1.7, color: alpha('#ffffff', 0.72) }}
-                  >
-                    {t(b.key)}
-                  </Typography>
-                </Stack>
-              ))}
-            </Stack>
-
-            {/* Testimonial strip */}
-            <Box
-              sx={{
-                mt: 3,
-                pt: 2,
-                borderTop: `1px solid ${alpha('#ffffff', 0.06)}`,
-              }}
-            >
-              <Typography
-                sx={{
-                  fontSize: { xs: 12.5, md: 14 },
-                  fontStyle: 'italic',
-                  color: alpha('#ffffff', 0.55),
-                  lineHeight: 1.65,
-                  mb: 1,
-                }}
-              >
-                &ldquo;{t('home.testimonial.quote')}&rdquo;
-              </Typography>
-              <Stack direction="row" spacing={0.75} alignItems="center">
-                <Iconify icon="solar:user-circle-bold" width={16} sx={{ color: GOLD }} />
-                <Typography sx={{ fontSize: 11, fontWeight: 700, color: alpha('#ffffff', 0.5), letterSpacing: 0.5 }}>
-                  {t('home.testimonial.author')}
+          <Stack spacing={1.75}>
+            {ABOUT_BULLETS.map((b) => (
+              <Stack key={b.key} direction="row" spacing={1.25} alignItems="flex-start">
+                <Iconify icon={b.icon} width={20} sx={{ color: GOLD, mt: 0.25, flexShrink: 0 }} />
+                <Typography
+                  className="font-tr"
+                  sx={{ fontSize: { xs: 13.5, md: 15 }, lineHeight: 1.7, color: alpha('#ffffff', 0.72) }}
+                >
+                  {t(b.key)}
                 </Typography>
               </Stack>
-            </Box>
-          </Box>
+            ))}
+          </Stack>
 
-          {/* Right: Stats grid (Pulse API) */}
+          {/* Testimonial card */}
           <Box
             sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-              gap: { xs: 1.25, sm: 1.5 },
+              mt: 2.75,
+              p: { xs: 1.75, md: 2.25 },
+              borderRadius: 1,
+              bgcolor: alpha('#000000', 0.35),
+              border: `1px solid ${alpha(GOLD, 0.22)}`,
+              backgroundImage: `
+                linear-gradient(135deg, ${alpha(GOLD, 0.06)} 0%, transparent 55%),
+                linear-gradient(180deg, ${alpha('#ffffff', 0.03)} 0%, transparent 100%)
+              `,
+              boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.05)}`,
             }}
           >
-            {aboutStatItems.map((stat, index) => (
-              <Box
-                key={stat.label}
-                sx={{
-                  position: 'relative',
-                  bgcolor: '#161618',
-                  border: `1px solid ${alpha('#ffffff', 0.08)}`,
-                  p: { xs: 1.75, md: 2.25 },
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  minHeight: { xs: 100, md: 120 },
-                  boxShadow: `0 10px 28px ${alpha('#000000', 0.45)}`,
-                  animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) ${0.08 + index * 0.08}s both`,
-                  transition: 'transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease',
-                  '&:hover': {
-                    transform: 'translateY(-6px)',
-                    borderColor: alpha(GOLD, 0.4),
-                    boxShadow: `0 18px 40px ${alpha('#000000', 0.65)}, 0 0 24px ${alpha(GOLD, 0.1)}`,
-                    '& .about-stat-value': { color: GOLD },
-                  },
-                }}
-              >
-                <Iconify icon={stat.icon} width={22} sx={{ color: alpha(GOLD, 0.6), mb: 1 }} />
-                <Typography
-                  className="about-stat-value font-tr"
-                  sx={{
-                    fontSize: { xs: 22, sm: 26, md: 30 },
-                    fontWeight: 800,
-                    color: '#ffffff',
-                    letterSpacing: 0.5,
-                    lineHeight: 1.1,
-                    transition: 'color 0.3s ease',
-                    mb: 0.75,
-                  }}
-                >
-                  {stat.value != null ? (
-                    <>
-                      {stat.prefix}
-                      <PulseCountUp value={stat.value} duration={1800} />
-                    </>
-                  ) : (
-                    stat.fallback
-                  )}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: { xs: 10, md: 11 },
-                    fontWeight: 700,
-                    letterSpacing: 1.2,
-                    color: alpha('#ffffff', 0.4),
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {stat.label}
-                </Typography>
-              </Box>
-            ))}
+            <Typography
+              sx={{
+                fontSize: { xs: 13, md: 14.5 },
+                fontStyle: 'italic',
+                color: alpha('#ffffff', 0.82),
+                lineHeight: 1.65,
+                mb: 1.25,
+              }}
+            >
+              &ldquo;{t('home.testimonial.quote')}&rdquo;
+            </Typography>
+            <Stack direction="row" spacing={0.75} alignItems="center">
+              <Iconify icon="solar:user-circle-bold" width={18} sx={{ color: GOLD }} />
+              <Typography sx={{ fontSize: 12, fontWeight: 700, color: alpha('#ffffff', 0.65), letterSpacing: 0.4 }}>
+                {t('home.testimonial.author')}
+              </Typography>
+            </Stack>
           </Box>
         </Box>
       </Stack>

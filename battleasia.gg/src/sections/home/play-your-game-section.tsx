@@ -148,9 +148,10 @@ function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
         width: 1,
         borderRadius: 0,
         overflow: 'hidden',
-        aspectRatio: '3 / 4.4',
-        minWidth: { xs: 168, sm: 0 },
-        maxWidth: { md: 248 },
+        aspectRatio: '3 / 5',
+        minWidth: { xs: 176, sm: 0 },
+        maxWidth: { md: 260 },
+        minHeight: { xs: 280, md: 320 },
         scrollSnapAlign: 'start',
         textDecoration: 'none',
         bgcolor: '#161618',
@@ -245,8 +246,8 @@ function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
             position: 'absolute',
             inset: 0,
             background: `
-              linear-gradient(180deg, ${alpha('#000000', 0.15)} 0%, transparent 30%),
-              linear-gradient(180deg, transparent 45%, ${alpha('#161618', 0.75)} 82%, #161618 100%)
+              linear-gradient(180deg, ${alpha('#000000', 0.2)} 0%, transparent 28%),
+              linear-gradient(180deg, transparent 35%, ${alpha('#000000', 0.55)} 68%, ${alpha('#0a0a0a', 0.92)} 88%, #0a0a0a 100%)
             `,
             pointerEvents: 'none',
             zIndex: 1,

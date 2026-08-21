@@ -126,7 +126,7 @@
   },
   "home": {
     "title": "游戏就是BattleAsia",
-    "subtitle": "Bangladesh's mobile tournament arena — win BAC, withdraw via bKash & Nagad.",
+    "subtitle": "Worldwide mobile tournament arena — win BAC coins and cash out anytime.",
     "downloadApk": "APK下载",
     "downloadApkButton": "BattleAsia Apk",
     "joinNow": "立即加入",
@@ -162,10 +162,10 @@
     },
     "aboutBullet1": "免费加入 — 没有隐藏费用。创建账户，几秒钟内参加任何锦标赛。",
     "aboutBullet2": "赢取BAC — 在PUBG、Free Fire、COD Mobile中竞技。每次击杀、每次胜利都能赚取真实BAC币。",
-    "aboutBullet3": "通过bKash / Nagad提现 — 随时将奖金直接提取到手机钱包。",
+    "aboutBullet3": "全球提现 — 随时将 BAC 奖金安全提现到支持的支付方式。",
     "testimonial": {
-      "quote": "第一次参加锦标赛就赢了350 BAC，10分钟内提现到bKash。正规平台！",
-      "author": "ShadowKing47 — ৳2,400+已赢"
+      "quote": "第一次参加锦标赛就赢了350 BAC，10分钟内完成提现。正规平台！",
+      "author": "ShadowKing47 — 已赢 2,400+ BAC"
     },
     "stats": {
       "totalWon": "总赢得",
