@@ -1,20 +1,10 @@
+import { Box, Link, Alert, Stack, Checkbox, IconButton, InputAdornment, FormControlLabel } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { z as zod } from 'zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useBoolean } from 'minimal-shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
-
-import {
-  Box,
-  Link,
-  Alert,
-  Stack,
-  Checkbox,
-  IconButton,
-  InputAdornment,
-  FormControlLabel,
-} from '@mui/material';
-import { alpha } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -120,123 +110,114 @@ export function SignInView() {
   });
 
   return (
-    <AuthFormShell compact title={t('auth.signInToAccount')} description={t('auth.heroLine')}>
-      {!!errorMessage && (
-        <Alert severity="error" sx={{ ...authAlertSx, mb: 1.5 }}>
-          {errorMessage}
-        </Alert>
-      )}
+    <Box sx={{ width: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <AuthFormShell
+        compact
+        progress={100}
+        title={t('auth.signInToAccount')}
+        description={t('auth.signInDescription')}
+      >
+        {!!errorMessage && (
+          <Alert severity="error" sx={{ ...authAlertSx, mb: 2 }}>
+            {errorMessage}
+          </Alert>
+        )}
 
-      <Form methods={methods} onSubmit={onSubmit}>
-        <Stack spacing={1.5}>
+        <Form methods={methods} onSubmit={onSubmit}>
           <Stack spacing={1.75}>
-          <Field.Text
-            name="email"
-            label={t('auth.emailAddress')}
-            placeholder={t('auth.emailPlaceholder')}
-            slotProps={{
-              ...authFieldSlotPropsCompact,
-              input: {
-                ...authFieldSlotPropsCompact.input,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Iconify icon="solar:letter-bold-duotone" width={18} sx={{ color: '#9CA3AF' }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-
-          <Field.Text
-            name="password"
-            label={t('auth.password')}
-            placeholder={t('auth.passwordPlaceholder')}
-            type={showPassword.value ? 'text' : 'password'}
-            slotProps={{
-              ...authFieldSlotPropsCompact,
-              input: {
-                ...authFieldSlotPropsCompact.input,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Iconify icon="solar:lock-password-bold-duotone" width={18} sx={{ color: '#9CA3AF' }} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: '#9CA3AF' }}>
-                      <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={18} />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          </Stack>
-
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-            sx={{ minHeight: 22, height: 22 }}
-          >
-            <FormControlLabel
-              sx={{
-                mr: 0,
-                ml: -0.5,
-                my: 0,
-                height: 22,
-                alignItems: 'center',
-                '& .MuiFormControlLabel-label': { lineHeight: 1, display: 'flex', alignItems: 'center' },
+            <Field.Text
+              name="email"
+              label={t('auth.emailAddress')}
+              placeholder={t('auth.emailPlaceholder')}
+              slotProps={{
+                ...authFieldSlotPropsCompact,
+                input: {
+                  ...authFieldSlotPropsCompact.input,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Iconify icon="solar:letter-bold-duotone" width={16} sx={{ color: '#9CA3AF' }} />
+                    </InputAdornment>
+                  ),
+                },
               }}
-              control={
-                <Checkbox
-                  size="small"
-                  checked={rememberMe}
-                  onChange={(event) => setRememberMe(event.target.checked)}
-                  sx={{
-                    color: alpha('#f5c518', 0.55),
-                    p: 0,
-                    mr: 0.75,
-                    '&.Mui-checked': { color: '#f5c518' },
-                  }}
-                />
-              }
-              label={
-                <Box sx={{ fontSize: 12, fontWeight: 600, color: '#e0e0e0', lineHeight: 1 }}>
-                  {t('auth.rememberMe')}
-                </Box>
-              }
             />
-            <Link
-              component={RouterLink}
-              href={paths.auth.forgotPassword}
-              sx={{
-                ...authLinkSx,
-                fontSize: 12,
-                lineHeight: 1,
-                display: 'inline-flex',
-                alignItems: 'center',
-                height: 22,
+
+            <Field.Text
+              name="password"
+              label={t('auth.password')}
+              placeholder={t('auth.passwordPlaceholder')}
+              type={showPassword.value ? 'text' : 'password'}
+              slotProps={{
+                ...authFieldSlotPropsCompact,
+                input: {
+                  ...authFieldSlotPropsCompact.input,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Iconify icon="solar:lock-password-bold-duotone" width={16} sx={{ color: '#9CA3AF' }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: '#9CA3AF' }}>
+                        <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={16} />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
               }}
-            >
-              {t('auth.forgotPassword')}
-            </Link>
+            />
+
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ minHeight: 24 }}>
+              <FormControlLabel
+                sx={{
+                  mr: 0,
+                  ml: -0.5,
+                  my: 0,
+                  '& .MuiFormControlLabel-label': { lineHeight: 1.4 },
+                }}
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={rememberMe}
+                    onChange={(event) => setRememberMe(event.target.checked)}
+                    sx={{
+                      color: alpha('#f5c518', 0.45),
+                      p: 0.25,
+                      mr: 0.75,
+                      '&.Mui-checked': { color: '#f5c518' },
+                    }}
+                  />
+                }
+                label={
+                  <Box sx={{ fontSize: 13, fontWeight: 500, color: alpha('#fff', 0.62) }}>
+                    {t('auth.rememberMe')}
+                  </Box>
+                }
+              />
+              <Link
+                component={RouterLink}
+                href={paths.auth.forgotPassword}
+                sx={{ ...authLinkSx, fontSize: 13, fontWeight: 600, textDecoration: 'underline' }}
+              >
+                {t('auth.forgotPassword')}
+              </Link>
+            </Stack>
+
+            <AuthSubmitButton loading={isSubmitting} loadingIndicator={`${t('auth.signIn')}...`} startIcon={false}>
+              {t('auth.signIn')}
+            </AuthSubmitButton>
+
+            <AuthSocialButtons />
+
+            <AuthFooterLinks
+              prefix={t('auth.newToBattleAsia')}
+              links={[{ label: t('auth.createYourAccount'), href: paths.auth.signUp }]}
+            />
           </Stack>
-
-          <AuthSubmitButton loading={isSubmitting} loadingIndicator={`${t('auth.signIn')}...`}>
-            {t('auth.signIn')}
-          </AuthSubmitButton>
-
-          <AuthSocialButtons />
-
-          <AuthFooterLinks
-            prefix={t('auth.newToBattleAsia')}
-            links={[{ label: t('auth.createYourAccount'), href: paths.auth.signUp }]}
-          />
-        </Stack>
-      </Form>
+        </Form>
+      </AuthFormShell>
 
       <AuthTrustRow />
-    </AuthFormShell>
+    </Box>
   );
 }

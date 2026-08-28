@@ -95,27 +95,26 @@ export function AuthSplitLayout({
         <Button
           component={RouterLink}
           href="/"
-          startIcon={<Iconify icon="solar:arrow-left-bold" width={12} />}
+          startIcon={<Iconify icon="solar:arrow-left-linear" width={16} />}
           sx={{
-            minHeight: 26,
-            height: 26,
-            px: 1,
-            py: 0,
-            borderRadius: 0,
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: 0.3,
+            minHeight: 36,
+            height: 36,
+            px: 1.5,
+            py: 0.75,
+            borderRadius: '8px',
+            fontSize: 14,
+            fontWeight: 600,
+            letterSpacing: 0,
             textTransform: 'none',
             lineHeight: 1,
             color: GOLD,
-            bgcolor: alpha('#000000', 0.45),
+            bgcolor: alpha('#000000', 0.35),
             border: `1px solid ${alpha(GOLD, 0.4)}`,
             boxShadow: 'none',
-            '& .MuiButton-startIcon': { mr: 0.5, ml: 0 },
+            '& .MuiButton-startIcon': { mr: 0.75, ml: 0 },
             '&:hover': {
-              bgcolor: alpha(GOLD, 0.12),
+              bgcolor: alpha(GOLD, 0.1),
               borderColor: GOLD,
-              boxShadow: `0 0 8px ${alpha(GOLD, 0.16)}`,
             },
           }}
         >

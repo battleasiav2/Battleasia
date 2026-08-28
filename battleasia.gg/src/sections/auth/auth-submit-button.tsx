@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
 
 import LoadingButton from '@mui/lab/LoadingButton';
@@ -9,13 +10,15 @@ import { authSubmitButtonSx } from './auth-form-styles';
 // ----------------------------------------------------------------------
 
 type AuthSubmitButtonProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   loading?: boolean;
-  loadingIndicator?: React.ReactNode;
+  loadingIndicator?: ReactNode;
   type?: 'submit' | 'button';
   onClick?: () => void;
   disabled?: boolean;
   sx?: SxProps<Theme>;
+  startIcon?: ReactNode | false;
+  endIcon?: ReactNode;
 };
 
 export function AuthSubmitButton({
@@ -26,7 +29,14 @@ export function AuthSubmitButton({
   onClick,
   disabled,
   sx,
+  startIcon,
+  endIcon,
 }: AuthSubmitButtonProps) {
+  const resolvedStartIcon =
+    startIcon === false
+      ? undefined
+      : startIcon ?? <Iconify icon="game-icons:crossed-swords" width={16} />;
+
   return (
     <LoadingButton
       fullWidth
@@ -38,12 +48,14 @@ export function AuthSubmitButton({
       loadingPosition="start"
       disabled={disabled}
       onClick={onClick}
-      startIcon={<Iconify icon="game-icons:crossed-swords" width={16} />}
+      startIcon={resolvedStartIcon}
+      endIcon={endIcon}
       sx={[
         authSubmitButtonSx,
         {
           overflow: 'hidden',
-          '& .MuiButton-startIcon': { m: 0, mr: 1 },
+          '& .MuiButton-startIcon': { m: 0, mr: resolvedStartIcon ? 1 : 0 },
+          '& .MuiButton-endIcon': { m: 0, ml: endIcon ? 0.75 : 0 },
           '& .MuiLoadingButton-loadingIndicatorCenter': { display: 'none' },
         },
         ...(Array.isArray(sx) ? sx : sx ? [sx] : []),

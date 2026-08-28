@@ -3,57 +3,34 @@ import { alpha, keyframes } from '@mui/material/styles';
 
 import { CONFIG } from 'src/global-config';
 
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
-
 import { useTranslate } from 'src/locales/use-locales';
-import { GlassStatTile, getDefaultGlassTokens } from 'src/components/battle-glass-card';
-import { Iconify } from 'src/components/iconify';
 
 const statIn = keyframes`
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 `;
 
-const goldPulse = keyframes`
-  0%, 100% { filter: brightness(1); }
-  50% { filter: brightness(1.08); }
-`;
+const GOLD = '#f5c518';
 
 export function AuthHeroPanel() {
   const { t } = useTranslate();
-  const glassTokens = getDefaultGlassTokens();
-
-  const features = [
-    { icon: 'solar:cup-star-bold-duotone', text: t('home.stats.matchesPlayed') },
-    { icon: 'solar:wallet-money-bold-duotone', text: t('home.stats.totalWon') },
-    { icon: 'solar:gamepad-bold-duotone', text: t('home.stats.gamesSupported') },
-  ];
 
   const stats = [
-    { label: t('home.stats.totalWon'), value: CONFIG.homeStats.prizeMoney },
-    { label: t('home.stats.matchesPlayed'), value: CONFIG.homeStats.tournaments },
-    { label: t('home.stats.gamesSupported'), value: CONFIG.homeStats.gamesSupported },
+    { label: t('auth.statActivePlayers'), value: CONFIG.homeStats.activePlayers ?? '12K+' },
+    { label: t('auth.statPrizesPaid'), value: CONFIG.homeStats.prizeMoney },
+    { label: t('auth.statMatchRooms'), value: CONFIG.homeStats.tournaments ?? '24/7' },
   ];
 
   return (
-    <Stack spacing={{ xs: 2, md: 3 }} sx={{ width: 1, maxWidth: 480, px: { md: 2 } }}>
-      <Box
-        sx={{
-          order: { xs: 2, md: 1 },
-          p: { xs: 1.5, md: 0 },
-          borderRadius: { xs: '2px', md: 0 },
-          bgcolor: { xs: alpha('#000000', 0.38), md: 'transparent' },
-          border: { xs: `1px solid ${alpha('#f5c518', 0.18)}`, md: 'none' },
-        }}
-      >
+    <Stack spacing={{ xs: 2.5, md: 4 }} sx={{ width: 1, maxWidth: 520, px: { md: 1 } }}>
+      <Box>
         <Typography
           sx={{
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: 1.8,
+            fontSize: 12,
+            fontWeight: 600,
+            letterSpacing: '0.22em',
             textTransform: 'uppercase',
-            color: alpha('#f5c518', 0.9),
-            mb: 1.25,
+            color: GOLD,
             textShadow: '0 1px 8px rgba(0,0,0,0.8)',
           }}
         >
@@ -62,83 +39,61 @@ export function AuthHeroPanel() {
         <Typography
           className="font-tr"
           sx={{
-            fontSize: { xs: 28, md: 38, lg: 44 },
+            mt: 2,
+            fontSize: { xs: 32, md: 40, lg: 48 },
             fontWeight: 800,
             color: '#ffffff',
-            lineHeight: 1.08,
+            lineHeight: 1.1,
+            letterSpacing: -0.5,
             textShadow: '0 2px 16px rgba(0, 0, 0, 0.85)',
           }}
         >
-          {t('auth.heroHeadline')}
+          {t('auth.heroHeadlineLine1')}
+          <br />
+          {t('auth.heroHeadlineLine2')}
         </Typography>
         <Typography
           sx={{
-            mt: 1.25,
-            fontSize: { xs: 14, md: 16, lg: 17 },
-            fontWeight: 700,
-            color: alpha('#ffffff', 0.92),
-            lineHeight: 1.4,
+            mt: 2,
+            maxWidth: 420,
+            fontSize: { xs: 14, md: 15 },
+            color: alpha('#ffffff', 0.58),
+            lineHeight: 1.65,
             textShadow: '0 1px 10px rgba(0, 0, 0, 0.85)',
           }}
         >
-          {t('auth.heroSubhead')}
+          {t('auth.heroDescription')}
         </Typography>
-        <Typography
-          sx={{
-            mt: 0.75,
-            fontSize: { xs: 13, md: 15 },
-            color: alpha('#f5c518', 0.95),
-            fontWeight: 700,
-            letterSpacing: 0.3,
-            textShadow: '0 1px 8px rgba(0, 0, 0, 0.8)',
-          }}
-        >
-          {t('auth.heroDaily')}
-        </Typography>
-        <BattleGoldDivider variant="hero" sx={{ mt: 2, width: 200 }} />
-
-        <Stack direction="row" spacing={1.5} sx={{ flexWrap: 'wrap', gap: 1.25, mt: 2 }}>
-          {features.map((item) => (
-            <Stack
-              key={item.text}
-              direction="row"
-              spacing={1}
-              alignItems="center"
-              sx={{
-                px: 1.25,
-                py: 0.85,
-                borderRadius: '2px',
-                bgcolor: alpha('#000000', 0.45),
-                border: `1px solid ${alpha('#ffffff', 0.12)}`,
-                backdropFilter: 'blur(8px)',
-              }}
-            >
-              <Iconify icon={item.icon} width={18} sx={{ color: '#f59e0b' }} />
-              <Typography sx={{ fontSize: 12, fontWeight: 600, color: alpha('#fff', 0.9) }}>
-                {item.text}
-              </Typography>
-            </Stack>
-          ))}
-        </Stack>
       </Box>
 
       <Box
         sx={{
-          order: { xs: 1, md: 2 },
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 1.25,
+          gap: 1.5,
+          maxWidth: 420,
         }}
       >
         {stats.map((item, index) => (
           <Box
             key={item.label}
             sx={{
-              animation: `${statIn} 0.4s ease-out ${index * 80}ms both, ${goldPulse} 3.4s ease-in-out ${0.6 + index * 0.25}s infinite`,
+              px: 2,
+              py: 1.5,
+              borderRadius: '12px',
+              border: `1px solid ${alpha('#ffffff', 0.1)}`,
+              bgcolor: alpha('#161618', 0.45),
+              backdropFilter: 'blur(12px)',
+              animation: `${statIn} 0.4s ease-out ${index * 80}ms both`,
               '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
             }}
           >
-            <GlassStatTile label={item.label} value={item.value} tokens={glassTokens} />
+            <Typography sx={{ fontSize: 18, fontWeight: 800, color: '#fff', lineHeight: 1.2 }}>
+              {item.value}
+            </Typography>
+            <Typography sx={{ mt: 0.25, fontSize: 11, color: alpha('#fff', 0.5) }}>
+              {item.label}
+            </Typography>
           </Box>
         ))}
       </Box>

@@ -8,9 +8,11 @@ class GoldButton extends StatefulWidget {
   final bool loading;
   final bool expanded;
   final IconData? icon;
+  final IconData? trailingIcon;
   final bool uppercase;
   final double height;
   final double fontSize;
+  final double borderRadius;
 
   const GoldButton({
     super.key,
@@ -19,9 +21,11 @@ class GoldButton extends StatefulWidget {
     this.loading = false,
     this.expanded = true,
     this.icon,
+    this.trailingIcon,
     this.uppercase = true,
     this.height = 44,
     this.fontSize = 13,
+    this.borderRadius = 0,
   });
 
   @override
@@ -48,6 +52,7 @@ class _GoldButtonState extends State<GoldButton> {
           height: widget.height,
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(widget.borderRadius),
             gradient: enabled
                 ? LinearGradient(
                     begin: Alignment.topCenter,
@@ -110,12 +115,22 @@ class _GoldButtonState extends State<GoldButton> {
                           color: enabled
                               ? const Color(0xFF111111)
                               : const Color(0xFF111111).withValues(alpha: 0.45),
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           fontSize: widget.fontSize,
-                          letterSpacing: 1.1,
+                          letterSpacing: widget.uppercase ? 1.1 : 0,
                           fontFamily: 'Poppins',
                         ),
                       ),
+                      if (widget.trailingIcon != null) ...[
+                        const SizedBox(width: 8),
+                        Icon(
+                          widget.trailingIcon,
+                          size: 16,
+                          color: enabled
+                              ? const Color(0xFF111111)
+                              : const Color(0xFF111111).withValues(alpha: 0.45),
+                        ),
+                      ],
                     ],
                   ),
           ),

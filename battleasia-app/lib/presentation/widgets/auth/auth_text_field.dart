@@ -34,18 +34,16 @@ class AuthTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final goldBorder = AppColors.gold.withValues(alpha: 0.28);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label.toUpperCase(),
+          label,
           style: AppTheme.bodySmall.copyWith(
-            color: const Color(0xC7E8E0D0),
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.1,
-            fontSize: 12,
+            color: Colors.white.withValues(alpha: 0.55),
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0,
+            fontSize: 13,
           ),
         ),
         const SizedBox(height: 6),
@@ -53,8 +51,8 @@ class AuthTextField extends StatelessWidget {
           decoration: BoxDecoration(
             boxShadow: [
               BoxShadow(
-                color: AppColors.gold.withValues(alpha: 0.12),
-                blurRadius: 10,
+                color: AppColors.gold.withValues(alpha: 0.08),
+                blurRadius: 8,
               ),
             ],
           ),
@@ -90,21 +88,21 @@ class AuthTextField extends StatelessWidget {
                       : null),
               suffixIcon: suffix,
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
-                borderSide: BorderSide(color: goldBorder),
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(8),
                 borderSide: BorderSide(
-                  color: AppColors.gold.withValues(alpha: 0.55),
+                  color: AppColors.gold.withValues(alpha: 0.5),
                 ),
               ),
               errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: AppColors.error),
               ),
               focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(color: AppColors.error, width: 1.2),
               ),
             ),

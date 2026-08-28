@@ -127,8 +127,9 @@ class _SignInScreenState extends State<SignInScreen> {
     final authProvider = context.watch<AuthProvider>();
 
     return AuthFormShell(
+      progress: 100,
       title: widget.titleKey.tr(),
-      description: widget.descriptionKey.tr(),
+      description: 'auth.signInDescription'.tr(),
       child: Form(
         key: _formKey,
         child: Column(
@@ -237,7 +238,6 @@ class _SignInScreenState extends State<SignInScreen> {
             const SizedBox(height: 14),
             AuthPrimaryButton(
               label: 'auth.signIn'.tr(),
-              icon: Icons.login_rounded,
               loading: authProvider.isLoading,
               onPressed: authProvider.isLoading ? null : _handleSignIn,
             ),
@@ -357,6 +357,7 @@ class _SocialBtn extends StatelessWidget {
         child: Container(
           height: 44,
           decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
             border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 8),
