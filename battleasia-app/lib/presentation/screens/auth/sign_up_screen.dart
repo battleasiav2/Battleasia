@@ -137,7 +137,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             ],
           ),
           child: DropdownButtonFormField<String>(
-            value: _selectedGameServer != null &&
+            key: ValueKey(_selectedGameServer ?? 'none'),
+            initialValue: _selectedGameServer != null &&
                     AppConstants.gameServers
                         .any((s) => s['value'] == _selectedGameServer)
                 ? _selectedGameServer
