@@ -33,8 +33,12 @@
   "auth": {
     "signIn": "Sign In",
     "signUp": "Sign Up",
-    "signUpTitle": "SIGN UP",
+    "signUpTitle": "Sign up",
     "signUpDescription": "Create your account and join tournaments",
+    "signUpStepAccount": "Account info",
+    "signUpStepInGame": "In-game details",
+    "nextStep": "Continue",
+    "backStep": "Back",
     "signInToAccount": "Sign in to your account",
     "email": "Email",
     "emailAddress": "Email address",
