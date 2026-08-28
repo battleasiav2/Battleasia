@@ -5,10 +5,7 @@ import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/utils/network_utils.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 
-/// Shop access:
-/// - Logged in + online → enter (session persists, no repeat login)
-/// - Not logged in → sign-in
-/// - Offline → sign out + sign-in required
+/// Shop access requires a fresh sign-in each time the shop is opened.
 class ShopAuthGate extends StatefulWidget {
   const ShopAuthGate({
     super.key,
@@ -19,19 +16,30 @@ class ShopAuthGate extends StatefulWidget {
   final Widget child;
   final Widget afterLoginScreen;
 
-  /// Returns true when shop may open. Offline clears the session.
+  static bool _shopSessionActive = false;
+
+  static void markShopSessionActive() {
+    _shopSessionActive = true;
+  }
+
+  static void clearShopSession() {
+    _shopSessionActive = false;
+  }
+
+  /// Returns true when the current shop visit has an active sign-in.
   static Future<bool> ensureShopAccess(BuildContext context) async {
     final auth = context.read<AuthProvider>();
     final online = await isNetworkOnline();
 
     if (!online) {
+      clearShopSession();
       if (auth.isAuthenticated) {
         await auth.signOut();
       }
       return false;
     }
 
-    return auth.isAuthenticated;
+    return _shopSessionActive && auth.isAuthenticated;
   }
 
   @override

@@ -63,7 +63,7 @@
     "select": "Select",
     "invalidPhone": "Please enter a valid phone number",
     "termsAgreement": "By signing up, I agree to Terms of Service and Privacy Policy.",
-    "creatingAccount": "Creating account...",
+    "creatingAccount": "Creating account..."
   },
   "shop": {
     "bacShopName": "BattleAsia Coin Shop",

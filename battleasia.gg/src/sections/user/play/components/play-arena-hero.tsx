@@ -17,11 +17,6 @@ const kenBurns = keyframes`
   100% { transform: scale(1) translate3d(0, 0, 0); }
 `;
 
-const bracketPulse = keyframes`
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.85; }
-`;
-
 const emberRise = keyframes`
   0% { transform: translate3d(0, 0, 0) scale(0.7); opacity: 0; }
   20% { opacity: 0.7; }
@@ -41,29 +36,6 @@ const EMBERS = [
   { left: '71%', size: 5, dx: '16px', delay: '0.8s', duration: '9.5s' },
   { left: '88%', size: 3, dx: '-12px', delay: '4.4s', duration: '10.5s' },
 ] as const;
-
-function bracketSx(position: 'tl' | 'tr' | 'bl' | 'br') {
-  const base = {
-    position: 'absolute' as const,
-    width: { xs: 26, md: 40 },
-    height: { xs: 26, md: 40 },
-    borderColor: alpha(GOLD, 0.6),
-    animation: `${bracketPulse} 3.6s ease-in-out infinite`,
-    pointerEvents: 'none' as const,
-    zIndex: 2,
-  };
-
-  if (position === 'tl') {
-    return { ...base, top: 14, left: 14, borderTop: '2px solid', borderLeft: '2px solid' };
-  }
-  if (position === 'tr') {
-    return { ...base, top: 14, right: 14, borderTop: '2px solid', borderRight: '2px solid', animationDelay: '0.4s' };
-  }
-  if (position === 'bl') {
-    return { ...base, bottom: 14, left: 14, borderBottom: '2px solid', borderLeft: '2px solid', animationDelay: '0.8s' };
-  }
-  return { ...base, bottom: 14, right: 14, borderBottom: '2px solid', borderRight: '2px solid', animationDelay: '1.2s' };
-}
 
 // ----------------------------------------------------------------------
 
@@ -181,11 +153,6 @@ export function PlayArenaHero({
           />
         ))}
       </Box>
-
-      <Box sx={bracketSx('tl')} />
-      <Box sx={bracketSx('tr')} />
-      <Box sx={bracketSx('bl')} />
-      <Box sx={bracketSx('br')} />
 
       <Stack
         spacing={{ xs: 1, md: 2 }}

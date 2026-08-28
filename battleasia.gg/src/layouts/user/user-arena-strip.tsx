@@ -17,34 +17,6 @@ const kenBurnsSoft = keyframes`
   100% { transform: scale(1); }
 `;
 
-const bracketPulse = keyframes`
-  0%, 100% { opacity: 0.28; }
-  50% { opacity: 0.8; }
-`;
-
-function corner(position: 'tl' | 'tr' | 'bl' | 'br') {
-  const base = {
-    position: 'absolute' as const,
-    width: { xs: 18, md: 26 },
-    height: { xs: 18, md: 26 },
-    borderColor: alpha(GOLD, 0.55),
-    animation: `${bracketPulse} 3.6s ease-in-out infinite`,
-    pointerEvents: 'none' as const,
-    zIndex: 2,
-  };
-
-  if (position === 'tl') {
-    return { ...base, top: 10, left: 10, borderTop: '2px solid', borderLeft: '2px solid' };
-  }
-  if (position === 'tr') {
-    return { ...base, top: 10, right: 10, borderTop: '2px solid', borderRight: '2px solid', animationDelay: '0.4s' };
-  }
-  if (position === 'bl') {
-    return { ...base, bottom: 10, left: 10, borderBottom: '2px solid', borderLeft: '2px solid', animationDelay: '0.8s' };
-  }
-  return { ...base, bottom: 10, right: 10, borderBottom: '2px solid', borderRight: '2px solid', animationDelay: '1.2s' };
-}
-
 // ----------------------------------------------------------------------
 
 export type UserArenaStripProps = {
@@ -115,11 +87,6 @@ export function UserArenaStrip({
           `,
         }}
       />
-
-      <Box sx={corner('tl')} />
-      <Box sx={corner('tr')} />
-      <Box sx={corner('bl')} />
-      <Box sx={corner('br')} />
 
       <Stack
         direction={{ xs: 'column', md: 'row' }}

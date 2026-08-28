@@ -3,9 +3,10 @@ import { alpha, type SxProps, type Theme } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
 
-import { glassShimmerKeyframes, glassShimmerLayer } from './glass-shimmer';
-import { GLASS_CARD_RADIUS, GLASS_CARD_RADIUS_SM } from './glass-card-tokens';
+import { GLASS_CARD_RADIUS_SM, GLASS_STAT_TILE_RADIUS } from './glass-card-tokens';
 import type { GlassCardTokens } from './types';
+
+const GOLD = '#f5c518';
 
 type GlassStatTileProps = {
   label: string;
@@ -18,7 +19,6 @@ type GlassStatTileProps = {
 
 export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: GlassStatTileProps) {
   const { stat } = tokens;
-  const gold = '#f5c518';
 
   const cardSx: SxProps<Theme> = {
     backgroundImage: 'none',
@@ -31,19 +31,11 @@ export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: G
     justifyContent: 'center',
     position: 'relative',
     overflow: 'hidden',
-    borderRadius: `${GLASS_CARD_RADIUS}px`,
+    borderRadius: `${GLASS_STAT_TILE_RADIUS}px`,
     bgcolor: stat.bgcolor,
     backgroundColor: stat.bgcolor,
     border: stat.border,
-    boxShadow: stat.boxShadow,
-    backdropFilter: 'blur(18px) saturate(1.1)',
-    WebkitBackdropFilter: 'blur(18px) saturate(1.1)',
-    transition: 'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
-    '&:hover': {
-      bgcolor: alpha('#000000', 0.48),
-      borderColor: alpha(gold, 0.28),
-      boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.06)}, 0 0 18px ${alpha(gold, 0.12)}`,
-    },
+    boxShadow: 'none',
     '& > *': { position: 'relative', zIndex: 1 },
     '&::before': {
       content: '""',
@@ -53,22 +45,9 @@ export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: G
       right: 0,
       height: 2,
       zIndex: 2,
-      background: `linear-gradient(90deg, transparent 0%, ${alpha(gold, 0.35)} 18%, ${gold} 50%, ${alpha(gold, 0.35)} 82%, transparent 100%)`,
-      boxShadow: `0 0 14px ${alpha(gold, 0.45)}`,
+      bgcolor: GOLD,
+      backgroundColor: GOLD,
     },
-    ...(stat.shimmer ? glassShimmerKeyframes : {}),
-    ...(stat.shimmer ? (glassShimmerLayer as Record<string, unknown>) : {}),
-    ...(stat.overlay
-      ? {
-          '&:after': {
-            content: "''",
-            position: 'absolute',
-            inset: 0,
-            background: stat.overlay,
-            pointerEvents: 'none',
-          },
-        }
-      : {}),
   };
 
   const iconBoxSx: SxProps<Theme> = {
@@ -78,10 +57,10 @@ export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: G
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: '50%',
-    bgcolor: alpha(gold, 0.08),
-    border: `1px solid ${alpha(gold, 0.22)}`,
-    color: gold,
+    borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
+    bgcolor: alpha(GOLD, 0.08),
+    border: `1px solid ${alpha(GOLD, 0.22)}`,
+    color: GOLD,
   };
 
   const labelSx = {
@@ -103,7 +82,6 @@ export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: G
     maxWidth: '100%',
     overflow: 'hidden',
     color: stat.valueColor,
-    // Responsive clamp so long totals (e.g. 5,315,xxx) stay on one line
     fontSize: {
       xs: 'clamp(0.92rem, 3.6vw, 1.15rem)',
       sm: '1.28rem',

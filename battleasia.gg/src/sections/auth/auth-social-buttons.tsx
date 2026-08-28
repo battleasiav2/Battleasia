@@ -6,14 +6,16 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
 
+import { authSocialIconButtonSx } from './auth-form-styles';
+
 const GOLD = '#f5c518';
 
-function GoogleMark() {
+function GoogleMark({ size = 18 }: { size?: number }) {
   return (
     <Box
       component="svg"
       viewBox="0 0 24 24"
-      sx={{ width: 16, height: 16, flexShrink: 0 }}
+      sx={{ width: size, height: size, flexShrink: 0, display: 'block' }}
       aria-hidden
     >
       <path
@@ -36,45 +38,6 @@ function GoogleMark() {
   );
 }
 
-const socialBtnSx = {
-  height: 42,
-  minHeight: 42,
-  py: 0,
-  px: 1,
-  borderRadius: '8px',
-  position: 'relative' as const,
-  overflow: 'hidden' as const,
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  textTransform: 'none' as const,
-  fontSize: 11.5,
-  fontWeight: 700,
-  lineHeight: 1.25,
-  whiteSpace: 'nowrap' as const,
-  color: alpha('#fff', 0.52),
-  bgcolor: alpha('#000', 0.42),
-  border: `1px solid ${alpha('#fff', 0.1)}`,
-  boxShadow: 'none',
-  transition: 'border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease',
-  '& .MuiButton-startIcon': {
-    display: 'inline-flex',
-    alignItems: 'center',
-    m: 0,
-    mr: 0.75,
-    opacity: 0.5,
-    '& > *': { width: 16, height: 16, display: 'block' },
-  },
-  '&:hover': {
-    bgcolor: alpha('#000', 0.55),
-    borderColor: alpha(GOLD, 0.25),
-    boxShadow: `0 0 14px ${alpha(GOLD, 0.08)}`,
-  },
-  '&:active': {
-    transform: 'scale(0.985)',
-  },
-};
-
 function SoonBadge() {
   return (
     <Typography
@@ -83,14 +46,14 @@ function SoonBadge() {
         position: 'absolute',
         top: 4,
         right: 4,
-        fontSize: 8,
+        fontSize: 6,
         fontWeight: 800,
-        letterSpacing: 0.8,
+        letterSpacing: 0.6,
         lineHeight: 1,
-        px: 0.75,
-        py: 0.35,
-        borderRadius: '4px',
-        bgcolor: alpha(GOLD, 0.2),
+        px: 0.6,
+        py: 0.25,
+        borderRadius: '3px',
+        bgcolor: alpha(GOLD, 0.16),
         color: GOLD,
         textTransform: 'uppercase',
       }}
@@ -108,35 +71,41 @@ export function AuthSocialButtons() {
   };
 
   return (
-    <Stack spacing={1} sx={{ mt: 0.25 }}>
+    <Stack spacing={1} sx={{ width: 1 }}>
       <Stack direction="row" alignItems="center" spacing={1} sx={{ py: 0.25 }}>
-        <Box sx={{ flex: 1, height: '1px', bgcolor: alpha('#fff', 0.1) }} />
+        <Box sx={{ flex: 1, height: '1px', bgcolor: alpha('#fff', 0.08) }} />
         <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: alpha('#fff', 0.42), textTransform: 'uppercase' }}>
           {t('auth.orContinueWith')}
         </Typography>
-        <Box sx={{ flex: 1, height: '1px', bgcolor: alpha('#fff', 0.1) }} />
+        <Box sx={{ flex: 1, height: '1px', bgcolor: alpha('#fff', 0.08) }} />
       </Stack>
 
       <Box
         sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-          gap: 1,
+          display: 'flex',
+          justifyContent: 'center',
+          gap: 0.75,
+          width: 1,
         }}
       >
-        <Button fullWidth variant="outlined" disableElevation onClick={comingSoon} startIcon={<GoogleMark />} sx={socialBtnSx}>
-          {t('auth.continueWithGoogle')}
-          <SoonBadge />
-        </Button>
         <Button
-          fullWidth
           variant="outlined"
           disableElevation
           onClick={comingSoon}
-          startIcon={<Iconify icon="mingcute:discord-fill" width={16} />}
-          sx={socialBtnSx}
+          aria-label={t('auth.continueWithGoogle')}
+          sx={{ ...authSocialIconButtonSx, flex: '1 1 0', maxWidth: 120 }}
         >
-          {t('auth.continueWithDiscord')}
+          <GoogleMark />
+          <SoonBadge />
+        </Button>
+        <Button
+          variant="outlined"
+          disableElevation
+          onClick={comingSoon}
+          aria-label={t('auth.continueWithDiscord')}
+          sx={{ ...authSocialIconButtonSx, flex: '1 1 0', maxWidth: 120 }}
+        >
+          <Iconify icon="mingcute:discord-fill" width={18} sx={{ color: '#7289da' }} />
           <SoonBadge />
         </Button>
       </Box>

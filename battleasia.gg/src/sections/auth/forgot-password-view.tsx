@@ -18,7 +18,7 @@ import { AuthFormShell } from './auth-form-shell';
 import { AuthTrustRow } from './auth-trust-row';
 import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
-import { authAlertSx, authFieldSlotPropsCompact, authLinkSx } from './auth-form-styles';
+import { authAlertSx, authCardFooterSx, authFieldSlotPropsCompact, authLinkSx } from './auth-form-styles';
 
 // ----------------------------------------------------------------------
 
@@ -65,7 +65,13 @@ export function ForgotPasswordView() {
   });
 
   return (
-    <AuthFormShell compact title={t('auth.forgotPasswordTitle')} description={t('auth.forgotPasswordDescription')}>
+    <Box sx={{ width: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <AuthFormShell
+        compact
+        progress={100}
+        title={t('auth.forgotPasswordTitle')}
+        description={t('auth.forgotPasswordDescription')}
+      >
       {!!errorMessage && (
         <Alert severity="error" sx={{ ...authAlertSx, mb: 1.5 }}>
           {errorMessage}
@@ -113,7 +119,10 @@ export function ForgotPasswordView() {
         </Stack>
       </Form>
 
-      <AuthTrustRow />
-    </AuthFormShell>
+        <Box sx={authCardFooterSx}>
+          <AuthTrustRow insideCard />
+        </Box>
+      </AuthFormShell>
+    </Box>
   );
 }

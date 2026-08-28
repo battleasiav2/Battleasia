@@ -3,9 +3,10 @@ import { alpha, type SxProps, type Theme } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
 
-import { glassShimmerKeyframes, glassShimmerLayer } from './glass-shimmer';
-import { GLASS_CARD_RADIUS, GLASS_CARD_RADIUS_SM } from './glass-card-tokens';
+import { GLASS_CARD_RADIUS_SM, GLASS_STAT_TILE_RADIUS } from './glass-card-tokens';
 import type { GlassCardTokens } from './types';
+
+const GOLD = '#f5c518';
 
 type GlassStatTileProps = {
   label: string;
@@ -18,31 +19,23 @@ type GlassStatTileProps = {
 
 export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: GlassStatTileProps) {
   const { stat } = tokens;
-  const gold = '#f5c518';
 
   const cardSx: SxProps<Theme> = {
     backgroundImage: 'none',
     color: 'inherit',
     p: { xs: 1.5, sm: 1.75 },
     minHeight: { xs: 96, sm: 108 },
+    height: '100%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
     position: 'relative',
     overflow: 'hidden',
-    borderRadius: `${GLASS_CARD_RADIUS}px`,
+    borderRadius: `${GLASS_STAT_TILE_RADIUS}px`,
     bgcolor: stat.bgcolor,
     backgroundColor: stat.bgcolor,
     border: stat.border,
-    boxShadow: stat.boxShadow,
-    backdropFilter: 'blur(18px) saturate(1.1)',
-    WebkitBackdropFilter: 'blur(18px) saturate(1.1)',
-    transition: 'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
-    '&:hover': {
-      bgcolor: alpha('#000000', 0.48),
-      borderColor: alpha(gold, 0.28),
-      boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.06)}, 0 0 18px ${alpha(gold, 0.12)}`,
-    },
+    boxShadow: 'none',
     '& > *': { position: 'relative', zIndex: 1 },
     '&::before': {
       content: '""',
@@ -52,42 +45,28 @@ export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: G
       right: 0,
       height: 2,
       zIndex: 2,
-      background: `linear-gradient(90deg, transparent 0%, ${alpha(gold, 0.35)} 18%, ${gold} 50%, ${alpha(gold, 0.35)} 82%, transparent 100%)`,
-      boxShadow: `0 0 14px ${alpha(gold, 0.45)}`,
+      bgcolor: GOLD,
+      backgroundColor: GOLD,
     },
-    ...(stat.shimmer ? glassShimmerKeyframes : {}),
-    ...(stat.shimmer ? (glassShimmerLayer as Record<string, unknown>) : {}),
-    ...(stat.overlay
-      ? {
-          '&:after': {
-            content: "''",
-            position: 'absolute',
-            inset: 0,
-            background: stat.overlay,
-            pointerEvents: 'none',
-          },
-        }
-      : {}),
   };
 
   const iconBoxSx: SxProps<Theme> = {
-    width: { xs: 40, sm: 44 },
-    height: { xs: 40, sm: 44 },
+    width: { xs: 36, sm: 40 },
+    height: { xs: 36, sm: 40 },
     flexShrink: 0,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
-    bgcolor: alpha(gold, 0.1),
-    border: `1px solid ${alpha(gold, 0.32)}`,
-    boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.06)}`,
-    color: gold,
+    bgcolor: alpha(GOLD, 0.08),
+    border: `1px solid ${alpha(GOLD, 0.22)}`,
+    color: GOLD,
   };
 
   const labelSx = {
     letterSpacing: 0.7,
     color: stat.labelColor,
-    fontSize: { xs: '0.58rem', sm: '0.66rem' },
+    fontSize: { xs: '0.55rem', sm: '0.64rem' },
     lineHeight: 1.25,
     fontWeight: 700,
     textTransform: 'uppercase' as const,
@@ -116,9 +95,9 @@ export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: G
           </Stack>
         </Stack>
       ) : icon ? (
-        <Stack direction="row" spacing={1.25} alignItems="center">
+        <Stack direction="row" spacing={1.1} alignItems="center">
           <Box sx={iconBoxSx}>
-            <Iconify icon={icon} width={22} />
+            <Iconify icon={icon} width={20} />
           </Box>
           <Stack spacing={0.35} sx={{ flex: 1, minWidth: 0 }}>
             <Typography variant="overline" sx={labelSx}>

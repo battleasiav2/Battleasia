@@ -12,6 +12,7 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/shop_item_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/widgets/common/glass_stat_tile.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_item_card.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_detail_screen.dart';
@@ -416,51 +417,27 @@ class _ShopScreenState extends State<ShopScreen> {
     return Row(
       children: [
         Expanded(
-          child: _statTile('shop.statBalance'.tr(), '${balance.toStringAsFixed(0)} BAC'),
+          child: GlassStatTile(
+            label: 'shop.statBalance'.tr(),
+            value: balance.toStringAsFixed(0),
+            suffix: 'BAC',
+          ),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _statTile('shop.statPacks'.tr(), '${_allItems.length}'),
+          child: GlassStatTile(
+            label: 'shop.statPacks'.tr(),
+            value: '${_allItems.length}',
+          ),
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: _statTile('shop.statChannels'.tr(), '${_channels.length}'),
+          child: GlassStatTile(
+            label: 'shop.statChannels'.tr(),
+            value: '${_channels.length}',
+          ),
         ),
       ],
-    );
-  }
-
-  Widget _statTile(String label, String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceElevated.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(2),
-        border: Border.all(color: AppColors.border(0.14)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label.toUpperCase(),
-            style: AppTheme.bodySmall.copyWith(
-              color: AppColors.textMuted,
-              fontSize: 9,
-              fontWeight: FontWeight.w700,
-              letterSpacing: 0.7,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: AppTheme.bodyMedium.copyWith(
-              color: AppColors.gold,
-              fontWeight: FontWeight.w800,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
     );
   }
 

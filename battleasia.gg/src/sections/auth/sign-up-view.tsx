@@ -10,7 +10,6 @@ import {
   Link,
   Alert,
   Stack,
-  Button,
   Select,
   MenuItem,
   Checkbox,
@@ -44,11 +43,12 @@ import { AuthSocialButtons } from './auth-social-buttons';
 import { AuthStepProgress } from './auth-step-progress';
 import {
   authAlertSx,
+  authBackLinkSx,
+  authCardFooterSx,
   authFieldSlotPropsCompact,
   authLinkSx,
   authPhoneCountrySx,
   authPhoneInputSx,
-  authSecondaryButtonSx,
   authSelectMenuProps,
   authSelectSx,
 } from './auth-form-styles';
@@ -425,26 +425,21 @@ export function SignUpView() {
                   )}
                 />
 
-                <Stack direction="row" spacing={1.25} sx={{ pt: 0.5, alignItems: 'stretch' }}>
-                  <Button
-                    type="button"
-                    variant="outlined"
-                    onClick={() => setStep(1)}
-                    startIcon={<Iconify icon="eva:arrow-back-fill" width={16} />}
-                    sx={{ ...authSecondaryButtonSx, width: 'auto', px: 2, flexShrink: 0 }}
-                  >
-                    {t('auth.back')}
-                  </Button>
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <AuthSubmitButton loading={isSubmitting} loadingIndicator={t('auth.creatingAccount')}>
-                      {t('auth.createAccount')}
-                    </AuthSubmitButton>
-                  </Box>
-                </Stack>
+                <Link
+                  component="button"
+                  type="button"
+                  onClick={() => setStep(1)}
+                  sx={authBackLinkSx}
+                >
+                  <Iconify icon="eva:arrow-back-fill" width={14} />
+                  {t('auth.back')}
+                </Link>
+
+                <AuthSubmitButton loading={isSubmitting} loadingIndicator={t('auth.creatingAccount')}>
+                  {t('auth.createAccount')}
+                </AuthSubmitButton>
               </>
             )}
-
-            <AuthSocialButtons />
 
             <AuthFooterLinks
               prefix={t('auth.alreadyHaveAccount')}
@@ -452,9 +447,15 @@ export function SignUpView() {
             />
           </Stack>
         </Form>
+
+        <Box sx={authCardFooterSx}>
+          <AuthTrustRow insideCard />
+        </Box>
       </AuthFormShell>
 
-      <AuthTrustRow />
+      <Box sx={{ width: 1, maxWidth: { xs: 1, sm: 420, md: 440 }, mt: 1.5 }}>
+        <AuthSocialButtons />
+      </Box>
     </Box>
   );
 }

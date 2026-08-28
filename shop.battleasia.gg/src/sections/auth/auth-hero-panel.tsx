@@ -1,14 +1,9 @@
 import { Box, Stack, Typography } from '@mui/material';
-import { alpha, keyframes } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 
 import { useTranslate } from 'src/locales/use-locales';
 
-const statIn = keyframes`
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-`;
-
-const GOLD = '#f5c518';
+import { HOME_GOLD, HOME_ROW_LINE, HomeBlurPanel } from 'src/sections/home/home-blur-panel';
 
 export function AuthHeroPanel() {
   const { t } = useTranslate();
@@ -20,16 +15,15 @@ export function AuthHeroPanel() {
   ];
 
   return (
-    <Stack spacing={{ xs: 2.5, md: 4 }} sx={{ width: 1, maxWidth: 520, px: { md: 1 } }}>
-      <Box>
+    <Stack spacing={{ xs: 2.5, md: 3.5 }} sx={{ width: 1, maxWidth: 520, px: { md: 1 } }}>
+      <Stack spacing={1.25}>
         <Typography
           sx={{
-            fontSize: 12,
-            fontWeight: 600,
-            letterSpacing: '0.22em',
+            fontSize: { xs: 11, md: 12 },
+            fontWeight: 700,
+            letterSpacing: 2.5,
             textTransform: 'uppercase',
-            color: GOLD,
-            textShadow: '0 1px 8px rgba(0,0,0,0.8)',
+            color: HOME_GOLD,
           }}
         >
           {t('shop.authHeroTagline')}
@@ -37,62 +31,59 @@ export function AuthHeroPanel() {
         <Typography
           className="font-tr"
           sx={{
-            mt: 2,
-            fontSize: { xs: 32, md: 40, lg: 48 },
+            fontSize: { xs: 28, md: 40, lg: 48 },
             fontWeight: 800,
             color: '#ffffff',
             lineHeight: 1.1,
-            letterSpacing: -0.5,
-            textShadow: '0 2px 16px rgba(0, 0, 0, 0.85)',
+            letterSpacing: { xs: 0.5, md: 1 },
+            textTransform: 'uppercase',
           }}
         >
           {t('shop.authHeroTitle')}
         </Typography>
         <Typography
           sx={{
-            mt: 2,
             maxWidth: 420,
-            fontSize: { xs: 14, md: 15 },
-            color: alpha('#ffffff', 0.58),
+            fontSize: { xs: 13, md: 14 },
+            color: alpha('#ffffff', 0.5),
             lineHeight: 1.65,
-            textShadow: '0 1px 10px rgba(0, 0, 0, 0.85)',
           }}
         >
           {t('shop.authHeroSubtitle')}
         </Typography>
-      </Box>
+      </Stack>
 
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 1.5,
-          maxWidth: 420,
-        }}
-      >
-        {stats.map((item, index) => (
-          <Box
-            key={item.label}
-            sx={{
-              px: 2,
-              py: 1.5,
-              borderRadius: '8px',
-              border: `1px solid ${alpha('#ffffff', 0.1)}`,
-              bgcolor: alpha('#161618', 0.45),
-              backdropFilter: 'blur(12px)',
-              animation: `${statIn} 0.4s ease-out ${index * 80}ms both`,
-              '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-            }}
-          >
-            <Typography sx={{ fontSize: 18, fontWeight: 800, color: '#fff', lineHeight: 1.2 }}>
-              {item.value}
-            </Typography>
-            <Typography sx={{ mt: 0.25, fontSize: 11, color: alpha('#fff', 0.5) }}>
-              {item.label}
-            </Typography>
-          </Box>
-        ))}
-      </Box>
+      <HomeBlurPanel sx={{ maxWidth: 420, p: 0 }}>
+        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)' }}>
+          {stats.map((item, index) => (
+            <Box
+              key={item.label}
+              sx={{
+                px: { xs: 1.15, sm: 1.75 },
+                py: 1.5,
+                borderTop: `2px solid ${HOME_GOLD}`,
+                ...(index > 0 ? { borderLeft: HOME_ROW_LINE } : {}),
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: 0.7,
+                  textTransform: 'uppercase',
+                  color: alpha('#fff', 0.55),
+                  lineHeight: 1.25,
+                }}
+              >
+                {item.label}
+              </Typography>
+              <Typography sx={{ mt: 0.5, fontSize: 18, fontWeight: 800, color: '#fff', lineHeight: 1.2 }}>
+                {item.value}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </HomeBlurPanel>
     </Stack>
   );
 }

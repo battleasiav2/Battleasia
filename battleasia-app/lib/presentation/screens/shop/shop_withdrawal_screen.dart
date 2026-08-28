@@ -9,6 +9,7 @@ import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/widgets/common/glass_stat_tile.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 
@@ -209,16 +210,18 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                         Row(
                           children: [
                             Expanded(
-                              child: _statTile(
-                                'shop.statBalance'.tr(),
-                                '${balance.toStringAsFixed(2)} BAC',
+                              child: GlassStatTile(
+                                label: 'shop.statBalance'.tr(),
+                                value: balance.toStringAsFixed(2),
+                                suffix: 'BAC',
                               ),
                             ),
                             const SizedBox(width: 10),
                             Expanded(
-                              child: _statTile(
-                                'wallet.withdrawable'.tr(),
-                                '${maxOut.toStringAsFixed(2)} BAC',
+                              child: GlassStatTile(
+                                label: 'wallet.withdrawable'.tr(),
+                                value: maxOut.toStringAsFixed(2),
+                                suffix: 'BAC',
                               ),
                             ),
                           ],
@@ -306,39 +309,6 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
             child: AppHeader(scrollController: _scrollController),
           ),
           const FloatingBottomNav(),
-        ],
-      ),
-    );
-  }
-
-  Widget _statTile(String label, String value) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceElevated.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(2),
-        border: Border.all(color: AppColors.border(0.14)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            label.toUpperCase(),
-            style: AppTheme.bodySmall.copyWith(
-              color: AppColors.textMuted,
-              fontSize: 10,
-              letterSpacing: 0.8,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: AppTheme.heading3.copyWith(
-              color: AppColors.gold,
-              fontSize: 16,
-            ),
-          ),
         ],
       ),
     );

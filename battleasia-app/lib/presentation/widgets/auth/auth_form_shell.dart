@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +18,7 @@ class AuthFormShell extends StatefulWidget {
   final VoidCallback? onHome;
   final double? progress;
   final Widget? steps;
+  final Widget? belowCard;
 
   const AuthFormShell({
     super.key,
@@ -26,6 +29,7 @@ class AuthFormShell extends StatefulWidget {
     this.onHome,
     this.progress,
     this.steps,
+    this.belowCard,
   });
 
   @override
@@ -141,8 +145,10 @@ class _AuthFormShellState extends State<AuthFormShell> {
                                       steps: widget.steps,
                                       child: widget.child,
                                     ),
-                                    const SizedBox(height: 20),
-                                    const _AuthTrustRow(),
+                                    if (widget.belowCard != null) ...[
+                                      const SizedBox(height: 14),
+                                      widget.belowCard!,
+                                    ],
                                   ],
                                 ),
                               ),
@@ -219,112 +225,117 @@ class _AuthPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        width: double.infinity,
-        decoration: BoxDecoration(
-          color: const Color(0xF0161618),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x66000000),
-              blurRadius: 40,
-              offset: Offset(0, 16),
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: const Color(0xFF161618).withValues(alpha: 0.4),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+          ),
+          foregroundDecoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
             ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (progress != null)
-              SizedBox(
-                height: 4,
-                child: ColoredBox(
-                  color: Colors.white.withValues(alpha: 0.08),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: FractionallySizedBox(
-                      widthFactor: (progress! / 100).clamp(0.0, 1.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              AppColors.gold,
-                              AppColors.gold.withValues(alpha: 0.55),
-                            ],
-                          ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (progress != null)
+                SizedBox(
+                  height: 3,
+                  child: ColoredBox(
+                    color: Colors.white.withValues(alpha: 0.08),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: FractionallySizedBox(
+                        widthFactor: (progress! / 100).clamp(0.0, 1.0),
+                        child: Container(
+                          color: AppColors.gold,
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Center(
-                    child: BattleAsiaLogo(
-                      logoSize: 104,
-                      showText: false,
-                      alignment: MainAxisAlignment.center,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Center(
+                      child: BattleAsiaLogo(
+                        logoSize: 104,
+                        showText: false,
+                        alignment: MainAxisAlignment.center,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 2,
-                      color: AppColors.gold,
+                    const SizedBox(height: 10),
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 2,
+                        color: AppColors.gold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'common.brandTagline'.tr(),
-                    style: AppTheme.labelUppercase.copyWith(
-                      color: AppColors.gold.withValues(alpha: 0.82),
-                      fontSize: 9,
-                      letterSpacing: 1.4,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    title,
-                    style: AppTheme.heading2.copyWith(
-                      fontSize: 19,
-                      height: 1.2,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      letterSpacing: -0.2,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  if (description != null) ...[
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     Text(
-                      description!,
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: Colors.white.withValues(alpha: 0.52),
-                        height: 1.45,
-                        fontSize: 13,
+                      'common.brandTagline'.tr(),
+                      style: AppTheme.labelUppercase.copyWith(
+                        color: AppColors.gold.withValues(alpha: 0.88),
+                        fontSize: 11,
+                        letterSpacing: 2.5,
                       ),
                       textAlign: TextAlign.center,
                     ),
+                    const SizedBox(height: 8),
+                    Text(
+                      title,
+                      style: AppTheme.heading2.copyWith(
+                        fontSize: 19,
+                        height: 1.2,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: -0.2,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    if (description != null) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        description!,
+                        style: AppTheme.bodyMedium.copyWith(
+                          color: Colors.white.withValues(alpha: 0.52),
+                          height: 1.45,
+                          fontSize: 13,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                    if (steps != null) ...[
+                      const SizedBox(height: 18),
+                      steps!,
+                    ] else
+                      const SizedBox(height: 18),
+                    child,
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.only(top: 16),
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.08),
+                          ),
+                        ),
+                      ),
+                      child: const _AuthTrustRow(),
+                    ),
                   ],
-                  if (steps != null) ...[
-                    const SizedBox(height: 18),
-                    steps!,
-                  ] else
-                    const SizedBox(height: 18),
-                  child,
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

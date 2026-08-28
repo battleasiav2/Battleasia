@@ -161,6 +161,8 @@ export function AuthSplitLayout({
           backgroundPosition: 'center top',
           backgroundRepeat: 'no-repeat',
           position: 'relative',
+          overflowX: 'clip',
+          overflowY: 'visible',
           minHeight: {
             xs: 'calc(100dvh - var(--layout-header-mobile-height, 36px))',
             md: 'calc(100dvh - var(--layout-header-desktop-height, 40px))',
@@ -195,6 +197,7 @@ export function AuthSplitLayout({
           display: 'flex',
           justifyContent: 'center',
           alignItems: { xs: 'flex-start', md: 'center' },
+          overflowX: 'clip',
           overflowY: 'visible',
           py: { xs: 2, md: 4 },
         }}

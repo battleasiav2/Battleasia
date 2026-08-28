@@ -13,6 +13,7 @@ import { Iconify } from 'src/components/iconify/iconify';
 import { CustomPopover } from 'src/components/custom-popover';
 import { useTranslate } from 'src/locales/use-locales';
 import { USER_COLORS } from 'src/layouts/user/user-theme';
+import { headerLanguageCodeSx, headerLanguagePillSx } from './header-chrome';
 
 // ----------------------------------------------------------------------
 
@@ -183,36 +184,37 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         sx={[
           {
             p: 0,
-            width: { xs: 36, sm: 42 },
-            height: { xs: 32, sm: 38 },
-            borderRadius: 0,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            bgcolor: open ? alpha(GOLD, 0.12) : alpha('#080c14', 0.55),
-            border: '2px solid',
-            borderColor: open ? alpha(GOLD, 0.5) : alpha('#ffffff', 0.18),
-            boxShadow: `inset 0 0 0 1px ${alpha('#000000', 0.25)}`,
-            transition: 'transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease',
-            '&:hover': {
-              bgcolor: alpha('#0c121c', 0.7),
-              borderColor: alpha(GOLD, 0.45),
-              transform: 'scale(1.03)',
-            },
-            '&:active': { transform: 'scale(0.96)' },
+            minWidth: 0,
+            ...headerLanguagePillSx(open),
           },
           ...(Array.isArray(sx) ? sx : [sx]),
         ]}
         {...other}
       >
-        <FlagIcon
-          code={currentLang?.countryCode}
+        <Box
           sx={{
-            width: { xs: 24, sm: 28 },
-            height: { xs: 18, sm: 21 },
-            borderRadius: 0,
+            width: 18,
+            height: 18,
+            borderRadius: '50%',
+            overflow: 'hidden',
+            flexShrink: 0,
+            display: 'grid',
+            placeItems: 'center',
+            boxShadow: `0 0 0 1px ${alpha('#ffffff', 0.12)}`,
           }}
-        />
+        >
+          <FlagIcon
+            code={currentLang?.countryCode}
+            sx={{
+              width: 18,
+              height: 18,
+              borderRadius: '50%',
+            }}
+          />
+        </Box>
+        <Typography component="span" sx={headerLanguageCodeSx}>
+          {(currentLang?.value ?? 'en').toUpperCase()}
+        </Typography>
       </ButtonBase>
 
       {renderMenuList()}

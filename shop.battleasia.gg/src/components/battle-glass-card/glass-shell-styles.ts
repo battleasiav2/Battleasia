@@ -61,7 +61,7 @@ export function getGlassShellSx(tokens: GlassCardTokens, extra?: SxProps<Theme>)
 }
 
 export function getGlassInnerSx(tokens: GlassCardTokens, extra?: SxProps<Theme>): SxProps<Theme> {
-  const { stat } = tokens;
+  const { stat, shell } = tokens;
 
   const base: SxProps<Theme> = {
     backgroundImage: 'none',
@@ -73,8 +73,8 @@ export function getGlassInnerSx(tokens: GlassCardTokens, extra?: SxProps<Theme>)
     backgroundColor: stat.bgcolor,
     border: stat.border,
     boxShadow: stat.boxShadow,
-    backdropFilter: 'blur(18px) saturate(1.1)',
-    WebkitBackdropFilter: 'blur(18px) saturate(1.1)',
+    backdropFilter: shell.backdropFilter ?? 'blur(14px)',
+    WebkitBackdropFilter: shell.backdropFilter ?? 'blur(14px)',
     ...(stat.shimmer ? { ...glassShimmerKeyframes, ...glassShimmerLayer } : {}),
     ...(stat.overlay
       ? {
@@ -146,8 +146,7 @@ const goldTopLineAccentSx: SxProps<Theme> = {
     height: 2,
     zIndex: 2,
     pointerEvents: 'none',
-    background: `linear-gradient(90deg, transparent 0%, ${alpha(GOLD_TOP_LINE, 0.35)} 18%, ${GOLD_TOP_LINE} 50%, ${alpha(GOLD_TOP_LINE, 0.35)} 82%, transparent 100%)`,
-    boxShadow: `0 0 14px ${alpha(GOLD_TOP_LINE, 0.45)}`,
+    bgcolor: GOLD_TOP_LINE,
   },
 };
 

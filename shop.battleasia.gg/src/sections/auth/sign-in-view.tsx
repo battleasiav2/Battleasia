@@ -15,6 +15,8 @@ import { useTranslate } from 'src/locales/use-locales';
 import { dispatch } from 'src/store';
 import { loginAction } from 'src/store/reducers/auth';
 
+import { markShopSessionActive } from 'src/utils/shop-session';
+
 import { Iconify } from 'src/components/iconify';
 import { Form, Field } from 'src/components/hook-form';
 
@@ -23,7 +25,7 @@ import { AuthTrustRow } from './auth-trust-row';
 import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
 import { AuthSocialButtons } from './auth-social-buttons';
-import { authAlertSx, authFieldSlotPropsCompact, authLinkSx } from './auth-form-styles';
+import { authAlertSx, authCardFooterSx, authFieldSlotPropsCompact, authLinkSx } from './auth-form-styles';
 
 const MAIN_APP_URL = (import.meta.env.VITE_MAIN_APP_URL as string | undefined) || 'https://battleasia.gg';
 const REMEMBER_EMAIL_KEY = 'ba_remember_email';
@@ -89,6 +91,8 @@ export function SignInView() {
           balance: { balance: user?.balance || 0 },
         })
       );
+
+      markShopSessionActive();
 
       await new Promise((resolve) => setTimeout(resolve, 100));
       router.push(paths.user.shop);
@@ -191,17 +195,21 @@ export function SignInView() {
               {t('auth.signIn')}
             </AuthSubmitButton>
 
-            <AuthSocialButtons />
-
             <AuthFooterLinks
               prefix={t('auth.dontHaveAccount')}
               links={[{ label: t('auth.signUp'), href: paths.auth.signUp }]}
             />
           </Stack>
         </Form>
+
+        <Box sx={authCardFooterSx}>
+          <AuthTrustRow insideCard />
+        </Box>
       </AuthFormShell>
 
-      <AuthTrustRow />
+      <Box sx={{ width: 1, maxWidth: { xs: 1, sm: 400, md: 420 }, mt: 1.5 }}>
+        <AuthSocialButtons />
+      </Box>
     </Box>
   );
 }

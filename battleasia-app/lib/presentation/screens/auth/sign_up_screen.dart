@@ -281,25 +281,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ],
               ),
               const SizedBox(height: 18),
-              Row(
-                children: [
-                  AuthSecondaryButton(
-                    label: 'auth.back'.tr(),
-                    onPressed: () => setState(() {
-                      _step = 1;
-                      _errorMessage = null;
-                    }),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: AuthPrimaryButton(
-                      label: 'auth.createAccount'.tr(),
-                      icon: Icons.sports_martial_arts_rounded,
-                      loading: authProvider.isLoading,
-                      onPressed: authProvider.isLoading ? null : _handleSignUp,
+              GestureDetector(
+                onTap: () => setState(() {
+                  _step = 1;
+                  _errorMessage = null;
+                }),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.arrow_back,
+                      size: 14,
+                      color: AppColors.gold.withValues(alpha: 0.95),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 4),
+                    Text(
+                      'auth.back'.tr(),
+                      style: AppTheme.bodyMedium.copyWith(
+                        color: AppColors.gold,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 10),
+              AuthPrimaryButton(
+                label: 'auth.createAccount'.tr(),
+                icon: Icons.sports_martial_arts_rounded,
+                loading: authProvider.isLoading,
+                onPressed: authProvider.isLoading ? null : _handleSignUp,
               ),
             ],
             const SizedBox(height: 16),
@@ -381,11 +393,11 @@ class _GameServerDropdown extends StatelessWidget {
               vertical: 12,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.zero,
               borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.zero,
               borderSide: BorderSide(color: AppColors.gold.withValues(alpha: 0.5)),
             ),
           ),

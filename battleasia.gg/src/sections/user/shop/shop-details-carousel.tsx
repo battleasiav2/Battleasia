@@ -6,11 +6,6 @@ import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { Image } from 'src/components/image';
-import {
-  GLASS_CARD_RADIUS,
-  getDefaultGlassTokens,
-  getGlassShellSx,
-} from 'src/components/battle-glass-card';
 import { USER_COLORS } from 'src/layouts/user';
 import {
   Carousel,
@@ -31,7 +26,6 @@ type Props = {
 export function ShopDetailsCarousel({ images, name }: Props) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const tokens = getDefaultGlassTokens();
   const autoplay = useRef(
     Autoplay({
       delay: 5000,
@@ -53,12 +47,11 @@ export function ShopDetailsCarousel({ images, name }: Props) {
   return (
     <Box>
       <Box
-        sx={getGlassShellSx(tokens, {
+        sx={{
           mb: 2,
           position: 'relative',
-          p: 0,
           overflow: 'hidden',
-        })}
+        }}
       >
         <CarouselArrowNumberButtons
           {...carousel.arrows}
@@ -80,7 +73,7 @@ export function ShopDetailsCarousel({ images, name }: Props) {
           }}
         />
 
-        <Carousel carousel={carousel} sx={{ borderRadius: `${GLASS_CARD_RADIUS}px`, width: '100%' }}>
+        <Carousel carousel={carousel} sx={{ borderRadius: 0, width: '100%' }}>
           {slides.map((slide) => (
             <Image
               key={slide.src}
@@ -127,7 +120,7 @@ export function ShopDetailsCarousel({ images, name }: Props) {
                   index === carousel.thumbs.selectedIndex
                     ? `2px solid ${USER_COLORS.gold}`
                     : `2px solid ${alpha('#ffffff', 0.1)}`,
-                borderRadius: `${GLASS_CARD_RADIUS - 2}px`,
+                borderRadius: 0,
                 transition: 'opacity 0.25s ease, border-color 0.25s ease',
                 '&:hover': { opacity: 1 },
               }}

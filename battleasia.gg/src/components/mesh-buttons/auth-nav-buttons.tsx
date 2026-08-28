@@ -4,7 +4,7 @@ import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 
 import { Iconify } from 'src/components/iconify/iconify';
-import { userGhostButtonSx, userGoldButtonSx } from 'src/layouts/user/user-theme';
+import { userGhostButtonSx, userSolidGoldButtonSx } from 'src/layouts/user/user-theme';
 
 type AuthNavButtonsProps = {
   homeLabel: string;
@@ -48,7 +48,7 @@ export function AuthNavButtons({ homeLabel, joinLabel, compact }: AuthNavButtons
           <Iconify icon="game-icons:crossed-swords" width={18} sx={{ flexShrink: 0 }} />
         }
         sx={{
-          ...userGoldButtonSx,
+          ...userSolidGoldButtonSx,
           ...buttonSx,
         }}
       >

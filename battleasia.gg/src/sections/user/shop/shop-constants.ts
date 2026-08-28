@@ -20,8 +20,7 @@ export const SHOP_EXTERNAL_URL =
 
 /**
  * Entry URL for “Go to BAC Shop”.
- * Opens the storefront — AuthGuard sends guests to sign-in.
- * Session persists (no forced reauth on every visit).
+ * Always lands on shop sign-in with `reauth=1` so each visit requires login.
  */
 export function getBacShopEntryUrl() {
   try {
@@ -29,10 +28,11 @@ export function getBacShopEntryUrl() {
       SHOP_EXTERNAL_URL,
       typeof window !== 'undefined' ? window.location.origin : 'http://localhost'
     );
-    storeUrl.search = '';
+    storeUrl.pathname = storeUrl.pathname.replace(/\/user\/shop\/?$/, '/auth/sign-in');
+    storeUrl.search = 'reauth=1';
     storeUrl.hash = '';
     return storeUrl.toString();
   } catch {
-    return SHOP_EXTERNAL_URL;
+    return `${SHOP_EXTERNAL_URL.replace(/\/user\/shop\/?$/, '/auth/sign-in')}?reauth=1`;
   }
 }

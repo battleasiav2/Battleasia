@@ -9,6 +9,8 @@ export const HOME_SCROLL_GOLD = '#f5c518';
 /** Mobile sideways scroll track — matches Play Your Game row */
 export const homeMobileScrollTrackSx: SxProps<Theme> = {
   overflowX: { xs: 'auto', md: 'visible' },
+  // auto on x alone would promote y to auto — keep section scroll on the document only
+  overflowY: { xs: 'hidden', md: 'visible' },
   scrollSnapType: { xs: 'x mandatory', md: 'none' },
   WebkitOverflowScrolling: 'touch',
   pb: { xs: 1.5, md: 0 },
@@ -28,6 +30,7 @@ export const homeMobileScrollFlexRowSx: SxProps<Theme> = {
   display: 'flex',
   gap: 1.25,
   overflowX: 'auto',
+  overflowY: 'hidden',
   scrollSnapType: 'x mandatory',
   WebkitOverflowScrolling: 'touch',
   pb: 1.5,

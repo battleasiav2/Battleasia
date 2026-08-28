@@ -47,16 +47,7 @@ class AuthTextField extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 6),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.gold.withValues(alpha: 0.08),
-                blurRadius: 8,
-              ),
-            ],
-          ),
-          child: TextFormField(
+        TextFormField(
             controller: controller,
             obscureText: obscureText,
             keyboardType: keyboardType,
@@ -88,26 +79,25 @@ class AuthTextField extends StatelessWidget {
                       : null),
               suffixIcon: suffix,
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.zero,
                 borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.zero,
                 borderSide: BorderSide(
                   color: AppColors.gold.withValues(alpha: 0.5),
                 ),
               ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: AppColors.error),
+              errorBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
+                borderSide: BorderSide(color: AppColors.error),
               ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(6),
-                borderSide: const BorderSide(color: AppColors.error, width: 1.2),
+              focusedErrorBorder: const OutlineInputBorder(
+                borderRadius: BorderRadius.zero,
+                borderSide: BorderSide(color: AppColors.error, width: 1.2),
               ),
             ),
           ),
-        ),
       ],
     );
   }

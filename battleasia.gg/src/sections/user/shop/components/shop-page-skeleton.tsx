@@ -1,7 +1,7 @@
 import { Box, Grid2 as Grid, Skeleton, Stack } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
-import { GLASS_CARD_RADIUS, getDefaultGlassTokens, getGlassShellSx } from 'src/components/battle-glass-card';
+import { getDefaultGlassTokens, getGlassShellSx } from 'src/components/battle-glass-card';
 
 // ----------------------------------------------------------------------
 

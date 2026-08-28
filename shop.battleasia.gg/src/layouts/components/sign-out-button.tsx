@@ -9,6 +9,9 @@ import { dispatch } from 'src/store';
 import { logoutAction } from 'src/store/reducers/auth';
 import { userLogoutButtonSx } from 'src/layouts/user/user-theme';
 
+import axios from 'src/lib/axios';
+import { clearShopPersistStorage, clearShopSession } from 'src/utils/shop-session';
+
 // ----------------------------------------------------------------------
 
 type Props = ButtonProps & {
@@ -18,7 +21,14 @@ type Props = ButtonProps & {
 export function SignOutButton({ onClose, sx, ...other }: Props) {
   const handleLogout = useCallback(async () => {
     try {
+      clearShopSession();
+      try {
+        await axios.post('api/v2/users/logout');
+      } catch {
+        // ignore
+      }
       dispatch(logoutAction());
+      clearShopPersistStorage();
       onClose?.();
     } catch (error) {
       console.error(error);

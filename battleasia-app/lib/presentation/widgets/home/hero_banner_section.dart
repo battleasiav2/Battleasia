@@ -148,6 +148,10 @@ class _HeroBannerSectionState extends State<HeroBannerSection> {
             child: GoldButton(
               label: 'Join Tournament',
               onPressed: () => _joinTournament(context),
+              glow: false,
+              borderRadius: 4,
+              height: 46,
+              fontSize: 14,
             ),
           ),
           Positioned(

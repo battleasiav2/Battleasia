@@ -14,9 +14,19 @@ class LocaleToggle extends StatelessWidget {
     (Locale('ur'), 'اردو', 'UR'),
   ];
 
+  static const _flagEmoji = {
+    'en': '🇺🇸',
+    'bn': '🇧🇩',
+    'zh': '🇨🇳',
+    'hi': '🇮🇳',
+    'ur': '🇵🇰',
+  };
+
   @override
   Widget build(BuildContext context) {
-    final current = context.locale.languageCode.toUpperCase();
+    final code = context.locale.languageCode;
+    final current = code.toUpperCase();
+    final flag = _flagEmoji[code] ?? '🌐';
 
     return PopupMenuButton<Locale>(
       tooltip: 'Language',
@@ -53,15 +63,28 @@ class LocaleToggle extends StatelessWidget {
             ),
           )
           .toList(),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        child: Text(
-          current,
-          style: AppTheme.bodySmall.copyWith(
-            color: AppColors.gold,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.5,
-          ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: Colors.white.withValues(alpha: 0.06),
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(flag, style: const TextStyle(fontSize: 14, height: 1)),
+            const SizedBox(width: 6),
+            Text(
+              current,
+              style: AppTheme.bodySmall.copyWith(
+                color: Colors.white.withValues(alpha: 0.88),
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+                letterSpacing: 0.2,
+              ),
+            ),
+          ],
         ),
       ),
     );

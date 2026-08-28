@@ -13,6 +13,7 @@ import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_alert.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_form_shell.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_text_field.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 
 const _rememberEmailKey = 'ba_remember_email';
 
@@ -102,6 +103,9 @@ class _SignInScreenState extends State<SignInScreen> {
         );
         return;
       }
+      if (widget.afterLoginScreen != null) {
+        ShopAuthGate.markShopSessionActive();
+      }
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) => widget.afterLoginScreen ?? const PlayScreen(),
@@ -130,6 +134,7 @@ class _SignInScreenState extends State<SignInScreen> {
       progress: 100,
       title: widget.titleKey.tr(),
       description: 'auth.signInDescription'.tr(),
+      belowCard: _SignInSocialSection(onTap: _comingSoon),
       child: Form(
         key: _formKey,
         child: Column(
@@ -242,63 +247,6 @@ class _SignInScreenState extends State<SignInScreen> {
               onPressed: authProvider.isLoading ? null : _handleSignIn,
             ),
             const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 1,
-                    color: Colors.white.withValues(alpha: 0.1),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    'auth.orContinueWith'.tr().toUpperCase(),
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.42),
-                      fontWeight: FontWeight.w700,
-                      fontSize: 10,
-                      letterSpacing: 0.8,
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    height: 1,
-                    color: Colors.white.withValues(alpha: 0.1),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: _SocialBtn(
-                    label: 'auth.continueWithGoogle'.tr(),
-                    onTap: _comingSoon,
-                    child: const Icon(
-                      Icons.g_mobiledata,
-                      color: Colors.white,
-                      size: 22,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _SocialBtn(
-                    label: 'auth.continueWithDiscord'.tr(),
-                    onTap: _comingSoon,
-                    child: const Icon(
-                      Icons.discord,
-                      color: Colors.white,
-                      size: 18,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 14),
             Text.rich(
               TextSpan(
                 text: '${'auth.dontHaveAccount'.tr()} ',
@@ -337,51 +285,158 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 }
 
+class _SignInSocialSection extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _SignInSocialSection({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                height: 1,
+                color: Colors.white.withValues(alpha: 0.1),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                'auth.orContinueWith'.tr().toUpperCase(),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.42),
+                  fontWeight: FontWeight.w700,
+                  fontSize: 10,
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ),
+            Expanded(
+              child: Container(
+                height: 1,
+                color: Colors.white.withValues(alpha: 0.1),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 108,
+              child: _SocialBtn(
+                semanticsLabel: 'auth.continueWithGoogle'.tr(),
+                onTap: onTap,
+                child: const _GoogleLogoIcon(size: 18),
+              ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+              width: 108,
+              child: _SocialBtn(
+                semanticsLabel: 'auth.continueWithDiscord'.tr(),
+                onTap: onTap,
+                child: const Icon(
+                  Icons.discord,
+                  color: Color(0xFF7289DA),
+                  size: 18,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 class _SocialBtn extends StatelessWidget {
-  final String label;
+  final String semanticsLabel;
   final VoidCallback onTap;
   final Widget child;
 
   const _SocialBtn({
-    required this.label,
+    required this.semanticsLabel,
     required this.onTap,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.black.withValues(alpha: 0.42),
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          height: 44,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              child,
-              const SizedBox(width: 6),
-              Flexible(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 11.5,
-                  ),
-                ),
-              ),
-            ],
+    return Semantics(
+      button: true,
+      label: semanticsLabel,
+      child: Material(
+        color: const Color(0xFF0E0E0E).withValues(alpha: 0.72),
+        borderRadius: BorderRadius.zero,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Container(
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+            ),
+            child: child,
           ),
         ),
       ),
     );
   }
+}
+
+class _GoogleLogoIcon extends StatelessWidget {
+  final double size;
+
+  const _GoogleLogoIcon({this.size = 22});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: size,
+      height: size,
+      child: CustomPaint(
+        painter: _GoogleLogoPainter(),
+        size: Size(size, size),
+      ),
+    );
+  }
+}
+
+class _GoogleLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final rect = Offset.zero & size;
+    final paint = Paint()..style = PaintingStyle.fill;
+
+    paint.color = const Color(0xFF4285F4);
+    canvas.drawArc(rect, -1.5708, 1.5708, true, paint);
+
+    paint.color = const Color(0xFF34A853);
+    canvas.drawArc(rect, 0, 1.5708, true, paint);
+
+    paint.color = const Color(0xFFFBBC05);
+    canvas.drawArc(rect, 1.5708, 1.5708, true, paint);
+
+    paint.color = const Color(0xFFEA4335);
+    canvas.drawArc(rect, 3.1416, 1.5708, true, paint);
+
+    paint.color = Colors.white;
+    canvas.drawCircle(Offset(size.width / 2, size.height / 2), size.width * 0.32, paint);
+
+    paint.color = const Color(0xFF4285F4);
+    canvas.drawRect(
+      Rect.fromLTWH(size.width * 0.45, size.height * 0.42, size.width * 0.5, size.height * 0.16),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

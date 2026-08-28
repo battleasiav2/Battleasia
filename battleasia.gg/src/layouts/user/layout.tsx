@@ -5,9 +5,9 @@ import { merge } from 'es-toolkit';
 import { lazy, Suspense } from 'react';
 
 import { useTheme, alpha } from '@mui/material/styles';
-import { Box, Alert, Stack, Button, Typography } from '@mui/material';
+import { Box, Alert, Stack, Typography } from '@mui/material';
 
-import { paths } from 'src/routes/paths';
+
 import { RouterLink } from 'src/routes/components';
 import { useRouter, usePathname } from 'src/routes/hooks';
 
@@ -27,8 +27,14 @@ import { HeaderSection } from '../core/header-section';
 import { LayoutSection } from '../core/layout-section';
 import { UserNavVertical } from './user-nav-vertical';
 import { userLayoutVars, userBattleNavColorVars } from './css-vars';
-import { USER_COLORS, userSolidGoldButtonSx, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
+import { USER_COLORS, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
 import { LanguagePopover } from '../components/language-popover';
+import { SignInIconButton } from '../components/sign-in-icon-button';
+import {
+    headerBarSx,
+    headerContainerSx,
+    getHeaderNavLinkSx,
+} from '../components/header-chrome';
 import { Searchbar } from '../components/searchbar';
 import { FloatingFooterNav } from '../components/floating-footer-nav';
 import {
@@ -121,7 +127,8 @@ export function UserLayout({
             container: {
                 maxWidth: false,
                 sx: {
-                    ...(isNavVertical && { px: { [layoutQuery]: 5 } }),
+                    ...headerContainerSx,
+                    ...(isNavVertical && { px: { [layoutQuery]: 3 } }),
                 },
             },
         };
@@ -211,20 +218,7 @@ export function UserLayout({
                                     component={item.href ? RouterLink : 'span'}
                                     href={item.href}
                                     onClick={(e: any) => handleMenuClick(e, item)}
-                                    sx={{
-                                        textTransform: 'none',
-                                        fontSize: { lg: 15, xl: 16 },
-                                        fontWeight: 600,
-                                        letterSpacing: 0.02,
-                                        color: isActive ? USER_COLORS.gold : '#d9d9d8',
-                                        textDecoration: 'none',
-                                        cursor: 'pointer',
-                                        whiteSpace: 'nowrap',
-                                        transition: 'color 0.2s',
-                                        '&:hover': {
-                                            color: USER_COLORS.gold,
-                                        },
-                                    }}
+                                    sx={getHeaderNavLinkSx(isActive)}
                                 >
                                     {t(item.labelKey)}
                                 </Typography>
@@ -238,9 +232,8 @@ export function UserLayout({
                     sx={{
                         display: 'flex',
                         alignItems: 'center',
-                        gap: { xs: 2, sm: 2.5, md: 3 },
                         flexShrink: 0,
-                        '& > *': { flexShrink: 0 },
+                        gap: { xs: 1, sm: 1.25 },
                     }}
                 >
                     {isLoggedIn ? (
@@ -277,23 +270,7 @@ export function UserLayout({
                             </Suspense>
                         </>
                     ) : (
-                        <Button
-                            component={RouterLink}
-                            href={paths.auth.signIn}
-                            variant="contained"
-                            disableElevation
-                            sx={{
-                                ...userSolidGoldButtonSx,
-                                height: { xs: 34, sm: 38 },
-                                minHeight: { xs: 34, sm: 38 },
-                                px: { xs: 1.5, sm: 2 },
-                                fontSize: { xs: 11, sm: 12 },
-                                whiteSpace: 'nowrap',
-                                minWidth: 'auto',
-                            }}
-                        >
-                            {t('auth.signIn')}
-                        </Button>
+                        <SignInIconButton />
                     )}
 
                     {/** @slot Language popover */}
@@ -323,29 +300,8 @@ export function UserLayout({
                             : 'var(--layout-nav-vertical-width)',
                     },
                     width: 'auto',
-                    minHeight: { xs: 64, sm: 68 },
-                    bgcolor: alpha('#000000', 0.78),
-                    borderBottom: 'none',
-                    backdropFilter: { xs: 'blur(10px)', md: 'blur(16px)' },
-                    WebkitBackdropFilter: { xs: 'blur(10px)', md: 'blur(16px)' },
-                    boxShadow: `
-                        inset 0 1px 0 ${alpha('#ffffff', 0.06)},
-                        0 8px 28px ${alpha('#000000', 0.35)}
-                    `,
-                    // Gold brand rail under the bar
-                    '&::after': {
-                        content: '""',
-                        position: 'absolute',
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        height: 1.5,
-                        background: `linear-gradient(90deg, transparent 0%, ${alpha(USER_COLORS.gold, 0.15)} 12%, ${USER_COLORS.gold} 50%, ${alpha(USER_COLORS.gold, 0.15)} 88%, transparent 100%)`,
-                        pointerEvents: 'none',
-                    },
-                    pb: { xs: 0.75, sm: 1 },
-                    pt: { xs: 0.75, sm: 1 },
-                    ...slotProps?.header?.sx
+                    ...(headerBarSx as Record<string, unknown>),
+                    ...slotProps?.header?.sx,
                 }}
             />
         );

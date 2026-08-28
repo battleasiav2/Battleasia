@@ -6,7 +6,7 @@ import { merge } from 'es-toolkit';
 
 import { useTheme, alpha } from '@mui/material/styles';
 import { iconButtonClasses } from '@mui/material/IconButton';
-import { Box, Alert, Stack, Button, Typography } from '@mui/material';
+import { Box, Alert, Stack, Typography } from '@mui/material';
 
 import { paths } from 'src/routes/paths';
 import { useRouter, usePathname } from 'src/routes/hooks';
@@ -16,7 +16,6 @@ import { useSelector } from 'src/store';
 
 import { Logo } from 'src/components/logo';
 import { useSettingsContext } from 'src/components/settings';
-import { userSolidGoldButtonSx } from 'src/layouts/user/user-theme';
 
 import { allLangs, useTranslate } from 'src/locales';
 import { layoutClasses } from '../core/classes';
@@ -26,6 +25,15 @@ import { HeaderSection } from '../core/header-section';
 import { FooterSection } from '../core/footer-section';
 import { LayoutSection } from '../core/layout-section';
 import { LanguagePopover } from '../components/language-popover';
+import { SignInIconButton } from '../components/sign-in-icon-button';
+import {
+  headerBarSx,
+  headerContainerSx,
+  headerCenterAreaSx,
+  headerLeftAreaSx,
+  headerRightAreaSx,
+  getHeaderNavLinkSx,
+} from '../components/header-chrome';
 import { navData as dashboardNavData } from '../nav-config-dashboard';
 import { dashboardLayoutVars, dashboardNavColorVars } from './css-vars';
 import { PublicMobileNav } from '../components/public-mobile-nav';
@@ -95,12 +103,9 @@ export function DashboardLayout({
         maxWidth: false,
         sx: {
           alignItems: 'center',
-          justifyContent: 'space-between',
-          minHeight: { xs: 60, md: 68 },
-          height: { xs: 60, md: 68 },
-          px: { xs: 1.75, sm: 2.5, md: 3.5 },
-          py: 0,
-          ...(isNavVertical && { px: { [layoutQuery]: 3.5 } }),
+          justifyContent: { xs: 'space-between', lg: 'stretch' },
+          ...headerContainerSx,
+          ...(isNavVertical && { px: { [layoutQuery]: 3 } }),
           ...(isNavHorizontal && {
             bgcolor: 'var(--layout-nav-bg)',
             height: { [layoutQuery]: 'var(--layout-nav-horizontal-height)' },
@@ -109,46 +114,9 @@ export function DashboardLayout({
         },
       },
       centerArea: {
-        sx: {
-          flex: '1 1 auto',
-          justifyContent: 'center',
-          alignItems: 'center',
-          overflow: 'visible',
-          px: { lg: 2 },
-        },
+        sx: headerCenterAreaSx,
       },
     };
-
-    const navLinkSx = (isActive: boolean) => ({
-      textTransform: 'uppercase' as const,
-      fontSize: { lg: 13, xl: 14 },
-      fontWeight: isActive ? 700 : 600,
-      letterSpacing: '0.08em',
-      color: isActive ? GOLD : alpha('#ffffff', 0.72),
-      textDecoration: 'none',
-      cursor: 'pointer',
-      whiteSpace: 'nowrap' as const,
-      lineHeight: 1,
-      position: 'relative' as const,
-      py: 0.75,
-      transition: 'color 0.2s ease',
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        left: '50%',
-        bottom: 0,
-        width: isActive ? '70%' : 0,
-        height: 1.5,
-        bgcolor: GOLD,
-        transform: 'translateX(-50%)',
-        transition: 'width 0.2s ease',
-        boxShadow: isActive ? `0 0 8px ${alpha(GOLD, 0.55)}` : 'none',
-      },
-      '&:hover': {
-        color: GOLD,
-        '&::after': { width: '70%' },
-      },
-    });
 
     const headerSlots: HeaderSectionProps['slots'] = {
       topArea: (
@@ -164,12 +132,12 @@ export function DashboardLayout({
           direction="row"
           alignItems="center"
           spacing={{ xs: 0.75, sm: 1 }}
-          sx={{ flexShrink: 0, minWidth: 0, height: 1 }}
+          sx={{ ...headerLeftAreaSx, flexShrink: 0, minWidth: 0, height: 1 }}
         >
           <Logo
             sx={{
-              width: { xs: 52, sm: 58, md: 64 },
-              height: { xs: 52, sm: 58, md: 64 },
+              width: { xs: 40, sm: 44, md: 46 },
+              height: { xs: 40, sm: 44, md: 46 },
               flexShrink: 0,
             }}
           />
@@ -178,8 +146,8 @@ export function DashboardLayout({
               className="font-brand-gaming"
               sx={{
                 fontSize: isBengali
-                  ? { xs: 14, sm: 16, md: 18 }
-                  : { xs: 15, sm: 17, md: 20 },
+                  ? { xs: 13, sm: 14, md: 16 }
+                  : { xs: 14, sm: 15, md: 17 },
                 color: GOLD,
                 fontWeight: 800,
                 lineHeight: 1,
@@ -225,7 +193,7 @@ export function DashboardLayout({
           direction="row"
           alignItems="center"
           justifyContent="center"
-          spacing={{ lg: 3, xl: 4 }}
+          spacing={{ lg: 2.5, xl: 3.5 }}
           sx={{
             display: { xs: 'none', lg: 'flex' },
             height: 1,
@@ -240,7 +208,7 @@ export function DashboardLayout({
                 component={RouterLink}
                 href={item.href}
                 onClick={(e) => handleMenuClick(e as React.MouseEvent<HTMLAnchorElement>, item)}
-                sx={navLinkSx(isActive)}
+                sx={getHeaderNavLinkSx(isActive)}
               >
                 {t(item.labelKey)}
               </Typography>
@@ -252,8 +220,13 @@ export function DashboardLayout({
         <Stack
           direction="row"
           alignItems="center"
-          spacing={{ xs: 0.65, sm: 1 }}
-          sx={{ flexShrink: 0, height: 1, minWidth: { lg: 120 }, justifyContent: 'flex-end' }}
+          sx={{
+            ...headerRightAreaSx,
+            display: 'flex',
+            height: 1,
+            gap: { xs: 1, sm: 1.25 },
+            justifyContent: 'flex-end',
+          }}
         >
           {isLoggedIn ? (
             <Suspense fallback={null}>
@@ -261,23 +234,7 @@ export function DashboardLayout({
               <AccountDrawer data={accountMenuItems} />
             </Suspense>
           ) : (
-            <Button
-              component={RouterLink}
-              href={paths.auth.signIn}
-              variant="contained"
-              disableElevation
-              sx={{
-                ...userSolidGoldButtonSx,
-                height: { xs: 34, sm: 38 },
-                minHeight: { xs: 34, sm: 38 },
-                px: { xs: 1.5, sm: 2 },
-                fontSize: { xs: 11, sm: 12 },
-                whiteSpace: 'nowrap',
-                minWidth: 'auto',
-              }}
-            >
-              {t('auth.signIn')}
-            </Button>
+            <SignInIconButton />
           )}
 
           <LanguagePopover data={allLangs} />
@@ -294,16 +251,7 @@ export function DashboardLayout({
         slots={{ ...headerSlots, ...slotProps?.header?.slots }}
         slotProps={merge(headerSlotProps, slotProps?.header?.slotProps ?? {})}
         sx={{
-          bgcolor: alpha('#0a0c10', 0.82),
-          backdropFilter: 'blur(14px) saturate(1.2)',
-          WebkitBackdropFilter: 'blur(14px) saturate(1.2)',
-          borderBottom: `1px solid ${alpha(GOLD, 0.18)}`,
-          borderRadius: 0,
-          boxShadow: `
-            inset 0 1px 0 ${alpha('#ffffff', 0.07)},
-            0 1px 0 ${alpha(GOLD, 0.1)},
-            0 10px 28px ${alpha('#000000', 0.32)}
-          `,
+          ...headerBarSx,
           ...slotProps?.header?.sx,
         }}
       />

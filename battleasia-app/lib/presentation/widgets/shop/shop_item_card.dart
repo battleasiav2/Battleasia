@@ -30,39 +30,41 @@ class ShopItemCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        child: Ink(
-          decoration: BoxDecoration(
-            color: const Color(0xFF181614),
-            border: Border.all(color: const Color(0xFF2B2B2B)),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                if (showBadge)
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
-                      color: _kBadgeBgColor[item.badge] ?? AppColors.gold,
-                      child: Text(
-                        item.badge.toUpperCase(),
-                        style: const TextStyle(
-                          fontSize: 10,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 0.4,
+        child: Stack(
+          children: [
+            Ink(
+              decoration: BoxDecoration(
+                color: const Color(0xFF161618),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(14, 16, 14, 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (showBadge)
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          color: _kBadgeBgColor[item.badge] ?? AppColors.gold,
+                          child: Text(
+                            item.badge.toUpperCase(),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.4,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  )
-                else
-                  const SizedBox(height: 22),
-                const SizedBox(height: 4),
+                      )
+                    else
+                      const SizedBox(height: 22),
+                    const SizedBox(height: 4),
                 SizedBox(
                   height: 96,
                   child: Stack(
@@ -138,6 +140,17 @@ class ShopItemCard extends StatelessWidget {
               ],
             ),
           ),
+            ),
+            const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: ColoredBox(
+                color: AppColors.gold,
+                child: SizedBox(height: 2),
+              ),
+            ),
+          ],
         ),
       ),
     );

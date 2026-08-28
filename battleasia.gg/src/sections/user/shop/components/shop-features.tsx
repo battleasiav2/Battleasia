@@ -4,7 +4,7 @@ import { alpha } from '@mui/material/styles';
 import { Iconify } from 'src/components/iconify';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
-import { getGoldTopLineCardSx } from 'src/components/battle-glass-card';
+import { HOME_ROW_LINE, HomeBlurPanel } from 'src/sections/home/home-blur-panel';
 
 import { USER_COLORS } from 'src/layouts/user';
 
@@ -38,29 +38,19 @@ export function ShopFeatures({ title, features }: ShopFeaturesProps) {
       </Typography>
       <BattleGoldDivider variant="section" sx={{ mt: 0.75, mb: 2, width: 100 }} />
 
-      <Box
-        sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
-          gap: 1.5,
-        }}
-      >
-        {features.map((feature) => (
-          <Box
-            key={feature.title}
-            sx={getGoldTopLineCardSx({
-              p: { xs: 1.75, md: 2 },
-              pt: { xs: 2.25, md: 2.5 },
-              transition: 'transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
-              '&:hover': {
-                transform: 'translateY(-4px)',
-                borderColor: alpha(USER_COLORS.gold, 0.35),
-                boxShadow: `0 12px 32px ${alpha('#000000', 0.5)}, 0 0 16px ${alpha(USER_COLORS.gold, 0.08)}`,
-              },
-              '& > *': { position: 'relative', zIndex: 1 },
-            })}
-          >
-            <Stack direction="row" spacing={1.25} alignItems="flex-start">
+      <HomeBlurPanel>
+        <Stack spacing={0}>
+          {features.map((feature, index) => (
+            <Stack
+              key={feature.title}
+              direction="row"
+              spacing={1.25}
+              alignItems="flex-start"
+              sx={{
+                py: { xs: 1.35, sm: 1.5 },
+                borderBottom: index < features.length - 1 ? HOME_ROW_LINE : 'none',
+              }}
+            >
               <Box
                 sx={{
                   width: 40,
@@ -94,9 +84,9 @@ export function ShopFeatures({ title, features }: ShopFeaturesProps) {
                 </Typography>
               </Box>
             </Stack>
-          </Box>
-        ))}
-      </Box>
+          ))}
+        </Stack>
+      </HomeBlurPanel>
     </Box>
   );
 }

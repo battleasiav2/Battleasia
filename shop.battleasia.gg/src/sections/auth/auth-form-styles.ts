@@ -1,6 +1,8 @@
 import { alpha } from '@mui/material/styles';
 import { inputBaseClasses } from '@mui/material/InputBase';
 
+import { HOME_ROW_LINE, homeBlurPanelSx } from 'src/sections/home/home-blur-panel';
+
 export const AUTH_BG_IMAGE = '/assets/images/shop/bac-store-hero.webp';
 
 export const AUTH_CARD_BG = '#161618';
@@ -8,23 +10,15 @@ export const AUTH_INPUT_BG = '#0e0e0e';
 export const AUTH_PLACEHOLDER = '#9CA3AF';
 
 export const AUTH_RADIUS = {
-  card: '8px',
-  control: '6px',
-  button: '4px',
+  card: '0',
+  control: '0',
+  button: '0',
 } as const;
 
 export const authCardSx = {
-  position: 'relative' as const,
+  ...homeBlurPanelSx,
   overflow: 'hidden' as const,
-  bgcolor: alpha(AUTH_CARD_BG, 0.94),
-  backgroundColor: alpha(AUTH_CARD_BG, 0.94),
-  backgroundImage: 'none',
-  border: `1px solid ${alpha('#ffffff', 0.08)}`,
   borderRadius: AUTH_RADIUS.card,
-  boxShadow: `0 16px 40px ${alpha('#000000', 0.42)}`,
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  '&:before': { display: 'none' },
 };
 
 const authInputAutofillSx = {
@@ -212,6 +206,72 @@ export const authLinkSx = {
   textUnderlineOffset: '3px',
   '&:hover': { color: '#ffe066' },
 };
+
+export const authBackLinkSx = {
+  ...authLinkSx,
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 0.5,
+  fontSize: 13,
+  fontWeight: 600,
+  border: 'none',
+  background: 'none',
+  cursor: 'pointer',
+  p: 0,
+  mb: 0.5,
+  textDecoration: 'none',
+  '&:hover': { color: '#ffe066', textDecoration: 'underline' },
+};
+
+export const authCardFooterSx = {
+  mt: 2,
+  pt: 2,
+  borderTop: HOME_ROW_LINE,
+};
+
+/** Icon-only social login tiles — compact, matches auth dark inputs */
+export const authSocialIconButtonSx = {
+  position: 'relative' as const,
+  overflow: 'hidden' as const,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minHeight: 40,
+  height: 40,
+  minWidth: 0,
+  py: 0,
+  px: 0,
+  borderRadius: AUTH_RADIUS.control,
+  bgcolor: alpha(AUTH_INPUT_BG, 0.72),
+  backgroundColor: alpha(AUTH_INPUT_BG, 0.72),
+  backgroundImage: 'none',
+  border: `1px solid ${alpha('#ffffff', 0.12)}`,
+  boxShadow: 'none',
+  color: 'inherit',
+  transition: 'border-color 0.15s ease, background-color 0.15s ease',
+  '&.MuiButton-root:hover': { boxShadow: 'none' },
+  '@media (hover: hover)': {
+    '&:hover': {
+      bgcolor: alpha(AUTH_INPUT_BG, 0.88),
+      backgroundColor: alpha(AUTH_INPUT_BG, 0.88),
+      borderColor: alpha('#f5c518', 0.32),
+      boxShadow: 'none',
+      transform: 'none',
+      filter: 'none',
+    },
+  },
+  '&:active, &.Mui-focusVisible': {
+    bgcolor: alpha(AUTH_INPUT_BG, 0.92),
+    backgroundColor: alpha(AUTH_INPUT_BG, 0.92),
+    borderColor: alpha('#f5c518', 0.4),
+    boxShadow: 'none',
+    transform: 'none',
+    filter: 'none',
+  },
+};
+
+/** @deprecated Use authSocialIconButtonSx */
+export const authSocialButtonSx = authSocialIconButtonSx;
 
 export const authAlertSx = {
   borderRadius: AUTH_RADIUS.control,

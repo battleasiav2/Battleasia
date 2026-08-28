@@ -13,6 +13,7 @@ import 'package:battleasia_app/data/models/referral_item_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
+import 'package:battleasia_app/presentation/widgets/common/glass_stat_tile.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_divider.dart';
 
 /// Earn / referral hub aligned with battleasia.gg referral dashboard.
@@ -305,53 +306,11 @@ class _ReferralScreenState extends State<ReferralScreen>
       ),
       itemBuilder: (_, i) {
         final item = items[i];
-        return GlassCard(
-          padding: const EdgeInsets.all(14),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(item.icon, color: AppColors.gold, size: 18),
-              const Spacer(),
-              Text(
-                item.label.toUpperCase(),
-                style: AppTheme.bodySmall.copyWith(
-                  color: AppColors.textMuted,
-                  fontSize: 10,
-                  letterSpacing: 0.7,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Row(
-                children: [
-                  if (item.showCoin) ...[
-                    Image.asset(
-                      'assets/images/currency.webp',
-                      width: 16,
-                      height: 16,
-                      errorBuilder: (_, __, ___) => const Icon(
-                        Icons.monetization_on,
-                        color: AppColors.gold,
-                        size: 16,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                  ],
-                  Flexible(
-                    child: Text(
-                      item.value,
-                      style: AppTheme.heading3.copyWith(
-                        color: AppColors.textPrimary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w800,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+        final valueText = item.showCoin ? item.value : item.value;
+        return GlassStatTile(
+          label: item.label,
+          value: valueText,
+          icon: item.icon,
         );
       },
     );

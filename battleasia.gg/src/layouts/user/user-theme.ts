@@ -256,39 +256,50 @@ export const userGoldButtonSx: SxProps<Theme> = createUserGlassToneButtonSx(
   USER_COLORS.goldLight
 );
 
-/** Solid filled gold CTA — hero + auth primary actions (44px) */
+/** Solid filled gold CTA — flat auth Continue style (hero, header, primary actions) */
 export const userSolidGoldButtonSx: SxProps<Theme> = {
-  borderRadius: 0,
+  borderRadius: '4px',
   py: 0,
   minHeight: 44,
   height: 44,
-  fontSize: 13,
-  fontWeight: 800,
-  letterSpacing: 1.1,
-  textTransform: 'uppercase',
+  fontSize: 14,
+  fontWeight: 700,
+  letterSpacing: 0,
+  textTransform: 'none',
   color: '#111111',
   backdropFilter: 'none',
   WebkitBackdropFilter: 'none',
   filter: 'none',
   textShadow: 'none',
   backgroundImage: 'none',
-  background: 'linear-gradient(180deg, #f5c518 0%, #d4a017 52%, #d97706 100%)',
-  border: `1px solid ${alpha('#fbbf24', 0.9)}`,
-  boxShadow: `0 0 16px ${alpha('#f5c518', 0.18)}`,
-  transition: 'transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease',
-  '&:hover': {
-    filter: 'none',
-    background: 'linear-gradient(180deg, #fbbf24 0%, #f5c518 52%, #d4a017 100%)',
-    boxShadow: `0 0 22px ${alpha('#f5c518', 0.38)}, 0 10px 28px ${alpha('#000000', 0.45)}`,
+  background: '#f5c518',
+  border: `1px solid ${alpha('#d4a017', 0.85)}`,
+  boxShadow: 'none',
+  transition: 'background-color 0.15s ease, border-color 0.15s ease',
+  '&.MuiButton-root:hover': { boxShadow: 'none' },
+  '@media (hover: hover)': {
+    '&:hover': {
+      background: '#eab308',
+      borderColor: alpha('#ca8a04', 0.9),
+      boxShadow: 'none',
+      transform: 'none',
+      filter: 'none',
+    },
   },
-  '&:active': {
-    transform: 'scale(0.985) translateY(1px)',
+  '&:active, &.Mui-focusVisible': {
+    background: '#d4a017',
+    borderColor: alpha('#b45309', 0.9),
+    boxShadow: 'none',
+    transform: 'none',
+    filter: 'none',
   },
   '&.Mui-disabled': {
     background: alpha('#f5c518', 0.28),
     color: alpha('#111111', 0.45),
     borderColor: alpha('#f5c518', 0.22),
     boxShadow: 'none',
+    transform: 'none',
+    filter: 'none',
   },
 };
 

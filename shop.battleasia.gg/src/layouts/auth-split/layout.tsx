@@ -4,6 +4,8 @@ import { merge } from 'es-toolkit';
 import { Alert, Button } from '@mui/material';
 import { alpha, useTheme, type Breakpoint } from '@mui/material/styles';
 
+import axios from 'src/lib/axios';
+
 import { paths } from 'src/routes/paths';
 import { useRouter, useSearchParams } from 'src/routes/hooks';
 
@@ -11,6 +13,12 @@ import { useSelector, useDispatch } from 'src/store';
 import { logoutAction } from 'src/store/reducers/auth';
 import { Iconify } from 'src/components/iconify';
 import { useTranslate } from 'src/locales/use-locales';
+
+import {
+  clearShopPersistStorage,
+  clearShopSession,
+  hasShopSession,
+} from 'src/utils/shop-session';
 
 import { AuthSplitSection } from './section';
 import { AUTH_BG_IMAGE } from 'src/sections/auth/auth-form-styles';
@@ -53,32 +61,53 @@ export function AuthSplitLayout({
   const searchParams = useSearchParams();
   const { t } = useTranslate();
   const { isLoggedIn } = useSelector((state) => state.auth);
-  const [reauthDone, setReauthDone] = useState(() => searchParams.get('reauth') !== '1');
+  const [reauthReady, setReauthReady] = useState(() => searchParams.get('reauth') !== '1');
 
-  // Legacy `?reauth=1` still clears shop session once; normal visits keep login.
+  // `?reauth=1` clears shop cookie/session so every entry requires sign-in.
   useEffect(() => {
     if (searchParams.get('reauth') !== '1') {
-      setReauthDone(true);
-      return;
+      setReauthReady(true);
+      return undefined;
     }
 
-    dispatch(logoutAction());
-    try {
-      localStorage.removeItem('persist:battleasia-shop');
-    } catch {
-      // ignore storage errors
-    }
-    router.replace(paths.auth.signIn);
-    setReauthDone(true);
+    let cancelled = false;
+
+    const runReauth = async () => {
+      clearShopSession();
+      try {
+        await axios.post('api/v2/users/logout');
+      } catch {
+        // ignore
+      }
+      dispatch(logoutAction());
+      clearShopPersistStorage();
+
+      if (cancelled) return;
+
+      const next = new URL(window.location.href);
+      next.searchParams.delete('reauth');
+      router.replace(`${next.pathname}${next.search}${next.hash}`);
+      setReauthReady(true);
+    };
+
+    void runReauth();
+    return () => {
+      cancelled = true;
+    };
   }, [dispatch, router, searchParams]);
 
   useEffect(() => {
-    if (reauthDone && isLoggedIn) {
+    if (!reauthReady || searchParams.get('reauth') === '1') return;
+    if (isLoggedIn && hasShopSession()) {
       router.replace(paths.user.shop);
     }
-  }, [isLoggedIn, reauthDone, router]);
+  }, [isLoggedIn, reauthReady, router, searchParams]);
 
-  if (!reauthDone || isLoggedIn) {
+  if (!reauthReady) {
+    return null;
+  }
+
+  if (isLoggedIn && hasShopSession()) {
     return null;
   }
 
@@ -168,6 +197,8 @@ export function AuthSplitLayout({
           backgroundPosition: 'center top',
           backgroundRepeat: 'no-repeat',
           position: 'relative',
+          overflowX: 'clip',
+          overflowY: 'visible',
           minHeight: {
             xs: 'calc(100dvh - var(--layout-header-mobile-height, 36px))',
             md: 'calc(100dvh - var(--layout-header-desktop-height, 40px))',
@@ -202,7 +233,8 @@ export function AuthSplitLayout({
           display: 'flex',
           justifyContent: 'center',
           alignItems: { xs: 'flex-start', md: 'center' },
-          overflow: 'auto',
+          overflowX: 'clip',
+          overflowY: 'visible',
           py: { xs: 3, md: 4 },
         }}
       >

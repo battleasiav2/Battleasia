@@ -24,7 +24,7 @@ import { AuthTrustRow } from './auth-trust-row';
 import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
 import { AuthSocialButtons } from './auth-social-buttons';
-import { authAlertSx, authFieldSlotPropsCompact, authLinkSx } from './auth-form-styles';
+import { authAlertSx, authCardFooterSx, authFieldSlotPropsCompact, authLinkSx } from './auth-form-styles';
 
 const REMEMBER_EMAIL_KEY = 'ba_remember_email';
 
@@ -207,17 +207,21 @@ export function SignInView() {
               {t('auth.signIn')}
             </AuthSubmitButton>
 
-            <AuthSocialButtons />
-
             <AuthFooterLinks
               prefix={t('auth.newToBattleAsia')}
               links={[{ label: t('auth.createYourAccount'), href: paths.auth.signUp }]}
             />
           </Stack>
         </Form>
+
+        <Box sx={authCardFooterSx}>
+          <AuthTrustRow insideCard />
+        </Box>
       </AuthFormShell>
 
-      <AuthTrustRow />
+      <Box sx={{ width: 1, maxWidth: { xs: 1, sm: 400, md: 420 }, mt: 1.5 }}>
+        <AuthSocialButtons />
+      </Box>
     </Box>
   );
 }

@@ -20,7 +20,7 @@ import { AuthFormShell } from './auth-form-shell';
 import { AuthTrustRow } from './auth-trust-row';
 import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
-import { authAlertSx, authFieldSlotProps } from './auth-form-styles';
+import { authAlertSx, authCardFooterSx, authFieldSlotProps } from './auth-form-styles';
 
 const FIELD_ICON_COLOR = '#ffffff';
 
@@ -259,10 +259,13 @@ export function ResetPasswordView() {
   );
 
   return (
-    <AuthFormShell
-      title={t('auth.resetYourPassword')}
-      description={t('auth.resetPasswordDescription')}
-    >
+    <Box sx={{ width: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <AuthFormShell
+        compact
+        progress={100}
+        title={t('auth.resetYourPassword')}
+        description={t('auth.resetPasswordDescription')}
+      >
       {!!errorMessage && (
         <Alert severity="error" sx={{ ...authAlertSx, mb: 2.5 }}>
           {errorMessage}
@@ -273,7 +276,10 @@ export function ResetPasswordView() {
         {renderForm()}
       </Form>
 
-      <AuthTrustRow />
-    </AuthFormShell>
+        <Box sx={authCardFooterSx}>
+          <AuthTrustRow insideCard />
+        </Box>
+      </AuthFormShell>
+    </Box>
   );
 }

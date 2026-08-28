@@ -7,7 +7,11 @@ import { Iconify } from 'src/components/iconify';
 
 const GOLD = '#f5c518';
 
-export function AuthTrustRow() {
+type AuthTrustRowProps = {
+  insideCard?: boolean;
+};
+
+export function AuthTrustRow({ insideCard }: AuthTrustRowProps) {
   const { t } = useTranslate();
 
   const items = [
@@ -21,7 +25,7 @@ export function AuthTrustRow() {
       direction="row"
       justifyContent="center"
       flexWrap="wrap"
-      sx={{ mt: 2.5, gap: { xs: 1.25, sm: 2 } }}
+      sx={{ mt: insideCard ? 0 : 2.5, gap: { xs: 1.25, sm: 2 } }}
     >
       {items.map((item) => (
         <Stack

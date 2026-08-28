@@ -17,6 +17,7 @@ import {
   homeMobileScrollItemSx,
 } from './home-horizontal-scroll';
 import { HOME_GAME_ARTS, PLAY_YOUR_GAME_IMAGE_PATHS } from './home-game-arts';
+import { HomeBlurPanel } from './home-blur-panel';
 
 export { HOME_GAME_ARTS, PLAY_YOUR_GAME_IMAGE_PATHS };
 
@@ -123,11 +124,6 @@ const goldScan = keyframes`
 const borderPulse = keyframes`
   0%, 100% { opacity: 0.35; }
   50% { opacity: 0.85; }
-`;
-
-const titleGlow = keyframes`
-  0%, 100% { text-shadow: 0 0 0 transparent; }
-  50% { text-shadow: 0 0 24px ${alpha(GOLD, 0.35)}; }
 `;
 
 // ----------------------------------------------------------------------
@@ -447,82 +443,97 @@ export function PlayYourGameSection() {
       sx={{
         scrollMarginTop: { xs: '80px', md: '100px' },
         position: 'relative',
-        overflowX: 'hidden',
+        // clip (not hidden) — hidden forces overflow-y → auto and creates a nested page scrollbar
+        overflowX: 'clip',
+        overflowY: 'visible',
         bgcolor: '#0a0a0a',
         py: { xs: 4.5, md: 6 },
         px: { xs: 2, md: 4 },
         '&::before': {
           content: '""',
           position: 'absolute',
+          inset: '-20px',
+          backgroundImage: `url(${HOME_GAME_ARTS[3]})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center top',
+          opacity: 0.22,
+          filter: 'blur(14px) grayscale(0.32) contrast(1.06)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        },
+        '&::after': {
+          content: '""',
+          position: 'absolute',
           inset: 0,
           background: `
-            radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(GOLD, 0.08)} 0%, transparent 55%),
-            radial-gradient(ellipse 40% 30% at 10% 100%, ${alpha('#38bdf8', 0.04)} 0%, transparent 50%)
+            linear-gradient(180deg, ${alpha('#0a0a0a', 0.78)} 0%, ${alpha('#0a0a0a', 0.9)} 48%, #0a0a0a 100%),
+            radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(GOLD, 0.1)} 0%, transparent 55%)
           `,
           pointerEvents: 'none',
+          zIndex: 0,
         },
       }}
     >
-      <Stack
-        spacing={{ xs: 3, md: 4 }}
-        sx={{ position: 'relative', zIndex: 1, maxWidth: 1280, mx: 'auto' }}
-      >
-        <Stack spacing={1.25} alignItems="center">
-          <Typography
-            sx={{
-              fontSize: { xs: 11, md: 12 },
-              fontWeight: 700,
-              letterSpacing: 2.5,
-              color: GOLD,
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('home.playYourGame.brandLabel')}
-          </Typography>
-          <Typography
-            variant="h2"
-            className="font-tr"
-            sx={{
-              fontSize: { xs: 22, sm: 32, md: 40 },
-              fontWeight: 800,
-              textAlign: 'center',
-              textTransform: 'uppercase',
-              letterSpacing: { xs: 1, md: 2 },
-              color: '#ffffff',
-              animation: `${titleGlow} 4s ease-in-out infinite`,
-            }}
-          >
-            {t('home.playYourGame.title')}
-          </Typography>
-          <Typography
-            className="font-tr"
-            sx={{
-              fontSize: { xs: 12, sm: 14 },
-              color: alpha('#ffffff', 0.5),
-              textAlign: 'center',
-              maxWidth: 520,
-              lineHeight: 1.6,
-            }}
-          >
-            {t('home.playYourGame.subtitle')}
-          </Typography>
-          <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
-        </Stack>
+      <Box sx={{ position: 'relative', zIndex: 1, maxWidth: 1280, mx: 'auto' }}>
+        <HomeBlurPanel>
+          <Stack spacing={{ xs: 2.5, md: 3.5 }}>
+            <Stack spacing={1.25} alignItems="center">
+              <Typography
+                sx={{
+                  fontSize: { xs: 11, md: 12 },
+                  fontWeight: 700,
+                  letterSpacing: 2.5,
+                  color: GOLD,
+                  textTransform: 'uppercase',
+                }}
+              >
+                {t('home.playYourGame.brandLabel')}
+              </Typography>
+              <Typography
+                variant="h2"
+                className="font-tr"
+                sx={{
+                  fontSize: { xs: 22, sm: 32, md: 40 },
+                  fontWeight: 800,
+                  textAlign: 'center',
+                  textTransform: 'uppercase',
+                  letterSpacing: { xs: 1, md: 2 },
+                  color: '#ffffff',
+                }}
+              >
+                {t('home.playYourGame.title')}
+              </Typography>
+              <Typography
+                className="font-tr"
+                sx={{
+                  fontSize: { xs: 12, sm: 14 },
+                  color: alpha('#ffffff', 0.5),
+                  textAlign: 'center',
+                  maxWidth: 520,
+                  lineHeight: 1.6,
+                }}
+              >
+                {t('home.playYourGame.subtitle')}
+              </Typography>
+              <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
+            </Stack>
 
-        <Box
-          sx={homeMobileScrollGridSx(
-            {
-              xs: 'repeat(5, minmax(168px, 1fr))',
-              lg: 'repeat(5, minmax(0, 230px))',
-            },
-            { xs: 1.25, md: 2 }
-          )}
-        >
-          {sorted.map((game, index) => (
-            <PlayYourGameCard key={game.key} game={game} index={index} />
-          ))}
-        </Box>
-      </Stack>
+            <Box
+              sx={homeMobileScrollGridSx(
+                {
+                  xs: 'repeat(5, minmax(168px, 1fr))',
+                  lg: 'repeat(5, minmax(0, 230px))',
+                },
+                { xs: 1.25, md: 2 }
+              )}
+            >
+              {sorted.map((game, index) => (
+                <PlayYourGameCard key={game.key} game={game} index={index} />
+              ))}
+            </Box>
+          </Stack>
+        </HomeBlurPanel>
+      </Box>
     </Box>
   );
 }

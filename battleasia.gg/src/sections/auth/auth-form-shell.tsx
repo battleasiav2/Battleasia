@@ -78,21 +78,14 @@ export function AuthFormShell({
                 '& img': { objectFit: 'contain', width: '100%', height: 'auto' },
               }}
             />
-            <Box
-              sx={{
-                height: 2,
-                width: 40,
-                bgcolor: GOLD,
-                boxShadow: `0 0 10px ${alpha(GOLD, 0.4)}`,
-              }}
-            />
+            <Box sx={{ height: 2, width: 40, bgcolor: GOLD }} />
             <Typography
               sx={{
-                fontSize: 9,
+                fontSize: { xs: 10, sm: 11 },
                 fontWeight: 700,
-                letterSpacing: 1.4,
+                letterSpacing: 2.5,
                 textTransform: 'uppercase',
-                color: alpha(GOLD, 0.82),
+                color: alpha(GOLD, 0.88),
                 pt: 0.25,
               }}
             >

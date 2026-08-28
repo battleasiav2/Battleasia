@@ -1,7 +1,7 @@
 
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState } from 'react';
 
-import { Box, Stack, SvgIcon, Accordion, Typography, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Box, Stack, SvgIcon, Collapse, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
 import { CONFIG } from 'src/global-config';
@@ -15,6 +15,7 @@ import { HeroMeshButtons } from 'src/components/mesh-buttons';
 import { HeroStickyCta } from './hero-sticky-cta';
 import { HeroTrustRow } from './hero-trust-row';
 import { HOME_GAME_ARTS } from './home-game-arts';
+import { HOME_ROW_LINE, HomeBlurPanel } from './home-blur-panel';
 import { homeMobileScrollGridSx, homeMobileScrollItemSx } from './home-horizontal-scroll';
 import { HeroRotatingBanner } from './hero-rotating-banner';
 import { HOME_HERO_SLIDES, readHeroSlideIndex } from './hero-slides';
@@ -80,22 +81,96 @@ const heroTopGlow = keyframes`
   50% { opacity: 0.7; }
 `;
 
-const HOME_IMAGE_PATHS = {
-  heroTitleLogo: '/assets/images/hero-title-battleasia.webp',
-} as const;
+type TournamentRuleItemProps = {
+  question: string;
+  answer: string;
+};
 
-const HOME_MODE_ARTS = {
-  solo: '/assets/images/home/modes/mode-solo.webp',
-  duo: '/assets/images/home/modes/mode-duo.webp',
-  squad: '/assets/images/home/modes/mode-squad.webp',
-  tdm: '/assets/images/home/modes/mode-tdm.webp',
-} as const;
+function TournamentRuleItem({ question, answer }: TournamentRuleItemProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Box sx={{ borderBottom: `1px solid ${alpha('#ffffff', 0.1)}` }}>
+      <Box
+        component="button"
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        aria-expanded={open}
+        sx={{
+          width: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 2,
+          py: { xs: 2, md: 2.25 },
+          px: 0,
+          border: 'none',
+          bgcolor: 'transparent',
+          cursor: 'pointer',
+          textAlign: 'left',
+          color: 'inherit',
+        }}
+      >
+        <Typography
+          className="font-tr"
+          sx={{
+            flex: 1,
+            fontSize: { xs: 12, sm: 13, md: 14 },
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: { xs: 0.4, md: 0.6 },
+            color: '#ffffff',
+            lineHeight: 1.35,
+            wordBreak: 'break-word',
+          }}
+        >
+          {question}
+        </Typography>
+
+        <Box
+          aria-hidden
+          sx={{
+            width: { xs: 34, md: 38 },
+            height: { xs: 34, md: 38 },
+            flexShrink: 0,
+            display: 'grid',
+            placeItems: 'center',
+            borderRadius: '50%',
+            border: `1px solid ${alpha(GOLD, 0.65)}`,
+            color: GOLD,
+            transition: 'transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease',
+            transform: open ? 'rotate(45deg)' : 'none',
+            bgcolor: open ? alpha(GOLD, 0.1) : 'transparent',
+            ...(open && { borderColor: GOLD }),
+          }}
+        >
+          <Iconify icon="mingcute:add-line" width={18} />
+        </Box>
+      </Box>
+
+      <Collapse in={open} timeout="auto" unmountOnExit>
+        <Typography
+          className="font-tr"
+          sx={{
+            pb: { xs: 2, md: 2.25 },
+            fontSize: { xs: 12, sm: 13 },
+            color: alpha('#ffffff', 0.58),
+            lineHeight: 1.65,
+          }}
+        >
+          {answer}
+        </Typography>
+      </Collapse>
+    </Box>
+  );
+}
 
 function blackGamingSectionSx(art?: string) {
   return {
     scrollMarginTop: { xs: '80px', md: '100px' },
     position: 'relative' as const,
-    overflowX: 'hidden' as const,
+    overflowX: 'clip' as const,
+    overflowY: 'visible' as const,
     bgcolor: '#0a0a0a',
     py: { xs: 4.5, md: 6 },
     px: { xs: 2, md: 4 },
@@ -139,6 +214,17 @@ function blackGamingSectionSx(art?: string) {
         }),
   };
 }
+
+const HOME_IMAGE_PATHS = {
+  heroTitleLogo: '/assets/images/hero-title-battleasia.webp',
+} as const;
+
+const HOME_MODE_ARTS = {
+  solo: '/assets/images/home/modes/mode-solo.webp',
+  duo: '/assets/images/home/modes/mode-duo.webp',
+  squad: '/assets/images/home/modes/mode-squad.webp',
+  tdm: '/assets/images/home/modes/mode-tdm.webp',
+} as const;
 
 // ----------------------------------------------------------------------
 // Preload active hero slide only (restored index if any) — avoid competing with LCP.
@@ -484,7 +570,7 @@ export function HomeView() {
   ] as const;
 
   const sectionAbout = (
-    <Box id="about-us" sx={{ ...blackGamingSectionSx(HOME_GAME_ARTS[0]), position: 'relative', overflow: 'hidden' }}>
+    <Box id="about-us" sx={{ ...blackGamingSectionSx(HOME_GAME_ARTS[0]), position: 'relative' }}>
       <Stack
         spacing={{ xs: 3, md: 4 }}
         sx={{ position: 'relative', zIndex: 1, maxWidth: 880, mx: 'auto' }}
@@ -511,7 +597,6 @@ export function HomeView() {
               textTransform: 'uppercase',
               letterSpacing: { xs: 1, md: 2 },
               color: '#ffffff',
-              animation: `${titleGlow} 4s ease-in-out infinite`,
             }}
           >
             {t('home.aboutBattleAsia')}
@@ -519,27 +604,19 @@ export function HomeView() {
           <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
         </Stack>
 
-        <Box
-          sx={{
-            position: 'relative',
-            bgcolor: '#161618',
-            border: `1px solid ${alpha('#ffffff', 0.08)}`,
-            p: { xs: 2.25, md: 3 },
-            boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
-            animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) both`,
-            transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.4s ease',
-            '&:hover': {
-              transform: 'translateY(-6px)',
-              borderColor: alpha(GOLD, 0.45),
-              boxShadow: `0 22px 48px ${alpha('#000000', 0.7)}, 0 0 32px ${alpha(GOLD, 0.12)}`,
-            },
-          }}
-        >
-          <Box sx={{ height: 2, width: 48, bgcolor: GOLD, mb: 2, boxShadow: `0 0 12px ${alpha(GOLD, 0.45)}` }} />
-
-          <Stack spacing={1.75}>
-            {ABOUT_BULLETS.map((b) => (
-              <Stack key={b.key} direction="row" spacing={1.25} alignItems="flex-start">
+        <HomeBlurPanel>
+          <Stack spacing={0}>
+            {ABOUT_BULLETS.map((b, idx) => (
+              <Stack
+                key={b.key}
+                direction="row"
+                spacing={1.25}
+                alignItems="flex-start"
+                sx={{
+                  py: { xs: 1.15, sm: 1.35 },
+                  borderBottom: idx < ABOUT_BULLETS.length - 1 ? HOME_ROW_LINE : 'none',
+                }}
+              >
                 <Iconify icon={b.icon} width={20} sx={{ color: GOLD, mt: 0.25, flexShrink: 0 }} />
                 <Typography
                   className="font-tr"
@@ -551,21 +628,7 @@ export function HomeView() {
             ))}
           </Stack>
 
-          {/* Testimonial card */}
-          <Box
-            sx={{
-              mt: 2.75,
-              p: { xs: 1.75, md: 2.25 },
-              borderRadius: 1,
-              bgcolor: alpha('#000000', 0.35),
-              border: `1px solid ${alpha(GOLD, 0.22)}`,
-              backgroundImage: `
-                linear-gradient(135deg, ${alpha(GOLD, 0.06)} 0%, transparent 55%),
-                linear-gradient(180deg, ${alpha('#ffffff', 0.03)} 0%, transparent 100%)
-              `,
-              boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.05)}`,
-            }}
-          >
+          <Box sx={{ borderTop: HOME_ROW_LINE, mt: 0.5, pt: { xs: 1.5, md: 1.75 } }}>
             <Typography
               sx={{
                 fontSize: { xs: 13, md: 14.5 },
@@ -584,7 +647,7 @@ export function HomeView() {
               </Typography>
             </Stack>
           </Box>
-        </Box>
+        </HomeBlurPanel>
       </Stack>
     </Box>
   );
@@ -654,61 +717,59 @@ export function HomeView() {
 
   const sectionHowToPlay = (
     <Box id="how-to-play" sx={blackGamingSectionSx(HOME_GAME_ARTS[2])}>
-      <Stack
-        spacing={{ xs: 3, md: 4 }}
-        sx={{ position: 'relative', zIndex: 1, maxWidth: 1280, mx: 'auto' }}
-      >
-        <Stack spacing={1.25} alignItems="center">
-          <Typography
-            sx={{
-              fontSize: { xs: 11, md: 12 },
-              fontWeight: 700,
-              letterSpacing: 2.5,
-              color: GOLD,
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('home.playYourGame.brandLabel')}
-          </Typography>
-          <Typography
-            variant="h2"
-            className="font-tr"
-            sx={{
-              fontSize: { xs: 22, sm: 32, md: 40 },
-              fontWeight: 800,
-              textAlign: 'center',
-              textTransform: 'uppercase',
-              letterSpacing: { xs: 1, md: 2 },
-              color: '#ffffff',
-              animation: `${titleGlow} 4s ease-in-out infinite`,
-            }}
-          >
-            {t('home.howToPlay')}
-          </Typography>
-          <Typography
-            className="font-tr"
-            sx={{
-              fontSize: { xs: 12, sm: 14 },
-              color: alpha('#ffffff', 0.5),
-              textAlign: 'center',
-              maxWidth: 520,
-              lineHeight: 1.6,
-            }}
-          >
-            {t('home.howToPlaySubtitle')}
-          </Typography>
-          <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
-        </Stack>
+      <Box sx={{ position: 'relative', zIndex: 1, maxWidth: 1280, mx: 'auto' }}>
+        <HomeBlurPanel>
+          <Stack spacing={{ xs: 2.5, md: 3.5 }}>
+            <Stack spacing={1.25} alignItems="center">
+              <Typography
+                sx={{
+                  fontSize: { xs: 11, md: 12 },
+                  fontWeight: 700,
+                  letterSpacing: 2.5,
+                  color: GOLD,
+                  textTransform: 'uppercase',
+                }}
+              >
+                {t('home.playYourGame.brandLabel')}
+              </Typography>
+              <Typography
+                variant="h2"
+                className="font-tr"
+                sx={{
+                  fontSize: { xs: 22, sm: 32, md: 40 },
+                  fontWeight: 800,
+                  textAlign: 'center',
+                  textTransform: 'uppercase',
+                  letterSpacing: { xs: 1, md: 2 },
+                  color: '#ffffff',
+                }}
+              >
+                {t('home.howToPlay')}
+              </Typography>
+              <Typography
+                className="font-tr"
+                sx={{
+                  fontSize: { xs: 12, sm: 14 },
+                  color: alpha('#ffffff', 0.5),
+                  textAlign: 'center',
+                  maxWidth: 520,
+                  lineHeight: 1.6,
+                }}
+              >
+                {t('home.howToPlaySubtitle')}
+              </Typography>
+              <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
+            </Stack>
 
-        <Box
-          sx={homeMobileScrollGridSx(
-            {
-              xs: 'repeat(4, minmax(280px, 1fr))',
-              lg: 'repeat(4, minmax(0, 1fr))',
-            },
-            { xs: 1.5, md: 2.5 }
-          )}
-        >
+            <Box
+              sx={homeMobileScrollGridSx(
+                {
+                  xs: 'repeat(4, minmax(280px, 1fr))',
+                  lg: 'repeat(4, minmax(0, 1fr))',
+                },
+                { xs: 1.5, md: 2.5 }
+              )}
+            >
           {gameModes.map((mode, index) => (
             <Box
               key={mode.title}
@@ -930,39 +991,41 @@ export function HomeView() {
               </Stack>
             </Box>
           ))}
-        </Box>
+            </Box>
 
-        <Stack alignItems="center" sx={{ pt: { xs: 1, md: 2 } }}>
-          <Box
-            component="a"
-            href="/play"
-            sx={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 1,
-              px: 4,
-              minHeight: 44,
-              bgcolor: alpha(GOLD, 0.1),
-              border: `1px solid ${alpha(GOLD, 0.35)}`,
-              color: GOLD,
-              fontSize: 13,
-              fontWeight: 800,
-              letterSpacing: 1.2,
-              textTransform: 'uppercase',
-              textDecoration: 'none',
-              transition: 'background 0.2s, border-color 0.2s, box-shadow 0.2s',
-              '&:hover': {
-                bgcolor: alpha(GOLD, 0.18),
-                borderColor: alpha(GOLD, 0.55),
-                boxShadow: `0 0 20px ${alpha(GOLD, 0.15)}`,
-              },
-            }}
-          >
-            {t('home.startPlaying')}
-            <Iconify icon="solar:arrow-right-bold" width={16} />
-          </Box>
-        </Stack>
-      </Stack>
+            <Stack alignItems="center">
+              <Box
+                component="a"
+                href="/play"
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  px: 4,
+                  minHeight: 44,
+                  bgcolor: alpha(GOLD, 0.1),
+                  border: `1px solid ${alpha(GOLD, 0.35)}`,
+                  color: GOLD,
+                  fontSize: 13,
+                  fontWeight: 800,
+                  letterSpacing: 1.2,
+                  textTransform: 'uppercase',
+                  textDecoration: 'none',
+                  transition: 'background 0.2s, border-color 0.2s, box-shadow 0.2s',
+                  '&:hover': {
+                    bgcolor: alpha(GOLD, 0.18),
+                    borderColor: alpha(GOLD, 0.55),
+                    boxShadow: `0 0 20px ${alpha(GOLD, 0.15)}`,
+                  },
+                }}
+              >
+                {t('home.startPlaying')}
+                <Iconify icon="solar:arrow-right-bold" width={16} />
+              </Box>
+            </Stack>
+          </Stack>
+        </HomeBlurPanel>
+      </Box>
     </Box>
   );
 
@@ -970,7 +1033,7 @@ export function HomeView() {
     <Box id="rules" sx={blackGamingSectionSx(HOME_GAME_ARTS[4])}>
       <Stack
         spacing={{ xs: 3, md: 4 }}
-        sx={{ position: 'relative', zIndex: 1, maxWidth: 900, mx: 'auto' }}
+        sx={{ position: 'relative', zIndex: 1, maxWidth: 1100, mx: 'auto', width: 1 }}
       >
         <Stack spacing={1.25} alignItems="center">
           <Typography
@@ -1014,96 +1077,18 @@ export function HomeView() {
           <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
         </Stack>
 
-        <Stack spacing={1.25}>
-          {FAQ.map((faq, index) => (
-            <Accordion
-              key={faq.question}
-              disableGutters
-              elevation={0}
-              sx={{
-                bgcolor: '#161618',
-                border: `1px solid ${alpha('#ffffff', 0.08)}`,
-                borderRadius: '0 !important',
-                overflow: 'hidden',
-                boxShadow: `0 8px 24px ${alpha('#000000', 0.4)}`,
-                animation: `${cardReveal} 0.55s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.07}s both`,
-                transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
-                '&:before': { display: 'none' },
-                '&.Mui-expanded': {
-                  margin: 0,
-                  borderColor: alpha(GOLD, 0.35),
-                  boxShadow: `0 12px 32px ${alpha('#000000', 0.55)}, 0 0 20px ${alpha(GOLD, 0.08)}`,
-                },
-                '&:hover': {
-                  borderColor: alpha(GOLD, 0.28),
-                },
-              }}
-            >
-              <AccordionSummary
-                expandIcon={
-                  <Iconify icon="solar:alt-arrow-down-bold" width={20} sx={{ color: GOLD }} />
-                }
-                sx={{
-                  py: { xs: 0.5, sm: 0.75 },
-                  px: { xs: 1.5, sm: 2.25 },
-                  minHeight: 52,
-                  bgcolor: 'transparent',
-                  '& .MuiAccordionSummary-content': { margin: '12px 0' },
-                  '&.Mui-expanded': { bgcolor: 'transparent' },
-                }}
-              >
-                <Stack direction="row" spacing={1.25} alignItems="center">
-                  <Typography
-                    sx={{
-                      fontSize: 11,
-                      fontWeight: 900,
-                      color: GOLD,
-                      minWidth: 22,
-                      textAlign: 'center',
-                      opacity: 0.7,
-                    }}
-                  >
-                    {String(index + 1).padStart(2, '0')}
-                  </Typography>
-                  <Typography
-                    className="font-tr"
-                    sx={{
-                      fontSize: { xs: 13, sm: 15, md: 16 },
-                      fontWeight: 700,
-                      color: '#ffffff',
-                      wordBreak: 'break-word',
-                      lineHeight: 1.35,
-                      letterSpacing: 0.2,
-                    }}
-                  >
-                    {faq.question}
-                  </Typography>
-                </Stack>
-              </AccordionSummary>
-              <AccordionDetails
-                sx={{
-                  pb: 2.25,
-                  px: { xs: 1.5, sm: 2.25 },
-                  pt: 0,
-                  bgcolor: 'transparent',
-                  borderTop: `1px solid ${alpha(GOLD, 0.15)}`,
-                }}
-              >
-                <Typography
-                  className="font-tr"
-                  sx={{
-                    fontSize: { xs: 12, sm: 13, md: 14 },
-                    color: alpha('#ffffff', 0.55),
-                    lineHeight: 1.7,
-                    pt: 1.5,
-                  }}
-                >
-                  {faq.answer}
-                </Typography>
-              </AccordionDetails>
-            </Accordion>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+            columnGap: { md: 6, lg: 8 },
+            alignItems: 'start',
+          }}
+        >
+          {FAQ.map((faq) => (
+            <TournamentRuleItem key={faq.question} question={faq.question} answer={faq.answer} />
           ))}
-        </Stack>
+        </Box>
 
         <Stack direction="row" justifyContent="center" spacing={1} alignItems="center" sx={{ pt: 1 }}>
           <Iconify icon="solar:chat-round-dots-bold" width={16} sx={{ color: alpha('#ffffff', 0.4) }} />

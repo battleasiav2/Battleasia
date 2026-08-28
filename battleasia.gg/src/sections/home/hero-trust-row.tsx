@@ -7,9 +7,9 @@ import { useTranslate } from 'src/locales/use-locales';
 const GOLD = '#f5c518';
 
 const TRUST_ITEMS = [
-  { key: 'auth.featureSecure', icon: 'solar:shield-check-bold' },
-  { key: 'auth.featureFairPlay', icon: 'solar:cup-star-bold' },
-  { key: 'auth.featureCashPrizes', icon: 'solar:wallet-money-bold' },
+  { key: 'auth.featureSecure', icon: 'solar:shield-check-bold-duotone' },
+  { key: 'auth.featureFairPlay', icon: 'solar:cup-star-bold-duotone' },
+  { key: 'auth.featureCashPrizes', icon: 'solar:wallet-money-bold-duotone' },
 ] as const;
 
 type HeroTrustRowProps = {
@@ -43,10 +43,9 @@ export function HeroTrustRow({ align = 'center' }: HeroTrustRowProps) {
           <Iconify icon={item.icon} width={14} sx={{ color: GOLD, flexShrink: 0 }} />
           <Typography
             sx={{
-              fontSize: { xs: 10, sm: 10.5 },
-              fontWeight: 700,
-              letterSpacing: 0.3,
-              color: alpha('#ffffff', 0.72),
+              fontSize: 12,
+              fontWeight: 500,
+              color: alpha('#ffffff', 0.5),
               whiteSpace: 'nowrap',
             }}
           >

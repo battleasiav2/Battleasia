@@ -415,32 +415,31 @@ class _AccountDrawerContent extends StatelessWidget {
   }
 
   Widget _buildExpandableAccountMenu(BuildContext context) {
-    return Theme(
-      data: Theme.of(context).copyWith(
-        dividerColor: Colors.transparent,
-        splashColor: AppColors.gold.withValues(alpha: 0.08),
-        highlightColor: AppColors.gold.withValues(alpha: 0.05),
-      ),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceElevated.withValues(alpha: 0.85),
-          borderRadius: BorderRadius.circular(2),
-          border: Border.all(color: AppColors.border(0.12)),
+    return AccountMenuTile.shell(
+      child: Theme(
+        data: Theme.of(context).copyWith(
+          dividerColor: Colors.transparent,
+          splashColor: AppColors.gold.withValues(alpha: 0.08),
+          highlightColor: AppColors.gold.withValues(alpha: 0.05),
         ),
         child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          childrenPadding: const EdgeInsets.fromLTRB(8, 0, 8, 12),
-          leading: const Icon(Icons.person, color: AppColors.goldAccent, size: 22),
+          tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+          childrenPadding: const EdgeInsets.fromLTRB(4, 0, 8, 10),
+          leading: Icon(
+            Icons.person,
+            color: Colors.white.withValues(alpha: 0.88),
+            size: 22,
+          ),
           title: Text(
             'account.menuAccount'.tr(),
             style: AppTheme.bodyMedium.copyWith(
               color: AppColors.textPrimary,
               fontWeight: FontWeight.w600,
+              fontSize: 15,
             ),
           ),
-          iconColor: AppColors.textMuted,
-          collapsedIconColor: AppColors.textMuted,
+          iconColor: Colors.white.withValues(alpha: 0.42),
+          collapsedIconColor: Colors.white.withValues(alpha: 0.42),
           children: [
             AccountMenuTile(
               icon: Icons.person_outline,

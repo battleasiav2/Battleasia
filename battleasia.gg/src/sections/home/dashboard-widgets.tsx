@@ -1,11 +1,10 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import {
     Box,
-    Chip,
+    Grid,
     Alert,
     Stack,
     Avatar,
-    Divider,
     Skeleton,
     Container,
     Typography,
@@ -20,16 +19,9 @@ import { fNumber, fShortenNumber } from 'src/utils/format-number';
 import { getAvatarUrl } from 'src/utils/get-image-url';
 import { useTranslate } from 'src/locales/use-locales';
 import CoinValue from 'src/components/coin-value';
-import {
-    PulseCard,
-    DEFAULT_GLASS_CARD_VARIANT,
-    GlassPanelCard,
-    GlassInnerTile,
-    getDefaultGlassTokens,
-    getGlassBadgeChipSx,
-    getGlassInnerSx,
-    GLASS_CARD_RADIUS_SM,
-} from 'src/components/battle-glass-card';
+import { Iconify } from 'src/components/iconify';
+import type { PulseCardLabels, PulseCardStats } from 'src/components/battle-glass-card';
+import { getDefaultGlassTokens } from 'src/components/battle-glass-card';
 import { socketService } from 'src/lib/socket';
 import { HOME_GAME_ARTS } from './play-your-game-section';
 import {
@@ -42,6 +34,7 @@ import {
     formatPulseLastUpdated,
     sanitizePublicDashboardData,
 } from './pulse-dashboard-utils';
+import { HOME_GOLD, HOME_ROW_LINE, HomeBlurPanel } from './home-blur-panel';
 import type {
     DashboardTopPlayer,
     PublicDashboardStats,
@@ -53,6 +46,285 @@ type SectionState = {
     data: PublicDashboardStats | null;
     error?: string;
 };
+
+/** Simple gaming split — one gold beam, fade ends, soft glow */
+function DashboardSplitGoldRule({ orientation }: { orientation: 'vertical' | 'horizontal' }) {
+    const isVertical = orientation === 'vertical';
+
+    return (
+        <Box
+            aria-hidden
+            sx={{
+                display: isVertical ? { xs: 'none', md: 'block' } : { xs: 'block', md: 'none' },
+                alignSelf: 'stretch',
+                flexShrink: 0,
+                mx: isVertical ? { md: 2.5, lg: 3.5 } : 'auto',
+                my: isVertical ? 0 : 2.5,
+                width: isVertical ? 2 : 1,
+                maxWidth: isVertical ? 2 : 220,
+                minHeight: isVertical ? 140 : 2,
+                background: isVertical
+                    ? `linear-gradient(180deg,
+                        transparent 0%,
+                        ${alpha(HOME_GOLD, 0.2)} 10%,
+                        ${HOME_GOLD} 50%,
+                        ${alpha(HOME_GOLD, 0.2)} 90%,
+                        transparent 100%)`
+                    : `linear-gradient(90deg,
+                        transparent 0%,
+                        ${alpha(HOME_GOLD, 0.2)} 10%,
+                        ${HOME_GOLD} 50%,
+                        ${alpha(HOME_GOLD, 0.2)} 90%,
+                        transparent 100%)`,
+                boxShadow: `0 0 12px ${alpha(HOME_GOLD, 0.22)}`,
+                clipPath: isVertical
+                    ? 'polygon(0 0, 100% 3%, 100% 97%, 0 100%)'
+                    : 'polygon(0 0, 97% 0, 100% 100%, 3% 100%)',
+            }}
+        />
+    );
+}
+
+function FlatPulseStat({
+    label,
+    value,
+    suffix,
+    icon,
+    loading,
+}: {
+    label: string;
+    value: React.ReactNode;
+    suffix?: string;
+    icon: string;
+    loading?: boolean;
+}) {
+    const tokens = getDefaultGlassTokens();
+
+    return (
+        <Box
+            sx={{
+                p: { xs: 1.25, sm: 1.5 },
+                minHeight: { xs: 90, sm: 100 },
+                height: '100%',
+                borderTop: `2px solid ${HOME_GOLD}`,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+            }}
+        >
+            {loading ? (
+                <Stack direction="row" spacing={1.25} alignItems="center">
+                    <Skeleton variant="circular" width={36} height={36} />
+                    <Stack spacing={0.75} sx={{ flex: 1 }}>
+                        <Skeleton width="55%" />
+                        <Skeleton width="40%" />
+                    </Stack>
+                </Stack>
+            ) : (
+                <Stack direction="row" spacing={1.1} alignItems="center">
+                    <Box
+                        sx={{
+                            width: { xs: 36, sm: 40 },
+                            height: { xs: 36, sm: 40 },
+                            flexShrink: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: HOME_GOLD,
+                        }}
+                    >
+                        <Iconify icon={icon} width={20} />
+                    </Box>
+                    <Stack spacing={0.35} sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography
+                            variant="overline"
+                            sx={{
+                                letterSpacing: 0.7,
+                                color: tokens.stat.labelColor,
+                                fontSize: { xs: '0.55rem', sm: '0.64rem' },
+                                lineHeight: 1.25,
+                                fontWeight: 700,
+                                textTransform: 'uppercase',
+                                wordBreak: 'break-word',
+                            }}
+                        >
+                            {label}
+                        </Typography>
+                        <Typography
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                flexWrap: 'nowrap',
+                                gap: 0.5,
+                                minWidth: 0,
+                                color: tokens.stat.valueColor,
+                                fontSize: {
+                                    xs: 'clamp(0.92rem, 3.6vw, 1.15rem)',
+                                    sm: '1.28rem',
+                                    md: '1.42rem',
+                                },
+                                fontWeight: 800,
+                                lineHeight: 1.1,
+                                '& > *': {
+                                    minWidth: 0,
+                                    maxWidth: '100%',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap',
+                                },
+                            }}
+                        >
+                            {value}
+                            {suffix ? (
+                                <Typography
+                                    component="span"
+                                    sx={{
+                                        color: tokens.stat.suffixColor,
+                                        fontSize: { xs: '0.62rem', sm: '0.72rem' },
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    {suffix}
+                                </Typography>
+                            ) : null}
+                        </Typography>
+                    </Stack>
+                </Stack>
+            )}
+        </Box>
+    );
+}
+
+function PulseHeroFlat({
+    badgeLabel,
+    title,
+    description,
+    liveSuffix,
+    labels,
+    stats,
+    loading,
+    lastUpdatedLabel,
+}: {
+    badgeLabel: string;
+    title: string;
+    description: string;
+    liveSuffix: string;
+    labels: PulseCardLabels;
+    stats: PulseCardStats;
+    loading?: boolean;
+    lastUpdatedLabel?: string;
+}) {
+    const tokens = getDefaultGlassTokens();
+
+    const statTiles = [
+        {
+            key: 'winnings',
+            label: labels.platformTotalWinnings,
+            value: stats.totalWinnings,
+            suffix: undefined,
+            icon: 'solar:wallet-money-bold',
+        },
+        {
+            key: 'matches',
+            label: labels.processedMatches,
+            value: stats.processedMatches,
+            suffix: undefined,
+            icon: 'solar:medal-ribbon-star-bold',
+        },
+        {
+            key: 'live',
+            label: labels.ongoingMatches,
+            value: stats.ongoingMatches,
+            suffix: liveSuffix,
+            icon: 'solar:play-bold',
+        },
+        {
+            key: 'joined',
+            label: labels.todayJoinedUsers,
+            value: stats.todayJoinedUsers,
+            suffix: undefined,
+            icon: 'solar:user-plus-rounded-bold',
+        },
+    ] as const;
+
+    return (
+        <HomeBlurPanel>
+            <Grid container spacing={{ xs: 2.5, md: 3.5 }} alignItems="center">
+                <Grid item xs={12} md={5}>
+                    <Stack spacing={1.25}>
+                        <Typography
+                            sx={{
+                                alignSelf: 'flex-start',
+                                fontSize: { xs: '0.68rem', sm: '0.76rem' },
+                                fontWeight: 700,
+                                letterSpacing: 0.75,
+                                textTransform: 'uppercase',
+                                color: alpha(HOME_GOLD, 0.88),
+                            }}
+                        >
+                            {badgeLabel}
+                        </Typography>
+                        <Typography
+                            variant="h3"
+                            sx={{
+                                color: tokens.titleColor,
+                                fontSize: { xs: '1.45rem', sm: '1.75rem', md: '2.1rem' },
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                                letterSpacing: { xs: 0.6, md: 1.1 },
+                                wordBreak: 'break-word',
+                                lineHeight: 1.1,
+                            }}
+                        >
+                            {title}
+                        </Typography>
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: tokens.subtitleColor,
+                                fontSize: { xs: '0.8rem', sm: '0.9rem' },
+                                lineHeight: 1.55,
+                                maxWidth: 480,
+                            }}
+                        >
+                            {description}
+                        </Typography>
+                        {lastUpdatedLabel ? (
+                            <Typography
+                                variant="caption"
+                                sx={{
+                                    color: alpha('#ffffff', 0.52),
+                                    fontWeight: 600,
+                                    letterSpacing: 0.3,
+                                }}
+                            >
+                                {lastUpdatedLabel}
+                            </Typography>
+                        ) : null}
+                    </Stack>
+                </Grid>
+
+                <Grid item xs={12} md={7}>
+                    <Grid container spacing={1.25}>
+                        {statTiles.map((tile) => (
+                            <Grid key={tile.key} item xs={6} sx={{ display: 'flex' }}>
+                                <Box sx={{ width: 1 }}>
+                                    <FlatPulseStat
+                                        label={tile.label}
+                                        value={tile.value}
+                                        suffix={tile.suffix}
+                                        icon={tile.icon}
+                                        loading={loading}
+                                    />
+                                </Box>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </Grid>
+            </Grid>
+        </HomeBlurPanel>
+    );
+}
 
 const formatDateTime = (value?: string | null) => {
     if (!value) return 'TBD';
@@ -92,21 +364,63 @@ const PlayerListCard = ({
     const tokens = getDefaultGlassTokens();
 
     return (
-    <GlassPanelCard>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1, flexWrap: 'wrap', gap: 0.5 }}>
-            <Stack spacing={0.25} sx={{ minWidth: 0, flex: 1 }}>
-                <Typography variant="h6" sx={{ color: tokens.titleColor, fontSize: { xs: '0.95rem', sm: '1.25rem' }, fontWeight: 800, wordBreak: 'break-word' }}>{title}</Typography>
-                <Typography variant="caption" sx={{ color: tokens.subtitleColor, fontSize: { xs: '0.65rem', sm: '0.75rem' } }}>
+    <HomeBlurPanel>
+        <Stack
+            direction="row"
+            alignItems="flex-start"
+            justifyContent="space-between"
+            sx={{ mb: 1.25, flexWrap: 'wrap', gap: 0.75 }}
+        >
+            <Stack spacing={0.35} sx={{ minWidth: 0, flex: 1 }}>
+                <Typography
+                    variant="h6"
+                    sx={{
+                        color: tokens.titleColor,
+                        fontSize: { xs: '1rem', sm: '1.15rem' },
+                        fontWeight: 800,
+                        wordBreak: 'break-word',
+                    }}
+                >
+                    {title}
+                </Typography>
+                <Typography
+                    variant="caption"
+                    sx={{
+                        color: tokens.subtitleColor,
+                        fontSize: { xs: '0.68rem', sm: '0.78rem' },
+                        lineHeight: 1.45,
+                    }}
+                >
                     {hint}
                 </Typography>
             </Stack>
-            <Chip size="small" label={translations.live} sx={{ flexShrink: 0, ...getGlassBadgeChipSx(tokens) }} />
+            <Typography
+                sx={{
+                    flexShrink: 0,
+                    fontSize: { xs: '0.58rem', sm: '0.64rem' },
+                    fontWeight: 700,
+                    letterSpacing: 0.75,
+                    textTransform: 'uppercase',
+                    color: alpha(HOME_GOLD, 0.82),
+                }}
+            >
+                {translations.live}
+            </Typography>
         </Stack>
-        <Divider sx={{ mb: 2, borderColor: alpha('#ffffff', 0.1) }} />
+        <Box sx={{ borderTop: HOME_ROW_LINE }}>
         {loading ? (
-            <Stack spacing={1.5}>
+            <Stack spacing={0}>
                 {Array.from({ length: 4 }).map((_, idx) => (
-                    <Stack key={idx} direction="row" spacing={1.5} alignItems="center">
+                    <Stack
+                        key={idx}
+                        direction="row"
+                        spacing={1.5}
+                        alignItems="center"
+                        sx={{
+                            py: 1.25,
+                            borderBottom: idx < 3 ? HOME_ROW_LINE : 'none',
+                        }}
+                    >
                         <Skeleton variant="circular" width={40} height={40} />
                         <Stack sx={{ flex: 1 }}>
                             <Skeleton width="60%" />
@@ -117,9 +431,9 @@ const PlayerListCard = ({
                 ))}
             </Stack>
         ) : (
-            <Stack spacing={1.5}>
+            <Stack spacing={0}>
                 {players.length === 0 ? (
-                    <Typography variant="body2" sx={{ color: tokens.subtitleColor }}>
+                    <Typography variant="body2" sx={{ color: tokens.subtitleColor, py: 2 }}>
                         {translations.noDataYet}
                     </Typography>
                 ) : (
@@ -143,35 +457,69 @@ const PlayerListCard = ({
                                 direction="row"
                                 spacing={{ xs: 1, sm: 1.5 }}
                                 alignItems="center"
-                                sx={getGlassInnerSx(tokens, {
-                                    p: { xs: 0.75, sm: 1 },
-                                    borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
-                                })}
+                                sx={{
+                                    py: { xs: 1.15, sm: 1.3 },
+                                    borderBottom: idx < players.length - 1 ? HOME_ROW_LINE : 'none',
+                                }}
                             >
                                 <Avatar
                                     src={getAvatarUrl(player.avatar)}
                                     alt={player.username}
                                     sx={{
-                                        width: { xs: 32, sm: 42 },
-                                        height: { xs: 32, sm: 42 },
-                                        bgcolor: alpha('#0ea5e9', 0.2),
+                                        width: { xs: 36, sm: 42 },
+                                        height: { xs: 36, sm: 42 },
+                                        bgcolor: alpha('#0ea5e9', 0.16),
                                         color: '#e2e8f0',
                                         fontWeight: 700,
-                                        fontSize: { xs: '0.75rem', sm: '1rem' },
+                                        fontSize: { xs: '0.75rem', sm: '0.95rem' },
                                         flexShrink: 0,
                                     }}
                                 >
                                     {player.username?.[0]?.toUpperCase() || '?'}
                                 </Avatar>
                                 <Stack sx={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                                    <Typography variant="subtitle2" noWrap sx={{ color: '#ffffff', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>{player.username}</Typography>
-                                    <Typography variant="caption" noWrap sx={{ color: tokens.subtitleColor, fontSize: { xs: '0.6rem', sm: '0.75rem' } }}>
+                                    <Typography
+                                        variant="subtitle2"
+                                        noWrap
+                                        sx={{
+                                            color: '#ffffff',
+                                            fontSize: { xs: '0.78rem', sm: '0.875rem' },
+                                            fontWeight: 700,
+                                        }}
+                                    >
+                                        {player.username}
+                                    </Typography>
+                                    <Typography
+                                        variant="caption"
+                                        noWrap
+                                        sx={{
+                                            color: tokens.subtitleColor,
+                                            fontSize: { xs: '0.62rem', sm: '0.72rem' },
+                                        }}
+                                    >
                                         {translations.lastPlayed}: {formatDateTime(player.lastPlayed)}
                                     </Typography>
                                 </Stack>
-                                <Stack spacing={0.25} sx={{ textAlign: 'right', flexShrink: 0 }}>
-                                    <Typography variant="subtitle2" sx={{ color: '#ffffff', fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>{metricValue}</Typography>
-                                    <Typography variant="caption" noWrap sx={{ color: tokens.stat.labelColor, fontSize: { xs: '0.6rem', sm: '0.75rem' } }}>
+                                <Stack spacing={0.2} sx={{ textAlign: 'right', flexShrink: 0 }}>
+                                    <Typography
+                                        variant="subtitle2"
+                                        sx={{
+                                            color: '#ffffff',
+                                            fontSize: { xs: '0.78rem', sm: '0.875rem' },
+                                            fontWeight: 700,
+                                            fontVariantNumeric: 'tabular-nums',
+                                        }}
+                                    >
+                                        {metricValue}
+                                    </Typography>
+                                    <Typography
+                                        variant="caption"
+                                        noWrap
+                                        sx={{
+                                            color: tokens.stat.labelColor,
+                                            fontSize: { xs: '0.58rem', sm: '0.68rem' },
+                                        }}
+                                    >
                                         {metricKey === 'totalWinnings'
                                             ? translations.winnings
                                             : metricKey === 'winRate'
@@ -187,7 +535,8 @@ const PlayerListCard = ({
                 )}
             </Stack>
         )}
-    </GlassPanelCard>
+        </Box>
+    </HomeBlurPanel>
     );
 };
 
@@ -280,14 +629,14 @@ function DashboardMatchTile({
     index,
     total,
     variant,
-    glassTokens,
+    isLast,
     platformTotalWinnings,
 }: {
     match: DashboardMatchSummary;
     index: number;
     total: number;
     variant: 'prize' | 'ongoing';
-    glassTokens: GlassTokens;
+    isLast?: boolean;
     platformTotalWinnings?: number;
 }) {
     const { t } = useTranslate();
@@ -295,11 +644,11 @@ function DashboardMatchTile({
         variant === 'prize'
             ? Math.min(
                   100,
-                  (match.prizeEstimate || 0) / Math.max(1, (platformTotalWinnings || 1) / 3) * 100
+                  ((match.prizeEstimate || 0) / Math.max(1, (platformTotalWinnings || 1) / 3)) * 100
               )
             : Math.min(
                   100,
-                  (match.participantsCount || 0) / Math.max(1, match.totalPlayer || 1) * 100
+                  ((match.participantsCount || 0) / Math.max(1, match.totalPlayer || 1)) * 100
               );
 
     const progressCaption =
@@ -312,116 +661,123 @@ function DashboardMatchTile({
         );
 
     return (
-        <GlassInnerTile
+        <Box
             sx={{
-                // Slightly tighter tile padding to match the smaller panel size.
-                p: { xs: 1.05, sm: 1.35 },
+                py: { xs: 1.1, sm: 1.25 },
+                borderBottom: isLast ? 'none' : HOME_ROW_LINE,
             }}
         >
-            <Stack direction="row" alignItems="center" spacing={{ xs: 0.5, sm: 1 }} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
-                <Chip
-                    size="small"
-                    label={match.gameName || 'Match'}
-                    sx={{ ...getGlassBadgeChipSx(glassTokens), fontSize: { xs: '0.65rem', sm: '0.75rem' } }}
-                />
+            <Stack direction="row" alignItems="center" spacing={0.75} sx={{ minWidth: 0 }}>
                 <Typography
-                    variant="subtitle2"
+                    noWrap
+                    sx={{
+                        flexShrink: 0,
+                        maxWidth: { xs: 72, sm: 84 },
+                        fontSize: { xs: '0.58rem', sm: '0.62rem' },
+                        fontWeight: 700,
+                        letterSpacing: 0.4,
+                        textTransform: 'uppercase',
+                        color: alpha(HOME_GOLD, 0.85),
+                    }}
+                >
+                    {match.gameName || 'Match'}
+                </Typography>
+                <Typography
+                    noWrap
                     sx={{
                         color: '#ffffff',
                         flex: 1,
                         minWidth: 0,
-                        fontSize: { xs: '0.8rem', sm: '0.875rem' },
+                        fontSize: { xs: '0.74rem', sm: '0.82rem' },
                         fontWeight: 700,
-                        lineHeight: 1.35,
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden',
+                        lineHeight: 1.25,
                     }}
                 >
                     {match.matchName}
                 </Typography>
-                <Chip
-                    size="small"
-                    label={`#${index + 1}/${total}`}
+                <Typography
                     sx={{
                         flexShrink: 0,
-                        ...getGlassBadgeChipSx(glassTokens),
-                        fontSize: { xs: '0.65rem', sm: '0.75rem' },
-                        height: { xs: 20, sm: 24 },
+                        fontSize: { xs: '0.58rem', sm: '0.62rem' },
+                        fontWeight: 700,
+                        color: alpha('#ffffff', 0.42),
+                        fontVariantNumeric: 'tabular-nums',
                     }}
-                />
+                >
+                    #{index + 1}/{total}
+                </Typography>
             </Stack>
-            <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1.15 }}>
+
+            <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mt: 0.55, minWidth: 0 }}>
                 <LinearProgress
                     variant="determinate"
                     value={progressValue}
                     sx={{
                         flex: 1,
-                        height: 8,
-                        borderRadius: 1,
-                        bgcolor: alpha('#ffffff', 0.12),
+                        height: 4,
+                        borderRadius: 0.5,
+                        bgcolor: alpha('#ffffff', 0.08),
                         '& .MuiLinearProgress-bar': {
-                            bgcolor: '#f5c518',
-                            borderRadius: 1,
-                            boxShadow: `0 0 8px ${alpha('#f5c518', 0.45)}`,
+                            bgcolor: HOME_GOLD,
+                            borderRadius: 0.5,
                         },
                     }}
                 />
                 <Typography
-                    variant="caption"
                     sx={{
                         flexShrink: 0,
-                        minWidth: { xs: 44, sm: 56 },
+                        minWidth: { xs: 36, sm: 44 },
                         textAlign: 'right',
-                        fontSize: { xs: '0.7rem', sm: '0.78rem' },
+                        fontSize: { xs: '0.62rem', sm: '0.68rem' },
                         fontWeight: 700,
-                        color: '#ffffff',
+                        color: alpha('#ffffff', 0.82),
                         fontVariantNumeric: 'tabular-nums',
+                        lineHeight: 1.2,
                     }}
                 >
                     {progressCaption}
                 </Typography>
             </Stack>
 
-            {/* Meta row — clear 2-column / space-between (no cramped overlap) */}
             <Stack
                 direction="row"
                 alignItems="center"
                 justifyContent="space-between"
-                spacing={1.5}
-                sx={{ mt: 1.1, gap: 1 }}
+                spacing={1}
+                sx={{ mt: 0.4, minWidth: 0 }}
             >
                 <Typography
-                    variant="caption"
+                    noWrap
                     sx={{
-                        color: alpha('#ffffff', 0.88),
-                        fontSize: { xs: '0.7rem', sm: '0.78rem' },
+                        color: alpha('#ffffff', 0.68),
+                        fontSize: { xs: '0.62rem', sm: '0.68rem' },
                         fontWeight: 600,
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: 0.5,
+                        gap: 0.35,
                         minWidth: 0,
+                        flex: 1,
                     }}
                 >
                     {variant === 'prize' ? `${t('home.dashboard.entry')}:` : `${t('home.dashboard.prizeEst')}`}
                     {variant === 'prize' ? (
-                        <CoinValue value={match.entryFee || 0} size={13} />
+                        <CoinValue value={match.entryFee || 0} size={11} />
                     ) : (
-                        <CoinValue value={match.prizeEstimate || 0} size={13} />
+                        <CoinValue value={match.prizeEstimate || 0} size={11} />
                     )}
                 </Typography>
+
                 <Typography
-                    variant="caption"
+                    noWrap
                     sx={{
-                        color: alpha('#ffffff', 0.72),
-                        fontSize: { xs: '0.7rem', sm: '0.78rem' },
+                        color: alpha('#ffffff', 0.52),
+                        fontSize: { xs: '0.62rem', sm: '0.68rem' },
                         fontWeight: 600,
                         textAlign: 'right',
                         flexShrink: 0,
                         display: 'inline-flex',
                         alignItems: 'center',
-                        gap: 0.5,
+                        gap: 0.35,
                         fontVariantNumeric: 'tabular-nums',
                     }}
                 >
@@ -431,14 +787,14 @@ function DashboardMatchTile({
                         </>
                     ) : match.entryFee ? (
                         <>
-                            {t('home.dashboard.entry')} <CoinValue value={match.entryFee || 0} size={13} />
+                            {t('home.dashboard.entry')} <CoinValue value={match.entryFee || 0} size={11} />
                         </>
                     ) : (
                         `${t('home.dashboard.entry')} ${t('home.dashboard.free')}`
                     )}
                 </Typography>
             </Stack>
-        </GlassInnerTile>
+        </Box>
     );
 }
 
@@ -473,47 +829,73 @@ function DashboardMatchPanel({
             : [];
 
     return (
-        <GlassPanelCard
-            sx={{
-                p: { xs: 1.25, sm: 1.6 },
-            }}
-        >
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1, flexWrap: 'wrap', gap: 0.5 }}>
-                <Typography variant="h6" sx={{ color: glassTokens.titleColor, fontSize: { xs: '0.95rem', sm: '1.25rem' }, fontWeight: 800 }}>
+        <HomeBlurPanel>
+            <Stack
+                direction="row"
+                alignItems="center"
+                justifyContent="space-between"
+                sx={{ mb: 1.25, flexWrap: 'wrap', gap: 0.5 }}
+            >
+                <Typography
+                    variant="h6"
+                    sx={{
+                        color: glassTokens.titleColor,
+                        fontSize: { xs: '0.95rem', sm: '1.15rem' },
+                        fontWeight: 800,
+                    }}
+                >
                     {title}
                 </Typography>
-                <Chip label={badgeLabel} size="small" sx={{ flexShrink: 0, ...getGlassBadgeChipSx(glassTokens) }} />
-            </Stack>
-            <Divider sx={{ mb: 1.5, borderColor: alpha('#ffffff', 0.1) }} />
-            {loading ? (
-                <Stack spacing={1.5}>
-                    {Array.from({ length: 3 }).map((_, idx) => (
-                        <Stack key={idx} spacing={0.5}>
-                            <Skeleton width="80%" />
-                            <LinearProgress />
-                        </Stack>
-                    ))}
-                </Stack>
-            ) : count ? (
-                <Stack spacing={1.15}>
-                    {tilesToRender.map((match, index) => (
-                        <DashboardMatchTile
-                            key={match.id || index}
-                            match={match}
-                            index={index}
-                            total={displayCount}
-                            variant={variant}
-                            glassTokens={glassTokens}
-                            platformTotalWinnings={platformTotalWinnings}
-                        />
-                    ))}
-                </Stack>
-            ) : (
-                <Typography variant="body2" sx={{ color: glassTokens.subtitleColor }}>
-                    {emptyLabel}
+                <Typography
+                    sx={{
+                        flexShrink: 0,
+                        fontSize: { xs: '0.62rem', sm: '0.68rem' },
+                        fontWeight: 700,
+                        letterSpacing: 0.5,
+                        textTransform: 'uppercase',
+                        color: alpha(HOME_GOLD, 0.82),
+                    }}
+                >
+                    {badgeLabel}
                 </Typography>
-            )}
-        </GlassPanelCard>
+            </Stack>
+            <Box sx={{ borderTop: HOME_ROW_LINE }}>
+                {loading ? (
+                    <Stack spacing={0}>
+                        {Array.from({ length: 3 }).map((_, idx) => (
+                            <Box
+                                key={idx}
+                                sx={{
+                                    py: 1.1,
+                                    borderBottom: idx < 2 ? HOME_ROW_LINE : 'none',
+                                }}
+                            >
+                                <Skeleton width="78%" height={14} sx={{ mb: 0.75 }} />
+                                <Skeleton width="100%" height={4} sx={{ borderRadius: 0.5 }} />
+                            </Box>
+                        ))}
+                    </Stack>
+                ) : count ? (
+                    <Box>
+                        {tilesToRender.map((match, index) => (
+                            <DashboardMatchTile
+                                key={match.id || index}
+                                match={match}
+                                index={index}
+                                total={displayCount}
+                                variant={variant}
+                                isLast={index === tilesToRender.length - 1}
+                                platformTotalWinnings={platformTotalWinnings}
+                            />
+                        ))}
+                    </Box>
+                ) : (
+                    <Typography variant="body2" sx={{ color: glassTokens.subtitleColor, py: 2 }}>
+                        {emptyLabel}
+                    </Typography>
+                )}
+            </Box>
+        </HomeBlurPanel>
     );
 }
 
@@ -698,7 +1080,8 @@ export function LandingDashboardSection() {
             id="public-dashboard"
             sx={{
                 position: 'relative',
-                overflowX: 'hidden',
+                overflowX: 'clip',
+                overflowY: 'visible',
                 bgcolor: '#0a0a0a',
                 py: { xs: 4.5, md: 6 },
                 color: '#f5f5f5',
@@ -729,8 +1112,7 @@ export function LandingDashboardSection() {
         >
             <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
                 <Stack spacing={3.5}>
-                    <PulseCard
-                        variant={DEFAULT_GLASS_CARD_VARIANT}
+                    <PulseHeroFlat
                         badgeLabel={t('home.dashboard.liveDashboardChip')}
                         title={t('home.dashboard.battleAsiaPulse')}
                         description={t('home.dashboard.pulseDescription')}
@@ -756,19 +1138,20 @@ export function LandingDashboardSection() {
 
                     <Box
                         sx={{
-                            gap: { xs: 1.5, md: 2.5 },
-                            gridTemplateColumns: { md: 'repeat(2, minmax(0, 1fr))' },
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: { md: 'stretch' },
                             ...homeMobileScrollFlexRowSx,
-                            display: { xs: 'flex', md: 'grid' },
-                            // Full-bleed swipe track so 100% cards don't leave a side peek
+                            overflowX: { xs: 'auto', md: 'visible' },
+                            scrollSnapType: { xs: 'x mandatory', md: 'none' },
+                            pb: { xs: 1.5, md: 0 },
                             px: { xs: 0, md: 0 },
                         }}
                     >
                         <Box
                             sx={{
                                 ...homeMobileScrollItemSx,
-                                // One full card per viewport on mobile (no awkward "Top..." peek)
-                                flex: { xs: '0 0 100%', md: 'unset' },
+                                flex: { xs: '0 0 100%', md: '1 1 0' },
                                 minWidth: { xs: 0, md: 0 },
                                 maxWidth: { xs: '100%', md: 'none' },
                             }}
@@ -790,10 +1173,11 @@ export function LandingDashboardSection() {
                                 }}
                             />
                         </Box>
+                        <DashboardSplitGoldRule orientation="vertical" />
                         <Box
                             sx={{
                                 ...homeMobileScrollItemSx,
-                                flex: { xs: '0 0 100%', md: 'unset' },
+                                flex: { xs: '0 0 100%', md: '1 1 0' },
                                 minWidth: { xs: 0, md: 0 },
                                 maxWidth: { xs: '100%', md: 'none' },
                             }}
@@ -819,34 +1203,40 @@ export function LandingDashboardSection() {
 
                     <Box
                         sx={{
-                            display: 'grid',
-                            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-                            gap: { xs: 1.25, md: 2 },
+                            display: 'flex',
+                            flexDirection: { xs: 'column', md: 'row' },
+                            alignItems: { md: 'stretch' },
                         }}
                     >
-                        <DashboardMatchPanel
-                            title={t('home.dashboard.highPrizeBattles')}
-                            badgeLabel={t('home.dashboard.topN')}
-                            matches={data?.highPrizeMatches || []}
-                            loading={loading}
-                            variant="prize"
-                            glassTokens={glassTokens}
-                            platformTotalWinnings={data?.platform?.totalWinnings}
-                            emptyLabel={t('home.dashboard.noHighPrizeMatches')}
-                        />
-                        <DashboardMatchPanel
-                            title={t('home.dashboard.ongoingMatchesTitle')}
-                            badgeLabel={
-                                data?.ongoingMatches?.length
-                                    ? `${data.ongoingMatches.length} ${t('home.dashboard.listed')}`
-                                    : t('home.dashboard.upcoming')
-                            }
-                            matches={data?.ongoingMatches || []}
-                            loading={loading}
-                            variant="ongoing"
-                            glassTokens={glassTokens}
-                            emptyLabel={t('home.dashboard.noOngoingMatches')}
-                        />
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <DashboardMatchPanel
+                                title={t('home.dashboard.highPrizeBattles')}
+                                badgeLabel={t('home.dashboard.topN')}
+                                matches={data?.highPrizeMatches || []}
+                                loading={loading}
+                                variant="prize"
+                                glassTokens={glassTokens}
+                                platformTotalWinnings={data?.platform?.totalWinnings}
+                                emptyLabel={t('home.dashboard.noHighPrizeMatches')}
+                            />
+                        </Box>
+                        <DashboardSplitGoldRule orientation="horizontal" />
+                        <DashboardSplitGoldRule orientation="vertical" />
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <DashboardMatchPanel
+                                title={t('home.dashboard.ongoingMatchesTitle')}
+                                badgeLabel={
+                                    data?.ongoingMatches?.length
+                                        ? `${data.ongoingMatches.length} ${t('home.dashboard.listed')}`
+                                        : t('home.dashboard.upcoming')
+                                }
+                                matches={data?.ongoingMatches || []}
+                                loading={loading}
+                                variant="ongoing"
+                                glassTokens={glassTokens}
+                                emptyLabel={t('home.dashboard.noOngoingMatches')}
+                            />
+                        </Box>
                     </Box>
                 </Stack>
             </Container>

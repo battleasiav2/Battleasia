@@ -18,8 +18,9 @@ import { loginAction } from 'src/store/reducers/auth';
 import { Form, Field } from 'src/components/hook-form';
 
 import { AuthFormShell } from './auth-form-shell';
+import { AuthTrustRow } from './auth-trust-row';
 import { AuthSubmitButton } from './auth-submit-button';
-import { authAlertSx, authFieldSlotProps, authLinkSx } from './auth-form-styles';
+import { authAlertSx, authCardFooterSx, authFieldSlotProps, authLinkSx } from './auth-form-styles';
 
 // ----------------------------------------------------------------------
 
@@ -234,6 +235,9 @@ export function EmailVerificationView() {
         <AuthSubmitButton type="button" onClick={() => router.push(paths.auth.signUp)}>
           {t('auth.goToSignUp')}
         </AuthSubmitButton>
+        <Box sx={authCardFooterSx}>
+          <AuthTrustRow insideCard />
+        </Box>
       </AuthFormShell>
     );
   }
@@ -272,6 +276,10 @@ export function EmailVerificationView() {
             {t('auth.signUpAgain')}
           </Link>
         </Typography>
+      </Box>
+
+      <Box sx={authCardFooterSx}>
+        <AuthTrustRow insideCard />
       </Box>
     </AuthFormShell>
   );

@@ -24,9 +24,10 @@ export function AuthSplitContent({
       sx={[
         (theme) => ({
           position: 'relative',
-          overflow: 'hidden',
+          overflowX: 'clip',
+          overflowY: 'visible',
           display: 'flex',
-          flex: '1 1 auto',
+          flex: { xs: '0 0 auto', [theme.breakpoints.up(layoutQuery)]: '0 0 50%' },
           alignItems: 'center',
           flexDirection: 'column',
           p: theme.spacing(3, 2, 10, 2),
@@ -34,7 +35,6 @@ export function AuthSplitContent({
             justifyContent: 'center',
             p: theme.spacing(10, 2, 10, 2),
             maxWidth: '50%',
-            flex: '0 0 50%',
           },
           // Background image with overlay
           // backgroundImage: 'url(/assets/images/auth.webp)',
