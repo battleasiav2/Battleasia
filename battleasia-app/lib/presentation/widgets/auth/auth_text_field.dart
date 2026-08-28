@@ -2,28 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 
-/// Shared label style for auth form fields — title case, not all-caps.
-class AuthFieldLabel extends StatelessWidget {
-  final String label;
-
-  const AuthFieldLabel({super.key, required this.label});
-
-  static TextStyle style(BuildContext context) {
-    return AppTheme.bodySmall.copyWith(
-      color: const Color(0xFFD1D5DB),
-      fontWeight: FontWeight.w600,
-      letterSpacing: 0.15,
-      fontSize: 11.5,
-      height: 1.25,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(label, style: style(context));
-  }
-}
-
 class AuthTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String label;
@@ -61,7 +39,15 @@ class AuthTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AuthFieldLabel(label: label),
+        Text(
+          label.toUpperCase(),
+          style: AppTheme.bodySmall.copyWith(
+            color: const Color(0xC7E8E0D0),
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.1,
+            fontSize: 12,
+          ),
+        ),
         const SizedBox(height: 6),
         DecoratedBox(
           decoration: BoxDecoration(

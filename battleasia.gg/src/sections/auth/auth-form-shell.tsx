@@ -90,10 +90,9 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
               fontWeight: 800,
               color: '#ffffff',
               textAlign: 'center',
-              fontSize: compact ? { xs: 16, sm: 18 } : { xs: 17, sm: 19 },
+              fontSize: compact ? { xs: 16, sm: 18 } : { xs: 18, sm: 20 },
               lineHeight: 1.2,
-              letterSpacing: 0.15,
-              textTransform: 'none',
+              letterSpacing: 0.3,
             }}
           >
             {title}
@@ -102,9 +101,9 @@ export function AuthFormShell({ title, description, children, wide, compact }: A
             <Typography
               variant="body2"
               sx={{
-                color: alpha('#ffffff', 0.55),
+                color: alpha('#ffffff', 0.62),
                 textAlign: 'center',
-                fontSize: compact ? 11.5 : 12,
+                fontSize: compact ? 12 : 12.5,
                 lineHeight: 1.45,
                 maxWidth: wide ? 440 : compact ? 300 : 340,
               }}

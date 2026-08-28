@@ -1,9 +1,7 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
-import 'package:battleasia_app/presentation/widgets/auth/auth_text_field.dart';
 
 class AuthPhoneField extends StatelessWidget {
   final TextEditingController controller;
@@ -28,7 +26,15 @@ class AuthPhoneField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        AuthFieldLabel(label: 'auth.mobileNumber'.tr()),
+        Text(
+          'MOBILE NUMBER',
+          style: AppTheme.bodySmall.copyWith(
+            color: const Color(0xC7E8E0D0),
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.1,
+            fontSize: 12,
+          ),
+        ),
         const SizedBox(height: 6),
         DecoratedBox(
           decoration: BoxDecoration(
