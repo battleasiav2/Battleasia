@@ -21,23 +21,22 @@ export function AuthTrustRow() {
       direction="row"
       justifyContent="center"
       flexWrap="wrap"
-      sx={{ mt: 1.5, gap: { xs: 0.75, sm: 1.25 } }}
+      sx={{ mt: 2.5, gap: { xs: 1.25, sm: 2 } }}
     >
       {items.map((item) => (
         <Stack
           key={item.label}
           direction="row"
           alignItems="center"
-          spacing={0.5}
+          spacing={0.75}
           sx={{ minHeight: 22 }}
         >
-          <Iconify icon={item.icon} width={13} sx={{ color: GOLD }} />
+          <Iconify icon={item.icon} width={14} sx={{ color: GOLD }} />
           <Typography
             sx={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: 0.2,
-              color: alpha('#fff', 0.62),
+              fontSize: 12,
+              fontWeight: 500,
+              color: alpha('#fff', 0.5),
               whiteSpace: 'nowrap',
             }}
           >

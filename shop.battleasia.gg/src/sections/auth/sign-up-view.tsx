@@ -9,19 +9,26 @@ import {
   Box,
   Link,
   Alert,
+  Stack,
+  Button,
   Select,
   MenuItem,
+  Checkbox,
   InputLabel,
   Typography,
   IconButton,
   FormControl,
   InputAdornment,
+  FormControlLabel,
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
+import { useRouter } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
 import useApi from 'src/hooks/use-api';
+import { useTranslate } from 'src/locales/use-locales';
 
 import { dispatch } from 'src/store';
 import { GAME_SERVERS } from 'src/global-config';
@@ -32,16 +39,18 @@ import { Form, Field } from 'src/components/hook-form';
 
 import { AuthFormShell } from './auth-form-shell';
 import { AuthTrustRow } from './auth-trust-row';
+import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
 import { AuthSocialButtons } from './auth-social-buttons';
+import { AuthStepProgress } from './auth-step-progress';
 import {
   authAlertSx,
-  authFieldSlotProps,
+  authFieldSlotPropsCompact,
   authLinkSx,
-  authFooterTextSx,
   authPhoneInputSx,
-  authSelectSx,
+  authSecondaryButtonSx,
   authSelectMenuProps,
+  authSelectSx,
 } from './auth-form-styles';
 
 export type SignUpSchemaType = zod.infer<typeof SignUpSchema>;
@@ -66,96 +75,70 @@ export const SignUpSchema = zod
       .string()
       .min(1, { message: 'Email is required!' })
       .email({ message: 'Email must be a valid email address!' }),
-    // referralCode: zod.string().optional(),
     password: zod
       .string()
       .min(1, { message: 'Password is required!' })
       .min(8, { message: 'Password must be at least 8 characters!' }),
     confirmPassword: zod.string().min(1, { message: 'Confirm Password is required!' }),
+    termsAccepted: zod.boolean().refine((val) => val === true, {
+      message: 'You must accept the Terms of Service',
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ['confirmPassword'],
   });
 
-// ----------------------------------------------------------------------
-
 export function SignUpView() {
+  const router = useRouter();
   const { registerApi } = useApi();
-
+  const { t } = useTranslate();
   const showPassword = useBoolean();
   const showConfirmPassword = useBoolean();
-
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
-  const defaultValues: SignUpSchemaType = {
-    inGameUserName: '',
-    mobile: '',
-    pubgId: '',
-    gameServer: '',
-    email: '',
-    // referralCode: '',
-    password: '',
-    confirmPassword: '',
-  };
+  const [step, setStep] = useState(1);
 
   const methods = useForm<SignUpSchemaType>({
     resolver: zodResolver(SignUpSchema),
-    defaultValues,
+    defaultValues: {
+      inGameUserName: '',
+      mobile: '',
+      pubgId: '',
+      gameServer: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      termsAccepted: false,
+    },
   });
 
-  const {
-    handleSubmit,
-    control,
-    formState: { isSubmitting },
-  } = methods;
+  const { handleSubmit, control, trigger, formState: { isSubmitting } } = methods;
+
+  const goNext = async () => {
+    setErrorMessage(null);
+    const valid = await trigger(['email', 'password', 'confirmPassword']);
+    if (valid) setStep(2);
+  };
 
   const onSubmit = handleSubmit(async (data) => {
     try {
       setErrorMessage(null);
 
-      // Parse phone number to extract country code and mobile number
-      let countryCode = '';
-      let mobileNo = '';
-
-      if (data.mobile) {
-        // First validate the phone number
-        if (!isValidPhoneNumber(data.mobile)) {
-          setErrorMessage('Please enter a valid phone number');
-          return;
-        }
-
-        try {
-          const phoneNumber = parsePhoneNumber(data.mobile);
-          if (phoneNumber && phoneNumber.isValid()) {
-            countryCode = phoneNumber.countryCallingCode || '';
-            mobileNo = phoneNumber.nationalNumber || '';
-
-            // Validate that country code was extracted
-            if (!countryCode || countryCode.trim() === '') {
-              setErrorMessage('Unable to extract country code from phone number. Please check your phone number format.');
-              return;
-            }
-
-            // Validate that mobile number was extracted
-            if (!mobileNo || mobileNo.trim() === '') {
-              setErrorMessage('Unable to extract mobile number from phone number. Please check your phone number format.');
-              return;
-            }
-          } else {
-            setErrorMessage('Invalid phone number format. Please enter a valid phone number.');
-            return;
-          }
-        } catch {
-          setErrorMessage('Invalid phone number format. Please enter a valid phone number with country code.');
-          return;
-        }
-      } else {
-        setErrorMessage('Phone number is required');
+      if (!data.mobile || !isValidPhoneNumber(data.mobile)) {
+        setErrorMessage(t('auth.invalidPhone'));
         return;
       }
 
-      const registerData = {
+      const phoneNumber = parsePhoneNumber(data.mobile);
+      const countryCode = phoneNumber?.countryCallingCode || '';
+      const mobileNo = phoneNumber?.nationalNumber || '';
+
+      if (!countryCode || !mobileNo) {
+        setErrorMessage(t('auth.invalidPhone'));
+        return;
+      }
+
+      const res = await registerApi({
         email: data.email,
         password: data.password,
         username: data.inGameUserName,
@@ -163,15 +146,12 @@ export function SignUpView() {
         mobileNo,
         pubgId: data.pubgId,
         gameServer: data.gameServer,
-        // referralCode: data.referralCode,
-      };
-
-      const res = await registerApi(registerData);
+      });
 
       const { status, session, user } = res.data;
 
       if (!status || !session?.accessToken) {
-        throw new Error(res.data?.message || 'Access token not found in response');
+        throw new Error(res.data?.message || 'Registration failed');
       }
 
       dispatch(
@@ -182,254 +162,233 @@ export function SignUpView() {
         })
       );
 
+      router.push(paths.user.shop);
     } catch (error: any) {
-      console.error(error);
-      const feedbackMessage = error?.response?.data?.message || error?.message || 'An error occurred';
-      setErrorMessage(feedbackMessage);
+      setErrorMessage(error?.response?.data?.message || error?.message || 'An error occurred');
     }
   });
 
-  const renderForm = () => (
-    <Box
-      sx={{
-        display: 'grid',
-        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
-        columnGap: 1.75,
-        rowGap: 1.75,
-      }}
-    >
-      {/* In Game User Name */}
-      <Field.Text
-        name="inGameUserName"
-        label={
-          <>
-            In Game User Name <Box component="span" sx={{ color: 'error.main' }}>*</Box>
-          </>
-        }
-        slotProps={{
-          ...authFieldSlotProps,
-          input: {
-            ...authFieldSlotProps.input,
-            startAdornment: (
-              <InputAdornment position="start">
-                <Iconify icon="solar:user-bold-duotone" width={20} sx={{ color: '#ffffff' }} />
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
-
-      {/* Enter your PUBG ID */}
-      <Field.Text
-        name="pubgId"
-        label={
-          <>
-            Enter your PUBG ID <Box component="span" sx={{ color: 'error.main' }}>*</Box>
-          </>
-        }
-        slotProps={{
-          ...authFieldSlotProps,
-          input: {
-            ...authFieldSlotProps.input,
-            startAdornment: (
-              <InputAdornment position="start">
-                <Iconify icon="solar:gamepad-bold-duotone" width={20} sx={{ color: '#ffffff' }} />
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
-
-      {/* Mobile No with Country Code — full width */}
-      <Box sx={{ gridColumn: '1 / -1' }}>
-        <Field.Phone
-          name="mobile"
-          label={
-            <>
-              Country Code & Mobile No <Box component="span" sx={{ color: 'error.main' }}>*</Box>
-            </>
-          }
-          slotProps={{
-            ...authFieldSlotProps,
-            input: {
-              ...authFieldSlotProps.input,
-              sx: { ...authFieldSlotProps.input.sx, ...authPhoneInputSx },
-            },
-          }}
-        />
-      </Box>
-
-      {/* Game Server */}
-      <FormControl fullWidth>
-        <InputLabel shrink sx={authFieldSlotProps.inputLabel.sx}>
-          Game Server <Box component="span" sx={{ color: 'error.main' }}>*</Box>
-        </InputLabel>
-        <Controller
-          name="gameServer"
-          control={control}
-          render={({ field, fieldState: { error } }) => (
-            <>
-              <Select
-                {...field}
-                label={
-                  <>
-                    Game Server <Box component="span" sx={{ color: 'error.main' }}>*</Box>
-                  </>
-                }
-                displayEmpty
-                error={!!error}
-                sx={authSelectSx}
-                MenuProps={authSelectMenuProps}
-              >
-                <MenuItem value="" disabled>
-                  Select
-                </MenuItem>
-                {GAME_SERVERS.map((server) => (
-                  <MenuItem key={server.value} value={server.value}>
-                    {server.label}
-                  </MenuItem>
-                ))}
-              </Select>
-              {error && (
-                <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 1.5 }}>
-                  {error.message}
-                </Typography>
-              )}
-            </>
-          )}
-        />
-      </FormControl>
-
-      {/* Email */}
-      <Field.Text
-        name="email"
-        label={
-          <>
-            Email <Box component="span" sx={{ color: 'error.main' }}>*</Box>
-          </>
-        }
-        slotProps={{
-          ...authFieldSlotProps,
-          input: {
-            ...authFieldSlotProps.input,
-            startAdornment: (
-              <InputAdornment position="start">
-                <Iconify icon="solar:letter-bold-duotone" width={20} sx={{ color: '#ffffff' }} />
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
-
-      {/* Password */}
-      <Field.Text
-        name="password"
-        label={
-          <>
-            Password <Box component="span" sx={{ color: 'error.main' }}>*</Box>
-          </>
-        }
-        type={showPassword.value ? 'text' : 'password'}
-        slotProps={{
-          ...authFieldSlotProps,
-          input: {
-            ...authFieldSlotProps.input,
-            startAdornment: (
-              <InputAdornment position="start">
-                <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: '#ffffff' }} />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={showPassword.onToggle} edge="end" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                  <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} />
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
-
-      {/* Confirm Password */}
-      <Field.Text
-        name="confirmPassword"
-        label={
-          <>
-            Confirm Password <Box component="span" sx={{ color: 'error.main' }}>*</Box>
-          </>
-        }
-        type={showConfirmPassword.value ? 'text' : 'password'}
-        slotProps={{
-          ...authFieldSlotProps,
-          input: {
-            ...authFieldSlotProps.input,
-            startAdornment: (
-              <InputAdornment position="start">
-                <Iconify icon="solar:lock-password-bold-duotone" width={20} sx={{ color: '#ffffff' }} />
-              </InputAdornment>
-            ),
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={showConfirmPassword.onToggle} edge="end" sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                  <Iconify
-                    icon={showConfirmPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'}
-                  />
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
-
-      <Box sx={{ gridColumn: '1 / -1', mt: 0.5 }}>
-        <AuthSubmitButton loading={isSubmitting} loadingIndicator="Create account...">
-          Create account
-        </AuthSubmitButton>
-      </Box>
-
-      <Box sx={{ gridColumn: '1 / -1' }}>
-        <AuthSocialButtons />
-      </Box>
-    </Box>
+  const fieldIcon = (icon: string) => (
+    <InputAdornment position="start">
+      <Iconify icon={icon} width={16} sx={{ color: '#9CA3AF' }} />
+    </InputAdornment>
   );
+
+  const progress = step === 1 ? 50 : 100;
+  const signupSteps = [
+    { id: 1, title: t('auth.stepAccountInfo'), hint: t('auth.stepAccountHint') },
+    { id: 2, title: t('auth.stepInGameInfo'), hint: t('auth.stepInGameHint') },
+  ] as const;
 
   return (
-    <AuthFormShell
-      wide
-      title="Create your account"
-      description={
-        <>
-          Already have an account?{' '}
-          <Link component={RouterLink} href={paths.auth.signIn} sx={authLinkSx}>
-            Sign In
-          </Link>
-        </>
-      }
-    >
-      {!!errorMessage && (
-        <Alert severity="error" sx={{ ...authAlertSx, mb: 3 }}>
-          {errorMessage}
-        </Alert>
-      )}
+    <Box sx={{ width: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <AuthFormShell
+        wide
+        progress={progress}
+        title={t('auth.createAccountTitle')}
+        description={t('auth.signUpStepsDescription')}
+        steps={<AuthStepProgress steps={signupSteps} currentStep={step} />}
+      >
+        {!!errorMessage && (
+          <Alert severity="error" sx={{ ...authAlertSx, mb: 2 }}>
+            {errorMessage}
+          </Alert>
+        )}
 
-      <Form methods={methods} onSubmit={onSubmit}>
-        {renderForm()}
-      </Form>
+        <Form methods={methods} onSubmit={onSubmit}>
+          <Stack spacing={1.75}>
+            {step === 1 ? (
+              <>
+                <Field.Text
+                  name="email"
+                  label={t('auth.emailAddress')}
+                  placeholder={t('auth.emailPlaceholder')}
+                  slotProps={{
+                    ...authFieldSlotPropsCompact,
+                    input: {
+                      ...authFieldSlotPropsCompact.input,
+                      startAdornment: fieldIcon('solar:letter-bold-duotone'),
+                    },
+                  }}
+                />
+                <Field.Text
+                  name="password"
+                  label={t('auth.password')}
+                  placeholder={t('auth.passwordPlaceholder')}
+                  type={showPassword.value ? 'text' : 'password'}
+                  slotProps={{
+                    ...authFieldSlotPropsCompact,
+                    input: {
+                      ...authFieldSlotPropsCompact.input,
+                      startAdornment: fieldIcon('solar:lock-password-bold-duotone'),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: '#9CA3AF' }}>
+                            <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={16} />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+                <Field.Text
+                  name="confirmPassword"
+                  label={t('auth.confirmPassword')}
+                  placeholder={t('auth.confirmPasswordHint')}
+                  type={showConfirmPassword.value ? 'text' : 'password'}
+                  slotProps={{
+                    ...authFieldSlotPropsCompact,
+                    input: {
+                      ...authFieldSlotPropsCompact.input,
+                      startAdornment: fieldIcon('solar:lock-password-bold-duotone'),
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={showConfirmPassword.onToggle} edge="end" size="small" sx={{ color: '#9CA3AF' }}>
+                            <Iconify icon={showConfirmPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={16} />
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
+                />
+                <AuthSubmitButton
+                  type="button"
+                  onClick={goNext}
+                  startIcon={false}
+                  endIcon={<Iconify icon="eva:arrow-forward-fill" width={16} />}
+                >
+                  {t('auth.continue')}
+                </AuthSubmitButton>
+              </>
+            ) : (
+              <>
+                <Field.Text
+                  name="inGameUserName"
+                  label={t('auth.inGameUserName')}
+                  placeholder={t('auth.inGameUserNamePlaceholder')}
+                  slotProps={{
+                    ...authFieldSlotPropsCompact,
+                    input: {
+                      ...authFieldSlotPropsCompact.input,
+                      startAdornment: fieldIcon('solar:user-bold-duotone'),
+                    },
+                  }}
+                />
+                <Field.Text
+                  name="pubgId"
+                  label={t('auth.pubgId')}
+                  placeholder={t('auth.pubgIdPlaceholder')}
+                  slotProps={{
+                    ...authFieldSlotPropsCompact,
+                    input: {
+                      ...authFieldSlotPropsCompact.input,
+                      startAdornment: fieldIcon('solar:gamepad-bold-duotone'),
+                    },
+                  }}
+                />
+                <Field.Phone
+                  name="mobile"
+                  label={t('auth.countryCodeMobile')}
+                  placeholder={t('auth.mobilePlaceholder')}
+                  country="BD"
+                  sx={authPhoneInputSx}
+                  slotProps={{
+                    inputLabel: authFieldSlotPropsCompact.inputLabel,
+                    input: {
+                      ...authFieldSlotPropsCompact.input,
+                      sx: { ...authFieldSlotPropsCompact.input.sx, ...authPhoneInputSx },
+                    },
+                  }}
+                />
+                <FormControl fullWidth>
+                  <InputLabel shrink sx={authFieldSlotPropsCompact.inputLabel.sx}>
+                    {t('auth.gameServer')}
+                  </InputLabel>
+                  <Controller
+                    name="gameServer"
+                    control={control}
+                    render={({ field, fieldState: { error } }) => (
+                      <>
+                        <Select {...field} displayEmpty error={!!error} MenuProps={authSelectMenuProps} sx={authSelectSx}>
+                          <MenuItem value="" disabled>
+                            {t('auth.select')}
+                          </MenuItem>
+                          {GAME_SERVERS.map((server) => (
+                            <MenuItem key={server.value} value={server.value}>
+                              {server.label}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {error && (
+                          <Typography variant="caption" color="error" sx={{ mt: 0.5, ml: 0.5 }}>
+                            {error.message}
+                          </Typography>
+                        )}
+                      </>
+                    )}
+                  />
+                </FormControl>
+                <Controller
+                  name="termsAccepted"
+                  control={control}
+                  render={({ field, fieldState: { error } }) => (
+                    <>
+                      <FormControlLabel
+                        sx={{ alignItems: 'flex-start', mx: 0, mt: 0.25 }}
+                        control={
+                          <Checkbox
+                            {...field}
+                            checked={field.value}
+                            size="small"
+                            sx={{
+                              color: alpha('#f5c518', 0.45),
+                              mt: -0.25,
+                              '&.Mui-checked': { color: '#f5c518' },
+                            }}
+                          />
+                        }
+                        label={
+                          <Typography sx={{ fontSize: 13, color: alpha('#fff', 0.55), lineHeight: 1.5 }}>
+                            {t('auth.termsAgreement')}
+                          </Typography>
+                        }
+                      />
+                      {error && (
+                        <Typography variant="caption" color="error" sx={{ mt: -1, ml: 0.5 }}>
+                          {error.message}
+                        </Typography>
+                      )}
+                    </>
+                  )}
+                />
+                <Stack direction="row" spacing={1.25} sx={{ pt: 0.5, alignItems: 'stretch' }}>
+                  <Button
+                    type="button"
+                    variant="outlined"
+                    onClick={() => setStep(1)}
+                    startIcon={<Iconify icon="eva:arrow-back-fill" width={16} />}
+                    sx={{ ...authSecondaryButtonSx, width: 'auto', px: 2, flexShrink: 0 }}
+                  >
+                    {t('auth.back')}
+                  </Button>
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <AuthSubmitButton loading={isSubmitting}>{t('auth.createAccount')}</AuthSubmitButton>
+                  </Box>
+                </Stack>
+              </>
+            )}
 
-      <Box sx={{ ...authFooterTextSx, mt: 2 }}>
-        By signing up, I agree to{' '}
-        <Link underline="always" sx={authLinkSx}>
-          Terms of service
-        </Link>{' '}
-        and{' '}
-        <Link underline="always" sx={authLinkSx}>
-          Privacy policy
-        </Link>
-        .
-      </Box>
+            <AuthSocialButtons />
+
+            <AuthFooterLinks
+              prefix={t('auth.alreadyHaveAccount')}
+              links={[{ label: t('auth.signIn'), href: paths.auth.signIn }]}
+            />
+          </Stack>
+        </Form>
+      </AuthFormShell>
 
       <AuthTrustRow />
-    </AuthFormShell>
+    </Box>
   );
 }
-

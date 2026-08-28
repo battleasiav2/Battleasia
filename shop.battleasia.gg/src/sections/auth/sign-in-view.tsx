@@ -1,20 +1,10 @@
+import { Box, Link, Alert, Stack, Checkbox, IconButton, InputAdornment, FormControlLabel } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { z as zod } from 'zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useBoolean } from 'minimal-shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
-
-import {
-  Box,
-  Link,
-  Alert,
-  Stack,
-  Checkbox,
-  IconButton,
-  InputAdornment,
-  FormControlLabel,
-} from '@mui/material';
-import { alpha } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -35,7 +25,7 @@ import { AuthSubmitButton } from './auth-submit-button';
 import { AuthSocialButtons } from './auth-social-buttons';
 import { authAlertSx, authFieldSlotPropsCompact, authLinkSx } from './auth-form-styles';
 
-const MAIN_APP_URL = (import.meta.env.VITE_MAIN_APP_URL as string | undefined) || 'http://localhost:8081';
+const MAIN_APP_URL = (import.meta.env.VITE_MAIN_APP_URL as string | undefined) || 'https://battleasia.gg';
 const REMEMBER_EMAIL_KEY = 'ba_remember_email';
 
 export type SignInSchemaType = zod.infer<typeof SignInSchema>;
@@ -45,10 +35,7 @@ export const SignInSchema = zod.object({
     .string()
     .min(1, { message: 'Email is required!' })
     .email({ message: 'Email must be a valid email address!' }),
-  password: zod
-    .string()
-    .min(1, { message: 'Password is required!' })
-    .min(6, { message: 'Password must be at least 6 characters!' }),
+  password: zod.string().min(1, { message: 'Password is required!' }),
 });
 
 export function SignInView() {
@@ -64,11 +51,7 @@ export function SignInView() {
     defaultValues: { email: '', password: '' },
   });
 
-  const {
-    handleSubmit,
-    setValue,
-    formState: { isSubmitting },
-  } = methods;
+  const { handleSubmit, setValue, formState: { isSubmitting } } = methods;
 
   useEffect(() => {
     try {
@@ -110,137 +93,115 @@ export function SignInView() {
       await new Promise((resolve) => setTimeout(resolve, 100));
       router.push(paths.user.shop);
     } catch (error: any) {
-      const feedbackMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        (typeof error === 'string' ? error : null) ||
-        'An error occurred';
-      setErrorMessage(feedbackMessage);
+      setErrorMessage(error?.response?.data?.message || error?.message || 'An error occurred');
     }
   });
 
   return (
-    <AuthFormShell compact title={t('auth.signInToAccount')} description={t('auth.heroLine')}>
-      {!!errorMessage && (
-        <Alert severity="error" sx={{ ...authAlertSx, mb: 1.5 }}>
-          {errorMessage}
-        </Alert>
-      )}
+    <Box sx={{ width: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <AuthFormShell
+        compact
+        progress={100}
+        title={t('auth.signInToAccount')}
+        description={t('auth.signInDescription')}
+      >
+        {!!errorMessage && (
+          <Alert severity="error" sx={{ ...authAlertSx, mb: 2 }}>
+            {errorMessage}
+          </Alert>
+        )}
 
-      <Form methods={methods} onSubmit={onSubmit}>
-        <Stack spacing={1.5}>
+        <Form methods={methods} onSubmit={onSubmit}>
           <Stack spacing={1.75}>
-          <Field.Text
-            name="email"
-            label={t('auth.emailAddress')}
-            placeholder={t('auth.emailPlaceholder')}
-            slotProps={{
-              ...authFieldSlotPropsCompact,
-              input: {
-                ...authFieldSlotPropsCompact.input,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Iconify icon="solar:letter-bold-duotone" width={18} sx={{ color: '#ffffff' }} />
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-
-          <Field.Text
-            name="password"
-            label={t('auth.password')}
-            placeholder={t('auth.passwordPlaceholder')}
-            type={showPassword.value ? 'text' : 'password'}
-            slotProps={{
-              ...authFieldSlotPropsCompact,
-              input: {
-                ...authFieldSlotPropsCompact.input,
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <Iconify icon="solar:lock-password-bold-duotone" width={18} sx={{ color: '#ffffff' }} />
-                  </InputAdornment>
-                ),
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: '#ffffff' }}>
-                      <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={18} />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              },
-            }}
-          />
-          </Stack>
-
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="space-between"
-            sx={{ minHeight: 22, height: 22 }}
-          >
-            <FormControlLabel
-              sx={{
-                mr: 0,
-                ml: -0.5,
-                my: 0,
-                height: 22,
-                alignItems: 'center',
-                '& .MuiFormControlLabel-label': { lineHeight: 1, display: 'flex', alignItems: 'center' },
+            <Field.Text
+              name="email"
+              label={t('auth.emailAddress')}
+              placeholder={t('auth.emailPlaceholder')}
+              slotProps={{
+                ...authFieldSlotPropsCompact,
+                input: {
+                  ...authFieldSlotPropsCompact.input,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Iconify icon="solar:letter-bold-duotone" width={16} sx={{ color: '#9CA3AF' }} />
+                    </InputAdornment>
+                  ),
+                },
               }}
-              control={
-                <Checkbox
-                  size="small"
-                  checked={rememberMe}
-                  onChange={(event) => setRememberMe(event.target.checked)}
-                  sx={{
-                    color: alpha('#f5c518', 0.55),
-                    p: 0,
-                    mr: 0.75,
-                    '&.Mui-checked': { color: '#f5c518' },
-                  }}
-                />
-              }
-              label={
-                <Box sx={{ fontSize: 12, fontWeight: 600, color: '#e0e0e0', lineHeight: 1 }}>
-                  {t('auth.rememberMe')}
-                </Box>
-              }
             />
-            <Link
-              href={`${MAIN_APP_URL}/auth/forgot-password`}
-              target="_blank"
-              rel="noopener noreferrer"
-              sx={{
-                ...authLinkSx,
-                fontSize: 12,
-                lineHeight: 1,
-                display: 'inline-flex',
-                alignItems: 'center',
-                height: 22,
+
+            <Field.Text
+              name="password"
+              label={t('auth.password')}
+              placeholder={t('auth.passwordPlaceholder')}
+              type={showPassword.value ? 'text' : 'password'}
+              slotProps={{
+                ...authFieldSlotPropsCompact,
+                input: {
+                  ...authFieldSlotPropsCompact.input,
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Iconify icon="solar:lock-password-bold-duotone" width={16} sx={{ color: '#9CA3AF' }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: '#9CA3AF' }}>
+                        <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={16} />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                },
               }}
-            >
-              {t('auth.forgotPassword')}
-            </Link>
+            />
+
+            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ minHeight: 24 }}>
+              <FormControlLabel
+                sx={{ mr: 0, ml: -0.5, my: 0 }}
+                control={
+                  <Checkbox
+                    size="small"
+                    checked={rememberMe}
+                    onChange={(event) => setRememberMe(event.target.checked)}
+                    sx={{
+                      color: alpha('#f5c518', 0.45),
+                      p: 0.25,
+                      mr: 0.75,
+                      '&.Mui-checked': { color: '#f5c518' },
+                    }}
+                  />
+                }
+                label={
+                  <Box sx={{ fontSize: 13, fontWeight: 500, color: alpha('#fff', 0.62) }}>
+                    {t('auth.rememberMe')}
+                  </Box>
+                }
+              />
+              <Link
+                href={`${MAIN_APP_URL.replace(/\/$/, '')}/auth/forgot-password`}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ ...authLinkSx, fontSize: 13, fontWeight: 600 }}
+              >
+                {t('auth.forgotPassword')}
+              </Link>
+            </Stack>
+
+            <AuthSubmitButton loading={isSubmitting} startIcon={false}>
+              {t('auth.signIn')}
+            </AuthSubmitButton>
+
+            <AuthSocialButtons />
+
+            <AuthFooterLinks
+              prefix={t('auth.dontHaveAccount')}
+              links={[{ label: t('auth.signUp'), href: paths.auth.signUp }]}
+            />
           </Stack>
-
-          <AuthSubmitButton
-            loading={isSubmitting}
-            loadingIndicator={`${t('auth.signIn')}...`}
-          >
-            {t('auth.signIn')}
-          </AuthSubmitButton>
-
-          <AuthSocialButtons />
-
-          <AuthFooterLinks
-            prefix={t('auth.dontHaveAccount')}
-            links={[{ label: t('auth.signUp'), href: paths.auth.signUp }]}
-          />
-        </Stack>
-      </Form>
+        </Form>
+      </AuthFormShell>
 
       <AuthTrustRow />
-    </AuthFormShell>
+    </Box>
   );
 }

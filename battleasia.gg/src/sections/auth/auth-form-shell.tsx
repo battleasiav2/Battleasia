@@ -3,7 +3,8 @@ import type { ReactNode } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
-import { Iconify } from 'src/components/iconify';
+import { Logo } from 'src/components/logo';
+import { useTranslate } from 'src/locales/use-locales';
 
 import { authCardSx } from './auth-form-styles';
 
@@ -20,12 +21,12 @@ type AuthFormShellProps = {
   title: ReactNode;
   description?: ReactNode;
   children: ReactNode;
-  /** Top progress bar width 0–100 */
   progress?: number;
-  /** Step pills shown below the header */
   steps?: ReactNode;
   wide?: boolean;
   compact?: boolean;
+  /** i18n key for line under logo */
+  taglineKey?: string;
 };
 
 export function AuthFormShell({
@@ -36,7 +37,10 @@ export function AuthFormShell({
   steps,
   wide,
   compact,
+  taglineKey = 'auth.brandTagline',
 }: AuthFormShellProps) {
+  const { t } = useTranslate();
+
   return (
     <Box
       sx={{
@@ -50,7 +54,7 @@ export function AuthFormShell({
     >
       <Box sx={{ ...authCardSx, width: 1 }}>
         {progress !== undefined && (
-          <Box sx={{ height: 4, bgcolor: alpha('#fff', 0.08) }}>
+          <Box sx={{ height: 3, bgcolor: alpha('#fff', 0.08) }}>
             <Box
               sx={{
                 height: 1,
@@ -62,32 +66,47 @@ export function AuthFormShell({
           </Box>
         )}
 
-        <Box sx={{ px: { xs: 3, sm: 4 }, py: compact ? { xs: 3, sm: 3.25 } : { xs: 3.5, sm: 4 } }}>
-          <Stack alignItems="center" textAlign="center" spacing={0.75} sx={{ mb: steps ? 0 : 2.5 }}>
+        <Box sx={{ px: { xs: 2.75, sm: 3.5 }, py: compact ? { xs: 2.75, sm: 3 } : { xs: 3, sm: 3.5 } }}>
+          <Stack alignItems="center" textAlign="center" spacing={0.5} sx={{ mb: steps ? 2 : 2.25 }}>
+            <Logo
+              disabled
+              sx={{
+                width: compact ? { xs: 96, sm: 104 } : { xs: 108, sm: 118 },
+                height: 'auto',
+                pointerEvents: 'none',
+                mb: 0.25,
+                '& img': { objectFit: 'contain', width: '100%', height: 'auto' },
+              }}
+            />
             <Box
               sx={{
-                width: 44,
-                height: 44,
-                mb: 0.5,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: '12px',
-                bgcolor: alpha(GOLD, 0.15),
-                color: GOLD,
-                boxShadow: `0 0 20px -5px ${alpha(GOLD, 0.45)}`,
+                height: 2,
+                width: 40,
+                bgcolor: GOLD,
+                boxShadow: `0 0 10px ${alpha(GOLD, 0.4)}`,
+              }}
+            />
+            <Typography
+              sx={{
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: 1.4,
+                textTransform: 'uppercase',
+                color: alpha(GOLD, 0.82),
+                pt: 0.25,
               }}
             >
-              <Iconify icon="solar:shield-check-bold-duotone" width={24} />
-            </Box>
+              {t(taglineKey)}
+            </Typography>
             <Typography
               className="font-tr"
               sx={{
                 fontWeight: 800,
                 color: '#ffffff',
-                fontSize: compact ? { xs: 18, sm: 20 } : { xs: 20, sm: 22 },
+                fontSize: compact ? { xs: 17, sm: 19 } : { xs: 19, sm: 21 },
                 lineHeight: 1.2,
                 letterSpacing: -0.2,
+                pt: 0.25,
               }}
             >
               {title}
@@ -95,10 +114,11 @@ export function AuthFormShell({
             {description && (
               <Typography
                 sx={{
-                  color: alpha('#ffffff', 0.55),
+                  color: alpha('#ffffff', 0.52),
                   fontSize: 13,
                   lineHeight: 1.45,
-                  maxWidth: 340,
+                  maxWidth: 320,
+                  pt: 0.25,
                 }}
               >
                 {description}

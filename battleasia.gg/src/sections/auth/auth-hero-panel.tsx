@@ -80,7 +80,7 @@ export function AuthHeroPanel() {
             sx={{
               px: 2,
               py: 1.5,
-              borderRadius: '12px',
+              borderRadius: '8px',
               border: `1px solid ${alpha('#ffffff', 0.1)}`,
               bgcolor: alpha('#161618', 0.45),
               backdropFilter: 'blur(12px)',

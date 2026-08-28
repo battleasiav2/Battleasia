@@ -3,35 +3,30 @@ import { inputBaseClasses } from '@mui/material/InputBase';
 
 export const AUTH_BG_IMAGE = '/assets/images/shop/bac-store-hero.webp';
 
-export const AUTH_CARD_BG = '#181614';
+export const AUTH_CARD_BG = '#161618';
 export const AUTH_INPUT_BG = '#0e0e0e';
-const AUTH_PLACEHOLDER = '#808080';
-const AUTH_BORDER = '#2b2b2b';
+export const AUTH_PLACEHOLDER = '#9CA3AF';
+
+export const AUTH_RADIUS = {
+  card: '8px',
+  control: '6px',
+} as const;
 
 export const authCardSx = {
-  bgcolor: AUTH_CARD_BG,
-  backgroundColor: AUTH_CARD_BG,
-  backgroundImage: `linear-gradient(180deg, #1c1a16 0%, ${AUTH_CARD_BG} 42%, #141210 100%)`,
-  border: `1px solid ${AUTH_BORDER}`,
-  boxShadow: `0 24px 60px ${alpha('#000000', 0.65)}`,
-  backdropFilter: 'none',
-  WebkitBackdropFilter: 'none',
-  '&:before': {
-    content: "''",
-    position: 'absolute',
-    inset: 0,
-    pointerEvents: 'none',
-    zIndex: 0,
-    background: `linear-gradient(180deg, ${alpha('#f5c518', 0.045)} 0%, transparent 48%)`,
-    animation: 'none',
-  },
+  position: 'relative' as const,
+  overflow: 'hidden' as const,
+  bgcolor: alpha(AUTH_CARD_BG, 0.94),
+  backgroundColor: alpha(AUTH_CARD_BG, 0.94),
+  backgroundImage: 'none',
+  border: `1px solid ${alpha('#ffffff', 0.08)}`,
+  borderRadius: AUTH_RADIUS.card,
+  boxShadow: `0 16px 40px ${alpha('#000000', 0.42)}`,
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
+  '&:before': { display: 'none' },
 };
 
 const authInputAutofillSx = {
-  '& input::selection, & .MuiInputBase-input::selection': {
-    backgroundColor: alpha('#f5c518', 0.28),
-    color: '#ffffff',
-  },
   '& input:-webkit-autofill, & input:-webkit-autofill:hover, & input:-webkit-autofill:focus, & input:-webkit-autofill:active, & input:autofill, & .MuiInputBase-input:-webkit-autofill, & .MuiInputBase-input:autofill':
     {
       WebkitTextFillColor: '#ffffff !important',
@@ -40,14 +35,8 @@ const authInputAutofillSx = {
       WebkitBoxShadow: `0 0 0 1000px ${AUTH_INPUT_BG} inset !important`,
       boxShadow: `0 0 0 1000px ${AUTH_INPUT_BG} inset !important`,
       backgroundColor: `${AUTH_INPUT_BG} !important`,
-      backgroundImage: 'none !important',
-      filter: 'none',
       transition: 'background-color 99999s ease-out 0s',
     },
-  '&:has(input:-webkit-autofill), &:has(input:autofill)': {
-    bgcolor: AUTH_INPUT_BG,
-    backgroundColor: AUTH_INPUT_BG,
-  },
 };
 
 export const authFieldSlotProps = {
@@ -56,21 +45,17 @@ export const authFieldSlotProps = {
     sx: {
       position: 'relative' as const,
       transform: 'none',
-      maxWidth: 'none',
-      whiteSpace: 'nowrap' as const,
-      overflow: 'visible',
-      textOverflow: 'clip',
-      fontSize: 12,
-      fontWeight: 700,
-      letterSpacing: 1.1,
+      fontSize: 13,
+      fontWeight: 600,
+      letterSpacing: 0,
       lineHeight: 1.2,
-      color: alpha('#e8e0d0', 0.78),
-      mb: 0.65,
-      textTransform: 'uppercase' as const,
+      color: alpha('#ffffff', 0.55),
+      mb: 0.6,
+      textTransform: 'none' as const,
       '&.MuiInputLabel-shrink': {
         transform: 'none',
-        fontSize: 12,
-        color: alpha('#e8e0d0', 0.78),
+        fontSize: 13,
+        color: alpha('#ffffff', 0.55),
         '&.Mui-focused': { color: alpha('#f5c518', 0.9) },
       },
       '&.Mui-focused': { color: alpha('#f5c518', 0.9) },
@@ -79,50 +64,26 @@ export const authFieldSlotProps = {
   input: {
     sx: {
       color: '#ffffff',
-      bgcolor: AUTH_INPUT_BG,
-      borderRadius: '4px',
-      fontSize: 16,
-      minHeight: 50,
-      boxShadow: `0 0 0 1px ${alpha('#f5c518', 0.14)}, 0 0 10px ${alpha('#f5c518', 0.12)}`,
+      bgcolor: alpha(AUTH_INPUT_BG, 0.65),
+      borderRadius: AUTH_RADIUS.control,
+      fontSize: 14,
+      minHeight: 42,
+      boxShadow: 'none',
       transition: 'border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease',
-      '& input': {
-        fontSize: 16,
-        paddingTop: '13px',
-        paddingBottom: '13px',
-      },
-      '& input::placeholder': {
-        color: AUTH_PLACEHOLDER,
-        opacity: 1,
-        fontSize: 16,
-      },
+      '& input': { fontSize: 14, paddingTop: '11px', paddingBottom: '11px' },
+      '& input::placeholder': { color: AUTH_PLACEHOLDER, opacity: 1, fontSize: 14 },
       '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-      '& fieldset': {
-        border: `1px solid ${alpha('#f5c518', 0.28)}`,
-      },
-      '&:hover fieldset': {
-        borderColor: alpha('#f5c518', 0.48),
-      },
-      '&:hover': {
-        boxShadow: `0 0 0 1px ${alpha('#f5c518', 0.2)}, 0 0 14px ${alpha('#f5c518', 0.18)}`,
-      },
+      '& fieldset': { border: `1px solid ${alpha('#ffffff', 0.12)}` },
+      '&:hover fieldset': { borderColor: alpha('#ffffff', 0.22) },
       '&.Mui-focused': {
-        bgcolor: AUTH_INPUT_BG,
-        boxShadow: `0 0 0 1px ${alpha('#f5c518', 0.32)}, 0 0 16px ${alpha('#f5c518', 0.22)}`,
+        bgcolor: alpha(AUTH_INPUT_BG, 0.8),
+        boxShadow: `0 0 0 2px ${alpha('#f5c518', 0.28)}`,
       },
-      '&.Mui-focused fieldset': {
-        borderColor: alpha('#f5c518', 0.55),
-        borderWidth: '1px',
+      '&.Mui-focused fieldset': { borderColor: alpha('#f5c518', 0.5), borderWidth: '1px' },
+      '& .MuiInputAdornment-root .iconify, & .MuiInputAdornment-root svg': {
+        color: `${AUTH_PLACEHOLDER} !important`,
       },
-      '& .MuiSelect-select': {
-        color: '#ffffff',
-        fontSize: 16,
-      },
-      '& .MuiSelect-icon': {
-        color: '#ffffff',
-      },
-      '& .MuiInputAdornment-root .iconify': {
-        color: '#ffffff',
-      },
+      '& .MuiIconButton-root': { color: AUTH_PLACEHOLDER },
       ...authInputAutofillSx,
     },
   },
@@ -131,17 +92,12 @@ export const authFieldSlotProps = {
 export const authFieldSlotPropsCompact = authFieldSlotProps;
 
 export const authPhoneInputSx = {
-  '--popover-button-width': '80px',
+  '--popover-button-width': '108px',
   '--popover-button-height': '28px',
   '--popover-button-mr': '10px',
   [`& .${inputBaseClasses.input}`]: {
     pl: 'calc(var(--popover-button-width) + var(--popover-button-mr) + 2px) !important',
-    fontSize: 16,
-    letterSpacing: 0,
-  },
-  '& .MuiFormHelperText-root': {
-    color: alpha('#ffffff', 0.55),
-    ml: 0,
+    fontSize: 14,
   },
 };
 
@@ -152,49 +108,21 @@ export const authPhoneCountrySx = {
   left: '10px !important',
   height: '32px !important',
   alignItems: 'center',
-  borderRadius: '2px',
+  borderRadius: AUTH_RADIUS.control,
   bgcolor: alpha('#ffffff', 0.06),
   px: 0.5,
-  '&:hover': {
-    bgcolor: alpha('#ffffff', 0.1),
-  },
-  '& .iconify': {
-    color: `${alpha('#ffffff', 0.7)} !important`,
-  },
-  '& > span': {
-    bgcolor: `${alpha('#ffffff', 0.2)} !important`,
-  },
 };
 
 export const authSelectMenuProps = {
   PaperProps: {
     sx: {
-      mt: 0.75,
-      maxHeight: 320,
-      borderRadius: 0,
-      bgcolor: alpha('#0a0a0a', 0.98),
+      mt: 0.5,
+      bgcolor: alpha('#0a0a0a', 0.96),
       border: `1px solid ${alpha('#ffffff', 0.14)}`,
-      backdropFilter: 'blur(14px)',
-      boxShadow: `0 16px 40px ${alpha('#000000', 0.65)}`,
       '& .MuiMenuItem-root': {
-        color: alpha('#ffffff', 0.9),
-        fontSize: 16,
-        minHeight: 44,
-        py: 1.1,
-        px: 1.5,
-        borderRadius: 0,
-        '&:hover': { bgcolor: alpha('#f5c518', 0.12) },
-        '&.Mui-selected': {
-          bgcolor: alpha('#f5c518', 0.18),
-          color: '#ffffff',
-          '&:hover': { bgcolor: alpha('#f5c518', 0.24) },
-        },
-        '&.Mui-disabled': {
-          color: alpha('#ffffff', 0.35),
-        },
-      },
-      '& .MuiList-root': {
-        py: 0.5,
+        color: alpha('#ffffff', 0.88),
+        fontSize: 14,
+        '&:hover': { bgcolor: alpha('#f59e0b', 0.12) },
       },
     },
   },
@@ -203,80 +131,86 @@ export const authSelectMenuProps = {
 export const authSelectSx = {
   mt: 0,
   color: '#ffffff',
-  bgcolor: AUTH_INPUT_BG,
-  borderRadius: '4px',
-  fontSize: 16,
-  minHeight: 50,
-  boxShadow: `0 0 0 1px ${alpha('#f5c518', 0.14)}, 0 0 10px ${alpha('#f5c518', 0.12)}`,
+  bgcolor: alpha(AUTH_INPUT_BG, 0.65),
+  borderRadius: AUTH_RADIUS.control,
+  fontSize: 14,
+  minHeight: 42,
+  boxShadow: 'none',
   '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
-  '& fieldset': {
-    border: `1px solid ${alpha('#f5c518', 0.28)}`,
-  },
-  '&:hover fieldset': {
-    borderColor: alpha('#f5c518', 0.48),
-  },
+  '& fieldset': { border: `1px solid ${alpha('#ffffff', 0.12)}` },
+  '&:hover fieldset': { borderColor: alpha('#ffffff', 0.22) },
   '&.Mui-focused': {
-    bgcolor: AUTH_INPUT_BG,
-    boxShadow: `0 0 0 1px ${alpha('#f5c518', 0.32)}, 0 0 16px ${alpha('#f5c518', 0.22)}`,
+    bgcolor: alpha(AUTH_INPUT_BG, 0.8),
+    boxShadow: `0 0 0 2px ${alpha('#f5c518', 0.28)}`,
   },
-  '&.Mui-focused fieldset': {
-    borderColor: alpha('#f5c518', 0.55),
-    borderWidth: '1px',
-  },
-  '& .MuiSelect-select': {
-    py: 1.35,
-    fontSize: 16,
-  },
+  '&.Mui-focused fieldset': { borderColor: alpha('#f5c518', 0.5) },
+  '& .MuiSelect-select': { py: 1.15, fontSize: 14 },
 };
 
 export const authSubmitButtonSx = {
-  borderRadius: 0,
-  py: 0,
-  minHeight: 44,
-  height: 44,
-  fontSize: 13,
-  fontWeight: 800,
-  letterSpacing: 1,
-  textTransform: 'uppercase' as const,
+  borderRadius: AUTH_RADIUS.control,
+  py: 1.25,
+  minHeight: 46,
+  height: 'auto',
+  fontSize: 14,
+  fontWeight: 700,
+  textTransform: 'none' as const,
   color: '#111111',
-  boxShadow: `0 0 16px ${alpha('#f5c518', 0.18)}`,
+  width: '100%',
   background: 'linear-gradient(180deg, #f5c518 0%, #d4a017 52%, #d97706 100%)',
   border: `1px solid ${alpha('#fbbf24', 0.9)}`,
-  backdropFilter: 'none',
-  WebkitBackdropFilter: 'none',
-  filter: 'none',
-  textShadow: 'none',
-  transition: 'transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease',
-  '&:hover': {
-    background: 'linear-gradient(180deg, #fbbf24 0%, #f5c518 52%, #d4a017 100%)',
-    boxShadow: `0 0 22px ${alpha('#f5c518', 0.38)}, 0 8px 28px ${alpha('#f5c518', 0.28)}`,
-    filter: 'none',
-    transform: 'translateY(-1px)',
+  boxShadow: `0 8px 24px ${alpha('#f5c518', 0.22)}`,
+  '@media (hover: hover)': {
+    '&:hover': {
+      filter: 'brightness(1.06)',
+      boxShadow: `0 8px 28px ${alpha('#f5c518', 0.38)}`,
+      transform: 'translateY(-1px)',
+    },
   },
-  '&:active': {
-    transform: 'scale(0.985) translateY(1px)',
+  '&.Mui-disabled': {
+    background: alpha('#f5c518', 0.28),
+    color: alpha('#111111', 0.45),
+  },
+};
+
+export const authSecondaryButtonSx = {
+  borderRadius: AUTH_RADIUS.control,
+  py: 1.25,
+  minHeight: 46,
+  fontSize: 14,
+  fontWeight: 600,
+  textTransform: 'none' as const,
+  color: alpha('#ffffff', 0.62),
+  bgcolor: 'transparent',
+  border: `1px solid ${alpha('#ffffff', 0.14)}`,
+  flexShrink: 0,
+  '@media (hover: hover)': {
+    '&:hover': {
+      bgcolor: alpha('#ffffff', 0.06),
+      borderColor: alpha('#ffffff', 0.22),
+      color: alpha('#ffffff', 0.88),
+    },
   },
 };
 
 export const authLinkSx = {
   color: '#f5c518',
-  fontWeight: 600,
-  textDecoration: 'none',
-  transition: 'color 0.2s ease',
-  '&:hover': { textDecoration: 'underline', color: '#fbbf24' },
+  fontWeight: 700,
+  textDecoration: 'underline',
+  textUnderlineOffset: '3px',
+  '&:hover': { color: '#ffe066' },
 };
 
 export const authAlertSx = {
-  borderRadius: '2px',
+  borderRadius: AUTH_RADIUS.control,
   bgcolor: alpha('#000000', 0.45),
   border: `1px solid ${alpha('#ffffff', 0.1)}`,
   color: '#ffffff',
-  '& .MuiAlert-icon': { color: 'inherit' },
 };
 
 export const authFooterTextSx = {
   textAlign: 'center' as const,
-  fontSize: 12.5,
-  color: alpha('#ffffff', 0.5),
+  fontSize: 13,
+  color: alpha('#ffffff', 0.55),
   lineHeight: 1.55,
 };

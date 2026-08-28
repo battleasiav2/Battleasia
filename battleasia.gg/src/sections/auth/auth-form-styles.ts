@@ -89,18 +89,23 @@ export const AUTH_INPUT_BG = '#0e0e0e';
 /** Brighter placeholder / adornment icons on dark inputs */
 export const AUTH_PLACEHOLDER = '#9CA3AF';
 
+export const AUTH_RADIUS = {
+  card: '8px',
+  control: '6px',
+} as const;
+
 /** Same surface language as home About / Play Your Game cards */
 export const authCardSx = {
   position: 'relative' as const,
   overflow: 'hidden' as const,
-  bgcolor: alpha(AUTH_CARD_BG, 0.92),
-  backgroundColor: alpha(AUTH_CARD_BG, 0.92),
+  bgcolor: alpha(AUTH_CARD_BG, 0.94),
+  backgroundColor: alpha(AUTH_CARD_BG, 0.94),
   backgroundImage: 'none',
-  border: `1px solid ${alpha('#ffffff', 0.12)}`,
-  borderRadius: '16px',
-  boxShadow: `0 24px 48px ${alpha('#000000', 0.4)}`,
-  backdropFilter: 'blur(20px)',
-  WebkitBackdropFilter: 'blur(20px)',
+  border: `1px solid ${alpha('#ffffff', 0.08)}`,
+  borderRadius: AUTH_RADIUS.card,
+  boxShadow: `0 16px 40px ${alpha('#000000', 0.42)}`,
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
   '&:before': {
     display: 'none',
   },
@@ -155,7 +160,7 @@ export const authFieldSlotProps = {
     sx: {
       color: '#ffffff',
       bgcolor: alpha(AUTH_INPUT_BG, 0.65),
-      borderRadius: '8px',
+      borderRadius: AUTH_RADIUS.control,
       fontSize: 14,
       minHeight: 42,
       boxShadow: 'none',
@@ -236,7 +241,7 @@ export const authPhoneCountrySx = {
   left: '10px !important',
   height: '32px !important',
   alignItems: 'center',
-  borderRadius: '2px',
+  borderRadius: AUTH_RADIUS.control,
   bgcolor: alpha('#ffffff', 0.06),
   px: 0.5,
   '&:hover': {
@@ -278,7 +283,7 @@ export const authSelectSx = {
   mt: 0,
   color: '#ffffff',
   bgcolor: alpha(AUTH_INPUT_BG, 0.65),
-  borderRadius: '8px',
+  borderRadius: AUTH_RADIUS.control,
   fontSize: 14,
   minHeight: 42,
   boxShadow: 'none',
@@ -304,7 +309,7 @@ export const authSelectSx = {
 };
 
 export const authSubmitButtonSx = {
-  borderRadius: '8px',
+  borderRadius: AUTH_RADIUS.control,
   py: 1.25,
   minHeight: 46,
   height: 'auto',
@@ -349,7 +354,7 @@ export const authSubmitButtonSx = {
 };
 
 export const authSecondaryButtonSx = {
-  borderRadius: '8px',
+  borderRadius: AUTH_RADIUS.control,
   py: 1.25,
   minHeight: 46,
   height: 'auto',
@@ -383,7 +388,7 @@ export const authLinkSx = {
 };
 
 export const authAlertSx = {
-  borderRadius: '8px',
+  borderRadius: AUTH_RADIUS.control,
   bgcolor: alpha('#000000', 0.45),
   border: `1px solid ${alpha('#ffffff', 0.1)}`,
   color: '#ffffff',

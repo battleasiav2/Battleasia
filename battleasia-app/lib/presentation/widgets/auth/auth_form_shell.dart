@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/screens/home/home_screen.dart';
+import 'package:battleasia_app/presentation/widgets/common/battleasia_logo.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
 /// Minimal auth card — matches web zip-style signup shell.
@@ -219,17 +220,17 @@ class _AuthPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xEB161618),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+          color: const Color(0xF0161618),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
           boxShadow: const [
             BoxShadow(
               color: Color(0x66000000),
-              blurRadius: 48,
-              offset: Offset(0, 24),
+              blurRadius: 40,
+              offset: Offset(0, 16),
             ),
           ],
         ),
@@ -261,37 +262,40 @@ class _AuthPanel extends StatelessWidget {
                 ),
               ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 24, 24, 22),
+              padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Center(
-                    child: Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: AppColors.gold.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.gold.withValues(alpha: 0.25),
-                            blurRadius: 20,
-                            spreadRadius: -5,
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.verified_user_outlined,
-                        color: AppColors.gold,
-                        size: 24,
-                      ),
+                  const Center(
+                    child: BattleAsiaLogo(
+                      logoSize: 104,
+                      showText: false,
+                      alignment: MainAxisAlignment.center,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 2,
+                      color: AppColors.gold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'common.brandTagline'.tr(),
+                    style: AppTheme.labelUppercase.copyWith(
+                      color: AppColors.gold.withValues(alpha: 0.82),
+                      fontSize: 9,
+                      letterSpacing: 1.4,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
                   Text(
                     title,
                     style: AppTheme.heading2.copyWith(
-                      fontSize: 20,
+                      fontSize: 19,
                       height: 1.2,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
@@ -304,7 +308,7 @@ class _AuthPanel extends StatelessWidget {
                     Text(
                       description!,
                       style: AppTheme.bodyMedium.copyWith(
-                        color: Colors.white.withValues(alpha: 0.55),
+                        color: Colors.white.withValues(alpha: 0.52),
                         height: 1.45,
                         fontSize: 13,
                       ),
@@ -312,10 +316,10 @@ class _AuthPanel extends StatelessWidget {
                     ),
                   ],
                   if (steps != null) ...[
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 18),
                     steps!,
                   ] else
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 18),
                   child,
                 ],
               ),
@@ -507,7 +511,7 @@ class AuthPrimaryButton extends StatelessWidget {
       uppercase: false,
       height: 46,
       fontSize: 14,
-      borderRadius: 8,
+      borderRadius: 6,
     );
   }
 }
