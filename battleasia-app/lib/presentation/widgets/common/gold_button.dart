@@ -13,6 +13,7 @@ class GoldButton extends StatefulWidget {
   final double height;
   final double fontSize;
   final double borderRadius;
+  final bool glow;
 
   const GoldButton({
     super.key,
@@ -26,6 +27,7 @@ class GoldButton extends StatefulWidget {
     this.height = 44,
     this.fontSize = 13,
     this.borderRadius = 0,
+    this.glow = true,
   });
 
   @override
@@ -53,30 +55,17 @@ class _GoldButtonState extends State<GoldButton> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(widget.borderRadius),
-            gradient: enabled
-                ? LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: _pressed
-                        ? const [
-                            Color(0xFFFBBF24),
-                            Color(0xFFF5C518),
-                            Color(0xFFD4A017),
-                          ]
-                        : const [
-                            Color(0xFFF5C518),
-                            Color(0xFFD4A017),
-                            Color(0xFFD97706),
-                          ],
-                  )
-                : null,
-            color: enabled ? null : AppColors.gold.withValues(alpha: 0.28),
+            color: enabled
+                ? (_pressed ? const Color(0xFFD4A017) : const Color(0xFFF5C518))
+                : AppColors.gold.withValues(alpha: 0.28),
             border: Border.all(
               color: enabled
-                  ? const Color(0xFFFBBF24).withValues(alpha: 0.9)
+                  ? (_pressed
+                      ? const Color(0xFFB45309)
+                      : const Color(0xFFD4A017))
                   : AppColors.gold.withValues(alpha: 0.22),
             ),
-            boxShadow: enabled
+            boxShadow: enabled && widget.glow
                 ? [
                     BoxShadow(
                       color: AppColors.gold.withValues(alpha: 0.28),

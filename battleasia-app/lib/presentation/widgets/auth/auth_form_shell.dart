@@ -511,7 +511,8 @@ class AuthPrimaryButton extends StatelessWidget {
       uppercase: false,
       height: 46,
       fontSize: 14,
-      borderRadius: 6,
+      borderRadius: 4,
+      glow: false,
     );
   }
 }
@@ -539,7 +540,7 @@ class AuthSecondaryButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         foregroundColor: Colors.white.withValues(alpha: 0.62),
         side: BorderSide(color: Colors.white.withValues(alpha: 0.14)),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
       ),
     );

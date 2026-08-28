@@ -10,6 +10,7 @@ export const AUTH_PLACEHOLDER = '#9CA3AF';
 export const AUTH_RADIUS = {
   card: '8px',
   control: '6px',
+  button: '4px',
 } as const;
 
 export const authCardSx = {
@@ -148,7 +149,7 @@ export const authSelectSx = {
 };
 
 export const authSubmitButtonSx = {
-  borderRadius: AUTH_RADIUS.control,
+  borderRadius: AUTH_RADIUS.button,
   py: 1.25,
   minHeight: 46,
   height: 'auto',
@@ -157,24 +158,35 @@ export const authSubmitButtonSx = {
   textTransform: 'none' as const,
   color: '#111111',
   width: '100%',
-  background: 'linear-gradient(180deg, #f5c518 0%, #d4a017 52%, #d97706 100%)',
-  border: `1px solid ${alpha('#fbbf24', 0.9)}`,
-  boxShadow: `0 8px 24px ${alpha('#f5c518', 0.22)}`,
+  background: '#f5c518',
+  border: `1px solid ${alpha('#d4a017', 0.85)}`,
+  boxShadow: 'none',
+  transition: 'background-color 0.15s ease, border-color 0.15s ease',
+  '&.MuiButton-root:hover': { boxShadow: 'none' },
   '@media (hover: hover)': {
     '&:hover': {
-      filter: 'brightness(1.06)',
-      boxShadow: `0 8px 28px ${alpha('#f5c518', 0.38)}`,
-      transform: 'translateY(-1px)',
+      background: '#eab308',
+      borderColor: alpha('#ca8a04', 0.9),
+      boxShadow: 'none',
+      transform: 'none',
+      filter: 'none',
     },
+  },
+  '&:active, &.Mui-focusVisible': {
+    background: '#d4a017',
+    borderColor: alpha('#b45309', 0.9),
+    boxShadow: 'none',
+    transform: 'none',
   },
   '&.Mui-disabled': {
     background: alpha('#f5c518', 0.28),
     color: alpha('#111111', 0.45),
+    boxShadow: 'none',
   },
 };
 
 export const authSecondaryButtonSx = {
-  borderRadius: AUTH_RADIUS.control,
+  borderRadius: AUTH_RADIUS.button,
   py: 1.25,
   minHeight: 46,
   fontSize: 14,
