@@ -369,7 +369,7 @@ const PlayerListCard = ({
             direction="row"
             alignItems="flex-start"
             justifyContent="space-between"
-            sx={{ mb: 1.25, flexWrap: 'wrap', gap: 0.75 }}
+            sx={{ mb: 1, flexWrap: 'wrap', gap: 0.75 }}
         >
             <Stack spacing={0.35} sx={{ minWidth: 0, flex: 1 }}>
                 <Typography
@@ -417,11 +417,11 @@ const PlayerListCard = ({
                         spacing={1.5}
                         alignItems="center"
                         sx={{
-                            py: 1.25,
+                            py: { xs: 0.85, sm: 0.95 },
                             borderBottom: idx < 3 ? HOME_ROW_LINE : 'none',
                         }}
                     >
-                        <Skeleton variant="circular" width={40} height={40} />
+                        <Skeleton variant="circular" width={34} height={34} />
                         <Stack sx={{ flex: 1 }}>
                             <Skeleton width="60%" />
                             <Skeleton width="40%" />
@@ -458,20 +458,24 @@ const PlayerListCard = ({
                                 spacing={{ xs: 1, sm: 1.5 }}
                                 alignItems="center"
                                 sx={{
-                                    py: { xs: 1.15, sm: 1.3 },
+                                    py: { xs: 0.85, sm: 0.95 },
                                     borderBottom: idx < players.length - 1 ? HOME_ROW_LINE : 'none',
+                                    transition: 'background-color 0.15s ease',
+                                    '&:hover': {
+                                        bgcolor: alpha('#ffffff', 0.03),
+                                    },
                                 }}
                             >
                                 <Avatar
                                     src={getAvatarUrl(player.avatar)}
                                     alt={player.username}
                                     sx={{
-                                        width: { xs: 36, sm: 42 },
-                                        height: { xs: 36, sm: 42 },
+                                        width: { xs: 32, sm: 36 },
+                                        height: { xs: 32, sm: 36 },
                                         bgcolor: alpha('#0ea5e9', 0.16),
                                         color: '#e2e8f0',
                                         fontWeight: 700,
-                                        fontSize: { xs: '0.75rem', sm: '0.95rem' },
+                                        fontSize: { xs: '0.7rem', sm: '0.82rem' },
                                         flexShrink: 0,
                                     }}
                                 >
@@ -1083,7 +1087,7 @@ export function LandingDashboardSection() {
                 overflowX: 'clip',
                 overflowY: 'visible',
                 bgcolor: '#0a0a0a',
-                py: { xs: 4.5, md: 6 },
+                py: { xs: 3.25, md: 5 },
                 color: '#f5f5f5',
                 '&:before': {
                     content: "''",
@@ -1111,7 +1115,7 @@ export function LandingDashboardSection() {
             }}
         >
             <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-                <Stack spacing={3.5}>
+                <Stack spacing={2.75}>
                     <PulseHeroFlat
                         badgeLabel={t('home.dashboard.liveDashboardChip')}
                         title={t('home.dashboard.battleAsiaPulse')}

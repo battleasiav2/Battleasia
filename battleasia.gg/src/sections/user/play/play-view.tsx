@@ -48,7 +48,9 @@ export function PlayView() {
   const { getGamesApi } = useApi();
   const [games, setGames] = useState<IGame[]>([]);
   const [loading, setLoading] = useState(true);
-  const [matchCounts, setMatchCounts] = useState<Pick<PublicDashboardStats, 'liveCountByGame' | 'upcomingCountByGame'>>({});
+  const [matchCounts, setMatchCounts] = useState<
+    Pick<PublicDashboardStats, 'liveCountByGame' | 'upcomingCountByGame' | 'participantsByGame'>
+  >({});
 
   const { isLoaded } = useImagePreloader(imagePaths, {
     delay: 300,
@@ -64,6 +66,7 @@ export function PlayView() {
       setMatchCounts({
         liveCountByGame: data?.liveCountByGame,
         upcomingCountByGame: data?.upcomingCountByGame,
+        participantsByGame: data?.participantsByGame,
       });
     } catch {
       // Non-blocking — cards still render without counts
@@ -92,6 +95,7 @@ export function PlayView() {
     () => ({
       live: matchCounts.liveCountByGame ?? {},
       upcoming: matchCounts.upcomingCountByGame ?? {},
+      players: matchCounts.participantsByGame ?? {},
     }),
     [matchCounts]
   );
@@ -173,20 +177,19 @@ export function PlayView() {
                   onAction={fetchGames}
                 />
               ) : (
-                <Grid container spacing={{ xs: 1.5, sm: 2, md: 2 }} sx={{ alignItems: 'stretch' }}>
+                <Grid container spacing={{ xs: 1.25, sm: 1.5, md: 2 }} sx={{ alignItems: 'stretch' }}>
                   {games.map((game) => (
-                    <Grid key={game.id} size={{ xs: 6, sm: 4, md: 2.4 }} sx={{ display: 'flex' }}>
+                    <Grid key={game.id} size={{ xs: 6, sm: 4, md: 2.4, lg: 2.4 }} sx={{ display: 'flex' }}>
                       <GameCard
                         title={game.name}
                         subTitle={getGameGenre(game.idPrefix)}
                         imageUrl={resolvePlayGameArt(game, 'image')}
-                        featured={game.idPrefix === 'PUBG'}
                         comingSoon={game.comingSoon}
                         disabled={game.comingSoon}
                         liveCount={countsByGameName.live[game.name] ?? 0}
-                        upcomingCount={countsByGameName.upcoming[game.name] ?? 0}
-                        liveLabel={t('play.liveGames')}
-                        upcomingLabel={t('play.upcomingGames')}
+                        playerCount={countsByGameName.players[game.name] ?? 0}
+                        liveBadgeLabel={t('play.liveBadge')}
+                        joinLabel={t('play.joinLabel')}
                         onClick={() => handleGameClick(game.id)}
                       />
                     </Grid>

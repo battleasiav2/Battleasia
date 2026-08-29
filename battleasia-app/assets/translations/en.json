@@ -242,7 +242,17 @@
     "tabTournament": "Tournament",
     "tabLive": "Live",
     "watchLive": "Watch Live",
-    "comingSoon": "COMING SOON"
+    "comingSoon": "COMING SOON",
+    "liveBadge": "LIVE",
+    "joinLabel": "JOIN"
+  },
+  "match": {
+    "spotsJoined": "Players joined",
+    "spotsJoinedHint": "Spots fill as players join — when full, entry closes.",
+    "matchFullHint": "All spots are taken — you can spectate if already joined.",
+    "matchFull": "Match full",
+    "matchFullToast": "This match is full — no more spots available.",
+    "yourBalance": "Your Balance"
   },
   "common": {
     "retry": "Retry",

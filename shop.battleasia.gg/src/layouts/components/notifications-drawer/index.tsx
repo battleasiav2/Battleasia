@@ -135,8 +135,8 @@ export function NotificationsDrawer({ data = [], sx, ...other }: NotificationsDr
         onClick={onOpen}
         sx={[
           {
-            width: { xs: 36, sm: 42 },
-            height: { xs: 32, sm: 38 },
+            width: { xs: 34, sm: 36 },
+            height: { xs: 34, sm: 36 },
             p: 0,
             borderRadius: '6px',
             bgcolor: open ? 'rgba(245, 197, 24, 0.14)' : 'rgba(8, 12, 20, 0.55)',

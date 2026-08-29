@@ -1,11 +1,14 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
+import 'package:battleasia_app/core/utils/match_capacity_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/utils/date_utils.dart' as date_utils;
 import 'package:battleasia_app/data/models/match_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
+import 'package:battleasia_app/presentation/widgets/play/match_spots_progress.dart';
 
 class MatchCard extends StatefulWidget {
   final MatchModel match;
@@ -251,6 +254,11 @@ class _MatchCardState extends State<MatchCard> {
   }
 
   Widget _buildMatchInfoSection(bool buttonDisabled) {
+    final capacity = getMatchCapacityState(
+      participantsCount: widget.match.participantsCount,
+      totalPlayer: widget.match.totalPlayer,
+    );
+    final isMatchFull = capacity.isFull;
     // Responsive sizes
     final contentPadding = ResponsiveUtils.getResponsiveSpacing(
       context,
@@ -418,6 +426,13 @@ class _MatchCardState extends State<MatchCard> {
               ),
               SizedBox(height: spacing12),
 
+              MatchSpotsProgress(
+                participantsCount: widget.match.participantsCount,
+                totalPlayer: widget.match.totalPlayer,
+                variant: MatchSpotsProgressVariant.compact,
+              ),
+              SizedBox(height: spacing12),
+
               // Statistics row
               Row(
                 children: [
@@ -503,11 +518,31 @@ class _MatchCardState extends State<MatchCard> {
                     ),
                   ),
                 )
-              : GoldButton(
-                  label: 'JOIN MATCH',
-                  loading: widget.joining,
-                  onPressed: buttonDisabled ? null : widget.onJoin,
-                ),
+              : isMatchFull
+                  ? OutlinedButton(
+                      onPressed: null,
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 40),
+                        foregroundColor: const Color(0xFFEF4444),
+                        side: BorderSide(
+                          color: const Color(0xFFEF4444).withValues(alpha: 0.45),
+                        ),
+                        backgroundColor: Colors.black.withValues(alpha: 0.35),
+                      ),
+                      child: Text(
+                        'match.matchFull'.tr(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    )
+                  : GoldButton(
+                      label: 'JOIN MATCH',
+                      loading: widget.joining,
+                      onPressed: buttonDisabled ? null : widget.onJoin,
+                    ),
         ],
       ),
     );

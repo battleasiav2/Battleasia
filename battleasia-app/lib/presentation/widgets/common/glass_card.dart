@@ -1,51 +1,66 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 
+/// Flat blur card surface — matches web UserGlassCard / HomeBlurPanel.
 class GlassCard extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry? margin;
-  final double borderRadius;
-  final bool showGoldGlow;
+  final bool showGoldBar;
+  /// Blur is opt-in (hero cards only) to keep scroll lists performant.
+  final bool useBlur;
 
   const GlassCard({
     super.key,
     required this.child,
     this.padding = const EdgeInsets.all(20),
     this.margin,
-    this.borderRadius = 2,
-    this.showGoldGlow = true,
+    this.showGoldBar = true,
+    this.useBlur = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    Widget card = Container(
       margin: margin,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(borderRadius),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.65),
-            blurRadius: 28,
-            offset: const Offset(0, 16),
+      child: Stack(
+        children: [
+          Container(
+            width: double.infinity,
+            padding: padding,
+            decoration: BoxDecoration(
+              color: const Color(0xFF161618).withValues(alpha: 0.4),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+            ),
+            foregroundDecoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+              ),
+            ),
+            child: child,
           ),
-          if (showGoldGlow)
-            BoxShadow(
-              color: AppColors.goldGlow(0.08),
-              blurRadius: 40,
-              spreadRadius: 0,
+          if (showGoldBar)
+            const Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: ColoredBox(
+                color: AppColors.gold,
+                child: SizedBox(height: 2),
+              ),
             ),
         ],
       ),
-      child: Container(
-        padding: padding,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(borderRadius),
-          // Solid translucent fill — avoids per-frame BackdropFilter cost on scroll.
-          color: AppColors.surface.withValues(alpha: 0.94),
-          border: Border.all(color: AppColors.border(0.14)),
-        ),
-        child: child,
+    );
+
+    if (!useBlur) return card;
+
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        child: card,
       ),
     );
   }

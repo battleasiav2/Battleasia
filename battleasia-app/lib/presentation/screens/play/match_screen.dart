@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/core/utils/match_capacity_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/match_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/play/match_card.dart';
+import 'package:battleasia_app/presentation/widgets/play/join_arena_card.dart';
+import 'package:battleasia_app/presentation/widgets/play/match_spots_progress.dart';
 import 'package:battleasia_app/core/utils/link_utils.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/match_detail_screen.dart';
@@ -100,6 +104,19 @@ class _MatchScreenState extends State<MatchScreen> {
         const SnackBar(
           content: Text('This match is available for premium members only'),
           backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    if (!isMatchJoinableByCapacity(
+      participantsCount: match.participantsCount,
+      totalPlayer: match.totalPlayer,
+    )) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('match.matchFullToast'.tr()),
+          backgroundColor: Colors.red,
         ),
       );
       return;
@@ -267,7 +284,11 @@ class _MatchScreenState extends State<MatchScreen> {
                 );
               },
         joining: _joiningMatchId == match.id,
-        canJoin: !match.premiumOnly || isPremiumUser,
+        canJoin: isMatchJoinableByCapacity(
+              participantsCount: match.participantsCount,
+              totalPlayer: match.totalPlayer,
+            ) &&
+            (!match.premiumOnly || isPremiumUser),
         isJoined: match.isJoined,
         showLive: isResult ? false : showLive,
         isPremiumUser: isPremiumUser,
@@ -686,7 +707,12 @@ class _MatchScreenState extends State<MatchScreen> {
                       Divider(height: 1, color: Colors.grey[300]),
                       detailRow('Team Type', detailText(match.teamType ?? '-')),
                       Divider(height: 1, color: Colors.grey[300]),
-                      detailRow('Players', detailText(match.totalPlayer.toString())),
+                      detailRow(
+                        'Players',
+                        detailText(
+                          '${match.participantsCount}/${match.totalPlayer}',
+                        ),
+                      ),
                       Divider(height: 1, color: Colors.grey[300]),
                       detailRow('Map', detailText(match.map ?? '-')),
                       Divider(height: 1, color: Colors.grey[300]),
@@ -721,6 +747,12 @@ class _MatchScreenState extends State<MatchScreen> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 12),
+                MatchSpotsProgress(
+                  participantsCount: match.participantsCount,
+                  totalPlayer: match.totalPlayer,
+                  variant: MatchSpotsProgressVariant.featured,
+                ),
                 const SizedBox(height: 16),
 
                 // Balance status row
@@ -731,28 +763,20 @@ class _MatchScreenState extends State<MatchScreen> {
                       authProvider.user?.balance ?? 0.0;
                   final insufficient =
                       match.entryFee > userBalance;
-                  return Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: insufficient
-                          ? Colors.red.shade50
-                          : Colors.green.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: insufficient
-                            ? Colors.red.shade200
-                            : Colors.green.shade200,
-                      ),
-                    ),
+                  return JoinArenaCard(
+                    accent: insufficient
+                        ? JoinArenaCardAccent.error
+                        : JoinArenaCardAccent.success,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Your Balance',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[600],
+                          'match.yourBalance'.tr(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
                           ),
                         ),
                         Row(
@@ -764,29 +788,26 @@ class _MatchScreenState extends State<MatchScreen> {
                               errorBuilder: (_, __, ___) =>
                                   const SizedBox.shrink(),
                             ),
-                            const SizedBox(width: 3),
+                            const SizedBox(width: 4),
                             Text(
                               userBalance.toStringAsFixed(0),
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: insufficient
-                                    ? Colors.red.shade700
-                                    : Colors.green.shade700,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
                               ),
                             ),
-                            if (insufficient) ...
-                              [
-                                const SizedBox(width: 6),
-                                Text(
-                                  '— Insufficient',
-                                  style: TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.red.shade700,
-                                  ),
+                            if (insufficient) ...[
+                              const SizedBox(width: 6),
+                              Text(
+                                '— Insufficient',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.red.shade400,
                                 ),
-                              ],
+                              ),
+                            ],
                           ],
                         ),
                       ],
@@ -803,6 +824,10 @@ class _MatchScreenState extends State<MatchScreen> {
                   final userBalance =
                       authProvider.user?.balance ?? 0.0;
                   final insufficient = match.entryFee > userBalance;
+                  final isFull = !isMatchJoinableByCapacity(
+                    participantsCount: match.participantsCount,
+                    totalPlayer: match.totalPlayer,
+                  );
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -821,7 +846,7 @@ class _MatchScreenState extends State<MatchScreen> {
                       ),
                       const SizedBox(width: 12),
                       ElevatedButton(
-                        onPressed: (_joiningMatchId != null || insufficient)
+                        onPressed: (_joiningMatchId != null || insufficient || isFull)
                             ? null
                             : _handleConfirmJoin,
                         style: ElevatedButton.styleFrom(
@@ -842,7 +867,7 @@ class _MatchScreenState extends State<MatchScreen> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text('Join'),
+                            : Text(isFull ? 'match.matchFull'.tr() : 'Join'),
                       ),
                     ],
                   );

@@ -33,6 +33,7 @@ import { SignInIconButton } from '../components/sign-in-icon-button';
 import {
     headerBarSx,
     headerContainerSx,
+    headerCompactSearchSx,
     getHeaderNavLinkSx,
 } from '../components/header-chrome';
 import { Searchbar } from '../components/searchbar';
@@ -194,7 +195,8 @@ export function UserLayout({
                                 border: `1px solid ${alpha('#ffffff', 0.1)}`,
                                 borderRadius: '6px',
                                 px: 0.5,
-                                py: 0.15,
+                                py: 0,
+                                ...headerCompactSearchSx,
                                 transition: 'border-color 0.2s ease, background-color 0.2s ease',
                                 '&:hover': {
                                     bgcolor: alpha('#000000', 0.55),

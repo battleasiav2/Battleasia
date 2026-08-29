@@ -116,3 +116,18 @@ export const headerRightStackSx: SystemStyleObject<Theme> = {
   height: 1,
   gap: { xs: 1, sm: 1.25 },
 };
+
+/** Shared compact control height for header icon buttons / search trigger */
+export const headerControlHeight = { xs: 34, sm: 36 } as const;
+
+export const headerCompactSearchSx: SystemStyleObject<Theme> = {
+  height: headerControlHeight,
+  minHeight: headerControlHeight,
+  maxHeight: headerControlHeight,
+  alignItems: 'center',
+  '& .MuiIconButton-root': {
+    width: 32,
+    height: 32,
+    p: 0.5,
+  },
+};

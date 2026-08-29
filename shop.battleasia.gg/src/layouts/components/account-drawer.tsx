@@ -1,21 +1,17 @@
 import type { IconButtonProps } from '@mui/material/IconButton';
 
-import { useState } from 'react';
 import { useBoolean } from 'minimal-shared/hooks';
 
 import {
   Box,
   Link,
   Stack,
-  Avatar,
   Drawer,
-  Collapse,
   Typography,
   IconButton,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
-import { paths } from 'src/routes/paths';
 import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
@@ -26,10 +22,8 @@ import { CONFIG } from 'src/global-config';
 import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { Scrollbar } from 'src/components/scrollbar';
-import { GLASS_CARD_RADIUS, getGoldTopLineCardSx, mergeGlassSx } from 'src/components/battle-glass-card';
-import { USER_COLORS, USER_IMAGES } from 'src/layouts/user/user-theme';
+import { USER_COLORS } from 'src/layouts/user/user-theme';
 
 import { AccountButton } from './account-button';
 import { SignOutButton } from './sign-out-button';
@@ -40,11 +34,23 @@ import type { AccountMenuItem } from '../menu-items-config';
 
 const GOLD = USER_COLORS.gold;
 
+const DRAWER_PAPER_SX = {
+  width: { xs: 'min(360px, 88vw)', sm: 400 },
+  display: 'flex',
+  flexDirection: 'column',
+  background: 'linear-gradient(180deg, #0c0c0e 0%, #000000 100%)',
+  borderLeft: `1px solid ${alpha(GOLD, 0.12)}`,
+  boxShadow: `-12px 0 48px ${alpha('#000000', 0.6)}, inset 1px 0 0 ${alpha(GOLD, 0.08)}`,
+} as const;
+
+const HAIRLINE_BORDER = `1px solid ${alpha(GOLD, 0.1)}`;
+
+const MAIN_APP_URL =
+  (import.meta.env.VITE_MAIN_APP_URL as string | undefined) || 'http://localhost:8081';
+
 export type AccountDrawerProps = IconButtonProps & {
   data?: AccountMenuItem[];
 };
-
-const MAIN_APP_URL = (import.meta.env.VITE_MAIN_APP_URL as string | undefined) || 'http://localhost:8081';
 
 function isMenuItemActive(pathname: string, option: AccountMenuItem): boolean {
   if (option.href && pathname.startsWith(option.href)) {
@@ -54,102 +60,75 @@ function isMenuItemActive(pathname: string, option: AccountMenuItem): boolean {
   return !!option.children?.some((child) => child.href && pathname.startsWith(child.href));
 }
 
-type MenuCardProps = {
+type DrawerLinkProps = {
   label: string;
-  icon: React.ReactNode;
   href?: string;
   onClick?: () => void;
   isActive?: boolean;
-  showChevron?: boolean;
-  chevronDown?: boolean;
   nested?: boolean;
 };
 
-function MenuCard({
+function DrawerLink({
   label,
-  icon,
   href,
   onClick,
   isActive = false,
-  showChevron = false,
-  chevronDown = false,
   nested = false,
-}: MenuCardProps) {
+}: DrawerLinkProps) {
+  const labelSx = {
+    flex: 1,
+    fontSize: nested ? { xs: 16, md: 17 } : { xs: 20, md: 22 },
+    fontWeight: isActive ? 600 : 500,
+    lineHeight: 1.25,
+    color: isActive ? '#ffffff' : alpha('#ffffff', 0.55),
+    transition: 'color 0.2s ease',
+  };
+
+  const rowSx = {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 1.25,
+    width: 1,
+    py: nested ? { xs: 0.85, md: 1 } : { xs: 1, md: 1.15 },
+    pl: nested ? 2 : 0,
+    pr: 1,
+    borderBottom: HAIRLINE_BORDER,
+    textDecoration: 'none',
+    cursor: onClick || href ? 'pointer' : 'default',
+    transition: 'opacity 0.2s ease',
+    '&:hover .drawer-link-label': {
+      color: '#ffffff',
+    },
+  };
+
+  const dotSx = {
+    width: 5,
+    height: 5,
+    borderRadius: '50%',
+    flexShrink: 0,
+    bgcolor: isActive ? GOLD : 'transparent',
+    transition: 'background-color 0.2s ease',
+  };
+
   const content = (
     <>
-      <Box
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-          color: 'inherit',
-          '& svg': {
-            width: nested ? 18 : 20,
-            height: nested ? 18 : 20,
-          },
-        }}
-      >
-        {icon}
-      </Box>
-
-      <Typography
-        sx={{
-          flex: 1,
-          fontSize: nested ? 13 : 14,
-          fontWeight: isActive ? 700 : 600,
-          letterSpacing: 0.02,
-          color: 'inherit',
-        }}
-      >
+      <Box sx={dotSx} />
+      <Typography component="span" className="drawer-link-label" sx={labelSx}>
         {label}
       </Typography>
-
-      {showChevron && (
-        <Iconify
-          icon={chevronDown ? 'eva:arrow-ios-downward-fill' : 'eva:arrow-ios-forward-fill'}
-          width={18}
-          sx={{ color: alpha('#ffffff', 0.4), flexShrink: 0 }}
-        />
-      )}
     </>
-  );
-
-  const cardSx = mergeGlassSx(
-    getGoldTopLineCardSx({
-      display: 'flex',
-      alignItems: 'center',
-      gap: 1.25,
-      px: nested ? 1.5 : 1.75,
-      py: nested ? 1 : 1.125,
-      pt: nested ? 1.2 : 1.35,
-      minHeight: nested ? 44 : 48,
-      borderRadius: `${GLASS_CARD_RADIUS}px`,
-      textDecoration: 'none',
-      cursor: 'pointer',
-      color: isActive ? GOLD : alpha('#ffffff', 0.78),
-      bgcolor: isActive ? alpha(GOLD, 0.08) : alpha('#000000', 0.42),
-      border: `1px solid ${isActive ? alpha(GOLD, 0.32) : alpha('#ffffff', 0.08)}`,
-      boxShadow: isActive ? `0 4px 18px ${alpha(GOLD, 0.1)}` : 'none',
-      transition: 'background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease',
-      '&:hover': {
-        bgcolor: alpha(GOLD, 0.1),
-        borderColor: alpha(GOLD, 0.28),
-        color: GOLD,
-      },
-    })
   );
 
   if (href) {
     return (
-      <Box component={RouterLink} href={href} sx={cardSx}>
+      <Box component={RouterLink} href={href} sx={rowSx}>
         {content}
       </Box>
     );
   }
 
   return (
-    <Box onClick={onClick} sx={cardSx}>
+    <Box onClick={onClick} sx={rowSx}>
       {content}
     </Box>
   );
@@ -169,145 +148,38 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
   };
 
   const { value: open, onFalse: onClose, onTrue: onOpen } = useBoolean();
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
-
-  const handleToggleExpand = (label: string) => {
-    setExpandedItems((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(label)) {
-        newSet.delete(label);
-      } else {
-        newSet.add(label);
-      }
-      return newSet;
-    });
-  };
-
-  const renderProfile = () => (
-    <Stack alignItems="center" spacing={1.25} sx={{ px: 2.5, pt: 7, pb: 2 }}>
-      <Avatar
-        src={user.photoURL}
-        alt={user.displayName}
-        sx={{
-          width: 84,
-          height: 84,
-          fontSize: 30,
-          fontWeight: 800,
-          color: GOLD,
-          bgcolor: alpha('#000000', 0.65),
-          border: `2px solid ${GOLD}`,
-          boxShadow: `0 0 28px ${alpha(GOLD, 0.22)}`,
-        }}
-      >
-        {user.displayName?.charAt(0).toUpperCase()}
-      </Avatar>
-
-      <Typography
-        variant="subtitle1"
-        noWrap
-        sx={{
-          maxWidth: 1,
-          fontWeight: 800,
-          letterSpacing: 0.02,
-          color: '#ffffff',
-        }}
-      >
-        {user.displayName}
-      </Typography>
-
-      <Typography
-        variant="body2"
-        noWrap
-        sx={{
-          maxWidth: 1,
-          color: alpha('#ffffff', 0.5),
-          fontSize: 13,
-        }}
-      >
-        {user.email}
-      </Typography>
-
-      <BattleGoldDivider variant="compact" />
-    </Stack>
-  );
 
   const renderList = () => (
-    <Stack spacing={1.25} sx={{ px: 2, py: 1 }}>
+    <Stack spacing={0} sx={{ px: { xs: 3, sm: 4 }, pt: 1, pb: 2 }}>
       {data.map((option) => {
         const translatedLabel = t(option.label);
-        const hasChildren = option.children && option.children.length > 0;
-        const isExpanded = expandedItems.has(option.label);
         const isActive = isMenuItemActive(pathname, option);
-
-        if (hasChildren) {
-          return (
-            <Box key={option.label}>
-              <MenuCard
-                label={translatedLabel}
-                icon={option.icon}
-                isActive={isActive}
-                showChevron
-                chevronDown={isExpanded}
-                onClick={() => handleToggleExpand(option.label)}
-              />
-
-              <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                <Stack spacing={0.75} sx={{ mt: 0.75, pl: 1.25 }}>
-                  {option.children?.map((child) => {
-                    const childActive = !!(child.href && pathname.startsWith(child.href));
-
-                    return (
-                      <Box key={child.label} onClick={onClose}>
-                        <MenuCard
-                          label={t(child.label)}
-                          icon={child.icon}
-                          href={child.href || '#'}
-                          isActive={childActive}
-                          nested
-                        />
-                      </Box>
-                    );
-                  })}
-                </Stack>
-              </Collapse>
-            </Box>
-          );
-        }
 
         return (
           <Box key={option.label} onClick={onClose}>
-            <MenuCard
+            <DrawerLink
               label={translatedLabel}
-              icon={option.icon}
               href={option.href || '#'}
               isActive={isActive}
             />
           </Box>
         );
       })}
-    </Stack>
-  );
 
-  const renderExtras = () => (
-    <Stack spacing={1.25} sx={{ px: 2, py: 2 }}>
       <Box
-        sx={mergeGlassSx(
-          getGoldTopLineCardSx({
-            p: 2,
-            pt: 2.25,
-            borderRadius: `${GLASS_CARD_RADIUS}px`,
-            bgcolor: alpha('#000000', 0.42),
-            border: `1px solid ${alpha(GOLD, 0.28)}`,
-          })
-        )}
+        sx={{
+          pt: 2.5,
+          pb: 0.5,
+          borderTop: HAIRLINE_BORDER,
+        }}
       >
         <Typography
           sx={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: 1.2,
+            fontSize: 11,
+            fontWeight: 600,
+            letterSpacing: 1,
             textTransform: 'uppercase',
-            color: alpha('#ffffff', 0.55),
+            color: alpha('#ffffff', 0.38),
             mb: 0.75,
           }}
         >
@@ -318,48 +190,34 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
             component="img"
             src={CONFIG.currencyIcon}
             alt="BAC"
-            sx={{ width: 22, height: 22, objectFit: 'contain' }}
+            sx={{ width: 20, height: 20, objectFit: 'contain' }}
           />
-          <Typography sx={{ fontSize: 22, fontWeight: 800, color: GOLD, lineHeight: 1 }}>
+          <Typography sx={{ fontSize: 24, fontWeight: 700, color: GOLD, lineHeight: 1 }}>
             {(balance ?? 0).toLocaleString()}
           </Typography>
         </Box>
       </Box>
 
-      <Box
-        component={Link}
-        href={MAIN_APP_URL}
-        underline="none"
-        sx={mergeGlassSx(
-          getGoldTopLineCardSx({
+      <Box sx={{ pt: 2, borderTop: HAIRLINE_BORDER }}>
+        <Link
+          href={MAIN_APP_URL}
+          underline="none"
+          onClick={onClose}
+          sx={{
             display: 'flex',
             alignItems: 'center',
-            gap: 1.25,
-            p: 1.5,
-            pt: 1.65,
-            borderRadius: `${GLASS_CARD_RADIUS}px`,
-            color: alpha('#ffffff', 0.78),
-            bgcolor: alpha('#000000', 0.42),
-            border: `1px solid ${alpha('#ffffff', 0.08)}`,
-            transition: 'all 0.2s ease',
-            '&:hover': {
-              color: GOLD,
-              bgcolor: alpha(GOLD, 0.1),
-              borderColor: alpha(GOLD, 0.28),
-            },
-          })
-        )}
-      >
-        <Iconify icon="game-icons:crossed-swords" width={20} sx={{ color: GOLD, flexShrink: 0 }} />
-        <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-          <Typography sx={{ fontSize: 13, fontWeight: 700, lineHeight: 1.3 }}>
-            {t('nav.battleArena')}
-          </Typography>
-          <Typography sx={{ fontSize: 11, color: alpha('#ffffff', 0.45), lineHeight: 1.3 }}>
-            {t('nav.backToMain')}
-          </Typography>
-        </Box>
-        <Iconify icon="eva:arrow-ios-forward-fill" width={18} sx={{ color: alpha('#ffffff', 0.4), flexShrink: 0 }} />
+            gap: 1.5,
+            py: 1.5,
+            fontSize: { xs: 16, md: 17 },
+            fontWeight: 500,
+            color: alpha('#ffffff', 0.55),
+            transition: 'color 0.2s ease',
+            '&:hover': { color: alpha('#ffffff', 0.88) },
+          }}
+        >
+          <Box sx={{ width: 5, height: 5, borderRadius: '50%', flexShrink: 0 }} />
+          {t('nav.backToMain')}
+        </Link>
       </Box>
     </Stack>
   );
@@ -381,74 +239,82 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
         slotProps={{
           backdrop: {
             sx: {
-              bgcolor: alpha('#000000', 0.55),
-              backdropFilter: 'blur(4px)',
+              bgcolor: alpha('#000000', 0.72),
             },
           },
         }}
         PaperProps={{
-          sx: {
-            width: { xs: 'min(320px, 90vw)', sm: 340 },
-            display: 'flex',
-            flexDirection: 'column',
-            bgcolor: alpha('#060608', 0.98),
-            backgroundImage: `
-              linear-gradient(180deg, ${alpha('#000000', 0.55)} 0%, ${alpha('#000000', 0.92)} 72%),
-              url(${USER_IMAGES.pageBg})
-            `,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center top',
-            borderLeft: `1px solid ${alpha('#ffffff', 0.1)}`,
-            boxShadow: `-12px 0 48px ${alpha('#000000', 0.65)}`,
-          },
+          sx: DRAWER_PAPER_SX,
         }}
       >
         <IconButton
           onClick={onClose}
           aria-label="Close menu"
           sx={{
-            top: 14,
-            left: 14,
+            top: 20,
+            right: 20,
             zIndex: 9,
             position: 'absolute',
-            width: 40,
-            height: 40,
-            color: alpha('#ffffff', 0.75),
-            bgcolor: alpha('#ffffff', 0.06),
-            border: `1px solid ${alpha('#ffffff', 0.1)}`,
+            width: 36,
+            height: 36,
+            p: 0,
+            color: alpha('#ffffff', 0.88),
             '&:hover': {
-              bgcolor: alpha(GOLD, 0.12),
-              borderColor: alpha(GOLD, 0.3),
-              color: GOLD,
+              bgcolor: 'transparent',
+              color: '#ffffff',
             },
           }}
         >
-          <Iconify icon="mingcute:close-line" width={22} />
+          <Iconify icon="mingcute:close-line" width={26} />
         </IconButton>
 
         <Scrollbar sx={{ flex: '1 1 auto' }}>
-          {renderProfile()}
-          {renderList()}
-          {renderExtras()}
+          <Stack spacing={0} sx={{ pt: { xs: 9, md: 10 }, pb: 2 }}>
+            {user.displayName ? (
+              <Typography
+                noWrap
+                sx={{
+                  px: { xs: 3, sm: 4 },
+                  pb: 2,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: alpha('#ffffff', 0.42),
+                  letterSpacing: 0.04,
+                }}
+              >
+                {user.displayName}
+              </Typography>
+            ) : null}
+            {renderList()}
+          </Stack>
         </Scrollbar>
 
         <Box
           sx={{
-            px: 2,
-            py: 2,
-            borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
-            bgcolor: alpha('#000000', 0.35),
-            backdropFilter: 'blur(8px)',
+            px: { xs: 3, sm: 4 },
+            py: 2.5,
+            mt: 'auto',
             mb: { xs: '72px', md: 0 },
           }}
         >
           <SignOutButton
             onClose={onClose}
+            variant="text"
             sx={{
-              width: 1,
-              height: 48,
-              fontSize: 13,
-              borderRadius: `${GLASS_CARD_RADIUS}px`,
+              justifyContent: 'flex-start',
+              px: 0,
+              minWidth: 0,
+              height: 'auto',
+              fontSize: { xs: 16, md: 17 },
+              fontWeight: 500,
+              color: alpha('#ffffff', 0.55),
+              textTransform: 'none',
+              border: 'none',
+              bgcolor: 'transparent',
+              '&:hover': {
+                bgcolor: 'transparent',
+                color: alpha('#ffffff', 0.88),
+              },
             }}
           />
         </Box>

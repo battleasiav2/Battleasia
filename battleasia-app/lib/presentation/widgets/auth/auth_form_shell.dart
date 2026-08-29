@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
-import 'package:battleasia_app/presentation/screens/home/home_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/battleasia_logo.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
@@ -15,7 +14,6 @@ class AuthFormShell extends StatefulWidget {
   final String? description;
   final Widget child;
   final bool wide;
-  final VoidCallback? onHome;
   final double? progress;
   final Widget? steps;
   final Widget? belowCard;
@@ -26,7 +24,6 @@ class AuthFormShell extends StatefulWidget {
     this.description,
     required this.child,
     this.wide = false,
-    this.onHome,
     this.progress,
     this.steps,
     this.belowCard,
@@ -45,20 +42,6 @@ class _AuthFormShellState extends State<AuthFormShell> {
     if (_assetsWarmed) return;
     _assetsWarmed = true;
     precacheImage(const AssetImage('assets/images/auth_m.webp'), context);
-  }
-
-  void _goHome() {
-    if (widget.onHome != null) {
-      widget.onHome!();
-      return;
-    }
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
-      return;
-    }
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-    );
   }
 
   @override
@@ -104,104 +87,51 @@ class _AuthFormShellState extends State<AuthFormShell> {
               ),
             ),
             SafeArea(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: _AuthBackHome(onPressed: _goHome),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      16,
+                      16,
+                      20 + bottomInset,
                     ),
-                  ),
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        return SingleChildScrollView(
-                          physics: const ClampingScrollPhysics(),
-                          keyboardDismissBehavior:
-                              ScrollViewKeyboardDismissBehavior.onDrag,
-                          padding: EdgeInsets.fromLTRB(
-                            16,
-                            8,
-                            16,
-                            20 + bottomInset,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight - 16,
+                      ),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: widget.wide ? 440 : 420,
                           ),
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              minHeight: constraints.maxHeight - 8,
-                            ),
-                            child: Center(
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth: widget.wide ? 440 : 420,
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    _AuthPanel(
-                                      title: widget.title,
-                                      description: widget.description,
-                                      progress: widget.progress,
-                                      steps: widget.steps,
-                                      child: widget.child,
-                                    ),
-                                    if (widget.belowCard != null) ...[
-                                      const SizedBox(height: 14),
-                                      widget.belowCard!,
-                                    ],
-                                  ],
-                                ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              _AuthPanel(
+                                title: widget.title,
+                                description: widget.description,
+                                progress: widget.progress,
+                                steps: widget.steps,
+                                child: widget.child,
                               ),
-                            ),
+                              if (widget.belowCard != null) ...[
+                                const SizedBox(height: 14),
+                                widget.belowCard!,
+                              ],
+                            ],
                           ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _AuthBackHome extends StatelessWidget {
-  final VoidCallback onPressed;
-  const _AuthBackHome({required this.onPressed});
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.black.withValues(alpha: 0.35),
-      borderRadius: BorderRadius.circular(8),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onPressed,
-        child: Container(
-          height: 36,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.gold.withValues(alpha: 0.4)),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.arrow_back, size: 16, color: AppColors.gold),
-              const SizedBox(width: 6),
-              Text(
-                'auth.backHome'.tr(),
-                style: const TextStyle(
-                  color: AppColors.gold,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );

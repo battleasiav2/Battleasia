@@ -14,6 +14,7 @@ import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/common/glass_stat_tile.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_item_card.dart';
+import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_detail_screen.dart';
 
@@ -451,13 +452,9 @@ class _ShopScreenState extends State<ShopScreen> {
       }),
     ];
 
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.7),
-        borderRadius: BorderRadius.circular(2),
-        border: Border.all(color: AppColors.border(0.16)),
-      ),
+      showGoldBar: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -7,6 +7,8 @@ import 'package:battleasia_app/core/services/games_service.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/game_model.dart';
+import 'package:battleasia_app/core/services/public_dashboard_service.dart';
+import 'package:battleasia_app/data/models/public_dashboard_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_hero_banner.dart';
@@ -27,8 +29,11 @@ class PlayScreen extends StatefulWidget {
 class _PlayScreenState extends State<PlayScreen> {
   final ScrollController _scrollController = ScrollController();
   final GamesService _gamesService = GamesService();
+  final PublicDashboardService _dashboardService = PublicDashboardService();
   String _activeTab = 'tournament';
   List<GameModel> _games = [];
+  Map<String, int> _liveCountByGame = {};
+  Map<String, int> _participantsByGame = {};
   bool _isLoading = true;
   String? _errorMessage;
 
@@ -36,6 +41,20 @@ class _PlayScreenState extends State<PlayScreen> {
   void initState() {
     super.initState();
     _fetchGames();
+    _fetchDashboardCounts();
+  }
+
+  Future<void> _fetchDashboardCounts() async {
+    final result = await _dashboardService.fetchDashboard();
+    if (!mounted || result['success'] != true) return;
+
+    final stats = result['data'] as PublicDashboardStats?;
+    if (stats == null) return;
+
+    setState(() {
+      _liveCountByGame = stats.liveCountByGame;
+      _participantsByGame = stats.participantsByGame;
+    });
   }
 
   @override
@@ -115,9 +134,9 @@ class _PlayScreenState extends State<PlayScreen> {
   Widget _buildSkeletonCardWithSpinner() {
     return GlassCard(
       padding: EdgeInsets.zero,
-      showGoldGlow: false,
+      showGoldBar: true,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.zero,
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -250,7 +269,7 @@ class _PlayScreenState extends State<PlayScreen> {
                       crossAxisCount: 2,
                       crossAxisSpacing: gridSpacing,
                       mainAxisSpacing: gridSpacing,
-                      childAspectRatio: 0.75,
+                      childAspectRatio: 1.0,
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (context, index) => index == 0
@@ -284,7 +303,7 @@ class _PlayScreenState extends State<PlayScreen> {
                       crossAxisCount: 2,
                       crossAxisSpacing: gridSpacing,
                       mainAxisSpacing: gridSpacing,
-                      childAspectRatio: 0.75,
+                      childAspectRatio: 1.0,
                     ),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final game = _games[index];
@@ -293,6 +312,10 @@ class _PlayScreenState extends State<PlayScreen> {
                         subTitle: game.genreLabel,
                         imageUrl: ImageUtils.getImageUrl(game.image),
                         comingSoon: game.comingSoon,
+                        liveCount: _liveCountByGame[game.name] ?? 0,
+                        playerCount: _participantsByGame[game.name] ?? 0,
+                        liveBadgeLabel: 'play.liveBadge'.tr(),
+                        joinLabel: 'play.joinLabel'.tr(),
                         onTap: () => _handleGameClick(game.id),
                       );
                     }, childCount: _games.length),

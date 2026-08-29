@@ -81,6 +81,8 @@ class PublicDashboardStats {
   final double totalWinnings;
   final int processedMatches;
   final int ongoingMatches;
+  final Map<String, int> liveCountByGame;
+  final Map<String, int> participantsByGame;
   final List<DashboardTopPlayer> topProfitPlayers;
   final List<DashboardTopPlayer> topPlayers;
   final List<DashboardMatchSummary> ongoingMatchList;
@@ -90,11 +92,20 @@ class PublicDashboardStats {
     required this.totalWinnings,
     required this.processedMatches,
     required this.ongoingMatches,
+    this.liveCountByGame = const {},
+    this.participantsByGame = const {},
     required this.topProfitPlayers,
     required this.topPlayers,
     required this.ongoingMatchList,
     required this.highPrizeMatches,
   });
+
+  static Map<String, int> _parseCountMap(dynamic raw) {
+    if (raw is! Map) return {};
+    return raw.map(
+      (key, value) => MapEntry(key.toString(), (value as num?)?.toInt() ?? 0),
+    );
+  }
 
   factory PublicDashboardStats.fromJson(Map<String, dynamic> json) {
     final platform = json['platform'] is Map
@@ -116,6 +127,8 @@ class PublicDashboardStats {
       totalWinnings: (platform['totalWinnings'] as num?)?.toDouble() ?? 0,
       processedMatches: (platform['processedMatches'] as num?)?.toInt() ?? 0,
       ongoingMatches: (platform['ongoingMatches'] as num?)?.toInt() ?? 0,
+      liveCountByGame: _parseCountMap(json['liveCountByGame']),
+      participantsByGame: _parseCountMap(json['participantsByGame']),
       topProfitPlayers: parseList(
         json['topProfitPlayers'],
         DashboardTopPlayer.fromJson,

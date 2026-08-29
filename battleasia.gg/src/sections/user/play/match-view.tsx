@@ -24,6 +24,7 @@ import { PlayTabs } from 'src/components/play-tabs';
 
 import { PLAY_IMAGE_PATHS } from './play-constants';
 import type { IMatch, MatchTab } from './match-types';
+import { isMatchJoinableByCapacity } from './match-capacity-utils';
 import {
   MatchCard,
   MatchJoinDialog,
@@ -164,6 +165,11 @@ export function MatchView() {
 
       if (match.premiumOnly && !isPremiumUser) {
         toast.error(t('match.premiumOnlyToast'), { id: 'premium-only' });
+        return;
+      }
+
+      if (!isMatchJoinableByCapacity(match)) {
+        toast.error(t('match.matchFullToast'), { id: 'match-full' });
         return;
       }
 
@@ -313,7 +319,7 @@ export function MatchView() {
                     match={match}
                     onJoin={handleRequestJoin}
                     joining={joiningMatchId === match.id}
-                    canJoin
+                    canJoin={isMatchJoinableByCapacity(match)}
                     isJoined={!!match.isJoined}
                     isPremiumUser={isPremiumUser}
                     isResult={activeTab === 'results'}

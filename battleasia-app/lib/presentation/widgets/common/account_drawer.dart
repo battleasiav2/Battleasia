@@ -4,9 +4,7 @@ import 'package:provider/provider.dart';
 import 'dart:typed_data';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
-import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/widgets/common/account_menu_tile.dart';
-import 'package:battleasia_app/presentation/widgets/common/gold_divider.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
@@ -149,264 +147,164 @@ class AccountDrawer extends StatelessWidget {
     String email,
     String? avatarUrl,
   ) {
-    showModalBottomSheet(
+    showGeneralDialog(
       context: context,
-      backgroundColor: AppColors.surface,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
-      ),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        minChildSize: 0.5,
-        maxChildSize: 0.95,
-        expand: false,
-        builder: (context, scrollController) => _AccountDrawerContent(
-          scrollController: scrollController,
-          authProvider: authProvider,
-          displayName: displayName,
-          email: email,
-          avatarUrl: avatarUrl,
-        ),
-      ),
+      barrierDismissible: true,
+      barrierLabel: 'Close menu',
+      barrierColor: Colors.black.withValues(alpha: 0.72),
+      transitionDuration: const Duration(milliseconds: 280),
+      pageBuilder: (context, _, __) => const SizedBox.shrink(),
+      transitionBuilder: (context, animation, _, __) {
+        final width = MediaQuery.sizeOf(context).width;
+        final panelWidth = width >= 600 ? 400.0 : (width * 0.88).clamp(280.0, 360.0);
+
+        return Align(
+          alignment: Alignment.centerRight,
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(1, 0),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF0C0C0E), Colors.black],
+                ),
+                border: Border(
+                  left: BorderSide(
+                    color: AppColors.gold.withValues(alpha: 0.12),
+                  ),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.6),
+                    blurRadius: 48,
+                    offset: const Offset(-12, 0),
+                  ),
+                ],
+              ),
+              child: SizedBox(
+                width: panelWidth,
+                height: double.infinity,
+                child: _AccountDrawerContent(
+                  authProvider: authProvider,
+                  displayName: displayName,
+                  email: email,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
 
 class _AccountDrawerContent extends StatelessWidget {
-  final ScrollController scrollController;
   final AuthProvider authProvider;
   final String displayName;
   final String email;
-  final String? avatarUrl;
 
   const _AccountDrawerContent({
-    required this.scrollController,
     required this.authProvider,
     required this.displayName,
     required this.email,
-    this.avatarUrl,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = ResponsiveUtils.isMobile(context);
-    final titleFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 24.0,
-      min: 20.0,
-      max: 36.0,
-    );
-    final bodyFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 16.0,
-    );
-    final buttonFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 18.0,
-      min: 16.0,
-      max: 20.0,
-    );
-    final avatarSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 48.0,
-    ).clamp(40.0, 56.0);
-    final avatarFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 36.0,
-      min: 28.0,
-      max: 44.0,
-    );
-
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Handle bar
-        Container(
-          margin: const EdgeInsets.only(top: 12),
-          width: 40,
-          height: 4,
-          decoration: BoxDecoration(
-            color: AppColors.textMuted.withValues(alpha: 0.35),
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-
         Align(
           alignment: Alignment.topRight,
           child: IconButton(
-            icon: const Icon(Icons.close, color: AppColors.textPrimary),
+            icon: Icon(Icons.close, color: Colors.white.withValues(alpha: 0.88), size: 26),
             onPressed: () => Navigator.pop(context),
           ),
         ),
-
-        // Scrollable content
         Expanded(
           child: SingleChildScrollView(
-            controller: scrollController,
-            padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 24 : 40,
-              vertical: 16,
+            padding: const EdgeInsets.fromLTRB(28, 8, 24, 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (displayName.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Text(
+                      displayName,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.42),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                _buildExpandableAccountMenu(context),
+                AccountMenuTile(
+                  label: 'nav.play'.tr(),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const PlayScreen()),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'nav.shop'.tr(),
+                  onTap: () {
+                    Navigator.pop(context);
+                    openShopRoute(context, const ShopScreen(), routeName: '/shop');
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'nav.referral'.tr(),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ReferralScreen()),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'nav.feed'.tr(),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const FeedScreen()),
+                    );
+                  },
+                ),
+              ],
             ),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 500),
-              child: Column(
-                children: [
-                  // Avatar section — gold ring
-                  Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.gold, width: 2),
-                    ),
-                    child: AccountDrawer._buildAvatarWidget(
-                      avatarUrl: avatarUrl,
-                      radius: avatarSize,
-                      displayName: displayName,
-                      fontSize: avatarFontSize,
-                      textColor: Colors.black,
-                    ),
-                  ),
-                  SizedBox(
-                    height: ResponsiveUtils.getResponsiveSpacing(
-                      context,
-                      baseSize: 16.0,
-                    ).clamp(12.0, 20.0),
-                  ),
-
-                  // Display name
-                  Text(
-                    displayName,
-                    style: AppTheme.heading3.copyWith(
-                      fontSize: titleFontSize,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  SizedBox(
-                    height: ResponsiveUtils.getResponsiveSpacing(
-                      context,
-                      baseSize: 4.0,
-                    ).clamp(2.0, 6.0),
-                  ),
-
-                  // Email
-                  Text(
-                    email,
-                    style: AppTheme.bodyMedium.copyWith(
-                      fontSize: bodyFontSize,
-                      color: AppColors.textMuted,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  const Center(child: GoldDivider(width: 140)),
-                  SizedBox(
-                    height: ResponsiveUtils.getResponsiveSpacing(
-                      context,
-                      baseSize: 32.0,
-                    ).clamp(24.0, 40.0),
-                  ),
-
-                  // Menu items - Based on web menu-items-config.tsx
-                  // Account (with children)
-                  _buildExpandableAccountMenu(context),
-
-                  AccountMenuTile(
-                    icon: Icons.sports_esports,
-                    label: 'nav.play'.tr(),
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PlayScreen(),
-                        ),
-                      );
-                    },
-                  ),
-
-                  AccountMenuTile(
-                    icon: Icons.shopping_bag,
-                    label: 'nav.shop'.tr(),
-                    onTap: () {
-                      Navigator.pop(context);
-                      openShopRoute(context, const ShopScreen(), routeName: '/shop');
-                    },
-                  ),
-
-                  AccountMenuTile(
-                    icon: Icons.people,
-                    label: 'nav.referral'.tr(),
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ReferralScreen(),
-                        ),
-                      );
-                    },
-                  ),
-
-                  AccountMenuTile(
-                    icon: Icons.article,
-                    label: 'nav.feed'.tr(),
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const FeedScreen(),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Sign out
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: () async {
-                        await authProvider.signOut();
-                        if (context.mounted) {
-                          Navigator.pop(context);
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (context) => const SignInScreen(),
-                            ),
-                          );
-                        }
-                      },
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.red.shade300,
-                        side: BorderSide(color: Colors.red.shade400.withValues(alpha: 0.6)),
-                        padding: EdgeInsets.symmetric(
-                          vertical: ResponsiveUtils.getResponsiveSpacing(
-                            context,
-                            baseSize: 16.0,
-                          ).clamp(12.0, 20.0),
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      child: Text(
-                        'account.logout'.tr(),
-                        style: AppTheme.bodyLarge.copyWith(
-                          fontSize: buttonFontSize,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    height: ResponsiveUtils.getResponsiveSpacing(
-                      context,
-                      baseSize: 24.0,
-                    ).clamp(16.0, 32.0),
-                  ),
-                ],
-              ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(28, 0, 24, 28),
+          child: TextButton(
+            onPressed: () async {
+              await authProvider.signOut();
+              if (context.mounted) {
+                Navigator.pop(context);
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const SignInScreen()),
+                );
+              }
+            },
+            style: TextButton.styleFrom(
+              alignment: Alignment.centerLeft,
+              foregroundColor: Colors.white.withValues(alpha: 0.55),
+              padding: EdgeInsets.zero,
+            ),
+            child: Text(
+              'account.logout'.tr(),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
           ),
         ),
@@ -415,165 +313,161 @@ class _AccountDrawerContent extends StatelessWidget {
   }
 
   Widget _buildExpandableAccountMenu(BuildContext context) {
-    return AccountMenuTile.shell(
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: AppColors.gold.withValues(alpha: 0.1)),
+        ),
+      ),
       child: Theme(
         data: Theme.of(context).copyWith(
           dividerColor: Colors.transparent,
-          splashColor: AppColors.gold.withValues(alpha: 0.08),
-          highlightColor: AppColors.gold.withValues(alpha: 0.05),
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
         ),
         child: ExpansionTile(
-          tilePadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
-          childrenPadding: const EdgeInsets.fromLTRB(4, 0, 8, 10),
-          leading: Icon(
-            Icons.person,
-            color: Colors.white.withValues(alpha: 0.88),
-            size: 22,
+          tilePadding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+          childrenPadding: const EdgeInsets.only(left: 4, bottom: 4),
+          title: Row(
+            children: [
+              Container(
+                width: 5,
+                height: 5,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.transparent,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'account.menuAccount'.tr(),
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.55),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 20,
+                    height: 1.25,
+                  ),
+                ),
+              ),
+            ],
           ),
-          title: Text(
-            'account.menuAccount'.tr(),
-            style: AppTheme.bodyMedium.copyWith(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
-              fontSize: 15,
-            ),
+        iconColor: Colors.white.withValues(alpha: 0.42),
+        collapsedIconColor: Colors.white.withValues(alpha: 0.42),
+        children: [
+          AccountMenuTile(
+            label: 'account.profile'.tr(),
+            nested: true,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const AccountScreen()),
+              );
+            },
           ),
-          iconColor: Colors.white.withValues(alpha: 0.42),
-          collapsedIconColor: Colors.white.withValues(alpha: 0.42),
-          children: [
-            AccountMenuTile(
-              icon: Icons.person_outline,
-              label: 'account.profile'.tr(),
-              nested: true,
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AccountScreen()),
-                );
-              },
-            ),
-            AccountMenuTile(
-              icon: Icons.account_balance_wallet,
-              label: 'account.wallet'.tr(),
-              nested: true,
-              onTap: () {
-                Navigator.pop(context);
-                openShopRoute(
-                  context,
-                  const WalletScreen(fromShop: true),
-                  routeName: '/shop/wallet',
-                );
-              },
-            ),
-            AccountMenuTile(
-              icon: Icons.payments_outlined,
-              label: 'account.withdraw'.tr(),
-              nested: true,
-              onTap: () {
-                Navigator.pop(context);
-                openShopRoute(
-                  context,
-                  const ShopWithdrawalScreen(),
-                  routeName: '/shop/withdraw',
-                );
-              },
-            ),
-            AccountMenuTile(
-              icon: Icons.sports_esports,
-              label: 'account.myMatches'.tr(),
-              nested: true,
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MyMatchesScreen()),
-                );
-              },
-            ),
-            AccountMenuTile(
-              icon: Icons.shopping_bag,
-              label: 'account.myOrders'.tr(),
-              nested: true,
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MyOrdersScreen()),
-                );
-              },
-            ),
-            AccountMenuTile(
-              icon: Icons.bar_chart,
-              label: 'account.myStatistics'.tr(),
-              nested: true,
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MyStatisticsScreen(),
-                  ),
-                );
-              },
-            ),
-            AccountMenuTile(
-              icon: Icons.people,
-              label: 'account.myReferrals'.tr(),
-              nested: true,
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MyReferralsScreen(),
-                  ),
-                );
-              },
-            ),
-            AccountMenuTile(
-              icon: Icons.notifications_active_outlined,
-              label: 'account.notifications'.tr(),
-              nested: true,
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NotificationsScreen(),
-                  ),
-                );
-              },
-            ),
-            AccountMenuTile(
-              icon: Icons.emoji_events,
-              label: 'account.leaderboard'.tr(),
-              nested: true,
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LeaderboardScreen(),
-                  ),
-                );
-              },
-            ),
-            AccountMenuTile(
-              icon: Icons.support_agent,
-              label: 'account.customerSupport'.tr(),
-              nested: true,
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const CustomerSupportScreen(),
-                  ),
-                );
-              },
-            ),
-          ],
+          AccountMenuTile(
+            label: 'account.wallet'.tr(),
+            nested: true,
+            onTap: () {
+              Navigator.pop(context);
+              openShopRoute(
+                context,
+                const WalletScreen(fromShop: true),
+                routeName: '/shop/wallet',
+              );
+            },
+          ),
+          AccountMenuTile(
+            label: 'account.withdraw'.tr(),
+            nested: true,
+            onTap: () {
+              Navigator.pop(context);
+              openShopRoute(
+                context,
+                const ShopWithdrawalScreen(),
+                routeName: '/shop/withdraw',
+              );
+            },
+          ),
+          AccountMenuTile(
+            label: 'account.myMatches'.tr(),
+            nested: true,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MyMatchesScreen()),
+              );
+            },
+          ),
+          AccountMenuTile(
+            label: 'account.myOrders'.tr(),
+            nested: true,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MyOrdersScreen()),
+              );
+            },
+          ),
+          AccountMenuTile(
+            label: 'account.myStatistics'.tr(),
+            nested: true,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MyStatisticsScreen()),
+              );
+            },
+          ),
+          AccountMenuTile(
+            label: 'account.myReferrals'.tr(),
+            nested: true,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MyReferralsScreen()),
+              );
+            },
+          ),
+          AccountMenuTile(
+            label: 'account.notifications'.tr(),
+            nested: true,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+              );
+            },
+          ),
+          AccountMenuTile(
+            label: 'account.leaderboard'.tr(),
+            nested: true,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LeaderboardScreen()),
+              );
+            },
+          ),
+          AccountMenuTile(
+            label: 'account.customerSupport'.tr(),
+            nested: true,
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CustomerSupportScreen()),
+              );
+            },
+          ),
+        ],
         ),
       ),
     );

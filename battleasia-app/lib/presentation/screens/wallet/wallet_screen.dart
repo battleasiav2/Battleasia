@@ -10,6 +10,7 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/balance_history_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/withdraw_sheet.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
@@ -492,12 +493,8 @@ class _WalletScreenState extends State<WalletScreen> {
       baseSize: 16.0,
     ).clamp(12.0, 16.0);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surfaceElevated.withValues(alpha: 0.95),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border(0.16)),
-      ),
+    return GlassCard(
+      useBlur: true,
       padding: EdgeInsets.all(cardPadding),
       child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -945,14 +942,10 @@ class _WalletScreenState extends State<WalletScreen> {
       baseSize: 16.0,
     ).clamp(14.0, 16.0);
 
-    return Container(
+    return GlassCard(
+      showGoldBar: false,
       margin: EdgeInsets.only(bottom: cardMargin),
       padding: EdgeInsets.all(cardPadding),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceElevated.withValues(alpha: 0.92),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.border(0.14)),
-      ),
       child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

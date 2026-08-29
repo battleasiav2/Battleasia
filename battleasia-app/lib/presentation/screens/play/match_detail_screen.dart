@@ -1,9 +1,11 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
+import 'package:battleasia_app/core/utils/match_capacity_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/utils/date_utils.dart' as date_utils;
 import 'package:battleasia_app/data/models/match_model.dart';
@@ -11,6 +13,7 @@ import 'package:battleasia_app/data/models/match_participant_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
+import 'package:battleasia_app/presentation/widgets/play/match_spots_progress.dart';
 
 class MatchDetailScreen extends StatefulWidget {
   final String matchId;
@@ -95,6 +98,19 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Insufficient balance'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    if (!isMatchJoinableByCapacity(
+      participantsCount: _matchDetail!.participantsCount,
+      totalPlayer: _matchDetail!.totalPlayer,
+    )) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('match.matchFullToast'.tr()),
           backgroundColor: Colors.red,
         ),
       );
@@ -429,6 +445,14 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
 
         SizedBox(height: spacing),
 
+        MatchSpotsProgress(
+          participantsCount: _matchDetail!.participantsCount,
+          totalPlayer: _matchDetail!.totalPlayer,
+          variant: MatchSpotsProgressVariant.featured,
+        ),
+
+        SizedBox(height: spacing),
+
         // Join Button
         Builder(
           builder: (context) {
@@ -437,10 +461,15 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
               listen: false,
             );
             final balance = authProvider.user?.balance ?? 0.0;
+            final isFull = !isMatchJoinableByCapacity(
+              participantsCount: _matchDetail!.participantsCount,
+              totalPlayer: _matchDetail!.totalPlayer,
+            );
             final buttonDisabled =
                 _matchDetail!.isJoined ||
                 _joining ||
-                _matchDetail!.entryFee > balance;
+                _matchDetail!.entryFee > balance ||
+                isFull;
             return SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -478,7 +507,9 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
                     : Text(
                         _matchDetail!.isJoined
                             ? 'Already Joined'
-                            : 'Join Match',
+                            : isFull
+                                ? 'match.matchFull'.tr()
+                                : 'Join Match',
                         style: AppTheme.bodyMedium.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

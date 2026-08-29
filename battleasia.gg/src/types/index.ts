@@ -147,6 +147,7 @@ export type PublicDashboardStats = {
     platform: DashboardPlatformStats;
     liveCountByGame?: Record<string, number>;
     upcomingCountByGame?: Record<string, number>;
+    participantsByGame?: Record<string, number>;
     topProfitPlayers: DashboardTopPlayer[];
     topPlayers: DashboardTopPlayer[];
     ongoingMatches: DashboardMatchSummary[];

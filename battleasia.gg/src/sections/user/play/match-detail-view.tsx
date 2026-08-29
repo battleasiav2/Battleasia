@@ -29,6 +29,7 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import type { MatchDetailData } from './match-types';
 import { getMatchBannerUrl } from './match-types';
+import { isMatchJoinableByCapacity } from './match-capacity-utils';
 import {
   MatchStatPill,
   MatchDetailHero,
@@ -36,6 +37,7 @@ import {
   MatchDetailRoomPanel,
   MatchDetailDescription,
   MatchDetailParticipants,
+  MatchSpotsProgress,
 } from './components';
 
 // ----------------------------------------------------------------------
@@ -108,6 +110,11 @@ export function MatchDetailView() {
     const pubgId = (user?.pubgId || '').trim();
     if (!pubgId) {
       toast.error(t('match.pubgIdRequired'), { id: 'pubg-id-required' });
+      return;
+    }
+
+    if (!isMatchJoinableByCapacity(matchDetail)) {
+      toast.error(t('match.matchFullToast'), { id: 'match-full' });
       return;
     }
 
@@ -195,9 +202,15 @@ export function MatchDetailView() {
               {matchDetail.matchType?.toUpperCase() || 'N/A'}
             </MatchStatPill>
             <MatchStatPill label={t('match.players')} minHeight={64}>
-              {matchDetail.totalPlayer ?? matchDetail.participantsCount ?? 0}
+              {`${matchDetail.participantsCount ?? 0} / ${matchDetail.totalPlayer ?? 0}`}
             </MatchStatPill>
           </Box>
+
+          <MatchSpotsProgress
+            variant="featured"
+            participantsCount={matchDetail.participantsCount}
+            totalPlayer={matchDetail.totalPlayer}
+          />
 
           {matchDetail.isJoined ? (
             <MatchDetailRoomPanel match={matchDetail} title={t('matchDetail.roomDetails')} />
@@ -232,7 +245,12 @@ export function MatchDetailView() {
                 disableElevation
                 fullWidth
                 onClick={handleJoinMatch}
-                disabled={matchDetail.isJoined || joining || (matchDetail.entryFee ?? 0) > balance}
+                disabled={
+                  matchDetail.isJoined ||
+                  joining ||
+                  (matchDetail.entryFee ?? 0) > balance ||
+                  !isMatchJoinableByCapacity(matchDetail)
+                }
                 sx={{
                   ...userGoldButtonSx,
                   maxWidth: { sm: 280 },
@@ -241,9 +259,11 @@ export function MatchDetailView() {
               >
                 {matchDetail.isJoined
                   ? t('matchDetail.alreadyJoined')
-                  : joining
-                    ? t('matchDetail.joining')
-                    : t('matchDetail.joinMatch')}
+                  : !isMatchJoinableByCapacity(matchDetail)
+                    ? t('match.matchFull')
+                    : joining
+                      ? t('matchDetail.joining')
+                      : t('matchDetail.joinMatch')}
               </Button>
             </Stack>
           </Box>

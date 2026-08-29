@@ -86,8 +86,12 @@ type TournamentRuleItemProps = {
   answer: string;
 };
 
-function TournamentRuleItem({ question, answer }: TournamentRuleItemProps) {
-  const [open, setOpen] = useState(false);
+function TournamentRuleItem({
+  question,
+  answer,
+  defaultOpen = false,
+}: TournamentRuleItemProps & { defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
 
   return (
     <Box sx={{ borderBottom: `1px solid ${alpha('#ffffff', 0.1)}` }}>
@@ -102,13 +106,21 @@ function TournamentRuleItem({ question, answer }: TournamentRuleItemProps) {
           alignItems: 'center',
           justifyContent: 'space-between',
           gap: 2,
-          py: { xs: 2, md: 2.25 },
-          px: 0,
+          py: { xs: 1.5, md: 1.65 },
+          px: { xs: 1, md: 1.25 },
+          mx: { xs: -1, md: -1.25 },
           border: 'none',
-          bgcolor: 'transparent',
+          borderLeft: `2px solid ${open ? GOLD : 'transparent'}`,
+          bgcolor: open ? alpha(GOLD, 0.06) : 'transparent',
           cursor: 'pointer',
           textAlign: 'left',
           color: 'inherit',
+          transition: 'background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
+          '&:hover': {
+            bgcolor: alpha(GOLD, 0.08),
+            borderLeftColor: alpha(GOLD, 0.75),
+            transform: 'translateX(2px)',
+          },
         }}
       >
         <Typography
@@ -136,15 +148,38 @@ function TournamentRuleItem({ question, answer }: TournamentRuleItemProps) {
             display: 'grid',
             placeItems: 'center',
             borderRadius: '50%',
-            border: `1px solid ${alpha(GOLD, 0.65)}`,
+            border: `2px solid ${open ? GOLD : alpha(GOLD, 0.72)}`,
             color: GOLD,
             transition: 'transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease',
             transform: open ? 'rotate(45deg)' : 'none',
-            bgcolor: open ? alpha(GOLD, 0.1) : 'transparent',
-            ...(open && { borderColor: GOLD }),
+            bgcolor: open ? alpha(GOLD, 0.12) : 'transparent',
           }}
         >
-          <Iconify icon="mingcute:add-line" width={18} />
+          <Box
+            sx={{
+              position: 'relative',
+              width: 13,
+              height: 13,
+              '&::before, &::after': {
+                content: '""',
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                bgcolor: 'currentColor',
+                borderRadius: 1,
+              },
+              '&::before': {
+                width: 2.5,
+                height: 13,
+                transform: 'translate(-50%, -50%)',
+              },
+              '&::after': {
+                width: 13,
+                height: 2.5,
+                transform: 'translate(-50%, -50%)',
+              },
+            }}
+          />
         </Box>
       </Box>
 
@@ -152,10 +187,11 @@ function TournamentRuleItem({ question, answer }: TournamentRuleItemProps) {
         <Typography
           className="font-tr"
           sx={{
-            pb: { xs: 2, md: 2.25 },
+            pb: { xs: 1.5, md: 1.65 },
+            px: { xs: 1, md: 1.25 },
             fontSize: { xs: 12, sm: 13 },
             color: alpha('#ffffff', 0.58),
-            lineHeight: 1.65,
+            lineHeight: 1.6,
           }}
         >
           {answer}
@@ -172,7 +208,7 @@ function blackGamingSectionSx(art?: string) {
     overflowX: 'clip' as const,
     overflowY: 'visible' as const,
     bgcolor: '#0a0a0a',
-    py: { xs: 4.5, md: 6 },
+    py: { xs: 3.25, md: 5 },
     px: { xs: 2, md: 4 },
     ...(art
       ? {
@@ -392,9 +428,18 @@ export function HomeView() {
             justifyContent: { xs: 'center', md: 'flex-end' },
             overflow: 'hidden',
             // CLS: reserved box before logo image loads
-            minHeight: { xs: 56, sm: 68, md: 84 },
+            minHeight: { xs: 64, sm: 76, md: 96 },
             animation: `${logoEnter} 1s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both`,
             '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              inset: { xs: '12% 8%', md: '8% 0' },
+              zIndex: 0,
+              background: `radial-gradient(ellipse 80% 70% at 50% 50%, ${alpha(GOLD, 0.22)} 0%, transparent 72%)`,
+              pointerEvents: 'none',
+              filter: 'blur(8px)',
+            },
           }}
         >
           <Box
@@ -409,14 +454,20 @@ export function HomeView() {
             sx={{
               position: 'relative',
               zIndex: 1,
-              width: { xs: 'min(100%, 280px)', sm: 'min(100%, 340px)', md: '100%' },
-              maxWidth: { xs: 280, sm: 340, md: 420 },
+              width: { xs: 'min(100%, 300px)', sm: 'min(100%, 360px)', md: '100%' },
+              maxWidth: { xs: 300, sm: 360, md: 460 },
               height: 'auto',
               aspectRatio: '5 / 1',
               display: 'block',
               objectFit: 'contain',
               objectPosition: { xs: 'center', md: 'right' },
-              filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.55))',
+              filter: `
+                drop-shadow(0 3px 10px rgba(0, 0, 0, 0.8))
+                drop-shadow(0 0 32px ${alpha(GOLD, 0.42)})
+                drop-shadow(0 0 64px ${alpha(GOLD, 0.18)})
+              `,
+              animation: `${titleGlow} 4.5s 2s ease-in-out infinite`,
+              '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
             }}
           />
           <Box
@@ -572,7 +623,7 @@ export function HomeView() {
   const sectionAbout = (
     <Box id="about-us" sx={{ ...blackGamingSectionSx(HOME_GAME_ARTS[0]), position: 'relative' }}>
       <Stack
-        spacing={{ xs: 3, md: 4 }}
+        spacing={{ xs: 2.25, md: 3 }}
         sx={{ position: 'relative', zIndex: 1, maxWidth: 880, mx: 'auto' }}
       >
         <Stack spacing={1.25} alignItems="center">
@@ -719,7 +770,7 @@ export function HomeView() {
     <Box id="how-to-play" sx={blackGamingSectionSx(HOME_GAME_ARTS[2])}>
       <Box sx={{ position: 'relative', zIndex: 1, maxWidth: 1280, mx: 'auto' }}>
         <HomeBlurPanel>
-          <Stack spacing={{ xs: 2.5, md: 3.5 }}>
+          <Stack spacing={{ xs: 2, md: 2.75 }}>
             <Stack spacing={1.25} alignItems="center">
               <Typography
                 sx={{
@@ -1032,7 +1083,7 @@ export function HomeView() {
   const sectionRoules = (
     <Box id="rules" sx={blackGamingSectionSx(HOME_GAME_ARTS[4])}>
       <Stack
-        spacing={{ xs: 3, md: 4 }}
+        spacing={{ xs: 2.25, md: 3 }}
         sx={{ position: 'relative', zIndex: 1, maxWidth: 1100, mx: 'auto', width: 1 }}
       >
         <Stack spacing={1.25} alignItems="center">
@@ -1077,18 +1128,25 @@ export function HomeView() {
           <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
         </Stack>
 
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-            columnGap: { md: 6, lg: 8 },
-            alignItems: 'start',
-          }}
-        >
-          {FAQ.map((faq) => (
-            <TournamentRuleItem key={faq.question} question={faq.question} answer={faq.answer} />
-          ))}
-        </Box>
+        <HomeBlurPanel sx={{ px: { xs: 1.5, md: 2 }, py: { xs: 0.5, md: 0.75 } }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+              columnGap: { md: 4, lg: 6 },
+              alignItems: 'start',
+            }}
+          >
+            {FAQ.map((faq, idx) => (
+              <TournamentRuleItem
+                key={faq.question}
+                question={faq.question}
+                answer={faq.answer}
+                defaultOpen={idx === 0}
+              />
+            ))}
+          </Box>
+        </HomeBlurPanel>
 
         <Stack direction="row" justifyContent="center" spacing={1} alignItems="center" sx={{ pt: 1 }}>
           <Iconify icon="solar:chat-round-dots-bold" width={16} sx={{ color: alpha('#ffffff', 0.4) }} />

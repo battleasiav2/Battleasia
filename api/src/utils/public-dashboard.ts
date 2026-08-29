@@ -233,6 +233,34 @@ export async function getPublicDashboardStats() {
     if (name) upcomingCountByGame[name] = row.count;
   }
 
+  const participantsByGameAgg = await MatchParticipant.aggregate<{ _id: string; count: number }>([
+    {
+      $lookup: {
+        from: 'matches',
+        localField: 'matchId',
+        foreignField: '_id',
+        as: 'match',
+      },
+    },
+    { $unwind: '$match' },
+    { $match: { 'match.status': { $in: ['active', 'start'] } } },
+    { $group: { _id: '$match.gameId', count: { $sum: 1 } } },
+  ]);
+  const participantGameIds = participantsByGameAgg
+    .map((row) => row._id)
+    .filter((id) => Types.ObjectId.isValid(id));
+  const participantGameNames = participantGameIds.length
+    ? await Game.find({ _id: { $in: participantGameIds.map((id) => new Types.ObjectId(id)) } })
+        .select('name')
+        .lean()
+    : [];
+  const participantNameMap = new Map(participantGameNames.map((g) => [g._id.toString(), g.name]));
+  const participantsByGame: Record<string, number> = {};
+  for (const row of participantsByGameAgg) {
+    const name = participantNameMap.get(row._id.toString());
+    if (name) participantsByGame[name] = row.count;
+  }
+
   return {
     platform: {
       totalWinnings: Math.round(totalWinnings * 10) / 10,
@@ -242,6 +270,7 @@ export async function getPublicDashboardStats() {
     },
     liveCountByGame,
     upcomingCountByGame,
+    participantsByGame,
     topProfitPlayers,
     topPlayers,
     ongoingMatches,

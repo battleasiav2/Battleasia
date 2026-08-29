@@ -22,7 +22,9 @@ import { USER_COLORS, userSolidGoldButtonSx, userGhostButtonSx } from 'src/layou
 
 import { MatchStatPill } from './match-stat-pill';
 import { MatchRoomDialog } from './match-room-dialog';
+import { MatchSpotsProgress } from './match-spots-progress';
 import { estimateMatchWinningPool } from '../match-prize-utils';
+import { getMatchCapacityState } from '../match-capacity-utils';
 import {
   getMatchBannerUrl,
   MATCH_BANNER_FALLBACK,
@@ -51,9 +53,12 @@ export function MatchCard({
   }, [primaryBanner]);
 
   const isPremiumMatch = match.premiumOnly === true;
-  const buttonDisabled = joining || isJoined || !canJoin || (isPremiumMatch && !isPremiumUser);
+  const { isFull: isMatchFull } = getMatchCapacityState(match);
+  const buttonDisabled =
+    joining || isJoined || !canJoin || isMatchFull || (isPremiumMatch && !isPremiumUser);
   const winningPool = estimateMatchWinningPool(match);
-  const showJoinCta = !isJoined && !(isPremiumMatch && !isPremiumUser) && !joining;
+  const showJoinCta =
+    !isJoined && !(isPremiumMatch && !isPremiumUser) && !joining && !isMatchFull;
 
   const goToDetail = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -187,11 +192,16 @@ export function MatchCard({
                 · {match.map}
               </Typography>
             ) : null}
-            <Typography sx={{ fontSize: 12, color: USER_COLORS.textMuted }}>
-              · {match.totalPlayer} players
-            </Typography>
           </Stack>
         </Box>
+
+          {!isResult ? (
+          <MatchSpotsProgress
+            variant="compact"
+            participantsCount={match.participantsCount}
+            totalPlayer={match.totalPlayer}
+          />
+        ) : null}
 
         <Box
           sx={{
@@ -313,6 +323,10 @@ export function MatchCard({
                 <Iconify icon="solar:crown-bold" width={16} />
                 <Typography sx={{ fontSize: 12, fontWeight: 800 }}>PREMIUM ONLY</Typography>
               </Stack>
+            ) : isMatchFull ? (
+              <Typography sx={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6 }}>
+                {t('match.matchFull')}
+              </Typography>
             ) : joining ? (
               'JOINING...'
             ) : (

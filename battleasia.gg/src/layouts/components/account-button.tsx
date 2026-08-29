@@ -33,10 +33,10 @@ export function AccountButton({ photoURL, displayName, sx, ...other }: AccountBu
         src={photoURL}
         alt={displayName}
         sx={{
-          width: { xs: 32, sm: 40 },
-          height: { xs: 32, sm: 40 },
-          border: `2px solid ${alpha(USER_COLORS.gold, 0.65)}`,
-          boxShadow: `0 0 0 1px ${alpha(USER_COLORS.gold, 0.25)}`,
+          width: { xs: 32, sm: 34 },
+          height: { xs: 32, sm: 34 },
+          border: `1.5px solid ${alpha(USER_COLORS.gold, 0.65)}`,
+          boxShadow: `0 0 0 1px ${alpha(USER_COLORS.gold, 0.2)}`,
         }}
       >
         {displayName?.charAt(0).toUpperCase()}

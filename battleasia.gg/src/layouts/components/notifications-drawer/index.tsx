@@ -167,8 +167,8 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
         onClick={onOpen}
         sx={[
           {
-            width: { xs: 36, sm: 42 },
-            height: { xs: 32, sm: 38 },
+            width: { xs: 34, sm: 36 },
+            height: { xs: 34, sm: 36 },
             p: 0,
             borderRadius: '6px',
             bgcolor: open ? alpha(USER_COLORS.gold, 0.14) : alpha('#080c14', 0.55),
@@ -206,7 +206,7 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
         >
           <Iconify
             icon="solar:bell-bing-bold-duotone"
-            width={22}
+            width={20}
             sx={{
               color: open ? USER_COLORS.gold : alpha('#ffffff', 0.92),
               transition: 'color 0.2s ease',

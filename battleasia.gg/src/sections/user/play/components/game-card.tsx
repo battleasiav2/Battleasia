@@ -9,57 +9,55 @@ import { PLAY_IMAGE_PATHS } from '../play-constants';
 
 // ----------------------------------------------------------------------
 
-const { gold: GOLD, success: LIVE_GREEN } = USER_COLORS;
-
-const CARD_MIN_HEIGHT = { xs: 248, sm: 258, md: 268 };
+const GOLD = USER_COLORS.gold;
+const CARD_BG = '#161618';
+const LIVE_GREEN = '#22c55e';
 
 const livePulse = keyframes`
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 ${alpha(LIVE_GREEN, 0.6)}; }
-  50% { opacity: 0.8; box-shadow: 0 0 0 6px ${alpha(LIVE_GREEN, 0)}; }
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 ${alpha(LIVE_GREEN, 0.55)}; }
+  50% { opacity: 0.7; box-shadow: 0 0 0 5px ${alpha(LIVE_GREEN, 0)}; }
 `;
+
+export function formatGamePlayerCount(value: number): string {
+  if (value >= 1_000_000) {
+    return `${(value / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`;
+  }
+  if (value >= 1_000) {
+    return `${(value / 1_000).toFixed(1).replace(/\.0$/, '')}K`;
+  }
+  return String(value);
+}
 
 type GameCardProps = {
   title: string;
   subTitle?: string;
   imageUrl?: string;
-  logo?: string;
-  featured?: boolean;
   comingSoon?: boolean;
   disabled?: boolean;
   liveCount?: number;
-  upcomingCount?: number;
-  liveLabel?: string;
-  upcomingLabel?: string;
+  playerCount?: number;
+  liveBadgeLabel?: string;
+  joinLabel?: string;
   onClick?: () => void;
 };
 
-/** Premium tournament tile — equal height grid cell, ref-style gold border. */
+/** Square-corner arena tile — matches home Play Your Game brand shell. */
 export function GameCard(props: GameCardProps) {
   const {
     title,
     subTitle,
     imageUrl,
-    logo: _logo,
-    featured = false,
     comingSoon,
     disabled,
     liveCount = 0,
-    upcomingCount = 0,
-    liveLabel = 'Live',
-    upcomingLabel = 'Upcoming',
+    playerCount = 0,
+    liveBadgeLabel = 'LIVE',
+    joinLabel = 'JOIN',
     onClick,
   } = props;
+
   const isDisabled = disabled || comingSoon;
-  const accent =
-    title.includes('Free Fire')
-      ? '#a855f7'
-      : title.includes('Call of Duty')
-        ? '#60a5fa'
-        : title.includes('Valorant')
-          ? '#5eead4'
-          : title.includes('Legends')
-            ? '#facc15'
-            : GOLD;
+  const showLive = liveCount > 0 && !comingSoon;
 
   return (
     <Box
@@ -74,50 +72,59 @@ export function GameCard(props: GameCardProps) {
       }}
       aria-disabled={isDisabled}
       sx={{
+        position: 'relative',
         width: 1,
-        minHeight: CARD_MIN_HEIGHT,
-        maxHeight: CARD_MIN_HEIGHT,
         display: 'flex',
         flexDirection: 'column',
-        borderRadius: '10px',
+        borderRadius: 0,
         overflow: 'hidden',
-        bgcolor: '#0c0c0c',
-        border: `1px solid ${alpha(accent, 0.4)}`,
-        boxShadow: `
-          0 0 0 1px ${alpha(accent, 0.08)},
-          0 12px 32px ${alpha('#000000', 0.55)},
-          0 0 24px ${alpha(accent, 0.12)}
-        `,
+        bgcolor: CARD_BG,
+        border: `1px solid ${alpha('#ffffff', 0.08)}`,
+        boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
         cursor: isDisabled ? 'not-allowed' : 'pointer',
-        opacity: isDisabled ? 0.72 : 1,
-        transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.3s ease',
+        opacity: isDisabled ? 0.65 : 1,
+        aspectRatio: '1 / 1',
+        minHeight: { xs: 168, sm: 190, md: 200 },
+        isolation: 'isolate',
+        transition:
+          'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.3s ease',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 2,
+          bgcolor: GOLD,
+          zIndex: 4,
+          boxShadow: `0 0 12px ${alpha(GOLD, 0.45)}`,
+        },
         '&:hover': isDisabled
           ? undefined
           : {
-              transform: 'translateY(-8px)',
-              borderColor: alpha(accent, 0.6),
+              transform: 'translateY(-6px)',
+              borderColor: alpha(GOLD, 0.38),
               boxShadow: `
-                0 0 0 1px ${alpha(accent, 0.18)},
-                0 22px 48px ${alpha('#000000', 0.65)},
-                0 0 36px ${alpha(accent, 0.22)}
+                0 18px 40px ${alpha('#000000', 0.65)},
+                0 0 0 1px ${alpha(GOLD, 0.16)},
+                0 0 24px ${alpha(GOLD, 0.1)}
               `,
               '& .game-card-art': { transform: 'scale(1.06)' },
+              '& .game-card-title': { color: GOLD },
             },
         '&:focus-visible': {
-          outline: `2px solid ${alpha(accent, 0.75)}`,
+          outline: `2px solid ${alpha(GOLD, 0.75)}`,
           outlineOffset: 2,
         },
       }}
     >
-      {/* Hero art */}
       <Box
         sx={{
           position: 'relative',
-          width: 1,
-          flex: '0 0 auto',
-          aspectRatio: '16 / 10',
+          flex: '1 1 auto',
+          minHeight: 0,
           overflow: 'hidden',
-          bgcolor: '#050505',
+          bgcolor: '#0a0a0a',
         }}
       >
         <Box
@@ -130,7 +137,7 @@ export function GameCard(props: GameCardProps) {
             width: 1,
             height: 1,
             objectFit: 'cover',
-            objectPosition: 'center center',
+            objectPosition: 'center top',
             display: 'block',
             transition: 'transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)',
           }}
@@ -140,218 +147,147 @@ export function GameCard(props: GameCardProps) {
           sx={{
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(180deg, transparent 55%, ${alpha('#0c0c0c', 0.92)} 100%)`,
+            background: `
+              linear-gradient(180deg, ${alpha('#000000', 0.18)} 0%, transparent 30%),
+              linear-gradient(180deg, transparent 40%, ${alpha('#000000', 0.55)} 72%, ${alpha(CARD_BG, 0.95)} 100%)
+            `,
             pointerEvents: 'none',
           }}
         />
 
-        {featured ? (
+        {showLive ? (
           <Box
             sx={{
               position: 'absolute',
-              top: 8,
-              left: 8,
-              px: 0.8,
-              py: 0.35,
-              display: 'flex',
+              top: 0,
+              left: 0,
+              zIndex: 2,
+              display: 'inline-flex',
               alignItems: 'center',
-              gap: 0.45,
-              bgcolor: alpha('#000000', 0.78),
-              border: `1px solid ${alpha(GOLD, 0.5)}`,
-              borderRadius: '999px',
-              boxShadow: `0 0 10px ${alpha(GOLD, 0.18)}`,
+              gap: 0.55,
+              px: 0.85,
+              py: 0.45,
+              bgcolor: alpha('#000000', 0.72),
+              borderBottom: `1px solid ${alpha(LIVE_GREEN, 0.45)}`,
+              borderRight: `1px solid ${alpha(LIVE_GREEN, 0.45)}`,
             }}
           >
-            <Iconify icon="solar:star-bold" width={11} sx={{ color: GOLD }} />
-            <Typography sx={{ fontSize: 8, fontWeight: 800, color: GOLD, letterSpacing: 0.7 }}>
-              FEATURED
+            <Box
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                bgcolor: LIVE_GREEN,
+                animation: `${livePulse} 1.6s ease-out infinite`,
+              }}
+            />
+            <Typography sx={{ fontSize: 9, fontWeight: 800, color: LIVE_GREEN, letterSpacing: 0.6 }}>
+              {liveCount} {liveBadgeLabel}
             </Typography>
           </Box>
-        ) : comingSoon ? (
+        ) : null}
+
+        {comingSoon ? (
           <Box
             sx={{
               position: 'absolute',
               top: 8,
-              left: 8,
-              px: 0.85,
-              py: 0.35,
-              bgcolor: alpha('#000000', 0.75),
-              border: `1px solid ${alpha(GOLD, 0.5)}`,
-              borderRadius: '4px',
+              right: 8,
+              zIndex: 2,
+              px: 0.8,
+              py: 0.25,
+              bgcolor: alpha('#000000', 0.65),
+              border: `1px solid ${alpha(GOLD, 0.35)}`,
             }}
           >
-            <Typography sx={{ fontSize: 8, fontWeight: 800, color: GOLD, letterSpacing: 0.8 }}>
+            <Typography sx={{ fontSize: 9, fontWeight: 800, color: GOLD, letterSpacing: 0.5 }}>
               SOON
             </Typography>
           </Box>
         ) : null}
       </Box>
 
-      {/* Title */}
       <Stack
-        spacing={0.35}
-        sx={{
-          flex: '0 0 auto',
-          px: 1,
-          pt: 0.75,
-          pb: 0.5,
-          alignItems: 'center',
-          textAlign: 'center',
-          minHeight: 52,
-          justifyContent: 'center',
-        }}
-      >
-        <Typography
-          className="font-tr"
-          sx={{
-            fontSize: { xs: 13, sm: 14 },
-            fontWeight: 900,
-            lineHeight: 1.15,
-            letterSpacing: 0.15,
-            width: 1,
-            minHeight: '2.3em',
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            color: accent,
-            textShadow: `0 0 18px ${alpha(accent, 0.15)}`,
-          }}
-        >
-          {title}
-        </Typography>
-
-        <Stack direction="row" alignItems="center" justifyContent="center" sx={{ width: 1, minHeight: 22 }}>
-          <Typography
-            sx={{
-              px: 1,
-              py: 0.35,
-              fontSize: { xs: 8.5, sm: 9 },
-              fontWeight: 800,
-              letterSpacing: 0.7,
-              textTransform: 'uppercase',
-              color: alpha('#ffffff', 0.78),
-              bgcolor: alpha('#ffffff', 0.06),
-              border: `1px solid ${alpha('#ffffff', 0.1)}`,
-              borderRadius: '999px',
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              maxWidth: '92%',
-            }}
-          >
-            {subTitle || '\u00A0'}
-          </Typography>
-        </Stack>
-      </Stack>
-
-      {/* Stats — equal height pills pinned to bottom */}
-      <Stack
-        direction="row"
         spacing={0.65}
         sx={{
-          flex: '0 0 auto',
-          px: 1,
-          pb: 1,
-          pt: 0,
+          flexShrink: 0,
+          px: { xs: 1.25, sm: 1.4 },
+          pt: 1,
+          pb: 1.1,
+          bgcolor: CARD_BG,
+          minHeight: { xs: 72, sm: 78 },
+          justifyContent: 'space-between',
         }}
       >
-        <StatPill
-          label={liveLabel}
-          value={liveCount}
-          accent={LIVE_GREEN}
-          active={liveCount > 0}
-          icon={
-            <Box
+        <Box sx={{ minWidth: 0 }}>
+          {subTitle ? (
+            <Typography
               sx={{
-                width: 11,
-                height: 11,
-                borderRadius: '50%',
-                bgcolor: LIVE_GREEN,
-                boxShadow: `0 0 10px ${alpha(LIVE_GREEN, 0.85)}`,
-                animation: liveCount > 0 ? `${livePulse} 1.5s ease-in-out infinite` : 'none',
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: 1.1,
+                textTransform: 'uppercase',
+                color: alpha(GOLD, 0.92),
+                mb: 0.25,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
               }}
+            >
+              {subTitle}
+            </Typography>
+          ) : null}
+          <Typography
+            className="game-card-title font-tr"
+            sx={{
+              fontSize: { xs: 11, sm: 12, md: 13 },
+              fontWeight: 800,
+              letterSpacing: 0.4,
+              color: '#ffffff',
+              textTransform: 'uppercase',
+              lineHeight: 1.2,
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              transition: 'color 0.3s ease',
+            }}
+          >
+            {title}
+          </Typography>
+        </Box>
+
+        <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={0.75}>
+          <Stack direction="row" alignItems="center" spacing={0.5} sx={{ minWidth: 0 }}>
+            <Iconify
+              icon="solar:users-group-rounded-bold"
+              width={14}
+              sx={{ color: alpha('#ffffff', 0.45), flexShrink: 0 }}
             />
-          }
-        />
-        <StatPill
-          label={upcomingLabel}
-          value={upcomingCount}
-          accent={GOLD}
-          active={upcomingCount > 0}
-          icon={
-            <Iconify icon="solar:calendar-bold" width={16} sx={{ color: GOLD }} />
-          }
-        />
-      </Stack>
-    </Box>
-  );
-}
-
-// ----------------------------------------------------------------------
-
-type StatPillProps = {
-  label: string;
-  value: number;
-  accent: string;
-  active: boolean;
-  icon: React.ReactNode;
-};
-
-function StatPill({ label, value, accent, active, icon }: StatPillProps) {
-  return (
-    <Box
-      sx={{
-        flex: 1,
-        minWidth: 0,
-        height: 58,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 0.4,
-        px: 0.4,
-        py: 0.5,
-        borderRadius: '8px',
-        bgcolor: alpha('#000000', 0.5),
-        backdropFilter: 'blur(10px)',
-        border: `1px solid ${alpha(accent, active ? 0.55 : 0.18)}`,
-        boxShadow: active
-          ? `inset 0 1px 0 ${alpha('#ffffff', 0.07)}, 0 0 16px ${alpha(accent, 0.2)}`
-          : `inset 0 1px 0 ${alpha('#ffffff', 0.04)}`,
-      }}
-    >
-      <Typography
-        sx={{
-          fontSize: 9.5,
-          fontWeight: 800,
-          color: alpha(accent, active ? 0.95 : 0.55),
-          textTransform: 'uppercase',
-          letterSpacing: 0.85,
-          lineHeight: 1,
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          maxWidth: '100%',
-          px: 0.25,
-        }}
-      >
-        {label}
-      </Typography>
-      <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.6}>
-        {icon}
-        <Typography
-          sx={{
-            fontSize: { xs: 19, sm: 21 },
-            fontWeight: 900,
-            lineHeight: 1,
-            letterSpacing: -0.4,
-            color: accent,
-            textShadow: active ? `0 0 12px ${alpha(accent, 0.45)}` : 'none',
-          }}
-        >
-          {value}
-        </Typography>
+            <Typography
+              sx={{
+                fontSize: 10,
+                fontWeight: 700,
+                color: alpha('#ffffff', 0.72),
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {formatGamePlayerCount(playerCount)}
+            </Typography>
+          </Stack>
+          <Typography
+            sx={{
+              fontSize: 9,
+              fontWeight: 800,
+              letterSpacing: 1,
+              color: GOLD,
+              textTransform: 'uppercase',
+              flexShrink: 0,
+            }}
+          >
+            {joinLabel}
+          </Typography>
+        </Stack>
       </Stack>
     </Box>
   );

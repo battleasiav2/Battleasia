@@ -447,7 +447,7 @@ export function PlayYourGameSection() {
         overflowX: 'clip',
         overflowY: 'visible',
         bgcolor: '#0a0a0a',
-        py: { xs: 4.5, md: 6 },
+        py: { xs: 3.25, md: 5 },
         px: { xs: 2, md: 4 },
         '&::before': {
           content: '""',
@@ -476,7 +476,7 @@ export function PlayYourGameSection() {
     >
       <Box sx={{ position: 'relative', zIndex: 1, maxWidth: 1280, mx: 'auto' }}>
         <HomeBlurPanel>
-          <Stack spacing={{ xs: 2.5, md: 3.5 }}>
+          <Stack spacing={{ xs: 2, md: 2.75 }}>
             <Stack spacing={1.25} alignItems="center">
               <Typography
                 sx={{

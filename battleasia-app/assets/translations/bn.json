@@ -232,7 +232,17 @@
     "tabTournament": "টুর্নামেন্ট",
     "tabLive": "লাইভ",
     "watchLive": "লাইভ দেখুন",
-    "comingSoon": "শীঘ্রই আসছে"
+    "comingSoon": "শীঘ্রই আসছে",
+    "liveBadge": "LIVE",
+    "joinLabel": "JOIN"
+  },
+  "match": {
+    "spotsJoined": "যোগ দিয়েছেন",
+    "spotsJoinedHint": "খেলোয়াড় যোগ দিলে বার ভরে — পূর্ণ হলে আর জয়েন বন্ধ।",
+    "matchFullHint": "সব স্পট পূর্ণ — আগে যোগ দিলে spectate করতে পারবেন।",
+    "matchFull": "ম্যাচ পূর্ণ",
+    "matchFullToast": "ম্যাচ পূর্ণ — আর কেউ যোগ দিতে পারবে না।",
+    "yourBalance": "আপনার ব্যালেন্স"
   },
   "common": {
     "retry": "আবার চেষ্টা",
