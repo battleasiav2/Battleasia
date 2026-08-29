@@ -316,29 +316,39 @@ export const authSubmitButtonSx = {
   filter: 'none',
   textShadow: 'none',
   backgroundImage: 'none',
-  background: '#f5c518',
+  // Use backgroundColor — MUI dark "contained + inherit" sets backgroundColor:white
+  // after shorthand `background`, which made production Sign In buttons look white.
+  backgroundColor: '#f5c518',
   border: `1px solid ${alpha('#d4a017', 0.85)}`,
   boxShadow: 'none',
   transition: 'background-color 0.15s ease, border-color 0.15s ease',
+  '&.MuiButton-contained.MuiButton-containedInherit': {
+    color: '#111111',
+    backgroundColor: '#f5c518',
+  },
   '&.MuiButton-root:hover': { boxShadow: 'none' },
   '@media (hover: hover)': {
     '&:hover': {
-      background: '#eab308',
+      backgroundColor: '#eab308',
       borderColor: alpha('#ca8a04', 0.9),
       boxShadow: 'none',
       transform: 'none',
       filter: 'none',
     },
+    '&.MuiButton-contained.MuiButton-containedInherit:hover': {
+      color: '#111111',
+      backgroundColor: '#eab308',
+    },
   },
   '&:active, &.Mui-focusVisible': {
-    background: '#d4a017',
+    backgroundColor: '#d4a017',
     borderColor: alpha('#b45309', 0.9),
     boxShadow: 'none',
     transform: 'none',
     filter: 'none',
   },
   '&.Mui-disabled': {
-    background: alpha('#f5c518', 0.28),
+    backgroundColor: alpha('#f5c518', 0.28),
     color: alpha('#111111', 0.45),
     borderColor: alpha('#f5c518', 0.22),
     boxShadow: 'none',
