@@ -23,7 +23,7 @@ import { Iconify } from 'src/components/iconify';
 import type { PulseCardLabels, PulseCardStats } from 'src/components/battle-glass-card';
 import { getDefaultGlassTokens } from 'src/components/battle-glass-card';
 import { socketService } from 'src/lib/socket';
-import { HOME_GAME_ARTS } from './play-your-game-section';
+import { HOME_GAME_ARTS } from './home-game-arts';
 import {
     homeMobileScrollItemSx,
     homeMobileScrollFlexRowSx,
