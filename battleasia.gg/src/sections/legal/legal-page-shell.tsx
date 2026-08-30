@@ -4,7 +4,7 @@ import { Box, Stack, Container, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
-import { HOME_GAME_ARTS } from 'src/sections/home/home-game-arts';
+import { HOME_GAME_ARTS } from 'src/sections/home/play-your-game-section';
 
 const GOLD = '#f5c518';
 

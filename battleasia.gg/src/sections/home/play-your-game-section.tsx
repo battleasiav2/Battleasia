@@ -14,10 +14,10 @@ import { useTranslate } from 'src/locales/use-locales';
 import {
   HOME_SCROLL_GOLD,
   homeMobileScrollGridSx,
+  homeMobileScrollItemSx,
 } from './home-horizontal-scroll';
 import { HOME_GAME_ARTS, PLAY_YOUR_GAME_IMAGE_PATHS } from './home-game-arts';
 import { HomeBlurPanel } from './home-blur-panel';
-import { HOME_MUTED_TEXT, homeGoldCtaSx, homePremiumCardGlowSx } from './home-tokens';
 
 export { HOME_GAME_ARTS, PLAY_YOUR_GAME_IMAGE_PATHS };
 
@@ -110,6 +110,11 @@ const cardReveal = keyframes`
   to { opacity: 1; transform: translateY(0) scale(1); }
 `;
 
+const livePulse = keyframes`
+  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 ${alpha('#22c55e', 0.55)}; }
+  50% { opacity: 0.7; box-shadow: 0 0 0 5px ${alpha('#22c55e', 0)}; }
+`;
+
 const goldScan = keyframes`
   0% { transform: translateX(-120%) skewX(-18deg); opacity: 0; }
   35% { opacity: 0.55; }
@@ -126,6 +131,7 @@ const borderPulse = keyframes`
 function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
   const { t } = useTranslate();
   const isAvailable = game.available;
+  const { liveCount } = game;
 
   return (
     <Box
@@ -145,13 +151,13 @@ function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
         scrollSnapAlign: 'start',
         textDecoration: 'none',
         bgcolor: '#161618',
-        border: `1px solid ${alpha(GOLD, 0.22)}`,
+        border: `1px solid ${alpha('#ffffff', 0.08)}`,
         isolation: 'isolate',
         animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.1}s both`,
         opacity: isAvailable ? 1 : 0.65,
         transition:
           'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, border-color 0.35s ease',
-        ...homePremiumCardGlowSx,
+        boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -164,17 +170,18 @@ function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
         },
         '&:hover': {
           transform: 'translateY(-10px)',
-          borderColor: alpha(GOLD, 0.55),
+          borderColor: alpha(GOLD, 0.45),
           boxShadow: `
             0 22px 48px ${alpha('#000000', 0.7)},
-            0 0 0 1px ${alpha(GOLD, 0.28)},
-            0 0 36px ${alpha(GOLD, 0.18)}
+            0 0 0 1px ${alpha(GOLD, 0.2)},
+            0 0 32px ${alpha(GOLD, 0.12)}
           `,
           '&::before': { opacity: 1, animation: `${borderPulse} 1.8s ease-in-out infinite` },
           '& .game-card-art': { transform: 'scale(1.08)' },
           '& .game-card-scan': { opacity: 1 },
           '& .game-card-bar': { transform: 'scaleX(1)' },
           '& .game-card-title': { color: GOLD },
+          '& .game-card-play': { opacity: 1, transform: 'translateY(0)' },
         },
       }}
     >
@@ -247,34 +254,66 @@ function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
           className="game-card-play"
           direction="row"
           alignItems="center"
-          justifyContent="center"
           spacing={0.6}
           sx={{
             position: 'absolute',
-            left: 12,
-            right: 12,
-            bottom: 12,
+            left: '50%',
+            bottom: 18,
+            transform: 'translate(-50%, 8px)',
             zIndex: 3,
-            ...homeGoldCtaSx,
-            minHeight: 34,
-            px: 1,
-            py: 0.65,
-            fontSize: 10,
+            opacity: 0,
+            px: 1.25,
+            py: 0.55,
+            bgcolor: alpha('#000000', 0.7),
+            border: `1px solid ${alpha(GOLD, 0.55)}`,
+            transition: 'opacity 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
           }}
         >
-          <Iconify icon="solar:play-bold" width={12} sx={{ color: '#111111' }} />
+          <Iconify icon="solar:play-bold" width={12} sx={{ color: GOLD }} />
           <Typography
             sx={{
               fontSize: 10,
               fontWeight: 800,
-              letterSpacing: 1.1,
-              color: '#111111',
+              letterSpacing: 1.2,
+              color: '#ffffff',
               textTransform: 'uppercase',
             }}
           >
             {t('home.playYourGame.enterArena')}
           </Typography>
         </Stack>
+
+        {liveCount > 0 && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              zIndex: 3,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 0.55,
+              px: 0.85,
+              py: 0.45,
+              bgcolor: alpha('#000000', 0.72),
+              borderBottom: `1px solid ${alpha('#22c55e', 0.45)}`,
+              borderRight: `1px solid ${alpha('#22c55e', 0.45)}`,
+            }}
+          >
+            <Box
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                bgcolor: '#22c55e',
+                animation: `${livePulse} 1.6s ease-out infinite`,
+              }}
+            />
+            <Typography sx={{ fontSize: 9, fontWeight: 800, color: '#22c55e', letterSpacing: 0.6 }}>
+              {liveCount} {t('home.playYourGame.live')}
+            </Typography>
+          </Box>
+        )}
 
         {!isAvailable && (
           <Box
@@ -309,37 +348,63 @@ function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
       />
 
       <Stack
-        direction="row"
-        alignItems="center"
-        spacing={1}
+        spacing={0.75}
         sx={{
           flexShrink: 0,
           px: { xs: 1.5, md: 1.75 },
-          pt: 1.25,
-          pb: 1.35,
+          pt: 1.4,
+          pb: 1.5,
           bgcolor: '#161618',
-          minHeight: { xs: 56, md: 60 },
+          minHeight: { xs: 96, md: 104 },
+          justifyContent: 'space-between',
         }}
       >
-        <Typography
-          className="game-card-title font-tr"
-          sx={{
-            flex: 1,
-            minWidth: 0,
-            fontSize: { xs: 13, sm: 14, md: 15 },
-            fontWeight: 800,
-            letterSpacing: 0.5,
-            color: '#ffffff',
-            textTransform: 'uppercase',
-            lineHeight: 1.2,
-            transition: 'color 0.3s ease',
-          }}
-        >
-          {t(`home.playYourGame.games.${game.key}`)}
-        </Typography>
-        {game.platforms.map((icon) => (
-          <Iconify key={icon} icon={icon} width={15} sx={{ color: alpha('#ffffff', 0.45) }} />
-        ))}
+        <Box>
+          <Typography
+            sx={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: 1.6,
+              color: GOLD,
+              textTransform: 'uppercase',
+              mb: 0.4,
+            }}
+          >
+            {t('home.playYourGame.brandLabel')}
+          </Typography>
+          <Typography
+            className="game-card-title font-tr"
+            sx={{
+              fontSize: { xs: 13, sm: 14, md: 15 },
+              fontWeight: 800,
+              letterSpacing: 0.5,
+              color: '#ffffff',
+              textTransform: 'uppercase',
+              lineHeight: 1.2,
+              transition: 'color 0.3s ease',
+            }}
+          >
+            {t(`home.playYourGame.games.${game.key}`)}
+          </Typography>
+        </Box>
+
+        <Stack direction="row" alignItems="center" spacing={1}>
+          {game.platforms.map((icon) => (
+            <Iconify key={icon} icon={icon} width={15} sx={{ color: alpha('#ffffff', 0.45) }} />
+          ))}
+          <Typography
+            sx={{
+              ml: 'auto !important',
+              fontSize: 9,
+              fontWeight: 700,
+              letterSpacing: 0.9,
+              color: alpha('#ffffff', 0.35),
+              textTransform: 'uppercase',
+            }}
+          >
+            {t(`home.playYourGame.genres.${game.genreKey}`)}
+          </Typography>
+        </Stack>
       </Stack>
     </Box>
   );
@@ -442,10 +507,10 @@ export function PlayYourGameSection() {
                 className="font-tr"
                 sx={{
                   fontSize: { xs: 12, sm: 14 },
-                  color: HOME_MUTED_TEXT,
+                  color: alpha('#ffffff', 0.5),
                   textAlign: 'center',
                   maxWidth: 520,
-                  lineHeight: 1.65,
+                  lineHeight: 1.6,
                 }}
               >
                 {t('home.playYourGame.subtitle')}
@@ -457,9 +522,9 @@ export function PlayYourGameSection() {
               sx={homeMobileScrollGridSx(
                 {
                   xs: 'repeat(5, minmax(168px, 1fr))',
-                  md: 'repeat(5, minmax(0, 1fr))',
+                  lg: 'repeat(5, minmax(0, 230px))',
                 },
-                { xs: 1.25, md: 1.5 }
+                { xs: 1.25, md: 2 }
               )}
             >
               {sorted.map((game, index) => (

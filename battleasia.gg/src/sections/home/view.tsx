@@ -19,8 +19,6 @@ import { HOME_ROW_LINE, HomeBlurPanel } from './home-blur-panel';
 import { homeMobileScrollGridSx, homeMobileScrollItemSx } from './home-horizontal-scroll';
 import { HeroRotatingBanner } from './hero-rotating-banner';
 import { HOME_HERO_SLIDES, readHeroSlideIndex } from './hero-slides';
-import { HomeBackToTop } from './home-back-to-top';
-import { HOME_MUTED_TEXT, homeGoldCtaSx } from './home-tokens';
 import { useTranslate } from 'src/locales/use-locales';
 
 // Below-fold + non-LCP FX: code-split (never block hero paint)
@@ -192,7 +190,7 @@ function TournamentRuleItem({
             pb: { xs: 1.5, md: 1.65 },
             px: { xs: 1, md: 1.25 },
             fontSize: { xs: 12, sm: 13 },
-            color: HOME_MUTED_TEXT,
+            color: alpha('#ffffff', 0.58),
             lineHeight: 1.6,
           }}
         >
@@ -555,7 +553,6 @@ export function HomeView() {
           }}
         >
           <HeroMeshButtons
-            playNowLabel={t('home.startPlaying')}
             downloadLabel={t('home.downloadApkButton')}
             downloadHref={appDownload.href}
             downloadFileName={appDownload.fileName}
@@ -582,7 +579,6 @@ export function HomeView() {
         }}
       >
         <HeroMeshButtons
-          playNowLabel={t('home.startPlaying')}
           downloadLabel={t('home.downloadApkButton')}
           downloadHref={appDownload.href}
           downloadFileName={appDownload.fileName}
@@ -594,7 +590,6 @@ export function HomeView() {
       </Stack>
 
       <HeroStickyCta
-        playNowLabel={t('home.startPlaying')}
         downloadLabel={t('home.downloadApkButton')}
         downloadHref={appDownload.href}
         downloadFileName={appDownload.fileName}
@@ -806,7 +801,7 @@ export function HomeView() {
                 className="font-tr"
                 sx={{
                   fontSize: { xs: 12, sm: 14 },
-                  color: HOME_MUTED_TEXT,
+                  color: alpha('#ffffff', 0.5),
                   textAlign: 'center',
                   maxWidth: 520,
                   lineHeight: 1.6,
@@ -1005,7 +1000,7 @@ export function HomeView() {
                     className="font-tr"
                     sx={{
                       fontSize: { xs: 12, md: 13 },
-                      color: HOME_MUTED_TEXT,
+                      color: alpha('#ffffff', 0.5),
                       lineHeight: 1.55,
                     }}
                   >
@@ -1054,12 +1049,29 @@ export function HomeView() {
                 component="a"
                 href="/play"
                 sx={{
-                  ...homeGoldCtaSx,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 1,
                   px: 4,
+                  minHeight: 44,
+                  bgcolor: alpha(GOLD, 0.1),
+                  border: `1px solid ${alpha(GOLD, 0.35)}`,
+                  color: GOLD,
+                  fontSize: 13,
+                  fontWeight: 800,
+                  letterSpacing: 1.2,
+                  textTransform: 'uppercase',
+                  textDecoration: 'none',
+                  transition: 'background 0.2s, border-color 0.2s, box-shadow 0.2s',
+                  '&:hover': {
+                    bgcolor: alpha(GOLD, 0.18),
+                    borderColor: alpha(GOLD, 0.55),
+                    boxShadow: `0 0 20px ${alpha(GOLD, 0.15)}`,
+                  },
                 }}
               >
                 {t('home.startPlaying')}
-                <Iconify icon="solar:arrow-right-bold" width={16} sx={{ color: '#111111' }} />
+                <Iconify icon="solar:arrow-right-bold" width={16} />
               </Box>
             </Stack>
           </Stack>
@@ -1105,7 +1117,7 @@ export function HomeView() {
             className="font-tr"
             sx={{
               fontSize: { xs: 12, sm: 14 },
-              color: HOME_MUTED_TEXT,
+              color: alpha('#ffffff', 0.5),
               textAlign: 'center',
               maxWidth: 520,
               lineHeight: 1.6,
@@ -1130,15 +1142,15 @@ export function HomeView() {
                 key={faq.question}
                 question={faq.question}
                 answer={faq.answer}
-                defaultOpen={false}
+                defaultOpen={idx === 0}
               />
             ))}
           </Box>
         </HomeBlurPanel>
 
         <Stack direction="row" justifyContent="center" spacing={1} alignItems="center" sx={{ pt: 1 }}>
-          <Iconify icon="solar:chat-round-dots-bold" width={16} sx={{ color: HOME_MUTED_TEXT }} />
-          <Typography sx={{ fontSize: 12, color: HOME_MUTED_TEXT }}>
+          <Iconify icon="solar:chat-round-dots-bold" width={16} sx={{ color: alpha('#ffffff', 0.4) }} />
+          <Typography sx={{ fontSize: 12, color: alpha('#ffffff', 0.4) }}>
             {t('home.needHelp')}{' '}
             <Box
               component="a"
@@ -1185,7 +1197,6 @@ export function HomeView() {
       {sectionAbout}
       {sectionHowToPlay}
       {sectionRoules}
-      <HomeBackToTop />
     </Box>
   );
 }

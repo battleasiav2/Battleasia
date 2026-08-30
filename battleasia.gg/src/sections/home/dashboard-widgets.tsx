@@ -23,7 +23,7 @@ import { Iconify } from 'src/components/iconify';
 import type { PulseCardLabels, PulseCardStats } from 'src/components/battle-glass-card';
 import { getDefaultGlassTokens } from 'src/components/battle-glass-card';
 import { socketService } from 'src/lib/socket';
-import { HOME_GAME_ARTS } from './home-game-arts';
+import { HOME_GAME_ARTS } from './play-your-game-section';
 import {
     homeMobileScrollItemSx,
     homeMobileScrollFlexRowSx,
@@ -35,9 +35,6 @@ import {
     sanitizePublicDashboardData,
 } from './pulse-dashboard-utils';
 import { HOME_GOLD, HOME_ROW_LINE, HomeBlurPanel } from './home-blur-panel';
-import { chunkItems, HomeChunkCarousel } from './home-chunk-carousel';
-import { LivePulseDot } from './live-pulse-dot';
-import { HOME_MUTED_TEXT, HOME_MUTED_TEXT_DIM, homePremiumPanelGlowSx } from './home-tokens';
 import type {
     DashboardTopPlayer,
     PublicDashboardStats,
@@ -255,20 +252,18 @@ function PulseHeroFlat({
             <Grid container spacing={{ xs: 2.5, md: 3.5 }} alignItems="center">
                 <Grid item xs={12} md={5}>
                     <Stack spacing={1.25}>
-                        <Stack direction="row" alignItems="center" spacing={0.85}>
-                            <LivePulseDot color="gold" size={7} />
-                            <Typography
-                                sx={{
-                                    fontSize: { xs: '0.68rem', sm: '0.76rem' },
-                                    fontWeight: 700,
-                                    letterSpacing: 0.75,
-                                    textTransform: 'uppercase',
-                                    color: alpha(HOME_GOLD, 0.92),
-                                }}
-                            >
-                                {badgeLabel}
-                            </Typography>
-                        </Stack>
+                        <Typography
+                            sx={{
+                                alignSelf: 'flex-start',
+                                fontSize: { xs: '0.68rem', sm: '0.76rem' },
+                                fontWeight: 700,
+                                letterSpacing: 0.75,
+                                textTransform: 'uppercase',
+                                color: alpha(HOME_GOLD, 0.88),
+                            }}
+                        >
+                            {badgeLabel}
+                        </Typography>
                         <Typography
                             variant="h3"
                             sx={{
@@ -298,10 +293,9 @@ function PulseHeroFlat({
                             <Typography
                                 variant="caption"
                                 sx={{
-                                    color: HOME_MUTED_TEXT_DIM,
+                                    color: alpha('#ffffff', 0.52),
                                     fontWeight: 600,
                                     letterSpacing: 0.3,
-                                    fontSize: { xs: '0.72rem', sm: '0.78rem' },
                                 }}
                             >
                                 {lastUpdatedLabel}
@@ -370,14 +364,14 @@ const PlayerListCard = ({
     const tokens = getDefaultGlassTokens();
 
     return (
-    <HomeBlurPanel sx={homePremiumPanelGlowSx}>
+    <HomeBlurPanel>
         <Stack
             direction="row"
             alignItems="flex-start"
             justifyContent="space-between"
-            sx={{ mb: 1.25, flexWrap: 'wrap', gap: 0.75 }}
+            sx={{ mb: 1, flexWrap: 'wrap', gap: 0.75 }}
         >
-            <Stack spacing={0.45} sx={{ minWidth: 0, flex: 1 }}>
+            <Stack spacing={0.35} sx={{ minWidth: 0, flex: 1 }}>
                 <Typography
                     variant="h6"
                     sx={{
@@ -392,20 +386,31 @@ const PlayerListCard = ({
                 <Typography
                     variant="caption"
                     sx={{
-                        color: HOME_MUTED_TEXT,
-                        fontSize: { xs: '0.72rem', sm: '0.82rem' },
-                        lineHeight: 1.5,
+                        color: tokens.subtitleColor,
+                        fontSize: { xs: '0.68rem', sm: '0.78rem' },
+                        lineHeight: 1.45,
                     }}
                 >
                     {hint}
                 </Typography>
             </Stack>
-            <LivePulseDot label={translations.live} color="green" />
+            <Typography
+                sx={{
+                    flexShrink: 0,
+                    fontSize: { xs: '0.58rem', sm: '0.64rem' },
+                    fontWeight: 700,
+                    letterSpacing: 0.75,
+                    textTransform: 'uppercase',
+                    color: alpha(HOME_GOLD, 0.82),
+                }}
+            >
+                {translations.live}
+            </Typography>
         </Stack>
         <Box sx={{ borderTop: HOME_ROW_LINE }}>
         {loading ? (
             <Stack spacing={0}>
-                {Array.from({ length: 3 }).map((_, idx) => (
+                {Array.from({ length: 4 }).map((_, idx) => (
                     <Stack
                         key={idx}
                         direction="row"
@@ -413,7 +418,7 @@ const PlayerListCard = ({
                         alignItems="center"
                         sx={{
                             py: { xs: 0.85, sm: 0.95 },
-                            borderBottom: idx < 2 ? HOME_ROW_LINE : 'none',
+                            borderBottom: idx < 3 ? HOME_ROW_LINE : 'none',
                         }}
                     >
                         <Skeleton variant="circular" width={34} height={34} />
@@ -426,118 +431,113 @@ const PlayerListCard = ({
                 ))}
             </Stack>
         ) : (
-            players.length === 0 ? (
-                <Typography variant="body2" sx={{ color: HOME_MUTED_TEXT, py: 2 }}>
-                    {translations.noDataYet}
-                </Typography>
-            ) : (
-                <HomeChunkCarousel
-                    pages={chunkItems(players, 3).map((pagePlayers, pageIndex) => (
-                        <Stack key={pageIndex} spacing={0}>
-                            {pagePlayers.map((player, idx) => {
-                                const globalIdx = pageIndex * 3 + idx;
-                                const metricValue = (() => {
-                                    switch (metricKey) {
-                                        case 'totalWinnings':
-                                            return <CoinValue value={player.totalWinnings || 0} size={14} />;
-                                        case 'winRate':
-                                            return `${fNumber(player.winRate || 0)}%`;
-                                        case 'totalKills':
-                                            return fNumber(player.totalKills || 0);
-                                        case 'averageScore':
-                                        default:
-                                            return fNumber(player.averageScore || 0);
-                                    }
-                                })();
-                                return (
-                                    <Stack
-                                        key={`${player.userId}-${globalIdx}`}
-                                        direction="row"
-                                        spacing={{ xs: 1, sm: 1.5 }}
-                                        alignItems="center"
+            <Stack spacing={0}>
+                {players.length === 0 ? (
+                    <Typography variant="body2" sx={{ color: tokens.subtitleColor, py: 2 }}>
+                        {translations.noDataYet}
+                    </Typography>
+                ) : (
+                    players.map((player, idx) => {
+                        const metricValue = (() => {
+                            switch (metricKey) {
+                                case 'totalWinnings':
+                                    return <CoinValue value={player.totalWinnings || 0} size={14} />;
+                                case 'winRate':
+                                    return `${fNumber(player.winRate || 0)}%`;
+                                case 'totalKills':
+                                    return fNumber(player.totalKills || 0);
+                                case 'averageScore':
+                                default:
+                                    return fNumber(player.averageScore || 0);
+                            }
+                        })();
+                        return (
+                            <Stack
+                                key={`${player.userId}-${idx}`}
+                                direction="row"
+                                spacing={{ xs: 1, sm: 1.5 }}
+                                alignItems="center"
+                                sx={{
+                                    py: { xs: 0.85, sm: 0.95 },
+                                    borderBottom: idx < players.length - 1 ? HOME_ROW_LINE : 'none',
+                                    transition: 'background-color 0.15s ease',
+                                    '&:hover': {
+                                        bgcolor: alpha('#ffffff', 0.03),
+                                    },
+                                }}
+                            >
+                                <Avatar
+                                    src={getAvatarUrl(player.avatar)}
+                                    alt={player.username}
+                                    sx={{
+                                        width: { xs: 32, sm: 36 },
+                                        height: { xs: 32, sm: 36 },
+                                        bgcolor: alpha('#0ea5e9', 0.16),
+                                        color: '#e2e8f0',
+                                        fontWeight: 700,
+                                        fontSize: { xs: '0.7rem', sm: '0.82rem' },
+                                        flexShrink: 0,
+                                    }}
+                                >
+                                    {player.username?.[0]?.toUpperCase() || '?'}
+                                </Avatar>
+                                <Stack sx={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                                    <Typography
+                                        variant="subtitle2"
+                                        noWrap
                                         sx={{
-                                            py: { xs: 0.85, sm: 0.95 },
-                                            borderBottom: idx < pagePlayers.length - 1 ? HOME_ROW_LINE : 'none',
-                                            transition: 'background-color 0.15s ease',
-                                            '&:hover': {
-                                                bgcolor: alpha('#ffffff', 0.03),
-                                            },
+                                            color: '#ffffff',
+                                            fontSize: { xs: '0.78rem', sm: '0.875rem' },
+                                            fontWeight: 700,
                                         }}
                                     >
-                                        <Avatar
-                                            src={getAvatarUrl(player.avatar)}
-                                            alt={player.username}
-                                            sx={{
-                                                width: { xs: 32, sm: 36 },
-                                                height: { xs: 32, sm: 36 },
-                                                bgcolor: alpha('#0ea5e9', 0.16),
-                                                color: '#e2e8f0',
-                                                fontWeight: 700,
-                                                fontSize: { xs: '0.7rem', sm: '0.82rem' },
-                                                flexShrink: 0,
-                                            }}
-                                        >
-                                            {player.username?.[0]?.toUpperCase() || '?'}
-                                        </Avatar>
-                                        <Stack sx={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
-                                            <Typography
-                                                variant="subtitle2"
-                                                noWrap
-                                                sx={{
-                                                    color: '#ffffff',
-                                                    fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                                                    fontWeight: 700,
-                                                }}
-                                            >
-                                                {player.username}
-                                            </Typography>
-                                            <Typography
-                                                variant="caption"
-                                                noWrap
-                                                sx={{
-                                                    color: HOME_MUTED_TEXT_DIM,
-                                                    fontSize: { xs: '0.68rem', sm: '0.76rem' },
-                                                }}
-                                            >
-                                                {translations.lastPlayed}: {formatDateTime(player.lastPlayed)}
-                                            </Typography>
-                                        </Stack>
-                                        <Stack spacing={0.2} sx={{ textAlign: 'right', flexShrink: 0 }}>
-                                            <Typography
-                                                variant="subtitle2"
-                                                sx={{
-                                                    color: '#ffffff',
-                                                    fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                                                    fontWeight: 700,
-                                                    fontVariantNumeric: 'tabular-nums',
-                                                }}
-                                            >
-                                                {metricValue}
-                                            </Typography>
-                                            <Typography
-                                                variant="caption"
-                                                noWrap
-                                                sx={{
-                                                    color: HOME_MUTED_TEXT_DIM,
-                                                    fontSize: { xs: '0.62rem', sm: '0.7rem' },
-                                                }}
-                                            >
-                                                {metricKey === 'totalWinnings'
-                                                    ? translations.winnings
-                                                    : metricKey === 'winRate'
-                                                        ? translations.winRate
-                                                        : metricKey === 'totalKills'
-                                                            ? translations.kills
-                                                            : translations.avgScore}
-                                            </Typography>
-                                        </Stack>
-                                    </Stack>
-                                );
-                            })}
-                        </Stack>
-                    ))}
-                />
-            )
+                                        {player.username}
+                                    </Typography>
+                                    <Typography
+                                        variant="caption"
+                                        noWrap
+                                        sx={{
+                                            color: tokens.subtitleColor,
+                                            fontSize: { xs: '0.62rem', sm: '0.72rem' },
+                                        }}
+                                    >
+                                        {translations.lastPlayed}: {formatDateTime(player.lastPlayed)}
+                                    </Typography>
+                                </Stack>
+                                <Stack spacing={0.2} sx={{ textAlign: 'right', flexShrink: 0 }}>
+                                    <Typography
+                                        variant="subtitle2"
+                                        sx={{
+                                            color: '#ffffff',
+                                            fontSize: { xs: '0.78rem', sm: '0.875rem' },
+                                            fontWeight: 700,
+                                            fontVariantNumeric: 'tabular-nums',
+                                        }}
+                                    >
+                                        {metricValue}
+                                    </Typography>
+                                    <Typography
+                                        variant="caption"
+                                        noWrap
+                                        sx={{
+                                            color: tokens.stat.labelColor,
+                                            fontSize: { xs: '0.58rem', sm: '0.68rem' },
+                                        }}
+                                    >
+                                        {metricKey === 'totalWinnings'
+                                            ? translations.winnings
+                                            : metricKey === 'winRate'
+                                                ? translations.winRate
+                                                : metricKey === 'totalKills'
+                                                    ? translations.kills
+                                                    : translations.avgScore}
+                                    </Typography>
+                                </Stack>
+                            </Stack>
+                        );
+                    })
+                )}
+            </Stack>
         )}
         </Box>
     </HomeBlurPanel>
@@ -547,6 +547,86 @@ const PlayerListCard = ({
 type GlassTokens = ReturnType<typeof getDefaultGlassTokens>;
 
 const TARGET_MATCH_TILES = 3;
+
+// Used only to visually fill empty slots when API returns fewer matches than the UI expects.
+// Keeps the layout symmetrical without replacing real API data.
+const DEMO_PRIZE_MATCHES: DashboardMatchSummary[] = [
+  {
+    id: 'demo-prize-1',
+    matchName: 'PUBG Premium Squad Live',
+    matchSchedule: 'TBD',
+    status: 'active',
+    entryFee: 50,
+    perKill: 0,
+    totalPlayer: 100,
+    prizeEstimate: 3000,
+    gameName: 'PUBG Mobile',
+    participantsCount: 9,
+  },
+  {
+    id: 'demo-prize-2',
+    matchName: 'PUBG Solo Rush #7',
+    matchSchedule: 'TBD',
+    status: 'active',
+    entryFee: 45,
+    perKill: 0,
+    totalPlayer: 100,
+    prizeEstimate: 2500,
+    gameName: 'PUBG Mobile',
+    participantsCount: 6,
+  },
+  {
+    id: 'demo-prize-3',
+    matchName: 'PUBG Solo Rush #15',
+    matchSchedule: 'TBD',
+    status: 'active',
+    entryFee: 45,
+    perKill: 0,
+    totalPlayer: 100,
+    prizeEstimate: 2500,
+    gameName: 'PUBG Mobile',
+    participantsCount: 6,
+  },
+];
+
+const DEMO_ONGOING_MATCHES: DashboardMatchSummary[] = [
+  {
+    id: 'demo-ongoing-1',
+    matchName: 'Miramar Squad Live Battle',
+    matchSchedule: 'TBD',
+    status: 'active',
+    entryFee: 30,
+    perKill: 0,
+    totalPlayer: 100,
+    prizeEstimate: 3000,
+    gameName: 'PUBG Mobile',
+    participantsCount: 4,
+  },
+  {
+    id: 'demo-ongoing-2',
+    matchName: 'PUBG Premium Squad Live',
+    matchSchedule: 'TBD',
+    status: 'active',
+    entryFee: 50,
+    perKill: 0,
+    totalPlayer: 100,
+    prizeEstimate: 5000,
+    gameName: 'PUBG Mobile',
+    participantsCount: 9,
+  },
+  {
+    id: 'demo-ongoing-3',
+    matchName: 'Miramar Squad Live Battle (Demo)',
+    matchSchedule: 'TBD',
+    status: 'active',
+    entryFee: 30,
+    perKill: 0,
+    totalPlayer: 100,
+    prizeEstimate: 2800,
+    gameName: 'PUBG Mobile',
+    participantsCount: 5,
+  },
+];
 
 function DashboardMatchTile({
     match,
@@ -588,15 +668,7 @@ function DashboardMatchTile({
         <Box
             sx={{
                 py: { xs: 1.1, sm: 1.25 },
-                px: { xs: 0.5, sm: 0.75 },
                 borderBottom: isLast ? 'none' : HOME_ROW_LINE,
-                borderLeft: variant === 'ongoing' ? `2px solid ${alpha(HOME_GOLD, 0.35)}` : 'none',
-                bgcolor: variant === 'ongoing' ? alpha(HOME_GOLD, 0.03) : 'transparent',
-                transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
-                '&:hover': {
-                    bgcolor: alpha(HOME_GOLD, 0.05),
-                    boxShadow: `inset 0 0 18px ${alpha(HOME_GOLD, 0.06)}`,
-                },
             }}
         >
             <Stack direction="row" alignItems="center" spacing={0.75} sx={{ minWidth: 0 }}>
@@ -632,7 +704,7 @@ function DashboardMatchTile({
                         flexShrink: 0,
                         fontSize: { xs: '0.58rem', sm: '0.62rem' },
                         fontWeight: 700,
-                        color: HOME_MUTED_TEXT_DIM,
+                        color: alpha('#ffffff', 0.42),
                         fontVariantNumeric: 'tabular-nums',
                     }}
                 >
@@ -660,9 +732,9 @@ function DashboardMatchTile({
                         flexShrink: 0,
                         minWidth: { xs: 36, sm: 44 },
                         textAlign: 'right',
-                        fontSize: { xs: '0.64rem', sm: '0.7rem' },
+                        fontSize: { xs: '0.62rem', sm: '0.68rem' },
                         fontWeight: 700,
-                        color: HOME_MUTED_TEXT,
+                        color: alpha('#ffffff', 0.82),
                         fontVariantNumeric: 'tabular-nums',
                         lineHeight: 1.2,
                     }}
@@ -681,8 +753,8 @@ function DashboardMatchTile({
                 <Typography
                     noWrap
                     sx={{
-                        color: HOME_MUTED_TEXT,
-                        fontSize: { xs: '0.64rem', sm: '0.7rem' },
+                        color: alpha('#ffffff', 0.68),
+                        fontSize: { xs: '0.62rem', sm: '0.68rem' },
                         fontWeight: 600,
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -702,8 +774,8 @@ function DashboardMatchTile({
                 <Typography
                     noWrap
                     sx={{
-                        color: HOME_MUTED_TEXT_DIM,
-                        fontSize: { xs: '0.64rem', sm: '0.7rem' },
+                        color: alpha('#ffffff', 0.52),
+                        fontSize: { xs: '0.62rem', sm: '0.68rem' },
                         fontWeight: 600,
                         textAlign: 'right',
                         flexShrink: 0,
@@ -750,29 +822,34 @@ function DashboardMatchPanel({
     emptyLabel: string;
 }) {
     const count = matches.length;
-    const matchPages = chunkItems(matches, TARGET_MATCH_TILES);
+    const displayCount = count > 0 ? Math.max(count, TARGET_MATCH_TILES) : 0;
+    const demoSource = variant === 'prize' ? DEMO_PRIZE_MATCHES : DEMO_ONGOING_MATCHES;
+    const tilesToRender =
+        count > 0
+            ? [
+                  ...matches.slice(0, TARGET_MATCH_TILES),
+                  ...demoSource.slice(0, Math.max(0, TARGET_MATCH_TILES - Math.min(count, TARGET_MATCH_TILES))),
+              ]
+            : [];
 
     return (
-        <HomeBlurPanel sx={homePremiumPanelGlowSx}>
+        <HomeBlurPanel>
             <Stack
                 direction="row"
                 alignItems="center"
                 justifyContent="space-between"
-                sx={{ mb: 1.25, flexWrap: 'wrap', gap: 0.75 }}
+                sx={{ mb: 1.25, flexWrap: 'wrap', gap: 0.5 }}
             >
-                <Stack direction="row" alignItems="center" spacing={0.85} sx={{ minWidth: 0 }}>
-                    {variant === 'ongoing' ? <LivePulseDot color="green" size={7} /> : null}
-                    <Typography
-                        variant="h6"
-                        sx={{
-                            color: glassTokens.titleColor,
-                            fontSize: { xs: '0.95rem', sm: '1.15rem' },
-                            fontWeight: 800,
-                        }}
-                    >
-                        {title}
-                    </Typography>
-                </Stack>
+                <Typography
+                    variant="h6"
+                    sx={{
+                        color: glassTokens.titleColor,
+                        fontSize: { xs: '0.95rem', sm: '1.15rem' },
+                        fontWeight: 800,
+                    }}
+                >
+                    {title}
+                </Typography>
                 <Typography
                     sx={{
                         flexShrink: 0,
@@ -780,7 +857,7 @@ function DashboardMatchPanel({
                         fontWeight: 700,
                         letterSpacing: 0.5,
                         textTransform: 'uppercase',
-                        color: alpha(HOME_GOLD, 0.88),
+                        color: alpha(HOME_GOLD, 0.82),
                     }}
                 >
                     {badgeLabel}
@@ -803,28 +880,21 @@ function DashboardMatchPanel({
                         ))}
                     </Stack>
                 ) : count ? (
-                    <HomeChunkCarousel
-                        pages={matchPages.map((pageMatches, pageIndex) => (
-                            <Box key={pageIndex}>
-                                {pageMatches.map((match, index) => {
-                                    const globalIndex = pageIndex * TARGET_MATCH_TILES + index;
-                                    return (
-                                        <DashboardMatchTile
-                                            key={match.id || `${pageIndex}-${index}`}
-                                            match={match}
-                                            index={globalIndex}
-                                            total={count}
-                                            variant={variant}
-                                            isLast={index === pageMatches.length - 1}
-                                            platformTotalWinnings={platformTotalWinnings}
-                                        />
-                                    );
-                                })}
-                            </Box>
+                    <Box>
+                        {tilesToRender.map((match, index) => (
+                            <DashboardMatchTile
+                                key={match.id || index}
+                                match={match}
+                                index={index}
+                                total={displayCount}
+                                variant={variant}
+                                isLast={index === tilesToRender.length - 1}
+                                platformTotalWinnings={platformTotalWinnings}
+                            />
                         ))}
-                    />
+                    </Box>
                 ) : (
-                    <Typography variant="body2" sx={{ color: HOME_MUTED_TEXT, py: 2 }}>
+                    <Typography variant="body2" sx={{ color: glassTokens.subtitleColor, py: 2 }}>
                         {emptyLabel}
                     </Typography>
                 )}
@@ -1045,7 +1115,7 @@ export function LandingDashboardSection() {
             }}
         >
             <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-                <Stack spacing={{ xs: 3.25, md: 4 }}>
+                <Stack spacing={2.75}>
                     <PulseHeroFlat
                         badgeLabel={t('home.dashboard.liveDashboardChip')}
                         title={t('home.dashboard.battleAsiaPulse')}
@@ -1075,8 +1145,6 @@ export function LandingDashboardSection() {
                             display: 'flex',
                             flexDirection: 'row',
                             alignItems: { md: 'stretch' },
-                            gap: { xs: 0, md: 0 },
-                            pt: { xs: 0.5, md: 1 },
                             ...homeMobileScrollFlexRowSx,
                             overflowX: { xs: 'auto', md: 'visible' },
                             scrollSnapType: { xs: 'x mandatory', md: 'none' },
