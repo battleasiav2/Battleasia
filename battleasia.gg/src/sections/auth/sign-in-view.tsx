@@ -24,7 +24,7 @@ import { AuthTrustRow } from './auth-trust-row';
 import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
 import { AuthSocialButtons } from './auth-social-buttons';
-import { authAlertSx, authCardFooterSx, authFieldSlotPropsCompact, authLinkSx } from './auth-form-styles';
+import { authAlertSx, authCardFooterSx, authFieldSlotPropsCompact, authLinkSx, AUTH_TEXT_SECONDARY } from './auth-form-styles';
 
 const REMEMBER_EMAIL_KEY = 'ba_remember_email';
 
@@ -189,7 +189,7 @@ export function SignInView() {
                   />
                 }
                 label={
-                  <Box sx={{ fontSize: 13, fontWeight: 500, color: alpha('#fff', 0.62) }}>
+                  <Box sx={{ fontSize: 13, fontWeight: 500, color: AUTH_TEXT_SECONDARY }}>
                     {t('auth.rememberMe')}
                   </Box>
                 }

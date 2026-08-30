@@ -40,7 +40,7 @@ class AuthTextField extends StatelessWidget {
         Text(
           label,
           style: AppTheme.bodySmall.copyWith(
-            color: Colors.white.withValues(alpha: 0.55),
+            color: AppColors.textSecondary,
             fontWeight: FontWeight.w600,
             letterSpacing: 0,
             fontSize: 13,

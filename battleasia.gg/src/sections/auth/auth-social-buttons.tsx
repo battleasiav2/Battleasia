@@ -6,7 +6,7 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
 
-import { authSocialIconButtonSx } from './auth-form-styles';
+import { AUTH_TEXT_MUTED, authSocialIconButtonSx } from './auth-form-styles';
 
 const GOLD = '#f5c518';
 
@@ -74,7 +74,7 @@ export function AuthSocialButtons() {
     <Stack spacing={1} sx={{ width: 1 }}>
       <Stack direction="row" alignItems="center" spacing={1} sx={{ py: 0.25 }}>
         <Box sx={{ flex: 1, height: '1px', bgcolor: alpha('#fff', 0.08) }} />
-        <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: alpha('#fff', 0.42), textTransform: 'uppercase' }}>
+        <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: AUTH_TEXT_MUTED, textTransform: 'uppercase' }}>
           {t('auth.orContinueWith')}
         </Typography>
         <Box sx={{ flex: 1, height: '1px', bgcolor: alpha('#fff', 0.08) }} />

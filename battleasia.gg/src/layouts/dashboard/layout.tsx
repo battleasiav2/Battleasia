@@ -3,6 +3,7 @@ import type { NavSectionProps } from 'src/components/nav-section';
 
 import { useEffect, useState, lazy, Suspense } from 'react';
 import { merge } from 'es-toolkit';
+import { useScrollOffsetTop } from 'minimal-shared/hooks';
 
 import { useTheme, alpha } from '@mui/material/styles';
 import { iconButtonClasses } from '@mui/material/IconButton';
@@ -27,7 +28,7 @@ import { LayoutSection } from '../core/layout-section';
 import { LanguagePopover } from '../components/language-popover';
 import { SignInIconButton } from '../components/sign-in-icon-button';
 import {
-  headerBarSx,
+  getHeaderBarSx,
   headerContainerSx,
   headerCenterAreaSx,
   headerLeftAreaSx,
@@ -85,6 +86,7 @@ export function DashboardLayout({
   const pathname = usePathname();
   const router = useRouter();
   const { isLoggedIn } = useSelector((state) => state.auth);
+  const { offsetTop: isHeaderScrolled } = useScrollOffsetTop();
 
   const navVars = dashboardNavColorVars(theme, settings.state.navColor, settings.state.navLayout);
 
@@ -251,7 +253,7 @@ export function DashboardLayout({
         slots={{ ...headerSlots, ...slotProps?.header?.slots }}
         slotProps={merge(headerSlotProps, slotProps?.header?.slotProps ?? {})}
         sx={{
-          ...headerBarSx,
+          ...getHeaderBarSx(isHeaderScrolled),
           ...slotProps?.header?.sx,
         }}
       />

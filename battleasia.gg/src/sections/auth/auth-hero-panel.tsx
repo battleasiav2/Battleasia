@@ -1,11 +1,10 @@
 import { Box, Stack, Typography } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 
 import { CONFIG } from 'src/global-config';
 
 import { useTranslate } from 'src/locales/use-locales';
 
-import { HOME_GOLD, HOME_ROW_LINE, HomeBlurPanel } from 'src/sections/home/home-blur-panel';
+import { HOME_GOLD, HOME_ROW_LINE, HOME_TEXT_MUTED, HOME_TEXT_SECONDARY, HomeBlurPanel } from 'src/sections/home/home-blur-panel';
 
 export function AuthHeroPanel() {
   const { t } = useTranslate();
@@ -21,7 +20,7 @@ export function AuthHeroPanel() {
       <Stack spacing={1.25}>
         <Typography
           sx={{
-            fontSize: { xs: 11, md: 12 },
+            fontSize: { xs: 12, md: 13 },
             fontWeight: 700,
             letterSpacing: 2.5,
             textTransform: 'uppercase',
@@ -48,8 +47,8 @@ export function AuthHeroPanel() {
         <Typography
           sx={{
             maxWidth: 420,
-            fontSize: { xs: 13, md: 14 },
-            color: alpha('#ffffff', 0.5),
+            fontSize: { xs: 13.5, md: 15 },
+            color: HOME_TEXT_MUTED,
             lineHeight: 1.65,
           }}
         >
@@ -71,11 +70,11 @@ export function AuthHeroPanel() {
             >
               <Typography
                 sx={{
-                  fontSize: 10,
+                  fontSize: { xs: 11, sm: 12 },
                   fontWeight: 700,
                   letterSpacing: 0.7,
                   textTransform: 'uppercase',
-                  color: alpha('#fff', 0.55),
+                  color: HOME_TEXT_SECONDARY,
                   lineHeight: 1.25,
                 }}
               >

@@ -3,6 +3,7 @@ import type { NavSectionProps } from 'src/components/nav-section';
 
 import { merge } from 'es-toolkit';
 import { lazy, Suspense } from 'react';
+import { useScrollOffsetTop } from 'minimal-shared/hooks';
 
 import { useTheme, alpha } from '@mui/material/styles';
 import { Box, Alert, Stack, Typography } from '@mui/material';
@@ -31,7 +32,7 @@ import { USER_COLORS, userHeaderPillSx, getUserLayoutMainSx } from './user-theme
 import { LanguagePopover } from '../components/language-popover';
 import { SignInIconButton } from '../components/sign-in-icon-button';
 import {
-    headerBarSx,
+    getHeaderBarSx,
     headerContainerSx,
     headerCompactSearchSx,
     getHeaderNavLinkSx,
@@ -86,6 +87,7 @@ export function UserLayout({
     const router = useRouter();
     
     const { isLoggedIn, balance, user } = useSelector((state) => state.auth);
+    const { offsetTop: isHeaderScrolled } = useScrollOffsetTop();
 
     // Preload currency icon
     const { isLoaded: isCurrencyIconLoaded } = useImagePreloader([CONFIG.currencyIcon], {
@@ -148,7 +150,7 @@ export function UserLayout({
                         display: { xs: 'flex', md: 'none' },
                         flexShrink: 0,
                         minWidth: 0,
-                        pl: { xs: 0.25, sm: 0.5 },
+                        pl: { xs: 0.5, sm: 0.75 },
                     }}
                 >
                     {/* Mobile-only: logo image — brand text lives in desktop sidebar */}
@@ -302,7 +304,7 @@ export function UserLayout({
                             : 'var(--layout-nav-vertical-width)',
                     },
                     width: 'auto',
-                    ...(headerBarSx as Record<string, unknown>),
+                    ...(getHeaderBarSx(isHeaderScrolled) as Record<string, unknown>),
                     ...slotProps?.header?.sx,
                 }}
             />

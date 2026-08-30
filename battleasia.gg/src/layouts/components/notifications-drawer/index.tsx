@@ -188,19 +188,27 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
         {...other}
       >
         <Badge
-          badgeContent={unreadCount}
-          color="error"
-          max={99}
+          variant="dot"
+          invisible={!unreadCount}
+          overlap="circular"
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
           sx={{
             '& .MuiBadge-badge': {
-              fontSize: 10,
-              fontWeight: 800,
-              minWidth: 16,
-              height: 16,
-              px: 0.5,
-              top: 2,
-              right: 2,
-              border: `1.5px solid ${alpha('#000000', 0.85)}`,
+              width: 9,
+              height: 9,
+              minWidth: 9,
+              borderRadius: '50%',
+              bgcolor: unreadCount > 0 ? '#ef4444' : USER_COLORS.gold,
+              color: 'transparent',
+              border: `2px solid ${alpha('#0a0a0a', 0.92)}`,
+              boxShadow: `0 0 8px ${alpha(unreadCount > 0 ? '#ef4444' : USER_COLORS.gold, 0.55)}`,
+              top: 5,
+              right: 5,
+              animation: unreadCount > 0 ? 'notifDotPulse 2s ease-in-out infinite' : 'none',
+            },
+            '@keyframes notifDotPulse': {
+              '0%, 100%': { opacity: 1, transform: 'scale(1)' },
+              '50%': { opacity: 0.72, transform: 'scale(1.14)' },
             },
           }}
         >

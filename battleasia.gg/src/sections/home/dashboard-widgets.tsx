@@ -2,14 +2,12 @@ import { useMemo, useState, useEffect, useCallback } from 'react';
 import {
     Box,
     Grid,
-    Alert,
     Stack,
     Avatar,
     Skeleton,
     Container,
     Typography,
     LinearProgress,
-    Button,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
@@ -34,7 +32,8 @@ import {
     formatPulseLastUpdated,
     sanitizePublicDashboardData,
 } from './pulse-dashboard-utils';
-import { HOME_GOLD, HOME_ROW_LINE, HomeBlurPanel } from './home-blur-panel';
+import { HOME_GOLD, HOME_ROW_LINE, HOME_TEXT_MUTED, HOME_TEXT_SECONDARY, HomeBlurPanel } from './home-blur-panel';
+import { LivePulseDot } from './live-pulse-dot';
 import type {
     DashboardTopPlayer,
     PublicDashboardStats,
@@ -44,7 +43,6 @@ import type {
 type SectionState = {
     loading: boolean;
     data: PublicDashboardStats | null;
-    error?: string;
 };
 
 /** Simple gaming split — one gold beam, fade ends, soft glow */
@@ -141,7 +139,7 @@ function FlatPulseStat({
                             sx={{
                                 letterSpacing: 0.7,
                                 color: tokens.stat.labelColor,
-                                fontSize: { xs: '0.55rem', sm: '0.64rem' },
+                                fontSize: { xs: '0.6875rem', sm: '0.75rem' },
                                 lineHeight: 1.25,
                                 fontWeight: 700,
                                 textTransform: 'uppercase',
@@ -180,7 +178,7 @@ function FlatPulseStat({
                                     component="span"
                                     sx={{
                                         color: tokens.stat.suffixColor,
-                                        fontSize: { xs: '0.62rem', sm: '0.72rem' },
+                                        fontSize: { xs: '0.6875rem', sm: '0.8125rem' },
                                         fontWeight: 600,
                                     }}
                                 >
@@ -248,22 +246,29 @@ function PulseHeroFlat({
     ] as const;
 
     return (
-        <HomeBlurPanel>
+        <HomeBlurPanel sx={{ pb: { xs: 2, sm: 2.25, md: 2.5 } }}>
             <Grid container spacing={{ xs: 2.5, md: 3.5 }} alignItems="center">
                 <Grid item xs={12} md={5}>
                     <Stack spacing={1.25}>
-                        <Typography
-                            sx={{
-                                alignSelf: 'flex-start',
-                                fontSize: { xs: '0.68rem', sm: '0.76rem' },
-                                fontWeight: 700,
-                                letterSpacing: 0.75,
-                                textTransform: 'uppercase',
-                                color: alpha(HOME_GOLD, 0.88),
-                            }}
+                        <Stack
+                            direction="row"
+                            alignItems="center"
+                            spacing={0.75}
+                            sx={{ alignSelf: 'flex-start' }}
                         >
-                            {badgeLabel}
-                        </Typography>
+                            <LivePulseDot color="green" size={7} />
+                            <Typography
+                                sx={{
+                                    fontSize: { xs: '0.68rem', sm: '0.76rem' },
+                                    fontWeight: 700,
+                                    letterSpacing: 0.75,
+                                    textTransform: 'uppercase',
+                                    color: alpha(HOME_GOLD, 0.88),
+                                }}
+                            >
+                                {badgeLabel}
+                            </Typography>
+                        </Stack>
                         <Typography
                             variant="h3"
                             sx={{
@@ -282,7 +287,7 @@ function PulseHeroFlat({
                             variant="body2"
                             sx={{
                                 color: tokens.subtitleColor,
-                                fontSize: { xs: '0.8rem', sm: '0.9rem' },
+                                fontSize: { xs: '0.8125rem', sm: '0.9375rem' },
                                 lineHeight: 1.55,
                                 maxWidth: 480,
                             }}
@@ -293,9 +298,9 @@ function PulseHeroFlat({
                             <Typography
                                 variant="caption"
                                 sx={{
-                                    color: alpha('#ffffff', 0.52),
+                                    color: HOME_TEXT_MUTED,
                                     fontWeight: 600,
-                                    letterSpacing: 0.3,
+                                    fontSize: { xs: '0.6875rem', sm: '0.75rem' },
                                 }}
                             >
                                 {lastUpdatedLabel}
@@ -387,30 +392,32 @@ const PlayerListCard = ({
                     variant="caption"
                     sx={{
                         color: tokens.subtitleColor,
-                        fontSize: { xs: '0.68rem', sm: '0.78rem' },
+                        fontSize: { xs: '0.75rem', sm: '0.8125rem' },
                         lineHeight: 1.45,
                     }}
                 >
                     {hint}
                 </Typography>
             </Stack>
-            <Typography
-                sx={{
-                    flexShrink: 0,
-                    fontSize: { xs: '0.58rem', sm: '0.64rem' },
-                    fontWeight: 700,
-                    letterSpacing: 0.75,
-                    textTransform: 'uppercase',
-                    color: alpha(HOME_GOLD, 0.82),
-                }}
-            >
-                {translations.live}
-            </Typography>
+            <Stack direction="row" alignItems="center" spacing={0.6} sx={{ flexShrink: 0 }}>
+                <LivePulseDot color="green" size={6} />
+                <Typography
+                    sx={{
+                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
+                        fontWeight: 700,
+                        letterSpacing: 0.75,
+                        textTransform: 'uppercase',
+                        color: alpha(HOME_GOLD, 0.92),
+                    }}
+                >
+                    {translations.live}
+                </Typography>
+            </Stack>
         </Stack>
         <Box sx={{ borderTop: HOME_ROW_LINE }}>
         {loading ? (
             <Stack spacing={0}>
-                {Array.from({ length: 4 }).map((_, idx) => (
+                {Array.from({ length: 5 }).map((_, idx) => (
                     <Stack
                         key={idx}
                         direction="row"
@@ -418,7 +425,7 @@ const PlayerListCard = ({
                         alignItems="center"
                         sx={{
                             py: { xs: 0.85, sm: 0.95 },
-                            borderBottom: idx < 3 ? HOME_ROW_LINE : 'none',
+                            borderBottom: idx < 4 ? HOME_ROW_LINE : 'none',
                         }}
                     >
                         <Skeleton variant="circular" width={34} height={34} />
@@ -498,7 +505,7 @@ const PlayerListCard = ({
                                         noWrap
                                         sx={{
                                             color: tokens.subtitleColor,
-                                            fontSize: { xs: '0.62rem', sm: '0.72rem' },
+                                            fontSize: { xs: '0.6875rem', sm: '0.75rem' },
                                         }}
                                     >
                                         {translations.lastPlayed}: {formatDateTime(player.lastPlayed)}
@@ -521,7 +528,7 @@ const PlayerListCard = ({
                                         noWrap
                                         sx={{
                                             color: tokens.stat.labelColor,
-                                            fontSize: { xs: '0.58rem', sm: '0.68rem' },
+                                            fontSize: { xs: '0.6875rem', sm: '0.75rem' },
                                         }}
                                     >
                                         {metricKey === 'totalWinnings'
@@ -677,11 +684,11 @@ function DashboardMatchTile({
                     sx={{
                         flexShrink: 0,
                         maxWidth: { xs: 72, sm: 84 },
-                        fontSize: { xs: '0.58rem', sm: '0.62rem' },
+                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
                         fontWeight: 700,
                         letterSpacing: 0.4,
                         textTransform: 'uppercase',
-                        color: alpha(HOME_GOLD, 0.85),
+                        color: alpha(HOME_GOLD, 0.92),
                     }}
                 >
                     {match.gameName || 'Match'}
@@ -692,7 +699,7 @@ function DashboardMatchTile({
                         color: '#ffffff',
                         flex: 1,
                         minWidth: 0,
-                        fontSize: { xs: '0.74rem', sm: '0.82rem' },
+                        fontSize: { xs: '0.8125rem', sm: '0.875rem' },
                         fontWeight: 700,
                         lineHeight: 1.25,
                     }}
@@ -702,9 +709,9 @@ function DashboardMatchTile({
                 <Typography
                     sx={{
                         flexShrink: 0,
-                        fontSize: { xs: '0.58rem', sm: '0.62rem' },
+                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
                         fontWeight: 700,
-                        color: alpha('#ffffff', 0.42),
+                        color: HOME_TEXT_MUTED,
                         fontVariantNumeric: 'tabular-nums',
                     }}
                 >
@@ -732,9 +739,9 @@ function DashboardMatchTile({
                         flexShrink: 0,
                         minWidth: { xs: 36, sm: 44 },
                         textAlign: 'right',
-                        fontSize: { xs: '0.62rem', sm: '0.68rem' },
+                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
                         fontWeight: 700,
-                        color: alpha('#ffffff', 0.82),
+                        color: HOME_TEXT_SECONDARY,
                         fontVariantNumeric: 'tabular-nums',
                         lineHeight: 1.2,
                     }}
@@ -753,8 +760,8 @@ function DashboardMatchTile({
                 <Typography
                     noWrap
                     sx={{
-                        color: alpha('#ffffff', 0.68),
-                        fontSize: { xs: '0.62rem', sm: '0.68rem' },
+                        color: HOME_TEXT_SECONDARY,
+                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
                         fontWeight: 600,
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -774,8 +781,8 @@ function DashboardMatchTile({
                 <Typography
                     noWrap
                     sx={{
-                        color: alpha('#ffffff', 0.52),
-                        fontSize: { xs: '0.62rem', sm: '0.68rem' },
+                        color: HOME_TEXT_MUTED,
+                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
                         fontWeight: 600,
                         textAlign: 'right',
                         flexShrink: 0,
@@ -840,24 +847,27 @@ function DashboardMatchPanel({
                 justifyContent="space-between"
                 sx={{ mb: 1.25, flexWrap: 'wrap', gap: 0.5 }}
             >
-                <Typography
-                    variant="h6"
-                    sx={{
-                        color: glassTokens.titleColor,
-                        fontSize: { xs: '0.95rem', sm: '1.15rem' },
-                        fontWeight: 800,
-                    }}
-                >
-                    {title}
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={0.85} sx={{ minWidth: 0 }}>
+                    {variant === 'ongoing' ? <LivePulseDot color="red" size={7} /> : null}
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            color: glassTokens.titleColor,
+                            fontSize: { xs: '0.95rem', sm: '1.15rem' },
+                            fontWeight: 800,
+                        }}
+                    >
+                        {title}
+                    </Typography>
+                </Stack>
                 <Typography
                     sx={{
                         flexShrink: 0,
-                        fontSize: { xs: '0.62rem', sm: '0.68rem' },
+                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
                         fontWeight: 700,
                         letterSpacing: 0.5,
                         textTransform: 'uppercase',
-                        color: alpha(HOME_GOLD, 0.82),
+                        color: alpha(HOME_GOLD, 0.92),
                     }}
                 >
                     {badgeLabel}
@@ -919,7 +929,7 @@ export function LandingDashboardSection() {
 
     const loadStats = async () => {
         try {
-            setState((prev) => ({ ...prev, loading: true, error: undefined }));
+            setState((prev) => ({ ...prev, loading: true }));
             let payload: PublicDashboardStats | undefined;
 
             try {
@@ -943,14 +953,10 @@ export function LandingDashboardSection() {
             if (applyPayload(payload)) {
                 return;
             }
-            setState({ loading: false, data: null, error: t('home.dashboard.loadFailed') });
-        } catch (error) {
-            console.error('Failed to load landing stats', error);
-            setState((prev) => ({
-                ...prev,
-                loading: false,
-                error: t('home.dashboard.loadFailedRetry'),
-            }));
+            setState({ loading: false, data: null });
+        } catch (loadError) {
+            console.error('Failed to load landing stats', loadError);
+            setState({ loading: false, data: null });
         }
     };
 
@@ -1040,7 +1046,7 @@ export function LandingDashboardSection() {
         return () => window.clearInterval(timer);
     }, [lastUpdatedAt]);
 
-    const { loading, data, error } = state;
+    const { loading, data } = state;
 
     const stats = useMemo(() => {
         if (!data?.platform) {
@@ -1087,7 +1093,7 @@ export function LandingDashboardSection() {
                 overflowX: 'clip',
                 overflowY: 'visible',
                 bgcolor: '#0a0a0a',
-                py: { xs: 3.25, md: 5 },
+                py: { xs: 3.5, md: 5.25 },
                 color: '#f5f5f5',
                 '&:before': {
                     content: "''",
@@ -1115,7 +1121,7 @@ export function LandingDashboardSection() {
             }}
         >
             <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
-                <Stack spacing={2.75}>
+                <Stack spacing={{ xs: 3.75, sm: 4.25, md: 4.75 }}>
                     <PulseHeroFlat
                         badgeLabel={t('home.dashboard.liveDashboardChip')}
                         title={t('home.dashboard.battleAsiaPulse')}
@@ -1127,19 +1133,6 @@ export function LandingDashboardSection() {
                         lastUpdatedLabel={lastUpdatedLabel}
                     />
 
-                    {error && !loading ? (
-                        <Alert
-                            severity="warning"
-                            action={
-                                <Button color="inherit" size="small" onClick={loadStats}>
-                                    {t('home.dashboard.retry')}
-                                </Button>
-                            }
-                        >
-                            {error}
-                        </Alert>
-                    ) : null}
-
                     <Box
                         sx={{
                             display: 'flex',
@@ -1148,6 +1141,7 @@ export function LandingDashboardSection() {
                             ...homeMobileScrollFlexRowSx,
                             overflowX: { xs: 'auto', md: 'visible' },
                             scrollSnapType: { xs: 'x mandatory', md: 'none' },
+                            pt: { xs: 0.5, md: 0.75 },
                             pb: { xs: 1.5, md: 0 },
                             px: { xs: 0, md: 0 },
                         }}

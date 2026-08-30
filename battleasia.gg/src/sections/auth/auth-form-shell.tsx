@@ -6,7 +6,7 @@ import { alpha, keyframes } from '@mui/material/styles';
 import { Logo } from 'src/components/logo';
 import { useTranslate } from 'src/locales/use-locales';
 
-import { authCardSx } from './auth-form-styles';
+import { authCardSx, AUTH_TEXT_MUTED } from './auth-form-styles';
 
 // ----------------------------------------------------------------------
 
@@ -81,7 +81,7 @@ export function AuthFormShell({
             <Box sx={{ height: 2, width: 40, bgcolor: GOLD }} />
             <Typography
               sx={{
-                fontSize: { xs: 10, sm: 11 },
+                fontSize: { xs: 11, sm: 12 },
                 fontWeight: 700,
                 letterSpacing: 2.5,
                 textTransform: 'uppercase',
@@ -107,8 +107,8 @@ export function AuthFormShell({
             {description && (
               <Typography
                 sx={{
-                  color: alpha('#ffffff', 0.52),
-                  fontSize: 13,
+                  color: AUTH_TEXT_MUTED,
+                  fontSize: { xs: 13, sm: 14 },
                   lineHeight: 1.45,
                   maxWidth: 320,
                   pt: 0.25,

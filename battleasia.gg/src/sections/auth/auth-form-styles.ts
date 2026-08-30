@@ -1,7 +1,7 @@
 import { alpha } from '@mui/material/styles';
 import { inputBaseClasses } from '@mui/material/InputBase';
 
-import { HOME_ROW_LINE, homeBlurPanelSx } from 'src/sections/home/home-blur-panel';
+import { HOME_ROW_LINE, HOME_TEXT_MUTED, HOME_TEXT_SECONDARY, homeBlurPanelSx } from 'src/sections/home/home-blur-panel';
 import { HOME_GAME_ARTS } from 'src/sections/home/home-game-arts';
 
 export const AUTH_BG_IMAGE = HOME_GAME_ARTS[0];
@@ -89,6 +89,8 @@ export const AUTH_CARD_BG = '#161618';
 export const AUTH_INPUT_BG = '#0e0e0e';
 /** Brighter placeholder / adornment icons on dark inputs */
 export const AUTH_PLACEHOLDER = '#9CA3AF';
+export const AUTH_TEXT_SECONDARY = HOME_TEXT_SECONDARY;
+export const AUTH_TEXT_MUTED = HOME_TEXT_MUTED;
 
 export const AUTH_RADIUS = {
   card: '0',
@@ -136,13 +138,13 @@ export const authFieldSlotProps = {
       fontWeight: 600,
       letterSpacing: 0,
       lineHeight: 1.2,
-      color: alpha('#ffffff', 0.55),
+      color: AUTH_TEXT_SECONDARY,
       mb: 0.6,
       textTransform: 'none' as const,
       '&.MuiInputLabel-shrink': {
         transform: 'none',
         fontSize: 13,
-        color: alpha('#ffffff', 0.55),
+        color: AUTH_TEXT_SECONDARY,
         '&.Mui-focused': { color: alpha('#f5c518', 0.9) },
       },
       '&.Mui-focused': { color: alpha('#f5c518', 0.9) },
@@ -221,7 +223,7 @@ export const authPhoneInputSx = {
     letterSpacing: 0,
   },
   '& .MuiFormHelperText-root': {
-    color: alpha('#ffffff', 0.55),
+    color: AUTH_TEXT_MUTED,
     ml: 0,
   },
 };
@@ -366,7 +368,7 @@ export const authSecondaryButtonSx = {
   fontWeight: 600,
   letterSpacing: 0,
   textTransform: 'none' as const,
-  color: alpha('#ffffff', 0.62),
+  color: AUTH_TEXT_SECONDARY,
   bgcolor: 'transparent',
   border: `1px solid ${alpha('#ffffff', 0.14)}`,
   boxShadow: 'none',
@@ -470,6 +472,6 @@ export const authAlertSx = {
 export const authFooterTextSx = {
   textAlign: 'center' as const,
   fontSize: 13,
-  color: alpha('#ffffff', 0.55),
+  color: AUTH_TEXT_MUTED,
   lineHeight: 1.55,
 };

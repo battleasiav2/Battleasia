@@ -19,6 +19,15 @@ type TopPlayerRow = {
   lastPlayed: string | null;
 };
 
+const DEMO_PULSE_USERNAME_BLOCKLIST = new Set(['testplayer', 'demouser', 'demo']);
+
+function isDemoPulseUsername(username: string): boolean {
+  const name = username.trim().toLowerCase();
+  if (!name) return true;
+  if (DEMO_PULSE_USERNAME_BLOCKLIST.has(name)) return true;
+  return /^testplayer\d*$/.test(name);
+}
+
 function toTopPlayer(row: TopPlayerRow, extra?: { winRate?: number; averageScore?: number }) {
   const totalMatches = row.totalMatches || 1;
   return {
@@ -35,6 +44,7 @@ function toTopPlayer(row: TopPlayerRow, extra?: { winRate?: number; averageScore
 }
 
 async function aggregatePlayerStats(sortField: 'totalWinnings' | 'totalKills', limit = 5) {
+  const fetchLimit = limit + 10;
   const rows = await Match.aggregate<TopPlayerRow>([
     { $match: { status: 'complete', 'results.0': { $exists: true } } },
     { $unwind: '$results' },
@@ -66,7 +76,7 @@ async function aggregatePlayerStats(sortField: 'totalWinnings' | 'totalKills', l
       },
     },
     { $sort: { [sortField]: -1 } },
-    { $limit: limit },
+    { $limit: fetchLimit },
     {
       $project: {
         userId: '$_id',
@@ -85,25 +95,26 @@ async function aggregatePlayerStats(sortField: 'totalWinnings' | 'totalKills', l
   const users = await User.find({ _id: { $in: userIds } }).select('username avatar');
   const userMap = new Map(users.map((u) => [u._id.toString(), u]));
 
-    return rows
-        .filter((row) => {
-            const user = userMap.get(row.userId.toString());
-            const username = (user?.username || row.username || '').trim().toLowerCase();
-            return username !== 'testplayer' && !username.startsWith('testplayer');
-        })
-        .map((row) => {
-            const user = userMap.get(row.userId.toString());
-            return toTopPlayer(
-      {
-        ...row,
-        username: user?.username || row.username,
-        avatar: user?.avatar || row.avatar,
-      },
-      sortField === 'totalKills'
-        ? { averageScore: Math.round((row.totalKills / Math.max(row.totalMatches, 1)) * 10) / 10 }
-        : undefined
-    );
-  });
+  return rows
+    .filter((row) => {
+      const user = userMap.get(row.userId.toString());
+      const username = user?.username || row.username || '';
+      return !isDemoPulseUsername(username);
+    })
+    .slice(0, limit)
+    .map((row) => {
+      const user = userMap.get(row.userId.toString());
+      return toTopPlayer(
+        {
+          ...row,
+          username: user?.username || row.username,
+          avatar: user?.avatar || row.avatar,
+        },
+        sortField === 'totalKills'
+          ? { averageScore: Math.round((row.totalKills / Math.max(row.totalMatches, 1)) * 10) / 10 }
+          : undefined
+      );
+    });
 }
 
 /** Start of calendar day in Asia/Dhaka (UTC+6). */

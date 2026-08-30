@@ -8,18 +8,25 @@ import { USER_COLORS } from 'src/layouts/user/user-theme';
 const GOLD = USER_COLORS.gold;
 
 /** Slim Hostinger-style bar — BattleAsia dark palette */
-export const headerBarSx: SystemStyleObject<Theme> = {
-  bgcolor: alpha('#0a0a0a', 0.94),
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
-  borderBottom: `1px solid ${alpha('#ffffff', 0.08)}`,
-  boxShadow: 'none',
-};
+export function getHeaderBarSx(isScrolled = false): SystemStyleObject<Theme> {
+  return {
+    bgcolor: alpha('#0a0a0a', isScrolled ? 0.92 : 0.76),
+    backdropFilter: isScrolled ? 'blur(8px)' : 'none',
+    WebkitBackdropFilter: isScrolled ? 'blur(8px)' : 'none',
+    borderBottom: `1px solid ${isScrolled ? alpha(GOLD, 0.1) : alpha('#ffffff', 0.05)}`,
+    boxShadow: 'none',
+    transition:
+      'background-color 0.22s ease, backdrop-filter 0.22s ease, border-color 0.22s ease',
+  };
+}
+
+/** Default (top of page) header surface */
+export const headerBarSx = getHeaderBarSx(false);
 
 export const headerContainerSx: SystemStyleObject<Theme> = {
   minHeight: { xs: 52, md: 56 },
   height: { xs: 52, md: 56 },
-  px: { xs: 1.5, sm: 2.5, md: 3 },
+  px: { xs: 2, sm: 2.5, md: 3 },
   py: 0,
   alignItems: 'center',
   // Mobile: flex (nav hidden). Desktop: equal side columns so nav sits in true page center.
@@ -31,6 +38,7 @@ export const headerContainerSx: SystemStyleObject<Theme> = {
 export const headerLeftAreaSx: SystemStyleObject<Theme> = {
   justifySelf: { lg: 'start' },
   minWidth: 0,
+  pl: { xs: 0.25, sm: 0 },
 };
 
 export const headerCenterAreaSx: SystemStyleObject<Theme> = {

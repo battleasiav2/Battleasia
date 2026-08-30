@@ -20,7 +20,7 @@ import { Form, Field } from 'src/components/hook-form';
 import { AuthFormShell } from './auth-form-shell';
 import { AuthTrustRow } from './auth-trust-row';
 import { AuthSubmitButton } from './auth-submit-button';
-import { authAlertSx, authCardFooterSx, authFieldSlotProps, authLinkSx } from './auth-form-styles';
+import { authAlertSx, authCardFooterSx, authFieldSlotProps, authLinkSx, AUTH_TEXT_MUTED } from './auth-form-styles';
 
 // ----------------------------------------------------------------------
 
@@ -195,7 +195,7 @@ export function EmailVerificationView() {
       />
 
       <Box sx={{ textAlign: 'center' }}>
-        <Typography variant="body2" sx={{ color: alpha('#ffffff', 0.55), mb: 1 }}>
+        <Typography variant="body2" sx={{ color: AUTH_TEXT_MUTED, mb: 1 }}>
           {timeLeft > 0 ? (
             <>{t('auth.timeRemaining')}: <strong>{formatTime(timeLeft)}</strong></>
           ) : (
@@ -270,7 +270,7 @@ export function EmailVerificationView() {
       </Form>
 
       <Box sx={{ mt: 2, textAlign: 'center' }}>
-        <Typography variant="body2" sx={{ color: alpha('#ffffff', 0.55), fontSize: 13 }}>
+        <Typography variant="body2" sx={{ color: AUTH_TEXT_MUTED, fontSize: 13 }}>
           {t('auth.didntReceiveEmail')}{' '}
           <Link component={RouterLink} href={paths.auth.signUp} sx={authLinkSx}>
             {t('auth.signUpAgain')}

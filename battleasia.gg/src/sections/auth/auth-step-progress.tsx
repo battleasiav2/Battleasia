@@ -3,6 +3,8 @@ import { alpha } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
 
+import { AUTH_TEXT_MUTED, AUTH_TEXT_SECONDARY } from './auth-form-styles';
+
 const GOLD = '#f5c518';
 
 export type AuthStep = {
@@ -40,7 +42,7 @@ export function AuthStepProgress({ steps, currentStep }: AuthStepProgressProps) 
                 borderRadius: '50%',
                 border: `1px solid ${done || active ? GOLD : alpha('#fff', 0.14)}`,
                 bgcolor: done ? GOLD : 'transparent',
-                color: done ? '#111' : active ? GOLD : alpha('#fff', 0.45),
+                color: done ? '#111' : active ? GOLD : AUTH_TEXT_MUTED,
                 fontSize: 12,
                 fontWeight: 700,
                 transition: 'all 0.25s ease',
@@ -55,7 +57,7 @@ export function AuthStepProgress({ steps, currentStep }: AuthStepProgressProps) 
                   display: 'block',
                   fontSize: 13,
                   fontWeight: 600,
-                  color: active || done ? '#fff' : alpha('#fff', 0.45),
+                  color: active || done ? '#fff' : AUTH_TEXT_MUTED,
                 }}
               >
                 {step.title}
@@ -64,8 +66,8 @@ export function AuthStepProgress({ steps, currentStep }: AuthStepProgressProps) 
                 noWrap
                 sx={{
                   display: 'block',
-                  fontSize: 11,
-                  color: alpha('#fff', 0.38),
+                  fontSize: 12,
+                  color: AUTH_TEXT_MUTED,
                 }}
               >
                 {step.hint}

@@ -51,6 +51,7 @@ import {
   authPhoneInputSx,
   authSelectMenuProps,
   authSelectSx,
+  AUTH_TEXT_MUTED,
 } from './auth-form-styles';
 
 const REFERRAL_STORAGE_KEY = 'battleasia_ref';
@@ -403,7 +404,7 @@ export function SignUpView() {
                           />
                         }
                         label={
-                          <Typography sx={{ fontSize: 13, color: alpha('#fff', 0.55), lineHeight: 1.5 }}>
+                          <Typography sx={{ fontSize: 13, color: AUTH_TEXT_MUTED, lineHeight: 1.5 }}>
                             {`${t('auth.termsAgreement')} `}
                             <Link component={RouterLink} href={paths.termsOfService} sx={authLinkSx}>
                               {t('auth.termsOfService')}

@@ -1,13 +1,15 @@
 import { alpha } from '@mui/material/styles';
 import { inputBaseClasses } from '@mui/material/InputBase';
 
-import { HOME_ROW_LINE, homeBlurPanelSx } from 'src/sections/home/home-blur-panel';
+import { HOME_ROW_LINE, HOME_TEXT_MUTED, HOME_TEXT_SECONDARY, homeBlurPanelSx } from 'src/sections/home/home-blur-panel';
 
 export const AUTH_BG_IMAGE = '/assets/images/shop/bac-store-hero.webp';
 
 export const AUTH_CARD_BG = '#161618';
 export const AUTH_INPUT_BG = '#0e0e0e';
 export const AUTH_PLACEHOLDER = '#9CA3AF';
+export const AUTH_TEXT_SECONDARY = HOME_TEXT_SECONDARY;
+export const AUTH_TEXT_MUTED = HOME_TEXT_MUTED;
 
 export const AUTH_RADIUS = {
   card: '0',
@@ -44,13 +46,13 @@ export const authFieldSlotProps = {
       fontWeight: 600,
       letterSpacing: 0,
       lineHeight: 1.2,
-      color: alpha('#ffffff', 0.55),
+      color: AUTH_TEXT_SECONDARY,
       mb: 0.6,
       textTransform: 'none' as const,
       '&.MuiInputLabel-shrink': {
         transform: 'none',
         fontSize: 13,
-        color: alpha('#ffffff', 0.55),
+        color: AUTH_TEXT_SECONDARY,
         '&.Mui-focused': { color: alpha('#f5c518', 0.9) },
       },
       '&.Mui-focused': { color: alpha('#f5c518', 0.9) },
@@ -194,7 +196,7 @@ export const authSecondaryButtonSx = {
   fontSize: 14,
   fontWeight: 600,
   textTransform: 'none' as const,
-  color: alpha('#ffffff', 0.62),
+  color: AUTH_TEXT_SECONDARY,
   bgcolor: 'transparent',
   border: `1px solid ${alpha('#ffffff', 0.14)}`,
   flexShrink: 0,
@@ -291,6 +293,6 @@ export const authAlertSx = {
 export const authFooterTextSx = {
   textAlign: 'center' as const,
   fontSize: 13,
-  color: alpha('#ffffff', 0.55),
+  color: AUTH_TEXT_MUTED,
   lineHeight: 1.55,
 };

@@ -11,8 +11,10 @@ export function isDemoPulsePlayer(player: DashboardTopPlayer): boolean {
   return false;
 }
 
+const PULSE_LEADERBOARD_SIZE = 5;
+
 export function filterDemoPulsePlayers(players: DashboardTopPlayer[] | undefined): DashboardTopPlayer[] {
-  return (players || []).filter((player) => !isDemoPulsePlayer(player));
+  return (players || []).filter((player) => !isDemoPulsePlayer(player)).slice(0, PULSE_LEADERBOARD_SIZE);
 }
 
 export function sanitizePublicDashboardData(data: PublicDashboardStats): PublicDashboardStats {

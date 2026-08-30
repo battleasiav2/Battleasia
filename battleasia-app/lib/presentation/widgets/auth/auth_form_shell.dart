@@ -214,7 +214,7 @@ class _AuthPanel extends StatelessWidget {
                       'common.brandTagline'.tr(),
                       style: AppTheme.labelUppercase.copyWith(
                         color: AppColors.gold.withValues(alpha: 0.88),
-                        fontSize: 11,
+                        fontSize: 12,
                         letterSpacing: 2.5,
                       ),
                       textAlign: TextAlign.center,
@@ -236,9 +236,9 @@ class _AuthPanel extends StatelessWidget {
                       Text(
                         description!,
                         style: AppTheme.bodyMedium.copyWith(
-                          color: Colors.white.withValues(alpha: 0.52),
+                          color: AppColors.textMuted,
                           height: 1.45,
-                          fontSize: 13,
+                          fontSize: 14,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -349,7 +349,7 @@ class _StepItem extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: active ? AppColors.gold : Colors.white.withValues(alpha: 0.45),
+                    color: active ? AppColors.gold : AppColors.textMuted,
                   ),
                 ),
         ),
@@ -367,7 +367,7 @@ class _StepItem extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                   color: active || done
                       ? Colors.white
-                      : Colors.white.withValues(alpha: 0.45),
+                      : AppColors.textMuted,
                 ),
               ),
               Text(
@@ -375,8 +375,8 @@ class _StepItem extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.white.withValues(alpha: 0.38),
+                  fontSize: 12,
+                  color: AppColors.textMuted,
                 ),
               ),
             ],
@@ -412,9 +412,9 @@ class _AuthTrustRow extends StatelessWidget {
                 Text(
                   item.$1,
                   style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.5),
+                    color: AppColors.textMuted,
                     fontWeight: FontWeight.w500,
-                    fontSize: 12,
+                    fontSize: 13,
                   ),
                 ),
               ],
