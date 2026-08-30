@@ -6,18 +6,24 @@ import { alpha } from '@mui/material/styles';
 import { HeroMeshButtons } from 'src/components/mesh-buttons';
 
 type HeroStickyCtaProps = {
+  playNowLabel?: string;
+  playNowHref?: string;
   downloadLabel?: string;
   downloadHref?: string;
   downloadFileName?: string;
   showDownload?: boolean;
+  showPlayNow?: boolean;
 };
 
 /** Mobile-only sticky CTAs after hero scrolls away */
 export function HeroStickyCta({
+  playNowLabel,
+  playNowHref,
   downloadLabel,
   downloadHref,
   downloadFileName,
   showDownload = true,
+  showPlayNow = true,
 }: HeroStickyCtaProps) {
   const [visible, setVisible] = useState(false);
 
@@ -58,10 +64,13 @@ export function HeroStickyCta({
       }}
     >
       <HeroMeshButtons
+        playNowLabel={playNowLabel}
+        playNowHref={playNowHref}
         downloadLabel={downloadLabel}
         downloadHref={downloadHref}
         downloadFileName={downloadFileName}
         showDownload={showDownload}
+        showPlayNow={showPlayNow}
       />
     </Box>
   );

@@ -2,7 +2,7 @@ import { alpha } from '@mui/material/styles';
 import { inputBaseClasses } from '@mui/material/InputBase';
 
 import { HOME_ROW_LINE, homeBlurPanelSx } from 'src/sections/home/home-blur-panel';
-import { HOME_GAME_ARTS } from 'src/sections/home/play-your-game-section';
+import { HOME_GAME_ARTS } from 'src/sections/home/home-game-arts';
 
 export const AUTH_BG_IMAGE = HOME_GAME_ARTS[0];
 
