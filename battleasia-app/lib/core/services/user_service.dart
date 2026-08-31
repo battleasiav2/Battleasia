@@ -1002,4 +1002,94 @@ class UserService {
       'message': data['message'] as String? ?? fallback,
     };
   }
+
+  Future<Map<String, dynamic>> getTransferSettings() async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/users/transfer/settings'),
+        headers: headers,
+      );
+      final body = response.body;
+      if (body.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+      final data = jsonDecode(body) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to fetch transfer settings',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> submitCoinTransfer({
+    required String recipientUsername,
+    required double amount,
+    String? note,
+  }) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/users/transfer'),
+        headers: headers,
+        body: jsonEncode({
+          'recipientUsername': recipientUsername,
+          'amount': amount,
+          if (note != null && note.trim().isNotEmpty) 'note': note.trim(),
+        }),
+      );
+      final body = response.body;
+      if (body.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+      final data = jsonDecode(body) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data'], 'message': data['message']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Transfer failed',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> getTransferHistory({int limit = 20}) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/users/transfer/history?limit=$limit'),
+        headers: headers,
+      );
+      final body = response.body;
+      if (body.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+      final data = jsonDecode(body) as Map<String, dynamic>;
+      if (response.statusCode == 200) {
+        return {'success': true, 'data': data};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to fetch transfer history',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
 }

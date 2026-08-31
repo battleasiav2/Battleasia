@@ -11,6 +11,7 @@ import { getIcons } from '@iconify/utils';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(__dirname, '..');
 const srcDir = path.join(rootDir, 'src');
+const apiSrcDir = path.join(rootDir, '../api/src');
 const outputFile = path.join(rootDir, 'src/components/iconify/iconify-bundle.generated.json');
 
 const COLLECTIONS = {
@@ -53,6 +54,33 @@ const EXTRA_ICONS = [
   'mingcute:twitter-line',
   'solar:chat-round-dots-bold',
   'solar:link-bold',
+  // Engagement badges / earn hub (icon names come from API, not always in src scan)
+  'solar:target-bold',
+  'solar:shield-star-bold',
+  'solar:medal-ribbons-star-bold',
+  'solar:medal-ribbon-bold',
+  'solar:medal-star-bold',
+  'solar:crown-star-bold',
+  'solar:passport-bold',
+  'solar:wheel-bold',
+  'solar:wad-of-money-bold',
+  'solar:users-group-rounded-bold',
+  // Engagement defaults from API / admin (dynamic Iconify names)
+  'solar:calendar-bold',
+  'solar:gamepad-bold',
+  'solar:cup-star-bold',
+  'solar:user-id-bold',
+  'solar:shield-bold',
+  'solar:star-bold',
+  'solar:crown-bold',
+  'solar:share-bold',
+  'solar:close-circle-bold',
+  'solar:hand-stars-bold',
+  'solar:users-group-two-rounded-bold',
+  'solar:flag-bold',
+  'solar:wallet-bold',
+  'solar:gift-bold',
+  'solar:fire-bold',
 ];
 
 /** Map legacy/missing icon names to icons that exist in bundled JSON sets. */
@@ -77,6 +105,7 @@ const ICON_ALIASES = {
   'ri:twitter-fill': 'mingcute:twitter-fill',
   'ri:twitter-x-fill': 'mingcute:twitter-fill',
   'mynaui:chat-messages': 'solar:chat-round-dots-bold',
+  'solar:medal-ribbons-bold': 'solar:medal-ribbon-bold',
 };
 
 function resolveIconName(fullName) {
@@ -106,13 +135,17 @@ function collectIconNames() {
   const iconPattern = new RegExp(`["'\`]((?:${prefixes}):[a-z0-9-]+)["'\`]`, 'g');
   const names = new Set(EXTRA_ICONS);
 
-  for (const file of walk(srcDir)) {
-    const content = fs.readFileSync(file, 'utf8');
-    let match = iconPattern.exec(content);
+  const scanDirs = [srcDir, apiSrcDir].filter((dir) => fs.existsSync(dir));
 
-    while (match) {
-      names.add(match[1]);
-      match = iconPattern.exec(content);
+  for (const dir of scanDirs) {
+    for (const file of walk(dir)) {
+      const content = fs.readFileSync(file, 'utf8');
+      let match = iconPattern.exec(content);
+
+      while (match) {
+        names.add(match[1]);
+        match = iconPattern.exec(content);
+      }
     }
   }
 

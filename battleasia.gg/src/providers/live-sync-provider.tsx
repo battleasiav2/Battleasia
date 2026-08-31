@@ -5,6 +5,7 @@ import { balanceAction } from 'src/store/reducers/auth';
 import { CONFIG } from 'src/global-config';
 import { socketService } from 'src/lib/socket';
 import { liveSyncBus } from 'src/lib/live-sync-bus';
+import { useEngagementAlertsPolling } from 'src/hooks/use-engagement-alerts-polling';
 
 // ----------------------------------------------------------------------
 
@@ -15,6 +16,8 @@ type LiveSyncProviderProps = {
 export function LiveSyncProvider({ children }: LiveSyncProviderProps) {
   const dispatch = useDispatch();
   const { isLoggedIn, user } = useSelector((state) => state.auth);
+
+  useEngagementAlertsPolling();
 
   useEffect(() => {
     if (!isLoggedIn || !user?._id) {

@@ -19,4 +19,5 @@ export * from './match-result-hero';
 export * from './match-result-skeleton';
 export * from './match-result-podium';
 export * from './match-result-leaderboard';
+export * from './match-share-card';
 

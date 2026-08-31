@@ -108,6 +108,14 @@ export const updatePremiumDetailsApi = async (premiumDuration: number, premiumPr
 export const getReferralSettingsApi = async () => axios.get('api/v3/users/referral-settings/details');
 export const updateReferralSettingsApi = async (commissionRate: number) => axios.put('api/v3/users/referral-settings/update', { commissionRate });
 
+export const getTransferSettingsApi = async () => axios.get('api/v3/users/transfer-settings/details');
+export const updateTransferSettingsApi = async (data: {
+  enabled: boolean;
+  feePercent: number;
+  minAmount: number;
+  maxAmount: number;
+}) => axios.put('api/v3/users/transfer-settings/update', data);
+
 // referral history
 export const getReferralHistoriesApi = async (params?: { page?: number; limit?: number; search?: string }) => {
   const queryParams = new URLSearchParams();

@@ -19,6 +19,7 @@ import { HOME_ROW_LINE, HomeBlurPanel } from './home-blur-panel';
 import { homeMobileScrollGridSx, homeMobileScrollItemSx } from './home-horizontal-scroll';
 import { HeroRotatingBanner } from './hero-rotating-banner';
 import { HOME_HERO_SLIDES, readHeroSlideIndex } from './hero-slides';
+import { AboutBattleAsiaSection } from './about-battleasia-section';
 import { useTranslate } from 'src/locales/use-locales';
 
 // Below-fold + non-LCP FX: code-split (never block hero paint)
@@ -628,95 +629,6 @@ export function HomeView() {
     </Box>
   );
 
-  const ABOUT_BULLETS = [
-    { icon: 'solar:user-plus-bold', key: 'home.aboutBullet1' },
-    { icon: 'solar:wallet-money-bold', key: 'home.aboutBullet2' },
-    { icon: 'solar:card-transfer-bold', key: 'home.aboutBullet3' },
-  ] as const;
-
-  const sectionAbout = (
-    <Box id="about-us" sx={{ ...blackGamingSectionSx(HOME_GAME_ARTS[0]), position: 'relative' }}>
-      <Stack
-        spacing={{ xs: 2.25, md: 3 }}
-        sx={{ position: 'relative', zIndex: 1, maxWidth: 880, mx: 'auto' }}
-      >
-        <Stack spacing={1.25} alignItems="center">
-          <Typography
-            sx={{
-              fontSize: { xs: 11, md: 12 },
-              fontWeight: 700,
-              letterSpacing: 2.5,
-              color: GOLD,
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('home.playYourGame.brandLabel')}
-          </Typography>
-          <Typography
-            variant="h2"
-            className="font-tr"
-            sx={{
-              fontSize: { xs: 22, sm: 32, md: 40 },
-              fontWeight: 800,
-              textAlign: 'center',
-              textTransform: 'uppercase',
-              letterSpacing: { xs: 1, md: 2 },
-              color: '#ffffff',
-            }}
-          >
-            {t('home.aboutBattleAsia')}
-          </Typography>
-          <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
-        </Stack>
-
-        <HomeBlurPanel>
-          <Stack spacing={0}>
-            {ABOUT_BULLETS.map((b, idx) => (
-              <Stack
-                key={b.key}
-                direction="row"
-                spacing={1.25}
-                alignItems="flex-start"
-                sx={{
-                  py: { xs: 1.15, sm: 1.35 },
-                  borderBottom: idx < ABOUT_BULLETS.length - 1 ? HOME_ROW_LINE : 'none',
-                }}
-              >
-                <Iconify icon={b.icon} width={20} sx={{ color: GOLD, mt: 0.25, flexShrink: 0 }} />
-                <Typography
-                  className="font-tr"
-                  sx={{ fontSize: { xs: 13.5, md: 15 }, lineHeight: 1.7, color: alpha('#ffffff', 0.72) }}
-                >
-                  {t(b.key)}
-                </Typography>
-              </Stack>
-            ))}
-          </Stack>
-
-          <Box sx={{ borderTop: HOME_ROW_LINE, mt: 0.5, pt: { xs: 1.5, md: 1.75 } }}>
-            <Typography
-              sx={{
-                fontSize: { xs: 13, md: 14.5 },
-                fontStyle: 'italic',
-                color: alpha('#ffffff', 0.82),
-                lineHeight: 1.65,
-                mb: 1.25,
-              }}
-            >
-              &ldquo;{t('home.testimonial.quote')}&rdquo;
-            </Typography>
-            <Stack direction="row" spacing={0.75} alignItems="center">
-              <Iconify icon="solar:user-circle-bold" width={18} sx={{ color: GOLD }} />
-              <Typography sx={{ fontSize: 12, fontWeight: 700, color: alpha('#ffffff', 0.65), letterSpacing: 0.4 }}>
-                {t('home.testimonial.author')}
-              </Typography>
-            </Stack>
-          </Box>
-        </HomeBlurPanel>
-      </Stack>
-    </Box>
-  );
-
   const gameModes = [
     {
       title: t('home.gameModes.solo.title'),
@@ -1210,7 +1122,7 @@ export function HomeView() {
         <PlayYourGameSection />
       </Suspense>
 
-      {sectionAbout}
+      <AboutBattleAsiaSection />
       {sectionHowToPlay}
       {sectionRoules}
     </Box>

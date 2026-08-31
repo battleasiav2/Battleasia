@@ -9,6 +9,7 @@ import * as filesApi from './api/files';
 import * as shopApi from './api/shop';
 import * as publicApi from './api/public';
 import * as socialApi from './api/social';
+import * as engagementApi from './api/engagement';
 import type { ApiContextType } from './type';
 
 const ApiContext = createContext<ApiContextType | null>(null);
@@ -27,6 +28,7 @@ export const ApiProvider = ({ children }: { children: React.ReactElement }) => {
       ...shopApi,
       ...publicApi,
       ...socialApi,
+      ...engagementApi,
     }),
     [] // Empty dependency array - create only once
   );

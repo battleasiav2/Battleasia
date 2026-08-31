@@ -33,6 +33,22 @@ export type ReferralStats = {
   totalDepositsFromReferrals: number;
   totalCommissionEvents: number;
   commissionRate: number;
+  referralMilestones?: {
+    enabled: boolean;
+    referralCount: number;
+    tiers: Array<{
+      key: string;
+      title: string;
+      description: string;
+      icon: string;
+      threshold: number;
+      bacAmount: number;
+      status: 'locked' | 'ready' | 'claimed';
+      canClaim: boolean;
+      progress: number;
+      current: number;
+    }>;
+  };
 };
 
 export type ApiReferralNetworkItem = {

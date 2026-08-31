@@ -13,6 +13,8 @@ import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/withdraw_sheet.dart';
+import 'package:battleasia_app/presentation/widgets/wallet/wallet_section_tabs.dart';
+import 'package:battleasia_app/presentation/widgets/wallet/wallet_earn_panel.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
 
 class WalletScreen extends StatefulWidget {
@@ -37,6 +39,7 @@ class _WalletScreenState extends State<WalletScreen> {
 
   // Withdrawal modal state
   List<Map<String, dynamic>> _currencyRates = [];
+  WalletSectionTab _sectionTab = WalletSectionTab.overview;
 
 
   @override
@@ -298,6 +301,43 @@ class _WalletScreenState extends State<WalletScreen> {
     if (reason == 'referral_bonus') {
       return 'wallet.txReferralBonus'.tr();
     }
+    if (reason == 'engagement_reward') {
+      final missionTitle = detail['missionTitle']?.toString();
+      return missionTitle != null ? '${'wallet.earnMissionReward'.tr()} - $missionTitle' : 'wallet.earnMissionReward'.tr();
+    }
+    if (reason == 'engagement_streak_reward') {
+      return 'wallet.streakReward'.tr();
+    }
+    if (reason == 'engagement_welcome_reward') {
+      final title = detail['welcomeTitle']?.toString();
+      return title != null ? '${'wallet.welcomeReward'.tr()} - $title' : 'wallet.welcomeReward'.tr();
+    }
+    if (reason == 'engagement_referral_reward') {
+      final title = detail['referralTierTitle']?.toString();
+      return title != null ? '${'wallet.referralMilestoneReward'.tr()} - $title' : 'wallet.referralMilestoneReward'.tr();
+    }
+    if (reason == 'engagement_weekly_reward') {
+      final title = detail['weeklyTitle']?.toString();
+      return title != null ? '${'wallet.weeklyArenaReward'.tr()} - $title' : 'wallet.weeklyArenaReward'.tr();
+    }
+    if (reason == 'engagement_share_reward') {
+      return 'wallet.shareToEarnTitle'.tr();
+    }
+    if (reason == 'engagement_deposit_bonus') {
+      return 'wallet.depositBonusTitle'.tr();
+    }
+    if (reason == 'engagement_spin_reward') {
+      final label = detail['prizeLabel']?.toString();
+      return label != null ? '${'wallet.luckySpinTitle'.tr()} - $label' : 'wallet.luckySpinTitle'.tr();
+    }
+    if (reason == 'engagement_squad_reward') {
+      final title = detail['squadTitle']?.toString();
+      return title != null ? '${'wallet.squadChallengeReward'.tr()} - $title' : 'wallet.squadChallengeReward'.tr();
+    }
+    if (reason == 'engagement_season_pass_reward') {
+      final title = detail['seasonTitle']?.toString();
+      return title != null ? '${'wallet.seasonPassReward'.tr()} - $title' : 'wallet.seasonPassReward'.tr();
+    }
     if (detail['note'] != null) {
       return detail['note'].toString();
     }
@@ -396,12 +436,24 @@ class _WalletScreenState extends State<WalletScreen> {
                       return Column(
                         children: [
                           SizedBox(height: spacing16),
-                          // Main Balance Card
-                          _buildBalanceCard(context, walletData),
-                          SizedBox(height: spacing24),
-
-                          // Transaction History
-                          _buildTransactionHistory(context),
+                          WalletSectionTabs(
+                            activeTab: _sectionTab,
+                            onChanged: (tab) => setState(() => _sectionTab = tab),
+                          ),
+                          SizedBox(height: spacing16),
+                          if (_sectionTab == WalletSectionTab.overview) ...[
+                            _buildBalanceCard(context, walletData),
+                          ],
+                          if (_sectionTab == WalletSectionTab.earn)
+                            WalletEarnPanel(
+                              onBalanceRefresh: () {
+                                _fetchBalanceHistory();
+                                _fetchWithdrawableAmount();
+                              },
+                            ),
+                          if (_sectionTab == WalletSectionTab.history) ...[
+                            _buildTransactionHistory(context),
+                          ],
                           SizedBox(height: spacing24),
                         ],
                       );

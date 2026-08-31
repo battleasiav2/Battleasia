@@ -32,6 +32,7 @@ import {
   MatchResultPodium,
   MatchResultSkeleton,
   MatchResultLeaderboard,
+  MatchShareCard,
 } from './components';
 
 // ----------------------------------------------------------------------
@@ -186,6 +187,8 @@ export function MatchResultView() {
             <MatchResultPodium topThree={topThree} />
           </Box>
         ) : null}
+
+        <MatchShareCard matchId={matchResult.id} matchName={matchResult.matchName} />
 
         <UserGlassCard noPadding>
           <Box sx={{ px: { xs: 2, md: 3 }, pt: 2.5, pb: 1 }}>

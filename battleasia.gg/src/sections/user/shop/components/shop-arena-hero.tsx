@@ -50,16 +50,15 @@ export function ShopArenaHero({
     <Box
       sx={{
         position: 'relative',
-        width: 'auto',
-        mx: { xs: -2, sm: -3, md: -4 },
-        // Mobile: no negative pull (header + overflow:clip was cutting the badge)
+        width: { xs: '100%', sm: 'auto' },
+        // Mobile: skip negative bleed — UserPageShell overflow:clip was clipping badge/edges
+        mx: { xs: 0, sm: -3, md: -4 },
         mt: { xs: 0, sm: -2, md: -3 },
         mb: { xs: 3, md: 4 },
-        // Mobile grows past minHeight if needed; desktop keeps flex-end panel
-        minHeight: { xs: 380, sm: 500, md: 560 },
+        minHeight: { xs: 'auto', sm: 500, md: 560 },
         display: 'flex',
         alignItems: { xs: 'stretch', sm: 'flex-end' },
-        overflow: 'visible',
+        overflow: 'hidden',
         bgcolor: '#000000',
         borderTop: `1px solid ${alpha(GOLD, 0.16)}`,
         borderBottom: `1px solid ${alpha(GOLD, 0.16)}`,
@@ -152,12 +151,13 @@ export function ShopArenaHero({
         <Typography
           className="font-tr"
           sx={{
-            fontSize: { xs: 28, sm: 44, md: 58 },
+            fontSize: { xs: 24, sm: 44, md: 58 },
             fontWeight: 800,
             lineHeight: 1.08,
             letterSpacing: { md: 0.5 },
             color: '#ffffff',
             textTransform: 'uppercase',
+            wordBreak: 'break-word',
           }}
         >
           {title}
@@ -188,43 +188,59 @@ export function ShopArenaHero({
           endIcon={<Iconify icon="solar:arrow-right-up-bold" width={16} />}
           sx={{
             ...userGoldButtonSx,
-            alignSelf: 'flex-start',
+            alignSelf: { xs: 'stretch', sm: 'flex-start' },
+            width: { xs: '100%', sm: 'auto' },
             px: { xs: 2.75, md: 3.5 },
             py: 1.2,
-            fontSize: 13,
+            fontSize: { xs: 12, sm: 13 },
+            whiteSpace: { xs: 'normal', sm: 'nowrap' },
           }}
         >
           {ctaLabel}
         </Button>
 
-        <HomeBlurPanel sx={{ p: 0, alignSelf: 'flex-start' }}>
-          <Box sx={{ display: 'grid', gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))` }}>
+        <HomeBlurPanel sx={{ p: 0, alignSelf: { xs: 'stretch', sm: 'flex-start' }, width: { xs: '100%', sm: 'auto' }, maxWidth: 1 }}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
+              width: 1,
+            }}
+          >
             {stats.map((stat, index) => (
               <Box
                 key={stat.label}
                 sx={{
-                  px: { xs: 1.5, md: 2 },
-                  py: 1.5,
+                  px: { xs: 1, sm: 1.5, md: 2 },
+                  py: { xs: 1.25, md: 1.5 },
                   borderTop: `2px solid ${HOME_GOLD}`,
-                  minWidth: { xs: 88, md: 108 },
+                  minWidth: 0,
                   ...(index > 0 ? { borderLeft: HOME_ROW_LINE } : {}),
                 }}
               >
                 <Typography
                   sx={{
-                    fontSize: 10,
+                    fontSize: { xs: 9, sm: 10 },
                     fontWeight: 700,
-                    letterSpacing: 0.7,
+                    letterSpacing: { xs: 0.4, sm: 0.7 },
                     textTransform: 'uppercase',
                     color: alpha('#fff', 0.55),
                     lineHeight: 1.25,
+                    wordBreak: 'break-word',
                   }}
                 >
                   {stat.label}
                 </Typography>
                 <Typography
                   className="font-tr"
-                  sx={{ mt: 0.5, fontSize: { xs: 18, md: 22 }, fontWeight: 800, color: '#fff', lineHeight: 1.1 }}
+                  sx={{
+                    mt: 0.5,
+                    fontSize: { xs: 16, sm: 18, md: 22 },
+                    fontWeight: 800,
+                    color: '#fff',
+                    lineHeight: 1.1,
+                    wordBreak: 'break-word',
+                  }}
                 >
                   {stat.value}
                 </Typography>

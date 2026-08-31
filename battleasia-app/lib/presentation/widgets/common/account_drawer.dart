@@ -15,7 +15,7 @@ import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth.dart';
 import 'package:battleasia_app/presentation/screens/referral/referral_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
-import 'package:battleasia_app/presentation/screens/wallet/wallet_screen.dart';
+import 'package:battleasia_app/presentation/screens/shop/shop_wallet_screen.dart';
 import 'package:battleasia_app/presentation/screens/my_matches/my_matches_screen.dart';
 import 'package:battleasia_app/presentation/screens/my_orders/my_orders_screen.dart';
 import 'package:battleasia_app/presentation/screens/my_statistics/my_statistics_screen.dart';
@@ -373,7 +373,7 @@ class _AccountDrawerContent extends StatelessWidget {
               Navigator.pop(context);
               openShopRoute(
                 context,
-                const WalletScreen(fromShop: true),
+                const ShopWalletScreen(),
                 routeName: '/shop/wallet',
               );
             },

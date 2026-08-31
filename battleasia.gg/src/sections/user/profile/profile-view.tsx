@@ -30,6 +30,7 @@ import {
   ProfilePageSkeleton,
   FeedList,
   ProfileGamingStatsStrip,
+  ProfileBadgesStrip,
   FollowListDialog,
   ProfileSocialExtras,
 } from './components';
@@ -334,6 +335,8 @@ export function ProfileView() {
       />
 
       {isOwnProfile ? <ProfileGamingStatsStrip stats={stats} loading={statsLoading} /> : null}
+
+      {isOwnProfile ? <ProfileBadgesStrip isOwnProfile userId={userId || user?._id} /> : null}
 
       <ProfileSocialExtras
         profileUserId={userId || user?._id || ''}

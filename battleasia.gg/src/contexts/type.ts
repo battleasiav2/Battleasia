@@ -131,6 +131,32 @@ export type ApiContextType = {
         description?: string;
     }) => Promise<any>;
     getWithdrawableAmountApi: () => Promise<any>;
+    getTransferSettingsApi: () => Promise<any>;
+    submitCoinTransferApi: (data: {
+        recipientUsername: string;
+        amount: number;
+        note?: string;
+    }) => Promise<any>;
+    getTransferHistoryApi: (params?: { page?: number; limit?: number }) => Promise<any>;
+
+    getEngagementHomeApi: () => Promise<any>;
+    getEngagementAlertsApi: () => Promise<any>;
+    claimEngagementRewardApi: (progressId: string) => Promise<any>;
+    claimEngagementStreakApi: () => Promise<any>;
+    claimWelcomeBonusApi: (key: string) => Promise<any>;
+    claimReferralMilestoneApi: (key: string) => Promise<any>;
+    claimWeeklyArenaApi: () => Promise<any>;
+    createEngagementSquadApi: (name: string) => Promise<any>;
+    joinEngagementSquadApi: (inviteCode: string) => Promise<any>;
+    leaveEngagementSquadApi: () => Promise<any>;
+    claimSquadChallengeApi: () => Promise<any>;
+    claimSeasonPassRewardApi: (level: number, track: 'free' | 'plus') => Promise<any>;
+    getShareStatusApi: (matchId: string) => Promise<any>;
+    claimShareRewardApi: (matchId: string, platform?: string) => Promise<any>;
+    getLuckySpinStatusApi: () => Promise<any>;
+    spinLuckySpinApi: () => Promise<any>;
+    getEngagementBadgesApi: () => Promise<any>;
+    getUserEngagementBadgesApi: (userId: string) => Promise<any>;
 
     getStoriesApi: () => Promise<any>;
     createStoryApi: (data: { mediaUrl: string; mediaType?: string; caption?: string }) => Promise<any>;

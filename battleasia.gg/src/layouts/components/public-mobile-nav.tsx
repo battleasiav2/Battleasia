@@ -43,9 +43,10 @@ export function PublicMobileNav() {
         zIndex: 1300,
         alignItems: 'stretch',
         justifyContent: 'space-between',
-        px: 0.5,
-        pt: 1,
-        pb: 'max(8px, env(safe-area-inset-bottom))',
+        gap: 0.25,
+        px: 0.75,
+        pt: 1.1,
+        pb: 'max(10px, env(safe-area-inset-bottom))',
         bgcolor: alpha('#141414', 0.96),
         borderTop: `1px solid ${alpha(GOLD, 0.28)}`,
         boxShadow: `0 -8px 24px ${alpha('#000000', 0.45)}`,
@@ -68,34 +69,39 @@ export function PublicMobileNav() {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 0.4,
-              py: 0.5,
+              gap: 0.45,
+              minHeight: 52,
+              py: 0.65,
+              px: 0.25,
               textDecoration: 'none',
               transition: 'color 0.2s ease',
               color: isActive ? GOLD : '#9CA3AF',
               '&:hover': { color: GOLD },
+              WebkitTapHighlightColor: 'transparent',
             }}
           >
-            <Iconify icon={getNavIcon(item)} width={20} />
+            <Iconify icon={getNavIcon(item)} width={22} />
             <Box
               component="span"
               sx={{
-                fontSize: 9.5,
+                fontSize: 10.5,
                 fontWeight: isActive ? 800 : 600,
-                letterSpacing: 0.3,
+                letterSpacing: 0.35,
                 textTransform: 'uppercase',
-                lineHeight: 1,
+                lineHeight: 1.2,
                 textAlign: 'center',
+                maxWidth: 72,
               }}
             >
               {t(item.labelKey)}
             </Box>
             <Box
               sx={{
-                mt: 0.25,
+                mt: 0.15,
                 height: 2,
-                width: isActive ? 22 : 0,
+                width: isActive ? 24 : 0,
                 bgcolor: GOLD,
+                borderRadius: 1,
                 transition: 'width 0.2s ease',
                 boxShadow: isActive ? `0 0 6px ${alpha(GOLD, 0.55)}` : 'none',
               }}

@@ -1,4 +1,5 @@
 import { useRef, useEffect, useCallback } from 'react';
+import toast from 'react-hot-toast';
 
 import { useDispatch, useSelector } from 'src/store';
 import {
@@ -20,6 +21,18 @@ import type { Notification } from 'src/store/types/notifications';
 // ----------------------------------------------------------------------
 
 const POLLING_INTERVAL = 30000; // 30 seconds
+
+const ENGAGEMENT_TOAST_TYPES = new Set([
+  'engagement_mission_complete',
+  'engagement_claim_ready',
+  'engagement_streak_at_risk',
+  'engagement_badge_unlocked',
+]);
+
+function maybeToastEngagementNotification(notification: Notification) {
+  if (!ENGAGEMENT_TOAST_TYPES.has(notification.type)) return;
+  toast.success(notification.title, { id: `engagement-${notification.id}` });
+}
 
 // ----------------------------------------------------------------------
 
@@ -66,6 +79,7 @@ export function useNotificationsPolling() {
             // Dispatch individual add actions for new notifications
             addedNotifications.forEach((notification) => {
               dispatch(addNotification(notification));
+              maybeToastEngagementNotification(notification);
             });
 
             // Update the full list if there are changes
@@ -178,6 +192,7 @@ export function useNotificationsPolling() {
         createdAt: data?.createdAt || new Date().toISOString(),
       };
       dispatch(addNotification(notification));
+      maybeToastEngagementNotification(notification);
     };
 
     const handleNotificationsSync = () => {

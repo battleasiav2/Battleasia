@@ -273,6 +273,13 @@ export type ApiContextType = {
     // referral settings
     getReferralSettingsApi: () => Promise<any>;
     updateReferralSettingsApi: (commissionRate: number) => Promise<any>;
+    getTransferSettingsApi: () => Promise<any>;
+    updateTransferSettingsApi: (data: {
+        enabled: boolean;
+        feePercent: number;
+        minAmount: number;
+        maxAmount: number;
+    }) => Promise<any>;
 
     // live chat widget settings
     getLiveChatSettingsApi: () => Promise<any>;
@@ -307,4 +314,18 @@ export type ApiContextType = {
     getAppDownloadSettingsApi: () => Promise<any>;
     updateAppDownloadSettingsApi: (data: any) => Promise<any>;
     uploadAppApkApi: (file: File, version?: string) => Promise<any>;
+
+    // engagement
+    getEngagementMissionsApi: (params?: { page?: number; limit?: number; search?: string }) => Promise<any>;
+    getEngagementMissionByIdApi: (id: string) => Promise<any>;
+    createEngagementMissionApi: (data: any) => Promise<any>;
+    updateEngagementMissionApi: (id: string, data: any) => Promise<any>;
+    deleteEngagementMissionApi: (id: string) => Promise<any>;
+    getEngagementSettingsApi: () => Promise<any>;
+    updateEngagementSettingsApi: (data: any) => Promise<any>;
+    getEngagementBadgesApi: (params?: { page?: number; limit?: number; search?: string }) => Promise<any>;
+    getEngagementBadgeByIdApi: (id: string) => Promise<any>;
+    createEngagementBadgeApi: (data: any) => Promise<any>;
+    updateEngagementBadgeApi: (id: string, data: any) => Promise<any>;
+    deleteEngagementBadgeApi: (id: string) => Promise<any>;
 };

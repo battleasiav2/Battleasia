@@ -50,6 +50,7 @@ import {
   WalletTransactionList,
   type BalanceHistoryItem,
 } from './components';
+import { WalletEarnPanel, WalletSectionTabs, type WalletTab } from './wallet-earn-panel';
 
 import { toast } from 'react-hot-toast';
 import { Iconify } from 'src/components/iconify';
@@ -127,6 +128,7 @@ export function WalletView() {
   const [withdrawableAmount, setWithdrawableAmount] = useState<number>(0);
   const [hasPendingWithdrawal, setHasPendingWithdrawal] = useState<boolean>(false);
   const [pendingWithdrawalAmount, setPendingWithdrawalAmount] = useState<number>(0);
+  const [walletTab, setWalletTab] = useState<WalletTab>('overview');
 
   // Fetch withdrawable amount
   useEffect(() => {
@@ -366,8 +368,55 @@ export function WalletView() {
     if (reason === 'withdrawal_rejected_refund') {
       return t('wallet.withdrawalRefund');
     }
-    if (reason === 'referral_bonus') {
+    if (reason === 'referral_bonus' || reason === 'referral_commission') {
       return t('wallet.referralBonus');
+    }
+    if (reason === 'engagement_reward') {
+      const missionTitle = detail.missionTitle;
+      return missionTitle ? `${t('wallet.earnMissionReward')} - ${missionTitle}` : t('wallet.earnMissionReward');
+    }
+    if (reason === 'engagement_streak_reward') {
+      const streakDay = detail.streakDay;
+      return streakDay ? `${t('wallet.streakReward')} (${streakDay})` : t('wallet.streakReward');
+    }
+    if (reason === 'engagement_welcome_reward') {
+      const welcomeTitle = detail.welcomeTitle;
+      return welcomeTitle ? `${t('wallet.welcomeReward')} - ${welcomeTitle}` : t('wallet.welcomeReward');
+    }
+    if (reason === 'engagement_referral_reward') {
+      const referralTitle = detail.referralTierTitle;
+      return referralTitle ? `${t('wallet.referralMilestoneReward')} - ${referralTitle}` : t('wallet.referralMilestoneReward');
+    }
+    if (reason === 'engagement_weekly_reward') {
+      const weeklyTitle = detail.weeklyTitle;
+      return weeklyTitle ? `${t('wallet.weeklyArenaReward')} - ${weeklyTitle}` : t('wallet.weeklyArenaReward');
+    }
+    if (reason === 'engagement_share_reward') {
+      const shareTitle = detail.shareTitle || detail.matchName;
+      return shareTitle ? `${t('wallet.shareReward')} - ${shareTitle}` : t('wallet.shareReward');
+    }
+    if (reason === 'engagement_deposit_bonus') {
+      const bonusTitle = detail.bonusTitle;
+      const percent = detail.percent;
+      if (bonusTitle && percent) return `${t('wallet.depositBonusReward')} - ${bonusTitle} (+${percent}%)`;
+      if (bonusTitle) return `${t('wallet.depositBonusReward')} - ${bonusTitle}`;
+      return t('wallet.depositBonusReward');
+    }
+    if (reason === 'engagement_spin_reward') {
+      const prizeLabel = detail.prizeLabel;
+      return prizeLabel ? `${t('wallet.spinReward')} - ${prizeLabel}` : t('wallet.spinReward');
+    }
+    if (reason === 'engagement_squad_reward') {
+      const squadTitle = detail.squadTitle;
+      return squadTitle ? `${t('wallet.squadChallengeReward')} - ${squadTitle}` : t('wallet.squadChallengeReward');
+    }
+    if (reason === 'engagement_season_pass_reward') {
+      const seasonTitle = detail.seasonTitle;
+      const seasonRewardLabel = detail.seasonRewardLabel;
+      if (seasonTitle && seasonRewardLabel) {
+        return `${t('wallet.seasonPassReward')} - ${seasonTitle} (${seasonRewardLabel})`;
+      }
+      return seasonTitle ? `${t('wallet.seasonPassReward')} - ${seasonTitle}` : t('wallet.seasonPassReward');
     }
     if (detail.note) {
       return detail.note;
@@ -662,6 +711,10 @@ export function WalletView() {
         <WalletPageSkeleton />
       ) : (
         <Stack spacing={3}>
+          <WalletSectionTabs activeTab={walletTab} onChange={setWalletTab} showEarn />
+
+          {walletTab === 'overview' ? (
+            <>
           <Box
             sx={{
               display: 'grid',
@@ -741,7 +794,18 @@ export function WalletView() {
               </Grid>
             </Grid>
           </UserGlassCard>
+            </>
+          ) : null}
 
+          {walletTab === 'earn' ? (
+            <WalletEarnPanel
+              onBalanceRefresh={refreshBalanceHistory}
+              getTransactionTitle={getTransactionTitle}
+              formatDate={formatDate}
+            />
+          ) : null}
+
+          {walletTab === 'history' ? (
           <WalletTransactionList
             transactions={transactions}
             loading={loading}
@@ -749,6 +813,7 @@ export function WalletView() {
             formatDate={formatDate}
             onRefresh={refreshBalanceHistory}
           />
+          ) : null}
         </Stack>
       )}
 

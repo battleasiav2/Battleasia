@@ -4,7 +4,7 @@ import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
-import 'package:battleasia_app/presentation/screens/wallet/wallet_screen.dart';
+import 'package:battleasia_app/presentation/screens/shop/shop_wallet_screen.dart';
 
 /// Store section tabs — matches web shop nav: Shop / Wallet / Withdrawal.
 enum ShopSectionTab { shop, wallet, withdrawal }
@@ -23,7 +23,7 @@ class ShopSectionNav extends StatelessWidget {
         page = const ShopScreen();
         break;
       case ShopSectionTab.wallet:
-        page = const WalletScreen(fromShop: true);
+        page = const ShopWalletScreen();
         break;
       case ShopSectionTab.withdrawal:
         page = const ShopWithdrawalScreen();

@@ -16,6 +16,7 @@ import * as socialModerationApi from './api/social-moderation';
 import * as dashboardApi from './api/dashboard';
 import * as mailSettingsApi from './api/mail-settings';
 import * as appDownloadApi from './api/app-download';
+import * as engagementApi from './api/engagement';
 
 const ApiContext = createContext<ApiContextType | null>(null);
 /* eslint-disable */
@@ -39,6 +40,7 @@ export const ApiProvider = ({ children }: { children: React.ReactElement }) => {
         ...socialModerationApi,
         ...mailSettingsApi,
         ...appDownloadApi,
+        ...engagementApi,
       }}
     >
       {children}

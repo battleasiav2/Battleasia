@@ -12,6 +12,7 @@ const ROOTS = {
   SHOP: '/shop',
   PAYMENTS: '/payments',
   SYSTEM: '/system',
+  ENGAGEMENT: '/engagement',
 };
 
 // ----------------------------------------------------------------------
@@ -37,6 +38,7 @@ export const paths = {
     online: `${ROOTS.USERS}/online`,
     premium: `${ROOTS.USERS}/premium`,
     referralSettings: `${ROOTS.USERS}/referral-settings`,
+    transferSettings: `${ROOTS.USERS}/transfer-settings`,
     referralHistory: `${ROOTS.USERS}/referral-history`,
   },
   games: {
@@ -85,5 +87,11 @@ export const paths = {
     root: `${ROOTS.SYSTEM}`,
     mailSettings: `${ROOTS.SYSTEM}/mail-settings`,
     appDownload: `${ROOTS.SYSTEM}/app-download`,
+  },
+  engagement: {
+    root: `${ROOTS.ENGAGEMENT}`,
+    missions: `${ROOTS.ENGAGEMENT}/missions`,
+    badges: `${ROOTS.ENGAGEMENT}/badges`,
+    settings: `${ROOTS.ENGAGEMENT}/settings`,
   },
 };

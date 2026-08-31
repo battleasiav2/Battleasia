@@ -84,3 +84,14 @@ export const submitWithdrawalApi = (data: {
 
 export const getWithdrawableAmountApi = () => axios.get('api/v2/users/withdrawable-amount');
 
+export const getTransferSettingsApi = () => axios.get('api/v2/users/transfer/settings');
+
+export const submitCoinTransferApi = (data: {
+  recipientUsername: string;
+  amount: number;
+  note?: string;
+}) => axios.post('api/v2/users/transfer', data);
+
+export const getTransferHistoryApi = (params?: { page?: number; limit?: number }) =>
+  axios.get('api/v2/users/transfer/history', { params });
+

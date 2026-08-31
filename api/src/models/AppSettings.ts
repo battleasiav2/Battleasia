@@ -54,6 +54,13 @@ export type ProfileSocialSettings = {
   pinnedUserIds: string[];
 };
 
+export type TransferSettings = {
+  enabled: boolean;
+  feePercent: number;
+  minAmount: number;
+  maxAmount: number;
+};
+
 export type MailSettings = {
   enabled: boolean;
   smtpHost: string;
@@ -72,6 +79,432 @@ export type AppDownloadSettings = {
   fileSize: number;
   version: string;
   updatedAt: string | null;
+};
+
+export type WelcomeMilestoneConfig = {
+  enabled: boolean;
+  bacAmount: number;
+  title: string;
+  description: string;
+  icon: string;
+};
+
+export type WelcomeBonusesSettings = {
+  enabled: boolean;
+  milestones: {
+    signup: WelcomeMilestoneConfig;
+    first_match: WelcomeMilestoneConfig;
+    complete_profile: WelcomeMilestoneConfig;
+    first_deposit: WelcomeMilestoneConfig;
+  };
+};
+
+export type ReferralTierConfig = {
+  enabled: boolean;
+  threshold: number;
+  bacAmount: number;
+  title: string;
+  description: string;
+  icon: string;
+};
+
+export type ReferralMilestonesSettings = {
+  enabled: boolean;
+  tiers: {
+    tier_5: ReferralTierConfig;
+    tier_10: ReferralTierConfig;
+    tier_25: ReferralTierConfig;
+  };
+};
+
+export type WeeklyArenaTeamType = 'solo' | 'duo' | 'squad' | 'any';
+
+export type WeeklyArenaChallengeSettings = {
+  enabled: boolean;
+  teamType: WeeklyArenaTeamType;
+  targetWins: number;
+  bacAmount: number;
+  title: string;
+  description: string;
+  icon: string;
+  leaderboardLimit: number;
+};
+
+export type SquadChallengeSettings = {
+  enabled: boolean;
+  teamType: WeeklyArenaTeamType;
+  targetWins: number;
+  bacAmount: number;
+  minMembersInMatch: number;
+  maxTeamSize: number;
+  title: string;
+  description: string;
+  icon: string;
+  leaderboardLimit: number;
+};
+
+export type LevelTitleConfig = {
+  level: number;
+  title: string;
+  icon: string;
+};
+
+export type LevelSystemSettings = {
+  enabled: boolean;
+  xpPerJoinMatch: number;
+  xpPerWin: number;
+  xpPerKill: number;
+  xpPerMissionClaim: number;
+  xpBasePerLevel: number;
+  xpGrowthPerLevel: number;
+  titles: LevelTitleConfig[];
+};
+
+export type ShareToEarnSettings = {
+  enabled: boolean;
+  bacAmount: number;
+  title: string;
+  description: string;
+  icon: string;
+  cooldownHours: number;
+};
+
+export type DepositBonusDaysSettings = {
+  enabled: boolean;
+  percent: number;
+  startAt: string | null;
+  endAt: string | null;
+  title: string;
+  description: string;
+  icon: string;
+  minDeposit: number;
+};
+
+export type LuckySpinPrize = {
+  id: string;
+  label: string;
+  bacAmount: number;
+  weight: number;
+  icon: string;
+  color: string;
+};
+
+export type LuckySpinSettings = {
+  enabled: boolean;
+  dailyFreeSpins: number;
+  title: string;
+  description: string;
+  prizes: LuckySpinPrize[];
+};
+
+export type SeasonPassReward = {
+  bacAmount: number;
+  label: string;
+  icon: string;
+};
+
+export type SeasonPassTier = {
+  level: number;
+  xpRequired: number;
+  freeReward: SeasonPassReward;
+  plusReward: SeasonPassReward;
+};
+
+export type SeasonPassSettings = {
+  enabled: boolean;
+  seasonKey: string;
+  title: string;
+  description: string;
+  icon: string;
+  startAt: string | null;
+  endAt: string | null;
+  xpPerJoinMatch: number;
+  xpPerWin: number;
+  xpPerMissionClaim: number;
+  tiers: SeasonPassTier[];
+};
+
+export type EngagementSettings = {
+  enabled: boolean;
+  streakEnabled: boolean;
+  dailyMissionsEnabled: boolean;
+  dailyMissionsCount: number;
+  dailyMissionsResetHour: number;
+  dailyLoginReward: number;
+  streakBonusPerDay: number;
+  maxStreakBonus: number;
+  welcomeBonus: number;
+  firstMatchBonus: number;
+  welcomeBonuses: WelcomeBonusesSettings;
+  badgesEnabled: boolean;
+  referralMilestones: ReferralMilestonesSettings;
+  weeklyArenaChallenge: WeeklyArenaChallengeSettings;
+  squadChallenge: SquadChallengeSettings;
+  levelSystem: LevelSystemSettings;
+  shareToEarn: ShareToEarnSettings;
+  depositBonusDays: DepositBonusDaysSettings;
+  luckySpin: LuckySpinSettings;
+  seasonPass: SeasonPassSettings;
+  smartNotificationsEnabled: boolean;
+  streakAtRiskHoursBeforeReset: number;
+  earnTabTitle: string;
+  earnTabSubtitle: string;
+};
+
+const DEFAULT_WELCOME_MILESTONE = (
+  title: string,
+  description: string,
+  bacAmount: number,
+  icon: string
+): WelcomeMilestoneConfig => ({
+  enabled: true,
+  bacAmount,
+  title,
+  description,
+  icon,
+});
+
+export const DEFAULT_WELCOME_BONUSES: WelcomeBonusesSettings = {
+  enabled: true,
+  milestones: {
+    signup: DEFAULT_WELCOME_MILESTONE(
+      'Welcome Bonus',
+      'Verify your email and claim your new player reward.',
+      20,
+      'solar:hand-stars-bold'
+    ),
+    first_match: DEFAULT_WELCOME_MILESTONE(
+      'First Match Bonus',
+      'Join your first tournament match and claim this bonus.',
+      15,
+      'solar:gamepad-bold'
+    ),
+    complete_profile: DEFAULT_WELCOME_MILESTONE(
+      'Complete Profile',
+      'Add avatar, PUBG ID, and game server to unlock this reward.',
+      25,
+      'solar:user-id-bold'
+    ),
+    first_deposit: DEFAULT_WELCOME_MILESTONE(
+      'First Deposit Bonus',
+      'Make your first approved deposit to claim extra BAC.',
+      30,
+      'solar:wallet-bold'
+    ),
+  },
+};
+
+export const DEFAULT_REFERRAL_TIER = (
+  title: string,
+  description: string,
+  threshold: number,
+  bacAmount: number,
+  icon: string
+): ReferralTierConfig => ({
+  enabled: true,
+  threshold,
+  bacAmount,
+  title,
+  description,
+  icon,
+});
+
+export const DEFAULT_REFERRAL_MILESTONES: ReferralMilestonesSettings = {
+  enabled: true,
+  tiers: {
+    tier_5: DEFAULT_REFERRAL_TIER(
+      'Referral Starter',
+      'Invite 5 friends who sign up with your code.',
+      5,
+      50,
+      'solar:users-group-rounded-bold'
+    ),
+    tier_10: DEFAULT_REFERRAL_TIER(
+      'Referral Builder',
+      'Grow your network to 10 referred signups.',
+      10,
+      100,
+      'solar:users-group-two-rounded-bold'
+    ),
+    tier_25: DEFAULT_REFERRAL_TIER(
+      'Referral Champion',
+      'Reach 25 referred signups and claim the top tier bonus.',
+      25,
+      250,
+      'solar:crown-star-bold'
+    ),
+  },
+};
+
+export const DEFAULT_WEEKLY_ARENA_CHALLENGE: WeeklyArenaChallengeSettings = {
+  enabled: true,
+  teamType: 'squad',
+  targetWins: 3,
+  bacAmount: 75,
+  title: 'Weekly Squad Wins',
+  description: 'Win 3 squad matches this week to claim your arena bonus.',
+  icon: 'solar:cup-star-bold',
+  leaderboardLimit: 10,
+};
+
+export const DEFAULT_SQUAD_CHALLENGE: SquadChallengeSettings = {
+  enabled: true,
+  teamType: 'squad',
+  targetWins: 2,
+  bacAmount: 100,
+  minMembersInMatch: 2,
+  maxTeamSize: 4,
+  title: 'Squad Challenge',
+  description: 'Team up with friends and win squad matches together this week.',
+  icon: 'solar:users-group-rounded-bold',
+  leaderboardLimit: 10,
+};
+
+export const DEFAULT_LEVEL_TITLES: LevelTitleConfig[] = [
+  { level: 1, title: 'Rookie', icon: 'solar:user-bold' },
+  { level: 5, title: 'Contender', icon: 'solar:shield-bold' },
+  { level: 10, title: 'Veteran', icon: 'solar:medal-star-bold' },
+  { level: 20, title: 'Elite', icon: 'solar:cup-star-bold' },
+  { level: 35, title: 'Champion', icon: 'solar:crown-star-bold' },
+  { level: 50, title: 'Legend', icon: 'solar:star-bold' },
+];
+
+export const DEFAULT_LEVEL_SYSTEM: LevelSystemSettings = {
+  enabled: true,
+  xpPerJoinMatch: 5,
+  xpPerWin: 25,
+  xpPerKill: 2,
+  xpPerMissionClaim: 10,
+  xpBasePerLevel: 100,
+  xpGrowthPerLevel: 25,
+  titles: DEFAULT_LEVEL_TITLES,
+};
+
+export const DEFAULT_SHARE_TO_EARN: ShareToEarnSettings = {
+  enabled: true,
+  bacAmount: 5,
+  title: 'Share Match Result',
+  description: 'Share a completed match result to earn a small BAC bonus.',
+  icon: 'solar:share-bold',
+  cooldownHours: 0,
+};
+
+export const DEFAULT_DEPOSIT_BONUS_DAYS: DepositBonusDaysSettings = {
+  enabled: false,
+  percent: 10,
+  startAt: null,
+  endAt: null,
+  title: 'Deposit Bonus Days',
+  description: 'Deposit during the promo window and get an extra BAC bonus on approval.',
+  icon: 'solar:wad-of-money-bold',
+  minDeposit: 0,
+};
+
+export const DEFAULT_LUCKY_SPIN_PRIZES: LuckySpinPrize[] = [
+  { id: 'miss', label: 'Try again', bacAmount: 0, weight: 40, icon: 'solar:close-circle-bold', color: '#6b7280' },
+  { id: 'bac_5', label: '5 BAC', bacAmount: 5, weight: 30, icon: 'solar:wad-of-money-bold', color: '#f5c518' },
+  { id: 'bac_10', label: '10 BAC', bacAmount: 10, weight: 20, icon: 'solar:cup-star-bold', color: '#34d399' },
+  { id: 'bac_25', label: '25 BAC', bacAmount: 25, weight: 8, icon: 'solar:medal-star-bold', color: '#60a5fa' },
+  { id: 'bac_50', label: '50 BAC', bacAmount: 50, weight: 2, icon: 'solar:crown-star-bold', color: '#f472b6' },
+];
+
+export const DEFAULT_LUCKY_SPIN: LuckySpinSettings = {
+  enabled: true,
+  dailyFreeSpins: 1,
+  title: 'Lucky Spin',
+  description: 'Spin once per day. Odds are public — what you see is what you get.',
+  prizes: DEFAULT_LUCKY_SPIN_PRIZES,
+};
+
+const DEFAULT_SEASON_PASS_REWARD = (
+  bacAmount: number,
+  label: string,
+  icon: string
+): SeasonPassReward => ({
+  bacAmount,
+  label,
+  icon,
+});
+
+export const DEFAULT_SEASON_PASS_TIERS: SeasonPassTier[] = [
+  {
+    level: 1,
+    xpRequired: 100,
+    freeReward: DEFAULT_SEASON_PASS_REWARD(10, 'Free Tier 1', 'solar:gift-bold'),
+    plusReward: DEFAULT_SEASON_PASS_REWARD(25, 'Plus Tier 1', 'solar:star-bold'),
+  },
+  {
+    level: 2,
+    xpRequired: 250,
+    freeReward: DEFAULT_SEASON_PASS_REWARD(15, 'Free Tier 2', 'solar:medal-ribbons-bold'),
+    plusReward: DEFAULT_SEASON_PASS_REWARD(40, 'Plus Tier 2', 'solar:crown-bold'),
+  },
+  {
+    level: 3,
+    xpRequired: 500,
+    freeReward: DEFAULT_SEASON_PASS_REWARD(20, 'Free Tier 3', 'solar:shield-bold'),
+    plusReward: DEFAULT_SEASON_PASS_REWARD(60, 'Plus Tier 3', 'solar:medal-star-bold'),
+  },
+  {
+    level: 4,
+    xpRequired: 900,
+    freeReward: DEFAULT_SEASON_PASS_REWARD(30, 'Free Tier 4', 'solar:cup-star-bold'),
+    plusReward: DEFAULT_SEASON_PASS_REWARD(90, 'Plus Tier 4', 'solar:crown-star-bold'),
+  },
+  {
+    level: 5,
+    xpRequired: 1400,
+    freeReward: DEFAULT_SEASON_PASS_REWARD(50, 'Free Tier 5', 'solar:star-bold'),
+    plusReward: DEFAULT_SEASON_PASS_REWARD(150, 'Plus Tier 5', 'solar:fire-bold'),
+  },
+];
+
+export const DEFAULT_SEASON_PASS: SeasonPassSettings = {
+  enabled: true,
+  seasonKey: '2026-s1',
+  title: 'BattleAsia Season Pass',
+  description: 'Earn season XP from matches and missions. Claim free rewards — unlock the Plus track with Premium.',
+  icon: 'solar:passport-bold',
+  startAt: null,
+  endAt: null,
+  xpPerJoinMatch: 10,
+  xpPerWin: 40,
+  xpPerMissionClaim: 25,
+  tiers: DEFAULT_SEASON_PASS_TIERS,
+};
+
+export const DEFAULT_ENGAGEMENT_SETTINGS: EngagementSettings = {
+  enabled: true,
+  streakEnabled: true,
+  dailyMissionsEnabled: true,
+  dailyMissionsCount: 3,
+  dailyMissionsResetHour: 0,
+  dailyLoginReward: 5,
+  streakBonusPerDay: 2,
+  maxStreakBonus: 50,
+  welcomeBonus: 20,
+  firstMatchBonus: 15,
+  welcomeBonuses: DEFAULT_WELCOME_BONUSES,
+  badgesEnabled: true,
+  referralMilestones: DEFAULT_REFERRAL_MILESTONES,
+  weeklyArenaChallenge: DEFAULT_WEEKLY_ARENA_CHALLENGE,
+  squadChallenge: DEFAULT_SQUAD_CHALLENGE,
+  levelSystem: DEFAULT_LEVEL_SYSTEM,
+  shareToEarn: DEFAULT_SHARE_TO_EARN,
+  depositBonusDays: DEFAULT_DEPOSIT_BONUS_DAYS,
+  luckySpin: DEFAULT_LUCKY_SPIN,
+  seasonPass: DEFAULT_SEASON_PASS,
+  smartNotificationsEnabled: true,
+  streakAtRiskHoursBeforeReset: 4,
+  earnTabTitle: 'Earn BAC',
+  earnTabSubtitle: 'Complete missions and claim rewards to grow your wallet.',
+};
+
+export const DEFAULT_TRANSFER_SETTINGS: TransferSettings = {
+  enabled: true,
+  feePercent: 2,
+  minAmount: 1,
+  maxAmount: 10000,
 };
 
 export const DEFAULT_MAIL_SETTINGS: MailSettings = {
@@ -203,11 +636,13 @@ export interface IAppSettings extends Document {
   premiumDuration: number;
   premiumPrice: number;
   commissionRate: number;
+  transferSettings: TransferSettings;
   liveChat: LiveChatSettings;
   messaging: MessagingSettings;
   profileSocial: ProfileSocialSettings;
   mail: MailSettings;
   appDownload: AppDownloadSettings;
+  engagement: EngagementSettings;
 }
 
 const appSettingsSchema = new Schema<IAppSettings>(
@@ -216,6 +651,10 @@ const appSettingsSchema = new Schema<IAppSettings>(
     premiumDuration: { type: Number, default: 30 },
     premiumPrice: { type: Number, default: 100 },
     commissionRate: { type: Number, default: 10 },
+    transferSettings: {
+      type: Schema.Types.Mixed,
+      default: () => ({ ...DEFAULT_TRANSFER_SETTINGS }),
+    },
     liveChat: {
       type: Schema.Types.Mixed,
       default: () => ({ ...DEFAULT_LIVE_CHAT_SETTINGS }),
@@ -235,6 +674,10 @@ const appSettingsSchema = new Schema<IAppSettings>(
     appDownload: {
       type: Schema.Types.Mixed,
       default: () => ({ ...DEFAULT_APP_DOWNLOAD_SETTINGS }),
+    },
+    engagement: {
+      type: Schema.Types.Mixed,
+      default: () => ({ ...DEFAULT_ENGAGEMENT_SETTINGS }),
     },
   },
   { timestamps: true }
@@ -324,6 +767,16 @@ export function normalizeMessagingSettings(raw?: Partial<MessagingSettings> | nu
   };
 }
 
+export function normalizeTransferSettings(raw?: Partial<TransferSettings> | null): TransferSettings {
+  const defaults = DEFAULT_TRANSFER_SETTINGS;
+  return {
+    enabled: raw?.enabled !== false,
+    feePercent: Math.min(Math.max(Number(raw?.feePercent ?? defaults.feePercent) || 0, 0), 100),
+    minAmount: Math.min(Math.max(Number(raw?.minAmount ?? defaults.minAmount) || 1, 0.01), 1000000),
+    maxAmount: Math.min(Math.max(Number(raw?.maxAmount ?? defaults.maxAmount) || defaults.maxAmount, 1), 10000000),
+  };
+}
+
 export function normalizeMailSettings(raw?: Partial<MailSettings> | null): MailSettings {
   return {
     enabled: raw?.enabled === true,
@@ -359,6 +812,332 @@ export function normalizeAppDownloadSettings(raw?: Partial<AppDownloadSettings> 
   };
 }
 
+export function normalizeWelcomeMilestoneConfig(
+  raw: Partial<WelcomeMilestoneConfig> | null | undefined,
+  fallback: WelcomeMilestoneConfig
+): WelcomeMilestoneConfig {
+  return {
+    enabled: raw?.enabled !== false,
+    bacAmount: Math.min(Math.max(Number(raw?.bacAmount ?? fallback.bacAmount) || 0, 0), 10000),
+    title: String(raw?.title || fallback.title).trim().slice(0, 80),
+    description: String(raw?.description || fallback.description).trim().slice(0, 200),
+    icon: String(raw?.icon || fallback.icon).trim().slice(0, 80),
+  };
+}
+
+export function normalizeWelcomeBonuses(
+  raw: Partial<WelcomeBonusesSettings> | null | undefined,
+  legacy?: { welcomeBonus?: number; firstMatchBonus?: number }
+): WelcomeBonusesSettings {
+  const defaults = DEFAULT_WELCOME_BONUSES;
+  const milestones = defaults.milestones;
+
+  const signupFallback = {
+    ...milestones.signup,
+    bacAmount: legacy?.welcomeBonus ?? milestones.signup.bacAmount,
+  };
+  const firstMatchFallback = {
+    ...milestones.first_match,
+    bacAmount: legacy?.firstMatchBonus ?? milestones.first_match.bacAmount,
+  };
+
+  return {
+    enabled: raw?.enabled !== false,
+    milestones: {
+      signup: normalizeWelcomeMilestoneConfig(raw?.milestones?.signup, signupFallback),
+      first_match: normalizeWelcomeMilestoneConfig(raw?.milestones?.first_match, firstMatchFallback),
+      complete_profile: normalizeWelcomeMilestoneConfig(
+        raw?.milestones?.complete_profile,
+        milestones.complete_profile
+      ),
+      first_deposit: normalizeWelcomeMilestoneConfig(raw?.milestones?.first_deposit, milestones.first_deposit),
+    },
+  };
+}
+
+export function normalizeReferralTierConfig(
+  raw: Partial<ReferralTierConfig> | null | undefined,
+  fallback: ReferralTierConfig
+): ReferralTierConfig {
+  return {
+    enabled: raw?.enabled !== false,
+    threshold: Math.min(Math.max(Number(raw?.threshold ?? fallback.threshold) || fallback.threshold, 1), 10000),
+    bacAmount: Math.min(Math.max(Number(raw?.bacAmount ?? fallback.bacAmount) || 0, 0), 100000),
+    title: String(raw?.title || fallback.title).trim().slice(0, 80),
+    description: String(raw?.description || fallback.description).trim().slice(0, 200),
+    icon: String(raw?.icon || fallback.icon).trim().slice(0, 80),
+  };
+}
+
+export function normalizeReferralMilestones(
+  raw: Partial<ReferralMilestonesSettings> | null | undefined
+): ReferralMilestonesSettings {
+  const defaults = DEFAULT_REFERRAL_MILESTONES;
+  return {
+    enabled: raw?.enabled !== false,
+    tiers: {
+      tier_5: normalizeReferralTierConfig(raw?.tiers?.tier_5, defaults.tiers.tier_5),
+      tier_10: normalizeReferralTierConfig(raw?.tiers?.tier_10, defaults.tiers.tier_10),
+      tier_25: normalizeReferralTierConfig(raw?.tiers?.tier_25, defaults.tiers.tier_25),
+    },
+  };
+}
+
+const VALID_WEEKLY_TEAM_TYPES = new Set<WeeklyArenaTeamType>(['solo', 'duo', 'squad', 'any']);
+
+export function normalizeWeeklyArenaChallenge(
+  raw: Partial<WeeklyArenaChallengeSettings> | null | undefined
+): WeeklyArenaChallengeSettings {
+  const defaults = DEFAULT_WEEKLY_ARENA_CHALLENGE;
+  const teamType = VALID_WEEKLY_TEAM_TYPES.has(raw?.teamType as WeeklyArenaTeamType)
+    ? (raw!.teamType as WeeklyArenaTeamType)
+    : defaults.teamType;
+
+  return {
+    enabled: raw?.enabled !== false,
+    teamType,
+    targetWins: Math.min(Math.max(Number(raw?.targetWins ?? defaults.targetWins) || defaults.targetWins, 1), 100),
+    bacAmount: Math.min(Math.max(Number(raw?.bacAmount ?? defaults.bacAmount) || 0, 0), 100000),
+    title: String(raw?.title || defaults.title).trim().slice(0, 80),
+    description: String(raw?.description || defaults.description).trim().slice(0, 200),
+    icon: String(raw?.icon || defaults.icon).trim().slice(0, 80),
+    leaderboardLimit: Math.min(Math.max(Number(raw?.leaderboardLimit ?? defaults.leaderboardLimit) || 10, 3), 25),
+  };
+}
+
+export function normalizeSquadChallenge(
+  raw: Partial<SquadChallengeSettings> | null | undefined
+): SquadChallengeSettings {
+  const defaults = DEFAULT_SQUAD_CHALLENGE;
+  const teamType = VALID_WEEKLY_TEAM_TYPES.has(raw?.teamType as WeeklyArenaTeamType)
+    ? (raw!.teamType as WeeklyArenaTeamType)
+    : defaults.teamType;
+
+  return {
+    enabled: raw?.enabled !== false,
+    teamType,
+    targetWins: Math.min(Math.max(Number(raw?.targetWins ?? defaults.targetWins) || defaults.targetWins, 1), 100),
+    bacAmount: Math.min(Math.max(Number(raw?.bacAmount ?? defaults.bacAmount) || 0, 0), 100000),
+    minMembersInMatch: Math.min(
+      Math.max(Number(raw?.minMembersInMatch ?? defaults.minMembersInMatch) || defaults.minMembersInMatch, 2),
+      4
+    ),
+    maxTeamSize: Math.min(Math.max(Number(raw?.maxTeamSize ?? defaults.maxTeamSize) || defaults.maxTeamSize, 2), 4),
+    title: String(raw?.title || defaults.title).trim().slice(0, 80),
+    description: String(raw?.description || defaults.description).trim().slice(0, 200),
+    icon: String(raw?.icon || defaults.icon).trim().slice(0, 80),
+    leaderboardLimit: Math.min(Math.max(Number(raw?.leaderboardLimit ?? defaults.leaderboardLimit) || 10, 3), 25),
+  };
+}
+
+export function normalizeLevelTitleConfig(
+  raw: Partial<LevelTitleConfig> | null | undefined,
+  fallback: LevelTitleConfig
+): LevelTitleConfig {
+  return {
+    level: Math.min(Math.max(Number(raw?.level ?? fallback.level) || fallback.level, 1), 100),
+    title: String(raw?.title || fallback.title).trim().slice(0, 40) || fallback.title,
+    icon: String(raw?.icon || fallback.icon).trim().slice(0, 80) || fallback.icon,
+  };
+}
+
+export function normalizeLevelSystem(raw?: Partial<LevelSystemSettings> | null): LevelSystemSettings {
+  const defaults = DEFAULT_LEVEL_SYSTEM;
+  const rawTitles = Array.isArray(raw?.titles) ? raw!.titles : defaults.titles;
+  const titles = rawTitles
+    .map((entry, index) =>
+      normalizeLevelTitleConfig(entry, defaults.titles[index] || defaults.titles[0])
+    )
+    .filter((entry) => entry.title)
+    .sort((a, b) => a.level - b.level)
+    .slice(0, 20);
+
+  return {
+    enabled: raw?.enabled !== false,
+    xpPerJoinMatch: Math.min(Math.max(Number(raw?.xpPerJoinMatch ?? defaults.xpPerJoinMatch) || 0, 0), 1000),
+    xpPerWin: Math.min(Math.max(Number(raw?.xpPerWin ?? defaults.xpPerWin) || 0, 0), 5000),
+    xpPerKill: Math.min(Math.max(Number(raw?.xpPerKill ?? defaults.xpPerKill) || 0, 0), 500),
+    xpPerMissionClaim: Math.min(
+      Math.max(Number(raw?.xpPerMissionClaim ?? defaults.xpPerMissionClaim) || 0, 0),
+      5000
+    ),
+    xpBasePerLevel: Math.min(Math.max(Number(raw?.xpBasePerLevel ?? defaults.xpBasePerLevel) || 100, 10), 10000),
+    xpGrowthPerLevel: Math.min(
+      Math.max(Number(raw?.xpGrowthPerLevel ?? defaults.xpGrowthPerLevel) || 0, 0),
+      5000
+    ),
+    titles: titles.length ? titles : DEFAULT_LEVEL_TITLES,
+  };
+}
+
+export function normalizeShareToEarn(raw?: Partial<ShareToEarnSettings> | null): ShareToEarnSettings {
+  const defaults = DEFAULT_SHARE_TO_EARN;
+  return {
+    enabled: raw?.enabled !== false,
+    bacAmount: Math.min(Math.max(Number(raw?.bacAmount ?? defaults.bacAmount) || 0, 0), 10000),
+    title: String(raw?.title || defaults.title).trim().slice(0, 80),
+    description: String(raw?.description || defaults.description).trim().slice(0, 200),
+    icon: String(raw?.icon || defaults.icon).trim().slice(0, 80),
+    cooldownHours: Math.min(Math.max(Number(raw?.cooldownHours ?? defaults.cooldownHours) || 0, 0), 168),
+  };
+}
+
+function normalizeOptionalIsoDate(value: unknown): string | null {
+  if (value == null || value === '') return null;
+  const date = new Date(String(value));
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString();
+}
+
+export function normalizeDepositBonusDays(
+  raw?: Partial<DepositBonusDaysSettings> | null
+): DepositBonusDaysSettings {
+  const defaults = DEFAULT_DEPOSIT_BONUS_DAYS;
+  return {
+    enabled: raw?.enabled === true,
+    percent: Math.min(Math.max(Number(raw?.percent ?? defaults.percent) || 0, 0), 100),
+    startAt: normalizeOptionalIsoDate(raw?.startAt ?? defaults.startAt),
+    endAt: normalizeOptionalIsoDate(raw?.endAt ?? defaults.endAt),
+    title: String(raw?.title || defaults.title).trim().slice(0, 80),
+    description: String(raw?.description || defaults.description).trim().slice(0, 200),
+    icon: String(raw?.icon || defaults.icon).trim().slice(0, 80),
+    minDeposit: Math.min(Math.max(Number(raw?.minDeposit ?? defaults.minDeposit) || 0, 0), 1000000),
+  };
+}
+
+export function normalizeLuckySpinPrize(
+  raw: Partial<LuckySpinPrize> | null | undefined,
+  fallback: LuckySpinPrize,
+  index: number
+): LuckySpinPrize {
+  const idBase = String(raw?.id || fallback.id || `prize_${index + 1}`)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, '_')
+    .slice(0, 40);
+
+  return {
+    id: idBase || `prize_${index + 1}`,
+    label: String(raw?.label || fallback.label).trim().slice(0, 40) || fallback.label,
+    bacAmount: Math.min(Math.max(Number(raw?.bacAmount ?? fallback.bacAmount) || 0, 0), 100000),
+    weight: Math.min(Math.max(Number(raw?.weight ?? fallback.weight) || 1, 1), 10000),
+    icon: String(raw?.icon || fallback.icon).trim().slice(0, 80) || fallback.icon,
+    color: String(raw?.color || fallback.color).trim().slice(0, 30) || fallback.color,
+  };
+}
+
+export function normalizeLuckySpin(raw?: Partial<LuckySpinSettings> | null): LuckySpinSettings {
+  const defaults = DEFAULT_LUCKY_SPIN;
+  const rawPrizes = Array.isArray(raw?.prizes) ? raw!.prizes : defaults.prizes;
+  const prizes = rawPrizes
+    .map((entry, index) =>
+      normalizeLuckySpinPrize(entry, defaults.prizes[index] || defaults.prizes[0], index)
+    )
+    .filter((entry) => entry.label)
+    .slice(0, 12);
+
+  return {
+    enabled: raw?.enabled !== false,
+    dailyFreeSpins: Math.min(Math.max(Number(raw?.dailyFreeSpins ?? defaults.dailyFreeSpins) || 1, 1), 10),
+    title: String(raw?.title || defaults.title).trim().slice(0, 80),
+    description: String(raw?.description || defaults.description).trim().slice(0, 200),
+    prizes: prizes.length >= 2 ? prizes : DEFAULT_LUCKY_SPIN_PRIZES,
+  };
+}
+
+export function normalizeSeasonPassReward(
+  raw: Partial<SeasonPassReward> | null | undefined,
+  fallback: SeasonPassReward
+): SeasonPassReward {
+  return {
+    bacAmount: Math.min(Math.max(Number(raw?.bacAmount ?? fallback.bacAmount) || 0, 0), 100000),
+    label: String(raw?.label || fallback.label).trim().slice(0, 40) || fallback.label,
+    icon: String(raw?.icon || fallback.icon).trim().slice(0, 80) || fallback.icon,
+  };
+}
+
+export function normalizeSeasonPassTier(
+  raw: Partial<SeasonPassTier> | null | undefined,
+  fallback: SeasonPassTier,
+  index: number
+): SeasonPassTier {
+  const level = Math.min(Math.max(Number(raw?.level ?? fallback.level ?? index + 1) || index + 1, 1), 50);
+  return {
+    level,
+    xpRequired: Math.min(Math.max(Number(raw?.xpRequired ?? fallback.xpRequired) || 100, 1), 1000000),
+    freeReward: normalizeSeasonPassReward(raw?.freeReward, fallback.freeReward),
+    plusReward: normalizeSeasonPassReward(raw?.plusReward, fallback.plusReward),
+  };
+}
+
+export function normalizeSeasonPass(raw?: Partial<SeasonPassSettings> | null): SeasonPassSettings {
+  const defaults = DEFAULT_SEASON_PASS;
+  const rawTiers = Array.isArray(raw?.tiers) ? raw!.tiers : defaults.tiers;
+  const tiers = rawTiers
+    .map((entry, index) =>
+      normalizeSeasonPassTier(entry, defaults.tiers[index] || defaults.tiers[0], index)
+    )
+    .filter((entry) => entry.xpRequired > 0)
+    .sort((a, b) => a.xpRequired - b.xpRequired)
+    .slice(0, 30)
+    .map((entry, index) => ({ ...entry, level: index + 1 }));
+
+  return {
+    enabled: raw?.enabled !== false,
+    seasonKey: String(raw?.seasonKey || defaults.seasonKey).trim().slice(0, 40) || defaults.seasonKey,
+    title: String(raw?.title || defaults.title).trim().slice(0, 80),
+    description: String(raw?.description || defaults.description).trim().slice(0, 200),
+    icon: String(raw?.icon || defaults.icon).trim().slice(0, 80),
+    startAt: normalizeOptionalIsoDate(raw?.startAt ?? defaults.startAt),
+    endAt: normalizeOptionalIsoDate(raw?.endAt ?? defaults.endAt),
+    xpPerJoinMatch: Math.min(Math.max(Number(raw?.xpPerJoinMatch ?? defaults.xpPerJoinMatch) || 0, 0), 1000),
+    xpPerWin: Math.min(Math.max(Number(raw?.xpPerWin ?? defaults.xpPerWin) || 0, 0), 5000),
+    xpPerMissionClaim: Math.min(
+      Math.max(Number(raw?.xpPerMissionClaim ?? defaults.xpPerMissionClaim) || 0, 0),
+      5000
+    ),
+    tiers: tiers.length >= 1 ? tiers : DEFAULT_SEASON_PASS_TIERS,
+  };
+}
+
+export function normalizeEngagementSettings(raw?: Partial<EngagementSettings> | null): EngagementSettings {
+  const welcomeBonus = Math.min(Math.max(Number(raw?.welcomeBonus) || DEFAULT_ENGAGEMENT_SETTINGS.welcomeBonus, 0), 10000);
+  const firstMatchBonus = Math.min(
+    Math.max(Number(raw?.firstMatchBonus) || DEFAULT_ENGAGEMENT_SETTINGS.firstMatchBonus, 0),
+    10000
+  );
+
+  return {
+    enabled: raw?.enabled !== false,
+    streakEnabled: raw?.streakEnabled !== false,
+    dailyMissionsEnabled: raw?.dailyMissionsEnabled !== false,
+    dailyMissionsCount: Math.min(Math.max(Number(raw?.dailyMissionsCount) || DEFAULT_ENGAGEMENT_SETTINGS.dailyMissionsCount, 1), 5),
+    dailyMissionsResetHour: Math.min(Math.max(Number(raw?.dailyMissionsResetHour) || DEFAULT_ENGAGEMENT_SETTINGS.dailyMissionsResetHour, 0), 23),
+    dailyLoginReward: Math.min(Math.max(Number(raw?.dailyLoginReward) || DEFAULT_ENGAGEMENT_SETTINGS.dailyLoginReward, 0), 10000),
+    streakBonusPerDay: Math.min(Math.max(Number(raw?.streakBonusPerDay) || DEFAULT_ENGAGEMENT_SETTINGS.streakBonusPerDay, 0), 1000),
+    maxStreakBonus: Math.min(Math.max(Number(raw?.maxStreakBonus) || DEFAULT_ENGAGEMENT_SETTINGS.maxStreakBonus, 0), 100000),
+    welcomeBonus,
+    firstMatchBonus,
+    welcomeBonuses: normalizeWelcomeBonuses(raw?.welcomeBonuses, { welcomeBonus, firstMatchBonus }),
+    badgesEnabled: raw?.badgesEnabled !== false,
+    referralMilestones: normalizeReferralMilestones(raw?.referralMilestones),
+    weeklyArenaChallenge: normalizeWeeklyArenaChallenge(raw?.weeklyArenaChallenge),
+    squadChallenge: normalizeSquadChallenge(raw?.squadChallenge),
+    levelSystem: normalizeLevelSystem(raw?.levelSystem),
+    shareToEarn: normalizeShareToEarn(raw?.shareToEarn),
+    depositBonusDays: normalizeDepositBonusDays(raw?.depositBonusDays),
+    luckySpin: normalizeLuckySpin(raw?.luckySpin),
+    seasonPass: normalizeSeasonPass(raw?.seasonPass),
+    smartNotificationsEnabled: raw?.smartNotificationsEnabled !== false,
+    streakAtRiskHoursBeforeReset: Math.min(
+      Math.max(Number(raw?.streakAtRiskHoursBeforeReset ?? DEFAULT_ENGAGEMENT_SETTINGS.streakAtRiskHoursBeforeReset) || 4, 1),
+      12
+    ),
+    earnTabTitle: String(raw?.earnTabTitle || DEFAULT_ENGAGEMENT_SETTINGS.earnTabTitle).trim().slice(0, 80),
+    earnTabSubtitle: String(raw?.earnTabSubtitle || DEFAULT_ENGAGEMENT_SETTINGS.earnTabSubtitle).trim().slice(0, 200),
+  };
+}
+
 export function normalizeProfileSocialSettings(raw?: Partial<ProfileSocialSettings> | null): ProfileSocialSettings {
   const pinnedUserIds = Array.isArray(raw?.pinnedUserIds)
     ? raw!.pinnedUserIds
@@ -389,6 +1168,7 @@ export async function getAppSettings() {
       profileSocial: normalizeProfileSocialSettings(DEFAULT_PROFILE_SOCIAL_SETTINGS),
       mail: { ...DEFAULT_MAIL_SETTINGS },
       appDownload: { ...DEFAULT_APP_DOWNLOAD_SETTINGS },
+      engagement: normalizeEngagementSettings(DEFAULT_ENGAGEMENT_SETTINGS),
     });
   }
 
@@ -416,6 +1196,19 @@ export async function getAppSettings() {
 
   if (!settings.appDownload) {
     settings.appDownload = { ...DEFAULT_APP_DOWNLOAD_SETTINGS };
+    dirty = true;
+  }
+
+  if (!settings.engagement) {
+    settings.engagement = normalizeEngagementSettings(DEFAULT_ENGAGEMENT_SETTINGS);
+    dirty = true;
+  } else if (!settings.engagement.welcomeBonuses) {
+    settings.engagement = normalizeEngagementSettings(settings.engagement);
+    dirty = true;
+  }
+
+  if (!settings.transferSettings) {
+    settings.transferSettings = { ...DEFAULT_TRANSFER_SETTINGS };
     dirty = true;
   }
 

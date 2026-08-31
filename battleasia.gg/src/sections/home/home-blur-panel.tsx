@@ -34,7 +34,7 @@ export function HomeBlurPanel({
         <Box
             sx={[
                 homeBlurPanelSx,
-                { p: { xs: 1.35, sm: 1.65 } },
+                { p: { xs: 1.5, sm: 1.65, md: 1.75 } },
                 ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
             ]}
         >

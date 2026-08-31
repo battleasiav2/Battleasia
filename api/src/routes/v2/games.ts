@@ -10,6 +10,10 @@ import { notifyBalanceChange } from '../../utils/balance-notify.js';
 import { notifyMatchJoined } from '../../utils/payment-notifications.js';
 import { buildMyMatchHistory, buildUserMatchHistory } from '../../utils/match-history.js';
 import { isUserPremium } from '../../utils/serialize.js';
+import { bumpProgressForAction } from '../../utils/engagement-service.js';
+import { awardMatchXp } from '../../utils/engagement-level.js';
+import { bumpSeasonPassXp } from '../../utils/engagement-season-pass.js';
+import { touchWelcomeEligibility } from '../../utils/engagement-welcome.js';
 
 const router = Router();
 
@@ -338,6 +342,23 @@ router.post('/matches/:id/join', requireAuth, async (req: AuthedRequest, res) =>
       matchId: match._id.toString(),
       matchName: match.matchName,
       entryFee,
+    });
+
+    bumpProgressForAction(user._id.toString(), 'join_match', 1, {
+      gameId: match.gameId?.toString(),
+    }).catch((error) => {
+      console.error('engagement join_match bump failed:', error);
+    });
+
+    awardMatchXp(user._id.toString(), { joined: true }).catch((error) => {
+      console.error('engagement join xp failed:', error);
+    });
+    bumpSeasonPassXp(user._id.toString(), { join: true }).catch((error) => {
+      console.error('engagement season join xp failed:', error);
+    });
+
+    touchWelcomeEligibility(user._id.toString()).catch((error) => {
+      console.error('engagement welcome touch failed:', error);
     });
 
     return res.json({

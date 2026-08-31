@@ -27,6 +27,10 @@ import {
 } from '../../utils/profile-social.js';
 import { recordBalanceHistory } from '../../utils/balance-history.js';
 import { notifyBalanceChange } from '../../utils/balance-notify.js';
+import { syncDailyStreak } from '../../utils/engagement-streak.js';
+import { touchReferrerMilestones, syncUserReferralMilestones } from '../../utils/engagement-referral.js';
+import { bumpProgressForAction } from '../../utils/engagement-service.js';
+import { touchWelcomeEligibility } from '../../utils/engagement-welcome.js';
 import { notifyPremiumActivated } from '../../utils/payment-notifications.js';
 import { buildMyMatchHistory, buildUserMatchHistory } from '../../utils/match-history.js';
 import { resolveReferrerId } from '../../utils/referral.js';
@@ -113,6 +117,10 @@ async function createLoginSession(
   if (res) {
     setAuthCookie(res, accessToken);
   }
+
+  syncDailyStreak(user._id.toString()).catch((error) => {
+    console.error('streak sync on login failed:', error);
+  });
 
   return accessToken;
 }
@@ -202,6 +210,12 @@ router.post('/signup', async (req, res) => {
         permissions: [],
       },
     });
+
+    if (referrerId) {
+      touchReferrerMilestones(referrerId).catch((error) => {
+        console.error('referral milestone sync failed:', error);
+      });
+    }
 
     await saveVerificationCode(normalizedEmail, 'signup');
 
@@ -316,8 +330,14 @@ router.get('/balance-history', requireAuth, async (req: AuthedRequest, res) => {
       >;
       const reason = detail.reason;
       let type: string = item.type;
-      if (reason === 'match_winnings' || reason === 'match_result_update' || reason === 'match_reward') {
+      if (reason === 'match_winnings' || reason === 'match_result_update' || reason === 'match_reward' || reason === 'engagement_reward' || reason === 'engagement_streak_reward' || reason === 'engagement_welcome_reward') {
         type = 'earning';
+      }
+      if (reason === 'user_transfer_sent') {
+        type = 'transfer_sent';
+      }
+      if (reason === 'user_transfer_received') {
+        type = 'transfer_received';
       }
 
       return {
@@ -447,10 +467,11 @@ router.get('/referral-settings', requireAuth, async (_req, res) => {
 
 router.get('/referral-stats', requireAuth, async (req: AuthedRequest, res) => {
   try {
-    const [referredUsers, commissions, settings] = await Promise.all([
+    const [referredUsers, commissions, settings, referralMilestones] = await Promise.all([
       User.find({ referredBy: req.userId }).select('status'),
       ReferralHistory.find({ referrerId: req.userId }),
       getAppSettings(),
+      syncUserReferralMilestones(req.userId!),
     ]);
 
     const totalReferrals = referredUsers.length;
@@ -474,6 +495,7 @@ router.get('/referral-stats', requireAuth, async (req: AuthedRequest, res) => {
         totalDepositsFromReferrals,
         totalCommissionEvents,
         commissionRate: settings.commissionRate,
+        referralMilestones,
       },
     });
   } catch (error) {
@@ -588,6 +610,10 @@ router.post('/verify-email', requireAuth, async (req: AuthedRequest, res) => {
     user.emailVerified = true;
     await user.save();
 
+    touchWelcomeEligibility(user._id.toString()).catch((error) => {
+      console.error('engagement welcome touch failed:', error);
+    });
+
     return res.json({ status: true, emailVerified: true, user: serializeUser(user) });
   } catch (error) {
     console.error('verify-email error:', error);
@@ -656,6 +682,15 @@ router.put('/me', requireAuth, async (req: AuthedRequest, res) => {
 
     await user.save();
     const data = await serializePublicUser(user, req.userId);
+
+    bumpProgressForAction(user._id.toString(), 'complete_profile', 1).catch((error) => {
+      console.error('engagement complete_profile bump failed:', error);
+    });
+
+    touchWelcomeEligibility(user._id.toString()).catch((error) => {
+      console.error('engagement welcome touch failed:', error);
+    });
+
     return res.json({ status: true, user: serializeUser(user), data, message: 'Profile updated' });
   } catch (error) {
     console.error('update me error:', error);
@@ -985,6 +1020,10 @@ router.post('/verify-email-signup', async (req, res) => {
     await user.save();
 
     const accessToken = await createLoginSession(user, req, res);
+
+    touchWelcomeEligibility(user._id.toString()).catch((error) => {
+      console.error('engagement welcome touch failed:', error);
+    });
 
     return res.json({
       status: true,

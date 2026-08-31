@@ -16,6 +16,8 @@ import {
   notifyDepositSubmitted,
 } from '../../../utils/payment-notifications.js';
 import { processReferralCommission } from '../../../utils/referral.js';
+import { touchWelcomeEligibility } from '../../../utils/engagement-welcome.js';
+import { applyDepositBonusOnApproval } from '../../../utils/engagement-deposit-bonus.js';
 import { safeQueryStatus, DEPOSIT_STATUSES } from '../../../utils/query-filter.js';
 
 const router = Router();
@@ -257,6 +259,21 @@ router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
       depositId: deposit._id,
       depositSource: 'manual',
     });
+
+    touchWelcomeEligibility(user._id.toString()).catch((error) => {
+      console.error('engagement welcome touch failed:', error);
+    });
+
+    try {
+      await applyDepositBonusOnApproval({
+        user,
+        depositAmount: deposit.coin_amount,
+        depositId: deposit._id.toString(),
+        performedBy: req.userId,
+      });
+    } catch (error) {
+      console.error('engagement deposit bonus failed:', error);
+    }
 
     const channel = await PaymentChannel.findById(deposit.payment_channel);
     return res.json({ status: true, data: serializeDeposit(deposit, channel) });

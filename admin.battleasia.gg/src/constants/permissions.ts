@@ -53,6 +53,11 @@ export const PERMISSIONS = {
     EDIT: 'shop.edit',
     DELETE: 'shop.delete',
   },
+
+  ENGAGEMENT: {
+    VIEW: 'engagement.view',
+    EDIT: 'engagement.edit',
+  },
   
 } as const;
 
@@ -65,7 +70,9 @@ export type PermissionKey =
   | typeof PERMISSIONS.PAYMENTS[keyof typeof PERMISSIONS.PAYMENTS]
   | typeof PERMISSIONS.NOTIFICATIONS[keyof typeof PERMISSIONS.NOTIFICATIONS]
   | typeof PERMISSIONS.FEED[keyof typeof PERMISSIONS.FEED]
-  | typeof PERMISSIONS.CUSTOMER_SUPPORT[keyof typeof PERMISSIONS.CUSTOMER_SUPPORT];
+  | typeof PERMISSIONS.CUSTOMER_SUPPORT[keyof typeof PERMISSIONS.CUSTOMER_SUPPORT]
+  | typeof PERMISSIONS.SHOP[keyof typeof PERMISSIONS.SHOP]
+  | typeof PERMISSIONS.ENGAGEMENT[keyof typeof PERMISSIONS.ENGAGEMENT];
 
 /**
  * Get all available permission values as an array

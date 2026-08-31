@@ -22,4 +22,6 @@ export const ALL_PERMISSIONS = [
   { key: 'shop.create', label: 'Create Shop Items', category: 'shop' },
   { key: 'shop.edit', label: 'Edit Shop Items', category: 'shop' },
   { key: 'shop.delete', label: 'Delete Shop Items', category: 'shop' },
+  { key: 'engagement.view', label: 'View Engagement', category: 'engagement' },
+  { key: 'engagement.edit', label: 'Edit Engagement', category: 'engagement' },
 ] as const;

@@ -7,7 +7,6 @@ import {
     Skeleton,
     Container,
     Typography,
-    LinearProgress,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
@@ -101,8 +100,8 @@ function FlatPulseStat({
     return (
         <Box
             sx={{
-                p: { xs: 1.25, sm: 1.5 },
-                minHeight: { xs: 90, sm: 100 },
+                p: { xs: 1.35, sm: 1.5 },
+                minHeight: { xs: 96, sm: 104 },
                 height: '100%',
                 borderTop: `2px solid ${HOME_GOLD}`,
                 display: 'flex',
@@ -133,14 +132,14 @@ function FlatPulseStat({
                     >
                         <Iconify icon={icon} width={20} />
                     </Box>
-                    <Stack spacing={0.35} sx={{ flex: 1, minWidth: 0 }}>
+                    <Stack spacing={0.45} sx={{ flex: 1, minWidth: 0 }}>
                         <Typography
                             variant="overline"
                             sx={{
                                 letterSpacing: 0.7,
                                 color: tokens.stat.labelColor,
-                                fontSize: { xs: '0.6875rem', sm: '0.75rem' },
-                                lineHeight: 1.25,
+                                fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                                lineHeight: 1.35,
                                 fontWeight: 700,
                                 textTransform: 'uppercase',
                                 wordBreak: 'break-word',
@@ -157,12 +156,12 @@ function FlatPulseStat({
                                 minWidth: 0,
                                 color: tokens.stat.valueColor,
                                 fontSize: {
-                                    xs: 'clamp(0.92rem, 3.6vw, 1.15rem)',
-                                    sm: '1.28rem',
-                                    md: '1.42rem',
+                                    xs: 'clamp(0.98rem, 3.8vw, 1.2rem)',
+                                    sm: '1.32rem',
+                                    md: '1.45rem',
                                 },
                                 fontWeight: 800,
-                                lineHeight: 1.1,
+                                lineHeight: 1.2,
                                 '& > *': {
                                     minWidth: 0,
                                     maxWidth: '100%',
@@ -178,7 +177,7 @@ function FlatPulseStat({
                                     component="span"
                                     sx={{
                                         color: tokens.stat.suffixColor,
-                                        fontSize: { xs: '0.6875rem', sm: '0.8125rem' },
+                                        fontSize: { xs: '0.75rem', sm: '0.8125rem' },
                                         fontWeight: 600,
                                     }}
                                 >
@@ -259,7 +258,7 @@ function PulseHeroFlat({
                             <LivePulseDot color="green" size={7} />
                             <Typography
                                 sx={{
-                                    fontSize: { xs: '0.68rem', sm: '0.76rem' },
+                                    fontSize: { xs: '0.75rem', sm: '0.8125rem' },
                                     fontWeight: 700,
                                     letterSpacing: 0.75,
                                     textTransform: 'uppercase',
@@ -287,8 +286,8 @@ function PulseHeroFlat({
                             variant="body2"
                             sx={{
                                 color: tokens.subtitleColor,
-                                fontSize: { xs: '0.8125rem', sm: '0.9375rem' },
-                                lineHeight: 1.55,
+                                fontSize: { xs: '0.875rem', sm: '0.9375rem' },
+                                lineHeight: { xs: 1.6, sm: 1.55 },
                                 maxWidth: 480,
                             }}
                         >
@@ -300,7 +299,8 @@ function PulseHeroFlat({
                                 sx={{
                                     color: HOME_TEXT_MUTED,
                                     fontWeight: 600,
-                                    fontSize: { xs: '0.6875rem', sm: '0.75rem' },
+                                    fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                                    lineHeight: 1.4,
                                 }}
                             >
                                 {lastUpdatedLabel}
@@ -310,7 +310,7 @@ function PulseHeroFlat({
                 </Grid>
 
                 <Grid item xs={12} md={7}>
-                    <Grid container spacing={1.25}>
+                    <Grid container spacing={{ xs: 1.35, sm: 1.5 }}>
                         {statTiles.map((tile) => (
                             <Grid key={tile.key} item xs={6} sx={{ display: 'flex' }}>
                                 <Box sx={{ width: 1 }}>
@@ -374,16 +374,17 @@ const PlayerListCard = ({
             direction="row"
             alignItems="flex-start"
             justifyContent="space-between"
-            sx={{ mb: 1, flexWrap: 'wrap', gap: 0.75 }}
+            sx={{ mb: { xs: 1.15, sm: 1.25 }, flexWrap: 'wrap', gap: 0.75 }}
         >
-            <Stack spacing={0.35} sx={{ minWidth: 0, flex: 1 }}>
+            <Stack spacing={0.45} sx={{ minWidth: 0, flex: 1 }}>
                 <Typography
                     variant="h6"
                     sx={{
                         color: tokens.titleColor,
-                        fontSize: { xs: '1rem', sm: '1.15rem' },
+                        fontSize: { xs: '1.05rem', sm: '1.15rem' },
                         fontWeight: 800,
                         wordBreak: 'break-word',
+                        lineHeight: 1.25,
                     }}
                 >
                     {title}
@@ -392,7 +393,7 @@ const PlayerListCard = ({
                     variant="caption"
                     sx={{
                         color: tokens.subtitleColor,
-                        fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                        fontSize: { xs: '0.8125rem', sm: '0.875rem' },
                         lineHeight: 1.45,
                     }}
                 >
@@ -403,11 +404,12 @@ const PlayerListCard = ({
                 <LivePulseDot color="green" size={6} />
                 <Typography
                     sx={{
-                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
+                        fontSize: { xs: '0.75rem', sm: '0.8125rem' },
                         fontWeight: 700,
                         letterSpacing: 0.75,
                         textTransform: 'uppercase',
                         color: alpha(HOME_GOLD, 0.92),
+                        lineHeight: 1.3,
                     }}
                 >
                     {translations.live}
@@ -424,7 +426,7 @@ const PlayerListCard = ({
                         spacing={1.5}
                         alignItems="center"
                         sx={{
-                            py: { xs: 0.85, sm: 0.95 },
+                            py: { xs: 1.05, sm: 0.95 },
                             borderBottom: idx < 4 ? HOME_ROW_LINE : 'none',
                         }}
                     >
@@ -448,7 +450,7 @@ const PlayerListCard = ({
                         const metricValue = (() => {
                             switch (metricKey) {
                                 case 'totalWinnings':
-                                    return <CoinValue value={player.totalWinnings || 0} size={14} />;
+                                    return <CoinValue value={player.totalWinnings || 0} size={15} />;
                                 case 'winRate':
                                     return `${fNumber(player.winRate || 0)}%`;
                                 case 'totalKills':
@@ -465,7 +467,7 @@ const PlayerListCard = ({
                                 spacing={{ xs: 1, sm: 1.5 }}
                                 alignItems="center"
                                 sx={{
-                                    py: { xs: 0.85, sm: 0.95 },
+                                    py: { xs: 1.05, sm: 0.95 },
                                     borderBottom: idx < players.length - 1 ? HOME_ROW_LINE : 'none',
                                     transition: 'background-color 0.15s ease',
                                     '&:hover': {
@@ -477,8 +479,8 @@ const PlayerListCard = ({
                                     src={getAvatarUrl(player.avatar)}
                                     alt={player.username}
                                     sx={{
-                                        width: { xs: 32, sm: 36 },
-                                        height: { xs: 32, sm: 36 },
+                                        width: { xs: 34, sm: 36 },
+                                        height: { xs: 34, sm: 36 },
                                         bgcolor: alpha('#0ea5e9', 0.16),
                                         color: '#e2e8f0',
                                         fontWeight: 700,
@@ -488,14 +490,15 @@ const PlayerListCard = ({
                                 >
                                     {player.username?.[0]?.toUpperCase() || '?'}
                                 </Avatar>
-                                <Stack sx={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+                                <Stack sx={{ flex: 1, minWidth: 0, overflow: 'hidden', gap: 0.2 }}>
                                     <Typography
                                         variant="subtitle2"
                                         noWrap
                                         sx={{
                                             color: '#ffffff',
-                                            fontSize: { xs: '0.78rem', sm: '0.875rem' },
+                                            fontSize: { xs: '0.8125rem', sm: '0.875rem' },
                                             fontWeight: 700,
+                                            lineHeight: 1.3,
                                         }}
                                     >
                                         {player.username}
@@ -505,20 +508,22 @@ const PlayerListCard = ({
                                         noWrap
                                         sx={{
                                             color: tokens.subtitleColor,
-                                            fontSize: { xs: '0.6875rem', sm: '0.75rem' },
+                                            fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                                            lineHeight: 1.4,
                                         }}
                                     >
                                         {translations.lastPlayed}: {formatDateTime(player.lastPlayed)}
                                     </Typography>
                                 </Stack>
-                                <Stack spacing={0.2} sx={{ textAlign: 'right', flexShrink: 0 }}>
+                                <Stack spacing={0.25} sx={{ textAlign: 'right', flexShrink: 0, minWidth: 56 }}>
                                     <Typography
                                         variant="subtitle2"
                                         sx={{
                                             color: '#ffffff',
-                                            fontSize: { xs: '0.78rem', sm: '0.875rem' },
+                                            fontSize: { xs: '0.8125rem', sm: '0.875rem' },
                                             fontWeight: 700,
                                             fontVariantNumeric: 'tabular-nums',
+                                            lineHeight: 1.3,
                                         }}
                                     >
                                         {metricValue}
@@ -528,7 +533,8 @@ const PlayerListCard = ({
                                         noWrap
                                         sx={{
                                             color: tokens.stat.labelColor,
-                                            fontSize: { xs: '0.6875rem', sm: '0.75rem' },
+                                            fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                                            lineHeight: 1.35,
                                         }}
                                     >
                                         {metricKey === 'totalWinnings'
@@ -556,7 +562,6 @@ type GlassTokens = ReturnType<typeof getDefaultGlassTokens>;
 const TARGET_MATCH_TILES = 3;
 
 // Used only to visually fill empty slots when API returns fewer matches than the UI expects.
-// Keeps the layout symmetrical without replacing real API data.
 const DEMO_PRIZE_MATCHES: DashboardMatchSummary[] = [
   {
     id: 'demo-prize-1',
@@ -641,169 +646,135 @@ function DashboardMatchTile({
     total,
     variant,
     isLast,
-    platformTotalWinnings,
 }: {
     match: DashboardMatchSummary;
     index: number;
     total: number;
     variant: 'prize' | 'ongoing';
     isLast?: boolean;
-    platformTotalWinnings?: number;
 }) {
     const { t } = useTranslate();
-    const progressValue =
-        variant === 'prize'
-            ? Math.min(
-                  100,
-                  ((match.prizeEstimate || 0) / Math.max(1, (platformTotalWinnings || 1) / 3)) * 100
-              )
-            : Math.min(
-                  100,
-                  ((match.participantsCount || 0) / Math.max(1, match.totalPlayer || 1)) * 100
-              );
-
-    const progressCaption =
-        variant === 'prize' ? (
-            fShortenNumber(match.prizeEstimate || 0)
-        ) : (
-            <>
-                {t('home.dashboard.spots')} {match.participantsCount}/{match.totalPlayer || '∞'}
-            </>
-        );
 
     return (
         <Box
             sx={{
-                py: { xs: 1.1, sm: 1.25 },
+                py: { xs: 1.25, sm: 1.25 },
                 borderBottom: isLast ? 'none' : HOME_ROW_LINE,
             }}
         >
-            <Stack direction="row" alignItems="center" spacing={0.75} sx={{ minWidth: 0 }}>
-                <Typography
-                    noWrap
-                    sx={{
-                        flexShrink: 0,
-                        maxWidth: { xs: 72, sm: 84 },
-                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
-                        fontWeight: 700,
-                        letterSpacing: 0.4,
-                        textTransform: 'uppercase',
-                        color: alpha(HOME_GOLD, 0.92),
-                    }}
+            <Stack spacing={0.65}>
+                <Stack
+                    direction="row"
+                    alignItems="flex-start"
+                    justifyContent="space-between"
+                    spacing={1}
+                    sx={{ minWidth: 0 }}
                 >
-                    {match.gameName || 'Match'}
-                </Typography>
-                <Typography
-                    noWrap
-                    sx={{
-                        color: '#ffffff',
-                        flex: 1,
-                        minWidth: 0,
-                        fontSize: { xs: '0.8125rem', sm: '0.875rem' },
-                        fontWeight: 700,
-                        lineHeight: 1.25,
-                    }}
-                >
-                    {match.matchName}
-                </Typography>
-                <Typography
-                    sx={{
-                        flexShrink: 0,
-                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
-                        fontWeight: 700,
-                        color: HOME_TEXT_MUTED,
-                        fontVariantNumeric: 'tabular-nums',
-                    }}
-                >
-                    #{index + 1}/{total}
-                </Typography>
-            </Stack>
+                    <Stack spacing={0.35} sx={{ minWidth: 0, flex: 1 }}>
+                        <Typography
+                            noWrap
+                            sx={{
+                                maxWidth: 1,
+                                fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                                fontWeight: 700,
+                                letterSpacing: 0.4,
+                                textTransform: 'uppercase',
+                                color: alpha(HOME_GOLD, 0.92),
+                                lineHeight: 1.3,
+                            }}
+                        >
+                            {match.gameName || 'Match'}
+                        </Typography>
+                        <Typography
+                            sx={{
+                                color: '#ffffff',
+                                fontSize: { xs: '0.875rem', sm: '0.9375rem' },
+                                fontWeight: 700,
+                                lineHeight: 1.35,
+                                display: '-webkit-box',
+                                WebkitLineClamp: { xs: 2, sm: 1 },
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                            }}
+                        >
+                            {match.matchName}
+                        </Typography>
+                    </Stack>
+                    <Typography
+                        sx={{
+                            flexShrink: 0,
+                            fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                            fontWeight: 700,
+                            color: HOME_TEXT_MUTED,
+                            fontVariantNumeric: 'tabular-nums',
+                            lineHeight: 1.3,
+                            pt: 0.15,
+                        }}
+                    >
+                        #{index + 1}/{total}
+                    </Typography>
+                </Stack>
 
-            <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mt: 0.55, minWidth: 0 }}>
-                <LinearProgress
-                    variant="determinate"
-                    value={progressValue}
-                    sx={{
-                        flex: 1,
-                        height: 4,
-                        borderRadius: 0.5,
-                        bgcolor: alpha('#ffffff', 0.08),
-                        '& .MuiLinearProgress-bar': {
-                            bgcolor: HOME_GOLD,
-                            borderRadius: 0.5,
-                        },
-                    }}
-                />
-                <Typography
-                    sx={{
-                        flexShrink: 0,
-                        minWidth: { xs: 36, sm: 44 },
-                        textAlign: 'right',
-                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
-                        fontWeight: 700,
-                        color: HOME_TEXT_SECONDARY,
-                        fontVariantNumeric: 'tabular-nums',
-                        lineHeight: 1.2,
-                    }}
+                <Stack
+                    direction={{ xs: 'column', sm: 'row' }}
+                    alignItems={{ xs: 'flex-start', sm: 'center' }}
+                    justifyContent="space-between"
+                    spacing={{ xs: 0.35, sm: 1 }}
+                    sx={{ minWidth: 0 }}
                 >
-                    {progressCaption}
-                </Typography>
-            </Stack>
+                    <Typography
+                        sx={{
+                            color: HOME_TEXT_SECONDARY,
+                            fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                            fontWeight: 600,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 0.4,
+                            minWidth: 0,
+                            flex: 1,
+                            lineHeight: 1.4,
+                        }}
+                    >
+                        {variant === 'prize' ? `${t('home.dashboard.entry')}:` : `${t('home.dashboard.prizeEst')}`}
+                        {variant === 'prize' ? (
+                            <CoinValue value={match.entryFee || 0} size={13} />
+                        ) : (
+                            <CoinValue value={match.prizeEstimate || 0} size={13} />
+                        )}
+                    </Typography>
 
-            <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                spacing={1}
-                sx={{ mt: 0.4, minWidth: 0 }}
-            >
-                <Typography
-                    noWrap
-                    sx={{
-                        color: HOME_TEXT_SECONDARY,
-                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
-                        fontWeight: 600,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 0.35,
-                        minWidth: 0,
-                        flex: 1,
-                    }}
-                >
-                    {variant === 'prize' ? `${t('home.dashboard.entry')}:` : `${t('home.dashboard.prizeEst')}`}
-                    {variant === 'prize' ? (
-                        <CoinValue value={match.entryFee || 0} size={11} />
-                    ) : (
-                        <CoinValue value={match.prizeEstimate || 0} size={11} />
-                    )}
-                </Typography>
-
-                <Typography
-                    noWrap
-                    sx={{
-                        color: HOME_TEXT_MUTED,
-                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
-                        fontWeight: 600,
-                        textAlign: 'right',
-                        flexShrink: 0,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 0.35,
-                        fontVariantNumeric: 'tabular-nums',
-                    }}
-                >
-                    {variant === 'prize' ? (
-                        <>
-                            {t('home.dashboard.spots')}: {match.participantsCount}/{match.totalPlayer || '∞'}
-                        </>
-                    ) : match.entryFee ? (
-                        <>
-                            {t('home.dashboard.entry')} <CoinValue value={match.entryFee || 0} size={11} />
-                        </>
-                    ) : (
-                        `${t('home.dashboard.entry')} ${t('home.dashboard.free')}`
-                    )}
-                </Typography>
+                    <Typography
+                        sx={{
+                            color: HOME_TEXT_MUTED,
+                            fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                            fontWeight: 600,
+                            textAlign: { xs: 'left', sm: 'right' },
+                            flexShrink: 0,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 0.4,
+                            fontVariantNumeric: 'tabular-nums',
+                            lineHeight: 1.4,
+                        }}
+                    >
+                        {variant === 'prize' ? (
+                            <>
+                                {fShortenNumber(match.prizeEstimate || 0)} · {t('home.dashboard.spots')}:{' '}
+                                {match.participantsCount}/{match.totalPlayer || '∞'}
+                            </>
+                        ) : match.entryFee ? (
+                            <>
+                                {t('home.dashboard.spots')}: {match.participantsCount}/{match.totalPlayer || '∞'} ·{' '}
+                                {t('home.dashboard.entry')} <CoinValue value={match.entryFee || 0} size={13} />
+                            </>
+                        ) : (
+                            <>
+                                {t('home.dashboard.spots')}: {match.participantsCount}/{match.totalPlayer || '∞'} ·{' '}
+                                {t('home.dashboard.entry')} {t('home.dashboard.free')}
+                            </>
+                        )}
+                    </Typography>
+                </Stack>
             </Stack>
         </Box>
     );
@@ -816,7 +787,6 @@ function DashboardMatchPanel({
     loading,
     variant,
     glassTokens,
-    platformTotalWinnings,
     emptyLabel,
 }: {
     title: string;
@@ -825,7 +795,6 @@ function DashboardMatchPanel({
     loading?: boolean;
     variant: 'prize' | 'ongoing';
     glassTokens: GlassTokens;
-    platformTotalWinnings?: number;
     emptyLabel: string;
 }) {
     const count = matches.length;
@@ -845,7 +814,7 @@ function DashboardMatchPanel({
                 direction="row"
                 alignItems="center"
                 justifyContent="space-between"
-                sx={{ mb: 1.25, flexWrap: 'wrap', gap: 0.5 }}
+                sx={{ mb: { xs: 1.15, sm: 1.25 }, flexWrap: 'wrap', gap: 0.65 }}
             >
                 <Stack direction="row" alignItems="center" spacing={0.85} sx={{ minWidth: 0 }}>
                     {variant === 'ongoing' ? <LivePulseDot color="red" size={7} /> : null}
@@ -853,8 +822,9 @@ function DashboardMatchPanel({
                         variant="h6"
                         sx={{
                             color: glassTokens.titleColor,
-                            fontSize: { xs: '0.95rem', sm: '1.15rem' },
+                            fontSize: { xs: '1.05rem', sm: '1.15rem' },
                             fontWeight: 800,
+                            lineHeight: 1.25,
                         }}
                     >
                         {title}
@@ -863,11 +833,12 @@ function DashboardMatchPanel({
                 <Typography
                     sx={{
                         flexShrink: 0,
-                        fontSize: { xs: '0.6875rem', sm: '0.75rem' },
+                        fontSize: { xs: '0.75rem', sm: '0.8125rem' },
                         fontWeight: 700,
                         letterSpacing: 0.5,
                         textTransform: 'uppercase',
                         color: alpha(HOME_GOLD, 0.92),
+                        lineHeight: 1.3,
                     }}
                 >
                     {badgeLabel}
@@ -885,7 +856,7 @@ function DashboardMatchPanel({
                                 }}
                             >
                                 <Skeleton width="78%" height={14} sx={{ mb: 0.75 }} />
-                                <Skeleton width="100%" height={4} sx={{ borderRadius: 0.5 }} />
+                                <Skeleton width="55%" height={12} />
                             </Box>
                         ))}
                     </Stack>
@@ -899,7 +870,6 @@ function DashboardMatchPanel({
                                 total={displayCount}
                                 variant={variant}
                                 isLast={index === tilesToRender.length - 1}
-                                platformTotalWinnings={platformTotalWinnings}
                             />
                         ))}
                     </Box>
@@ -1214,7 +1184,6 @@ export function LandingDashboardSection() {
                                 loading={loading}
                                 variant="prize"
                                 glassTokens={glassTokens}
-                                platformTotalWinnings={data?.platform?.totalWinnings}
                                 emptyLabel={t('home.dashboard.noHighPrizeMatches')}
                             />
                         </Box>

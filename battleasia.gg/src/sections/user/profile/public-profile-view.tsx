@@ -17,7 +17,7 @@ import {
   UserBackButton,
 } from 'src/layouts/user';
 
-import { FeedList, ProfileInfo, ProfileBanner, ProfileSidebar, ProfilePageSkeleton, ProfileGamingStatsStrip, FollowListDialog, ProfileSocialExtras } from './components';
+import { FeedList, ProfileInfo, ProfileBanner, ProfileSidebar, ProfilePageSkeleton, ProfileGamingStatsStrip, ProfileBadgesStrip, FollowListDialog, ProfileSocialExtras } from './components';
 import { computeProfileGamingStats, mapApiFeedToItem } from './profile-stats-utils';
 import { useMessagingHandler } from '../messages/use-messaging-settings';
 import { MessagingProviderPicker } from '../messages/components';
@@ -281,6 +281,8 @@ export function PublicProfileView() {
       />
 
       <ProfileGamingStatsStrip stats={stats} loading={statsLoading} />
+
+      <ProfileBadgesStrip userId={viewingUser?._id} isOwnProfile={false} />
 
       <ProfileSocialExtras
         profileUserId={viewingUser!._id}

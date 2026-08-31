@@ -12,6 +12,7 @@ import {
   useCarousel,
   CarouselThumb,
   CarouselThumbs,
+  CarouselDotButtons,
   CarouselArrowNumberButtons,
 } from 'src/components/carousel';
 import Autoplay from 'embla-carousel-autoplay';
@@ -98,6 +99,37 @@ export function ShopDetailsCarousel({ images, name }: Props) {
             background: `linear-gradient(180deg, transparent 50%, ${alpha('#000000', 0.45)} 100%)`,
           }}
         />
+
+        {slides.length > 1 ? (
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 12,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 2,
+              display: { xs: 'flex', sm: 'none' },
+              pointerEvents: 'auto',
+            }}
+          >
+            <CarouselDotButtons
+              {...carousel.dots}
+              variant="rounded"
+              slotProps={{
+                dot: {
+                  sx: {
+                    width: 22,
+                    height: 3,
+                    bgcolor: USER_COLORS.gold,
+                    '&:not(.Mui-selected)': {
+                      bgcolor: alpha('#ffffff', 0.25),
+                    },
+                  },
+                },
+              }}
+            />
+          </Box>
+        ) : null}
       </Box>
 
       {slides.length > 1 && !isMobile ? (

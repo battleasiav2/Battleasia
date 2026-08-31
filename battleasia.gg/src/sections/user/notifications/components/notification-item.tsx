@@ -31,6 +31,10 @@ const typeIconMap: Record<string, string> = {
   mail: 'solar:letter-bold-duotone',
   delivery: 'solar:delivery-bold-duotone',
   general: 'solar:bell-bold-duotone',
+  engagement_mission_complete: 'solar:flag-bold',
+  engagement_claim_ready: 'solar:gift-bold',
+  engagement_streak_at_risk: 'solar:fire-bold',
+  engagement_badge_unlocked: 'solar:medal-ribbons-star-bold',
 };
 
 const readerContent = (data: string) => (

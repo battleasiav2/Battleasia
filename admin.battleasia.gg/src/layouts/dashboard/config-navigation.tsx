@@ -32,6 +32,7 @@ const ICONS = {
   customerSupport: icon('solar:headphones-round-sound-bold'),
   shop: icon('iconoir:shopping-bag-check'),
   system: icon('solar:settings-bold-duotone'),
+  engagement: icon('solar:gift-bold'),
 };
 
 // ----------------------------------------------------------------------
@@ -69,6 +70,7 @@ export function useNavData() {
                 { title: 'Online', path: paths.users.online, requiredPermission: PERMISSIONS.USERS.VIEW },
                 { title: 'Premium', path: paths.users.premium, requiredPermission: PERMISSIONS.USERS.VIEW },
                 { title: 'Referral Settings', path: paths.users.referralSettings, requiredPermission: PERMISSIONS.USERS.VIEW },
+                { title: 'Transfer Settings', path: paths.users.transferSettings, requiredPermission: PERMISSIONS.USERS.VIEW },
                 { title: 'Referral History', path: paths.users.referralHistory, requiredPermission: PERMISSIONS.USERS.VIEW },
               ],
             },
@@ -142,6 +144,17 @@ export function useNavData() {
               children: [
                 { title: 'Coin List', path: paths.shop.coinlist, requiredPermission: PERMISSIONS.SHOP.VIEW },
                 { title: 'Coin Rate', path: paths.shop.coinrate, requiredPermission: PERMISSIONS.SHOP.VIEW },
+              ],
+            },
+            {
+              title: 'engagement',
+              path: paths.engagement.root,
+              icon: ICONS.engagement,
+              requiredPermission: PERMISSIONS.ENGAGEMENT.VIEW,
+              children: [
+                { title: 'Missions', path: paths.engagement.missions, requiredPermission: PERMISSIONS.ENGAGEMENT.VIEW },
+                { title: 'Badges', path: paths.engagement.badges, requiredPermission: PERMISSIONS.ENGAGEMENT.VIEW },
+                { title: 'Settings', path: paths.engagement.settings, requiredPermission: PERMISSIONS.ENGAGEMENT.EDIT },
               ],
             },
             {

@@ -2,6 +2,7 @@ export * from './feed-card';
 export * from './feed-list';
 export * from './profile-posts-grid';
 export * from './profile-gaming-stats';
+export * from './profile-badges-strip';
 export * from './profile-info';
 export * from './profile-banner';
 export * from './profile-sidebar';

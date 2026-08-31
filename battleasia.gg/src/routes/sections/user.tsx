@@ -28,6 +28,7 @@ const MatchPage = lazy(() => lazyRetry(() => import('src/pages/user/match')));
 const MatchDetailPage = lazy(() => lazyRetry(() => import('src/pages/user/match-detail')));
 const MatchResultPage = lazy(() => lazyRetry(() => import('src/pages/user/match-result')));
 const ShopPage = lazy(() => lazyRetry(() => import('src/pages/user/shop')));
+const ShopWalletPage = lazy(() => lazyRetry(() => import('src/pages/user/shop-wallet')));
 const ShopDetailPage = lazy(() => lazyRetry(() => import('src/pages/user/shop-detail')));
 const ReferralPage = lazy(() => lazyRetry(() => import('src/pages/user/referral')));
 const FeedPage = lazy(() => lazyRetry(() => import('src/pages/user/feed')));
@@ -90,7 +91,7 @@ export const userRoutes: RouteObject[] = [
       { path: 'play/:matchId/result', element: <MatchResultPage /> },
       { path: 'play/:gameId', element: <MatchPage /> },
       { path: 'shop', element: <ShopPage /> },
-      { path: 'shop/wallet', element: <WalletPage /> },
+      { path: 'shop/wallet', element: <ShopWalletPage /> },
       { path: 'shop/:shopId', element: <ShopDetailPage /> },
       { path: 'earn', element: <Navigate to={paths.user.referral} replace /> },
       { path: 'referral', element: <ReferralPage /> },

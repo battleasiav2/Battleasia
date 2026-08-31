@@ -18,6 +18,7 @@ import {
 
 import { Iconify } from 'src/components/iconify';
 import { AnimatedBalance } from 'src/components/animated-balance';
+import { CONFIG } from 'src/global-config';
 import {
   getDefaultGlassTokens,
   getGlassInnerSx,
@@ -59,12 +60,11 @@ export function ProfileSidebar({
   onFollowersClick,
   onFollowingClick,
 }: ProfileSidebarProps) {
-  const { t, currentLang } = useTranslate();
+  const { t } = useTranslate();
   const { user, balance } = useSelector((state: RootState) => state.auth);
   const [copiedID, setCopiedID] = useState(false);
   const [copiedName, setCopiedName] = useState(false);
   const tokens = getDefaultGlassTokens();
-  const isBengali = currentLang?.value === 'bn';
 
   useEffect(() => {
     if (!user?._id) return undefined;
@@ -122,10 +122,25 @@ export function ProfileSidebar({
 
   const shareButtonSx = {
     ...userGhostButtonSx,
-    fontSize: isBengali ? '0.7rem' : { xs: '0.7rem', sm: '0.75rem' },
-    flex: 1,
-    minWidth: 0,
+    width: '100%',
+    minHeight: 40,
+    py: 1,
+    px: 1.25,
+    fontSize: '0.6875rem',
+    lineHeight: 1.25,
+    letterSpacing: 0.35,
+    justifyContent: 'center',
+    whiteSpace: 'nowrap',
+    '& .MuiButton-startIcon': {
+      marginRight: 0.5,
+      marginLeft: 0,
+    },
   };
+
+  const socialStatItems = [
+    { type: 'following' as const, label: t('profile.following'), value: following, onClick: onFollowingClick },
+    { type: 'followers' as const, label: t('profile.followers'), value: followers, onClick: onFollowersClick },
+  ];
 
   return (
     <Stack spacing={2}>
@@ -134,7 +149,15 @@ export function ProfileSidebar({
           <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: USER_COLORS.textMuted, textTransform: 'uppercase', mb: 1 }}>
             {t('profile.accountBalance')}
           </Typography>
-          <AnimatedBalance value={balance ?? 0} fontSize={{ xs: '1.25rem', sm: '1.5rem' }} fontWeight={800} color={USER_COLORS.gold} />
+          <Stack direction="row" alignItems="center" spacing={0.75}>
+            <Box
+              component="img"
+              src={CONFIG.currencyIcon}
+              alt=""
+              sx={{ width: { xs: 22, sm: 24 }, height: { xs: 22, sm: 24 }, flexShrink: 0 }}
+            />
+            <AnimatedBalance value={balance ?? 0} fontSize={{ xs: '1.25rem', sm: '1.5rem' }} fontWeight={800} color={USER_COLORS.gold} />
+          </Stack>
         </Box>
       ) : null}
 
@@ -143,40 +166,72 @@ export function ProfileSidebar({
           {t('profile.social')}
         </Typography>
 
-        <Stack direction="row" spacing={1.5} sx={{ mb: 2 }}>
-          {[
-            { type: 'followers' as const, label: t('profile.followers'), value: followers, icon: 'solar:users-group-rounded-bold' },
-            { type: 'following' as const, label: t('profile.following'), value: following, icon: 'streamline-ultimate:following-1-bold' },
-          ].map((item) => {
-            const handleClick = item.type === 'followers' ? onFollowersClick : onFollowingClick;
-            return (
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 1,
+            mb: 2,
+          }}
+        >
+          {socialStatItems.map((item) => (
             <Box
               key={item.type}
-              onClick={handleClick}
+              onClick={item.onClick}
               sx={{
-                ...getGlassInnerSx(tokens, { p: 1.5, flex: 1, textAlign: 'center' }),
-                cursor: handleClick ? 'pointer' : 'default',
+                ...getGlassInnerSx(tokens, {
+                  py: 1.25,
+                  px: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minHeight: 64,
+                  gap: 0.35,
+                }),
+                cursor: item.onClick ? 'pointer' : 'default',
                 transition: 'border-color 0.2s, transform 0.2s',
-                '&:hover': handleClick ? { borderColor: alpha(USER_COLORS.gold, 0.35), transform: 'translateY(-1px)' } : undefined,
+                '&:hover': item.onClick
+                  ? { borderColor: alpha(USER_COLORS.gold, 0.35), transform: 'translateY(-1px)' }
+                  : undefined,
               }}
             >
-              <Iconify icon={item.icon} width={20} sx={{ color: USER_COLORS.gold, mb: 0.5 }} />
-              <Typography sx={{ fontSize: 18, fontWeight: 800, color: USER_COLORS.textPrimary }}>{item.value}</Typography>
-              <Typography sx={{ fontSize: 10, color: USER_COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+              <Typography
+                sx={{
+                  fontSize: 20,
+                  fontWeight: 800,
+                  lineHeight: 1,
+                  color: USER_COLORS.textPrimary,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {item.value}
+              </Typography>
+              <Typography
+                noWrap
+                sx={{
+                  fontSize: 10,
+                  color: USER_COLORS.textMuted,
+                  textTransform: 'uppercase',
+                  letterSpacing: 0.65,
+                  lineHeight: 1.2,
+                  maxWidth: '100%',
+                }}
+              >
                 {item.label}
               </Typography>
             </Box>
-            );
-          })}
-        </Stack>
+          ))}
+        </Box>
 
         <Typography sx={{ fontSize: 12, color: USER_COLORS.textMuted, mb: 1 }}>
           {t('profile.shareProfileLink')}
         </Typography>
-        <Stack direction={isBengali ? 'column' : 'row'} spacing={1}>
+        <Stack spacing={1}>
           <Button
             size="small"
-            startIcon={<Iconify icon={copiedID ? 'solar:check-circle-bold' : 'solar:link-bold'} width={16} />}
+            fullWidth
+            startIcon={<Iconify icon={copiedID ? 'solar:check-circle-bold' : 'solar:link-bold'} width={14} />}
             onClick={handleShareProfileID}
             sx={shareButtonSx}
           >
@@ -184,7 +239,8 @@ export function ProfileSidebar({
           </Button>
           <Button
             size="small"
-            startIcon={<Iconify icon={copiedName ? 'solar:check-circle-bold' : 'solar:link-bold'} width={16} />}
+            fullWidth
+            startIcon={<Iconify icon={copiedName ? 'solar:check-circle-bold' : 'solar:link-bold'} width={14} />}
             onClick={handleShareProfileName}
             sx={shareButtonSx}
           >

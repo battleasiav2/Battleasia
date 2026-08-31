@@ -41,6 +41,7 @@ import usersSessionsRoutes from './routes/v3/users/sessions.js';
 import usersPremiumRoutes from './routes/v3/users/premium.js';
 
 import usersReferralSettingsRoutes from './routes/v3/users/referral-settings.js';
+import usersTransferSettingsRoutes from './routes/v3/users/transfer-settings.js';
 
 import usersReferralHistoryRoutes from './routes/v3/users/referral-history.js';
 
@@ -54,6 +55,12 @@ import feedListRoutes from './routes/v3/feed/list.js';
 
 import feedCategoriesRoutes from './routes/v3/feed/categories.js';
 
+import engagementMissionsRoutes from './routes/v3/engagement/missions.js';
+
+import engagementBadgesRoutes from './routes/v3/engagement/badges.js';
+
+import engagementSettingsRoutes from './routes/v3/engagement/settings.js';
+
 import notificationsRoutes from './routes/v3/notifications.js';
 
 import customerSupportRoutes from './routes/v2/customer-support.js';
@@ -61,12 +68,15 @@ import customerSupportRoutes from './routes/v2/customer-support.js';
 import appSettingsRoutes from './routes/v2/app-settings.js';
 
 import v2UsersRoutes from './routes/v2/users.js';
+import v2UserTransferRoutes from './routes/v2/user-transfer.js';
 
 import v2GamesRoutes from './routes/v2/games.js';
 
 import v2NotificationsRoutes from './routes/v2/notifications.js';
 
 import v2FeedRoutes from './routes/v2/feed.js';
+
+import v2EngagementRoutes from './routes/v2/engagement.js';
 
 import v2SocialRoutes from './routes/v2/social.js';
 
@@ -227,6 +237,7 @@ export function createApp() {
   app.use('/api/v3/users/premium', requireAdmin, usersPremiumRoutes);
 
   app.use('/api/v3/users/referral-settings', requireAdmin, usersReferralSettingsRoutes);
+  app.use('/api/v3/users/transfer-settings', requireAdmin, usersTransferSettingsRoutes);
 
   app.use('/api/v3/users/referral-history', requireAdmin, usersReferralHistoryRoutes);
 
@@ -246,6 +257,12 @@ export function createApp() {
 
   app.use('/api/v3/feed/categories', requireAdmin, feedCategoriesRoutes);
 
+  app.use('/api/v3/engagement/missions', requireAdmin, engagementMissionsRoutes);
+
+  app.use('/api/v3/engagement/badges', requireAdmin, engagementBadgesRoutes);
+
+  app.use('/api/v3/engagement/settings', requireAdmin, engagementSettingsRoutes);
+
   app.use('/api/v3/notifications', requireAdmin, notificationsRoutes);
 
   app.use('/api/v2/customer-support', customerSupportRoutes);
@@ -253,6 +270,7 @@ export function createApp() {
   app.use('/api/v2/app-settings', appSettingsRoutes);
 
   app.use('/api/v2/users', v2UsersRoutes);
+  app.use('/api/v2/users/transfer', v2UserTransferRoutes);
 
   app.use('/api/v2/games', v2GamesRoutes);
 
@@ -261,6 +279,8 @@ export function createApp() {
   app.use('/api/v2/feed', v2FeedRoutes);
 
   app.use('/api/v2/social', v2SocialRoutes);
+
+  app.use('/api/v2/engagement', v2EngagementRoutes);
 
   app.use('/api/v3/shop/orders', v3ShopOrdersRoutes);
 

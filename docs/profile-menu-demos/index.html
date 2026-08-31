@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BattleAsia Profile Menu Demos</title>
+  <style>
+    * { box-sizing: border-box; }
+    a { text-decoration: none; color: inherit; }
+    :root {
+      --gold: #f5c518;
+      --gold-soft: #ffe08a;
+      --card: #161618;
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.42);
+      --muted2: rgba(255,255,255,0.55);
+      --border: rgba(255,255,255,0.08);
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Inter, system-ui, sans-serif;
+      background: #070707;
+      color: #e5e5e5;
+      padding: 24px;
+    }
+    h1 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin: 0 0 6px;
+      color: var(--gold);
+    }
+    .sub {
+      margin: 0 0 24px;
+      color: #9ca3af;
+      font-size: 0.92rem;
+      line-height: 1.55;
+      max-width: 960px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 22px;
+      max-width: 1600px;
+    }
+    .panel {
+      background: #111;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .panel-head {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .panel-head strong { font-size: 0.92rem; color: #fff; display: block; }
+    .panel-head span { font-size: 0.78rem; color: #9ca3af; margin-top: 3px; display: block; }
+
+    /* Phone frame with dimmed page behind */
+    .scene {
+      position: relative;
+      min-height: 640px;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.62), rgba(0,0,0,0.88)),
+        url('https://images.unsplash.com/photo-1542751371-adc38448a05e?w=800&q=60') center/cover;
+    }
+    .drawer {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      width: 88%;
+      max-width: 340px;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      padding: 18px 22px 20px;
+      box-shadow: -8px 0 40px rgba(0,0,0,0.55);
+    }
+    .drawer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 18px;
+    }
+    .user { font-size: 13px; color: var(--muted); font-weight: 500; padding-top: 4px; }
+    .close {
+      width: 32px; height: 32px; border: none; background: transparent;
+      color: rgba(255,255,255,0.88); font-size: 22px; line-height: 1; cursor: default;
+    }
+    .nav { flex: 1; }
+    .apk {
+      margin-top: auto;
+      padding: 14px 14px 12px;
+      background: rgba(22,22,24,0.95);
+      border: 1px solid rgba(245,197,24,0.28);
+      border-radius: 2px;
+      position: relative;
+      overflow: hidden;
+    }
+    .apk::after {
+      content: '';
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 3px;
+      background: var(--gold);
+    }
+    .apk-row { display: flex; gap: 10px; align-items: flex-start; }
+    .apk-logo {
+      width: 36px; height: 36px; border-radius: 6px;
+      background: linear-gradient(135deg, #1a1a1c, #0a0a0a);
+      border: 1px solid var(--border);
+      display: grid; place-items: center;
+      font-size: 10px; font-weight: 800; color: var(--gold);
+    }
+    .apk-kicker { font-size: 9px; font-weight: 700; letter-spacing: 1.1px; color: var(--gold); text-transform: uppercase; }
+    .apk-title { font-size: 13px; font-weight: 800; color: #fff; letter-spacing: 0.04em; margin: 2px 0; }
+    .apk-desc { font-size: 10px; color: var(--muted2); line-height: 1.4; }
+    .logout {
+      margin-top: 14px;
+      font-size: 22px;
+      font-weight: 500;
+      color: var(--muted2);
+      padding: 4px 0;
+    }
+    .fab {
+      position: absolute;
+      right: 18px; bottom: 18px;
+      width: 46px; height: 46px; border-radius: 50%;
+      background: var(--gold);
+      display: grid; place-items: center;
+      box-shadow: 0 4px 18px rgba(245,197,24,0.35);
+      font-size: 18px;
+    }
+
+    /* Demo 1 — Gradient underline (current) */
+    .d1 .link {
+      display: block;
+      padding: 14px 4px 14px 0;
+      font-size: 28px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.78);
+      text-decoration: none;
+      line-height: 1.15;
+    }
+    .d1 .link.active {
+      color: #fff;
+      font-weight: 600;
+      background-image: linear-gradient(90deg, var(--gold), var(--gold-soft), rgba(245,197,24,0.45));
+      background-size: 100% 2px;
+      background-position: 0 100%;
+      background-repeat: no-repeat;
+      padding-bottom: 16px;
+    }
+    .d1 .sub-link {
+      font-size: 22px;
+      padding: 10px 0 10px 14px;
+    }
+
+    /* Demo 2 — Gold left rail */
+    .d2 .link {
+      display: block;
+      padding: 13px 12px 13px 16px;
+      margin: 2px 0;
+      font-size: 26px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.75);
+      border-left: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .d2 .link.active {
+      color: #fff;
+      font-weight: 600;
+      border-left-color: var(--gold);
+      background: rgba(245,197,24,0.07);
+    }
+    .d2 .sub-link { font-size: 20px; padding-left: 28px; opacity: 0.9; }
+
+    /* Demo 3 — Editorial numbered */
+    .d3 .link {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .d3 .num {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: rgba(245,197,24,0.55);
+      min-width: 22px;
+    }
+    .d3 .label {
+      font-size: 26px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.76);
+    }
+    .d3 .link.active .num { color: var(--gold); }
+    .d3 .link.active .label { color: #fff; font-weight: 600; }
+    .d3 .sub-link .label { font-size: 20px; }
+    .d3 .sub-link .num { opacity: 0.5; }
+
+    /* Demo 4 — Caps + gold rules */
+    .d4 .link {
+      display: block;
+      padding: 16px 0;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.62);
+      border-bottom: 1px solid rgba(245,197,24,0.18);
+    }
+    .d4 .link:first-of-type { border-top: 1px solid rgba(245,197,24,0.18); }
+    .d4 .link.active {
+      color: var(--gold);
+      padding-left: 8px;
+      border-left: 2px solid var(--gold);
+    }
+    .d4 .sub-link {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      padding-left: 18px;
+      opacity: 0.85;
+    }
+
+    /* Demo 5 — Inset chip rows (brand glass) */
+    .d5 .link {
+      display: block;
+      margin-bottom: 8px;
+      padding: 14px 14px 12px;
+      background: rgba(22,22,24,0.55);
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-size: 24px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.78);
+      position: relative;
+      overflow: hidden;
+    }
+    .d5 .link::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: transparent;
+    }
+    .d5 .link.active {
+      color: #fff;
+      border-color: rgba(245,197,24,0.32);
+      background: rgba(245,197,24,0.08);
+      box-shadow: 0 4px 16px rgba(245,197,24,0.08);
+    }
+    .d5 .link.active::before { background: var(--gold); }
+    .d5 .sub-link { font-size: 18px; margin-left: 10px; opacity: 0.92; }
+
+    /* Demo 6 — Gold glow hero */
+    .d6 .drawer-top { flex-direction: column; align-items: flex-start; gap: 6px; margin-bottom: 28px; }
+    .d6 .drawer-top .row { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+    .d6 .user-big { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: 0.02em; }
+    .d6 .user-line { width: 48px; height: 2px; background: linear-gradient(90deg, var(--gold), transparent); margin-top: 8px; }
+    .d6 .link {
+      display: block;
+      padding: 15px 0;
+      font-size: 27px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.58);
+      letter-spacing: 0.01em;
+    }
+    .d6 .link.active {
+      color: #fff;
+      font-weight: 600;
+      text-shadow: 0 0 24px rgba(245,197,24,0.35), 0 0 8px rgba(245,197,24,0.2);
+    }
+
+    /* Demo 7 — Right tick minimal */
+    .d7 .link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0;
+      font-size: 26px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.62);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .d7 .link.active {
+      color: #fff;
+      font-weight: 600;
+    }
+    .d7 .tick {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: transparent;
+      flex-shrink: 0;
+    }
+    .d7 .link.active .tick {
+      background: var(--gold);
+      box-shadow: 0 0 10px rgba(245,197,24,0.8);
+    }
+
+    /* Demo 8 — Corner bracket pro */
+    .d8 .link {
+      display: block;
+      margin: 6px 0;
+      padding: 16px 18px;
+      font-size: 25px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.65);
+      position: relative;
+    }
+    .d8 .link.active {
+      color: #fff;
+      font-weight: 600;
+    }
+    .d8 .link.active::before,
+    .d8 .link.active::after {
+      content: '';
+      position: absolute;
+      width: 10px; height: 10px;
+      border-color: var(--gold);
+      border-style: solid;
+    }
+    .d8 .link.active::before {
+      top: 8px; left: 0;
+      border-width: 2px 0 0 2px;
+    }
+    .d8 .link.active::after {
+      bottom: 8px; right: 0;
+      border-width: 0 2px 2px 0;
+    }
+
+    /* Demo 9 — Aurora edge + hairline stack */
+    .d9.drawer {
+      background: linear-gradient(180deg, #0c0c0e 0%, #000 100%);
+      border-left: 1px solid rgba(245,197,24,0.12);
+      box-shadow: -12px 0 48px rgba(0,0,0,0.6), inset 1px 0 0 rgba(245,197,24,0.08);
+    }
+    .d9 .link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 0;
+      font-size: 26px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.55);
+      border-bottom: 1px solid rgba(245,197,24,0.1);
+    }
+    .d9 .dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: transparent;
+      flex-shrink: 0;
+    }
+    .d9 .link.active {
+      color: #fff;
+      font-weight: 600;
+    }
+    .d9 .link.active .dot { background: var(--gold); }
+
+    /* Demo 10 — Luxe compact */
+    .d10 .drawer-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .d10 .user-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 4px;
+    }
+    .d10 .user-name { font-size: 18px; font-weight: 600; color: rgba(255,255,255,0.88); }
+    .d10 .nav-rule {
+      height: 1px;
+      background: linear-gradient(90deg, var(--gold), rgba(245,197,24,0.15), transparent);
+      margin-bottom: 8px;
+    }
+    .d10 .link {
+      display: block;
+      padding: 13px 0;
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.52);
+    }
+    .d10 .link.active {
+      color: var(--gold);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    .d10 .logout { font-size: 16px; letter-spacing: 0.12em; text-transform: uppercase; }
+    .d10 .apk { padding: 12px; }
+    .d10 .apk-title { font-size: 11px; }
+
+    .section-title {
+      font-size: 1.1rem;
+      margin: 36px 0 16px;
+      color: #fff;
+      font-weight: 700;
+    }
+    .section-title span { color: var(--gold); font-size: 0.85rem; font-weight: 600; margin-left: 8px; }
+    .pick {
+      margin-top: 28px;
+      max-width: 960px;
+      padding: 14px 16px;
+      border: 1px solid rgba(245,197,24,0.25);
+      border-radius: 8px;
+      background: rgba(245,197,24,0.04);
+      font-size: 0.88rem;
+      line-height: 1.55;
+      color: #d1d5db;
+    }
+    .pick strong { color: var(--gold); }
+
+    .gallery {
+      display: grid;
+      gap: 20px;
+      max-width: 1100px;
+      margin-bottom: 32px;
+    }
+    figure {
+      margin: 0;
+      background: #111;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #000;
+    }
+    figcaption {
+      padding: 12px 14px;
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    figcaption strong { color: #fff; }
+    figcaption span { color: #9ca3af; }
+  </style>
+</head>
+<body>
+  <h1>Profile Menu — 10 Design Demos</h1>
+  <p class="sub">
+    Same black / white / gold palette. Demos 1–5 = first batch. Demos 6–10 = premium 10/10 picks.
+    Open: <code>docs/profile-menu-demos/index.html</code> — reply with demo number (1–10).
+  </p>
+
+  <div class="gallery">
+    <figure>
+      <img src="./profile-menu-demos-overview.png" alt="All 5 profile menu demos overview" />
+      <figcaption><strong>Overview — all 5 demos</strong><span>Compare side by side</span></figcaption>
+    </figure>
+    <figure>
+      <img src="./profile-menu-demo-1-gradient-underline.png" alt="Demo 1 Gradient Underline" />
+      <figcaption><strong>Demo 1 — Gradient Underline</strong><span>Current · minimal · reference match</span></figcaption>
+    </figure>
+    <figure>
+      <img src="./profile-menu-demo-2-gold-left-rail.png" alt="Demo 2 Gold Left Rail" />
+      <figcaption><strong>Demo 2 — Gold Left Rail</strong><span>Esports sidebar · active bar + tint</span></figcaption>
+    </figure>
+    <figure>
+      <img src="./profile-menu-demo-3-editorial-numbered.png" alt="Demo 3 Editorial Numbered" />
+      <figcaption><strong>Demo 3 — Editorial Numbered</strong><span>01/02/03 · premium magazine</span></figcaption>
+    </figure>
+    <figure>
+      <img src="./profile-menu-demo-4-caps-gold-rules.png" alt="Demo 4 Caps Gold Rules" />
+      <figcaption><strong>Demo 4 — Caps + Gold Rules</strong><span>Uppercase · luxury pro tone</span></figcaption>
+    </figure>
+    <figure>
+      <img src="./profile-menu-demo-5-inset-chip-rows.png" alt="Demo 5 Inset Chip Rows" />
+      <figcaption><strong>Demo 5 — Inset Chip Rows</strong><span>Brand glass cards · home style match</span></figcaption>
+    </figure>
+  </div>
+
+  <h2 class="section-title">Premium batch <span>6 – 10 · recommended</span></h2>
+  <div class="gallery">
+    <figure>
+      <img src="./profile-menu-demo-6-gold-glow-hero.png" alt="Demo 6 Gold Glow Hero" />
+      <figcaption><strong>Demo 6 — Gold Glow Hero</strong><span>Username hero · active text glow · esports premium</span></figcaption>
+    </figure>
+    <figure>
+      <img src="./profile-menu-demo-7-right-tick-minimal.png" alt="Demo 7 Right Tick Minimal" />
+      <figcaption><strong>Demo 7 — Right Tick Minimal</strong><span>Ultra clean · gold dot indicator · pro app feel</span></figcaption>
+    </figure>
+    <figure>
+      <img src="./profile-menu-demo-8-corner-bracket.png" alt="Demo 8 Corner Bracket Pro" />
+      <figcaption><strong>Demo 8 — Corner Bracket Pro</strong><span>Gold L-brackets on active · tournament HUD vibe</span></figcaption>
+    </figure>
+    <figure>
+      <img src="./profile-menu-demo-9-aurora-edge.png" alt="Demo 9 Aurora Edge" />
+      <figcaption><strong>Demo 9 — Aurora Edge</strong><span>Gold edge light · dot + hairline stack · refined</span></figcaption>
+    </figure>
+    <figure>
+      <img src="./profile-menu-demo-10-luxe-compact.png" alt="Demo 10 Luxe Compact" />
+      <figcaption><strong>Demo 10 — Luxe Compact</strong><span>Tight spacing · gold caps label · luxury tone</span></figcaption>
+    </figure>
+  </div>
+
+  <h2 class="section-title">Live interactive previews</h2>
+
+  <div class="grid">
+    <!-- Demo 1 -->
+    <div class="panel" id="demo-1">
+      <div class="panel-head">
+        <strong>Demo 1 — Gradient Underline</strong>
+        <span>Current style · large text · gold underline on active · minimal &amp; clean</span>
+      </div>
+      <div class="scene">
+        <div class="drawer d1">
+          <div class="drawer-top">
+            <div class="user">sumonbd</div>
+            <button class="close" aria-hidden="true">×</button>
+          </div>
+          <nav class="nav">
+            <a class="link" href="#">Account</a>
+            <a class="link active" href="#">Play</a>
+            <a class="link" href="#">Shop</a>
+            <a class="link" href="#">Referral</a>
+            <a class="link" href="#">Feed</a>
+          </nav>
+          <div class="apk">
+            <div class="apk-row">
+              <div class="apk-logo">BA</div>
+              <div>
+                <div class="apk-kicker">Android App</div>
+                <div class="apk-title">DOWNLOAD APK</div>
+                <div class="apk-desc">Install the BattleAsia APK and jump into live tournaments faster.</div>
+              </div>
+            </div>
+          </div>
+          <div class="logout">Logout</div>
+        </div>
+        <div class="fab">💬</div>
+      </div>
+    </div>
+
+    <!-- Demo 2 -->
+    <div class="panel" id="demo-2">
+      <div class="panel-head">
+        <strong>Demo 2 — Gold Left Rail</strong>
+        <span>Active item gets gold bar + soft tint · esports sidebar feel</span>
+      </div>
+      <div class="scene">
+        <div class="drawer d2">
+          <div class="drawer-top">
+            <div class="user">sumonbd</div>
+            <button class="close">×</button>
+          </div>
+          <nav class="nav">
+            <a class="link" href="#">Account</a>
+            <a class="link active" href="#">Play</a>
+            <a class="link" href="#">Shop</a>
+            <a class="link" href="#">Referral</a>
+            <a class="link" href="#">Feed</a>
+          </nav>
+          <div class="apk">
+            <div class="apk-row">
+              <div class="apk-logo">BA</div>
+              <div>
+                <div class="apk-kicker">Android App</div>
+                <div class="apk-title">DOWNLOAD APK</div>
+                <div class="apk-desc">Install the BattleAsia APK and jump into live tournaments faster.</div>
+              </div>
+            </div>
+          </div>
+          <div class="logout">Logout</div>
+        </div>
+        <div class="fab">💬</div>
+      </div>
+    </div>
+
+    <!-- Demo 3 -->
+    <div class="panel" id="demo-3">
+      <div class="panel-head">
+        <strong>Demo 3 — Editorial Numbered</strong>
+        <span>01 / 02 / 03 labels · premium magazine layout · subtle dividers</span>
+      </div>
+      <div class="scene">
+        <div class="drawer d3">
+          <div class="drawer-top">
+            <div class="user">sumonbd</div>
+            <button class="close">×</button>
+          </div>
+          <nav class="nav">
+            <a class="link" href="#"><span class="num">01</span><span class="label">Account</span></a>
+            <a class="link active" href="#"><span class="num">02</span><span class="label">Play</span></a>
+            <a class="link" href="#"><span class="num">03</span><span class="label">Shop</span></a>
+            <a class="link" href="#"><span class="num">04</span><span class="label">Referral</span></a>
+            <a class="link" href="#"><span class="num">05</span><span class="label">Feed</span></a>
+          </nav>
+          <div class="apk">
+            <div class="apk-row">
+              <div class="apk-logo">BA</div>
+              <div>
+                <div class="apk-kicker">Android App</div>
+                <div class="apk-title">DOWNLOAD APK</div>
+                <div class="apk-desc">Install the BattleAsia APK and jump into live tournaments faster.</div>
+              </div>
+            </div>
+          </div>
+          <div class="logout">Logout</div>
+        </div>
+        <div class="fab">💬</div>
+      </div>
+    </div>
+
+    <!-- Demo 4 -->
+    <div class="panel" id="demo-4">
+      <div class="panel-head">
+        <strong>Demo 4 — Caps + Gold Rules</strong>
+        <span>Uppercase tracking · thin gold separators · luxury / pro brand tone</span>
+      </div>
+      <div class="scene">
+        <div class="drawer d4">
+          <div class="drawer-top">
+            <div class="user">sumonbd</div>
+            <button class="close">×</button>
+          </div>
+          <nav class="nav">
+            <a class="link" href="#">Account</a>
+            <a class="link active" href="#">Play</a>
+            <a class="link" href="#">Shop</a>
+            <a class="link" href="#">Referral</a>
+            <a class="link" href="#">Feed</a>
+          </nav>
+          <div class="apk">
+            <div class="apk-row">
+              <div class="apk-logo">BA</div>
+              <div>
+                <div class="apk-kicker">Android App</div>
+                <div class="apk-title">DOWNLOAD APK</div>
+                <div class="apk-desc">Install the BattleAsia APK and jump into live tournaments faster.</div>
+              </div>
+            </div>
+          </div>
+          <div class="logout">Logout</div>
+        </div>
+        <div class="fab">💬</div>
+      </div>
+    </div>
+
+    <!-- Demo 5 -->
+    <div class="panel" id="demo-5">
+      <div class="panel-head">
+        <strong>Demo 5 — Inset Chip Rows</strong>
+        <span>Brand glass cards · gold top bar on active · matches home card style</span>
+      </div>
+      <div class="scene">
+        <div class="drawer d5">
+          <div class="drawer-top">
+            <div class="user">sumonbd</div>
+            <button class="close">×</button>
+          </div>
+          <nav class="nav">
+            <a class="link" href="#">Account</a>
+            <a class="link active" href="#">Play</a>
+            <a class="link" href="#">Shop</a>
+            <a class="link" href="#">Referral</a>
+            <a class="link" href="#">Feed</a>
+          </nav>
+          <div class="apk">
+            <div class="apk-row">
+              <div class="apk-logo">BA</div>
+              <div>
+                <div class="apk-kicker">Android App</div>
+                <div class="apk-title">DOWNLOAD APK</div>
+                <div class="apk-desc">Install the BattleAsia APK and jump into live tournaments faster.</div>
+              </div>
+            </div>
+          </div>
+          <div class="logout">Logout</div>
+        </div>
+        <div class="fab">💬</div>
+      </div>
+    </div>
+
+    <!-- Demo 6 -->
+    <div class="panel" id="demo-6">
+      <div class="panel-head">
+        <strong>Demo 6 — Gold Glow Hero</strong>
+        <span>Username as hero · gold accent line · active link soft glow · 10/10 esports premium</span>
+      </div>
+      <div class="scene">
+        <div class="drawer d6">
+          <div class="drawer-top">
+            <div class="row">
+              <div class="user-big">sumonbd</div>
+              <button class="close">×</button>
+            </div>
+            <div class="user-line"></div>
+          </div>
+          <nav class="nav">
+            <a class="link" href="#">Account</a>
+            <a class="link active" href="#">Play</a>
+            <a class="link" href="#">Shop</a>
+            <a class="link" href="#">Referral</a>
+            <a class="link" href="#">Feed</a>
+          </nav>
+          <div class="apk">
+            <div class="apk-row">
+              <div class="apk-logo">BA</div>
+              <div>
+                <div class="apk-kicker">Android App</div>
+                <div class="apk-title">DOWNLOAD APK</div>
+                <div class="apk-desc">Install the BattleAsia APK and jump into live tournaments faster.</div>
+              </div>
+            </div>
+          </div>
+          <div class="logout">Logout</div>
+        </div>
+        <div class="fab">💬</div>
+      </div>
+    </div>
+
+    <!-- Demo 7 -->
+    <div class="panel" id="demo-7">
+      <div class="panel-head">
+        <strong>Demo 7 — Right Tick Minimal</strong>
+        <span>Hairline dividers · gold dot on active right · Apple-level clean spacing</span>
+      </div>
+      <div class="scene">
+        <div class="drawer d7">
+          <div class="drawer-top">
+            <div class="user">sumonbd</div>
+            <button class="close">×</button>
+          </div>
+          <nav class="nav">
+            <a class="link" href="#"><span>Account</span><span class="tick"></span></a>
+            <a class="link active" href="#"><span>Play</span><span class="tick"></span></a>
+            <a class="link" href="#"><span>Shop</span><span class="tick"></span></a>
+            <a class="link" href="#"><span>Referral</span><span class="tick"></span></a>
+            <a class="link" href="#"><span>Feed</span><span class="tick"></span></a>
+          </nav>
+          <div class="apk">
+            <div class="apk-row">
+              <div class="apk-logo">BA</div>
+              <div>
+                <div class="apk-kicker">Android App</div>
+                <div class="apk-title">DOWNLOAD APK</div>
+                <div class="apk-desc">Install the BattleAsia APK and jump into live tournaments faster.</div>
+              </div>
+            </div>
+          </div>
+          <div class="logout">Logout</div>
+        </div>
+        <div class="fab">💬</div>
+      </div>
+    </div>
+
+    <!-- Demo 8 -->
+    <div class="panel" id="demo-8">
+      <div class="panel-head">
+        <strong>Demo 8 — Corner Bracket Pro</strong>
+        <span>Gold L-brackets frame active item · tournament HUD · bold &amp; unique</span>
+      </div>
+      <div class="scene">
+        <div class="drawer d8">
+          <div class="drawer-top">
+            <div class="user">sumonbd</div>
+            <button class="close">×</button>
+          </div>
+          <nav class="nav">
+            <a class="link" href="#">Account</a>
+            <a class="link active" href="#">Play</a>
+            <a class="link" href="#">Shop</a>
+            <a class="link" href="#">Referral</a>
+            <a class="link" href="#">Feed</a>
+          </nav>
+          <div class="apk">
+            <div class="apk-row">
+              <div class="apk-logo">BA</div>
+              <div>
+                <div class="apk-kicker">Android App</div>
+                <div class="apk-title">DOWNLOAD APK</div>
+                <div class="apk-desc">Install the BattleAsia APK and jump into live tournaments faster.</div>
+              </div>
+            </div>
+          </div>
+          <div class="logout">Logout</div>
+        </div>
+        <div class="fab">💬</div>
+      </div>
+    </div>
+
+    <!-- Demo 9 -->
+    <div class="panel" id="demo-9">
+      <div class="panel-head">
+        <strong>Demo 9 — Aurora Edge</strong>
+        <span>Gold edge light on drawer · dot prefix · hairline gold stack · most refined</span>
+      </div>
+      <div class="scene">
+        <div class="drawer d9">
+          <div class="drawer-top">
+            <div class="user">sumonbd</div>
+            <button class="close">×</button>
+          </div>
+          <nav class="nav">
+            <a class="link" href="#"><span class="dot"></span><span>Account</span></a>
+            <a class="link active" href="#"><span class="dot"></span><span>Play</span></a>
+            <a class="link" href="#"><span class="dot"></span><span>Shop</span></a>
+            <a class="link" href="#"><span class="dot"></span><span>Referral</span></a>
+            <a class="link" href="#"><span class="dot"></span><span>Feed</span></a>
+          </nav>
+          <div class="apk">
+            <div class="apk-row">
+              <div class="apk-logo">BA</div>
+              <div>
+                <div class="apk-kicker">Android App</div>
+                <div class="apk-title">DOWNLOAD APK</div>
+                <div class="apk-desc">Install the BattleAsia APK and jump into live tournaments faster.</div>
+              </div>
+            </div>
+          </div>
+          <div class="logout">Logout</div>
+        </div>
+        <div class="fab">💬</div>
+      </div>
+    </div>
+
+    <!-- Demo 10 -->
+    <div class="panel" id="demo-10">
+      <div class="panel-head">
+        <strong>Demo 10 — Luxe Compact</strong>
+        <span>Gold MEMBER tag · tight letter-spacing · active in gold · luxury fintech tone</span>
+      </div>
+      <div class="scene">
+        <div class="drawer d10">
+          <div class="drawer-top">
+            <div>
+              <div class="user-tag">Member</div>
+              <div class="user-name">sumonbd</div>
+            </div>
+            <button class="close">×</button>
+          </div>
+          <div class="nav-rule"></div>
+          <nav class="nav">
+            <a class="link" href="#">Account</a>
+            <a class="link active" href="#">Play</a>
+            <a class="link" href="#">Shop</a>
+            <a class="link" href="#">Referral</a>
+            <a class="link" href="#">Feed</a>
+          </nav>
+          <div class="apk">
+            <div class="apk-row">
+              <div class="apk-logo">BA</div>
+              <div>
+                <div class="apk-kicker">Android App</div>
+                <div class="apk-title">DOWNLOAD APK</div>
+                <div class="apk-desc">Install the BattleAsia APK and jump into live tournaments faster.</div>
+              </div>
+            </div>
+          </div>
+          <div class="logout">Logout</div>
+        </div>
+        <div class="fab">💬</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pick">
+    <strong>Top picks (10/10):</strong>
+    Demo 6 — best esports premium glow.
+    Demo 7 — cleanest pro-app feel.
+    Demo 9 — most refined overall (recommended).
+    Demo 10 — luxury compact if you want tighter menu.
+    Batch 1: Demo 1 still best for pure minimal reference match.
+  </div>
+</body>
+</html>

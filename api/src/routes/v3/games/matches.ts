@@ -25,6 +25,7 @@ import {
   emitMatchCreated,
   emitMatchUpdated,
 } from '../../../utils/socket.js';
+import { recordMatchEngagementProgress } from '../../../utils/engagement-service.js';
 
 const router = Router();
 
@@ -160,6 +161,21 @@ router.post('/:id/distribute-winnings', requireAuth, async (req, res) => {
     }
     if (match.winningsDistributed) {
       return res.status(400).json({ status: false, message: 'Winnings already distributed' });
+    }
+
+    for (const entry of match.results || []) {
+      const participant = await MatchParticipant.findById(entry.participantId);
+      if (!participant) continue;
+
+      recordMatchEngagementProgress(participant.userId.toString(), {
+        kills: Number(entry.kills) || 0,
+        won: entry.status === 'winner',
+        gameId: match.gameId?.toString(),
+        teamType: match.teamType,
+        matchId: match._id.toString(),
+      }).catch((error) => {
+        console.error('engagement match progress failed:', error);
+      });
     }
 
     for (const entry of match.results || []) {

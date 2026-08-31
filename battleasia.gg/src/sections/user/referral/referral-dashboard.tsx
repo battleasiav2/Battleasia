@@ -8,6 +8,7 @@ import { useLiveSync, LIVE_SYNC_TOPICS } from 'src/hooks/use-live-sync';
 import { useSelector } from 'src/store';
 import { paths } from 'src/routes/paths';
 import { useTranslate } from 'src/locales/use-locales';
+import { toast } from 'react-hot-toast';
 import {
   UserPageShell,
   UserGlassCard,
@@ -37,6 +38,8 @@ import {
   ReferralCodeCard,
   ReferralNetworkList,
   ReferralCommissionList,
+  ReferralMilestonesPanel,
+  type ReferralMilestonesState,
 } from './components';
 
 // ----------------------------------------------------------------------
@@ -57,9 +60,12 @@ type ReferralDashboardProps = {
 export function ReferralDashboard({ showInviteSection = true, defaultTab = 'network' }: ReferralDashboardProps) {
   const { t } = useTranslate();
   const { user, isLoggedIn } = useSelector((state) => state.auth);
-  const { getReferralSettingsApi, getReferralStatsApi, getReferralsApi, getReferralCommissionsApi } = useApi();
+  const { getReferralSettingsApi, getReferralStatsApi, getReferralsApi, getReferralCommissionsApi, claimReferralMilestoneApi } = useApi();
 
   const [stats, setStats] = useState<ReferralStats | null>(null);
+  const [referralMilestones, setReferralMilestones] = useState<ReferralMilestonesState | null>(null);
+  const [claimingTierKey, setClaimingTierKey] = useState<string | null>(null);
+  const [flashKey, setFlashKey] = useState<string | null>(null);
   const [network, setNetwork] = useState<ReferralNetworkItem[]>([]);
   const [commissions, setCommissions] = useState<ReferralCommissionItem[]>([]);
   const [commissionRate, setCommissionRate] = useState(10);
@@ -91,7 +97,9 @@ export function ReferralDashboard({ showInviteSection = true, defaultTab = 'netw
       }
 
       if (statsRes?.data?.status) {
-        setStats(statsRes.data.data as ReferralStats);
+        const data = statsRes.data.data as ReferralStats;
+        setStats(data);
+        setReferralMilestones(data.referralMilestones || null);
       }
 
       if (networkRes?.data?.status) {
@@ -119,6 +127,24 @@ export function ReferralDashboard({ showInviteSection = true, defaultTab = 'netw
   }, [fetchData]);
 
   useLiveSync(fetchData, LIVE_SYNC_TOPICS.referral);
+
+  const handleClaimReferralTier = async (key: string) => {
+    setClaimingTierKey(key);
+    try {
+      const response = await claimReferralMilestoneApi(key);
+      if (response?.data?.status) {
+        toast.success(t('referral.milestoneClaimSuccess'));
+        setFlashKey(`referral:${key}`);
+        window.setTimeout(() => setFlashKey(null), 650);
+        setReferralMilestones(response.data.data.referral || null);
+        fetchData();
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || t('referral.milestoneClaimFailed'));
+    } finally {
+      setClaimingTierKey(null);
+    }
+  };
 
   const displayStats = useMemo(
     () => ({
@@ -186,6 +212,15 @@ export function ReferralDashboard({ showInviteSection = true, defaultTab = 'netw
           loading={loading}
         />
       </Box>
+
+        <Box sx={{ mb: 3 }}>
+          <ReferralMilestonesPanel
+            referral={referralMilestones}
+            claimingKey={claimingTierKey}
+            flashKey={flashKey}
+            onClaim={handleClaimReferralTier}
+          />
+        </Box>
 
       {showInviteSection ? (
         <>

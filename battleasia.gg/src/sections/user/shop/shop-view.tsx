@@ -12,7 +12,7 @@ import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
 import { ShopDetailsCarousel } from './shop-details-carousel';
 import { SHOP_HERO_IMAGE, SHOP_IMAGE_PATHS, getBacShopEntryUrl } from './shop-constants';
-import { ShopFeatures, ShopArenaHero, ShopPageSkeleton } from './components';
+import { ShopFeatures, ShopArenaHero, ShopPageSkeleton, ShopSectionNav } from './components';
 
 // ----------------------------------------------------------------------
 
@@ -65,6 +65,8 @@ export function ShopView() {
 
   return (
     <UserPageShell>
+      <ShopSectionNav />
+
       <ShopArenaHero
         badge={t('shop.badgeOfficialStore')}
         title={t('shop.bacShopName')}
@@ -110,10 +112,12 @@ export function ShopView() {
               alignItems="center"
               spacing={0.6}
               sx={{
+                alignSelf: { xs: 'flex-start', sm: 'center' },
                 px: 1.25,
                 py: 0.55,
                 border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
                 bgcolor: alpha('#000000', 0.45),
+                flexShrink: 0,
               }}
             >
               <Iconify icon="solar:star-bold" width={12} sx={{ color: USER_COLORS.gold }} />
@@ -228,17 +232,19 @@ export function ShopView() {
 
                   <Stack
                     direction="row"
+                    flexWrap="wrap"
+                    useFlexGap
                     justifyContent="center"
-                    spacing={1.5}
-                    sx={{ pt: 0.5 }}
+                    spacing={1}
+                    sx={{ pt: 0.5, rowGap: 0.75 }}
                   >
                     {[
                       { icon: 'solar:shield-check-bold', label: t('shop.trustSecure') },
                       { icon: 'solar:clock-circle-bold', label: t('shop.trustInstant') },
                     ].map((item) => (
-                      <Stack key={item.label} direction="row" alignItems="center" spacing={0.4}>
-                        <Iconify icon={item.icon} width={12} sx={{ color: alpha(USER_COLORS.gold, 0.7) }} />
-                        <Typography sx={{ fontSize: 9.5, fontWeight: 700, color: alpha('#ffffff', 0.45), letterSpacing: 0.2 }}>
+                      <Stack key={item.label} direction="row" alignItems="center" spacing={0.4} sx={{ flexShrink: 0 }}>
+                        <Iconify icon={item.icon} width={12} sx={{ color: alpha(USER_COLORS.gold, 0.7), flexShrink: 0 }} />
+                        <Typography sx={{ fontSize: 9.5, fontWeight: 700, color: alpha('#ffffff', 0.45), letterSpacing: 0.2, whiteSpace: 'nowrap' }}>
                           {item.label}
                         </Typography>
                       </Stack>
