@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import * as Yup from 'yup';
-import { useForm } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import toast from 'react-hot-toast';
 import {
@@ -53,6 +53,7 @@ const BadgeSchema = Yup.object().shape({
   threshold: Yup.number().min(1).required(),
   tier: Yup.number().min(1),
   sortOrder: Yup.number().min(0),
+  active: Yup.boolean().required(),
 });
 
 type Props = {
@@ -82,7 +83,7 @@ export function BadgeDialog({ open, mode, badge, onClose, onSuccess }: Props) {
   );
 
   const methods = useForm<BadgeFormValues>({
-    resolver: yupResolver(BadgeSchema),
+    resolver: yupResolver(BadgeSchema) as Resolver<BadgeFormValues>,
     defaultValues,
   });
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import * as Yup from 'yup';
-import { useForm } from 'react-hook-form';
+import { useForm, type Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import toast from 'react-hot-toast';
 import {
@@ -60,6 +60,8 @@ const MissionSchema = Yup.object().shape({
   rewardBac: Yup.number().min(0).required(),
   rewardLabel: Yup.string().max(80),
   sortOrder: Yup.number().min(0),
+  active: Yup.boolean().required(),
+  inDailyPool: Yup.boolean().required(),
 });
 
 type Props = {
@@ -92,7 +94,7 @@ export function MissionDialog({ open, mode, mission, onClose, onSuccess }: Props
   );
 
   const methods = useForm<MissionFormValues>({
-    resolver: yupResolver(MissionSchema),
+    resolver: yupResolver(MissionSchema) as Resolver<MissionFormValues>,
     defaultValues,
   });
 
