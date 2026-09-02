@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 
 import { GLASS_CARD_RADIUS } from 'src/components/battle-glass-card';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -15,7 +16,7 @@ type PlayTabsProps = {
   onChange?: (tab: string) => void;
 };
 
-const GOLD = '#feab02';
+const GOLD = 'var(--ba-gold)';
 
 export function PlayTabs({
   tabs,
@@ -69,11 +70,11 @@ export function PlayTabs({
               flex: { xs: '1 1 0', md: '0 0 auto' },
               minWidth: 0,
               textAlign: 'center',
-              bgcolor: isActive ? alpha(GOLD, 0.14) : 'transparent',
-              border: isActive ? `1px solid ${alpha(GOLD, 0.35)}` : '1px solid transparent',
+              bgcolor: isActive ? goldAlpha(0.14) : 'transparent',
+              border: isActive ? `1px solid ${goldAlpha(0.35)}` : '1px solid transparent',
               transition: 'background-color 0.25s ease, border-color 0.25s ease',
               '&:hover': {
-                bgcolor: isActive ? alpha(GOLD, 0.18) : alpha('#ffffff', 0.05),
+                bgcolor: isActive ? goldAlpha(0.18) : alpha('#ffffff', 0.05),
               },
             }}
           >

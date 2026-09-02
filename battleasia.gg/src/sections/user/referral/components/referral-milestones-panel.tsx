@@ -7,6 +7,7 @@ import {
   UserActionButton,
   USER_COLORS,
   userMutedTextSx,
+  goldAlpha,
 } from 'src/layouts/user';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 import { Iconify } from 'src/components/iconify';
@@ -69,8 +70,8 @@ function ReferralTierCard({
             display: 'grid',
             placeItems: 'center',
             flexShrink: 0,
-            bgcolor: alpha(isClaimed ? '#22c55e' : EARN_HUB_GOLD, 0.12),
-            border: `1px solid ${alpha(isClaimed ? '#22c55e' : EARN_HUB_GOLD, 0.25)}`,
+            bgcolor: isClaimed ? alpha('#22c55e', 0.12) : goldAlpha(0.12),
+            border: `1px solid ${isClaimed ? alpha('#22c55e', 0.25) : goldAlpha(0.25)}`,
             color: isClaimed ? '#22c55e' : EARN_HUB_GOLD,
           }}
         >
@@ -94,7 +95,7 @@ function ReferralTierCard({
               <Typography sx={{ ...userMutedTextSx, fontSize: 11 }}>
                 {t('referral.milestoneProgress', { current, target })}
               </Typography>
-              <Typography sx={{ fontSize: 11, color: alpha(EARN_HUB_GOLD, 0.9), fontWeight: 700 }}>
+              <Typography sx={{ fontSize: 11, color: goldAlpha( 0.9), fontWeight: 700 }}>
                 {Math.round(percent)}%
               </Typography>
             </Stack>
@@ -107,7 +108,7 @@ function ReferralTierCard({
                 bgcolor: alpha('#ffffff', 0.08),
                 '& .MuiLinearProgress-bar': {
                   borderRadius: 99,
-                  bgcolor: isClaimed || isReady ? EARN_HUB_GOLD : alpha(EARN_HUB_GOLD, 0.45),
+                  bgcolor: isClaimed || isReady ? EARN_HUB_GOLD : goldAlpha( 0.45),
                 },
               }}
             />

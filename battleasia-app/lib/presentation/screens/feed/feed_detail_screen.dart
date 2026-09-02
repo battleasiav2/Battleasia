@@ -1088,7 +1088,7 @@ class _HtmlContentWidget extends StatelessWidget {
           margin: Margins.symmetric(vertical: 8),
         ),
         'blockquote': Style(
-          border: const Border(left: BorderSide(color: AppColors.gold, width: 3)),
+          border: Border(left: BorderSide(color: AppColors.gold, width: 3)),
           padding: HtmlPaddings.only(left: 12),
           fontStyle: FontStyle.italic,
           color: const Color(0xFF555555),

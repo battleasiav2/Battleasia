@@ -1,19 +1,19 @@
-import { alpha } from '@mui/material/styles';
+import { goldAlpha } from 'src/theme/accent-presets';
 
-export const EARN_HUB_GOLD = '#feab02';
+export const EARN_HUB_GOLD = 'var(--ba-gold)';
 
 export const earnClaimPopKeyframes = {
   '@keyframes earnClaimPop': {
-    '0%': { transform: 'scale(1)', boxShadow: `0 0 0 ${alpha(EARN_HUB_GOLD, 0)}` },
+    '0%': { transform: 'scale(1)', boxShadow: `0 0 0 ${goldAlpha(0)}` },
     '35%': {
       transform: 'scale(1.015)',
-      boxShadow: `0 0 28px ${alpha(EARN_HUB_GOLD, 0.28)}`,
+      boxShadow: `0 0 28px ${goldAlpha(0.28)}`,
     },
-    '100%': { transform: 'scale(1)', boxShadow: `0 0 0 ${alpha(EARN_HUB_GOLD, 0)}` },
+    '100%': { transform: 'scale(1)', boxShadow: `0 0 0 ${goldAlpha(0)}` },
   },
   '@keyframes earnReadyPulse': {
-    '0%, 100%': { borderColor: alpha(EARN_HUB_GOLD, 0.35) },
-    '50%': { borderColor: alpha(EARN_HUB_GOLD, 0.75) },
+    '0%, 100%': { borderColor: goldAlpha(0.35) },
+    '50%': { borderColor: goldAlpha(0.75) },
   },
 };
 

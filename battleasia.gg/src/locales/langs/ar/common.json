@@ -467,7 +467,18 @@
     "feed": "Feed",
     "settings": "Settings",
     "logout": "Logout",
-    "login": "LOGIN"
+    "login": "LOGIN",
+    "siteColor": "لون الموقع",
+    "siteColorHint": "يتغير لون الأزرار والحدود والإبرازات.",
+    "accent": {
+      "gold": "ذهبي",
+      "ember": "جمر",
+      "jade": "يشم",
+      "cyan": "سماوي",
+      "violet": "بنفسجي",
+      "rose": "وردي",
+      "sky": "سماوي فاتح"
+    }
   },
   "footer": {
     "downloadAppForAndroid": "Download app for Android",

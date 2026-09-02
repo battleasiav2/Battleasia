@@ -467,7 +467,18 @@
     "feed": "Feed",
     "settings": "Settings",
     "logout": "Logout",
-    "login": "LOGIN"
+    "login": "LOGIN",
+    "siteColor": "Couleur du site",
+    "siteColorHint": "Les boutons, bordures et surbrillances suivent cette couleur.",
+    "accent": {
+      "gold": "Or",
+      "ember": "Braise",
+      "jade": "Jade",
+      "cyan": "Cyan",
+      "violet": "Violet",
+      "rose": "Rose",
+      "sky": "Ciel"
+    }
   },
   "footer": {
     "downloadAppForAndroid": "Download app for Android",

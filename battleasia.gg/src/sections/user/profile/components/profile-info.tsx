@@ -5,8 +5,7 @@ import { useTranslate } from 'src/locales/use-locales';
 import {
   UserGlassCard,
   USER_COLORS,
-  userMutedTextSx,
-} from 'src/layouts/user';
+  userMutedTextSx, goldAlpha } from 'src/layouts/user';
 
 import { Iconify } from 'src/components/iconify';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
@@ -41,8 +40,8 @@ function InfoField({ icon, label, value }: InfoFieldProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: alpha(USER_COLORS.gold, 0.1),
-          border: `1px solid ${alpha(USER_COLORS.gold, 0.22)}`,
+          bgcolor: goldAlpha(0.1),
+          border: `1px solid ${goldAlpha(0.22)}`,
           color: USER_COLORS.gold,
         }}
       >
@@ -92,7 +91,7 @@ function SocialLink({ href, icon, label }: SocialLinkProps) {
         textDecoration: 'none',
         transition: 'border-color 0.2s, transform 0.2s',
         '&:hover': {
-          borderColor: alpha(USER_COLORS.gold, 0.4),
+          borderColor: goldAlpha(0.4),
           transform: 'translateY(-1px)',
         },
       })}
@@ -157,8 +156,8 @@ export function ProfileInfo({ viewingUser, isOwnProfile, isLoggedIn }: ProfileIn
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            bgcolor: alpha(USER_COLORS.gold, 0.1),
-            border: `1px solid ${alpha(USER_COLORS.gold, 0.22)}`,
+            bgcolor: goldAlpha(0.1),
+            border: `1px solid ${goldAlpha(0.22)}`,
             color: USER_COLORS.gold,
           }}
         >

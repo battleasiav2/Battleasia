@@ -10,8 +10,7 @@ import {
   UserActionButton,
   UserArenaStrip,
   UserArenaChip,
-  USER_COLORS,
-} from 'src/layouts/user';
+  USER_COLORS, goldAlpha } from 'src/layouts/user';
 
 import { Iconify } from 'src/components/iconify';
 import { Logo } from 'src/components/logo';
@@ -125,7 +124,7 @@ export function ProfileBanner({
                   border: `3px solid ${USER_COLORS.gold}`,
                   bgcolor: USER_COLORS.gold,
                   borderRadius: '50%',
-                  boxShadow: `0 0 28px ${alpha(USER_COLORS.gold, 0.3)}`,
+                  boxShadow: `0 0 28px ${goldAlpha(0.3)}`,
                 }}
               />
             ) : (
@@ -137,7 +136,7 @@ export function ProfileBanner({
                   height: { xs: 88, md: 104 },
                   border: `3px solid ${USER_COLORS.gold}`,
                   bgcolor: alpha(USER_COLORS.surface, 0.8),
-                  boxShadow: `0 0 28px ${alpha(USER_COLORS.gold, 0.3)}`,
+                  boxShadow: `0 0 28px ${goldAlpha(0.3)}`,
                 }}
               />
             )}

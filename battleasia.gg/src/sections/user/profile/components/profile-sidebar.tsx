@@ -13,8 +13,7 @@ import { useTranslate } from 'src/locales/use-locales';
 import {
   UserGlassCard,
   USER_COLORS,
-  userGhostButtonSx,
-} from 'src/layouts/user';
+  userGhostButtonSx, goldAlpha } from 'src/layouts/user';
 
 import { Iconify } from 'src/components/iconify';
 import { AnimatedBalance } from 'src/components/animated-balance';
@@ -192,7 +191,7 @@ export function ProfileSidebar({
                 cursor: item.onClick ? 'pointer' : 'default',
                 transition: 'border-color 0.2s, transform 0.2s',
                 '&:hover': item.onClick
-                  ? { borderColor: alpha(USER_COLORS.gold, 0.35), transform: 'translateY(-1px)' }
+                  ? { borderColor: goldAlpha(0.35), transform: 'translateY(-1px)' }
                   : undefined,
               }}
             >

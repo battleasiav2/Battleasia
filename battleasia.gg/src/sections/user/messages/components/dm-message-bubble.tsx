@@ -6,7 +6,7 @@ import { getImageUrl } from 'src/utils/get-image-url';
 import { CONFIG } from 'src/global-config';
 import { Iconify } from 'src/components/iconify';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
-import { USER_COLORS, userMutedTextSx } from 'src/layouts/user';
+import { USER_COLORS, userMutedTextSx, goldAlpha } from 'src/layouts/user';
 
 import type { DmMessage } from '../messages-types';
 
@@ -35,8 +35,8 @@ export function DmMessageBubble({ message, youLabel }: DmMessageBubbleProps) {
           sx={{
             width: 36,
             height: 36,
-            bgcolor: alpha(USER_COLORS.gold, isMe ? 0.2 : 0.1),
-            border: `1px solid ${alpha(USER_COLORS.gold, 0.3)}`,
+            bgcolor: goldAlpha(isMe ? 0.2 : 0.1),
+            border: `1px solid ${goldAlpha(0.3)}`,
             fontSize: 13,
             fontWeight: 700,
           }}
@@ -55,8 +55,8 @@ export function DmMessageBubble({ message, youLabel }: DmMessageBubbleProps) {
               py: 1.25,
               maxWidth: '100%',
               wordBreak: 'break-word',
-              borderColor: isMe ? alpha(USER_COLORS.gold, 0.35) : undefined,
-              bgcolor: isMe ? alpha(USER_COLORS.gold, 0.14) : alpha('#ffffff', 0.05),
+              borderColor: isMe ? goldAlpha(0.35) : undefined,
+              bgcolor: isMe ? goldAlpha(0.14) : alpha('#ffffff', 0.05),
             })}
           >
             {message.body ? (

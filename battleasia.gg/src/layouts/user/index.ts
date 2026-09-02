@@ -49,4 +49,5 @@ export {
   getUserLayoutMainSx,
   userSectionTitleSx,
   userSectionDividerSx,
+  goldAlpha,
 } from './user-theme';

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/core/providers/accent_provider.dart';
 import 'package:battleasia_app/presentation/screens/auth/auth_wrapper.dart';
 
 void main() async {
@@ -51,17 +52,31 @@ class BattleAsiaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AuthProvider(),
-      child: MaterialApp(
-        title: 'BattleAsia',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.darkTheme,
-        scrollBehavior: const AppScrollBehavior(),
-        locale: context.locale,
-        supportedLocales: context.supportedLocales,
-        localizationsDelegates: context.localizationDelegates,
-        home: const AuthWrapper(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(
+          create: (_) {
+            final accent = AccentProvider();
+            accent.load();
+            return accent;
+          },
+        ),
+      ],
+      child: Consumer<AccentProvider>(
+        builder: (context, accent, _) {
+          return MaterialApp(
+            key: ValueKey(accent.id),
+            title: 'BattleAsia',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.darkTheme,
+            scrollBehavior: const AppScrollBehavior(),
+            locale: context.locale,
+            supportedLocales: context.supportedLocales,
+            localizationsDelegates: context.localizationDelegates,
+            home: const AuthWrapper(),
+          );
+        },
       ),
     );
   }

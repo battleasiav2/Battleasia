@@ -5,8 +5,9 @@ import { alpha } from '@mui/material/styles';
 
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { HOME_GAME_ARTS } from 'src/sections/home/home-game-arts';
+import { goldAlpha } from 'src/theme/accent-presets';
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 
 type LegalPageShellProps = {
   title: string;
@@ -27,8 +28,8 @@ export function LegalSection({ title, children }: { title: string; children: Rea
         boxShadow: `0 10px 28px ${alpha('#000000', 0.4)}`,
         transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
         '&:hover': {
-          borderColor: alpha(GOLD, 0.28),
-          boxShadow: `0 14px 36px ${alpha('#000000', 0.55)}, 0 0 20px ${alpha(GOLD, 0.06)}`,
+          borderColor: goldAlpha(0.28),
+          boxShadow: `0 14px 36px ${alpha('#000000', 0.55)}, 0 0 20px ${goldAlpha(0.06)}`,
         },
       }}
     >
@@ -38,7 +39,7 @@ export function LegalSection({ title, children }: { title: string; children: Rea
           width: 36,
           bgcolor: GOLD,
           mb: 1.5,
-          boxShadow: `0 0 10px ${alpha(GOLD, 0.4)}`,
+          boxShadow: `0 0 10px ${goldAlpha(0.4)}`,
         }}
       />
       <Typography
@@ -124,7 +125,7 @@ export function LegalPageShell({
           inset: 0,
           background: `
             linear-gradient(180deg, ${alpha('#0a0a0a', 0.84)} 0%, ${alpha('#0a0a0a', 0.93)} 45%, #0a0a0a 100%),
-            radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(GOLD, 0.08)} 0%, transparent 55%)
+            radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha(0.08)} 0%, transparent 55%)
           `,
           pointerEvents: 'none',
           zIndex: 0,

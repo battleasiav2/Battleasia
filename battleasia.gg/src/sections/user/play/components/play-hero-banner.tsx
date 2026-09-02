@@ -12,7 +12,7 @@ import { Carousel, useCarousel, CarouselSlide, CarouselDotButtons, CarouselArrow
 
 import { WatchLiveButton } from 'src/components/watch-live-button';
 
-import { USER_COLORS } from 'src/layouts/user/user-theme';
+import { USER_COLORS, goldAlpha } from 'src/layouts/user/user-theme';
 
 // ----------------------------------------------------------------------
 
@@ -84,7 +84,7 @@ export function PlayHeroBanner({ slides, onWatchLive }: PlayHeroBannerProps) {
                     fontWeight: 700,
                     letterSpacing: 1.8,
                     textTransform: 'uppercase',
-                    color: alpha(USER_COLORS.gold, 0.9),
+                    color: goldAlpha(0.9),
                   }}
                 >
                   Live Arena

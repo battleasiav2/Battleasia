@@ -11,8 +11,9 @@ import {
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 import { Iconify } from 'src/components/iconify';
 import { CoinValue } from 'src/components/coin-value';
+import { goldAlpha } from 'src/theme/accent-presets';
 
-const GOLD = '#feab02';
+const GOLD = 'var(--ba-gold)';
 
 export type StreakCalendarDay = {
   date: string;
@@ -75,16 +76,16 @@ export function WalletStreakPanel({ streak, claiming, onClaim }: Props) {
               borderRadius: 2,
               display: 'grid',
               placeItems: 'center',
-              bgcolor: alpha(GOLD, 0.14),
-              border: `1px solid ${alpha(GOLD, 0.3)}`,
+              bgcolor: goldAlpha(0.14),
+              border: `1px solid ${goldAlpha(0.3)}`,
               color: GOLD,
-              boxShadow: `0 0 24px ${alpha(GOLD, 0.12)}`,
+              boxShadow: `0 0 24px ${goldAlpha(0.12)}`,
             }}
           >
             <Iconify icon="solar:fire-bold" width={28} />
           </Box>
           <Box>
-            <Typography className="font-tr" sx={{ fontSize: 12, fontWeight: 700, color: alpha(GOLD, 0.9), letterSpacing: 1, textTransform: 'uppercase' }}>
+            <Typography className="font-tr" sx={{ fontSize: 12, fontWeight: 700, color: goldAlpha(0.9), letterSpacing: 1, textTransform: 'uppercase' }}>
               {t('wallet.streakTitle')}
             </Typography>
             <Stack direction="row" spacing={1} alignItems="baseline">
@@ -107,7 +108,7 @@ export function WalletStreakPanel({ streak, claiming, onClaim }: Props) {
             <CoinValue value={streak.todayReward} size={14} />
           </Stack>
           {streak.streakBonus > 0 ? (
-            <Typography sx={{ fontSize: 11, color: alpha(GOLD, 0.85) }}>
+            <Typography sx={{ fontSize: 11, color: goldAlpha(0.85) }}>
               {t('wallet.streakBonusIncluded', { bonus: streak.streakBonus })}
             </Typography>
           ) : null}
@@ -152,9 +153,9 @@ export function WalletStreakPanel({ streak, claiming, onClaim }: Props) {
                       ? `2px solid ${GOLD}`
                       : `1px solid ${alpha('#ffffff', active ? 0.18 : 0.08)}`,
                     bgcolor: day.claimed
-                      ? alpha(GOLD, 0.22)
+                      ? goldAlpha(0.22)
                       : day.checkedIn
-                        ? alpha(GOLD, 0.1)
+                        ? goldAlpha(0.1)
                         : alpha('#ffffff', 0.03),
                     color: day.claimed || day.checkedIn ? GOLD : alpha('#ffffff', 0.35),
                   }}

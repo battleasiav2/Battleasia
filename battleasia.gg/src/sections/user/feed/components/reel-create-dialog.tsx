@@ -28,8 +28,7 @@ import {
   userPolishedDialogEyebrowSx,
   userPolishedDialogHeadingSx,
   userPolishedDialogContentSx,
-  userPolishedDialogCloseButtonSx,
-} from 'src/layouts/user';
+  userPolishedDialogCloseButtonSx, goldAlpha } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
@@ -125,7 +124,7 @@ export function ReelCreateDialog({ open, onClose, onCreated }: ReelCreateDialogP
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: `1px dashed ${alpha(USER_COLORS.gold, 0.35)}`,
+              border: `1px dashed ${goldAlpha(0.35)}`,
               bgcolor: alpha('#000000', 0.35),
               cursor: 'pointer',
             }}

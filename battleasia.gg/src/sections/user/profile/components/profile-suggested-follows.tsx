@@ -8,7 +8,7 @@ import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
 import { getImageUrl } from 'src/utils/get-image-url';
 import { paths } from 'src/routes/paths';
-import { USER_COLORS, UserGlassCard, UserActionButton } from 'src/layouts/user';
+import { USER_COLORS, UserGlassCard, UserActionButton, goldAlpha } from 'src/layouts/user';
 import { homeMobileScrollFlexRowSx } from 'src/sections/home/home-horizontal-scroll';
 
 import { mapFollowUser, type FollowUserItem } from '../profile-social-types';
@@ -86,7 +86,7 @@ export function ProfileSuggestedFollows({ contextUserId, isLoggedIn, onFollowCha
                 src={getImageUrl(item.avatar)}
                 alt={item.username}
                 onClick={() => navigate(paths.profile(item.id))}
-                sx={{ width: 52, height: 52, cursor: 'pointer', border: `1px solid ${alpha(USER_COLORS.gold, 0.3)}` }}
+                sx={{ width: 52, height: 52, cursor: 'pointer', border: `1px solid ${goldAlpha(0.3)}` }}
               />
               <Typography sx={{ fontWeight: 700, color: USER_COLORS.textPrimary, fontSize: 13 }} noWrap>
                 {item.username}

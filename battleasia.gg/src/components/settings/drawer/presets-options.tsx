@@ -31,7 +31,7 @@ export function PresetsOptions({
         () => ({
           gap: 1.5,
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: 'repeat(4, 1fr)',
         }),
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}

@@ -8,6 +8,7 @@ import {
   USER_COLORS,
   userMutedTextSx,
   getUserChipSx,
+  goldAlpha,
 } from 'src/layouts/user';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 import { Iconify } from 'src/components/iconify';
@@ -80,7 +81,7 @@ function TrackReward({
         p: 1,
         flex: 1,
         minWidth: 0,
-        borderColor: canClaim ? alpha(EARN_HUB_GOLD, 0.45) : undefined,
+        borderColor: canClaim ? goldAlpha( 0.45) : undefined,
         ...getEarnClaimFlashSx(flashKey === claimKey),
         ...getEarnReadyPulseSx(Boolean(canClaim) && flashKey !== claimKey),
       })}
@@ -145,8 +146,8 @@ export function WalletSeasonPassPanel({ seasonPass, claimingKey, flashKey = null
               display: 'grid',
               placeItems: 'center',
               flexShrink: 0,
-              bgcolor: alpha(EARN_HUB_GOLD, 0.12),
-              border: `1px solid ${alpha(EARN_HUB_GOLD, 0.25)}`,
+              bgcolor: goldAlpha( 0.12),
+              border: `1px solid ${goldAlpha( 0.25)}`,
               color: EARN_HUB_GOLD,
             }}
           >
@@ -185,7 +186,7 @@ export function WalletSeasonPassPanel({ seasonPass, claimingKey, flashKey = null
                 <Typography sx={{ ...userMutedTextSx, fontSize: 11 }}>
                   {t('wallet.seasonPassXpProgress', { xp, target: nextTierXp || xp })}
                 </Typography>
-                <Typography sx={{ fontSize: 11, color: alpha(EARN_HUB_GOLD, 0.9), fontWeight: 700 }}>
+                <Typography sx={{ fontSize: 11, color: goldAlpha( 0.9), fontWeight: 700 }}>
                   {progressPct}%
                 </Typography>
               </Stack>
@@ -198,7 +199,7 @@ export function WalletSeasonPassPanel({ seasonPass, claimingKey, flashKey = null
                   bgcolor: alpha('#ffffff', 0.08),
                   '& .MuiLinearProgress-bar': {
                     borderRadius: 99,
-                    bgcolor: alpha(EARN_HUB_GOLD, 0.85),
+                    bgcolor: goldAlpha( 0.85),
                   },
                 }}
               />

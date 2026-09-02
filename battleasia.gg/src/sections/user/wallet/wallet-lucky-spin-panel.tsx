@@ -12,6 +12,7 @@ import {
   USER_COLORS,
   userMutedTextSx,
   getUserChipSx,
+  goldAlpha,
 } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 import { CoinValue } from 'src/components/coin-value';
@@ -175,7 +176,7 @@ export function WalletLuckySpinPanel({ luckySpin, onSpun, onBalanceRefresh }: Pr
                 width: '100%',
                 height: '100%',
                 borderRadius: '50%',
-                border: `3px solid ${alpha(EARN_HUB_GOLD, 0.55)}`,
+                border: `3px solid ${goldAlpha( 0.55)}`,
                 background: wheelBg,
                 transform: `rotate(${rotation}deg)`,
                 transition: spinning
@@ -190,7 +191,7 @@ export function WalletLuckySpinPanel({ luckySpin, onSpun, onBalanceRefresh }: Pr
                 inset: '38%',
                 borderRadius: '50%',
                 bgcolor: '#161618',
-                border: `1px solid ${alpha(EARN_HUB_GOLD, 0.35)}`,
+                border: `1px solid ${goldAlpha( 0.35)}`,
                 display: 'grid',
                 placeItems: 'center',
               }}

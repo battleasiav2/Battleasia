@@ -1,7 +1,7 @@
 import { alpha } from '@mui/material/styles';
 import { Box, Stack, Typography } from '@mui/material';
 
-import { USER_COLORS } from 'src/layouts/user';
+import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 import { UserActionButton } from 'src/layouts/user';
 
@@ -34,8 +34,8 @@ export function ExternalMessagingPanel({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: alpha(USER_COLORS.gold, 0.1),
-          border: `1px solid ${alpha(USER_COLORS.gold, 0.22)}`,
+          bgcolor: goldAlpha(0.1),
+          border: `1px solid ${goldAlpha(0.22)}`,
           color: USER_COLORS.gold,
         }}
       >
@@ -66,8 +66,8 @@ export function ExternalMessagingPanel({
               }
               sx={{
                 justifyContent: 'flex-start',
-                borderColor: alpha(provider.color || USER_COLORS.gold, 0.35),
-                '&:hover': { bgcolor: alpha(provider.color || USER_COLORS.gold, 0.08) },
+                borderColor: provider.color ? alpha(provider.color, 0.35) : goldAlpha(0.35),
+                '&:hover': { bgcolor: provider.color ? alpha(provider.color, 0.08) : goldAlpha(0.08) },
               }}
             >
               {openLabel.replace('{{provider}}', provider.label)}

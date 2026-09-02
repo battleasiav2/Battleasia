@@ -25,6 +25,7 @@ import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
 import { AuthSocialButtons } from './auth-social-buttons';
 import { authAlertSx, authCardFooterSx, authFieldSlotPropsCompact, authLinkSx, AUTH_TEXT_SECONDARY } from './auth-form-styles';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 const REMEMBER_EMAIL_KEY = 'ba_remember_email';
 
@@ -181,10 +182,10 @@ export function SignInView() {
                     checked={rememberMe}
                     onChange={(event) => setRememberMe(event.target.checked)}
                     sx={{
-                      color: alpha('#f5c518', 0.45),
+                      color: goldAlpha(0.45),
                       p: 0.25,
                       mr: 0.75,
-                      '&.Mui-checked': { color: '#f5c518' },
+                      '&.Mui-checked': { color: 'var(--ba-gold)' },
                     }}
                   />
                 }

@@ -15,6 +15,7 @@ import { useTranslate } from 'src/locales/use-locales';
 import { layoutClasses } from '../core/classes';
 import { NavToggleButton } from '../components/nav-toggle-button';
 import { USER_COLORS } from './user-theme';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -81,8 +82,8 @@ export function UserNavVertical({
               px: 0.65,
               py: 0.2,
               borderRadius: '3px',
-              border: `1px solid ${alpha(USER_COLORS.gold, 0.65)}`,
-              bgcolor: alpha(USER_COLORS.gold, 0.08),
+              border: `1px solid ${goldAlpha(0.65)}`,
+              bgcolor: goldAlpha(0.08),
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -142,7 +143,7 @@ export function UserNavVertical({
           p: 1.5,
           borderRadius: `${GLASS_CARD_RADIUS}px`,
           bgcolor: alpha('#000000', 0.42),
-          border: `1px solid ${alpha(USER_COLORS.gold, 0.18)}`,
+          border: `1px solid ${goldAlpha(0.18)}`,
         }}
       >
         <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, color: USER_COLORS.gold, textTransform: 'uppercase' }}>

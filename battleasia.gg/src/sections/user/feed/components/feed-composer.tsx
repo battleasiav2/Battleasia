@@ -30,7 +30,7 @@ import { useSelector } from 'src/store';
 
 import { useTranslate } from 'src/locales/use-locales';
 
-import { UserGlassCard, UserActionButton, USER_COLORS, userFieldSx } from 'src/layouts/user';
+import { UserGlassCard, UserActionButton, USER_COLORS, userFieldSx, goldAlpha } from 'src/layouts/user';
 
 import { getImageUrl } from 'src/utils/get-image-url';
 
@@ -237,9 +237,9 @@ export function FeedComposer({ onPosted }: FeedComposerProps) {
 
               height: 44,
 
-              border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
+              border: `1px solid ${goldAlpha(0.35)}`,
 
-              boxShadow: `0 0 16px ${alpha(USER_COLORS.gold, 0.12)}`,
+              boxShadow: `0 0 16px ${goldAlpha(0.12)}`,
 
             }}
 
@@ -281,7 +281,7 @@ export function FeedComposer({ onPosted }: FeedComposerProps) {
 
                     width: '100%',
 
-                    border: `1px solid ${alpha(USER_COLORS.gold, 0.25)}`,
+                    border: `1px solid ${goldAlpha(0.25)}`,
 
                     '& img': { objectFit: 'cover', aspectRatio: '1 / 1' },
 
@@ -349,11 +349,11 @@ export function FeedComposer({ onPosted }: FeedComposerProps) {
 
                     color: USER_COLORS.gold,
 
-                    border: `1px solid ${alpha(USER_COLORS.gold, 0.25)}`,
+                    border: `1px solid ${goldAlpha(0.25)}`,
 
                     borderRadius: 0,
 
-                    '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.08) },
+                    '&:hover': { bgcolor: goldAlpha(0.08) },
 
                   }}
 

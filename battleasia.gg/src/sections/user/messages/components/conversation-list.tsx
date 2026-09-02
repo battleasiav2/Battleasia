@@ -3,7 +3,7 @@ import { alpha } from '@mui/material/styles';
 
 import { fToNow } from 'src/utils/format-time';
 import { getImageUrl } from 'src/utils/get-image-url';
-import { USER_COLORS, userMutedTextSx } from 'src/layouts/user';
+import { USER_COLORS, userMutedTextSx, goldAlpha } from 'src/layouts/user';
 
 import type { DmConversation } from '../messages-types';
 
@@ -47,12 +47,12 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
             sx={{
               p: 1.25,
               cursor: 'pointer',
-              border: `1px solid ${selected ? alpha(USER_COLORS.gold, 0.35) : alpha('#ffffff', 0.08)}`,
-              bgcolor: selected ? alpha(USER_COLORS.gold, 0.08) : alpha('#000000', 0.25),
+              border: `1px solid ${selected ? goldAlpha(0.35) : alpha('#ffffff', 0.08)}`,
+              bgcolor: selected ? goldAlpha(0.08) : alpha('#000000', 0.25),
               transition: 'border-color 0.2s, background-color 0.2s',
               '&:hover': {
-                borderColor: alpha(USER_COLORS.gold, 0.28),
-                bgcolor: alpha(USER_COLORS.gold, 0.05),
+                borderColor: goldAlpha(0.28),
+                bgcolor: goldAlpha(0.05),
               },
             }}
           >
@@ -62,7 +62,7 @@ export function ConversationList({ conversations, loading, selectedId, onSelect 
               sx={{
                 width: 44,
                 height: 44,
-                border: `1px solid ${alpha(USER_COLORS.gold, 0.25)}`,
+                border: `1px solid ${goldAlpha(0.25)}`,
               }}
             />
             <Box sx={{ flex: 1, minWidth: 0 }}>

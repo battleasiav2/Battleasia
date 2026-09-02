@@ -5,7 +5,7 @@ import CoinValue from 'src/components/coin-value';
 import { Iconify } from 'src/components/iconify';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
-import { USER_COLORS } from 'src/layouts/user';
+import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 
 import { formatReferralDate, type ReferralItem } from '../my-referrals-types';
 
@@ -90,8 +90,8 @@ export function ReferralsList({ referrals, labels }: ReferralsListProps) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  bgcolor: alpha(USER_COLORS.gold, 0.1),
-                  border: `1px solid ${alpha(USER_COLORS.gold, 0.22)}`,
+                  bgcolor: goldAlpha(0.1),
+                  border: `1px solid ${goldAlpha(0.22)}`,
                   color: USER_COLORS.gold,
                 }}
               >

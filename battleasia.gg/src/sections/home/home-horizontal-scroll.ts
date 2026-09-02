@@ -1,10 +1,11 @@
 import type { SxProps, Theme } from '@mui/material/styles';
 
 import { alpha } from '@mui/material/styles';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
-export const HOME_SCROLL_GOLD = '#f5c518';
+export const HOME_SCROLL_GOLD = 'var(--ba-gold)';
 
 /** Mobile sideways scroll track — matches Play Your Game row */
 export const homeMobileScrollTrackSx: SxProps<Theme> = {
@@ -16,7 +17,7 @@ export const homeMobileScrollTrackSx: SxProps<Theme> = {
   pb: { xs: 1.5, md: 0 },
   '&::-webkit-scrollbar': { height: 4 },
   '&::-webkit-scrollbar-thumb': {
-    bgcolor: alpha(HOME_SCROLL_GOLD, 0.35),
+    bgcolor: goldAlpha(0.35),
     borderRadius: 0,
   },
 };
@@ -37,7 +38,7 @@ export const homeMobileScrollFlexRowSx: SxProps<Theme> = {
   px: { xs: 0.5, md: 0 },
   '&::-webkit-scrollbar': { height: 4 },
   '&::-webkit-scrollbar-thumb': {
-    bgcolor: alpha(HOME_SCROLL_GOLD, 0.35),
+    bgcolor: goldAlpha(0.35),
     borderRadius: 0,
   },
 };

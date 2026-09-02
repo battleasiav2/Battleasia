@@ -3,7 +3,7 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
-export const HOME_GOLD = '#f5c518';
+export const HOME_GOLD = 'var(--ba-gold)';
 
 /** Home/dashboard readable text scale — WCAG AA on #161618 / #0a0a0a */
 export const HOME_TEXT_PRIMARY = '#ffffff';

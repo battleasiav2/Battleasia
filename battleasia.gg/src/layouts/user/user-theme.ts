@@ -11,16 +11,17 @@ import {
   getGlassBadgeChipSx,
 } from 'src/components/battle-glass-card';
 import { getGoldDividerSx } from 'src/components/battle-gold-divider';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
 /** Homepage-aligned brand tokens for authenticated area */
 export const USER_COLORS = {
-  gold: '#f5c518',
-  goldDark: '#d97706',
-  goldLight: '#fbbf24',
-  goldGradient: 'linear-gradient(180deg, #f59e0b 0%, #ea8c00 52%, #d97706 100%)',
-  goldGradientHover: 'linear-gradient(180deg, #fbbf24 0%, #f59e0b 52%, #ea8c00 100%)',
+  gold: 'var(--ba-gold)',
+  goldDark: 'var(--ba-gold-dark)',
+  goldLight: 'var(--ba-gold-light)',
+  goldGradient: 'linear-gradient(180deg, var(--ba-gold-light) 0%, var(--ba-gold) 52%, var(--ba-gold-dark) 100%)',
+  goldGradientHover: 'linear-gradient(180deg, var(--ba-gold-light) 0%, var(--ba-gold) 48%, var(--ba-gold) 100%)',
   success: '#22c55e',
   error: '#ef4444',
   info: '#38bdf8',
@@ -38,13 +39,15 @@ export const USER_COLORS = {
 
 export type UserChipTone = 'gold' | 'success' | 'error' | 'info' | 'neutral';
 
+export { goldAlpha } from 'src/theme/accent-presets';
+
 /** Dark-glass chips that stay readable even when MUI dark scheme overrides filled defaults */
 export function getUserChipSx(tone: UserChipTone = 'gold'): SxProps<Theme> {
   const tones: Record<UserChipTone, { fg: string; bg: string; border: string }> = {
     gold: {
       fg: USER_COLORS.gold,
-      bg: alpha(USER_COLORS.gold, 0.16),
-      border: alpha(USER_COLORS.gold, 0.45),
+      bg: goldAlpha( 0.16),
+      border: goldAlpha( 0.45),
     },
     success: {
       fg: USER_COLORS.success,
@@ -119,9 +122,9 @@ export const userPolishedDialogPaperSx: SxProps<Theme> = {
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
-  border: `1px solid ${alpha(USER_COLORS.gold, 0.26)}`,
+  border: `1px solid ${goldAlpha( 0.26)}`,
   backgroundImage: `
-    linear-gradient(180deg, ${alpha(USER_COLORS.gold, 0.07)} 0%, transparent 24%),
+    linear-gradient(180deg, ${goldAlpha( 0.07)} 0%, transparent 24%),
     linear-gradient(180deg, ${alpha('#0a0a0a', 0.97)} 0%, #050505 100%)
   `,
 };
@@ -147,7 +150,7 @@ export const userPolishedDialogEyebrowSx: SxProps<Theme> = {
   fontWeight: 700,
   letterSpacing: 1.1,
   textTransform: 'uppercase',
-  color: alpha(USER_COLORS.gold, 0.9),
+  color: goldAlpha( 0.9),
   mb: 0.5,
 };
 
@@ -180,7 +183,7 @@ export const userPageTitleSx: SxProps<Theme> = {
   letterSpacing: { xs: 0.5, md: 1 },
   color: USER_COLORS.textPrimary,
   lineHeight: 1.08,
-  textShadow: `0 0 40px ${alpha(USER_COLORS.gold, 0.12)}`,
+  textShadow: `0 0 40px ${goldAlpha( 0.12)}`,
 };
 
 export const userPageDividerSx: SxProps<Theme> = getGoldDividerSx({ variant: 'title' });
@@ -213,26 +216,32 @@ const userGlassButtonBaseSx: SxProps<Theme> = {
   },
 };
 
+function toneAlpha(color: string, opacity: number) {
+  if (color.includes('--ba-gold-light')) return `rgba(var(--ba-gold-light-rgb), ${opacity})`;
+  if (color.includes('--ba-gold')) return goldAlpha(opacity);
+  return alpha(color, opacity);
+}
+
 function createUserGlassToneButtonSx(accent: string, accentLight: string): SxProps<Theme> {
   return {
     ...userGlassButtonBaseSx,
     color: accent,
     bgcolor: alpha('#000000', 0.52),
     backgroundColor: alpha('#000000', 0.52),
-    border: `1px solid ${alpha(accent, 0.58)}`,
+    border: `1px solid ${toneAlpha(accent, 0.58)}`,
     boxShadow: `
       inset 0 1px 0 ${alpha('#ffffff', 0.06)},
-      0 0 0 1px ${alpha(accent, 0.06)},
+      0 0 0 1px ${toneAlpha(accent, 0.06)},
       0 8px 28px ${alpha('#000000', 0.45)}
     `,
     '&:hover': {
-      bgcolor: alpha(accent, 0.14),
-      backgroundColor: `${alpha(accent, 0.14)} !important`,
+      bgcolor: toneAlpha(accent, 0.14),
+      backgroundColor: `${toneAlpha(accent, 0.14)} !important`,
       borderColor: accent,
       color: accentLight,
       boxShadow: `
-        inset 0 0 28px ${alpha(accent, 0.16)},
-        0 0 24px ${alpha(accent, 0.22)},
+        inset 0 0 28px ${toneAlpha(accent, 0.16)},
+        0 0 24px ${toneAlpha(accent, 0.22)},
         0 12px 36px ${alpha('#000000', 0.55)}
       `,
       transform: 'translateY(-1px)',
@@ -243,8 +252,8 @@ function createUserGlassToneButtonSx(accent: string, accentLight: string): SxPro
     '&.Mui-disabled': {
       bgcolor: alpha('#000000', 0.35),
       backgroundColor: `${alpha('#000000', 0.35)} !important`,
-      color: alpha(accent, 0.35),
-      borderColor: alpha(accent, 0.22),
+      color: toneAlpha(accent, 0.35),
+      borderColor: toneAlpha(accent, 0.22),
       boxShadow: 'none',
     },
   };
@@ -266,37 +275,37 @@ export const userSolidGoldButtonSx: SxProps<Theme> = {
   fontWeight: 700,
   letterSpacing: 0,
   textTransform: 'none',
-  color: '#111111',
+  color: 'var(--ba-gold-ink)',
   backdropFilter: 'none',
   WebkitBackdropFilter: 'none',
   filter: 'none',
   textShadow: 'none',
   backgroundImage: 'none',
-  background: '#f5c518',
-  border: `1px solid ${alpha('#d4a017', 0.85)}`,
+  background: 'var(--ba-gold)',
+  border: `1px solid ${goldAlpha(0.85)}`,
   boxShadow: 'none',
   transition: 'background-color 0.15s ease, border-color 0.15s ease',
   '&.MuiButton-root:hover': { boxShadow: 'none' },
   '@media (hover: hover)': {
     '&:hover': {
-      background: '#eab308',
-      borderColor: alpha('#ca8a04', 0.9),
+      background: 'var(--ba-gold-light)',
+      borderColor: goldAlpha(0.9),
       boxShadow: 'none',
       transform: 'none',
       filter: 'none',
     },
   },
   '&:active, &.Mui-focusVisible': {
-    background: '#d4a017',
-    borderColor: alpha('#b45309', 0.9),
+    background: 'var(--ba-gold-dark)',
+    borderColor: goldAlpha(0.9),
     boxShadow: 'none',
     transform: 'none',
     filter: 'none',
   },
   '&.Mui-disabled': {
-    background: alpha('#f5c518', 0.28),
+    background: goldAlpha(0.28),
     color: alpha('#111111', 0.45),
-    borderColor: alpha('#f5c518', 0.22),
+    borderColor: goldAlpha(0.22),
     boxShadow: 'none',
     transform: 'none',
     filter: 'none',
@@ -334,12 +343,12 @@ export const userGhostButtonSx: SxProps<Theme> = {
     0 6px 20px ${alpha('#000000', 0.35)}
   `,
   '&:hover': {
-    bgcolor: alpha(USER_COLORS.gold, 0.1),
-    borderColor: alpha(USER_COLORS.gold, 0.52),
+    bgcolor: goldAlpha( 0.1),
+    borderColor: goldAlpha( 0.52),
     color: USER_COLORS.gold,
     boxShadow: `
-      inset 0 0 20px ${alpha(USER_COLORS.gold, 0.1)},
-      0 0 16px ${alpha(USER_COLORS.gold, 0.18)},
+      inset 0 0 20px ${goldAlpha( 0.1)},
+      0 0 16px ${goldAlpha( 0.18)},
       0 10px 28px ${alpha('#000000', 0.45)}
     `,
     transform: 'translateY(-1px)',
@@ -505,7 +514,7 @@ export const userFieldSx: SxProps<Theme> = {
     },
     '&.Mui-focused': {
       bgcolor: alpha('#000000', 0.65),
-      boxShadow: `0 0 0 3px ${alpha(USER_COLORS.gold, 0.18)}`,
+      boxShadow: `0 0 0 3px ${goldAlpha( 0.18)}`,
     },
     '&.Mui-focused fieldset': {
       borderColor: USER_COLORS.gold,
@@ -550,11 +559,11 @@ export const userMenuPaperSx: SxProps<Theme> = {
     py: 1.1,
     px: 1.5,
     borderRadius: 0,
-    '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.12) },
+    '&:hover': { bgcolor: goldAlpha( 0.12) },
     '&.Mui-selected': {
-      bgcolor: alpha(USER_COLORS.gold, 0.18),
+      bgcolor: goldAlpha( 0.18),
       color: '#ffffff',
-      '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.24) },
+      '&:hover': { bgcolor: goldAlpha( 0.24) },
     },
     '&.Mui-disabled': {
       color: alpha('#ffffff', 0.35),

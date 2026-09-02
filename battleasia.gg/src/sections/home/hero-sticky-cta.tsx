@@ -4,6 +4,7 @@ import { Box } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { HeroMeshButtons } from 'src/components/mesh-buttons';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 type HeroStickyCtaProps = {
   downloadLabel?: string;
@@ -51,7 +52,7 @@ export function HeroStickyCta({
         pt: 1,
         pb: 'max(10px, env(safe-area-inset-bottom))',
         bgcolor: alpha('#141414', 0.96),
-        borderTop: `1px solid ${alpha('#f5c518', 0.28)}`,
+        borderTop: `1px solid ${goldAlpha(0.28)}`,
         boxShadow: `0 -8px 24px ${alpha('#000000', 0.45)}`,
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',

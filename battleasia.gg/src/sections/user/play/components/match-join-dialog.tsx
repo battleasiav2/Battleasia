@@ -54,9 +54,7 @@ import {
 
   userGoldButtonSx,
 
-  userGhostButtonSx,
-
-} from 'src/layouts/user';
+  userGhostButtonSx, goldAlpha } from 'src/layouts/user';
 
 
 
@@ -256,11 +254,11 @@ export function MatchJoinDialog({
 
           overflow: 'hidden',
 
-          border: `1px solid ${alpha(USER_COLORS.gold, 0.26)}`,
+          border: `1px solid ${goldAlpha(0.26)}`,
 
           backgroundImage: `
 
-            linear-gradient(180deg, ${alpha(USER_COLORS.gold, 0.07)} 0%, transparent 24%),
+            linear-gradient(180deg, ${goldAlpha(0.07)} 0%, transparent 24%),
 
             linear-gradient(180deg, ${alpha('#0a0a0a', 0.97)} 0%, #050505 100%)
 
@@ -328,7 +326,7 @@ export function MatchJoinDialog({
 
                   textTransform: 'uppercase',
 
-                  color: alpha(USER_COLORS.gold, 0.9),
+                  color: goldAlpha(0.9),
 
                   mb: 0.5,
 
@@ -480,7 +478,7 @@ export function MatchJoinDialog({
 
                             fontWeight: 700,
 
-                            color: alpha(USER_COLORS.gold, 0.85),
+                            color: goldAlpha(0.85),
 
                             textTransform: 'uppercase',
 

@@ -5,7 +5,8 @@
     "referral": "推荐",
     "feed": "动态",
     "login": "登录",
-    "home": "首页"
+    "home": "首页",
+    "siteColor": "站点颜色"
   },
   "feedHub": {
     "feed": "动态",

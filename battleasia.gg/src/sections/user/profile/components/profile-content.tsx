@@ -36,8 +36,7 @@ import {
     userGoldButtonSx,
     userGlassDialogPaperSx,
     userSelectMenuProps,
-    getUserChipSx,
-} from 'src/layouts/user';
+    getUserChipSx, goldAlpha } from 'src/layouts/user';
 
 import { getDefaultGlassTokens, getGlassInnerSx, getGlassShellSx } from 'src/components/battle-glass-card';
 
@@ -323,7 +322,7 @@ export function ProfileContent({ pendingAvatarFile, onAvatarSaved }: ProfileCont
                 sx={getGlassShellSx(tokens, {
                     mb: 3,
                     p: 2.5,
-                    borderColor: alpha(USER_COLORS.gold, 0.28),
+                    borderColor: goldAlpha(0.28),
                 })}
             >
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="space-between" alignItems="flex-start">

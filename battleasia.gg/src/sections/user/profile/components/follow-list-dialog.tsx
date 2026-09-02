@@ -18,7 +18,7 @@ import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
 import { getImageUrl } from 'src/utils/get-image-url';
 import { paths } from 'src/routes/paths';
-import { USER_COLORS, userPolishedDialogPaperSx, userPolishedDialogRailSx, userPolishedDialogTitleSx, userPolishedDialogEyebrowSx, userPolishedDialogHeadingSx, userPolishedDialogContentSx, userPolishedDialogCloseButtonSx, UserActionButton } from 'src/layouts/user';
+import { USER_COLORS, userPolishedDialogPaperSx, userPolishedDialogRailSx, userPolishedDialogTitleSx, userPolishedDialogEyebrowSx, userPolishedDialogHeadingSx, userPolishedDialogContentSx, userPolishedDialogCloseButtonSx, UserActionButton, goldAlpha } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 
@@ -118,15 +118,15 @@ export function FollowListDialog({ open, onClose, userId, mode, onFollowChange }
                     border: `1px solid ${alpha('#ffffff', 0.1)}`,
                     bgcolor: alpha('#000000', 0.25),
                     '&:hover': {
-                      borderColor: alpha(USER_COLORS.gold, 0.28),
-                      bgcolor: alpha(USER_COLORS.gold, 0.06),
+                      borderColor: goldAlpha(0.28),
+                      bgcolor: goldAlpha(0.06),
                     },
                   }}
                 >
                   <Avatar
                     src={getImageUrl(item.avatar)}
                     alt={item.username}
-                    sx={{ width: 40, height: 40, cursor: 'pointer', border: `1px solid ${alpha(USER_COLORS.gold, 0.25)}` }}
+                    sx={{ width: 40, height: 40, cursor: 'pointer', border: `1px solid ${goldAlpha(0.25)}` }}
                     onClick={() => {
                       onClose();
                       navigate(paths.profile(item.id));

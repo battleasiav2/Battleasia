@@ -30,6 +30,7 @@ import { UserNavVertical } from './user-nav-vertical';
 import { userLayoutVars, userBattleNavColorVars } from './css-vars';
 import { USER_COLORS, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
 import { LanguagePopover } from '../components/language-popover';
+import { AccentPopover } from '../components/accent-popover';
 import { SignInIconButton } from '../components/sign-in-icon-button';
 import {
     getHeaderBarSx,
@@ -49,6 +50,7 @@ import {
 import type { MainSectionProps } from '../core/main-section';
 import type { HeaderSectionProps } from '../core/header-section';
 import type { LayoutSectionProps } from '../core/layout-section';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 const AccountDrawer = lazy(() =>
   import('../components/account-drawer').then((m) => ({ default: m.AccountDrawer }))
@@ -202,13 +204,13 @@ export function UserLayout({
                                 transition: 'border-color 0.2s ease, background-color 0.2s ease',
                                 '&:hover': {
                                     bgcolor: alpha('#000000', 0.55),
-                                    borderColor: alpha(USER_COLORS.gold, 0.35),
+                                    borderColor: goldAlpha(0.35),
                                 },
                                 '& .MuiIconButton-root': { color: alpha('#ffffff', 0.7) },
                                 '& .MuiLabel-root, & .label': {
-                                    bgcolor: alpha(USER_COLORS.gold, 0.15),
+                                    bgcolor: goldAlpha(0.15),
                                     color: USER_COLORS.gold,
-                                    border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
+                                    border: `1px solid ${goldAlpha(0.35)}`,
                                     boxShadow: 'none',
                                 },
                             }}
@@ -281,6 +283,7 @@ export function UserLayout({
                     <LanguagePopover
                         data={allLangs}
                     />
+                    <AccentPopover />
                 </Box>
             ),
         };

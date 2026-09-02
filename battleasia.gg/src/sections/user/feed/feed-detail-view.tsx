@@ -38,8 +38,7 @@ import {
   userPolishedDialogTitleSx,
   userPolishedDialogEyebrowSx,
   userPolishedDialogHeadingSx,
-  userPolishedDialogCloseButtonSx,
-} from 'src/layouts/user';
+  userPolishedDialogCloseButtonSx, goldAlpha } from 'src/layouts/user';
 
 import { Image } from 'src/components/image';
 import { Iconify } from 'src/components/iconify';
@@ -481,8 +480,8 @@ export function FeedDetailView() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  bgcolor: alpha(USER_COLORS.gold, 0.1),
-                  border: `1px solid ${alpha(USER_COLORS.gold, 0.22)}`,
+                  bgcolor: goldAlpha(0.1),
+                  border: `1px solid ${goldAlpha(0.22)}`,
                   color: USER_COLORS.gold,
                 }}
               >
@@ -528,7 +527,7 @@ export function FeedDetailView() {
                 bgcolor: alpha('#ffffff', 0.06),
                 color: USER_COLORS.textSubtle,
                 border: `1px solid ${USER_COLORS.border}`,
-                '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.12), color: USER_COLORS.gold },
+                '&:hover': { bgcolor: goldAlpha(0.12), color: USER_COLORS.gold },
               }}
             >
               <Iconify icon="eva:facebook-fill" width={20} />
@@ -539,7 +538,7 @@ export function FeedDetailView() {
                 bgcolor: alpha('#ffffff', 0.06),
                 color: USER_COLORS.textSubtle,
                 border: `1px solid ${USER_COLORS.border}`,
-                '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.12), color: USER_COLORS.gold },
+                '&:hover': { bgcolor: goldAlpha(0.12), color: USER_COLORS.gold },
               }}
             >
               <Iconify icon="eva:twitter-fill" width={20} />
@@ -632,7 +631,7 @@ export function FeedDetailView() {
             mb: 3,
             p: 0,
             overflow: 'hidden',
-            borderColor: alpha(USER_COLORS.gold, 0.35),
+            borderColor: goldAlpha(0.35),
           })}
         >
           <Image alt={feed.title} src={coverUrl} sx={{ width: '100%', height: 'auto', display: 'block' }} />
@@ -791,7 +790,7 @@ export function FeedDetailView() {
                     height: 32,
                     color: USER_COLORS.gold,
                     '&:hover': {
-                      bgcolor: alpha(USER_COLORS.gold, 0.12),
+                      bgcolor: goldAlpha(0.12),
                     },
                   }}
                 >
@@ -874,7 +873,7 @@ export function FeedDetailView() {
                         fontSize: '1.5rem',
                         p: 0.5,
                         '&:hover': {
-                          bgcolor: alpha(USER_COLORS.gold, 0.12),
+                          bgcolor: goldAlpha(0.12),
                           transform: 'scale(1.1)',
                         },
                         transition: 'all 0.2s',

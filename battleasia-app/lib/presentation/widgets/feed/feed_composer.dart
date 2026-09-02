@@ -150,7 +150,7 @@ class _FeedComposerState extends State<FeedComposer> {
             children: [
               IconButton(
                 onPressed: _submitting ? null : _pickImage,
-                icon: const Icon(Icons.image_outlined, color: AppColors.gold),
+                icon: Icon(Icons.image_outlined, color: AppColors.gold),
                 tooltip: 'Add photo',
               ),
               const Spacer(),

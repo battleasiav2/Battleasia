@@ -467,7 +467,18 @@
     "feed": "Feed",
     "settings": "Settings",
     "logout": "Logout",
-    "login": "LOGIN"
+    "login": "LOGIN",
+    "siteColor": "Màu trang",
+    "siteColorHint": "Nút, viền và điểm nhấn sẽ đổi theo màu này.",
+    "accent": {
+      "gold": "Vàng",
+      "ember": "Than hồng",
+      "jade": "Ngọc",
+      "cyan": "Lục lam",
+      "violet": "Tím",
+      "rose": "Hồng",
+      "sky": "Xanh trời"
+    }
   },
   "footer": {
     "downloadAppForAndroid": "Download app for Android",

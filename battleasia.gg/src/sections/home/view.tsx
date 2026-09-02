@@ -21,6 +21,7 @@ import { HeroRotatingBanner } from './hero-rotating-banner';
 import { HOME_HERO_SLIDES, readHeroSlideIndex } from './hero-slides';
 import { AboutBattleAsiaSection } from './about-battleasia-section';
 import { useTranslate } from 'src/locales/use-locales';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // Below-fold + non-LCP FX: code-split (never block hero paint)
 const HeroFxOverlay = lazy(() =>
@@ -35,7 +36,7 @@ const PlayYourGameSection = lazy(() =>
 
 // ----------------------------------------------------------------------
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 
 const cardReveal = keyframes`
   from { opacity: 0; transform: translateY(24px) scale(0.97); }
@@ -44,7 +45,7 @@ const cardReveal = keyframes`
 
 const titleGlow = keyframes`
   0%, 100% { text-shadow: 0 0 0 transparent; }
-  50% { text-shadow: 0 0 24px ${alpha(GOLD, 0.35)}; }
+  50% { text-shadow: 0 0 24px ${goldAlpha(0.35)}; }
 `;
 
 const borderPulse = keyframes`
@@ -112,14 +113,14 @@ function TournamentRuleItem({
           mx: { xs: -1, md: -1.25 },
           border: 'none',
           borderLeft: `2px solid ${open ? GOLD : 'transparent'}`,
-          bgcolor: open ? alpha(GOLD, 0.06) : 'transparent',
+          bgcolor: open ? goldAlpha(0.06) : 'transparent',
           cursor: 'pointer',
           textAlign: 'left',
           color: 'inherit',
           transition: 'background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
           '&:hover': {
-            bgcolor: alpha(GOLD, 0.08),
-            borderLeftColor: alpha(GOLD, 0.75),
+            bgcolor: goldAlpha(0.08),
+            borderLeftColor: goldAlpha(0.75),
             transform: 'translateX(2px)',
           },
         }}
@@ -149,11 +150,11 @@ function TournamentRuleItem({
             display: 'grid',
             placeItems: 'center',
             borderRadius: '50%',
-            border: `2px solid ${open ? GOLD : alpha(GOLD, 0.72)}`,
+            border: `2px solid ${open ? GOLD : goldAlpha(0.72)}`,
             color: GOLD,
             transition: 'transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease',
             transform: open ? 'rotate(45deg)' : 'none',
-            bgcolor: open ? alpha(GOLD, 0.12) : 'transparent',
+            bgcolor: open ? goldAlpha(0.12) : 'transparent',
           }}
         >
           <Box
@@ -231,7 +232,7 @@ function blackGamingSectionSx(art?: string) {
             inset: 0,
             background: `
               linear-gradient(180deg, ${alpha('#0a0a0a', 0.82)} 0%, ${alpha('#0a0a0a', 0.92)} 45%, #0a0a0a 100%),
-              radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(GOLD, 0.08)} 0%, transparent 55%)
+              radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha(0.08)} 0%, transparent 55%)
             `,
             pointerEvents: 'none',
             zIndex: 0,
@@ -243,7 +244,7 @@ function blackGamingSectionSx(art?: string) {
             position: 'absolute',
             inset: 0,
             background: `
-              radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(GOLD, 0.08)} 0%, transparent 55%),
+              radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha(0.08)} 0%, transparent 55%),
               radial-gradient(ellipse 40% 30% at 10% 100%, ${alpha('#38bdf8', 0.04)} 0%, transparent 50%)
             `,
             pointerEvents: 'none',
@@ -377,7 +378,7 @@ export function HomeView() {
           zIndex: 3,
           pointerEvents: 'none',
           overflow: 'hidden',
-          background: `linear-gradient(90deg, transparent 0%, ${alpha(GOLD, 0.15)} 50%, transparent 100%)`,
+          background: `linear-gradient(90deg, transparent 0%, ${goldAlpha(0.15)} 50%, transparent 100%)`,
           animation: `${heroTopGlow} 4.5s ease-in-out infinite`,
           '@media (prefers-reduced-motion: reduce)': { animation: 'none', opacity: 0.4 },
           '&::after': {
@@ -424,7 +425,7 @@ export function HomeView() {
             fontWeight: 700,
             letterSpacing: { xs: 1.4, sm: 1.8 },
             textTransform: 'uppercase',
-            color: alpha('#f5c518', 0.92),
+            color: goldAlpha(0.92),
             textShadow: '0 1px 10px rgba(0,0,0,0.85)',
             width: 1,
             animation: `${copyEnter} 0.7s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both`,
@@ -451,7 +452,7 @@ export function HomeView() {
               position: 'absolute',
               inset: { xs: '12% 8%', md: '8% 0' },
               zIndex: 0,
-              background: `radial-gradient(ellipse 80% 70% at 50% 50%, ${alpha(GOLD, 0.22)} 0%, transparent 72%)`,
+              background: `radial-gradient(ellipse 80% 70% at 50% 50%, ${goldAlpha(0.22)} 0%, transparent 72%)`,
               pointerEvents: 'none',
               filter: 'blur(8px)',
             },
@@ -478,8 +479,8 @@ export function HomeView() {
               objectPosition: { xs: 'center', md: 'right' },
               filter: `
                 drop-shadow(0 3px 10px rgba(0, 0, 0, 0.8))
-                drop-shadow(0 0 32px ${alpha(GOLD, 0.42)})
-                drop-shadow(0 0 64px ${alpha(GOLD, 0.18)})
+                drop-shadow(0 0 32px ${goldAlpha(0.42)})
+                drop-shadow(0 0 64px ${goldAlpha(0.18)})
               `,
               animation: `${titleGlow} 4.5s 2s ease-in-out infinite`,
               '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
@@ -495,7 +496,7 @@ export function HomeView() {
               background: `linear-gradient(90deg,
                 transparent 0%,
                 ${alpha('#ffffff', 0.05)} 35%,
-                ${alpha(GOLD, 0.45)} 50%,
+                ${goldAlpha(0.45)} 50%,
                 ${alpha('#ffffff', 0.08)} 65%,
                 transparent 100%)`,
               mixBlendMode: 'screen',
@@ -771,7 +772,7 @@ export function HomeView() {
                   content: '""',
                   position: 'absolute',
                   inset: 0,
-                  border: `1px solid ${alpha(GOLD, 0.55)}`,
+                  border: `1px solid ${goldAlpha(0.55)}`,
                   opacity: 0,
                   zIndex: 2,
                   pointerEvents: 'none',
@@ -779,11 +780,11 @@ export function HomeView() {
                 },
                 '&:hover': {
                   transform: 'translateY(-8px)',
-                  borderColor: alpha(GOLD, 0.45),
+                  borderColor: goldAlpha(0.45),
                   boxShadow: `
                     0 22px 48px ${alpha('#000000', 0.7)},
-                    0 0 0 1px ${alpha(GOLD, 0.2)},
-                    0 0 32px ${alpha(GOLD, 0.12)}
+                    0 0 0 1px ${goldAlpha(0.2)},
+                    0 0 32px ${goldAlpha(0.12)}
                   `,
                   '&::before': { opacity: 1, animation: `${borderPulse} 1.8s ease-in-out infinite` },
                   '& .mode-card-bar': { transform: 'scaleX(1)' },
@@ -849,7 +850,7 @@ export function HomeView() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    bgcolor: alpha(GOLD, 0.9),
+                    bgcolor: goldAlpha(0.9),
                   }}
                 >
                   <Typography sx={{ fontSize: 13, fontWeight: 900, color: '#111', lineHeight: 1 }}>
@@ -865,7 +866,7 @@ export function HomeView() {
                     px: 1,
                     py: 0.4,
                     bgcolor: alpha('#000000', 0.72),
-                    border: `1px solid ${alpha(GOLD, 0.55)}`,
+                    border: `1px solid ${goldAlpha(0.55)}`,
                   }}
                 >
                   <Typography
@@ -898,7 +899,7 @@ export function HomeView() {
                     width: 52,
                     height: 52,
                     bgcolor: alpha('#000000', 0.45),
-                    border: `1px solid ${alpha(GOLD, 0.35)}`,
+                    border: `1px solid ${goldAlpha(0.35)}`,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -945,7 +946,7 @@ export function HomeView() {
                     transform: 'scaleX(0)',
                     transformOrigin: 'left center',
                     transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
-                    boxShadow: `0 0 12px ${alpha(GOLD, 0.45)}`,
+                    boxShadow: `0 0 12px ${goldAlpha(0.45)}`,
                   }}
                 />
 
@@ -983,8 +984,8 @@ export function HomeView() {
                   gap: 1,
                   px: 4,
                   minHeight: 44,
-                  bgcolor: alpha(GOLD, 0.1),
-                  border: `1px solid ${alpha(GOLD, 0.35)}`,
+                  bgcolor: goldAlpha(0.1),
+                  border: `1px solid ${goldAlpha(0.35)}`,
                   color: GOLD,
                   fontSize: 13,
                   fontWeight: 800,
@@ -993,9 +994,9 @@ export function HomeView() {
                   textDecoration: 'none',
                   transition: 'background 0.2s, border-color 0.2s, box-shadow 0.2s',
                   '&:hover': {
-                    bgcolor: alpha(GOLD, 0.18),
-                    borderColor: alpha(GOLD, 0.55),
-                    boxShadow: `0 0 20px ${alpha(GOLD, 0.15)}`,
+                    bgcolor: goldAlpha(0.18),
+                    borderColor: goldAlpha(0.55),
+                    boxShadow: `0 0 20px ${goldAlpha(0.15)}`,
                   },
                 }}
               >

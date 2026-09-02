@@ -7,7 +7,7 @@ import { getAvatarUrl } from 'src/utils/get-image-url';
 
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, userMutedTextSx, getUserChipSx } from 'src/layouts/user';
+import { USER_COLORS, userMutedTextSx, getUserChipSx, goldAlpha } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
@@ -75,7 +75,7 @@ export function LeaderboardTable({ rows, labels, formatScore, getRankIcon }: Lea
               },
               gap: { xs: 1, md: 1 },
               alignItems: 'center',
-              borderColor: isTopRank ? alpha(USER_COLORS.gold, 0.2) : undefined,
+              borderColor: isTopRank ? goldAlpha(0.2) : undefined,
             })}
           >
             <Typography sx={{ fontSize: 16, fontWeight: 800, color: isTopRank ? USER_COLORS.gold : USER_COLORS.textMuted, textAlign: 'center' }}>
@@ -88,8 +88,8 @@ export function LeaderboardTable({ rows, labels, formatScore, getRankIcon }: Lea
                 sx={{
                   width: 40,
                   height: 40,
-                  bgcolor: alpha(USER_COLORS.gold, 0.12),
-                  border: `1px solid ${alpha(USER_COLORS.gold, 0.3)}`,
+                  bgcolor: goldAlpha(0.12),
+                  border: `1px solid ${goldAlpha(0.3)}`,
                   fontWeight: 700,
                 }}
               >

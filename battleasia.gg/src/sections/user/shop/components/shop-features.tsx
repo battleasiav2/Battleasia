@@ -6,7 +6,7 @@ import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
 import { HOME_ROW_LINE, HomeBlurPanel } from 'src/sections/home/home-blur-panel';
 
-import { USER_COLORS } from 'src/layouts/user';
+import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
@@ -59,8 +59,8 @@ export function ShopFeatures({ title, features }: ShopFeaturesProps) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  bgcolor: alpha(USER_COLORS.gold, 0.1),
-                  border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
+                  bgcolor: goldAlpha(0.1),
+                  border: `1px solid ${goldAlpha(0.28)}`,
                   color: USER_COLORS.gold,
                 }}
               >

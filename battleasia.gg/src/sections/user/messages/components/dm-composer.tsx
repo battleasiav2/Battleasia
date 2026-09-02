@@ -3,7 +3,7 @@ import { Box, Chip, Stack, InputBase, IconButton, CircularProgress } from '@mui/
 
 import { Iconify } from 'src/components/iconify';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
-import { USER_COLORS, getUserChipSx } from 'src/layouts/user';
+import { USER_COLORS, getUserChipSx, goldAlpha } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
@@ -74,9 +74,9 @@ export function DmComposer({
           disabled={!canSend}
           sx={{
             color: USER_COLORS.gold,
-            bgcolor: alpha(USER_COLORS.gold, 0.12),
-            border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
-            '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.2) },
+            bgcolor: goldAlpha(0.12),
+            border: `1px solid ${goldAlpha(0.28)}`,
+            '&:hover': { bgcolor: goldAlpha(0.2) },
           }}
         >
           {sending ? (

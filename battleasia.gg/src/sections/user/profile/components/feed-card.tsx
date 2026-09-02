@@ -4,7 +4,7 @@ import { Box, Link, Stack, Avatar, Typography } from '@mui/material';
 import { fDate } from 'src/utils/format-time';
 import { getImageUrl } from 'src/utils/get-image-url';
 
-import { UserGlassCard, USER_COLORS, userMutedTextSx } from 'src/layouts/user';
+import { UserGlassCard, USER_COLORS, userMutedTextSx, goldAlpha } from 'src/layouts/user';
 import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
@@ -42,7 +42,7 @@ export function FeedCard({ feed }: FeedCardProps) {
         p: 0,
         transition: 'transform 0.2s, border-color 0.2s',
         '&:hover': {
-          borderColor: alpha(USER_COLORS.gold, 0.35),
+          borderColor: goldAlpha(0.35),
           transform: 'translateY(-2px)',
         },
       }}
@@ -166,7 +166,7 @@ export function FeedCard({ feed }: FeedCardProps) {
               width: 40,
               height: 40,
               border: `2px solid ${USER_COLORS.gold}`,
-              boxShadow: `0 0 12px ${alpha(USER_COLORS.gold, 0.3)}`,
+              boxShadow: `0 0 12px ${goldAlpha(0.3)}`,
             }}
           />
         )}

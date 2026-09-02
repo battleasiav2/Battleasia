@@ -234,7 +234,7 @@ class _WalletEarnPanelState extends State<WalletEarnPanel> {
             const SizedBox(height: 8),
             Text(
               'wallet.earnReadyCount'.tr(namedArgs: {'count': '$_claimableCount'}),
-              style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.w700, fontSize: 12.5),
+              style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.w700, fontSize: 12.5),
             ),
           ],
         ],
@@ -264,7 +264,7 @@ class _WalletEarnPanelState extends State<WalletEarnPanel> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(value, style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.w800, fontSize: 18)),
+          Text(value, style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.w800, fontSize: 18)),
           const SizedBox(height: 4),
           Text(label, style: const TextStyle(color: AppColors.textMuted, fontSize: 11)),
         ],
@@ -319,7 +319,7 @@ class _WalletEarnPanelState extends State<WalletEarnPanel> {
                     ],
                     if (tab.$1 == 'streak' && streakClaimable) ...[
                       const SizedBox(width: 6),
-                      Container(width: 6, height: 6, decoration: const BoxDecoration(color: AppColors.gold, shape: BoxShape.circle)),
+                      Container(width: 6, height: 6, decoration: BoxDecoration(color: AppColors.gold, shape: BoxShape.circle)),
                     ],
                   ],
                 ),
@@ -347,7 +347,7 @@ class _WalletEarnPanelState extends State<WalletEarnPanel> {
                 child: Text(title, style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800, fontSize: 15)),
               ),
               if (reward != null)
-                Text(reward, style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.w700, fontSize: 13)),
+                Text(reward, style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.w700, fontSize: 13)),
             ],
           ),
           const SizedBox(height: 6),
@@ -374,7 +374,7 @@ class _WalletEarnPanelState extends State<WalletEarnPanel> {
         children: [
           Text(
             'wallet.streakDays'.tr(namedArgs: {'days': '${streak['currentStreak'] ?? 0}'}),
-            style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.w700),
+            style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 12),
           if (canClaim)
@@ -603,7 +603,7 @@ class _WalletEarnPanelState extends State<WalletEarnPanel> {
       title: promo!['title'] as String? ?? 'wallet.depositBonusTitle'.tr(),
       subtitle: promo['description'] as String? ?? '',
       reward: '+${promo['percent'] ?? 0}%',
-      child: Text('wallet.depositBonusActive'.tr(), style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.w700, fontSize: 12)),
+      child: Text('wallet.depositBonusActive'.tr(), style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.w700, fontSize: 12)),
     );
   }
 

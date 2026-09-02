@@ -6,8 +6,7 @@ import { Box, Stack, Typography, IconButton } from '@mui/material';
 import {
   UserGlassCard,
   UserActionButton,
-  USER_COLORS,
-} from 'src/layouts/user';
+  USER_COLORS, goldAlpha } from 'src/layouts/user';
 import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
@@ -77,9 +76,9 @@ export function ReferralLinkCard({ referralUrl, title, copiedLabel, copyLabel }:
             sx={{
               flexShrink: 0,
               color: copied ? USER_COLORS.success : USER_COLORS.gold,
-              bgcolor: alpha(USER_COLORS.gold, 0.1),
-              border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
-              '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.18) },
+              bgcolor: goldAlpha(0.1),
+              border: `1px solid ${goldAlpha(0.28)}`,
+              '&:hover': { bgcolor: goldAlpha(0.18) },
             }}
           >
             <Iconify icon={copied ? 'solar:check-circle-bold' : 'solar:copy-bold'} width={22} />

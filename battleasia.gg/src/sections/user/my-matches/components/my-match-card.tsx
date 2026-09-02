@@ -9,7 +9,7 @@ import {
   getGoldTopLineShellSx,
 } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, userGoldButtonSx, getUserChipSx } from 'src/layouts/user';
+import { USER_COLORS, userGoldButtonSx, getUserChipSx, goldAlpha } from 'src/layouts/user';
 
 import { MatchStatPill } from '../../play/components/match-stat-pill';
 import type { MyMatchCardData } from '../my-matches-types';
@@ -62,7 +62,7 @@ export function MyMatchCard({ match, onViewDetails, translations }: MyMatchCardP
         transition: 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease',
         '&:hover': {
           transform: 'translateY(-4px)',
-          boxShadow: `0 20px 48px ${alpha('#000000', 0.75)}, 0 0 28px ${alpha(USER_COLORS.gold, 0.1)}`,
+          boxShadow: `0 20px 48px ${alpha('#000000', 0.75)}, 0 0 28px ${goldAlpha(0.1)}`,
         },
       })}
     >
@@ -96,8 +96,8 @@ export function MyMatchCard({ match, onViewDetails, translations }: MyMatchCardP
           <Box
             sx={{
               ...getGlassBadgeChipSx(tokens),
-              bgcolor: alpha(USER_COLORS.gold, 0.18),
-              border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
+              bgcolor: goldAlpha(0.18),
+              border: `1px solid ${goldAlpha(0.35)}`,
             }}
           >
             <Typography sx={{ fontSize: 10, fontWeight: 800, px: 0.5, color: USER_COLORS.gold }}>

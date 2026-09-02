@@ -15,8 +15,7 @@ import { useApi, useImagePreloader, useLiveSync, LIVE_SYNC_TOPICS } from 'src/ho
 import {
   UserPageShell,
   UserGlassCard,
-  USER_COLORS,
-} from 'src/layouts/user';
+  USER_COLORS, goldAlpha } from 'src/layouts/user';
 
 import { toast } from 'react-hot-toast';
 import { CONFIG } from 'src/global-config';
@@ -371,8 +370,8 @@ export function ProfileView() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    bgcolor: alpha(USER_COLORS.gold, 0.1),
-                    border: `1px solid ${alpha(USER_COLORS.gold, 0.22)}`,
+                    bgcolor: goldAlpha(0.1),
+                    border: `1px solid ${goldAlpha(0.22)}`,
                     color: USER_COLORS.gold,
                   }}
                 >

@@ -20,7 +20,7 @@ import {
   getGlassInnerSx,
 } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, userGlassDialogPaperSx, userGoldButtonSx } from 'src/layouts/user';
+import { USER_COLORS, userGlassDialogPaperSx, userGoldButtonSx, goldAlpha } from 'src/layouts/user';
 import { useTranslate } from 'src/locales/use-locales';
 
 import { getMatchRoomCredentialsApi } from 'src/contexts/api/games';
@@ -108,9 +108,9 @@ export function MatchRoomDialog({ match, trigger }: MatchRoomDialogProps) {
             ...userGlassDialogPaperSx,
             maxWidth: 420,
             overflow: 'hidden',
-            border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
+            border: `1px solid ${goldAlpha(0.28)}`,
             backgroundImage: `
-              linear-gradient(180deg, ${alpha(USER_COLORS.gold, 0.08)} 0%, transparent 28%),
+              linear-gradient(180deg, ${goldAlpha(0.08)} 0%, transparent 28%),
               linear-gradient(180deg, ${alpha('#0a0a0a', 0.96)} 0%, #050505 100%)
             `,
           },
@@ -132,7 +132,7 @@ export function MatchRoomDialog({ match, trigger }: MatchRoomDialogProps) {
                   fontWeight: 700,
                   letterSpacing: 1.2,
                   textTransform: 'uppercase',
-                  color: alpha(USER_COLORS.gold, 0.9),
+                  color: goldAlpha(0.9),
                   mb: 0.5,
                 }}
               >
@@ -174,7 +174,7 @@ export function MatchRoomDialog({ match, trigger }: MatchRoomDialogProps) {
               <Box
                 sx={{
                   ...getGlassInnerSx(tokens, { p: 1.75 }),
-                  borderColor: alpha(USER_COLORS.gold, 0.22),
+                  borderColor: goldAlpha(0.22),
                 }}
               >
                 <Typography
@@ -251,10 +251,10 @@ export function MatchRoomDialog({ match, trigger }: MatchRoomDialogProps) {
                       sx={{
                         flexShrink: 0,
                         color: USER_COLORS.gold,
-                        border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
+                        border: `1px solid ${goldAlpha(0.35)}`,
                         borderRadius: `${GLASS_CARD_RADIUS}px`,
-                        bgcolor: alpha(USER_COLORS.gold, 0.08),
-                        '&:hover': { bgcolor: alpha(USER_COLORS.gold, 0.16) },
+                        bgcolor: goldAlpha(0.08),
+                        '&:hover': { bgcolor: goldAlpha(0.16) },
                         '&.Mui-disabled': { opacity: 0.35 },
                       }}
                     >

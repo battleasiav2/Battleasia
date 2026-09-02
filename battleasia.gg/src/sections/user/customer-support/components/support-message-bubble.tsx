@@ -7,7 +7,7 @@ import { CONFIG } from 'src/global-config';
 import { Iconify } from 'src/components/iconify';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, userMutedTextSx } from 'src/layouts/user';
+import { USER_COLORS, userMutedTextSx, goldAlpha } from 'src/layouts/user';
 
 import { ADMIN_PARTICIPANT } from '../customer-support-constants';
 import type { ChatMessage } from '../customer-support-types';
@@ -66,8 +66,8 @@ export function SupportMessageBubble({ message, youLabel, userAvatar, userInitia
               py: 1.5,
               maxWidth: '100%',
               wordBreak: 'break-word',
-              borderColor: isMe ? alpha(USER_COLORS.gold, 0.35) : undefined,
-              bgcolor: isMe ? alpha(USER_COLORS.gold, 0.16) : alpha('#ffffff', 0.05),
+              borderColor: isMe ? goldAlpha(0.35) : undefined,
+              bgcolor: isMe ? goldAlpha(0.16) : alpha('#ffffff', 0.05),
             })}
           >
             {message.body ? (
@@ -131,8 +131,8 @@ export function SupportMessageBubble({ message, youLabel, userAvatar, userInitia
             sx={{
               width: 40,
               height: 40,
-              bgcolor: alpha(USER_COLORS.gold, 0.2),
-              border: `1px solid ${alpha(USER_COLORS.gold, 0.4)}`,
+              bgcolor: goldAlpha(0.2),
+              border: `1px solid ${goldAlpha(0.4)}`,
               fontWeight: 700,
             }}
           >

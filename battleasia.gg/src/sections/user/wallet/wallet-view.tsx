@@ -38,8 +38,7 @@ import {
   userPolishedDialogCloseButtonSx,
   userFieldSx,
   userFieldLabelProps,
-  userSelectMenuProps,
-} from 'src/layouts/user';
+  userSelectMenuProps, goldAlpha } from 'src/layouts/user';
 
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 import { UserAnimatedStat } from 'src/layouts/user';
@@ -462,7 +461,7 @@ export function WalletView() {
 
       <DialogContent dividers sx={userPolishedDialogContentSx}>
         {hasPendingWithdrawal && (
-          <UserGlassCard sx={{ p: 2, mb: 3, bgcolor: alpha(USER_COLORS.gold, 0.1), border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}` }}>
+          <UserGlassCard sx={{ p: 2, mb: 3, bgcolor: goldAlpha(0.1), border: `1px solid ${goldAlpha(0.35)}` }}>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Iconify icon="solar:alarm-bold" width={24} sx={{ color: USER_COLORS.gold }} />
               <Box>

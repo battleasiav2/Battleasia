@@ -3,6 +3,7 @@ import type { SystemStyleObject } from '@mui/system';
 
 import { alpha } from '@mui/material/styles';
 
+import { goldAlpha } from 'src/theme/accent-presets';
 import { USER_COLORS } from 'src/layouts/user/user-theme';
 
 const GOLD = USER_COLORS.gold;
@@ -13,7 +14,7 @@ export function getHeaderBarSx(isScrolled = false): SystemStyleObject<Theme> {
     bgcolor: alpha('#0a0a0a', isScrolled ? 0.92 : 0.76),
     backdropFilter: isScrolled ? 'blur(8px)' : 'none',
     WebkitBackdropFilter: isScrolled ? 'blur(8px)' : 'none',
-    borderBottom: `1px solid ${isScrolled ? alpha(GOLD, 0.1) : alpha('#ffffff', 0.05)}`,
+    borderBottom: `1px solid ${isScrolled ? goldAlpha(0.1) : alpha('#ffffff', 0.05)}`,
     boxShadow: 'none',
     transition:
       'background-color 0.22s ease, backdrop-filter 0.22s ease, border-color 0.22s ease',
@@ -88,8 +89,8 @@ export const headerSignInIconButtonSx: SystemStyleObject<Theme> = {
   transition: 'color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease',
   '&:hover': {
     color: GOLD,
-    bgcolor: alpha(GOLD, 0.08),
-    borderColor: alpha(GOLD, 0.32),
+    bgcolor: goldAlpha(0.08),
+    borderColor: goldAlpha(0.32),
   },
 };
 
@@ -102,7 +103,7 @@ export const headerLanguagePillSx = (open: boolean): SystemStyleObject<Theme> =>
   minHeight: 34,
   borderRadius: '999px',
   bgcolor: open ? alpha('#ffffff', 0.1) : alpha('#ffffff', 0.06),
-  border: `1px solid ${open ? alpha(GOLD, 0.28) : alpha('#ffffff', 0.1)}`,
+  border: `1px solid ${open ? goldAlpha(0.28) : alpha('#ffffff', 0.1)}`,
   transition: 'background-color 0.15s ease, border-color 0.15s ease',
   '&:hover': {
     bgcolor: alpha('#ffffff', 0.1),

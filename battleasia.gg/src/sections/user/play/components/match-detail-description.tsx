@@ -6,7 +6,7 @@ import { fDateTime } from 'src/utils/format-time';
 import CoinValue from 'src/components/coin-value';
 import { getDefaultGlassTokens, getGlassShellSx } from 'src/components/battle-glass-card';
 
-import { USER_COLORS } from 'src/layouts/user';
+import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 
 import type { MatchDetailData } from '../match-types';
 
@@ -106,7 +106,7 @@ export function MatchDetailDescription({ match, labels }: MatchDetailDescription
         <Box
           sx={getGlassShellSx(tokens, {
             p: 2,
-            borderColor: match.isJoined ? alpha(USER_COLORS.gold, 0.2) : alpha('#ffffff', 0.1),
+            borderColor: match.isJoined ? goldAlpha(0.2) : alpha('#ffffff', 0.1),
           })}
         >
           <Typography sx={{ fontSize: 14, color: alpha('#ffffff', 0.78), lineHeight: 1.7 }}>

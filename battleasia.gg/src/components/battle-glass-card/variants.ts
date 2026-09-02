@@ -1,6 +1,7 @@
 import { alpha } from '@mui/material/styles';
 
 import type { GlassCardTokens, GlassCardVariant } from './types';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 export const GLASS_CARD_VARIANTS: Record<GlassCardVariant, GlassCardTokens> = {
   'midnight-grid': {
@@ -9,27 +10,27 @@ export const GLASS_CARD_VARIANTS: Record<GlassCardVariant, GlassCardTokens> = {
     description: 'Dark charcoal glass, gold trim, flat square stat tiles',
     shell: {
       bgcolor: alpha('#121212', 0.82),
-      border: `1px solid ${alpha('#f5c518', 0.35)}`,
+      border: `1px solid ${goldAlpha(0.35)}`,
       boxShadow: `0 20px 50px ${alpha('#000000', 0.55)}, inset 0 1px 0 ${alpha('#ffffff', 0.06)}`,
       backdropFilter: 'blur(14px)',
-      overlay: `linear-gradient(180deg, ${alpha('#f5c518', 0.04)} 0%, transparent 40%)`,
+      overlay: `linear-gradient(180deg, ${goldAlpha(0.04)} 0%, transparent 40%)`,
     },
     badge: {
-      bgcolor: alpha('#f5c518', 0.92),
+      bgcolor: goldAlpha(0.92),
       color: '#111111',
-      border: `1px solid ${alpha('#f5c518', 1)}`,
-      boxShadow: `0 4px 14px ${alpha('#f5c518', 0.35)}`,
+      border: `1px solid ${goldAlpha(1)}`,
+      boxShadow: `0 4px 14px ${goldAlpha(0.35)}`,
     },
     titleColor: '#f8fafc',
     subtitleColor: alpha('#e2e8f0', 0.72),
     stat: {
       bgcolor: alpha('#0a0a0a', 0.72),
-      border: `1px solid ${alpha('#f5c518', 0.22)}`,
+      border: `1px solid ${goldAlpha(0.22)}`,
       boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.05)}`,
-      overlay: `linear-gradient(135deg, ${alpha('#f5c518', 0.08)}, transparent 55%)`,
+      overlay: `linear-gradient(135deg, ${goldAlpha(0.08)}, transparent 55%)`,
       labelColor: alpha('#f8fafc', 0.72),
       valueColor: '#ffffff',
-      suffixColor: alpha('#f5c518', 0.85),
+      suffixColor: goldAlpha(0.85),
     },
   },
   'cyber-edge': {
@@ -68,15 +69,15 @@ export const GLASS_CARD_VARIANTS: Record<GlassCardVariant, GlassCardTokens> = {
     shell: {
       bgcolor: alpha('#1a1410', 0.86),
       border: `2px solid ${alpha('#d4a017', 0.5)}`,
-      boxShadow: `0 24px 48px ${alpha('#000000', 0.6)}, inset 0 0 0 1px ${alpha('#f5c518', 0.15)}`,
+      boxShadow: `0 24px 48px ${alpha('#000000', 0.6)}, inset 0 0 0 1px ${goldAlpha(0.15)}`,
       backdropFilter: 'blur(12px)',
-      overlay: `radial-gradient(ellipse at top left, ${alpha('#f5c518', 0.12)}, transparent 60%)`,
+      overlay: `radial-gradient(ellipse at top left, ${goldAlpha(0.12)}, transparent 60%)`,
     },
     badge: {
-      bgcolor: `linear-gradient(180deg, ${alpha('#f5c518', 1)}, ${alpha('#c9a000', 1)})`,
+      bgcolor: `linear-gradient(180deg, ${goldAlpha(1)}, ${alpha('#c9a000', 1)})`,
       color: '#1a1000',
-      border: `1px solid ${alpha('#f5c518', 0.9)}`,
-      boxShadow: `0 6px 16px ${alpha('#f5c518', 0.4)}`,
+      border: `1px solid ${goldAlpha(0.9)}`,
+      boxShadow: `0 6px 16px ${goldAlpha(0.4)}`,
     },
     titleColor: '#fff8e7',
     subtitleColor: alpha('#fde68a', 0.65),
@@ -84,10 +85,10 @@ export const GLASS_CARD_VARIANTS: Record<GlassCardVariant, GlassCardTokens> = {
       bgcolor: alpha('#0f0c08', 0.8),
       border: `1px solid ${alpha('#d4a017', 0.35)}`,
       boxShadow: `inset 0 2px 8px ${alpha('#000000', 0.35)}`,
-      overlay: `linear-gradient(180deg, ${alpha('#f5c518', 0.1)}, transparent)`,
+      overlay: `linear-gradient(180deg, ${goldAlpha(0.1)}, transparent)`,
       labelColor: alpha('#fde68a', 0.75),
       valueColor: '#fffbeb',
-      suffixColor: '#f5c518',
+      suffixColor: 'var(--ba-gold)',
     },
   },
   'frost-panel': {
@@ -130,9 +131,9 @@ export const GLASS_CARD_VARIANTS: Record<GlassCardVariant, GlassCardTokens> = {
       backdropFilter: 'blur(14px)',
     },
     badge: {
-      bgcolor: alpha('#f5c518', 0.12),
-      color: '#f5c518',
-      border: `1px solid ${alpha('#f5c518', 0.45)}`,
+      bgcolor: goldAlpha(0.12),
+      color: 'var(--ba-gold)',
+      border: `1px solid ${goldAlpha(0.45)}`,
       boxShadow: 'none',
     },
     titleColor: '#ffffff',
@@ -143,7 +144,7 @@ export const GLASS_CARD_VARIANTS: Record<GlassCardVariant, GlassCardTokens> = {
       boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.05)}`,
       labelColor: '#D1D5DB',
       valueColor: '#ffffff',
-      suffixColor: alpha('#f5c518', 0.85),
+      suffixColor: goldAlpha(0.85),
     },
   },
 };

@@ -73,7 +73,7 @@ export function AuthConsumer({ children }: Props) {
             justifyContent: 'center',
           }}
         >
-          <CircularProgress size={40} sx={{ color: '#f5c518' }} />
+          <CircularProgress size={40} sx={{ color: 'var(--ba-gold)' }} />
         </Box>
       ) : null}
     </>

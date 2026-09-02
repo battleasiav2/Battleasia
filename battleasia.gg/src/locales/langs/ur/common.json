@@ -295,7 +295,18 @@
     "feed": "فیڈ",
     "settings": "ترتیبات",
     "logout": "لاگ آؤٹ",
-    "login": "LOGIN"
+    "login": "LOGIN",
+    "siteColor": "سائٹ کا رنگ",
+    "siteColorHint": "بٹن، بارڈر اور ہائی لائٹ اس رنگ میں بدل جائیں گے۔",
+    "accent": {
+      "gold": "گولڈ",
+      "ember": "ایمبر",
+      "jade": "جیڈ",
+      "cyan": "سائن",
+      "violet": "وائلٹ",
+      "rose": "روز",
+      "sky": "اسکائی"
+    }
   },
   "footer": {
     "downloadAppForAndroid": "اینڈرائیڈ کے لیے ایپ ڈاؤن لوڈ کریں",

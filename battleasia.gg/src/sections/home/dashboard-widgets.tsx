@@ -9,6 +9,7 @@ import {
     Typography,
 } from '@mui/material';
 import { alpha } from '@mui/material/styles';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 import { CONFIG } from 'src/global-config';
 import useApi from 'src/hooks/use-api';
@@ -63,17 +64,17 @@ function DashboardSplitGoldRule({ orientation }: { orientation: 'vertical' | 'ho
                 background: isVertical
                     ? `linear-gradient(180deg,
                         transparent 0%,
-                        ${alpha(HOME_GOLD, 0.2)} 10%,
+                        ${goldAlpha( 0.2)} 10%,
                         ${HOME_GOLD} 50%,
-                        ${alpha(HOME_GOLD, 0.2)} 90%,
+                        ${goldAlpha( 0.2)} 90%,
                         transparent 100%)`
                     : `linear-gradient(90deg,
                         transparent 0%,
-                        ${alpha(HOME_GOLD, 0.2)} 10%,
+                        ${goldAlpha( 0.2)} 10%,
                         ${HOME_GOLD} 50%,
-                        ${alpha(HOME_GOLD, 0.2)} 90%,
+                        ${goldAlpha( 0.2)} 90%,
                         transparent 100%)`,
-                boxShadow: `0 0 12px ${alpha(HOME_GOLD, 0.22)}`,
+                boxShadow: `0 0 12px ${goldAlpha( 0.22)}`,
                 clipPath: isVertical
                     ? 'polygon(0 0, 100% 3%, 100% 97%, 0 100%)'
                     : 'polygon(0 0, 97% 0, 100% 100%, 3% 100%)',
@@ -262,7 +263,7 @@ function PulseHeroFlat({
                                     fontWeight: 700,
                                     letterSpacing: 0.75,
                                     textTransform: 'uppercase',
-                                    color: alpha(HOME_GOLD, 0.88),
+                                    color: goldAlpha( 0.88),
                                 }}
                             >
                                 {badgeLabel}
@@ -408,7 +409,7 @@ const PlayerListCard = ({
                         fontWeight: 700,
                         letterSpacing: 0.75,
                         textTransform: 'uppercase',
-                        color: alpha(HOME_GOLD, 0.92),
+                        color: goldAlpha( 0.92),
                         lineHeight: 1.3,
                     }}
                 >
@@ -679,7 +680,7 @@ function DashboardMatchTile({
                                 fontWeight: 700,
                                 letterSpacing: 0.4,
                                 textTransform: 'uppercase',
-                                color: alpha(HOME_GOLD, 0.92),
+                                color: goldAlpha( 0.92),
                                 lineHeight: 1.3,
                             }}
                         >
@@ -837,7 +838,7 @@ function DashboardMatchPanel({
                         fontWeight: 700,
                         letterSpacing: 0.5,
                         textTransform: 'uppercase',
-                        color: alpha(HOME_GOLD, 0.92),
+                        color: goldAlpha( 0.92),
                         lineHeight: 1.3,
                     }}
                 >
@@ -1083,7 +1084,7 @@ export function LandingDashboardSection() {
                     inset: 0,
                     background: `
                         linear-gradient(180deg, ${alpha('#0a0a0a', 0.84)} 0%, ${alpha('#0a0a0a', 0.93)} 50%, #0a0a0a 100%),
-                        radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha('#f5c518', 0.08)} 0%, transparent 55%)
+                        radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha(0.08)} 0%, transparent 55%)
                     `,
                     pointerEvents: 'none',
                     zIndex: 0,

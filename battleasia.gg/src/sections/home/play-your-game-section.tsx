@@ -18,6 +18,7 @@ import {
 } from './home-horizontal-scroll';
 import { HOME_GAME_ARTS, PLAY_YOUR_GAME_IMAGE_PATHS } from './home-game-arts';
 import { HomeBlurPanel } from './home-blur-panel';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 export { HOME_GAME_ARTS, PLAY_YOUR_GAME_IMAGE_PATHS };
 
@@ -162,7 +163,7 @@ function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
           content: '""',
           position: 'absolute',
           inset: 0,
-          border: `1px solid ${alpha(GOLD, 0.55)}`,
+          border: `1px solid ${goldAlpha(0.55)}`,
           opacity: 0,
           zIndex: 6,
           pointerEvents: 'none',
@@ -170,11 +171,11 @@ function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
         },
         '&:hover': {
           transform: 'translateY(-10px)',
-          borderColor: alpha(GOLD, 0.45),
+          borderColor: goldAlpha(0.45),
           boxShadow: `
             0 22px 48px ${alpha('#000000', 0.7)},
-            0 0 0 1px ${alpha(GOLD, 0.2)},
-            0 0 32px ${alpha(GOLD, 0.12)}
+            0 0 0 1px ${goldAlpha(0.2)},
+            0 0 32px ${goldAlpha(0.12)}
           `,
           '&::before': { opacity: 1, animation: `${borderPulse} 1.8s ease-in-out infinite` },
           '& .game-card-art': { transform: 'scale(1.08)' },
@@ -231,7 +232,7 @@ function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
               left: 0,
               width: '42%',
               height: '100%',
-              background: `linear-gradient(90deg, transparent, ${alpha(GOLD, 0.18)}, transparent)`,
+              background: `linear-gradient(90deg, transparent, ${goldAlpha(0.18)}, transparent)`,
               animation: `${goldScan} 1.1s ease-in-out`,
             },
           }}
@@ -265,7 +266,7 @@ function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
             px: 1.25,
             py: 0.55,
             bgcolor: alpha('#000000', 0.7),
-            border: `1px solid ${alpha(GOLD, 0.55)}`,
+            border: `1px solid ${goldAlpha(0.55)}`,
             transition: 'opacity 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
           }}
         >
@@ -325,7 +326,7 @@ function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
               px: 0.8,
               py: 0.25,
               bgcolor: alpha('#000000', 0.65),
-              border: `1px solid ${alpha(GOLD, 0.35)}`,
+              border: `1px solid ${goldAlpha(0.35)}`,
             }}
           >
             <Typography sx={{ fontSize: 9, fontWeight: 800, color: GOLD, letterSpacing: 0.5 }}>
@@ -343,7 +344,7 @@ function PlayYourGameCard({ game, index }: { game: GameDef; index: number }) {
           transform: 'scaleX(0)',
           transformOrigin: 'left center',
           transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
-          boxShadow: `0 0 12px ${alpha(GOLD, 0.65)}`,
+          boxShadow: `0 0 12px ${goldAlpha(0.65)}`,
         }}
       />
 
@@ -467,7 +468,7 @@ export function PlayYourGameSection() {
           inset: 0,
           background: `
             linear-gradient(180deg, ${alpha('#0a0a0a', 0.78)} 0%, ${alpha('#0a0a0a', 0.9)} 48%, #0a0a0a 100%),
-            radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(GOLD, 0.1)} 0%, transparent 55%)
+            radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha(0.1)} 0%, transparent 55%)
           `,
           pointerEvents: 'none',
           zIndex: 0,

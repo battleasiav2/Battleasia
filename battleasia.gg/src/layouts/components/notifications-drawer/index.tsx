@@ -26,8 +26,7 @@ import {
   UserActionButton,
   UserEmptyState,
   userGlassDialogPaperSx,
-  userMutedTextSx,
-} from 'src/layouts/user';
+  userMutedTextSx, goldAlpha } from 'src/layouts/user';
 
 import { NotificationItem } from 'src/sections/user/notifications/components/notification-item';
 
@@ -171,14 +170,14 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
             height: { xs: 34, sm: 36 },
             p: 0,
             borderRadius: '6px',
-            bgcolor: open ? alpha(USER_COLORS.gold, 0.14) : alpha('#080c14', 0.55),
+            bgcolor: open ? goldAlpha(0.14) : alpha('#080c14', 0.55),
             border: '1.5px solid',
-            borderColor: open ? alpha(USER_COLORS.gold, 0.55) : alpha('#ffffff', 0.18),
+            borderColor: open ? goldAlpha(0.55) : alpha('#ffffff', 0.18),
             boxShadow: `inset 0 0 0 1px ${alpha('#000000', 0.25)}`,
             transition: 'transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease',
             '&:hover': {
               bgcolor: alpha('#0c121c', 0.72),
-              borderColor: alpha(USER_COLORS.gold, 0.45),
+              borderColor: goldAlpha(0.45),
               transform: 'scale(1.04)',
             },
             '&:active': { transform: 'scale(0.96)' },
@@ -201,7 +200,7 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
               bgcolor: unreadCount > 0 ? '#ef4444' : USER_COLORS.gold,
               color: 'transparent',
               border: `2px solid ${alpha('#0a0a0a', 0.92)}`,
-              boxShadow: `0 0 8px ${alpha(unreadCount > 0 ? '#ef4444' : USER_COLORS.gold, 0.55)}`,
+              boxShadow: `0 0 8px ${unreadCount > 0 ? alpha('#ef4444', 0.55) : goldAlpha(0.55)}`,
               top: 5,
               right: 5,
               animation: unreadCount > 0 ? 'notifDotPulse 2s ease-in-out infinite' : 'none',

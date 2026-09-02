@@ -5,7 +5,8 @@
     "referral": "Referral",
     "feed": "Feed",
     "login": "LOGIN",
-    "home": "Home"
+    "home": "Home",
+    "siteColor": "Site color"
   },
   "feedHub": {
     "feed": "Feed",

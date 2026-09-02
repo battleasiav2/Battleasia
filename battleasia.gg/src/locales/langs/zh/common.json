@@ -295,7 +295,18 @@
     "feed": "动态",
     "settings": "设置",
     "logout": "登出",
-    "login": "LOGIN"
+    "login": "LOGIN",
+    "siteColor": "站点颜色",
+    "siteColorHint": "按钮、边框和高亮会跟随此颜色。",
+    "accent": {
+      "gold": "金",
+      "ember": "橙",
+      "jade": "翠",
+      "cyan": "青",
+      "violet": "紫",
+      "rose": "玫",
+      "sky": "蓝"
+    }
   },
   "footer": {
     "downloadAppForAndroid": "下载安卓应用",

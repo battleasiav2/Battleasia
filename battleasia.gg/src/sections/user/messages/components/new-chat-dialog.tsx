@@ -17,7 +17,7 @@ import {
 import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
 import { getImageUrl } from 'src/utils/get-image-url';
-import { USER_COLORS, userFieldSx, userPolishedDialogPaperSx, userPolishedDialogRailSx, userPolishedDialogTitleSx, userPolishedDialogEyebrowSx, userPolishedDialogHeadingSx, userPolishedDialogContentSx, userPolishedDialogCloseButtonSx } from 'src/layouts/user';
+import { USER_COLORS, userFieldSx, userPolishedDialogPaperSx, userPolishedDialogRailSx, userPolishedDialogTitleSx, userPolishedDialogEyebrowSx, userPolishedDialogHeadingSx, userPolishedDialogContentSx, userPolishedDialogCloseButtonSx, goldAlpha } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
@@ -122,7 +122,7 @@ export function NewChatDialog({ open, onClose, onSelectUser }: NewChatDialogProp
                   cursor: 'pointer',
                   border: `1px solid ${alpha('#ffffff', 0.08)}`,
                   bgcolor: alpha('#000000', 0.25),
-                  '&:hover': { borderColor: alpha(USER_COLORS.gold, 0.3), bgcolor: alpha(USER_COLORS.gold, 0.06) },
+                  '&:hover': { borderColor: goldAlpha(0.3), bgcolor: goldAlpha(0.06) },
                 }}
               >
                 <Avatar src={getImageUrl(user.avatar)} alt={user.username} sx={{ width: 40, height: 40 }} />

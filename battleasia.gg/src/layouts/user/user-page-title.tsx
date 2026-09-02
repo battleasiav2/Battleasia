@@ -8,6 +8,7 @@ import { alpha } from '@mui/material/styles';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
 import { USER_COLORS, userMutedTextSx, userPageTitleSx } from './user-theme';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -36,7 +37,7 @@ export function UserPageTitle({ title, subtitle, badge, action, sx }: UserPageTi
               fontWeight: 700,
               letterSpacing: 1.8,
               textTransform: 'uppercase',
-              color: alpha(USER_COLORS.gold, 0.9),
+              color: goldAlpha(0.9),
               mb: 0.75,
             }}
           >

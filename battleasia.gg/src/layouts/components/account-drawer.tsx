@@ -32,6 +32,7 @@ import { SignOutButton } from './sign-out-button';
 import { NavApkBanner } from './nav-apk-banner';
 
 import type { AccountMenuItem } from '../menu-items-config';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -42,11 +43,11 @@ const DRAWER_PAPER_SX = {
   display: 'flex',
   flexDirection: 'column',
   background: 'linear-gradient(180deg, #0c0c0e 0%, #000000 100%)',
-  borderLeft: `1px solid ${alpha(GOLD, 0.12)}`,
-  boxShadow: `-12px 0 48px ${alpha('#000000', 0.6)}, inset 1px 0 0 ${alpha(GOLD, 0.08)}`,
+  borderLeft: `1px solid ${goldAlpha(0.12)}`,
+  boxShadow: `-12px 0 48px ${alpha('#000000', 0.6)}, inset 1px 0 0 ${goldAlpha(0.08)}`,
 } as const;
 
-const HAIRLINE_BORDER = `1px solid ${alpha(GOLD, 0.1)}`;
+const HAIRLINE_BORDER = `1px solid ${goldAlpha(0.1)}`;
 
 export type AccountDrawerProps = IconButtonProps & {
   data?: AccountMenuItem[];

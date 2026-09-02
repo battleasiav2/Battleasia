@@ -8,6 +8,7 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
 import { USER_COLORS } from 'src/layouts/user/user-theme';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -62,11 +63,11 @@ export function ShopSectionNav() {
                 alignItems: 'center',
                 gap: 0.4,
                 textDecoration: 'none',
-                bgcolor: selected ? alpha(GOLD, 0.14) : 'transparent',
+                bgcolor: selected ? goldAlpha(0.14) : 'transparent',
                 border: `1px solid ${selected ? GOLD : 'transparent'}`,
                 transition: 'background-color 0.2s ease, border-color 0.2s ease',
                 '&:hover': {
-                  bgcolor: selected ? alpha(GOLD, 0.18) : alpha('#ffffff', 0.04),
+                  bgcolor: selected ? goldAlpha(0.18) : alpha('#ffffff', 0.04),
                 },
               }}
             >

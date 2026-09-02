@@ -14,8 +14,7 @@ import {
   UserGlassCard,
   UserEmptyState,
   USER_COLORS,
-  userMutedTextSx,
-} from 'src/layouts/user';
+  userMutedTextSx, goldAlpha } from 'src/layouts/user';
 import { homeMobileScrollFlexRowSx } from 'src/sections/home/home-horizontal-scroll';
 
 import { FeedCard } from './components';
@@ -103,9 +102,9 @@ export function ExploreView({ embedded = false }: { embedded?: boolean }) {
                     key={item.tag}
                     label={`#${item.tag} · ${item.count}`}
                     sx={{
-                      bgcolor: alpha(USER_COLORS.gold, 0.1),
+                      bgcolor: goldAlpha(0.1),
                       color: USER_COLORS.textPrimary,
-                      border: `1px solid ${alpha(USER_COLORS.gold, 0.25)}`,
+                      border: `1px solid ${goldAlpha(0.25)}`,
                       fontWeight: 700,
                     }}
                   />
@@ -133,13 +132,13 @@ export function ExploreView({ embedded = false }: { embedded?: boolean }) {
                         cursor: 'pointer',
                         border: `1px solid ${alpha('#ffffff', 0.1)}`,
                         bgcolor: alpha('#000000', 0.25),
-                        '&:hover': { borderColor: alpha(USER_COLORS.gold, 0.35) },
+                        '&:hover': { borderColor: goldAlpha(0.35) },
                       }}
                     >
                       <Avatar
                         src={getImageUrl(creator.avatar)}
                         alt={creator.username}
-                        sx={{ width: 52, height: 52, border: `1px solid ${alpha(USER_COLORS.gold, 0.3)}` }}
+                        sx={{ width: 52, height: 52, border: `1px solid ${goldAlpha(0.3)}` }}
                       />
                       <Typography sx={{ fontWeight: 700, color: USER_COLORS.textPrimary, fontSize: 13 }} noWrap>
                         {creator.username}

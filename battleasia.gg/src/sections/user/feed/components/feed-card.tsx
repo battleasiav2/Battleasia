@@ -8,7 +8,7 @@ import { RouterLink } from 'src/routes/components';
 import { fDate } from 'src/utils/format-time';
 import { getImageUrl } from 'src/utils/get-image-url';
 
-import { USER_COLORS, getUserChipSx } from 'src/layouts/user';
+import { USER_COLORS, getUserChipSx, goldAlpha } from 'src/layouts/user';
 
 import { Image } from 'src/components/image';
 import { Iconify } from 'src/components/iconify';
@@ -56,8 +56,8 @@ export function FeedCard({ feed, publishedAtLabel, onLike, onSave }: FeedCardPro
         transition: 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease, border-color 0.28s ease',
         '&:hover': {
           transform: 'translateY(-4px)',
-          borderColor: alpha(USER_COLORS.gold, 0.35),
-          boxShadow: `0 20px 48px ${alpha('#000000', 0.75)}, 0 0 28px ${alpha(USER_COLORS.gold, 0.12)}`,
+          borderColor: goldAlpha(0.35),
+          boxShadow: `0 20px 48px ${alpha('#000000', 0.75)}, 0 0 28px ${goldAlpha(0.12)}`,
           '& .feed-card-bar': { transform: 'scaleX(1)' },
           '& .feed-card-title': { color: USER_COLORS.gold },
         },
@@ -80,7 +80,7 @@ export function FeedCard({ feed, publishedAtLabel, onLike, onSave }: FeedCardPro
               width: 1,
               height: 1,
               bgcolor: alpha('#ffffff', 0.04),
-              backgroundImage: `linear-gradient(135deg, ${alpha(USER_COLORS.gold, 0.08)} 0%, transparent 60%)`,
+              backgroundImage: `linear-gradient(135deg, ${goldAlpha(0.08)} 0%, transparent 60%)`,
             }}
           />
         )}
@@ -205,7 +205,7 @@ export function FeedCard({ feed, publishedAtLabel, onLike, onSave }: FeedCardPro
             transform: 'scaleX(0)',
             transformOrigin: 'left center',
             transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
-            boxShadow: `0 0 12px ${alpha(USER_COLORS.gold, 0.45)}`,
+            boxShadow: `0 0 12px ${goldAlpha(0.45)}`,
           }}
         />
 

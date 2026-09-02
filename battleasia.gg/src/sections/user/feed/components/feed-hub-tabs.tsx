@@ -3,7 +3,7 @@ import { Box, Stack, Typography } from '@mui/material';
 
 import { useTranslate } from 'src/locales/use-locales';
 import { Iconify } from 'src/components/iconify';
-import { USER_COLORS } from 'src/layouts/user';
+import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ export function FeedHubTabs({ active, onChange }: FeedHubTabsProps) {
         bgcolor: alpha('#000000', 0.9),
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
-        borderBottom: `1px solid ${alpha(USER_COLORS.gold, 0.22)}`,
+        borderBottom: `1px solid ${goldAlpha(0.22)}`,
         boxShadow: `0 10px 28px ${alpha('#000000', 0.45)}`,
       }}
     >

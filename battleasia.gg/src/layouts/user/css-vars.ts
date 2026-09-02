@@ -5,6 +5,7 @@ import type { Theme, CSSObject } from '@mui/material/styles';
 import { varAlpha } from 'minimal-shared/utils';
 
 import { bulletColor } from 'src/components/nav-section';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 import { USER_COLORS } from './user-theme';
 
@@ -57,17 +58,17 @@ export function userBattleNavColorVars(
       '--nav-subheader-color': varAlpha(palette.common.whiteChannel, 0.45),
       '--nav-subheader-hover-color': palette.common.white,
       '--nav-item-color': varAlpha(palette.common.whiteChannel, 0.62),
-      '--nav-item-hover-bg': alpha(gold, 0.08),
+      '--nav-item-hover-bg': goldAlpha(0.08),
       '--nav-item-root-active-color': gold,
       '--nav-item-root-active-color-on-dark': gold,
-      '--nav-item-root-active-bg': alpha(gold, 0.14),
-      '--nav-item-root-active-hover-bg': alpha(gold, 0.2),
+      '--nav-item-root-active-bg': goldAlpha(0.14),
+      '--nav-item-root-active-hover-bg': goldAlpha(0.2),
       '--nav-item-root-open-color': palette.common.white,
       '--nav-item-root-open-bg': varAlpha(palette.common.whiteChannel, 0.06),
       '--nav-bullet-light-color': bulletColor.dark,
       ...(navLayout === 'vertical' && {
         '--nav-item-sub-active-color': gold,
-        '--nav-item-sub-active-bg': alpha(gold, 0.1),
+        '--nav-item-sub-active-bg': goldAlpha(0.1),
         '--nav-item-sub-open-color': palette.common.white,
         '--nav-item-sub-open-bg': varAlpha(palette.common.whiteChannel, 0.06),
       }),

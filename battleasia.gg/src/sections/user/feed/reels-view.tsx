@@ -14,8 +14,7 @@ import {
   UserPageTitle,
   UserActionButton,
   UserEmptyState,
-  USER_COLORS,
-} from 'src/layouts/user';
+  USER_COLORS, goldAlpha } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 
 import { ReelCreateDialog } from './components/reel-create-dialog';
@@ -138,7 +137,7 @@ export function ReelsView({ embedded = false }: { embedded?: boolean }) {
                     src={getImageUrl(reel.avatar)}
                     alt={reel.username}
                     onClick={() => navigate(paths.profile(reel.userId))}
-                    sx={{ width: 36, height: 36, cursor: 'pointer', border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}` }}
+                    sx={{ width: 36, height: 36, cursor: 'pointer', border: `1px solid ${goldAlpha(0.35)}` }}
                   />
                   <Typography sx={{ fontWeight: 800, color: '#fff' }}>{reel.username}</Typography>
                 </Stack>

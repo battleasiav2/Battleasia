@@ -12,6 +12,7 @@ import { useTranslate } from 'src/locales/use-locales';
 import { startAppDownload } from 'src/utils/app-download-url';
 
 import { USER_COLORS } from '../user/user-theme';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -41,9 +42,9 @@ export function NavApkBanner({ onNavigate, sx }: NavApkBannerProps) {
           position: 'relative',
           overflow: 'hidden',
           borderRadius: `${GLASS_CARD_RADIUS}px`,
-          border: `1px solid ${alpha(USER_COLORS.gold, 0.32)}`,
+          border: `1px solid ${goldAlpha(0.32)}`,
           background: `
-            linear-gradient(145deg, ${alpha(USER_COLORS.gold, 0.16)} 0%, ${alpha('#000000', 0.55)} 42%, ${alpha('#0a0a0a', 0.92)} 100%)
+            linear-gradient(145deg, ${goldAlpha(0.16)} 0%, ${alpha('#000000', 0.55)} 42%, ${alpha('#0a0a0a', 0.92)} 100%)
           `,
           boxShadow: `
             inset 0 1px 0 ${alpha('#ffffff', 0.08)},
@@ -62,7 +63,7 @@ export function NavApkBanner({ onNavigate, sx }: NavApkBannerProps) {
           width: 88,
           height: 88,
           borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha(USER_COLORS.gold, 0.35)} 0%, transparent 70%)`,
+          background: `radial-gradient(circle, ${goldAlpha(0.35)} 0%, transparent 70%)`,
           pointerEvents: 'none',
         }}
       />
@@ -77,8 +78,8 @@ export function NavApkBanner({ onNavigate, sx }: NavApkBannerProps) {
               display: 'grid',
               placeItems: 'center',
               borderRadius: `${GLASS_CARD_RADIUS}px`,
-              bgcolor: alpha(USER_COLORS.gold, 0.1),
-              border: `1px solid ${alpha(USER_COLORS.gold, 0.4)}`,
+              bgcolor: goldAlpha(0.1),
+              border: `1px solid ${goldAlpha(0.4)}`,
               overflow: 'hidden',
               p: 0.4,
             }}
@@ -100,7 +101,7 @@ export function NavApkBanner({ onNavigate, sx }: NavApkBannerProps) {
                 fontWeight: 700,
                 letterSpacing: 1.1,
                 textTransform: 'uppercase',
-                color: alpha(USER_COLORS.gold, 0.9),
+                color: goldAlpha(0.9),
                 lineHeight: 1.2,
               }}
             >
@@ -154,10 +155,10 @@ export function NavApkBanner({ onNavigate, sx }: NavApkBannerProps) {
             color: '#111',
             bgcolor: USER_COLORS.gold,
             border: `1px solid ${alpha('#fff', 0.15)}`,
-            boxShadow: `0 6px 18px ${alpha(USER_COLORS.gold, 0.28)}`,
+            boxShadow: `0 6px 18px ${goldAlpha(0.28)}`,
             '&:hover': {
               bgcolor: USER_COLORS.goldLight,
-              boxShadow: `0 8px 22px ${alpha(USER_COLORS.gold, 0.38)}`,
+              boxShadow: `0 8px 22px ${goldAlpha(0.38)}`,
             },
           }}
         >

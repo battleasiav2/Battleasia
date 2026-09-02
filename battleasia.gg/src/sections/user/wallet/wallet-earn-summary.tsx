@@ -2,7 +2,7 @@ import { alpha } from '@mui/material/styles';
 import { Box, Stack, Typography } from '@mui/material';
 
 import { useTranslate } from 'src/locales/use-locales';
-import { UserGlassCard, USER_COLORS, userMutedTextSx } from 'src/layouts/user';
+import { UserGlassCard, USER_COLORS, userMutedTextSx, goldAlpha } from 'src/layouts/user';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 import { Iconify } from 'src/components/iconify';
 
@@ -33,8 +33,8 @@ function SummaryTile({
       sx={getGlassInnerSx(glassTokens, {
         p: { xs: 1.25, md: 1.5 },
         minHeight: 88,
-        border: highlight ? `1px solid ${alpha(EARN_HUB_GOLD, 0.45)}` : undefined,
-        bgcolor: highlight ? alpha(EARN_HUB_GOLD, 0.06) : undefined,
+        border: highlight ? `1px solid ${goldAlpha( 0.45)}` : undefined,
+        bgcolor: highlight ? goldAlpha( 0.06) : undefined,
       })}
     >
       <Stack spacing={0.75}>

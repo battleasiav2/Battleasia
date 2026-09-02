@@ -1,5 +1,6 @@
 import { Box, Stack, Typography, Grid2 as Grid } from '@mui/material';
 import { alpha } from '@mui/material/styles';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 import { CONFIG } from 'src/global-config';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
@@ -45,7 +46,7 @@ function blackGamingSectionSx(art?: string) {
             inset: 0,
             background: `
               linear-gradient(180deg, ${alpha('#0a0a0a', 0.82)} 0%, ${alpha('#0a0a0a', 0.92)} 45%, #0a0a0a 100%),
-              radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(HOME_GOLD, 0.08)} 0%, transparent 55%)
+              radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha( 0.08)} 0%, transparent 55%)
             `,
             pointerEvents: 'none',
             zIndex: 0,
@@ -57,7 +58,7 @@ function blackGamingSectionSx(art?: string) {
             position: 'absolute',
             inset: 0,
             background: `
-              radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(HOME_GOLD, 0.08)} 0%, transparent 55%),
+              radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha( 0.08)} 0%, transparent 55%),
               radial-gradient(ellipse 40% 30% at 10% 100%, ${alpha('#38bdf8', 0.04)} 0%, transparent 50%)
             `,
             pointerEvents: 'none',

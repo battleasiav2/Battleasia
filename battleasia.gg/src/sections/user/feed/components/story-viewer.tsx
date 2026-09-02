@@ -13,7 +13,7 @@ import {
 
 import { fDateTime } from 'src/utils/format-time';
 import { getImageUrl } from 'src/utils/get-image-url';
-import { USER_COLORS } from 'src/layouts/user';
+import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 
 import type { StoryGroup } from './story-types';
@@ -218,8 +218,8 @@ export function StoryViewer({
                   height: 3,
                   bgcolor: 'transparent',
                   '& .MuiLinearProgress-bar': {
-                    bgcolor: paused && index === storyIndex ? alpha(USER_COLORS.gold, 0.55) : USER_COLORS.gold,
-                    boxShadow: `0 0 8px ${alpha(USER_COLORS.gold, 0.6)}`,
+                    bgcolor: paused && index === storyIndex ? goldAlpha(0.55) : USER_COLORS.gold,
+                    boxShadow: `0 0 8px ${goldAlpha(0.6)}`,
                     transition: paused ? 'none' : undefined,
                   },
                 }}
@@ -243,7 +243,7 @@ export function StoryViewer({
           <Avatar
             src={getImageUrl(group.avatar)}
             alt={group.username}
-            sx={{ width: 36, height: 36, border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}` }}
+            sx={{ width: 36, height: 36, border: `1px solid ${goldAlpha(0.45)}` }}
           />
           <Box sx={{ flex: 1, minWidth: 0 }}>
             <Typography sx={{ fontSize: 14, fontWeight: 700, color: '#ffffff' }}>{group.username}</Typography>

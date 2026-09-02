@@ -6,6 +6,7 @@ import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { WatchLiveButton } from 'src/components/watch-live-button';
 
 import { USER_COLORS, userGoldButtonSx } from 'src/layouts/user/user-theme';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -85,8 +86,8 @@ export function PlayArenaHero({
         justifyContent: 'center',
         overflow: 'hidden',
         bgcolor: '#000000',
-        borderTop: `1px solid ${alpha(GOLD, 0.16)}`,
-        borderBottom: `1px solid ${alpha(GOLD, 0.16)}`,
+        borderTop: `1px solid ${goldAlpha(0.16)}`,
+        borderBottom: `1px solid ${goldAlpha(0.16)}`,
       }}
     >
       <Box
@@ -114,11 +115,11 @@ export function PlayArenaHero({
             xs: `
               linear-gradient(90deg, ${alpha('#000000', 0.9)} 0%, ${alpha('#000000', 0.62)} 45%, ${alpha('#000000', 0.35)} 100%),
               linear-gradient(180deg, ${alpha('#000000', 0.6)} 0%, transparent 32%, ${alpha('#000000', 0.92)} 100%),
-              radial-gradient(ellipse 60% 45% at 20% 20%, ${alpha(GOLD, 0.12)} 0%, transparent 60%)
+              radial-gradient(ellipse 60% 45% at 20% 20%, ${goldAlpha(0.12)} 0%, transparent 60%)
             `,
             md: `
               linear-gradient(180deg, ${alpha('#000000', 0.55)} 0%, ${alpha('#000000', 0.35)} 40%, ${alpha('#000000', 0.88)} 100%),
-              radial-gradient(ellipse 70% 55% at 50% 35%, ${alpha(GOLD, 0.14)} 0%, transparent 65%),
+              radial-gradient(ellipse 70% 55% at 50% 35%, ${goldAlpha(0.14)} 0%, transparent 65%),
               linear-gradient(90deg, ${alpha('#000000', 0.45)} 0%, transparent 28%, transparent 72%, ${alpha('#000000', 0.45)} 100%)
             `,
           },
@@ -145,8 +146,8 @@ export function PlayArenaHero({
               width: ember.size,
               height: ember.size,
               borderRadius: '50%',
-              bgcolor: alpha(GOLD, 0.75),
-              boxShadow: `0 0 10px ${alpha(GOLD, 0.6)}`,
+              bgcolor: goldAlpha(0.75),
+              boxShadow: `0 0 10px ${goldAlpha(0.6)}`,
               '--dx': ember.dx,
               animation: `${emberRise} ${ember.duration} ${ember.delay} infinite linear`,
             }}
@@ -182,7 +183,7 @@ export function PlayArenaHero({
               fontWeight: 800,
               letterSpacing: 1.4,
               textTransform: 'uppercase',
-              color: alpha(GOLD, 0.92),
+              color: goldAlpha(0.92),
             }}
           >
             {badge}
@@ -195,7 +196,7 @@ export function PlayArenaHero({
             sx={{
               px: 0.85,
               py: 0.3,
-              border: `1px solid ${alpha(GOLD, 0.32)}`,
+              border: `1px solid ${goldAlpha(0.32)}`,
               bgcolor: alpha('#000000', 0.5),
               backdropFilter: 'blur(6px)',
             }}
@@ -225,7 +226,7 @@ export function PlayArenaHero({
             letterSpacing: { md: 0.5 },
             color: '#ffffff',
             textTransform: 'uppercase',
-            textShadow: `0 4px 28px ${alpha('#000000', 0.9)}, 0 0 40px ${alpha(GOLD, 0.14)}`,
+            textShadow: `0 4px 28px ${alpha('#000000', 0.9)}, 0 0 40px ${goldAlpha(0.14)}`,
           }}
         >
           {title}
@@ -264,7 +265,7 @@ export function PlayArenaHero({
                 sx={{
                   px: 1.5,
                   py: 1.25,
-                  border: `1px solid ${alpha(GOLD, 0.22)}`,
+                  border: `1px solid ${goldAlpha(0.22)}`,
                   bgcolor: alpha('#000000', 0.4),
                   textAlign: 'center',
                 }}

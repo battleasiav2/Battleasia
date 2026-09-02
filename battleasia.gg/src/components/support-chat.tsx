@@ -25,10 +25,11 @@ import useApi from 'src/hooks/use-api';
 import { CONFIG } from 'src/global-config';
 import { socketService } from 'src/lib/socket';
 import axios from 'src/lib/axios';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 const FAB_SIZE = 52;
 const POS_STORAGE_KEY = 'ba-support-chat-pos';
 const DRAG_THRESHOLD_PX = 8;
@@ -513,7 +514,7 @@ export function SupportChat() {
               bgcolor: alpha('#0c0c0e', 0.97),
               border: `1px solid ${alpha('#ffffff', 0.12)}`,
               boxShadow: `
-                0 0 0 1px ${alpha(GOLD, 0.16)},
+                0 0 0 1px ${goldAlpha(0.16)},
                 0 16px 40px ${alpha('#000000', 0.55)}
               `,
               transition: 'box-shadow 0.25s ease',
@@ -537,7 +538,7 @@ export function SupportChat() {
                 sx={{
                   width: 32,
                   height: 32,
-                  border: `1px solid ${alpha(GOLD, 0.45)}`,
+                  border: `1px solid ${goldAlpha(0.45)}`,
                   bgcolor: alpha('#000000', 0.5),
                 }}
               />
@@ -594,7 +595,7 @@ export function SupportChat() {
                 px: 1.25,
                 py: 1.25,
                 backgroundImage: `
-                  radial-gradient(ellipse 60% 40% at 80% 0%, ${alpha(GOLD, 0.06)} 0%, transparent 55%),
+                  radial-gradient(ellipse 60% 40% at 80% 0%, ${goldAlpha(0.06)} 0%, transparent 55%),
                   linear-gradient(180deg, ${alpha('#000000', 0.2)} 0%, transparent 30%)
                 `,
                 scrollbarWidth: 'thin',
@@ -658,8 +659,8 @@ export function SupportChat() {
                             px: 1.15,
                             py: 0.85,
                             borderRadius: 0.75,
-                            bgcolor: isMe ? alpha(GOLD, 0.16) : alpha('#ffffff', 0.06),
-                            border: `1px solid ${isMe ? alpha(GOLD, 0.35) : alpha('#ffffff', 0.1)}`,
+                            bgcolor: isMe ? goldAlpha(0.16) : alpha('#ffffff', 0.06),
+                            border: `1px solid ${isMe ? goldAlpha(0.35) : alpha('#ffffff', 0.1)}`,
                           }}
                         >
                           {!isMe && (
@@ -794,7 +795,7 @@ export function SupportChat() {
                           height: 44,
                           objectFit: 'cover',
                           borderRadius: 0.75,
-                          border: `1px solid ${alpha(GOLD, 0.35)}`,
+                          border: `1px solid ${goldAlpha(0.35)}`,
                         }}
                       />
                       <IconButton
@@ -841,10 +842,10 @@ export function SupportChat() {
                     height: 34,
                     borderRadius: 0.75,
                     color: GOLD,
-                    bgcolor: alpha(GOLD, 0.1),
-                    border: `1px solid ${alpha(GOLD, 0.28)}`,
+                    bgcolor: goldAlpha(0.1),
+                    border: `1px solid ${goldAlpha(0.28)}`,
                     transition: 'background-color 0.2s ease, transform 0.2s ease',
-                    '&:hover': { bgcolor: alpha(GOLD, 0.18), transform: 'scale(1.04)' },
+                    '&:hover': { bgcolor: goldAlpha(0.18), transform: 'scale(1.04)' },
                     '&.Mui-disabled': {
                       color: alpha('#ffffff', 0.25),
                       bgcolor: alpha('#ffffff', 0.04),
@@ -936,14 +937,14 @@ export function SupportChat() {
           userSelect: 'none',
           bgcolor: alpha('#0a0a0a', 0.9),
           color: GOLD,
-          border: `1px solid ${alpha(GOLD, 0.4)}`,
+          border: `1px solid ${goldAlpha(0.4)}`,
           boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
           transition: dragging
             ? 'none'
             : 'background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
           '&:hover': {
-            bgcolor: alpha(GOLD, 0.16),
-            borderColor: alpha(GOLD, 0.55),
+            bgcolor: goldAlpha(0.16),
+            borderColor: goldAlpha(0.55),
             transform: dragging ? 'none' : 'scale(1.04)',
           },
         }}

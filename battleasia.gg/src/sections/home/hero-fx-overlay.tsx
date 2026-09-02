@@ -1,9 +1,12 @@
 import { Box } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
+import { HeroEmberField } from './hero-ember-field';
+import { goldAlpha } from 'src/theme/accent-presets';
+
 // ----------------------------------------------------------------------
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 const GOLD_SOFT = '#ffe08a';
 const LIVE_GREEN = '#22c55e';
 const FIRE_ORANGE = '#ff6a12';
@@ -89,12 +92,6 @@ const bracketPulse = keyframes`
   50% { opacity: 0.72; }
 `;
 
-const emberRise = keyframes`
-  0% { transform: translate3d(0, 0, 0) scale(0.55); opacity: 0; }
-  12% { opacity: 0.9; }
-  100% { transform: translate3d(var(--dx), var(--rise, -220px), 0) scale(0.35); opacity: 0; }
-`;
-
 const fireBedPulse = keyframes`
   0%, 100% { opacity: 0.55; transform: translate3d(0, 0, 0) scaleY(1); }
   50% { opacity: 0.85; transform: translate3d(0, -2%, 0) scaleY(1.08); }
@@ -105,6 +102,13 @@ const flameLick = keyframes`
   14% { opacity: var(--peak, 0.7); }
   55% { opacity: calc(var(--peak, 0.7) * 0.55); }
   100% { transform: translate3d(var(--dx), -42%, 0) scaleY(1.18) scaleX(0.78); opacity: 0; }
+`;
+
+const smokeLift = keyframes`
+  0% { transform: translate3d(0, 12%, 0) scale(0.82); opacity: 0; }
+  18% { opacity: var(--peak, 0.18); }
+  70% { opacity: calc(var(--peak, 0.18) * 0.45); }
+  100% { transform: translate3d(var(--dx), -58%, 0) scale(1.28); opacity: 0; }
 `;
 
 /** Fewer, softer orbs — gradient falloff only, no live blur */
@@ -121,24 +125,17 @@ const MOTES = [
   { top: '36%', left: '82%', dx: '-14px', delay: '0.8s', duration: '10s' },
 ] as const;
 
-const EMBERS = [
-  { left: '8%', delay: '0s', duration: '4.2s', dx: '10px', size: 3, rise: '-240px' },
-  { left: '18%', delay: '0.7s', duration: '5s', dx: '-14px', size: 2, rise: '-280px' },
-  { left: '32%', delay: '1.4s', duration: '4.6s', dx: '16px', size: 3, rise: '-260px' },
-  { left: '46%', delay: '0.3s', duration: '3.8s', dx: '-8px', size: 2, rise: '-220px' },
-  { left: '58%', delay: '1.1s', duration: '4.8s', dx: '12px', size: 4, rise: '-300px' },
-  { left: '72%', delay: '0.9s', duration: '5.2s', dx: '-16px', size: 2, rise: '-250px' },
-  { left: '84%', delay: '1.8s', duration: '4.4s', dx: '8px', size: 3, rise: '-270px' },
-  { left: '92%', delay: '0.5s', duration: '5.4s', dx: '-10px', size: 2, rise: '-230px' },
+const FLAMES = [
+  { left: '4%', width: 78, height: 170, delay: '0s', duration: '2.4s', dx: '8px', peak: 0.5 },
+  { left: '14%', width: 104, height: 220, delay: '0.4s', duration: '2.8s', dx: '-10px', peak: 0.68 },
+  { left: '26%', width: 86, height: 190, delay: '0.9s', duration: '2.2s', dx: '12px', peak: 0.58 },
+  { left: '38%', width: 96, height: 210, delay: '0.2s', duration: '3s', dx: '-8px', peak: 0.62 },
 ] as const;
 
-const FLAMES = [
-  { left: '6%', width: 72, height: 160, delay: '0s', duration: '2.4s', dx: '8px', peak: 0.55 },
-  { left: '22%', width: 96, height: 210, delay: '0.4s', duration: '2.8s', dx: '-10px', peak: 0.7 },
-  { left: '38%', width: 80, height: 180, delay: '0.9s', duration: '2.2s', dx: '12px', peak: 0.62 },
-  { left: '52%', width: 110, height: 230, delay: '0.2s', duration: '3s', dx: '-8px', peak: 0.75 },
-  { left: '68%', width: 88, height: 190, delay: '0.7s', duration: '2.5s', dx: '10px', peak: 0.58 },
-  { left: '82%', width: 74, height: 165, delay: '1.1s', duration: '2.7s', dx: '-12px', peak: 0.5 },
+const SMOKE = [
+  { left: '6%', width: 90, height: 160, delay: '0s', duration: '7.5s', dx: '18px', peak: 0.16 },
+  { left: '18%', width: 120, height: 200, delay: '1.6s', duration: '8.4s', dx: '-14px', peak: 0.2 },
+  { left: '30%', width: 100, height: 180, delay: '3.1s', duration: '7.8s', dx: '22px', peak: 0.14 },
 ] as const;
 
 function cornerBracket(position: 'tl' | 'tr' | 'bl' | 'br') {
@@ -146,7 +143,7 @@ function cornerBracket(position: 'tl' | 'tr' | 'bl' | 'br') {
     position: 'absolute' as const,
     width: { xs: 18, md: 28 },
     height: { xs: 18, md: 28 },
-    borderColor: alpha(GOLD, 0.55),
+    borderColor: goldAlpha(0.55),
     animation: `${bracketPulse} 3.2s ease-in-out infinite`,
     pointerEvents: 'none' as const,
   };
@@ -179,7 +176,7 @@ export function HeroFxOverlay() {
           position: 'absolute',
           inset: '-4%',
           background: `
-            radial-gradient(ellipse 55% 40% at 32% 42%, ${alpha(GOLD, 0.1)} 0%, transparent 60%),
+            radial-gradient(ellipse 55% 40% at 32% 42%, ${goldAlpha(0.1)} 0%, transparent 60%),
             radial-gradient(ellipse 45% 35% at 72% 28%, ${alpha('#ffffff', 0.04)} 0%, transparent 55%)
           `,
           animation: `${atmosphereShift} 16s ease-in-out infinite`,
@@ -201,7 +198,7 @@ export function HeroFxOverlay() {
           py: 0.4,
           borderRadius: 0.5,
           bgcolor: alpha('#000000', 0.55),
-          border: `1px solid ${alpha(GOLD, 0.28)}`,
+          border: `1px solid ${goldAlpha(0.28)}`,
         }}
       >
         <Box sx={{ position: 'relative', width: 8, height: 8 }}>
@@ -254,21 +251,21 @@ export function HeroFxOverlay() {
           left: 0,
           width: '22%',
           height: { xs: 1, md: 1.5 },
-          background: `linear-gradient(90deg, transparent, ${alpha(GOLD, 0.55)}, ${alpha('#ffffff', 0.35)}, transparent)`,
-          boxShadow: `0 0 12px ${alpha(GOLD, 0.25)}`,
+          background: `linear-gradient(90deg, transparent, ${goldAlpha(0.55)}, ${alpha('#ffffff', 0.35)}, transparent)`,
+          boxShadow: `0 0 12px ${goldAlpha(0.25)}`,
           animation: `${scanSweep} 7.5s 1.2s ease-in-out infinite`,
           willChange: 'transform, opacity',
         }}
       />
 
-      {/* Fire bed — rising flames + sparks (CSS only) */}
+      {/* Left-city fire bed — glow sits over the burning skyline */}
       <Box
         sx={{
           position: 'absolute',
           left: 0,
-          right: 0,
+          width: { xs: '72%', md: '52%' },
           bottom: 0,
-          height: { xs: '42%', md: '48%' },
+          height: { xs: '52%', md: '58%' },
           overflow: 'hidden',
           mixBlendMode: 'screen',
         }}
@@ -276,14 +273,14 @@ export function HeroFxOverlay() {
         <Box
           sx={{
             position: 'absolute',
-            left: '-8%',
-            right: '-8%',
-            bottom: '-18%',
-            height: { xs: '70%', md: '78%' },
+            left: '-10%',
+            right: '8%',
+            bottom: '-16%',
+            height: { xs: '72%', md: '80%' },
             background: `
-              radial-gradient(ellipse 80% 70% at 50% 100%, ${alpha(FIRE_CORE, 0.42)} 0%, transparent 62%),
-              radial-gradient(ellipse 50% 55% at 28% 100%, ${alpha(FIRE_ORANGE, 0.32)} 0%, transparent 58%),
-              radial-gradient(ellipse 46% 52% at 74% 100%, ${alpha(FIRE_TIP, 0.22)} 0%, transparent 55%)
+              radial-gradient(ellipse 70% 72% at 28% 100%, ${alpha(FIRE_CORE, 0.38)} 0%, transparent 62%),
+              radial-gradient(ellipse 48% 58% at 18% 100%, ${alpha(FIRE_ORANGE, 0.3)} 0%, transparent 58%),
+              radial-gradient(ellipse 40% 50% at 44% 100%, ${alpha(FIRE_TIP, 0.18)} 0%, transparent 55%)
             `,
             animation: `${fireBedPulse} 2.4s ease-in-out infinite`,
             willChange: 'transform, opacity',
@@ -316,29 +313,33 @@ export function HeroFxOverlay() {
             }}
           />
         ))}
+
+        {SMOKE.map((plume, i) => (
+          <Box
+            key={`smoke-${i}`}
+            sx={{
+              position: 'absolute',
+              left: plume.left,
+              bottom: '4%',
+              width: { xs: plume.width * 0.78, md: plume.width },
+              height: { xs: plume.height * 0.82, md: plume.height },
+              borderRadius: '50%',
+              background: `radial-gradient(ellipse 70% 80% at 50% 70%,
+                ${alpha('#c4b8a8', 0.28)} 0%,
+                ${alpha('#8a7d70', 0.1)} 42%,
+                transparent 74%
+              )`,
+              '--dx': plume.dx,
+              '--peak': plume.peak,
+              animation: `${smokeLift} ${plume.duration} ${plume.delay} ease-out infinite`,
+              willChange: 'transform, opacity',
+              display: { xs: i === 1 ? 'block' : 'none', md: 'block' },
+            }}
+          />
+        ))}
       </Box>
 
-      {/* Sparks rising from fire */}
-      {EMBERS.map((ember, i) => (
-        <Box
-          key={`ember-${i}`}
-          sx={{
-            position: 'absolute',
-            left: ember.left,
-            bottom: { xs: '10%', md: '12%' },
-            width: ember.size,
-            height: ember.size,
-            borderRadius: '50%',
-            bgcolor: i % 2 === 0 ? FIRE_TIP : FIRE_ORANGE,
-            boxShadow: `0 0 8px ${alpha(FIRE_ORANGE, 0.8)}`,
-            '--dx': ember.dx,
-            '--rise': ember.rise,
-            animation: `${emberRise} ${ember.duration} ${ember.delay} infinite linear`,
-            willChange: 'transform, opacity',
-            display: { xs: i < 5 ? 'block' : 'none', md: 'block' },
-          }}
-        />
-      ))}
+      <HeroEmberField />
 
       {/* Desktop-only richer layers */}
       <Box sx={{ display: { xs: 'none', md: 'block' }, position: 'absolute', inset: 0 }}>
@@ -352,7 +353,7 @@ export function HeroFxOverlay() {
             background: `
               linear-gradient(168deg,
                 ${alpha(GOLD_SOFT, 0.12)} 0%,
-                ${alpha(GOLD, 0.04)} 30%,
+                ${goldAlpha(0.04)} 30%,
                 transparent 62%
               )
             `,
@@ -372,7 +373,7 @@ export function HeroFxOverlay() {
             background: `
               linear-gradient(172deg,
                 ${alpha('#ffffff', 0.07)} 0%,
-                ${alpha(GOLD, 0.035)} 38%,
+                ${goldAlpha(0.035)} 38%,
                 transparent 68%
               )
             `,
@@ -396,7 +397,7 @@ export function HeroFxOverlay() {
               radial-gradient(circle,
                 ${alpha('#ffffff', 0.3)} 0%,
                 ${alpha(GOLD_SOFT, 0.14)} 28%,
-                ${alpha(GOLD, 0.04)} 52%,
+                ${goldAlpha(0.04)} 52%,
                 transparent 72%
               )
             `,
@@ -416,7 +417,7 @@ export function HeroFxOverlay() {
             background: `linear-gradient(90deg,
               transparent 0%,
               ${alpha('#ffffff', 0.02)} 32%,
-              ${alpha(GOLD, 0.14)} 50%,
+              ${goldAlpha(0.14)} 50%,
               ${alpha(GOLD_SOFT, 0.07)} 58%,
               transparent 100%)`,
             mixBlendMode: 'screen',
@@ -436,7 +437,7 @@ export function HeroFxOverlay() {
               width: orb.size,
               height: orb.size,
               borderRadius: '50%',
-              background: `radial-gradient(circle, ${alpha(orb.color, 0.4)} 0%, ${alpha(orb.color, 0.1)} 35%, transparent 70%)`,
+              background: `radial-gradient(circle, ${orb.color.includes('--ba-gold') ? goldAlpha(0.4) : alpha(orb.color, 0.4)} 0%, ${orb.color.includes('--ba-gold') ? goldAlpha(0.1) : alpha(orb.color, 0.1)} 35%, transparent 70%)`,
               mixBlendMode: 'screen',
               '--dx': orb.dx,
               '--dy': orb.dy,
@@ -458,7 +459,7 @@ export function HeroFxOverlay() {
               height: 2,
               borderRadius: '50%',
               bgcolor: alpha('#ffffff', 0.85),
-              boxShadow: `0 0 5px ${alpha(GOLD, 0.55)}`,
+              boxShadow: `0 0 5px ${goldAlpha(0.55)}`,
               '--dx': mote.dx,
               animation: `${moteFloat} ${mote.duration} ${mote.delay} ease-in-out infinite`,
               willChange: 'transform, opacity',
@@ -485,8 +486,8 @@ export function HeroFxOverlay() {
             right: '18%',
             bottom: 0,
             height: 2,
-            background: `linear-gradient(90deg, transparent, ${alpha(GOLD, 0.45)}, transparent)`,
-            boxShadow: `0 0 16px ${alpha(GOLD, 0.25)}`,
+            background: `linear-gradient(90deg, transparent, ${goldAlpha(0.45)}, transparent)`,
+            boxShadow: `0 0 16px ${goldAlpha(0.25)}`,
             animation: `${edgeGlow} 6s ease-in-out infinite`,
           }}
         />

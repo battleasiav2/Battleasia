@@ -6,6 +6,7 @@ import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
 import { HOME_GOLD, HOME_ROW_LINE, HomeBlurPanel } from 'src/sections/home/home-blur-panel';
 import { USER_COLORS, userGoldButtonSx } from 'src/layouts/user/user-theme';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -60,8 +61,8 @@ export function ShopArenaHero({
         alignItems: { xs: 'stretch', sm: 'flex-end' },
         overflow: 'hidden',
         bgcolor: '#000000',
-        borderTop: `1px solid ${alpha(GOLD, 0.16)}`,
-        borderBottom: `1px solid ${alpha(GOLD, 0.16)}`,
+        borderTop: `1px solid ${goldAlpha(0.16)}`,
+        borderBottom: `1px solid ${goldAlpha(0.16)}`,
       }}
     >
       <Box
@@ -96,7 +97,7 @@ export function ShopArenaHero({
             background: `
               linear-gradient(90deg, ${alpha('#000000', 0.9)} 0%, ${alpha('#000000', 0.6)} 48%, ${alpha('#000000', 0.38)} 100%),
               linear-gradient(180deg, ${alpha('#000000', 0.55)} 0%, transparent 34%, ${alpha('#000000', 0.92)} 100%),
-              radial-gradient(ellipse 55% 40% at 18% 22%, ${alpha(GOLD, 0.14)} 0%, transparent 60%)
+              radial-gradient(ellipse 55% 40% at 18% 22%, ${goldAlpha(0.14)} 0%, transparent 60%)
             `,
           }}
         />
@@ -122,7 +123,7 @@ export function ShopArenaHero({
               fontWeight: 700,
               letterSpacing: 2.5,
               textTransform: 'uppercase',
-              color: alpha(GOLD, 0.92),
+              color: goldAlpha(0.92),
               lineHeight: 1.3,
             }}
           >
@@ -136,7 +137,7 @@ export function ShopArenaHero({
             sx={{
               px: 1,
               py: 0.45,
-              border: `1px solid ${alpha(GOLD, 0.32)}`,
+              border: `1px solid ${goldAlpha(0.32)}`,
               bgcolor: alpha('#000000', 0.5),
               flexShrink: 0,
             }}

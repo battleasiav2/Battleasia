@@ -19,8 +19,7 @@ import {
   UserEmptyState,
   UserActionButton,
   USER_COLORS,
-  userMutedTextSx,
-} from 'src/layouts/user';
+  userMutedTextSx, goldAlpha } from 'src/layouts/user';
 
 import { Scrollbar } from 'src/components/scrollbar';
 import { Iconify } from 'src/components/iconify';
@@ -358,7 +357,7 @@ export function MessagesView({ embedded = false }: { embedded?: boolean }) {
                     <Avatar
                       src={getImageUrl(selectedConversation.participant.avatar)}
                       alt={selectedConversation.participant.username}
-                      sx={{ width: 40, height: 40, border: `1px solid ${alpha(USER_COLORS.gold, 0.3)}` }}
+                      sx={{ width: 40, height: 40, border: `1px solid ${goldAlpha(0.3)}` }}
                     />
                     <Box sx={{ flex: 1, minWidth: 0 }}>
                       <Typography sx={{ fontWeight: 800, color: USER_COLORS.textPrimary }}>

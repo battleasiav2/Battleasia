@@ -334,7 +334,18 @@
     "messages": "Messages",
     "settings": "Settings",
     "logout": "Logout",
-    "login": "LOGIN"
+    "login": "LOGIN",
+    "siteColor": "Site color",
+    "siteColorHint": "Accent updates buttons, borders, and highlights.",
+    "accent": {
+      "gold": "Gold",
+      "ember": "Ember",
+      "jade": "Jade",
+      "cyan": "Cyan",
+      "violet": "Violet",
+      "rose": "Rose",
+      "sky": "Sky"
+    }
   },
   "footer": {
     "downloadAppForAndroid": "Download app for Android",

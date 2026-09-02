@@ -5,7 +5,7 @@ import { Box, Stack, Typography, Grid2 as Grid } from '@mui/material';
 
 import { useTranslate } from 'src/locales/use-locales';
 import { useImagePreloader } from 'src/hooks';
-import { USER_COLORS, UserPageShell, UserActionButton, UserGlassCard } from 'src/layouts/user';
+import { USER_COLORS, UserPageShell, UserActionButton, UserGlassCard, goldAlpha } from 'src/layouts/user';
 
 import { Iconify } from 'src/components/iconify';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
@@ -115,7 +115,7 @@ export function ShopView() {
                 alignSelf: { xs: 'flex-start', sm: 'center' },
                 px: 1.25,
                 py: 0.55,
-                border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
+                border: `1px solid ${goldAlpha(0.35)}`,
                 bgcolor: alpha('#000000', 0.45),
                 flexShrink: 0,
               }}
@@ -176,8 +176,8 @@ export function ShopView() {
                     spacing={1.25}
                     sx={{
                       p: 1.5,
-                      border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
-                      bgcolor: alpha(USER_COLORS.gold, 0.06),
+                      border: `1px solid ${goldAlpha(0.28)}`,
+                      bgcolor: goldAlpha(0.06),
                     }}
                   >
                     <Box
@@ -187,8 +187,8 @@ export function ShopView() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        bgcolor: alpha(USER_COLORS.gold, 0.12),
-                        border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
+                        bgcolor: goldAlpha(0.12),
+                        border: `1px solid ${goldAlpha(0.28)}`,
                         color: USER_COLORS.gold,
                       }}
                     >
@@ -243,7 +243,7 @@ export function ShopView() {
                       { icon: 'solar:clock-circle-bold', label: t('shop.trustInstant') },
                     ].map((item) => (
                       <Stack key={item.label} direction="row" alignItems="center" spacing={0.4} sx={{ flexShrink: 0 }}>
-                        <Iconify icon={item.icon} width={12} sx={{ color: alpha(USER_COLORS.gold, 0.7), flexShrink: 0 }} />
+                        <Iconify icon={item.icon} width={12} sx={{ color: goldAlpha(0.7), flexShrink: 0 }} />
                         <Typography sx={{ fontSize: 9.5, fontWeight: 700, color: alpha('#ffffff', 0.45), letterSpacing: 0.2, whiteSpace: 'nowrap' }}>
                           {item.label}
                         </Typography>

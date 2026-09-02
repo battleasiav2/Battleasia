@@ -7,8 +7,9 @@ import { useTranslate } from 'src/locales/use-locales';
 import { Iconify } from 'src/components/iconify';
 
 import { AUTH_TEXT_MUTED, authSocialIconButtonSx } from './auth-form-styles';
+import { goldAlpha } from 'src/theme/accent-presets';
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 
 function GoogleMark({ size = 18 }: { size?: number }) {
   return (
@@ -53,7 +54,7 @@ function SoonBadge() {
         px: 0.6,
         py: 0.25,
         borderRadius: '3px',
-        bgcolor: alpha(GOLD, 0.16),
+        bgcolor: goldAlpha(0.16),
         color: GOLD,
         textTransform: 'uppercase',
       }}

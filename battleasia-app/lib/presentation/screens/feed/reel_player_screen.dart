@@ -107,7 +107,7 @@ class _ReelPlayerScreenState extends State<ReelPlayerScreen> {
                       style: AppTheme.bodyMedium.copyWith(color: Colors.white70),
                     )
                   : _chewieController == null
-                      ? const CircularProgressIndicator(color: AppColors.gold)
+                      ? CircularProgressIndicator(color: AppColors.gold)
                       : Chewie(controller: _chewieController!),
             ),
           ),

@@ -19,8 +19,7 @@ import {
   UserEmptyState,
   USER_COLORS,
   userMutedTextSx,
-  getUserChipSx,
-} from 'src/layouts/user';
+  getUserChipSx, goldAlpha } from 'src/layouts/user';
 
 import { Image } from 'src/components/image';
 import { Iconify } from 'src/components/iconify';
@@ -192,7 +191,7 @@ export function MyOrdersView() {
                         transition: 'transform 0.2s, border-color 0.2s',
                         '&:hover': {
                           transform: 'translateY(-2px)',
-                          borderColor: alpha(USER_COLORS.gold, 0.35),
+                          borderColor: goldAlpha(0.35),
                         },
                       }}
                     >

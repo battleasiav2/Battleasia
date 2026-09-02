@@ -13,7 +13,20 @@ export type SettingsState = {
   contrast?: 'default' | 'hight';
   navColor?: 'integrate' | 'apparent';
   navLayout?: 'vertical' | 'horizontal' | 'mini';
-  primaryColor?: 'default' | 'preset1' | 'preset2' | 'preset3' | 'preset4' | 'preset5';
+  primaryColor?:
+    | 'gold'
+    | 'ember'
+    | 'jade'
+    | 'cyan'
+    | 'violet'
+    | 'rose'
+    | 'sky'
+    | 'default'
+    | 'preset1'
+    | 'preset2'
+    | 'preset3'
+    | 'preset4'
+    | 'preset5';
 };
 
 export type SettingsContextValue = {

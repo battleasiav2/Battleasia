@@ -7,7 +7,7 @@ import { CONFIG } from 'src/global-config';
 import { Iconify } from 'src/components/iconify';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
-import { USER_COLORS } from 'src/layouts/user';
+import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
@@ -81,7 +81,7 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
         bgcolor: notification.isUnRead ? alpha(USER_COLORS.info, 0.05) : undefined,
         transition: 'border-color 0.2s ease, background-color 0.2s ease',
         '&:hover': {
-          borderColor: alpha(USER_COLORS.gold, 0.25),
+          borderColor: goldAlpha(0.25),
           bgcolor: alpha('#ffffff', 0.04),
         },
       })}
@@ -113,8 +113,8 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
             borderRadius: '50%',
             alignItems: 'center',
             justifyContent: 'center',
-            bgcolor: alpha(USER_COLORS.gold, 0.1),
-            border: `1px solid ${alpha(USER_COLORS.gold, 0.22)}`,
+            bgcolor: goldAlpha(0.1),
+            border: `1px solid ${goldAlpha(0.22)}`,
           }}
         >
           <Box
@@ -136,8 +136,8 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            bgcolor: alpha(USER_COLORS.gold, 0.12),
-            border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
+            bgcolor: goldAlpha(0.12),
+            border: `1px solid ${goldAlpha(0.28)}`,
             color: USER_COLORS.gold,
           }}
         >

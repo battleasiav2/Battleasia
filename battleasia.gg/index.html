@@ -4,6 +4,36 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#000000" />
+    <script>
+      (function () {
+        var palettes = {
+          gold: ['#f5c518', '#fbbf24', '#d97706', '#111111', '245, 197, 24'],
+          ember: ['#ff8a1a', '#ffb347', '#e05d00', '#111111', '255, 138, 26'],
+          jade: ['#34d399', '#6ee7b7', '#059669', '#042f1e', '52, 211, 153'],
+          cyan: ['#22d3ee', '#67e8f9', '#0891b2', '#082f38', '34, 211, 238'],
+          violet: ['#a78bfa', '#c4b5fd', '#7c3aed', '#1e1038', '167, 139, 250'],
+          rose: ['#fb7185', '#fda4af', '#e11d48', '#3f0a14', '251, 113, 133'],
+          sky: ['#38bdf8', '#7dd3fc', '#0284c7', '#0b2838', '56, 189, 248'],
+        };
+        var legacy = { default: 'gold', preset1: 'sky', preset2: 'violet', preset3: 'cyan', preset4: 'ember', preset5: 'rose' };
+        var id = 'gold';
+        try {
+          id = localStorage.getItem('ba-accent') || '';
+          if (!palettes[id]) {
+            var s = JSON.parse(localStorage.getItem('app-settings') || '{}');
+            id = s.primaryColor || 'gold';
+          }
+        } catch (e) {}
+        if (legacy[id]) id = legacy[id];
+        var p = palettes[id] || palettes.gold;
+        var r = document.documentElement;
+        r.style.setProperty('--ba-gold', p[0]);
+        r.style.setProperty('--ba-gold-light', p[1]);
+        r.style.setProperty('--ba-gold-dark', p[2]);
+        r.style.setProperty('--ba-gold-ink', p[3]);
+        r.style.setProperty('--ba-gold-rgb', p[4]);
+      })();
+    </script>
     <meta
       name="description"
       content="BattleAsia — play mobile esports tournaments, win real rewards. PUBG Mobile, Free Fire, COD, Valorant and more."

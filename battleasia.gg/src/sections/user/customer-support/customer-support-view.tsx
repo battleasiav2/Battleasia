@@ -27,8 +27,7 @@ import {
   userFieldSx,
   userFieldLabelProps,
   userSelectMenuProps,
-  getUserChipSx,
-} from 'src/layouts/user';
+  getUserChipSx, goldAlpha } from 'src/layouts/user';
 
 import { Scrollbar } from 'src/components/scrollbar';
 import { PlayTabs } from 'src/components/play-tabs';
@@ -469,7 +468,7 @@ export function CustomerSupportView() {
                     alignItems: 'center',
                     transition: 'border-color 0.2s, transform 0.2s',
                     '&:hover': {
-                      borderColor: alpha(USER_COLORS.gold, 0.4),
+                      borderColor: goldAlpha(0.4),
                       transform: 'translateY(-1px)',
                     },
                   }}
@@ -621,7 +620,7 @@ export function CustomerSupportView() {
                 startIcon={<Iconify icon="solar:gallery-add-bold" />}
                 sx={{
                   color: USER_COLORS.gold,
-                  border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
+                  border: `1px solid ${goldAlpha(0.35)}`,
                   borderRadius: 0,
                   fontWeight: 700,
                 }}

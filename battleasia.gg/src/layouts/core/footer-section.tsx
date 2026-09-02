@@ -8,8 +8,9 @@ import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { createMenuClickHandler } from '../menu-items-config';
 import { useRouter, usePathname } from 'src/routes/hooks';
 import { useTranslate } from 'src/locales/use-locales';
+import { goldAlpha } from 'src/theme/accent-presets';
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 
 /** Trusted partner / affiliate domain pills */
 const FOOTER_PARTNERS = [
@@ -90,7 +91,7 @@ export function FooterSection() {
           content: '""',
           position: 'absolute',
           inset: 0,
-          background: `radial-gradient(ellipse 60% 40% at 50% 0%, ${alpha(GOLD, 0.06)} 0%, transparent 55%)`,
+          background: `radial-gradient(ellipse 60% 40% at 50% 0%, ${goldAlpha(0.06)} 0%, transparent 55%)`,
           pointerEvents: 'none',
         },
       }}
@@ -290,8 +291,8 @@ export function FooterSection() {
                   textDecoration: 'none',
                   transition: 'border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease',
                   '&:hover': {
-                    borderColor: alpha(GOLD, 0.55),
-                    bgcolor: alpha(GOLD, 0.08),
+                    borderColor: goldAlpha(0.55),
+                    bgcolor: goldAlpha(0.08),
                     transform: 'translateY(-1px)',
                     '& .partner-label': { color: GOLD },
                   },

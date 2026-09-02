@@ -13,6 +13,7 @@ import {
   USER_COLORS,
   userMutedTextSx,
   getUserChipSx,
+  goldAlpha,
 } from 'src/layouts/user';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 import { CoinValue } from 'src/components/coin-value';
@@ -88,7 +89,7 @@ export function WalletEarnHistoryPanel({ getTransactionTitle, formatDate, refres
         </Typography>
         {items.length > 0 ? (
           <Stack direction="row" spacing={1} alignItems="center" sx={{ mt: 1.25 }}>
-            <Typography sx={{ fontSize: 12, color: alpha(EARN_HUB_GOLD, 0.9), fontWeight: 700 }}>
+            <Typography sx={{ fontSize: 12, color: goldAlpha( 0.9), fontWeight: 700 }}>
               {t('wallet.earnHubHistoryTotal')}
             </Typography>
             <CoinValue value={totalEarned} size={14} />
@@ -201,11 +202,11 @@ export function WalletEarnHubTabs({
               flex: { xs: '1 1 0', md: '0 0 auto' },
               minWidth: 0,
               textAlign: 'center',
-              bgcolor: isActive ? alpha(EARN_HUB_GOLD, 0.14) : 'transparent',
-              border: isActive ? `1px solid ${alpha(EARN_HUB_GOLD, 0.35)}` : '1px solid transparent',
+              bgcolor: isActive ? goldAlpha( 0.14) : 'transparent',
+              border: isActive ? `1px solid ${goldAlpha( 0.35)}` : '1px solid transparent',
               transition: 'background-color 0.2s ease, border-color 0.2s ease',
               '&:hover': {
-                bgcolor: isActive ? alpha(EARN_HUB_GOLD, 0.18) : alpha('#ffffff', 0.05),
+                bgcolor: isActive ? goldAlpha( 0.18) : alpha('#ffffff', 0.05),
               },
             }}
           >

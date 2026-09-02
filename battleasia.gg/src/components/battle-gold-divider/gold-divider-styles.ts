@@ -1,11 +1,11 @@
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { CSSProperties } from 'react';
 
-import { alpha } from '@mui/material/styles';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
-export const BRAND_GOLD = '#f5c518';
+export const BRAND_GOLD = 'var(--ba-gold)';
 
 export type GoldDividerVariant = 'title' | 'hero' | 'section' | 'compact' | 'full';
 
@@ -41,19 +41,19 @@ export function getGoldDividerSx(options?: GoldDividerOptions): SxProps<Theme> {
   // Auth-style diamond divider: two gradient segments with a gap + a glowing center gem.
   const gemBackground = `linear-gradient(90deg,
     transparent 0%,
-    ${alpha(gold, 0.12)} 14%,
-    ${alpha(gold, 0.6)} 44%,
+    ${goldAlpha(0.12)} 14%,
+    ${goldAlpha(0.6)} 44%,
     transparent 47%,
     transparent 53%,
-    ${alpha(gold, 0.6)} 56%,
-    ${alpha(gold, 0.12)} 86%,
+    ${goldAlpha(0.6)} 56%,
+    ${goldAlpha(0.12)} 86%,
     transparent 100%)`;
 
   const solidBackground = `linear-gradient(90deg,
     transparent 0%,
-    ${alpha(gold, 0.28)} 25%,
-    ${alpha(gold, 0.75)} 50%,
-    ${alpha(gold, 0.28)} 75%,
+    ${goldAlpha(0.28)} 25%,
+    ${goldAlpha(0.75)} 50%,
+    ${goldAlpha(0.28)} 75%,
     transparent 100%)`;
 
   return {
@@ -67,7 +67,7 @@ export function getGoldDividerSx(options?: GoldDividerOptions): SxProps<Theme> {
     overflow: 'visible',
     flexShrink: 0,
     background: showCenterGem ? gemBackground : solidBackground,
-    boxShadow: showCenterGem ? 'none' : `0 0 8px ${alpha(gold, 0.18)}`,
+    boxShadow: showCenterGem ? 'none' : `0 0 8px ${goldAlpha(0.18)}`,
     ...(showCenterGem
       ? {
           '&::after': {
@@ -80,7 +80,7 @@ export function getGoldDividerSx(options?: GoldDividerOptions): SxProps<Theme> {
             height: 7,
             borderRadius: '1px',
             bgcolor: gold,
-            boxShadow: `0 0 8px ${alpha(gold, 0.65)}`,
+            boxShadow: `0 0 8px ${goldAlpha(0.65)}`,
             pointerEvents: 'none',
           },
         }

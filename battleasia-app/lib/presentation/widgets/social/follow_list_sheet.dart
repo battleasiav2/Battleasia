@@ -85,7 +85,7 @@ class _FollowListSheetState extends State<FollowListSheet> {
           Text(title, style: AppTheme.heading3.copyWith(color: AppColors.gold)),
           const SizedBox(height: 12),
           if (_loading)
-            const Expanded(child: Center(child: CircularProgressIndicator(color: AppColors.gold)))
+            Expanded(child: Center(child: CircularProgressIndicator(color: AppColors.gold)))
           else if (_users.isEmpty)
             Expanded(
               child: Center(

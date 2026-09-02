@@ -88,7 +88,7 @@ class _FeedExplorePanelState extends State<FeedExplorePanel> {
               return Chip(
                 label: Text('#${h['tag']} (${h['count']})'),
                 backgroundColor: AppColors.surfaceElevated,
-                labelStyle: const TextStyle(color: AppColors.gold),
+                labelStyle: TextStyle(color: AppColors.gold),
                 side: BorderSide(color: AppColors.border(0.2)),
               );
             }).toList(),
@@ -252,7 +252,7 @@ class _FeedReelsPanelState extends State<FeedReelsPanel> {
               final ok = await ReelCreateSheet.show(context);
               if (ok) _load();
             },
-            icon: const Icon(Icons.add_circle_outline, color: AppColors.gold),
+            icon: Icon(Icons.add_circle_outline, color: AppColors.gold),
             label: Text(
               'reels.createReel'.tr(),
               style: AppTheme.bodyMedium.copyWith(
@@ -639,7 +639,7 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
                   _active = null;
                   _pendingAttachments = [];
                 }),
-                icon: const Icon(Icons.arrow_back, color: AppColors.gold),
+                icon: Icon(Icons.arrow_back, color: AppColors.gold),
               ),
               Expanded(
                 child: Text(
@@ -705,7 +705,7 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
                         height: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Icon(Icons.image_outlined, color: AppColors.gold),
+                    : Icon(Icons.image_outlined, color: AppColors.gold),
                 tooltip: 'messages.attachImage'.tr(),
               ),
               Expanded(
@@ -721,7 +721,7 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
               ),
               IconButton(
                 onPressed: _sendMessage,
-                icon: const Icon(Icons.send, color: AppColors.gold),
+                icon: Icon(Icons.send, color: AppColors.gold),
               ),
             ],
           ),
@@ -736,7 +736,7 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
           alignment: Alignment.centerRight,
           child: TextButton.icon(
             onPressed: _openNewChat,
-            icon: const Icon(Icons.add_comment_outlined, color: AppColors.gold),
+            icon: Icon(Icons.add_comment_outlined, color: AppColors.gold),
             label: Text(
               'messages.newChat'.tr(),
               style: AppTheme.bodyMedium.copyWith(

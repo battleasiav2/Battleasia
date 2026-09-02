@@ -9,7 +9,7 @@ import {
   getGlassBadgeChipSx,
 } from 'src/components/battle-glass-card';
 
-import { USER_COLORS } from 'src/layouts/user';
+import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 
 import { REFERRALS_HERO_IMAGE } from '../my-referrals-constants';
 
@@ -68,7 +68,7 @@ export function ReferralsHero({ title }: ReferralsHeroProps) {
             fontWeight: 700,
             letterSpacing: 1.8,
             textTransform: 'uppercase',
-            color: alpha(USER_COLORS.gold, 0.9),
+            color: goldAlpha(0.9),
           }}
         >
           {t('myReferrals.badgeReferralNetwork')}
@@ -88,7 +88,7 @@ export function ReferralsHero({ title }: ReferralsHeroProps) {
             {title}
           </Typography>
 
-          <Box sx={{ ...getGlassBadgeChipSx(tokens), border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}` }}>
+          <Box sx={{ ...getGlassBadgeChipSx(tokens), border: `1px solid ${goldAlpha(0.35)}` }}>
             <Stack direction="row" alignItems="center" spacing={0.5} sx={{ px: 0.5 }}>
               <Iconify icon="solar:users-group-rounded-bold" width={12} sx={{ color: USER_COLORS.gold }} />
               <Typography sx={{ fontSize: 10, fontWeight: 800, color: USER_COLORS.gold }}>{t('myReferrals.badgeNetwork')}</Typography>

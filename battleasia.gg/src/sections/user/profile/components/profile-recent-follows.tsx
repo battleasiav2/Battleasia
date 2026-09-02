@@ -8,7 +8,7 @@ import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
 import { getImageUrl } from 'src/utils/get-image-url';
 import { paths } from 'src/routes/paths';
-import { USER_COLORS, UserGlassCard } from 'src/layouts/user';
+import { USER_COLORS, UserGlassCard, goldAlpha } from 'src/layouts/user';
 
 import { mapFollowUser, type FollowUserItem } from '../profile-social-types';
 
@@ -61,7 +61,7 @@ export function ProfileRecentFollows({ profileUserId, isLoggedIn }: ProfileRecen
               p: 1,
               cursor: 'pointer',
               border: `1px solid ${alpha('#ffffff', 0.08)}`,
-              '&:hover': { borderColor: alpha(USER_COLORS.gold, 0.25), bgcolor: alpha(USER_COLORS.gold, 0.04) },
+              '&:hover': { borderColor: goldAlpha(0.25), bgcolor: goldAlpha(0.04) },
             }}
           >
             <Avatar src={getImageUrl(item.avatar)} alt={item.username} sx={{ width: 36, height: 36 }} />

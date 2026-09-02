@@ -9,6 +9,7 @@ import { useTranslate } from 'src/locales';
 
 import { USER_COLORS } from 'src/layouts/user/user-theme';
 import { accountMenuItems } from '../menu-items-config';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -53,7 +54,7 @@ export function FloatingFooterNav() {
                 pt: 1,
                 pb: 'max(8px, env(safe-area-inset-bottom))',
                 bgcolor: alpha('#141414', 0.96),
-                borderTop: `1px solid ${alpha(GOLD, 0.28)}`,
+                borderTop: `1px solid ${goldAlpha(0.28)}`,
                 boxShadow: `0 -8px 24px ${alpha('#000000', 0.45)}`,
                 backdropFilter: 'blur(10px)',
                 WebkitBackdropFilter: 'blur(10px)',
@@ -113,7 +114,7 @@ export function FloatingFooterNav() {
                                 width: isActive ? 22 : 0,
                                 bgcolor: GOLD,
                                 transition: 'width 0.2s ease',
-                                boxShadow: isActive ? `0 0 6px ${alpha(GOLD, 0.55)}` : 'none',
+                                boxShadow: isActive ? `0 0 6px ${goldAlpha(0.55)}` : 'none',
                             }}
                         />
                     </Box>

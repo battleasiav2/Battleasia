@@ -56,13 +56,11 @@ class _GoldButtonState extends State<GoldButton> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(widget.borderRadius),
             color: enabled
-                ? (_pressed ? const Color(0xFFD4A017) : const Color(0xFFF5C518))
+                ? (_pressed ? AppColors.goldDark : AppColors.gold)
                 : AppColors.gold.withValues(alpha: 0.28),
             border: Border.all(
               color: enabled
-                  ? (_pressed
-                      ? const Color(0xFFB45309)
-                      : const Color(0xFFD4A017))
+                  ? (_pressed ? AppColors.goldDark : AppColors.gold)
                   : AppColors.gold.withValues(alpha: 0.22),
             ),
             boxShadow: enabled && widget.glow

@@ -4,7 +4,7 @@ import { alpha } from '@mui/material/styles';
 import CoinValue from 'src/components/coin-value';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
-import { USER_COLORS } from 'src/layouts/user';
+import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 
 import {
   formatReferralDate,
@@ -114,8 +114,8 @@ export function ReferralCommissionList({ items, labels }: ReferralCommissionList
                 px: 1,
                 py: 0.35,
                 borderRadius: '4px',
-                bgcolor: alpha(USER_COLORS.gold, 0.12),
-                border: `1px solid ${alpha(USER_COLORS.gold, 0.28)}`,
+                bgcolor: goldAlpha(0.12),
+                border: `1px solid ${goldAlpha(0.28)}`,
               }}
             >
               <Typography sx={{ fontSize: 10, fontWeight: 800, color: USER_COLORS.gold, textTransform: 'uppercase' }}>

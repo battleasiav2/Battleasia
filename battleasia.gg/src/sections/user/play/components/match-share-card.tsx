@@ -13,6 +13,7 @@ import {
   USER_COLORS,
   userMutedTextSx,
   getUserChipSx,
+  goldAlpha,
 } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 import { CoinValue } from 'src/components/coin-value';
@@ -150,8 +151,8 @@ export function MatchShareCard({ matchId, matchName }: Props) {
             borderRadius: 1.25,
             display: 'grid',
             placeItems: 'center',
-            bgcolor: alpha(EARN_HUB_GOLD, 0.12),
-            border: `1px solid ${alpha(EARN_HUB_GOLD, 0.28)}`,
+            bgcolor: goldAlpha( 0.12),
+            border: `1px solid ${goldAlpha( 0.28)}`,
             color: EARN_HUB_GOLD,
             flexShrink: 0,
           }}

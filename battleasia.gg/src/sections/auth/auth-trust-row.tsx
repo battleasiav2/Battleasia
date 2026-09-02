@@ -6,7 +6,7 @@ import { Iconify } from 'src/components/iconify';
 
 import { AUTH_TEXT_MUTED } from './auth-form-styles';
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 
 type AuthTrustRowProps = {
   insideCard?: boolean;

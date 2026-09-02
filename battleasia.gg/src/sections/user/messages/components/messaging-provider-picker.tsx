@@ -8,7 +8,7 @@ import {
   IconButton,
 } from '@mui/material';
 
-import { USER_COLORS, userGlassDialogPaperSx } from 'src/layouts/user';
+import { USER_COLORS, userGlassDialogPaperSx, goldAlpha } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 import { useTranslate } from 'src/locales/use-locales';
 
@@ -68,7 +68,7 @@ export function MessagingProviderPicker({
                 cursor: 'pointer',
                 border: `1px solid ${alpha('#ffffff', 0.1)}`,
                 bgcolor: alpha('#000000', 0.25),
-                '&:hover': { borderColor: alpha(USER_COLORS.gold, 0.35), bgcolor: alpha(USER_COLORS.gold, 0.06) },
+                '&:hover': { borderColor: goldAlpha(0.35), bgcolor: goldAlpha(0.06) },
               }}
             >
               <Iconify icon={provider.icon} width={22} sx={{ color: provider.color || USER_COLORS.gold }} />

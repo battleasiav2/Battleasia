@@ -5,7 +5,7 @@ import { Iconify } from 'src/components/iconify';
 
 import { AUTH_TEXT_MUTED, AUTH_TEXT_SECONDARY } from './auth-form-styles';
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 
 export type AuthStep = {
   id: number;

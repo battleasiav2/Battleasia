@@ -300,7 +300,18 @@
     "saved": "সেভ করা",
     "messages": "বার্তা",
     "settings": "সেটিংস",
-    "logout": "লগআউট"
+    "logout": "লগআউট",
+    "siteColor": "সাইট কালার",
+    "siteColorHint": "বাটন, বর্ডার ও হাইলাইট এই রঙে বদলাবে।",
+    "accent": {
+      "gold": "গোল্ড",
+      "ember": "এম্বার",
+      "jade": "জেড",
+      "cyan": "সায়ান",
+      "violet": "ভায়োলেট",
+      "rose": "রোজ",
+      "sky": "স্কাই"
+    }
   },
   "footer": {
     "downloadAppForAndroid": "অ্যান্ড্রয়েডের জন্য অ্যাপ ডাউনলোড করুন",

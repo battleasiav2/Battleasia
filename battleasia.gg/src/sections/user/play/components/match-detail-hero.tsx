@@ -7,6 +7,7 @@ import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { USER_COLORS } from 'src/layouts/user';
 
 import type { MatchDetailData } from '../match-types';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -45,8 +46,8 @@ export function MatchDetailHero({ match, bannerUrl }: MatchDetailHeroProps) {
         alignItems: 'flex-end',
         overflow: 'hidden',
         bgcolor: '#000000',
-        borderTop: `1px solid ${alpha(GOLD, 0.16)}`,
-        borderBottom: `1px solid ${alpha(GOLD, 0.16)}`,
+        borderTop: `1px solid ${goldAlpha(0.16)}`,
+        borderBottom: `1px solid ${goldAlpha(0.16)}`,
       }}
     >
       <Box
@@ -72,7 +73,7 @@ export function MatchDetailHero({ match, bannerUrl }: MatchDetailHeroProps) {
           background: `
             linear-gradient(90deg, ${alpha('#000000', 0.88)} 0%, ${alpha('#000000', 0.45)} 55%, ${alpha('#000000', 0.3)} 100%),
             linear-gradient(180deg, ${alpha('#000000', 0.4)} 0%, transparent 35%, ${alpha('#000000', 0.9)} 100%),
-            radial-gradient(ellipse 50% 40% at 20% 25%, ${alpha(GOLD, 0.1)} 0%, transparent 60%)
+            radial-gradient(ellipse 50% 40% at 20% 25%, ${goldAlpha(0.1)} 0%, transparent 60%)
           `,
         }}
       />
@@ -95,7 +96,7 @@ export function MatchDetailHero({ match, bannerUrl }: MatchDetailHeroProps) {
               fontWeight: 800,
               letterSpacing: 1.6,
               textTransform: 'uppercase',
-              color: alpha(GOLD, 0.9),
+              color: goldAlpha(0.9),
             }}
           >
             {match.gameName}

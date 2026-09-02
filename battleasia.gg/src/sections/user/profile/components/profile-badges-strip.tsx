@@ -10,11 +10,12 @@ import {
   UserGlassCard,
   USER_COLORS,
   userMutedTextSx,
+  goldAlpha,
 } from 'src/layouts/user';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 import { Iconify } from 'src/components/iconify';
 
-const BADGE_GOLD = '#feab02';
+const BADGE_GOLD = 'var(--ba-gold)';
 
 export type ProfileBadgeItem = {
   id: string;
@@ -59,8 +60,8 @@ function BadgeTile({ badge, showProgress }: { badge: ProfileBadgeItem; showProgr
         p: { xs: 1.25, md: 1.5 },
         minHeight: 132,
         opacity: unlocked ? 1 : 0.72,
-        border: unlocked ? `1px solid ${alpha(BADGE_GOLD, 0.35)}` : `1px solid ${alpha('#ffffff', 0.08)}`,
-        bgcolor: unlocked ? alpha(BADGE_GOLD, 0.06) : undefined,
+        border: unlocked ? `1px solid ${goldAlpha(0.35)}` : `1px solid ${alpha('#ffffff', 0.08)}`,
+        bgcolor: unlocked ? goldAlpha(0.06) : undefined,
       })}
     >
       <Stack spacing={1} alignItems="center" textAlign="center">
@@ -71,7 +72,7 @@ function BadgeTile({ badge, showProgress }: { badge: ProfileBadgeItem; showProgr
             borderRadius: 1.5,
             display: 'grid',
             placeItems: 'center',
-            bgcolor: alpha(unlocked ? BADGE_GOLD : '#ffffff', unlocked ? 0.14 : 0.06),
+            bgcolor: unlocked ? goldAlpha(0.14) : alpha('#ffffff', 0.06),
             color: unlocked ? BADGE_GOLD : alpha('#ffffff', 0.35),
             filter: unlocked ? 'none' : 'grayscale(1)',
           }}
@@ -101,7 +102,7 @@ function BadgeTile({ badge, showProgress }: { badge: ProfileBadgeItem; showProgr
               <Typography sx={{ ...userMutedTextSx, fontSize: 10 }}>
                 {badge.progress ?? badge.current ?? 0}/{badge.target ?? badge.threshold}
               </Typography>
-              <Typography sx={{ fontSize: 10, color: alpha(BADGE_GOLD, 0.85), fontWeight: 700 }}>
+              <Typography sx={{ fontSize: 10, color: goldAlpha(0.85), fontWeight: 700 }}>
                 {Math.round(percent)}%
               </Typography>
             </Stack>
@@ -114,7 +115,7 @@ function BadgeTile({ badge, showProgress }: { badge: ProfileBadgeItem; showProgr
                 bgcolor: alpha('#ffffff', 0.08),
                 '& .MuiLinearProgress-bar': {
                   borderRadius: 99,
-                  bgcolor: alpha(BADGE_GOLD, 0.65),
+                  bgcolor: goldAlpha(0.65),
                 },
               }}
             />

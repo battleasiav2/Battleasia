@@ -8,6 +8,7 @@ import 'package:battleasia_app/presentation/widgets/common/battleasia_logo.dart'
 import 'package:battleasia_app/presentation/widgets/common/account_drawer.dart';
 import 'package:battleasia_app/presentation/widgets/common/animated_balance_display.dart';
 import 'package:battleasia_app/presentation/widgets/common/locale_toggle.dart';
+import 'package:battleasia_app/presentation/widgets/common/accent_toggle.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 
 class AppHeader extends StatelessWidget {
@@ -50,6 +51,8 @@ class AppHeader extends StatelessWidget {
             logoSize: logoSize,
           ),
           const Spacer(),
+          const AccentToggle(),
+          const SizedBox(width: 8),
           const LocaleToggle(),
           const SizedBox(width: 12),
           Consumer<AuthProvider>(

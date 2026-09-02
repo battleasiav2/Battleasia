@@ -10,6 +10,7 @@ import { GLASS_CARD_RADIUS } from 'src/components/battle-glass-card';
 
 import { USER_COLORS } from './user-theme';
 import { UserActionButton } from './user-action-button';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -55,8 +56,8 @@ export function UserEmptyState({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: alpha(USER_COLORS.gold, 0.1),
-          border: `1px solid ${alpha(USER_COLORS.gold, 0.22)}`,
+          bgcolor: goldAlpha(0.1),
+          border: `1px solid ${goldAlpha(0.22)}`,
           color: USER_COLORS.gold,
         }}
       >

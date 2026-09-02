@@ -6,7 +6,7 @@ import { Box, Stack, Avatar, Typography, Skeleton } from '@mui/material';
 import useApi from 'src/hooks/use-api';
 import { useSelector } from 'src/store';
 import { useTranslate } from 'src/locales/use-locales';
-import { UserGlassCard, USER_COLORS } from 'src/layouts/user';
+import { UserGlassCard, USER_COLORS, goldAlpha } from 'src/layouts/user';
 import { getImageUrl } from 'src/utils/get-image-url';
 import { Iconify } from 'src/components/iconify';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
@@ -62,18 +62,18 @@ function StoryCard({
         cursor: 'pointer',
         border: `2px solid ${
           createCard
-            ? alpha(USER_COLORS.gold, 0.45)
+            ? goldAlpha(0.45)
             : hasUnseen
               ? USER_COLORS.gold
               : alpha('#ffffff', 0.18)
         }`,
-        boxShadow: hasUnseen ? `0 8px 24px ${alpha(USER_COLORS.gold, 0.18)}` : 'none',
+        boxShadow: hasUnseen ? `0 8px 24px ${goldAlpha(0.18)}` : 'none',
         bgcolor: alpha('#000000', 0.55),
         transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
         '&:hover': {
           transform: 'translateY(-2px)',
           borderColor: USER_COLORS.gold,
-          boxShadow: `0 12px 28px ${alpha(USER_COLORS.gold, 0.22)}`,
+          boxShadow: `0 12px 28px ${goldAlpha(0.22)}`,
         },
       }}
     >
@@ -119,7 +119,7 @@ function StoryCard({
             position: 'absolute',
             inset: 0,
             background: createCard
-              ? `linear-gradient(145deg, ${alpha(USER_COLORS.gold, 0.18)} 0%, ${alpha('#000000', 0.75)} 100%)`
+              ? `linear-gradient(145deg, ${goldAlpha(0.18)} 0%, ${alpha('#000000', 0.75)} 100%)`
               : `linear-gradient(145deg, ${alpha('#ffffff', 0.08)} 0%, ${alpha('#000000', 0.82)} 100%)`,
           }}
         />

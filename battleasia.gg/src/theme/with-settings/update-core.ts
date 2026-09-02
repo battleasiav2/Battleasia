@@ -6,6 +6,7 @@ import { setFont, hexToRgbChannel, createPaletteChannel } from 'minimal-shared/u
 import { withNonLatin } from '../core/typography';
 import { primaryColorPresets } from './color-presets';
 import { createShadowColor } from '../core/custom-shadows';
+import { resolveAccentId } from '../accent-presets';
 
 import type { ThemeOptions, ThemeColorScheme } from '../types';
 
@@ -25,15 +26,15 @@ export function updateCoreWithSettings(
     direction,
     fontFamily,
     contrast = 'default',
-    primaryColor = 'default',
+    primaryColor = 'gold',
   } = settingsState ?? {};
 
   const isDefaultContrast = contrast === 'default';
-  const isDefaultPrimaryColor = primaryColor === 'default';
+  const accentId = resolveAccentId(primaryColor);
 
   const lightPalette = theme.colorSchemes?.light.palette as ColorSystem['palette'];
 
-  const updatedPrimaryColor = createPaletteChannel(primaryColorPresets[primaryColor]);
+  const updatedPrimaryColor = createPaletteChannel(primaryColorPresets[accentId]);
   // const updatedSecondaryColor = createPaletteChannel(SECONDARY_COLORS[primaryColor!]);
 
   const updateColorScheme = (scheme: ThemeColorScheme) => {
@@ -41,10 +42,7 @@ export function updateCoreWithSettings(
 
     const updatedPalette = {
       ...colorSchemes?.palette,
-      ...(!isDefaultPrimaryColor && {
-        primary: updatedPrimaryColor,
-        // secondary: updatedSecondaryColor,
-      }),
+      primary: updatedPrimaryColor,
       ...(scheme === 'light' && {
         background: {
           ...lightPalette?.background,
@@ -58,10 +56,7 @@ export function updateCoreWithSettings(
 
     const updatedCustomShadows = {
       ...colorSchemes?.customShadows,
-      ...(!isDefaultPrimaryColor && {
-        primary: createShadowColor(updatedPrimaryColor.mainChannel),
-        // secondary: createShadowColor(updatedSecondaryColor.mainChannel),
-      }),
+      primary: createShadowColor(updatedPrimaryColor.mainChannel),
     };
 
     return {

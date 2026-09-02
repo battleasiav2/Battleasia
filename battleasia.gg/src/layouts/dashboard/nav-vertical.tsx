@@ -68,7 +68,7 @@ export function NavVertical({
                             className="font-tr"
                             sx={{
                                 fontSize: isBengali ? { xs: 26, md: 30 } : { xs: 28, md: 30 },
-                                color: '#feab02',
+                                color: 'var(--ba-gold)',
                                 fontWeight: 700,
                                 lineHeight: 1.05,
                             }}

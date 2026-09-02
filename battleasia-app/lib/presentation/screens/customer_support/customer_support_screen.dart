@@ -427,7 +427,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                 _createCategory = 'other';
               });
             },
-            icon: const Icon(Icons.add, color: AppColors.gold),
+            icon: Icon(Icons.add, color: AppColors.gold),
             label: Text(
               'support.newTicket'.tr(),
               style: AppTheme.bodySmall.copyWith(
@@ -698,7 +698,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                   onPressed: _conversation == null
                       ? null
                       : () => _loadMessages(_conversation!.id),
-                  icon: const Icon(Icons.refresh, color: AppColors.gold),
+                  icon: Icon(Icons.refresh, color: AppColors.gold),
                 ),
               ],
             ),
@@ -767,7 +767,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                 children: [
                   IconButton(
                     onPressed: _sending ? null : () => _pickAttachments(),
-                    icon: const Icon(Icons.attach_file, color: AppColors.gold),
+                    icon: Icon(Icons.attach_file, color: AppColors.gold),
                   ),
                   Expanded(
                     child: TextField(
@@ -801,7 +801,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                             height: 20,
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
-                        : const Icon(Icons.send, color: AppColors.gold),
+                        : Icon(Icons.send, color: AppColors.gold),
                   ),
                 ],
               ),

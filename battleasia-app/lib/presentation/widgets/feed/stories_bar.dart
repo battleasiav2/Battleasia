@@ -424,7 +424,7 @@ class _StoryCreateSheetState extends State<_StoryCreateSheet> {
                       height: 120,
                       color: Colors.black26,
                       alignment: Alignment.center,
-                      child: const Icon(Icons.videocam, color: AppColors.gold),
+                      child: Icon(Icons.videocam, color: AppColors.gold),
                     ),
             )
           else

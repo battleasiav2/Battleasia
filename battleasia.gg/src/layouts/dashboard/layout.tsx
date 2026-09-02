@@ -26,6 +26,7 @@ import { HeaderSection } from '../core/header-section';
 import { FooterSection } from '../core/footer-section';
 import { LayoutSection } from '../core/layout-section';
 import { LanguagePopover } from '../components/language-popover';
+import { AccentPopover } from '../components/accent-popover';
 import { SignInIconButton } from '../components/sign-in-icon-button';
 import {
   getHeaderBarSx,
@@ -43,6 +44,7 @@ import { menuItems, accountMenuItems, createMenuClickHandler } from '../menu-ite
 import type { MainSectionProps } from '../core/main-section';
 import type { HeaderSectionProps } from '../core/header-section';
 import type { LayoutSectionProps } from '../core/layout-section';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // Logged-in chrome — keep simplebar / drawer JS off anonymous home LCP
 const AccountDrawer = lazy(() =>
@@ -54,7 +56,7 @@ const NotificationsDrawer = lazy(() =>
 
 // ----------------------------------------------------------------------
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 
 type LayoutBaseProps = Pick<LayoutSectionProps, 'sx' | 'children' | 'cssVars'>;
 
@@ -167,8 +169,8 @@ export function DashboardLayout({
                 px: 0.65,
                 py: 0.2,
                 borderRadius: '3px',
-                border: `1px solid ${alpha(GOLD, 0.65)}`,
-                bgcolor: alpha(GOLD, 0.08),
+                border: `1px solid ${goldAlpha(0.65)}`,
+                bgcolor: goldAlpha(0.08),
                 display: { xs: 'none', sm: 'inline-flex' },
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -240,6 +242,7 @@ export function DashboardLayout({
           )}
 
           <LanguagePopover data={allLangs} />
+          <AccentPopover />
         </Stack>
       ),
     };

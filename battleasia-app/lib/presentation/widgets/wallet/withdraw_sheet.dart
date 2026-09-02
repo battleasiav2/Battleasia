@@ -163,7 +163,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: AppColors.gold),
+          borderSide: BorderSide(color: AppColors.gold),
         ),
       );
 
@@ -393,7 +393,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
                 width: 20,
                 height: 20,
                 errorBuilder: (_, __, ___) =>
-                    const Icon(Icons.monetization_on, color: AppColors.gold),
+                    Icon(Icons.monetization_on, color: AppColors.gold),
               ),
             ),
           ),

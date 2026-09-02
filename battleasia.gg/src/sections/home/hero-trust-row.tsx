@@ -4,7 +4,7 @@ import { alpha } from '@mui/material/styles';
 import { Iconify } from 'src/components/iconify/iconify';
 import { useTranslate } from 'src/locales/use-locales';
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 
 const TRUST_ITEMS = [
   { key: 'auth.featureSecure', icon: 'solar:shield-check-bold-duotone' },

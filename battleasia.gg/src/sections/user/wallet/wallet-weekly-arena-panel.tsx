@@ -8,6 +8,7 @@ import {
   USER_COLORS,
   userMutedTextSx,
   getUserChipSx,
+  goldAlpha,
 } from 'src/layouts/user';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 import { Iconify } from 'src/components/iconify';
@@ -86,8 +87,8 @@ export function WalletWeeklyArenaPanel({ weeklyArena, claiming, flash = false, o
               display: 'grid',
               placeItems: 'center',
               flexShrink: 0,
-              bgcolor: alpha(EARN_HUB_GOLD, 0.12),
-              border: `1px solid ${alpha(EARN_HUB_GOLD, 0.25)}`,
+              bgcolor: goldAlpha( 0.12),
+              border: `1px solid ${goldAlpha( 0.25)}`,
               color: EARN_HUB_GOLD,
             }}
           >
@@ -129,7 +130,7 @@ export function WalletWeeklyArenaPanel({ weeklyArena, claiming, flash = false, o
                 <Typography sx={{ ...userMutedTextSx, fontSize: 11 }}>
                   {t('wallet.weeklyArenaProgress', { current: winCount, target: targetWins })}
                 </Typography>
-                <Typography sx={{ fontSize: 11, color: alpha(EARN_HUB_GOLD, 0.9), fontWeight: 700 }}>
+                <Typography sx={{ fontSize: 11, color: goldAlpha( 0.9), fontWeight: 700 }}>
                   {Math.round(percent)}%
                 </Typography>
               </Stack>
@@ -142,14 +143,14 @@ export function WalletWeeklyArenaPanel({ weeklyArena, claiming, flash = false, o
                   bgcolor: alpha('#ffffff', 0.08),
                   '& .MuiLinearProgress-bar': {
                     borderRadius: 99,
-                    bgcolor: isClaimed || canClaim ? EARN_HUB_GOLD : alpha(EARN_HUB_GOLD, 0.65),
+                    bgcolor: isClaimed || canClaim ? EARN_HUB_GOLD : goldAlpha( 0.65),
                   },
                 }}
               />
             </Stack>
 
             {weeklyArena.viewerRank ? (
-              <Typography sx={{ mt: 1, fontSize: 12, color: alpha(EARN_HUB_GOLD, 0.9), fontWeight: 700 }}>
+              <Typography sx={{ mt: 1, fontSize: 12, color: goldAlpha( 0.9), fontWeight: 700 }}>
                 {t('wallet.weeklyArenaYourRank', { rank: weeklyArena.viewerRank })}
               </Typography>
             ) : null}
@@ -191,11 +192,11 @@ export function WalletWeeklyArenaPanel({ weeklyArena, claiming, flash = false, o
                 sx={getGlassInnerSx(glassTokens, {
                   p: 1,
                   borderLeft: entry.isViewer ? `3px solid ${EARN_HUB_GOLD}` : undefined,
-                  bgcolor: entry.isViewer ? alpha(EARN_HUB_GOLD, 0.05) : undefined,
+                  bgcolor: entry.isViewer ? goldAlpha( 0.05) : undefined,
                 })}
               >
                 <Stack direction="row" alignItems="center" spacing={1}>
-                  <Typography sx={{ width: 24, fontWeight: 800, fontSize: 12, color: alpha(EARN_HUB_GOLD, 0.9) }}>
+                  <Typography sx={{ width: 24, fontWeight: 800, fontSize: 12, color: goldAlpha( 0.9) }}>
                     #{entry.rank}
                   </Typography>
                   <Avatar src={entry.avatar || undefined} sx={{ width: 28, height: 28, fontSize: 12 }}>
@@ -204,7 +205,7 @@ export function WalletWeeklyArenaPanel({ weeklyArena, claiming, flash = false, o
                   <Typography sx={{ flex: 1, minWidth: 0, fontWeight: entry.isViewer ? 800 : 600, fontSize: 13, color: USER_COLORS.textPrimary }} noWrap>
                     {entry.username}
                   </Typography>
-                  <Typography sx={{ fontSize: 12, color: alpha(EARN_HUB_GOLD, 0.9), fontWeight: 700 }}>
+                  <Typography sx={{ fontSize: 12, color: goldAlpha( 0.9), fontWeight: 700 }}>
                     {entry.winCount} {t('wallet.weeklyArenaWinsShort')}
                   </Typography>
                 </Stack>

@@ -1,6 +1,7 @@
 import { Box, Card, Chip, Grid, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
+import { goldAlpha } from 'src/theme/accent-presets';
 import { glassShimmerKeyframes, glassShimmerLayer } from './glass-shimmer';
 import { GLASS_CARD_RADIUS, GLASS_CARD_RADIUS_SM } from './glass-card-tokens';
 import { GlassStatTile } from './glass-stat-tile';
@@ -83,7 +84,7 @@ export function PulseCard({
     <Box>
       {showDemoLabel ? (
         <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
-          <Typography variant="subtitle2" sx={{ color: '#f5c518', fontWeight: 700, letterSpacing: 0.4 }}>
+          <Typography variant="subtitle2" sx={{ color: 'var(--ba-gold)', fontWeight: 700, letterSpacing: 0.4 }}>
             {tokens.label}
           </Typography>
           <Typography variant="caption" sx={{ color: alpha('#ffffff', 0.72) }}>
@@ -108,9 +109,9 @@ export function PulseCard({
             'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, box-shadow 0.4s ease',
           '&:hover': {
             transform: 'translateY(-6px)',
-            borderColor: 'rgba(245, 197, 24, 0.45)',
+            borderColor: goldAlpha(0.45),
             boxShadow:
-              '0 22px 48px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(245, 197, 24, 0.2), 0 0 32px rgba(245, 197, 24, 0.12)',
+              `0 22px 48px rgba(0, 0, 0, 0.7), 0 0 0 1px ${goldAlpha(0.2)}, 0 0 32px ${goldAlpha(0.12)}`,
           },
           '&:before': tokens.shell.overlay
             ? {
@@ -139,13 +140,13 @@ export function PulseCard({
                   letterSpacing: 0.6,
                   height: 28,
                   px: 0.5,
-                  bgcolor: 'rgba(245, 197, 24, 0.12)',
-                  color: '#f5c518',
-                  border: '1px solid rgba(245, 197, 24, 0.45)',
-                  boxShadow: '0 0 12px rgba(245, 197, 24, 0.1)',
+                  bgcolor: goldAlpha(0.12),
+                  color: 'var(--ba-gold)',
+                  border: `1px solid ${goldAlpha(0.45)}`,
+                  boxShadow: `0 0 12px ${goldAlpha(0.1)}`,
                   '& .MuiChip-label': {
                     px: 1.25,
-                    color: '#f5c518',
+                    color: 'var(--ba-gold)',
                     fontWeight: 700,
                   },
                 }}

@@ -10,6 +10,7 @@ import { USER_COLORS } from 'src/layouts/user';
 import { useTranslate } from 'src/locales/use-locales';
 
 import type { MatchResultData } from '../match-types';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -51,8 +52,8 @@ export function MatchResultHero({ match, mapImageUrl, onMapError }: MatchResultH
         alignItems: 'flex-end',
         overflow: 'hidden',
         bgcolor: '#000000',
-        borderTop: `1px solid ${alpha(GOLD, 0.16)}`,
-        borderBottom: `1px solid ${alpha(GOLD, 0.16)}`,
+        borderTop: `1px solid ${goldAlpha(0.16)}`,
+        borderBottom: `1px solid ${goldAlpha(0.16)}`,
       }}
     >
       <Box
@@ -90,7 +91,7 @@ export function MatchResultHero({ match, mapImageUrl, onMapError }: MatchResultH
           zIndex: 2,
           px: 1.1,
           py: 0.45,
-          border: `1px solid ${alpha(GOLD, 0.45)}`,
+          border: `1px solid ${goldAlpha(0.45)}`,
           bgcolor: alpha('#000000', 0.55),
         }}
       >

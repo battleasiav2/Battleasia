@@ -2,7 +2,7 @@ import { alpha } from '@mui/material/styles';
 import { Box, LinearProgress, Stack, Typography } from '@mui/material';
 
 import { useTranslate } from 'src/locales/use-locales';
-import { UserGlassCard, USER_COLORS, userMutedTextSx, getUserChipSx } from 'src/layouts/user';
+import { UserGlassCard, USER_COLORS, userMutedTextSx, getUserChipSx, goldAlpha } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 
 import { EARN_HUB_GOLD } from './wallet-earn-hub-styles';
@@ -51,8 +51,8 @@ export function WalletLevelPanel({ level }: Props) {
               borderRadius: 1.25,
               display: 'grid',
               placeItems: 'center',
-              bgcolor: alpha(EARN_HUB_GOLD, 0.12),
-              border: `1px solid ${alpha(EARN_HUB_GOLD, 0.28)}`,
+              bgcolor: goldAlpha( 0.12),
+              border: `1px solid ${goldAlpha( 0.28)}`,
               color: EARN_HUB_GOLD,
               flexShrink: 0,
             }}

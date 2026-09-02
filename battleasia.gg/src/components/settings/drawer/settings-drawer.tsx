@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography';
 import { useColorScheme } from '@mui/material/styles';
 
 import { themeConfig } from 'src/theme/theme-config';
-import { primaryColorPresets } from 'src/theme/with-settings';
+import { ACCENT_PRESET_OPTIONS } from 'src/theme/with-settings';
 
 import { Iconify } from '../../iconify';
 import { BaseOption } from './base-option';
@@ -136,17 +136,12 @@ export function SettingsDrawer({ sx, defaultSettings }: SettingsDrawerProps) {
 
   const renderPresets = () => (
     <LargeBlock
-      title="Presets"
+      title="Site color"
       canReset={settings.state.primaryColor !== defaultSettings.primaryColor}
       onReset={() => settings.setState({ primaryColor: defaultSettings.primaryColor })}
     >
       <PresetsOptions
-        options={
-          Object.keys(primaryColorPresets).map((key) => ({
-            name: key,
-            value: primaryColorPresets[key].main,
-          })) as { name: SettingsState['primaryColor']; value: string }[]
-        }
+        options={ACCENT_PRESET_OPTIONS}
         value={settings.state.primaryColor}
         onChangeOption={(newOption) => settings.setState({ primaryColor: newOption })}
       />

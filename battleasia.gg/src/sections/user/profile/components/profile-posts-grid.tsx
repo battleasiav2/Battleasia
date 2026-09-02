@@ -7,7 +7,7 @@ import { useRouter } from 'src/routes/hooks';
 import { getImageUrl } from 'src/utils/get-image-url';
 
 import { useTranslate } from 'src/locales/use-locales';
-import { USER_COLORS } from 'src/layouts/user';
+import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 
 import { Iconify } from 'src/components/iconify';
 import { Image } from 'src/components/image';
@@ -103,7 +103,7 @@ export function ProfilePostsGrid({ feeds }: ProfilePostsGridProps) {
                 sx={{
                   width: 1,
                   height: 1,
-                  backgroundImage: `linear-gradient(135deg, ${alpha(USER_COLORS.gold, 0.12)} 0%, transparent 70%)`,
+                  backgroundImage: `linear-gradient(135deg, ${goldAlpha(0.12)} 0%, transparent 70%)`,
                 }}
               >
                 <Iconify icon="solar:document-text-bold" width={28} sx={{ color: USER_COLORS.textMuted }} />

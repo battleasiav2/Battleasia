@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { merge } from 'es-toolkit';
 
-import { Alert, Box, Button } from '@mui/material';
+import { Alert, Box, Button, Stack } from '@mui/material';
 import { alpha, useTheme, type Breakpoint } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
@@ -23,6 +23,8 @@ import type { AuthSplitContentProps } from './content';
 import type { MainSectionProps } from '../core/main-section';
 import type { HeaderSectionProps } from '../core/header-section';
 import type { LayoutSectionProps } from '../core/layout-section';
+import { goldAlpha } from 'src/theme/accent-presets';
+import { AccentPopover } from '../components/accent-popover';
 
 const AuthHeroPanel = lazy(() =>
   import('src/sections/auth/auth-hero-panel').then((m) => ({ default: m.AuthHeroPanel }))
@@ -30,7 +32,7 @@ const AuthHeroPanel = lazy(() =>
 
 // ----------------------------------------------------------------------
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 const AUTH_BG = '/assets/images/auth/auth-bg.webp';
 
 type LayoutBaseProps = Pick<LayoutSectionProps, 'sx' | 'children' | 'cssVars'>;
@@ -109,17 +111,22 @@ export function AuthSplitLayout({
             lineHeight: 1,
             color: GOLD,
             bgcolor: alpha('#000000', 0.35),
-            border: `1px solid ${alpha(GOLD, 0.4)}`,
+            border: `1px solid ${goldAlpha(0.4)}`,
             boxShadow: 'none',
             '& .MuiButton-startIcon': { mr: 0.75, ml: 0 },
             '&:hover': {
-              bgcolor: alpha(GOLD, 0.1),
+              bgcolor: goldAlpha(0.1),
               borderColor: GOLD,
             },
           }}
         >
           {t('auth.backHome')}
         </Button>
+      ),
+      rightArea: (
+        <Stack direction="row" alignItems="center" sx={{ height: 1 }}>
+          <AccentPopover />
+        </Stack>
       ),
     };
 
@@ -173,7 +180,7 @@ export function AuthSplitLayout({
             inset: 0,
             background: `
               linear-gradient(90deg, ${alpha('#0a0a0a', 0.9)} 0%, ${alpha('#0a0a0a', 0.7)} 48%, ${alpha('#0a0a0a', 0.82)} 100%),
-              radial-gradient(ellipse 70% 45% at 50% 0%, ${alpha(GOLD, 0.08)} 0%, transparent 55%)
+              radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha(0.08)} 0%, transparent 55%)
             `,
             zIndex: 0,
           },

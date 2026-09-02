@@ -14,6 +14,7 @@ import { CustomPopover } from 'src/components/custom-popover';
 import { useTranslate } from 'src/locales/use-locales';
 import { USER_COLORS } from 'src/layouts/user/user-theme';
 import { headerLanguageCodeSx, headerLanguagePillSx } from './header-chrome';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -76,7 +77,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         <Typography
           className="font-tr"
           sx={{
-            color: alpha(GOLD, 0.9),
+            color: goldAlpha(0.9),
             fontWeight: 600,
             fontSize: 11,
             lineHeight: 1,
@@ -115,10 +116,10 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
                 px: 1.25,
                 py: 0.75,
                 textAlign: 'left',
-                bgcolor: isSelected ? alpha(GOLD, 0.1) : 'transparent',
+                bgcolor: isSelected ? goldAlpha(0.1) : 'transparent',
                 transition: 'background-color 0.2s ease',
                 '&:hover': {
-                  bgcolor: isSelected ? alpha(GOLD, 0.14) : alpha('#ffffff', 0.04),
+                  bgcolor: isSelected ? goldAlpha(0.14) : alpha('#ffffff', 0.04),
                 },
               }}
             >

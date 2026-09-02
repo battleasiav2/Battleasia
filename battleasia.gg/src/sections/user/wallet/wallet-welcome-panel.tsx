@@ -7,6 +7,7 @@ import {
   UserActionButton,
   USER_COLORS,
   userMutedTextSx,
+  goldAlpha,
 } from 'src/layouts/user';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 import { Iconify } from 'src/components/iconify';
@@ -63,8 +64,8 @@ function WelcomeMilestoneCard({
             display: 'grid',
             placeItems: 'center',
             flexShrink: 0,
-            bgcolor: alpha(isClaimed ? '#22c55e' : EARN_HUB_GOLD, 0.12),
-            border: `1px solid ${alpha(isClaimed ? '#22c55e' : EARN_HUB_GOLD, 0.25)}`,
+            bgcolor: isClaimed ? alpha('#22c55e', 0.12) : goldAlpha(0.12),
+            border: `1px solid ${isClaimed ? alpha('#22c55e', 0.25) : goldAlpha(0.25)}`,
             color: isClaimed ? '#22c55e' : EARN_HUB_GOLD,
           }}
         >
@@ -93,7 +94,7 @@ function WelcomeMilestoneCard({
               bgcolor: alpha('#ffffff', 0.08),
               '& .MuiLinearProgress-bar': {
                 borderRadius: 99,
-                  bgcolor: isClaimed || isReady ? EARN_HUB_GOLD : alpha(EARN_HUB_GOLD, 0.45),
+                  bgcolor: isClaimed || isReady ? EARN_HUB_GOLD : goldAlpha( 0.45),
               },
             }}
           />

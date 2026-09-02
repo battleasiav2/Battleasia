@@ -7,6 +7,7 @@ import { Logo } from 'src/components/logo';
 import { useTranslate } from 'src/locales/use-locales';
 
 import { authCardSx, AUTH_TEXT_MUTED } from './auth-form-styles';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -15,7 +16,7 @@ const cardReveal = keyframes`
   to { opacity: 1; transform: translateY(0); }
 `;
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 
 type AuthFormShellProps = {
   title: ReactNode;
@@ -59,7 +60,7 @@ export function AuthFormShell({
               sx={{
                 height: 1,
                 width: `${progress}%`,
-                background: `linear-gradient(90deg, ${GOLD}, ${alpha(GOLD, 0.55)})`,
+                background: `linear-gradient(90deg, ${GOLD}, ${goldAlpha(0.55)})`,
                 transition: 'width 0.5s ease',
               }}
             />
@@ -85,7 +86,7 @@ export function AuthFormShell({
                 fontWeight: 700,
                 letterSpacing: 2.5,
                 textTransform: 'uppercase',
-                color: alpha(GOLD, 0.88),
+                color: goldAlpha(0.88),
                 pt: 0.25,
               }}
             >

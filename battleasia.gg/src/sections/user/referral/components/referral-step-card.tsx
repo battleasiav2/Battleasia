@@ -4,7 +4,7 @@ import { alpha } from '@mui/material/styles';
 import { Iconify } from 'src/components/iconify';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
-import { USER_COLORS } from 'src/layouts/user';
+import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ export function ReferralStepCard({ icon, label, step }: ReferralStepCardProps) {
           fontSize: 10,
           fontWeight: 800,
           letterSpacing: 1.2,
-          color: alpha(USER_COLORS.gold, 0.8),
+          color: goldAlpha(0.8),
           textTransform: 'uppercase',
           mb: 1.5,
         }}
@@ -42,9 +42,9 @@ export function ReferralStepCard({ icon, label, step }: ReferralStepCardProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          bgcolor: alpha(USER_COLORS.gold, 0.12),
-          border: `2px solid ${alpha(USER_COLORS.gold, 0.35)}`,
-          boxShadow: `0 0 24px ${alpha(USER_COLORS.gold, 0.12)}`,
+          bgcolor: goldAlpha(0.12),
+          border: `2px solid ${goldAlpha(0.35)}`,
+          boxShadow: `0 0 24px ${goldAlpha(0.12)}`,
         }}
       >
         <Iconify icon={icon} sx={{ color: USER_COLORS.gold, width: { xs: 30, md: 34 }, height: { xs: 30, md: 34 } }} />

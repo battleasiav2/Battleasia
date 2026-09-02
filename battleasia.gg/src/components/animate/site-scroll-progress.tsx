@@ -3,7 +3,7 @@ import { useScrollProgress } from './scroll-progress/use-scroll-progress';
 
 // ----------------------------------------------------------------------
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 
 /**
  * Thin gold reading progress bar fixed to the top of the viewport.

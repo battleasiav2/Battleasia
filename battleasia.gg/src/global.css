@@ -1,5 +1,15 @@
 @import './components/scrollbar/styles.css';
 
+html {
+  --ba-gold: #f5c518;
+  --ba-gold-light: #fbbf24;
+  --ba-gold-dark: #d97706;
+  --ba-gold-ink: #111111;
+  --ba-gold-rgb: 245, 197, 24;
+  --ba-gold-light-rgb: 251, 191, 36;
+  --ba-gold-dark-rgb: 217, 119, 6;
+}
+
 /** **************************************
 * Fonts: self-hosted latin only, font-display:optional → zero swap CLS
 *************************************** */

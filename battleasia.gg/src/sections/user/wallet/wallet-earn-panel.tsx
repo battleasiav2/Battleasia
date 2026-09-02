@@ -12,6 +12,7 @@ import {
   UserActionButton,
   USER_COLORS,
   userMutedTextSx,
+  goldAlpha,
 } from 'src/layouts/user';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 import { Iconify } from 'src/components/iconify';
@@ -109,8 +110,8 @@ function MissionCard({
             display: 'grid',
             placeItems: 'center',
             flexShrink: 0,
-            bgcolor: alpha(EARN_HUB_GOLD, 0.12),
-            border: `1px solid ${alpha(EARN_HUB_GOLD, 0.25)}`,
+            bgcolor: goldAlpha( 0.12),
+            border: `1px solid ${goldAlpha( 0.25)}`,
             color: EARN_HUB_GOLD,
           }}
         >
@@ -134,7 +135,7 @@ function MissionCard({
               <Typography sx={{ ...userMutedTextSx, fontSize: 11 }}>
                 {item.progress}/{item.target}
               </Typography>
-              <Typography sx={{ fontSize: 11, color: alpha(EARN_HUB_GOLD, 0.9), fontWeight: 700 }}>
+              <Typography sx={{ fontSize: 11, color: goldAlpha( 0.9), fontWeight: 700 }}>
                 {Math.round(percent)}%
               </Typography>
             </Stack>
@@ -147,7 +148,7 @@ function MissionCard({
                 bgcolor: alpha('#ffffff', 0.08),
                 '& .MuiLinearProgress-bar': {
                   borderRadius: 99,
-                  bgcolor: canClaim || isClaimed ? EARN_HUB_GOLD : alpha(EARN_HUB_GOLD, 0.65),
+                  bgcolor: canClaim || isClaimed ? EARN_HUB_GOLD : goldAlpha( 0.65),
                   transition: 'transform 0.35s ease',
                 },
               }}

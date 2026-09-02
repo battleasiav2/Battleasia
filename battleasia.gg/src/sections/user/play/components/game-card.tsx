@@ -6,6 +6,7 @@ import { alpha, keyframes } from '@mui/material/styles';
 import { Iconify } from 'src/components/iconify/iconify';
 import { USER_COLORS } from 'src/layouts/user/user-theme';
 import { PLAY_IMAGE_PATHS } from '../play-constants';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -97,23 +98,23 @@ export function GameCard(props: GameCardProps) {
           height: 2,
           bgcolor: GOLD,
           zIndex: 4,
-          boxShadow: `0 0 12px ${alpha(GOLD, 0.45)}`,
+          boxShadow: `0 0 12px ${goldAlpha(0.45)}`,
         },
         '&:hover': isDisabled
           ? undefined
           : {
               transform: 'translateY(-6px)',
-              borderColor: alpha(GOLD, 0.38),
+              borderColor: goldAlpha(0.38),
               boxShadow: `
                 0 18px 40px ${alpha('#000000', 0.65)},
-                0 0 0 1px ${alpha(GOLD, 0.16)},
-                0 0 24px ${alpha(GOLD, 0.1)}
+                0 0 0 1px ${goldAlpha(0.16)},
+                0 0 24px ${goldAlpha(0.1)}
               `,
               '& .game-card-art': { transform: 'scale(1.06)' },
               '& .game-card-title': { color: GOLD },
             },
         '&:focus-visible': {
-          outline: `2px solid ${alpha(GOLD, 0.75)}`,
+          outline: `2px solid ${goldAlpha(0.75)}`,
           outlineOffset: 2,
         },
       }}
@@ -197,7 +198,7 @@ export function GameCard(props: GameCardProps) {
               px: 0.8,
               py: 0.25,
               bgcolor: alpha('#000000', 0.65),
-              border: `1px solid ${alpha(GOLD, 0.35)}`,
+              border: `1px solid ${goldAlpha(0.35)}`,
             }}
           >
             <Typography sx={{ fontSize: 9, fontWeight: 800, color: GOLD, letterSpacing: 0.5 }}>
@@ -227,7 +228,7 @@ export function GameCard(props: GameCardProps) {
                 fontWeight: 700,
                 letterSpacing: 1.1,
                 textTransform: 'uppercase',
-                color: alpha(GOLD, 0.92),
+                color: goldAlpha(0.92),
                 mb: 0.25,
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',

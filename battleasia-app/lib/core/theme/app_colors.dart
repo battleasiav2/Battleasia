@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:battleasia_app/core/theme/accent_palette.dart';
 
 /// Website-aligned brand tokens (battleasia.gg user area).
 class AppColors {
   AppColors._();
 
-  static const Color gold = Color(0xFFF5C518);
-  static const Color goldDark = Color(0xFFD97706);
-  static const Color goldLight = Color(0xFFFBBF24);
-  static const Color goldAccent = Color(0xFFF59E0B);
+  static Color gold = const Color(0xFFF5C518);
+  static Color goldDark = const Color(0xFFD97706);
+  static Color goldLight = const Color(0xFFFBBF24);
+  static Color goldAccent = const Color(0xFFF59E0B);
+  static Color goldInk = const Color(0xFF111111);
 
   static const Color pageBg = Color(0xFF000000);
   static const Color surface = Color(0xFF0A0A0A);
@@ -30,15 +32,29 @@ class AppColors {
   static Color goldGlow([double opacity = 0.08]) =>
       gold.withValues(alpha: opacity);
 
-  static const LinearGradient goldGradient = LinearGradient(
+  static LinearGradient goldGradient = const LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [Color(0xFFF59E0B), Color(0xFFEA8C00), Color(0xFFD97706)],
   );
 
-  static const LinearGradient goldGradientHover = LinearGradient(
+  static LinearGradient goldGradientHover = const LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
     colors: [Color(0xFFFBBF24), Color(0xFFF59E0B), Color(0xFFEA8C00)],
   );
+
+  static void bind(AccentPalette palette) {
+    gold = palette.gold;
+    goldLight = palette.goldLight;
+    goldDark = palette.goldDark;
+    goldAccent = palette.goldLight;
+    goldInk = palette.ink;
+    goldGradient = palette.gradient;
+    goldGradientHover = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [palette.goldLight, palette.gold, palette.gold],
+    );
+  }
 }

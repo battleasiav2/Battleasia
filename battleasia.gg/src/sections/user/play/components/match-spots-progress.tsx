@@ -6,6 +6,7 @@ import { useTranslate } from 'src/locales/use-locales';
 import { USER_COLORS } from 'src/layouts/user';
 
 import { getMatchCapacityState, type MatchCapacityInput } from '../match-capacity-utils';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -55,8 +56,8 @@ export function MatchSpotsProgress({
   const fillBackground = isFull
     ? `linear-gradient(90deg, ${alpha(FULL_RED, 0.75)} 0%, ${FULL_RED} 48%, ${alpha('#f87171', 0.95)} 100%)`
     : nearlyFull
-      ? `linear-gradient(90deg, ${alpha(GOLD, 0.7)} 0%, ${GOLD} 52%, ${alpha('#fbbf24', 0.98)} 100%)`
-      : `linear-gradient(90deg, ${alpha(GOLD, 0.45)} 0%, ${GOLD} 50%, ${alpha('#fde68a', 0.95)} 100%)`;
+      ? `linear-gradient(90deg, ${goldAlpha(0.7)} 0%, ${GOLD} 52%, ${alpha('#fbbf24', 0.98)} 100%)`
+      : `linear-gradient(90deg, ${goldAlpha(0.45)} 0%, ${GOLD} 50%, ${alpha('#fde68a', 0.95)} 100%)`;
 
   const barTrack = (
     <Box
@@ -85,7 +86,7 @@ export function MatchSpotsProgress({
           background: fillBackground,
           boxShadow: isFull
             ? `0 0 16px ${alpha(FULL_RED, 0.5)}`
-            : `0 0 14px ${alpha(GOLD, 0.42)}`,
+            : `0 0 14px ${goldAlpha(0.42)}`,
           transition: 'width 0.65s cubic-bezier(0.22, 1, 0.36, 1)',
           animation: nearlyFull || isFull ? `${fillPulse} 1.8s ease-in-out infinite` : undefined,
           overflow: 'hidden',
@@ -120,7 +121,7 @@ export function MatchSpotsProgress({
             width: isFeatured ? 3 : 2,
             height: isFeatured ? 14 : 10,
             bgcolor: isFull ? FULL_RED : GOLD,
-            boxShadow: `0 0 10px ${alpha(isFull ? FULL_RED : GOLD, 0.45)}`,
+            boxShadow: `0 0 10px ${isFull ? alpha(FULL_RED, 0.45) : goldAlpha(0.45)}`,
           }}
         />
         <Typography
@@ -151,7 +152,7 @@ export function MatchSpotsProgress({
             </Typography>
           </Box>
         ) : isFeatured && spotsLeft <= 10 ? (
-          <Typography sx={{ fontSize: 9, fontWeight: 700, color: alpha(GOLD, 0.9), letterSpacing: 0.5 }}>
+          <Typography sx={{ fontSize: 9, fontWeight: 700, color: goldAlpha(0.9), letterSpacing: 0.5 }}>
             {t('match.spotsLeft', { count: spotsLeft })}
           </Typography>
         ) : null}
@@ -223,7 +224,7 @@ export function MatchSpotsProgress({
           right: 0,
           height: 2,
           bgcolor: GOLD,
-          boxShadow: `0 0 12px ${alpha(GOLD, 0.4)}`,
+          boxShadow: `0 0 12px ${goldAlpha(0.4)}`,
         },
       }}
     >

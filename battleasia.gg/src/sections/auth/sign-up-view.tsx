@@ -41,6 +41,7 @@ import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
 import { AuthSocialButtons } from './auth-social-buttons';
 import { AuthStepProgress } from './auth-step-progress';
+import { goldAlpha } from 'src/theme/accent-presets';
 import {
   authAlertSx,
   authBackLinkSx,
@@ -397,9 +398,9 @@ export function SignUpView() {
                             checked={field.value}
                             size="small"
                             sx={{
-                              color: alpha('#f5c518', 0.45),
+                              color: goldAlpha(0.45),
                               mt: -0.25,
-                              '&.Mui-checked': { color: '#f5c518' },
+                              '&.Mui-checked': { color: 'var(--ba-gold)' },
                             }}
                           />
                         }

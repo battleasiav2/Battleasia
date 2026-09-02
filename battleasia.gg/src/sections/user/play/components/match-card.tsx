@@ -18,7 +18,7 @@ import {
   getGoldTopLineShellSx,
 } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, userSolidGoldButtonSx, userGhostButtonSx } from 'src/layouts/user';
+import { USER_COLORS, userSolidGoldButtonSx, userGhostButtonSx, goldAlpha } from 'src/layouts/user';
 
 import { MatchStatPill } from './match-stat-pill';
 import { MatchRoomDialog } from './match-room-dialog';
@@ -88,7 +88,7 @@ export function MatchCard({
         bgcolor: alpha('#0a0a0c', 0.55),
         backgroundColor: alpha('#0a0a0c', 0.55),
         backgroundImage: `
-          linear-gradient(145deg, ${alpha('#ffffff', 0.06)} 0%, transparent 42%, ${alpha(USER_COLORS.gold, 0.04)} 100%)
+          linear-gradient(145deg, ${alpha('#ffffff', 0.06)} 0%, transparent 42%, ${goldAlpha(0.04)} 100%)
         `,
         backdropFilter: 'blur(18px) saturate(1.15)',
         WebkitBackdropFilter: 'blur(18px) saturate(1.15)',
@@ -96,16 +96,16 @@ export function MatchCard({
         boxShadow: `
           inset 0 1px 0 ${alpha('#ffffff', 0.08)},
           0 12px 36px ${alpha('#000000', 0.45)},
-          0 0 0 1px ${alpha(USER_COLORS.gold, 0.06)}
+          0 0 0 1px ${goldAlpha(0.06)}
         `,
         transition: 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease',
         '&:hover': {
           transform: 'translateY(-4px)',
-          borderColor: alpha(USER_COLORS.gold, 0.35),
+          borderColor: goldAlpha(0.35),
           boxShadow: `
             inset 0 1px 0 ${alpha('#ffffff', 0.1)},
             0 20px 48px ${alpha('#000000', 0.65)},
-            0 0 28px ${alpha(USER_COLORS.gold, 0.12)}
+            0 0 28px ${goldAlpha(0.12)}
           `,
         },
       })}
@@ -140,7 +140,7 @@ export function MatchCard({
 
         <Stack direction="row" spacing={0.75} sx={{ position: 'absolute', top: 10, left: 10, right: 10, flexWrap: 'wrap' }}>
           {isPremiumMatch ? (
-            <Box sx={{ ...getGlassBadgeChipSx(tokens), bgcolor: alpha(USER_COLORS.gold, 0.2), color: USER_COLORS.gold, border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}` }}>
+            <Box sx={{ ...getGlassBadgeChipSx(tokens), bgcolor: goldAlpha(0.2), color: USER_COLORS.gold, border: `1px solid ${goldAlpha(0.35)}` }}>
               <Stack direction="row" alignItems="center" spacing={0.5} sx={{ px: 0.5 }}>
                 <Iconify icon="solar:crown-bold" width={12} />
                 <Typography sx={{ fontSize: 10, fontWeight: 800 }}>PREMIUM</Typography>
@@ -261,7 +261,7 @@ export function MatchCard({
                       color: USER_COLORS.gold,
                       textDecoration: 'underline',
                       cursor: 'pointer',
-                      '&:hover': { color: alpha(USER_COLORS.gold, 0.8) },
+                      '&:hover': { color: goldAlpha(0.8) },
                     }}
                   >
                     {t('match.roomIdPassword')}

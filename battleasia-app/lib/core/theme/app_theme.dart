@@ -3,15 +3,15 @@ import 'package:battleasia_app/core/theme/app_colors.dart';
 
 class AppTheme {
   // Legacy aliases — prefer AppColors in new code.
-  static const Color primaryColor = AppColors.gold;
-  static const Color secondaryColor = AppColors.goldAccent;
-  static const Color accentColor = AppColors.gold;
+  static Color get primaryColor => AppColors.gold;
+  static Color get secondaryColor => AppColors.goldAccent;
+  static Color get accentColor => AppColors.gold;
   static const Color backgroundColor = AppColors.pageBg;
   static const Color surfaceColor = AppColors.surface;
   static const Color textPrimary = AppColors.textPrimary;
   static const Color textSecondary = AppColors.textMuted;
 
-  static const LinearGradient accentGradient = AppColors.goldGradient;
+  static LinearGradient get accentGradient => AppColors.goldGradient;
 
   static const TextStyle heading1 = TextStyle(
     fontSize: 32,
@@ -58,7 +58,7 @@ class AppTheme {
     fontFamily: 'Poppins',
   );
 
-  static const TextStyle labelUppercase = TextStyle(
+  static TextStyle get labelUppercase => TextStyle(
     fontSize: 10,
     fontWeight: FontWeight.w700,
     letterSpacing: 1.6,
@@ -72,7 +72,7 @@ class AppTheme {
       brightness: Brightness.dark,
       primaryColor: AppColors.gold,
       scaffoldBackgroundColor: AppColors.pageBg,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: ColorScheme.dark(
         primary: AppColors.gold,
         secondary: AppColors.goldAccent,
         surface: AppColors.surface,
@@ -128,7 +128,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2),
-          borderSide: const BorderSide(color: AppColors.goldAccent, width: 1),
+          borderSide: BorderSide(color: AppColors.goldAccent, width: 1),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(2),

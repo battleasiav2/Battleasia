@@ -25,8 +25,7 @@ import {
   userPolishedDialogEyebrowSx,
   userPolishedDialogHeadingSx,
   userPolishedDialogContentSx,
-  userPolishedDialogCloseButtonSx,
-} from 'src/layouts/user';
+  userPolishedDialogCloseButtonSx, goldAlpha } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
 import { Image } from 'src/components/image';
 
@@ -144,7 +143,7 @@ export function StoryCreateDialog({ open, onClose, onCreated }: StoryCreateDialo
                     width: '100%',
                     maxHeight: 360,
                     bgcolor: '#000000',
-                    border: `1px solid ${alpha(USER_COLORS.gold, 0.25)}`,
+                    border: `1px solid ${goldAlpha(0.25)}`,
                   }}
                 />
               ) : (
@@ -180,12 +179,12 @@ export function StoryCreateDialog({ open, onClose, onCreated }: StoryCreateDialo
                 px: 2,
                 textAlign: 'center',
                 cursor: 'pointer',
-                border: `1px dashed ${alpha(USER_COLORS.gold, 0.4)}`,
+                border: `1px dashed ${goldAlpha(0.4)}`,
                 bgcolor: alpha('#000000', 0.35),
                 transition: 'border-color 0.2s, background-color 0.2s',
                 '&:hover': {
                   borderColor: USER_COLORS.gold,
-                  bgcolor: alpha(USER_COLORS.gold, 0.06),
+                  bgcolor: goldAlpha(0.06),
                 },
               }}
             >
