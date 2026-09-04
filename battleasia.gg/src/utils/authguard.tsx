@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
+import { safeAuthReturnPath, signInWithReturn } from 'src/utils/auth-return';
 
 import { useSelector } from 'src/store';
 
@@ -16,7 +17,9 @@ const AuthGuard = ({ children }: GuardProps) => {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      router.replace(paths.auth.signIn);
+      const next = `${window.location.pathname}${window.location.search}`;
+      const safe = safeAuthReturnPath(next);
+      router.replace(safe ? signInWithReturn(safe) : paths.auth.signIn);
     }
   }, [isLoggedIn, router]);
 

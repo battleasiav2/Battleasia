@@ -7,8 +7,9 @@ import { useBoolean } from 'minimal-shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { paths } from 'src/routes/paths';
-import { useRouter } from 'src/routes/hooks';
+import { useRouter, useSearchParams } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
+import { safeAuthReturnPath } from 'src/utils/auth-return';
 
 import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
@@ -41,6 +42,7 @@ export const SignInSchema = zod.object({
 
 export function SignInView() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { loginApi } = useApi();
   const { t } = useTranslate();
   const showPassword = useBoolean();
@@ -96,7 +98,7 @@ export function SignInView() {
       );
 
       await new Promise((resolve) => setTimeout(resolve, 100));
-      router.push(paths.user.play);
+      router.push(safeAuthReturnPath(searchParams.get('returnTo')) || paths.user.play);
     } catch (error: any) {
       const responseData = error?.response?.data;
       if (responseData?.emailVerificationRequired) {
@@ -210,7 +212,17 @@ export function SignInView() {
 
             <AuthFooterLinks
               prefix={t('auth.newToBattleAsia')}
-              links={[{ label: t('auth.createYourAccount'), href: paths.auth.signUp }]}
+              links={[
+                {
+                  label: t('auth.createYourAccount'),
+                  href: (() => {
+                    const next = safeAuthReturnPath(searchParams.get('returnTo'));
+                    return next
+                      ? `${paths.auth.signUp}?returnTo=${encodeURIComponent(next)}`
+                      : paths.auth.signUp;
+                  })(),
+                },
+              ]}
             />
           </Stack>
         </Form>

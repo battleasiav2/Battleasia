@@ -131,6 +131,7 @@ export type DashboardTopPlayer = {
 
 export type DashboardMatchSummary = {
     id: string;
+    gameId?: string;
     matchName: string;
     matchSchedule: string;
     status: string;

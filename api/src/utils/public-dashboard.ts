@@ -147,10 +147,22 @@ async function getGameNameMap(gameIds: string[]) {
   return new Map(games.map((g) => [g._id.toString(), g.name]));
 }
 
-async function buildMatchSummaries(matches: Array<InstanceType<typeof Match>>) {
+type MatchSummarySource = {
+  _id: Types.ObjectId | string;
+  gameId: Types.ObjectId | string;
+  matchName: string;
+  matchSchedule: string;
+  status: string;
+  entryFee: number;
+  perKill: number;
+  totalPlayer: number;
+  banner?: string;
+};
+
+async function buildMatchSummaries(matches: MatchSummarySource[]) {
   if (!matches.length) return [];
 
-  const matchIds = matches.map((m) => m._id);
+  const matchIds = matches.map((m) => new Types.ObjectId(m._id.toString()));
   const participantCounts = await MatchParticipant.aggregate<{ _id: Types.ObjectId; count: number }>([
     { $match: { matchId: { $in: matchIds } } },
     { $group: { _id: '$matchId', count: { $sum: 1 } } },
@@ -161,6 +173,7 @@ async function buildMatchSummaries(matches: Array<InstanceType<typeof Match>>) {
 
   return matches.map((match) => ({
     id: match._id.toString(),
+    gameId: match.gameId.toString(),
     matchName: match.matchName,
     matchSchedule: match.matchSchedule,
     status: match.status,
@@ -172,6 +185,25 @@ async function buildMatchSummaries(matches: Array<InstanceType<typeof Match>>) {
     gameName: gameMap.get(match.gameId.toString()) || '',
     participantsCount: countMap.get(match._id.toString()) || 0,
   }));
+}
+
+/** One highest-prize joinable match per game (up to 5 titles). */
+async function getTopMatchPerGame(statuses: Array<'active' | 'start'>, limit = 5) {
+  return Match.aggregate<MatchSummarySource>([
+    { $match: { status: { $in: statuses } } },
+    {
+      $addFields: {
+        _prize: {
+          $multiply: [{ $ifNull: ['$entryFee', 0] }, { $ifNull: ['$totalPlayer', 0] }],
+        },
+      },
+    },
+    { $sort: { _prize: -1, matchSchedule: 1 } },
+    { $group: { _id: '$gameId', doc: { $first: '$$ROOT' } } },
+    { $replaceRoot: { newRoot: '$doc' } },
+    { $sort: { _prize: -1 } },
+    { $limit: limit },
+  ]);
 }
 
 export async function getPublicDashboardStats() {
@@ -203,10 +235,8 @@ export async function getPublicDashboardStats() {
       countTodayJoinedUsers(),
       aggregatePlayerStats('totalWinnings', 5),
       aggregatePlayerStats('totalKills', 5),
-      Match.find({ status: 'start' }).sort({ matchSchedule: 1 }).limit(5),
-      Match.find({ status: { $in: ['active', 'start', 'complete'] } })
-        .sort({ entryFee: -1, totalPlayer: -1 })
-        .limit(5),
+      getTopMatchPerGame(['start'], 5),
+      getTopMatchPerGame(['active', 'start'], 5),
     ]);
 
   const totalWinnings = winningsAgg[0]?.total ?? 0;

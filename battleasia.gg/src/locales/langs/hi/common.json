@@ -271,7 +271,10 @@
       "entry": "एंट्री",
       "spots": "स्पॉट्स",
       "prizeEst": "अनुमानित पुरस्कार",
-      "free": "मुफ्त"
+      "free": "मुफ्त",
+      "joinNow": "जॉइन",
+      "matchFull": "फुल",
+      "signInToJoin": "जॉइन करने के लिए साइन इन करें"
     }
   },
   "navigation": {

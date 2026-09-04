@@ -4,6 +4,7 @@ import {
     Grid,
     Stack,
     Avatar,
+    Button,
     Skeleton,
     Container,
     Typography,
@@ -13,8 +14,12 @@ import { goldAlpha } from 'src/theme/accent-presets';
 
 import { CONFIG } from 'src/global-config';
 import useApi from 'src/hooks/use-api';
+import { paths } from 'src/routes/paths';
+import { useRouter } from 'src/routes/hooks';
+import { useSelector } from 'src/store';
 import { fNumber, fShortenNumber } from 'src/utils/format-number';
 import { getAvatarUrl } from 'src/utils/get-image-url';
+import { signInWithReturn } from 'src/utils/auth-return';
 import { useTranslate } from 'src/locales/use-locales';
 import CoinValue from 'src/components/coin-value';
 import { Iconify } from 'src/components/iconify';
@@ -560,86 +565,16 @@ const PlayerListCard = ({
 
 type GlassTokens = ReturnType<typeof getDefaultGlassTokens>;
 
-const TARGET_MATCH_TILES = 3;
+const TARGET_MATCH_TILES = 5;
 
-// Used only to visually fill empty slots when API returns fewer matches than the UI expects.
-const DEMO_PRIZE_MATCHES: DashboardMatchSummary[] = [
-  {
-    id: 'demo-prize-1',
-    matchName: 'PUBG Premium Squad Live',
-    matchSchedule: 'TBD',
-    status: 'active',
-    entryFee: 50,
-    perKill: 0,
-    totalPlayer: 100,
-    prizeEstimate: 3000,
-    gameName: 'PUBG Mobile',
-    participantsCount: 9,
-  },
-  {
-    id: 'demo-prize-2',
-    matchName: 'PUBG Solo Rush #7',
-    matchSchedule: 'TBD',
-    status: 'active',
-    entryFee: 45,
-    perKill: 0,
-    totalPlayer: 100,
-    prizeEstimate: 2500,
-    gameName: 'PUBG Mobile',
-    participantsCount: 6,
-  },
-  {
-    id: 'demo-prize-3',
-    matchName: 'PUBG Solo Rush #15',
-    matchSchedule: 'TBD',
-    status: 'active',
-    entryFee: 45,
-    perKill: 0,
-    totalPlayer: 100,
-    prizeEstimate: 2500,
-    gameName: 'PUBG Mobile',
-    participantsCount: 6,
-  },
-];
+function isRealMatchId(id: string | undefined) {
+    return Boolean(id) && !String(id).startsWith('demo-');
+}
 
-const DEMO_ONGOING_MATCHES: DashboardMatchSummary[] = [
-  {
-    id: 'demo-ongoing-1',
-    matchName: 'Miramar Squad Live Battle',
-    matchSchedule: 'TBD',
-    status: 'active',
-    entryFee: 30,
-    perKill: 0,
-    totalPlayer: 100,
-    prizeEstimate: 3000,
-    gameName: 'PUBG Mobile',
-    participantsCount: 4,
-  },
-  {
-    id: 'demo-ongoing-2',
-    matchName: 'PUBG Premium Squad Live',
-    matchSchedule: 'TBD',
-    status: 'active',
-    entryFee: 50,
-    perKill: 0,
-    totalPlayer: 100,
-    prizeEstimate: 5000,
-    gameName: 'PUBG Mobile',
-    participantsCount: 9,
-  },
-  {
-    id: 'demo-ongoing-3',
-    matchName: 'Miramar Squad Live Battle (Demo)',
-    matchSchedule: 'TBD',
-    status: 'active',
-    entryFee: 30,
-    perKill: 0,
-    totalPlayer: 100,
-    prizeEstimate: 2800,
-    gameName: 'PUBG Mobile',
-    participantsCount: 5,
-  },
-];
+function isMatchFull(match: DashboardMatchSummary) {
+    const cap = match.totalPlayer || 0;
+    return cap > 0 && match.participantsCount >= cap;
+}
 
 function DashboardMatchTile({
     match,
@@ -655,6 +590,20 @@ function DashboardMatchTile({
     isLast?: boolean;
 }) {
     const { t } = useTranslate();
+    const router = useRouter();
+    const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+    const full = isMatchFull(match);
+    const matchPath = isRealMatchId(match.id) ? paths.user.match(match.id) : '';
+    const showJoin = Boolean(matchPath);
+
+    const handleJoin = () => {
+        if (!matchPath) return;
+        if (!isLoggedIn) {
+            router.push(signInWithReturn(matchPath));
+            return;
+        }
+        router.push(matchPath);
+    };
 
     return (
         <Box
@@ -663,7 +612,7 @@ function DashboardMatchTile({
                 borderBottom: isLast ? 'none' : HOME_ROW_LINE,
             }}
         >
-            <Stack spacing={0.65}>
+            <Stack spacing={0.75}>
                 <Stack
                     direction="row"
                     alignItems="flex-start"
@@ -717,64 +666,107 @@ function DashboardMatchTile({
                 </Stack>
 
                 <Stack
-                    direction={{ xs: 'column', sm: 'row' }}
-                    alignItems={{ xs: 'flex-start', sm: 'center' }}
+                    direction="row"
+                    alignItems="center"
                     justifyContent="space-between"
-                    spacing={{ xs: 0.35, sm: 1 }}
+                    spacing={1}
                     sx={{ minWidth: 0 }}
                 >
-                    <Typography
-                        sx={{
-                            color: HOME_TEXT_SECONDARY,
-                            fontSize: { xs: '0.75rem', sm: '0.8125rem' },
-                            fontWeight: 600,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 0.4,
-                            minWidth: 0,
-                            flex: 1,
-                            lineHeight: 1.4,
-                        }}
-                    >
-                        {variant === 'prize' ? `${t('home.dashboard.entry')}:` : `${t('home.dashboard.prizeEst')}`}
-                        {variant === 'prize' ? (
-                            <CoinValue value={match.entryFee || 0} size={13} />
-                        ) : (
-                            <CoinValue value={match.prizeEstimate || 0} size={13} />
-                        )}
-                    </Typography>
+                    <Stack spacing={0.25} sx={{ minWidth: 0, flex: 1 }}>
+                        <Typography
+                            sx={{
+                                color: HOME_TEXT_SECONDARY,
+                                fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                                fontWeight: 600,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 0.4,
+                                minWidth: 0,
+                                lineHeight: 1.4,
+                            }}
+                        >
+                            {variant === 'prize' ? `${t('home.dashboard.entry')}:` : `${t('home.dashboard.prizeEst')}`}
+                            {variant === 'prize' ? (
+                                <CoinValue value={match.entryFee || 0} size={13} />
+                            ) : (
+                                <CoinValue value={match.prizeEstimate || 0} size={13} />
+                            )}
+                        </Typography>
 
-                    <Typography
-                        sx={{
-                            color: HOME_TEXT_MUTED,
-                            fontSize: { xs: '0.75rem', sm: '0.8125rem' },
-                            fontWeight: 600,
-                            textAlign: { xs: 'left', sm: 'right' },
-                            flexShrink: 0,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 0.4,
-                            fontVariantNumeric: 'tabular-nums',
-                            lineHeight: 1.4,
-                        }}
-                    >
-                        {variant === 'prize' ? (
-                            <>
-                                {fShortenNumber(match.prizeEstimate || 0)} · {t('home.dashboard.spots')}:{' '}
-                                {match.participantsCount}/{match.totalPlayer || '∞'}
-                            </>
-                        ) : match.entryFee ? (
-                            <>
-                                {t('home.dashboard.spots')}: {match.participantsCount}/{match.totalPlayer || '∞'} ·{' '}
-                                {t('home.dashboard.entry')} <CoinValue value={match.entryFee || 0} size={13} />
-                            </>
-                        ) : (
-                            <>
-                                {t('home.dashboard.spots')}: {match.participantsCount}/{match.totalPlayer || '∞'} ·{' '}
-                                {t('home.dashboard.entry')} {t('home.dashboard.free')}
-                            </>
-                        )}
-                    </Typography>
+                        <Typography
+                            sx={{
+                                color: HOME_TEXT_MUTED,
+                                fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                                fontWeight: 600,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: 0.4,
+                                fontVariantNumeric: 'tabular-nums',
+                                lineHeight: 1.4,
+                            }}
+                        >
+                            {variant === 'prize' ? (
+                                <>
+                                    {fShortenNumber(match.prizeEstimate || 0)} · {t('home.dashboard.spots')}:{' '}
+                                    {match.participantsCount}/{match.totalPlayer || '∞'}
+                                </>
+                            ) : match.entryFee ? (
+                                <>
+                                    {t('home.dashboard.spots')}: {match.participantsCount}/{match.totalPlayer || '∞'} ·{' '}
+                                    {t('home.dashboard.entry')} <CoinValue value={match.entryFee || 0} size={13} />
+                                </>
+                            ) : (
+                                <>
+                                    {t('home.dashboard.spots')}: {match.participantsCount}/{match.totalPlayer || '∞'} ·{' '}
+                                    {t('home.dashboard.entry')} {t('home.dashboard.free')}
+                                </>
+                            )}
+                        </Typography>
+                    </Stack>
+
+                    {showJoin ? (
+                        <Button
+                            variant="contained"
+                            disableElevation
+                            disabled={full}
+                            onClick={handleJoin}
+                            aria-label={
+                                full
+                                    ? t('home.dashboard.matchFull')
+                                    : isLoggedIn
+                                      ? t('home.dashboard.joinNow')
+                                      : t('home.dashboard.signInToJoin')
+                            }
+                            sx={{
+                                flexShrink: 0,
+                                minWidth: { xs: 78, sm: 88 },
+                                minHeight: 34,
+                                height: 34,
+                                px: 1.4,
+                                borderRadius: '4px',
+                                fontSize: 11,
+                                fontWeight: 800,
+                                letterSpacing: 0.7,
+                                textTransform: 'uppercase',
+                                color: 'var(--ba-gold-ink)',
+                                background: 'var(--ba-gold)',
+                                border: `1px solid ${goldAlpha(0.85)}`,
+                                boxShadow: `0 0 14px ${goldAlpha(0.28)}`,
+                                '&:hover': {
+                                    background: 'var(--ba-gold-light)',
+                                    boxShadow: `0 0 18px ${goldAlpha(0.38)}`,
+                                },
+                                '&.Mui-disabled': {
+                                    background: goldAlpha(0.22),
+                                    color: alpha('#111111', 0.5),
+                                    borderColor: goldAlpha(0.18),
+                                    boxShadow: 'none',
+                                },
+                            }}
+                        >
+                            {full ? t('home.dashboard.matchFull') : t('home.dashboard.joinNow')}
+                        </Button>
+                    ) : null}
                 </Stack>
             </Stack>
         </Box>
@@ -799,15 +791,7 @@ function DashboardMatchPanel({
     emptyLabel: string;
 }) {
     const count = matches.length;
-    const displayCount = count > 0 ? Math.max(count, TARGET_MATCH_TILES) : 0;
-    const demoSource = variant === 'prize' ? DEMO_PRIZE_MATCHES : DEMO_ONGOING_MATCHES;
-    const tilesToRender =
-        count > 0
-            ? [
-                  ...matches.slice(0, TARGET_MATCH_TILES),
-                  ...demoSource.slice(0, Math.max(0, TARGET_MATCH_TILES - Math.min(count, TARGET_MATCH_TILES))),
-              ]
-            : [];
+    const tilesToRender = matches.slice(0, TARGET_MATCH_TILES);
 
     return (
         <HomeBlurPanel>
@@ -848,12 +832,12 @@ function DashboardMatchPanel({
             <Box sx={{ borderTop: HOME_ROW_LINE }}>
                 {loading ? (
                     <Stack spacing={0}>
-                        {Array.from({ length: 3 }).map((_, idx) => (
+                        {Array.from({ length: TARGET_MATCH_TILES }).map((_, idx) => (
                             <Box
                                 key={idx}
                                 sx={{
                                     py: 1.1,
-                                    borderBottom: idx < 2 ? HOME_ROW_LINE : 'none',
+                                    borderBottom: idx < TARGET_MATCH_TILES - 1 ? HOME_ROW_LINE : 'none',
                                 }}
                             >
                                 <Skeleton width="78%" height={14} sx={{ mb: 0.75 }} />
@@ -868,7 +852,7 @@ function DashboardMatchPanel({
                                 key={match.id || index}
                                 match={match}
                                 index={index}
-                                total={displayCount}
+                                total={tilesToRender.length}
                                 variant={variant}
                                 isLast={index === tilesToRender.length - 1}
                             />

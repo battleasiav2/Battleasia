@@ -271,7 +271,10 @@
       "entry": "انٹری",
       "spots": "جگہیں",
       "prizeEst": "تخمینہ انعام",
-      "free": "مفت"
+      "free": "مفت",
+      "joinNow": "جوائن",
+      "matchFull": "بھر گیا",
+      "signInToJoin": "جوائن کرنے کے لیے سائن ان کریں"
     }
   },
   "navigation": {

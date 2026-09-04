@@ -443,7 +443,10 @@
       "entry": "Entry",
       "spots": "Spots",
       "prizeEst": "Prize est.",
-      "free": "Free"
+      "free": "Free",
+      "joinNow": "Join",
+      "matchFull": "Full",
+      "signInToJoin": "Sign in to join this match"
     }
   },
   "navigation": {

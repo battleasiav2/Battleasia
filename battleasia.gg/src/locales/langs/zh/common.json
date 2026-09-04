@@ -271,7 +271,10 @@
       "entry": "报名费",
       "spots": "名额",
       "prizeEst": "预估奖金",
-      "free": "免费"
+      "free": "免费",
+      "joinNow": "加入",
+      "matchFull": "已满",
+      "signInToJoin": "登录后加入比赛"
     }
   },
   "navigation": {
