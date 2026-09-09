@@ -4,7 +4,6 @@ import { alpha, keyframes } from '@mui/material/styles';
 import { Iconify } from 'src/components/iconify';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
-import { HOME_GOLD, HOME_ROW_LINE, HomeBlurPanel } from 'src/sections/home/home-blur-panel';
 import { USER_COLORS, userGoldButtonSx } from 'src/layouts/user/user-theme';
 import { goldAlpha } from 'src/theme/accent-presets';
 
@@ -14,8 +13,18 @@ const GOLD = USER_COLORS.gold;
 
 const kenBurns = keyframes`
   0% { transform: scale(1) translate3d(0, 0, 0); }
-  50% { transform: scale(1.07) translate3d(-1.2%, -0.8%, 0); }
+  50% { transform: scale(1.08) translate3d(-1.5%, -1%, 0); }
   100% { transform: scale(1) translate3d(0, 0, 0); }
+`;
+
+const pulseBadge = keyframes`
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+`;
+
+const shimmer = keyframes`
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 `;
 
 // ----------------------------------------------------------------------
@@ -23,6 +32,7 @@ const kenBurns = keyframes`
 type ShopStat = {
   label: string;
   value: string;
+  icon?: string;
 };
 
 type ShopArenaHeroProps = {
@@ -36,7 +46,13 @@ type ShopArenaHeroProps = {
   stats: ShopStat[];
 };
 
-/** Shop storefront hero — same black/gold arena language as Play. */
+const STAT_ICONS = [
+  'solar:wallet-money-bold-duotone',
+  'solar:bolt-bold-duotone',
+  'solar:clock-circle-bold-duotone',
+];
+
+/** High-Aesthetic Esports Cyberpunk Storefront Hero Banner */
 export function ShopArenaHero({
   badge,
   title,
@@ -52,19 +68,78 @@ export function ShopArenaHero({
       sx={{
         position: 'relative',
         width: { xs: '100%', sm: 'auto' },
-        // Mobile: skip negative bleed — UserPageShell overflow:clip was clipping badge/edges
         mx: { xs: 0, sm: -3, md: -4 },
         mt: { xs: 0, sm: -2, md: -3 },
-        mb: { xs: 3, md: 4 },
-        minHeight: { xs: 'auto', sm: 500, md: 560 },
+        mb: { xs: 3.5, md: 4.5 },
+        minHeight: { xs: 'auto', sm: 520, md: 580 },
         display: 'flex',
         alignItems: { xs: 'stretch', sm: 'flex-end' },
         overflow: 'hidden',
-        bgcolor: '#000000',
-        borderTop: `1px solid ${goldAlpha(0.16)}`,
-        borderBottom: `1px solid ${goldAlpha(0.16)}`,
+        bgcolor: '#030509',
+        borderTop: `1px solid ${goldAlpha(0.3)}`,
+        borderBottom: `1px solid ${goldAlpha(0.3)}`,
+        boxShadow: `0 24px 60px ${alpha('#000000', 0.95)}`,
       }}
     >
+      {/* Visual Frame HUD Brackets */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 12,
+          left: 12,
+          width: 24,
+          height: 24,
+          borderTop: `2px solid ${goldAlpha(0.6)}`,
+          borderLeft: `2px solid ${goldAlpha(0.6)}`,
+          zIndex: 4,
+          pointerEvents: 'none',
+          display: { xs: 'none', sm: 'block' },
+        }}
+      />
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 12,
+          right: 12,
+          width: 24,
+          height: 24,
+          borderTop: `2px solid ${goldAlpha(0.6)}`,
+          borderRight: `2px solid ${goldAlpha(0.6)}`,
+          zIndex: 4,
+          pointerEvents: 'none',
+          display: { xs: 'none', sm: 'block' },
+        }}
+      />
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 12,
+          left: 12,
+          width: 24,
+          height: 24,
+          borderBottom: `2px solid ${goldAlpha(0.6)}`,
+          borderLeft: `2px solid ${goldAlpha(0.6)}`,
+          zIndex: 4,
+          pointerEvents: 'none',
+          display: { xs: 'none', sm: 'block' },
+        }}
+      />
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 12,
+          right: 12,
+          width: 24,
+          height: 24,
+          borderBottom: `2px solid ${goldAlpha(0.6)}`,
+          borderRight: `2px solid ${goldAlpha(0.6)}`,
+          zIndex: 4,
+          pointerEvents: 'none',
+          display: { xs: 'none', sm: 'block' },
+        }}
+      />
+
+      {/* Background Image & Multi-layer Overlays */}
       <Box
         sx={{
           position: 'absolute',
@@ -84,172 +159,281 @@ export function ShopArenaHero({
             height: 1,
             objectFit: 'cover',
             objectPosition: 'center center',
+            filter: 'contrast(1.08) brightness(0.9)',
             animation: `${kenBurns} 28s ease-in-out infinite`,
             willChange: 'transform',
             '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
           }}
         />
 
+        {/* Diagonal Scanline Cyber Mesh */}
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            backgroundImage: `repeating-linear-gradient(
+              45deg,
+              ${alpha('#ffffff', 0.015)} 0px,
+              ${alpha('#ffffff', 0.015)} 2px,
+              transparent 2px,
+              transparent 8px
+            )`,
+            pointerEvents: 'none',
+          }}
+        />
+
+        {/* Ambient Radial & Vignette Gradient Stack */}
         <Box
           sx={{
             position: 'absolute',
             inset: 0,
             background: `
-              linear-gradient(90deg, ${alpha('#000000', 0.9)} 0%, ${alpha('#000000', 0.6)} 48%, ${alpha('#000000', 0.38)} 100%),
-              linear-gradient(180deg, ${alpha('#000000', 0.55)} 0%, transparent 34%, ${alpha('#000000', 0.92)} 100%),
-              radial-gradient(ellipse 55% 40% at 18% 22%, ${goldAlpha(0.14)} 0%, transparent 60%)
+              radial-gradient(ellipse 65% 50% at 20% 35%, ${goldAlpha(0.24)} 0%, transparent 65%),
+              linear-gradient(90deg, ${alpha('#030509', 0.95)} 0%, ${alpha('#030509', 0.72)} 50%, ${alpha('#030509', 0.45)} 100%),
+              linear-gradient(180deg, ${alpha('#030509', 0.6)} 0%, transparent 35%, ${alpha('#030509', 0.96)} 100%)
             `,
           }}
         />
-
       </Box>
 
+      {/* Hero Content Stack */}
       <Stack
-        spacing={{ xs: 1.5, md: 2 }}
+        spacing={{ xs: 2, md: 2.5 }}
         sx={{
           position: 'relative',
           zIndex: 3,
           width: 1,
           px: { xs: 3, sm: 4, md: 6 },
-          pt: { xs: 2.5, sm: 5, md: 5 },
-          pb: { xs: 3.5, md: 5 },
-          maxWidth: { md: 760 },
+          pt: { xs: 3.5, sm: 6, md: 6 },
+          pb: { xs: 4, md: 5.5 },
+          maxWidth: { md: 820 },
         }}
       >
+        {/* Top Cyber HUD Badges */}
         <Stack direction="row" alignItems="center" spacing={1.25} flexWrap="wrap" useFlexGap>
-          <Typography
+          {/* Badge 1: Store Type HUD Tag */}
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1}
             sx={{
-              fontSize: { xs: 11, md: 12 },
-              fontWeight: 700,
-              letterSpacing: 2.5,
-              textTransform: 'uppercase',
-              color: goldAlpha(0.92),
-              lineHeight: 1.3,
+              px: 1.5,
+              py: 0.6,
+              bgcolor: alpha('#000000', 0.65),
+              border: `1px solid ${goldAlpha(0.4)}`,
+              boxShadow: `0 4px 14px ${alpha('#000000', 0.5)}, inset 0 0 10px ${goldAlpha(0.08)}`,
+              clipPath: 'polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)',
             }}
           >
-            {badge}
-          </Typography>
+            <Box
+              sx={{
+                width: 7,
+                height: 7,
+                borderRadius: '50%',
+                bgcolor: '#22c55e',
+                boxShadow: '0 0 8px #22c55e',
+                animation: `${pulseBadge} 2s infinite ease-in-out`,
+              }}
+            />
+            <Typography
+              sx={{
+                fontSize: { xs: 10, md: 11 },
+                fontWeight: 800,
+                letterSpacing: 2,
+                textTransform: 'uppercase',
+                color: goldAlpha(0.95),
+                lineHeight: 1.2,
+              }}
+            >
+              {badge}
+            </Typography>
+          </Stack>
 
+          {/* Badge 2: Verified Security Tag */}
           <Stack
             direction="row"
             alignItems="center"
             spacing={0.6}
             sx={{
-              px: 1,
-              py: 0.45,
-              border: `1px solid ${goldAlpha(0.32)}`,
-              bgcolor: alpha('#000000', 0.5),
+              px: 1.25,
+              py: 0.6,
+              border: `1px solid ${goldAlpha(0.35)}`,
+              bgcolor: goldAlpha(0.08),
+              backdropFilter: 'blur(8px)',
               flexShrink: 0,
             }}
           >
-            <Iconify icon="solar:shield-check-bold" width={12} sx={{ color: GOLD }} />
-            <Typography sx={{ fontSize: 10, fontWeight: 800, letterSpacing: 1, color: '#ffffff', lineHeight: 1.2 }}>
+            <Iconify icon="solar:shield-check-bold" width={14} sx={{ color: GOLD }} />
+            <Typography
+              sx={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: 1.2,
+                color: '#ffffff',
+                textTransform: 'uppercase',
+                lineHeight: 1.2,
+              }}
+            >
               {verifiedLabel}
             </Typography>
           </Stack>
         </Stack>
 
+        {/* Hero Title with Gold Gradient Text Effect */}
         <Typography
           className="font-tr"
           sx={{
-            fontSize: { xs: 24, sm: 44, md: 58 },
-            fontWeight: 800,
-            lineHeight: 1.08,
-            letterSpacing: { md: 0.5 },
-            color: '#ffffff',
+            fontSize: { xs: 28, sm: 48, md: 62 },
+            fontWeight: 900,
+            lineHeight: 1.05,
+            letterSpacing: { xs: 0.5, md: 1 },
             textTransform: 'uppercase',
             wordBreak: 'break-word',
+            background: `linear-gradient(135deg, #FFFFFF 25%, ${goldAlpha(0.95)} 70%, ${GOLD} 100%)`,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            filter: `drop-shadow(0 4px 16px ${alpha('#000000', 0.8)})`,
           }}
         >
           {title}
         </Typography>
 
+        {/* Subtitle Description */}
         <Typography
           className="font-tr"
           sx={{
-            fontSize: { xs: 13.5, md: 16 },
-            lineHeight: 1.55,
-            color: alpha('#ffffff', 0.5),
-            maxWidth: 560,
+            fontSize: { xs: 14, md: 16.5 },
+            lineHeight: 1.6,
+            color: alpha('#ffffff', 0.72),
+            maxWidth: 620,
+            textShadow: `0 2px 8px ${alpha('#000000', 0.8)}`,
           }}
         >
           {description}
         </Typography>
 
-        <BattleGoldDivider variant="hero" sx={{ width: { xs: 160, md: 220 } }} />
+        <BattleGoldDivider variant="hero" sx={{ width: { xs: 180, md: 240 }, my: 0.5 }} />
 
-        <Button
-          component="a"
-          href={ctaHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          variant="outlined"
-          disableElevation
-          startIcon={<Iconify icon="solar:shop-bold" />}
-          endIcon={<Iconify icon="solar:arrow-right-up-bold" width={16} />}
+        {/* Store CTA Button */}
+        <Box sx={{ position: 'relative', display: 'inline-block', width: { xs: '100%', sm: 'auto' } }}>
+          <Button
+            component="a"
+            href={ctaHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="outlined"
+            disableElevation
+            startIcon={<Iconify icon="solar:shop-bold" width={20} />}
+            endIcon={<Iconify icon="solar:arrow-right-up-bold" width={18} />}
+            sx={{
+              ...userGoldButtonSx,
+              alignSelf: { xs: 'stretch', sm: 'flex-start' },
+              width: { xs: '100%', sm: 'auto' },
+              px: { xs: 3, md: 4 },
+              py: 1.35,
+              fontSize: { xs: 13, sm: 14 },
+              fontWeight: 800,
+              letterSpacing: 1,
+              whiteSpace: 'nowrap',
+              position: 'relative',
+              overflow: 'hidden',
+              clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)',
+              border: `1px solid ${GOLD}`,
+              boxShadow: `0 8px 24px ${goldAlpha(0.3)}, inset 0 0 16px ${goldAlpha(0.15)}`,
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                background: `linear-gradient(90deg, transparent, ${alpha('#ffffff', 0.25)}, transparent)`,
+                animation: `${shimmer} 3.5s infinite ease-in-out`,
+              },
+            }}
+          >
+            {ctaLabel}
+          </Button>
+        </Box>
+
+        {/* Telemetry Stat Cards Bar */}
+        <Box
           sx={{
-            ...userGoldButtonSx,
-            alignSelf: { xs: 'stretch', sm: 'flex-start' },
-            width: { xs: '100%', sm: 'auto' },
-            px: { xs: 2.75, md: 3.5 },
-            py: 1.2,
-            fontSize: { xs: 12, sm: 13 },
-            whiteSpace: { xs: 'normal', sm: 'nowrap' },
+            pt: 1,
+            width: 1,
+            maxWidth: { md: 680 },
           }}
         >
-          {ctaLabel}
-        </Button>
-
-        <HomeBlurPanel sx={{ p: 0, alignSelf: { xs: 'stretch', sm: 'flex-start' }, width: { xs: '100%', sm: 'auto' }, maxWidth: 1 }}>
           <Box
             sx={{
               display: 'grid',
               gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
+              gap: { xs: 1, sm: 1.5 },
               width: 1,
             }}
           >
-            {stats.map((stat, index) => (
-              <Box
-                key={stat.label}
-                sx={{
-                  px: { xs: 1, sm: 1.5, md: 2 },
-                  py: { xs: 1.25, md: 1.5 },
-                  borderTop: `2px solid ${HOME_GOLD}`,
-                  minWidth: 0,
-                  ...(index > 0 ? { borderLeft: HOME_ROW_LINE } : {}),
-                }}
-              >
-                <Typography
+            {stats.map((stat, index) => {
+              const iconName = stat.icon || STAT_ICONS[index % STAT_ICONS.length];
+              return (
+                <Box
+                  key={stat.label}
                   sx={{
-                    fontSize: { xs: 9, sm: 10 },
-                    fontWeight: 700,
-                    letterSpacing: { xs: 0.4, sm: 0.7 },
-                    textTransform: 'uppercase',
-                    color: alpha('#fff', 0.55),
-                    lineHeight: 1.25,
-                    wordBreak: 'break-word',
+                    position: 'relative',
+                    px: { xs: 1.5, sm: 2 },
+                    py: { xs: 1.35, sm: 1.6 },
+                    bgcolor: alpha('#06090e', 0.7),
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                    border: `1px solid ${goldAlpha(0.25)}`,
+                    borderTop: `2px solid ${GOLD}`,
+                    boxShadow: `0 8px 24px ${alpha('#000000', 0.5)}, inset 0 0 14px ${goldAlpha(0.05)}`,
+                    clipPath: 'polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)',
+                    transition: 'all 0.25s ease',
+                    '&:hover': {
+                      borderColor: GOLD,
+                      bgcolor: alpha('#06090e', 0.88),
+                      transform: 'translateY(-2px)',
+                      boxShadow: `0 12px 28px ${alpha('#000000', 0.7)}, 0 0 16px ${goldAlpha(0.2)}`,
+                    },
                   }}
                 >
-                  {stat.label}
-                </Typography>
-                <Typography
-                  className="font-tr"
-                  sx={{
-                    mt: 0.5,
-                    fontSize: { xs: 16, sm: 18, md: 22 },
-                    fontWeight: 800,
-                    color: '#fff',
-                    lineHeight: 1.1,
-                    wordBreak: 'break-word',
-                  }}
-                >
-                  {stat.value}
-                </Typography>
-              </Box>
-            ))}
+                  <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+                    <Iconify icon={iconName} width={16} sx={{ color: GOLD, flexShrink: 0 }} />
+                    <Typography
+                      sx={{
+                        fontSize: { xs: 9.5, sm: 10.5 },
+                        fontWeight: 700,
+                        letterSpacing: 0.8,
+                        textTransform: 'uppercase',
+                        color: alpha('#ffffff', 0.6),
+                        lineHeight: 1.2,
+                        wordBreak: 'break-word',
+                      }}
+                    >
+                      {stat.label}
+                    </Typography>
+                  </Stack>
+
+                  <Typography
+                    className="font-tr"
+                    sx={{
+                      fontSize: { xs: 16, sm: 20, md: 22 },
+                      fontWeight: 900,
+                      color: '#ffffff',
+                      lineHeight: 1.1,
+                      wordBreak: 'break-word',
+                      textShadow: `0 0 10px ${goldAlpha(0.3)}`,
+                    }}
+                  >
+                    {stat.value}
+                  </Typography>
+                </Box>
+              );
+            })}
           </Box>
-        </HomeBlurPanel>
+        </Box>
       </Stack>
     </Box>
   );
 }
+

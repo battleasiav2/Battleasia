@@ -14,6 +14,7 @@ export type SettingsState = {
   navColor?: 'integrate' | 'apparent';
   navLayout?: 'vertical' | 'horizontal' | 'mini';
   primaryColor?:
+    | 'lime'
     | 'gold'
     | 'ember'
     | 'jade'

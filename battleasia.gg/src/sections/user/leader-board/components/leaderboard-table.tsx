@@ -1,13 +1,13 @@
-import { Box, Stack, Avatar, Typography, Chip } from '@mui/material';
+import { Box, Chip, Stack, Avatar, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import type { ILeaderboardEntry } from 'src/types';
 import { CONFIG } from 'src/global-config';
 import { getAvatarUrl } from 'src/utils/get-image-url';
 
-import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
+import { getGlassInnerSx, getDefaultGlassTokens } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, userMutedTextSx, getUserChipSx, goldAlpha } from 'src/layouts/user';
+import { goldAlpha, USER_COLORS, getUserChipSx, userMutedTextSx } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
@@ -75,7 +75,15 @@ export function LeaderboardTable({ rows, labels, formatScore, getRankIcon }: Lea
               },
               gap: { xs: 1, md: 1 },
               alignItems: 'center',
-              borderColor: isTopRank ? goldAlpha(0.2) : undefined,
+              borderColor: isTopRank ? goldAlpha(0.28) : alpha('#ffffff', 0.08),
+              bgcolor: alpha('#10141c', 0.75),
+              backdropFilter: 'blur(14px)',
+              transition: 'transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease',
+              '&:hover': {
+                transform: 'translateX(4px)',
+                borderColor: goldAlpha(0.5),
+                boxShadow: `0 6px 22px ${alpha('#000000', 0.6)}, 0 0 16px ${goldAlpha(0.12)}`,
+              },
             })}
           >
             <Typography sx={{ fontSize: 16, fontWeight: 800, color: isTopRank ? USER_COLORS.gold : USER_COLORS.textMuted, textAlign: 'center' }}>

@@ -24,6 +24,8 @@ export const ICON_ALIASES: Record<string, string> = {
   'solar:trophy-bold': 'solar:medal-ribbon-star-bold',
   'solar:trophy-bold-duotone': 'solar:medal-ribbon-star-bold-duotone',
   'solar:story-bold': 'solar:document-bold',
+  'solar:shop-2-bold-duotone': 'solar:shop-bold-duotone',
+  'solar:shop-2-bold': 'solar:shop-bold',
 };
 
 export function resolveIconName(icon: string): string {

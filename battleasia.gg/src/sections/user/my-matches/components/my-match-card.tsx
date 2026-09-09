@@ -1,15 +1,15 @@
-import { Box, Stack, Button, Typography, Grid2 as Grid, Chip } from '@mui/material';
+import { Box, Chip, Stack, Button, Typography, Grid2 as Grid } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
 import { CoinValue } from 'src/components/coin-value';
 import {
-  getDefaultGlassTokens,
   getGlassBadgeChipSx,
+  getDefaultGlassTokens,
   getGoldTopLineShellSx,
 } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, userGoldButtonSx, getUserChipSx, goldAlpha } from 'src/layouts/user';
+import { goldAlpha, USER_COLORS, getUserChipSx, userGoldButtonSx } from 'src/layouts/user';
 
 import { MatchStatPill } from '../../play/components/match-stat-pill';
 import type { MyMatchCardData } from '../my-matches-types';
@@ -59,10 +59,21 @@ export function MyMatchCard({ match, onViewDetails, translations }: MyMatchCardP
         height: 1,
         display: 'flex',
         flexDirection: 'column',
-        transition: 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease',
+        bgcolor: alpha('#10141c', 0.8),
+        backdropFilter: 'blur(16px)',
+        borderColor: isWin
+          ? alpha(USER_COLORS.success, 0.4)
+          : isLoss
+            ? alpha('#ffffff', 0.08)
+            : goldAlpha(0.25),
+        boxShadow: isWin
+          ? `0 12px 32px ${alpha('#000000', 0.55)}, 0 0 20px ${alpha(USER_COLORS.success, 0.12)}`
+          : `0 12px 32px ${alpha('#000000', 0.55)}`,
+        transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.3s ease',
         '&:hover': {
-          transform: 'translateY(-4px)',
-          boxShadow: `0 20px 48px ${alpha('#000000', 0.75)}, 0 0 28px ${goldAlpha(0.1)}`,
+          transform: 'translateY(-6px)',
+          borderColor: isWin ? USER_COLORS.success : goldAlpha(0.55),
+          boxShadow: `0 20px 48px ${alpha('#000000', 0.75)}, 0 0 28px ${isWin ? alpha(USER_COLORS.success, 0.25) : goldAlpha(0.18)}`,
         },
       })}
     >

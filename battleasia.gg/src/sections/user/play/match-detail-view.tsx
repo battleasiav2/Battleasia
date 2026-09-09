@@ -13,11 +13,12 @@ import { useImagePreloader } from 'src/hooks';
 import { useDispatch, useSelector } from 'src/store';
 import { balanceAction } from 'src/store/reducers/auth';
 import {
-  UserPageShell,
-  UserBackButton,
-  UserGlassCard,
-  UserEmptyState,
+  goldAlpha,
   USER_COLORS,
+  UserPageShell,
+  UserGlassCard,
+  UserBackButton,
+  UserEmptyState,
   userGoldButtonSx,
 } from 'src/layouts/user';
 
@@ -33,11 +34,11 @@ import { isMatchJoinableByCapacity } from './match-capacity-utils';
 import {
   MatchStatPill,
   MatchDetailHero,
+  MatchSpotsProgress,
   MatchDetailSkeleton,
   MatchDetailRoomPanel,
   MatchDetailDescription,
   MatchDetailParticipants,
-  MatchSpotsProgress,
 } from './components';
 
 // ----------------------------------------------------------------------
@@ -218,10 +219,23 @@ export function MatchDetailView() {
 
           <Box
             sx={{
-              p: 2,
-              borderRadius: '6px',
-              bgcolor: alpha('#000000', 0.35),
-              border: `1px solid ${alpha('#ffffff', 0.1)}`,
+              p: { xs: 2, sm: 2.5 },
+              borderRadius: '8px',
+              bgcolor: alpha('#10141c', 0.85),
+              backdropFilter: 'blur(16px)',
+              border: `1px solid ${goldAlpha(0.28)}`,
+              boxShadow: `0 12px 32px ${alpha('#000000', 0.6)}, inset 0 1px 0 ${alpha('#ffffff', 0.08)}`,
+              position: 'relative',
+              overflow: 'hidden',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '2px',
+                background: `linear-gradient(90deg, transparent, ${USER_COLORS.gold}, #ffffff, ${USER_COLORS.gold}, transparent)`,
+              },
             }}
           >
             <Stack
@@ -230,13 +244,27 @@ export function MatchDetailView() {
               justifyContent="space-between"
               spacing={2}
             >
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Iconify icon="solar:wallet-money-bold" width={20} sx={{ color: USER_COLORS.gold }} />
+              <Stack direction="row" alignItems="center" spacing={1.5}>
+                <Box
+                  sx={{
+                    width: 44,
+                    height: 44,
+                    borderRadius: '8px',
+                    bgcolor: goldAlpha(0.1),
+                    border: `1px solid ${goldAlpha(0.3)}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Iconify icon="solar:wallet-money-bold" width={24} sx={{ color: USER_COLORS.gold }} />
+                </Box>
                 <Box>
-                  <Typography sx={{ fontSize: 11, color: USER_COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 0.6 }}>
+                  <Typography sx={{ fontSize: 11, fontWeight: 700, color: USER_COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 0.8 }}>
                     Your Balance
                   </Typography>
-                  <CoinValue value={balance} size={18} />
+                  <CoinValue value={balance} size={20} />
                 </Box>
               </Stack>
 
@@ -254,7 +282,14 @@ export function MatchDetailView() {
                 sx={{
                   ...userGoldButtonSx,
                   maxWidth: { sm: 280 },
-                  py: 1.25,
+                  py: 1.4,
+                  fontSize: 14,
+                  fontWeight: 800,
+                  letterSpacing: 0.8,
+                  boxShadow: `0 6px 20px ${goldAlpha(0.25)}`,
+                  '&:hover': {
+                    boxShadow: `0 8px 26px ${goldAlpha(0.4)}`,
+                  },
                 }}
               >
                 {matchDetail.isJoined

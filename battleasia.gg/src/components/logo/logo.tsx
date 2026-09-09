@@ -15,7 +15,7 @@ import { logoClasses } from './classes';
 
 // ----------------------------------------------------------------------
 
-/** Same asset as nixbazar.com — public/logo/logo.webp */
+/** Brand mark — public/logo/logo.webp (battleasia.gg) */
 const LOGO_SRC = `${CONFIG.assetsDir}/logo/logo.webp`;
 
 export type LogoProps = LinkProps & {
@@ -23,14 +23,14 @@ export type LogoProps = LinkProps & {
   disabled?: boolean;
 };
 
-const LogoComponent = forwardRef<HTMLAnchorElement, LogoProps>((props, ref) => {
+const LogoComponent = forwardRef<HTMLElement, LogoProps>((props, ref) => {
   const { className, href = '/', isSingle = true, disabled, sx, ...other } = props;
 
   return (
     <LogoRoot
-      ref={ref}
-      component={RouterLink}
-      href={href}
+      ref={ref as any}
+      component={disabled ? 'div' : RouterLink}
+      {...(disabled ? {} : { href })}
       aria-label="BattleAsia logo"
       underline="none"
       className={mergeClasses([logoClasses.root, className])}

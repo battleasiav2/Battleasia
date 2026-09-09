@@ -2,7 +2,7 @@ import type { PaletteColorNoChannels } from './core/palette';
 
 export const ACCENT_STORAGE_KEY = 'ba-accent';
 
-export const ACCENT_IDS = ['gold', 'ember', 'jade', 'cyan', 'violet', 'rose', 'sky'] as const;
+export const ACCENT_IDS = ['lime', 'gold', 'ember', 'jade', 'cyan', 'violet', 'rose', 'sky'] as const;
 
 export type AccentId = (typeof ACCENT_IDS)[number];
 
@@ -54,8 +54,16 @@ function makePalette(
   };
 }
 
-/** Seven accents tuned for black glass UI — readable on #000 / #161618. */
+/** Accents tuned for black glass UI — readable on #000 / #161618. */
 export const ACCENT_PALETTES: Record<AccentId, AccentPalette> = {
+  lime: makePalette('lime', 'Lime', '#cbfb24', '#e2ff58', '#9de006', '#081401', {
+    lighter: '#F6FED9',
+    light: '#E2FF58',
+    main: '#cbfb24',
+    dark: '#9de006',
+    darker: '#659702',
+    contrastText: '#081401',
+  }),
   gold: makePalette('gold', 'Gold', '#f5c518', '#fbbf24', '#d97706', '#111111', {
     lighter: '#FEF4D4',
     light: '#FDE68A',
@@ -130,7 +138,7 @@ export function isAccentId(value: unknown): value is AccentId {
 export function resolveAccentId(value?: string | null): AccentId {
   if (isAccentId(value)) return value;
   if (value && LEGACY_PRIMARY_MAP[value]) return LEGACY_PRIMARY_MAP[value];
-  return 'gold';
+  return 'lime';
 }
 
 export function getAccentPalette(id?: string | null): AccentPalette {
@@ -152,11 +160,15 @@ export function applyAccentToDocument(id?: string | null) {
   root.style.setProperty('--ba-gold-rgb', p.rgb);
   root.style.setProperty('--ba-gold-light-rgb', p.lightRgb);
   root.style.setProperty('--ba-gold-dark-rgb', p.darkRgb);
+  root.style.setProperty('--ba-nav-badge-light', p.goldLight);
+  root.style.setProperty('--ba-nav-badge-main', p.gold);
+  root.style.setProperty('--ba-nav-badge-dark', p.goldDark);
+  root.style.setProperty('--ba-nav-badge-ink', p.ink);
   root.dataset.accent = p.id;
 }
 
 export function readStoredAccentId(): AccentId {
-  if (typeof window === 'undefined') return 'gold';
+  if (typeof window === 'undefined') return 'lime';
   try {
     const dedicated = window.localStorage.getItem(ACCENT_STORAGE_KEY);
     if (isAccentId(dedicated)) return dedicated;
@@ -168,7 +180,7 @@ export function readStoredAccentId(): AccentId {
   } catch {
     // ignore
   }
-  return 'gold';
+  return 'lime';
 }
 
 export function persistAccentId(id: AccentId) {

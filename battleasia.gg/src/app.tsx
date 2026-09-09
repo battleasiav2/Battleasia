@@ -1,4 +1,8 @@
 import 'src/global.css';
+import '@fontsource/barlow/latin-600.css';
+import '@fontsource/barlow/latin-700.css';
+import '@fontsource/barlow/latin-800.css';
+import '@fontsource/barlow/latin-900.css';
 
 import { useEffect } from 'react';
 
@@ -15,6 +19,8 @@ import { defaultSettings, SettingsProvider } from 'src/components/settings';
 import { AuthConsumer } from './utils/authcheck';
 import { LiveSyncProvider } from 'src/providers/live-sync-provider';
 import { Toaster } from 'react-hot-toast';
+import { LostLightLoader } from 'src/components/loading-screen';
+import { TacticalCursor } from 'src/components/gaming-cursor';
 
 // ----------------------------------------------------------------------
 
@@ -24,7 +30,6 @@ type AppProps = {
 
 export default function App({ children }: AppProps) {
   useScrollToTop();
-  useDismissBootShell();
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -44,6 +49,8 @@ export default function App({ children }: AppProps) {
               defaultMode={themeConfig.defaultMode}
               modeStorageKey={themeConfig.modeStorageKey}
             >
+              <TacticalCursor />
+              <LostLightLoader />
               <DeferredSettingsDrawer defaultSettings={defaultSettings} />
               <AuthConsumer>
                 <LiveSyncProvider>{children}</LiveSyncProvider>
@@ -71,36 +78,4 @@ function useScrollToTop() {
   }, [pathname]);
 
   return null;
-}
-
-/** Dismiss static LCP boot shell after React has painted (fixed overlay → no CLS). */
-function useDismissBootShell() {
-  useEffect(() => {
-    const shell = document.getElementById('boot-shell');
-    if (!shell || shell.hasAttribute('hidden')) return undefined;
-
-    let cancelled = false;
-    const dismiss = () => {
-      if (cancelled) return;
-      shell.setAttribute('hidden', '');
-      document.getElementById('boot-shell-css')?.remove();
-      window.removeEventListener('pointerdown', dismiss);
-      window.removeEventListener('keydown', dismiss);
-      window.removeEventListener('touchstart', dismiss);
-    };
-
-    window.addEventListener('pointerdown', dismiss, { once: true, passive: true });
-    window.addEventListener('keydown', dismiss, { once: true });
-    window.addEventListener('touchstart', dismiss, { once: true, passive: true });
-    // Short hold for first paint; long enough that hero is often ready underneath
-    const fallback = window.setTimeout(dismiss, 1600);
-
-    return () => {
-      cancelled = true;
-      window.clearTimeout(fallback);
-      window.removeEventListener('pointerdown', dismiss);
-      window.removeEventListener('keydown', dismiss);
-      window.removeEventListener('touchstart', dismiss);
-    };
-  }, []);
 }

@@ -6,8 +6,7 @@ import { lazy, Suspense } from 'react';
 import { useScrollOffsetTop } from 'minimal-shared/hooks';
 
 import { useTheme, alpha } from '@mui/material/styles';
-import { Box, Alert, Stack, Typography } from '@mui/material';
-
+import { Box, Alert, Stack } from '@mui/material';
 
 import { RouterLink } from 'src/routes/components';
 import { useRouter, usePathname } from 'src/routes/hooks';
@@ -34,9 +33,10 @@ import { AccentPopover } from '../components/accent-popover';
 import { SignInIconButton } from '../components/sign-in-icon-button';
 import {
     getHeaderBarSx,
-    headerContainerSx,
     headerCompactSearchSx,
     getHeaderNavLinkSx,
+    headerNavDividerSx,
+    headerRightAreaSx,
 } from '../components/header-chrome';
 import { Searchbar } from '../components/searchbar';
 import { FloatingFooterNav } from '../components/floating-footer-nav';
@@ -87,8 +87,8 @@ export function UserLayout({
     const settings = useSettingsContext();
     const pathname = usePathname();
     const router = useRouter();
-    
-    const { isLoggedIn, balance, user } = useSelector((state) => state.auth);
+
+    const { isLoggedIn, balance } = useSelector((state) => state.auth);
     const { offsetTop: isHeaderScrolled } = useScrollOffsetTop();
 
     // Preload currency icon
@@ -99,7 +99,7 @@ export function UserLayout({
 
     const navVars = userBattleNavColorVars(theme, settings.state.navLayout);
 
-    // Convert accountMenuItems to navData — primary arena links + secondary utilities (no nested Account clutter)
+    // Convert accountMenuItems to navData — primary arena links + secondary utilities
     const toNavItem = (item: (typeof accountMenuItems)[number]) => ({
         title: t(item.labelKey),
         path: item.href!,
@@ -132,8 +132,24 @@ export function UserLayout({
             container: {
                 maxWidth: false,
                 sx: {
-                    ...headerContainerSx,
-                    ...(isNavVertical && { px: { [layoutQuery]: 3 } }),
+                    minHeight: { xs: 40, md: 42 },
+                    height: { xs: 40, md: 42 },
+                    px: { xs: 2, sm: 2.5, [layoutQuery]: 3 },
+                    py: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    width: '100%',
+                },
+            },
+            centerArea: {
+                sx: {
+                    display: 'flex',
+                    flex: 1,
+                    alignItems: 'center',
+                    justifyContent: 'flex-start',
+                    minWidth: 0,
+                    mx: { xs: 1, lg: 2 },
                 },
             },
         };
@@ -149,17 +165,17 @@ export function UserLayout({
                     direction="row"
                     alignItems="center"
                     sx={{
-                        display: { xs: 'flex', md: 'none' },
+                        display: { xs: 'flex', [layoutQuery]: 'none' },
                         flexShrink: 0,
                         minWidth: 0,
                         pl: { xs: 0.5, sm: 0.75 },
                     }}
                 >
-                    {/* Mobile-only: logo image — brand text lives in desktop sidebar */}
+                    {/* Mobile-only: logo image */}
                     <Logo
                         sx={{
-                            width: { xs: 44, sm: 48 },
-                            height: { xs: 44, sm: 48 },
+                            width: { xs: 40, sm: 44 },
+                            height: { xs: 40, sm: 44 },
                             flexShrink: 0,
                             display: 'flex',
                             alignItems: 'center',
@@ -178,14 +194,10 @@ export function UserLayout({
                 <Stack
                     direction="row"
                     alignItems="center"
-                    justifyContent="center"
                     spacing={1}
                     sx={{
-                        display: { xs: 'none', lg: 'flex' },
-                        width: 1,
-                        flex: 1,
-                        minWidth: 0,
-                        px: { lg: 1, xl: 2 },
+                        width: '100%',
+                        maxWidth: { lg: 420, xl: 460 },
                     }}
                 >
                     {isLoggedIn ? (
@@ -216,30 +228,45 @@ export function UserLayout({
                             }}
                         />
                     ) : (
-                        menuItems.map((item) => {
+                        menuItems.map((item, index) => {
                             const isActive = item.isActive(pathname);
                             return (
-                                <Typography
+                                <Box
                                     key={item.href}
-                                    component={item.href ? RouterLink : 'span'}
-                                    href={item.href}
-                                    onClick={(e: any) => handleMenuClick(e, item)}
-                                    sx={getHeaderNavLinkSx(isActive)}
+                                    sx={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        height: '100%',
+                                    }}
                                 >
-                                    {t(item.labelKey)}
-                                </Typography>
+                                    {index > 0 && <Box sx={headerNavDividerSx} />}
+                                    <Box
+                                        component={item.href ? RouterLink : 'span'}
+                                        href={item.href}
+                                        onClick={(e: any) => handleMenuClick(e, item)}
+                                        sx={getHeaderNavLinkSx(isActive)}
+                                    >
+                                        <span className="nav-label">{t(item.labelKey)}</span>
+                                    </Box>
+                                </Box>
                             );
                         })
                     )}
                 </Stack>
             ),
             rightArea: (
-                <Box
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="flex-end"
+                    spacing={{ xs: 0.75, sm: 1.25 }}
                     sx={{
+                        ...headerRightAreaSx,
                         display: 'flex',
-                        alignItems: 'center',
+                        height: 1,
+                        ml: 'auto',
+                        justifySelf: 'flex-end',
                         flexShrink: 0,
-                        gap: { xs: 1, sm: 1.25 },
                     }}
                 >
                     {isLoggedIn ? (
@@ -271,8 +298,8 @@ export function UserLayout({
                                 />
                             </Stack>
                             <Suspense fallback={null}>
-                              <NotificationsDrawer />
-                              <AccountDrawer data={accountMenuItems} />
+                               <NotificationsDrawer />
+                               <AccountDrawer data={accountMenuItems} />
                             </Suspense>
                         </>
                     ) : (
@@ -284,7 +311,7 @@ export function UserLayout({
                         data={allLangs}
                     />
                     <AccentPopover />
-                </Box>
+                </Stack>
             ),
         };
 
@@ -398,4 +425,3 @@ export function UserLayout({
         </LayoutSection>
     );
 }
-

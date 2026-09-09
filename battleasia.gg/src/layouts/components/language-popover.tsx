@@ -192,23 +192,35 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         ]}
         {...other}
       >
+        {/* Tactical Flag Scope with Radar Ring */}
         <Box
           sx={{
-            width: 18,
-            height: 18,
+            position: 'relative',
+            width: 19,
+            height: 19,
             borderRadius: '50%',
             overflow: 'hidden',
             flexShrink: 0,
             display: 'grid',
             placeItems: 'center',
-            boxShadow: `0 0 0 1px ${alpha('#ffffff', 0.12)}`,
+            boxShadow: `0 0 0 1px ${alpha('#ffffff', 0.22)}`,
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              inset: 0,
+              borderRadius: '50%',
+              border: '1px solid var(--ba-nav-badge-main, #cbfb24)',
+              opacity: open ? 0.9 : 0,
+              animation: 'radar-ping 2.4s ease-in-out infinite',
+              pointerEvents: 'none',
+            },
           }}
         >
           <FlagIcon
             code={currentLang?.countryCode}
             sx={{
-              width: 18,
-              height: 18,
+              width: 19,
+              height: 19,
               borderRadius: '50%',
             }}
           />
@@ -216,6 +228,17 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         <Typography component="span" sx={headerLanguageCodeSx}>
           {(currentLang?.value ?? 'en').toUpperCase()}
         </Typography>
+        <Iconify
+          icon="solar:alt-arrow-down-bold"
+          className="lang-chevron"
+          width={11}
+          sx={{
+            color: open ? 'var(--ba-nav-badge-main, #cbfb24)' : 'rgba(255, 255, 255, 0.55)',
+            transform: open ? 'rotate(180deg)' : 'none',
+            transition: 'transform 0.2s ease, color 0.2s ease',
+            ml: -0.25,
+          }}
+        />
       </ButtonBase>
 
       {renderMenuList()}

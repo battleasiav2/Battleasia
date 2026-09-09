@@ -1,4 +1,4 @@
-import { StrictMode } from 'react';
+import { Suspense, StrictMode } from 'react';
 import { Provider } from 'react-redux';
 import { createRoot } from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
@@ -9,6 +9,7 @@ import App from './app';
 import { store, persister } from './store';
 import { routesSection } from './routes/sections';
 import { ErrorBoundary } from './routes/components';
+import { LoadingScreen } from './components/loading-screen';
 import { SoftRemountBoundary } from './components/soft-remount-boundary';
 
 // ----------------------------------------------------------------------
@@ -18,7 +19,9 @@ const router = createBrowserRouter([
     Component: () => (
       <SoftRemountBoundary>
         <App>
-          <Outlet />
+          <Suspense fallback={<LoadingScreen />}>
+            <Outlet />
+          </Suspense>
         </App>
       </SoftRemountBoundary>
     ),

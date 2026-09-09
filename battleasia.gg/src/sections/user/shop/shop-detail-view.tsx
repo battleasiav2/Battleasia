@@ -20,6 +20,7 @@ import {
   USER_COLORS,
   userMutedTextSx,
   getUserChipSx,
+  goldAlpha,
 } from 'src/layouts/user';
 
 import { Image } from 'src/components/image';
@@ -144,6 +145,10 @@ export function ShopDetailView() {
             actionVariant="gold"
             disabled={isSoldOut}
             startIcon={<Iconify icon="solar:cart-check-bold" width={18} />}
+            sx={{
+              borderRadius: 0,
+              clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
+            }}
           >
             {isSoldOut ? t('shop.soldOut') : t('shop.buyNow')}
           </UserActionButton>
@@ -159,6 +164,10 @@ export function ShopDetailView() {
           disabled={isSoldOut}
           startIcon={<Iconify icon="solar:cart-check-bold" width={18} />}
           fullWidth
+          sx={{
+            borderRadius: 0,
+            clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
+          }}
         >
           {isSoldOut ? t('shop.soldOut') : t('shop.buyNow')}
         </UserActionButton>
@@ -168,8 +177,8 @@ export function ShopDetailView() {
         sx={{
           display: 'grid',
           gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
-          gap: 1.5,
-          mb: 3,
+          gap: 1.75,
+          mb: 3.5,
         }}
       >
         <UserStatTile label={t('shop.price')} value={`$${Number(item.price).toFixed(2)}`} />
@@ -184,15 +193,28 @@ export function ShopDetailView() {
         />
       </Box>
 
-      <Grid container spacing={2} alignItems="stretch">
+      <Grid container spacing={2.5} alignItems="stretch">
         <Grid size={{ xs: 12, lg: 7 }}>
-          <UserGlassCard sx={{ p: { xs: 1.5, md: 2 }, height: 1 }}>
+          <Box
+            sx={{
+              height: 1,
+              p: { xs: 1.75, md: 2.25 },
+              bgcolor: alpha('#06090e', 0.75),
+              backdropFilter: 'blur(18px)',
+              WebkitBackdropFilter: 'blur(18px)',
+              border: `1px solid ${goldAlpha(0.28)}`,
+              borderTop: `2px solid ${USER_COLORS.gold}`,
+              boxShadow: `0 12px 36px ${alpha('#000000', 0.7)}`,
+              clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+            }}
+          >
             <Box
               sx={{
                 position: 'relative',
-                borderRadius: 2,
                 overflow: 'hidden',
-                bgcolor: alpha('#000000', 0.35),
+                bgcolor: alpha('#000000', 0.45),
+                border: `1px solid ${goldAlpha(0.2)}`,
+                clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
               }}
             >
               <Image
@@ -214,30 +236,41 @@ export function ShopDetailView() {
                 />
               ) : null}
             </Box>
-          </UserGlassCard>
+          </Box>
         </Grid>
 
         <Grid size={{ xs: 12, lg: 5 }}>
-          <Stack spacing={2} sx={{ height: 1 }}>
-            <UserGlassCard sx={{ p: { xs: 2, md: 2.5 } }}>
+          <Stack spacing={2.5} sx={{ height: 1 }}>
+            <Box
+              sx={{
+                p: { xs: 2.25, md: 2.75 },
+                bgcolor: alpha('#06090e', 0.75),
+                backdropFilter: 'blur(18px)',
+                WebkitBackdropFilter: 'blur(18px)',
+                border: `1px solid ${goldAlpha(0.28)}`,
+                borderTop: `2px solid ${USER_COLORS.gold}`,
+                boxShadow: `0 12px 36px ${alpha('#000000', 0.7)}`,
+                clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+              }}
+            >
               <Typography
                 className="font-tr"
                 sx={{
                   fontSize: 18,
-                  fontWeight: 800,
+                  fontWeight: 900,
                   textTransform: 'uppercase',
                   color: USER_COLORS.textPrimary,
-                  letterSpacing: 0.5,
-                  mb: 2,
+                  letterSpacing: 0.6,
+                  mb: 2.25,
                 }}
               >
                 {t('shop.detailTitle')}
               </Typography>
 
-              <Stack spacing={1.25}>
+              <Stack spacing={1.5}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography sx={{ ...userMutedTextSx, fontSize: 12 }}>{t('shop.price')}</Typography>
-                  <Typography sx={{ fontSize: 20, fontWeight: 800, color: USER_COLORS.gold }}>
+                  <Typography sx={{ ...userMutedTextSx, fontSize: 13 }}>{t('shop.price')}</Typography>
+                  <Typography sx={{ fontSize: 22, fontWeight: 900, color: USER_COLORS.gold, textShadow: `0 0 12px ${goldAlpha(0.4)}` }}>
                     ${Number(item.price).toFixed(2)}
                   </Typography>
                 </Stack>
@@ -245,7 +278,7 @@ export function ShopDetailView() {
                 {item.discountPercent > 0 ? (
                   <>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      <Typography sx={{ ...userMutedTextSx, fontSize: 12 }}>{t('shop.originalPrice')}</Typography>
+                      <Typography sx={{ ...userMutedTextSx, fontSize: 13 }}>{t('shop.originalPrice')}</Typography>
                       <Typography
                         sx={{
                           fontSize: 14,
@@ -268,21 +301,31 @@ export function ShopDetailView() {
                 ) : null}
 
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
-                  <Typography sx={{ ...userMutedTextSx, fontSize: 12 }}>{t('shop.amount')}</Typography>
-                  <Typography sx={{ fontSize: 14, fontWeight: 700, color: USER_COLORS.textPrimary }}>
+                  <Typography sx={{ ...userMutedTextSx, fontSize: 13 }}>{t('shop.amount')}</Typography>
+                  <Typography sx={{ fontSize: 15, fontWeight: 800, color: USER_COLORS.textPrimary }}>
                     {item.amount} {item.symbol}
                   </Typography>
                 </Stack>
               </Stack>
-            </UserGlassCard>
+            </Box>
 
             {item.paymentOptions?.length ? (
-              <UserGlassCard sx={{ p: { xs: 2, md: 2.5 } }}>
+              <Box
+                sx={{
+                  p: { xs: 2, md: 2.5 },
+                  bgcolor: alpha('#06090e', 0.75),
+                  backdropFilter: 'blur(18px)',
+                  WebkitBackdropFilter: 'blur(18px)',
+                  border: `1px solid ${goldAlpha(0.28)}`,
+                  borderTop: `2px solid ${USER_COLORS.gold}`,
+                  clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)',
+                }}
+              >
                 <Typography
                   sx={{
                     fontSize: 12,
-                    fontWeight: 700,
-                    letterSpacing: 0.8,
+                    fontWeight: 800,
+                    letterSpacing: 1,
                     textTransform: 'uppercase',
                     color: USER_COLORS.gold,
                     mb: 1.5,
@@ -292,14 +335,14 @@ export function ShopDetailView() {
                 </Typography>
                 <Stack direction="row" flexWrap="wrap" gap={1}>
                   {item.paymentOptions.map((option) => (
-                    <Box key={option} sx={getGlassInnerSx(tokens, { px: 1.25, py: 0.75 })}>
-                      <Typography sx={{ fontSize: 12, fontWeight: 600, color: USER_COLORS.textPrimary, textTransform: 'uppercase' }}>
+                    <Box key={option} sx={getGlassInnerSx(tokens, { px: 1.5, py: 0.85, borderRadius: 0 })}>
+                      <Typography sx={{ fontSize: 12, fontWeight: 700, color: USER_COLORS.textPrimary, textTransform: 'uppercase' }}>
                         {option}
                       </Typography>
                     </Box>
                   ))}
                 </Stack>
-              </UserGlassCard>
+              </Box>
             ) : null}
 
             <UserActionButton
@@ -311,7 +354,15 @@ export function ShopDetailView() {
               fullWidth
               disabled={isSoldOut}
               startIcon={<Iconify icon="solar:arrow-right-up-bold" width={18} />}
-              sx={{ height: { xs: 48, md: 52 }, fontSize: { xs: 13, md: 14 } }}
+              sx={{
+                height: { xs: 48, md: 52 },
+                fontSize: { xs: 13, md: 14 },
+                fontWeight: 900,
+                letterSpacing: 0.8,
+                borderRadius: 0,
+                clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
+                boxShadow: `0 8px 24px ${goldAlpha(0.35)}`,
+              }}
             >
               {isSoldOut ? t('shop.soldOut') : t('shop.goToBacShop')}
             </UserActionButton>
@@ -321,3 +372,4 @@ export function ShopDetailView() {
     </UserPageShell>
   );
 }
+

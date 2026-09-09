@@ -1,9 +1,10 @@
 import type { RouteObject } from 'react-router';
 
-import { lazy } from 'react';
+import { lazy, Suspense } from 'react';
 import { Navigate } from 'react-router';
 
 import { CONFIG } from 'src/global-config';
+import { LoadingScreen } from 'src/components/loading-screen';
 
 import { authRoutes } from './auth';
 import { userRoutes } from './user';
@@ -29,5 +30,12 @@ export const routesSection: RouteObject[] = [
   ...userRoutes,
 
   // No match
-  { path: '*', element: <Page404 /> },
+  {
+    path: '*',
+    element: (
+      <Suspense fallback={<LoadingScreen />}>
+        <Page404 />
+      </Suspense>
+    ),
+  },
 ];

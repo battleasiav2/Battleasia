@@ -1,10 +1,9 @@
 import type { BoxProps } from '@mui/material/Box';
-import type { SxProps, Theme } from '@mui/material/styles';
+import type { Theme, SxProps } from '@mui/material/styles';
 
-import { forwardRef, useEffect, useRef, useState } from 'react';
+import { useRef, useState, useEffect, forwardRef } from 'react';
 
 import Box from '@mui/material/Box';
-import { keyframes } from '@mui/material/styles';
 
 // ----------------------------------------------------------------------
 
@@ -17,34 +16,28 @@ export type ScrollRevealProps = BoxProps & {
   amount?: number;
   distance?: number;
   disabled?: boolean;
+  repeat?: boolean;
   /** Full-viewport section — PUBG Mobile panel feel */
   fullViewport?: boolean;
   sx?: SxProps<Theme>;
 };
 
-const revealUp = keyframes`
-  from { opacity: 0; transform: translate3d(0, var(--ba-reveal-y, 28px), 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
-`;
-
-const revealLeft = keyframes`
-  from { opacity: 0; transform: translate3d(calc(var(--ba-reveal-y, 28px) * -1), 0, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
-`;
-
-const revealRight = keyframes`
-  from { opacity: 0; transform: translate3d(var(--ba-reveal-y, 28px), 0, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
-`;
-
-function resolveAnimation(preset: ScrollRevealPreset, direction: ScrollRevealProps['direction']) {
-  if (preset === 'cinematic-slide-left' || direction === 'inLeft') return `${revealLeft} 0.55s ease both`;
-  if (preset === 'cinematic-slide-right' || direction === 'inRight') return `${revealRight} 0.55s ease both`;
-  return `${revealUp} 0.55s ease both`;
+function resolveTransform(
+  visible: boolean,
+  direction: ScrollRevealProps['direction'],
+  enterDir: 'fromBottom' | 'fromTop',
+  distance: number
+) {
+  if (visible) return 'translate3d(0, 0, 0) scale(1)';
+  if (direction === 'inLeft') return `translate3d(-${distance}px, 0, 0)`;
+  if (direction === 'inRight') return `translate3d(${distance}px, 0, 0)`;
+  if (direction === 'inDown' || enterDir === 'fromTop') return `translate3d(0, -${distance}px, 0) scale(0.985)`;
+  return `translate3d(0, ${distance}px, 0) scale(0.985)`;
 }
 
 /**
  * Scroll-into-view reveal — CSS + IntersectionObserver only (no framer-motion on critical path).
+ * Smoothly reveals contents when scrolling down and when scrolling up.
  */
 export const ScrollReveal = forwardRef<HTMLDivElement, ScrollRevealProps>((props, ref) => {
   const {
@@ -52,9 +45,10 @@ export const ScrollReveal = forwardRef<HTMLDivElement, ScrollRevealProps>((props
     direction = 'inUp',
     preset = 'soft',
     stagger = false,
-    amount = preset.startsWith('cinematic') ? 0.14 : 0.18,
-    distance = preset.startsWith('cinematic') ? 48 : 28,
+    amount = preset.startsWith('cinematic') ? 0.08 : 0.1,
+    distance = preset.startsWith('cinematic') ? 36 : 26,
     disabled = false,
+    repeat = true,
     fullViewport = false,
     sx,
     ...other
@@ -62,6 +56,7 @@ export const ScrollReveal = forwardRef<HTMLDivElement, ScrollRevealProps>((props
 
   const localRef = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(disabled);
+  const [enterDirection, setEnterDirection] = useState<'fromBottom' | 'fromTop'>('fromBottom');
   const reduceMotion =
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -78,16 +73,28 @@ export const ScrollReveal = forwardRef<HTMLDivElement, ScrollRevealProps>((props
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry?.isIntersecting) {
+        if (!entry) return;
+        if (entry.isIntersecting) {
+          if (entry.boundingClientRect.top > 0) {
+            setEnterDirection('fromBottom');
+          } else {
+            setEnterDirection('fromTop');
+          }
           setVisible(true);
-          observer.disconnect();
+          if (!repeat) {
+            observer.disconnect();
+          }
+        } else if (repeat) {
+          setVisible(false);
         }
       },
-      { threshold: amount, rootMargin: '0px 0px -8% 0px' }
+      { threshold: amount, rootMargin: '0px 0px -40px 0px' }
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [amount, disabled, reduceMotion]);
+  }, [amount, disabled, reduceMotion, repeat]);
+
+  const isVisible = visible || reduceMotion || disabled;
 
   const sectionSx: SxProps<Theme> = [
     fullViewport && {
@@ -99,25 +106,31 @@ export const ScrollReveal = forwardRef<HTMLDivElement, ScrollRevealProps>((props
       scrollSnapStop: 'normal',
     },
     {
-      '--ba-reveal-y': `${distance}px`,
-      opacity: visible || reduceMotion || disabled ? 1 : 0,
-      animation: visible && !reduceMotion && !disabled ? resolveAnimation(preset, direction) : 'none',
+      opacity: isVisible ? 1 : 0,
+      transform: resolveTransform(isVisible, direction, enterDirection, distance),
+      transition: isVisible
+        ? 'opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1)'
+        : 'opacity 0.35s ease-out, transform 0.35s ease-out',
+      willChange: 'opacity, transform',
       '@media (prefers-reduced-motion: reduce)': {
         opacity: 1,
-        animation: 'none',
+        transform: 'none',
+        transition: 'none',
       },
       ...(stagger
         ? {
             '& > *': {
-              opacity: visible ? 1 : 0,
-              animation: visible && !reduceMotion ? `${revealUp} 0.45s ease both` : 'none',
+              opacity: isVisible ? 1 : 0,
+              transform: isVisible ? 'translate3d(0, 0, 0)' : 'translate3d(0, 20px, 0)',
+              transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
+              willChange: 'opacity, transform',
             },
-            '& > *:nth-of-type(1)': { animationDelay: '0ms' },
-            '& > *:nth-of-type(2)': { animationDelay: '60ms' },
-            '& > *:nth-of-type(3)': { animationDelay: '120ms' },
-            '& > *:nth-of-type(4)': { animationDelay: '180ms' },
-            '& > *:nth-of-type(5)': { animationDelay: '240ms' },
-            '& > *:nth-of-type(6)': { animationDelay: '300ms' },
+            '& > *:nth-of-type(1)': { transitionDelay: '0ms' },
+            '& > *:nth-of-type(2)': { transitionDelay: '80ms' },
+            '& > *:nth-of-type(3)': { transitionDelay: '160ms' },
+            '& > *:nth-of-type(4)': { transitionDelay: '240ms' },
+            '& > *:nth-of-type(5)': { transitionDelay: '320ms' },
+            '& > *:nth-of-type(6)': { transitionDelay: '400ms' },
           }
         : null),
     },

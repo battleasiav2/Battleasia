@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-enum AccentId { gold, ember, jade, cyan, violet, rose, sky }
+enum AccentId { lime, gold, ember, jade, cyan, violet, rose, sky }
 
 class AccentPalette {
   const AccentPalette({
@@ -27,6 +27,14 @@ class AccentPalette {
 }
 
 const accentPalettes = <AccentId, AccentPalette>{
+  AccentId.lime: AccentPalette(
+    id: AccentId.lime,
+    label: 'Lime',
+    gold: Color(0xFFCBFB24),
+    goldLight: Color(0xFFE2FF58),
+    goldDark: Color(0xFF9DE006),
+    ink: Color(0xFF081401),
+  ),
   AccentId.gold: AccentPalette(
     id: AccentId.gold,
     label: 'Gold',

@@ -1,7 +1,6 @@
 import { Box, Link, Alert, Stack, Checkbox, IconButton, InputAdornment, FormControlLabel } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 import { z as zod } from 'zod';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useBoolean } from 'minimal-shared/hooks';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,7 +24,7 @@ import { AuthTrustRow } from './auth-trust-row';
 import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
 import { AuthSocialButtons } from './auth-social-buttons';
-import { authAlertSx, authCardFooterSx, authFieldSlotPropsCompact, authLinkSx, AUTH_TEXT_SECONDARY } from './auth-form-styles';
+import { authLinkSx, authAlertSx, authCardFooterSx, AUTH_TEXT_SECONDARY, authFieldSlotPropsCompact } from './auth-form-styles';
 import { goldAlpha } from 'src/theme/accent-presets';
 
 const REMEMBER_EMAIL_KEY = 'ba_remember_email';
@@ -113,7 +112,19 @@ export function SignInView() {
   });
 
   return (
-    <Box sx={{ width: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Box
+      sx={{
+        width: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        '@keyframes authViewEnter': {
+          '0%': { opacity: 0, transform: 'translateY(16px) scale(0.98)' },
+          '100%': { opacity: 1, transform: 'translateY(0) scale(1)' },
+        },
+        animation: 'authViewEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards',
+      }}
+    >
       <AuthFormShell
         compact
         progress={100}
@@ -138,7 +149,7 @@ export function SignInView() {
                   ...authFieldSlotPropsCompact.input,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Iconify icon="solar:letter-bold-duotone" width={16} sx={{ color: '#9CA3AF' }} />
+                      <Iconify icon="solar:letter-bold-duotone" width={18} sx={{ color: '#9CA3AF' }} />
                     </InputAdornment>
                   ),
                 },
@@ -156,13 +167,13 @@ export function SignInView() {
                   ...authFieldSlotPropsCompact.input,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Iconify icon="solar:lock-password-bold-duotone" width={16} sx={{ color: '#9CA3AF' }} />
+                      <Iconify icon="solar:lock-password-bold-duotone" width={18} sx={{ color: '#9CA3AF' }} />
                     </InputAdornment>
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: '#9CA3AF' }}>
-                        <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={16} />
+                        <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={18} />
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -187,7 +198,14 @@ export function SignInView() {
                       color: goldAlpha(0.45),
                       p: 0.25,
                       mr: 0.75,
-                      '&.Mui-checked': { color: 'var(--ba-gold)' },
+                      transition: 'all 0.2s ease',
+                      '&.Mui-checked': {
+                        color: 'var(--ba-gold)',
+                        filter: 'drop-shadow(0 0 4px rgba(245,158,11,0.6))',
+                      },
+                      '&:hover': {
+                        bgcolor: goldAlpha(0.08),
+                      },
                     }}
                   />
                 }
@@ -200,13 +218,40 @@ export function SignInView() {
               <Link
                 component={RouterLink}
                 href={paths.auth.forgotPassword}
-                sx={{ ...authLinkSx, fontSize: 13, fontWeight: 600, textDecoration: 'underline' }}
+                sx={{
+                  ...authLinkSx,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  textDecoration: 'none',
+                  position: 'relative',
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    bottom: -1,
+                    left: 0,
+                    width: '100%',
+                    height: '1.5px',
+                    bgcolor: 'var(--ba-gold)',
+                    opacity: 0.6,
+                    transition: 'opacity 0.2s ease, transform 0.2s ease',
+                    transform: 'scaleX(0.9)',
+                  },
+                  '&:hover::after': {
+                    opacity: 1,
+                    transform: 'scaleX(1)',
+                  },
+                }}
               >
                 {t('auth.forgotPassword')}
               </Link>
             </Stack>
 
-            <AuthSubmitButton loading={isSubmitting} loadingIndicator={`${t('auth.signIn')}...`} startIcon={false}>
+            <AuthSubmitButton
+              loading={isSubmitting}
+              loadingIndicator={`${t('auth.signIn')}...`}
+              startIcon={false}
+              endIcon={<Iconify icon="solar:login-3-bold" width={18} />}
+            >
               {t('auth.signIn')}
             </AuthSubmitButton>
 
@@ -232,7 +277,19 @@ export function SignInView() {
         </Box>
       </AuthFormShell>
 
-      <Box sx={{ width: 1, maxWidth: { xs: 1, sm: 400, md: 420 }, mt: 1.5 }}>
+      <Box
+        sx={{
+          width: 1,
+          maxWidth: { xs: 1, sm: 400, md: 420 },
+          mt: 1.5,
+          animation: 'authViewEnter 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both',
+          '@keyframes authViewEnter': {
+            '0%': { opacity: 0, transform: 'scale(1.1) translateY(-4px)', filter: 'blur(8px)' },
+            '100%': { opacity: 1, transform: 'scale(1) translateY(0)', filter: 'blur(0px)' },
+          },
+          '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+        }}
+      >
         <AuthSocialButtons />
       </Box>
     </Box>

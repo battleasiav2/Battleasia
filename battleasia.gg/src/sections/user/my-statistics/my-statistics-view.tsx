@@ -4,25 +4,24 @@ import { alpha } from '@mui/material/styles';
 import { Box, Stack, Typography } from '@mui/material';
 
 import CoinValue from 'src/components/coin-value';
-import { UserAnimatedStat } from 'src/layouts/user';
+import { USER_COLORS ,
+  UserStatTile,
+  UserPageShell,
+  UserGlassCard,
+  UserEmptyState,
+  UserAnimatedStat,
+} from 'src/layouts/user';
 
 import { useApi, useLiveSync, LIVE_SYNC_TOPICS } from 'src/hooks';
 import { useSelector } from 'src/store';
-import {
-  UserPageShell,
-  UserGlassCard,
-  UserStatTile,
-  UserEmptyState,
-  USER_COLORS,
-} from 'src/layouts/user';
 
 import { useTranslate } from 'src/locales/use-locales';
 
 import {
-  mapApiMatchToStatistics,
-  sortStatisticsByDate,
-  type ApiMatchHistoryItem,
   type StatisticsItem,
+  sortStatisticsByDate,
+  mapApiMatchToStatistics,
+  type ApiMatchHistoryItem,
 } from './my-statistics-types';
 import { StatisticsHero, StatisticsHistoryList, StatisticsPageSkeleton } from './components';
 
@@ -164,48 +163,74 @@ export function MyStatisticsView() {
           ) : (
             <UserGlassCard
               sx={{
-                p: { xs: 1.5, md: 2 },
-                borderColor: alpha(netProfit >= 0 ? USER_COLORS.success : USER_COLORS.error, 0.2),
+                p: { xs: 2, md: 2.5 },
+                bgcolor: alpha('#10141c', 0.8),
+                backdropFilter: 'blur(16px)',
+                borderColor: alpha(netProfit >= 0 ? USER_COLORS.success : USER_COLORS.error, 0.35),
+                boxShadow: `0 14px 36px ${alpha('#000000', 0.6)}, 0 0 24px ${alpha(netProfit >= 0 ? USER_COLORS.success : USER_COLORS.error, 0.1)}`,
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: '2px',
+                  background: `linear-gradient(90deg, transparent, ${netProfit >= 0 ? USER_COLORS.success : USER_COLORS.error}, transparent)`,
+                },
               }}
             >
               <Stack
                 direction={{ xs: 'column', sm: 'row' }}
                 alignItems={{ xs: 'flex-start', sm: 'center' }}
                 justifyContent="space-between"
-                spacing={1}
+                spacing={1.5}
                 sx={{ mb: 2, px: { xs: 0.5, sm: 1 } }}
               >
-                <Typography
-                  className="font-tr"
-                  sx={{
-                    fontSize: 16,
-                    fontWeight: 800,
-                    textTransform: 'uppercase',
-                    color: USER_COLORS.gold,
-                    letterSpacing: 0.5,
-                  }}
-                >
-                  Match History
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      bgcolor: netProfit >= 0 ? USER_COLORS.success : USER_COLORS.error,
+                      boxShadow: `0 0 8px ${netProfit >= 0 ? USER_COLORS.success : USER_COLORS.error}`,
+                    }}
+                  />
+                  <Typography
+                    className="font-tr"
+                    sx={{
+                      fontSize: 16,
+                      fontWeight: 800,
+                      textTransform: 'uppercase',
+                      color: USER_COLORS.gold,
+                      letterSpacing: 0.8,
+                    }}
+                  >
+                    Match History
+                  </Typography>
+                </Stack>
 
                 <Box
                   sx={{
-                    px: 1.25,
-                    py: 0.5,
-                    borderRadius: '4px',
-                    bgcolor: alpha(netProfit >= 0 ? USER_COLORS.success : USER_COLORS.error, 0.12),
-                    border: `1px solid ${alpha(netProfit >= 0 ? USER_COLORS.success : USER_COLORS.error, 0.3)}`,
+                    px: 1.5,
+                    py: 0.6,
+                    borderRadius: '6px',
+                    bgcolor: alpha(netProfit >= 0 ? USER_COLORS.success : USER_COLORS.error, 0.15),
+                    border: `1px solid ${alpha(netProfit >= 0 ? USER_COLORS.success : USER_COLORS.error, 0.35)}`,
+                    boxShadow: `0 0 12px ${alpha(netProfit >= 0 ? USER_COLORS.success : USER_COLORS.error, 0.12)}`,
                   }}
                 >
-                  <Stack direction="row" alignItems="center" spacing={0.5}>
-                    <Typography sx={{ fontSize: 11, color: USER_COLORS.textMuted, textTransform: 'uppercase' }}>
+                  <Stack direction="row" alignItems="center" spacing={0.75}>
+                    <Typography sx={{ fontSize: 11, fontWeight: 700, color: USER_COLORS.textMuted, textTransform: 'uppercase', letterSpacing: 0.5 }}>
                       {t('myStatistics.netProfit')}:
                     </Typography>
                     <CoinValue
                       value={Math.abs(netProfit)}
                       size={14}
                       textSx={{
-                        fontWeight: 700,
+                        fontWeight: 800,
                         color: netProfit >= 0 ? USER_COLORS.success : USER_COLORS.error,
                       }}
                     />

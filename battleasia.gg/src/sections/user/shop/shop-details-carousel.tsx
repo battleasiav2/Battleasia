@@ -1,12 +1,12 @@
 import { useRef } from 'react';
 
 import Box from '@mui/material/Box';
-import { alpha } from '@mui/material/styles';
-import { useTheme } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
 import { Image } from 'src/components/image';
 import { USER_COLORS } from 'src/layouts/user';
+import { goldAlpha } from 'src/theme/accent-presets';
 import {
   Carousel,
   useCarousel,
@@ -23,6 +23,8 @@ type Props = {
   images?: string[];
   name?: string;
 };
+
+const GOLD = USER_COLORS.gold;
 
 export function ShopDetailsCarousel({ images, name }: Props) {
   const theme = useTheme();
@@ -46,12 +48,16 @@ export function ShopDetailsCarousel({ images, name }: Props) {
   const slides = images?.map((img) => ({ src: img })) || [];
 
   return (
-    <Box>
+    <Box sx={{ position: 'relative' }}>
       <Box
         sx={{
           mb: 2,
           position: 'relative',
           overflow: 'hidden',
+          bgcolor: '#04070d',
+          border: `1px solid ${goldAlpha(0.25)}`,
+          clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+          boxShadow: `0 12px 32px ${alpha('#000000', 0.8)}`,
         }}
       >
         <CarouselArrowNumberButtons
@@ -60,21 +66,26 @@ export function ShopDetailsCarousel({ images, name }: Props) {
           totalSlides={carousel.dots.dotCount}
           selectedIndex={carousel.dots.selectedIndex + 1}
           sx={{
-            right: 12,
-            bottom: 12,
+            right: 14,
+            bottom: 14,
             position: 'absolute',
             display: { xs: 'none', sm: 'flex' },
             zIndex: 2,
             '& .MuiButtonBase-root': {
-              bgcolor: alpha('#000000', 0.65),
-              color: USER_COLORS.gold,
-              border: `1px solid ${alpha('#ffffff', 0.12)}`,
-              '&:hover': { bgcolor: alpha('#000000', 0.85) },
+              bgcolor: alpha('#06090e', 0.85),
+              color: GOLD,
+              border: `1px solid ${goldAlpha(0.35)}`,
+              backdropFilter: 'blur(10px)',
+              '&:hover': {
+                bgcolor: goldAlpha(0.25),
+                borderColor: GOLD,
+                boxShadow: `0 0 14px ${goldAlpha(0.35)}`,
+              },
             },
           }}
         />
 
-        <Carousel carousel={carousel} sx={{ borderRadius: 0, width: '100%' }}>
+        <Carousel carousel={carousel} sx={{ width: '100%' }}>
           {slides.map((slide) => (
             <Image
               key={slide.src}
@@ -86,17 +97,22 @@ export function ShopDetailsCarousel({ images, name }: Props) {
                 width: '100%',
                 maxHeight: isMobile ? 360 : 440,
                 objectFit: 'cover',
+                filter: 'contrast(1.05)',
               }}
             />
           ))}
         </Carousel>
 
+        {/* Ambient Gradient Overlay */}
         <Box
           sx={{
             position: 'absolute',
             inset: 0,
             pointerEvents: 'none',
-            background: `linear-gradient(180deg, transparent 50%, ${alpha('#000000', 0.45)} 100%)`,
+            background: `
+              linear-gradient(180deg, transparent 40%, ${alpha('#030509', 0.8)} 100%),
+              radial-gradient(ellipse 60% 40% at 50% 100%, ${goldAlpha(0.12)} 0%, transparent 70%)
+            `,
           }}
         />
 
@@ -118,11 +134,13 @@ export function ShopDetailsCarousel({ images, name }: Props) {
               slotProps={{
                 dot: {
                   sx: {
-                    width: 22,
+                    width: 24,
                     height: 3,
-                    bgcolor: USER_COLORS.gold,
+                    bgcolor: GOLD,
+                    boxShadow: `0 0 8px ${GOLD}`,
                     '&:not(.Mui-selected)': {
-                      bgcolor: alpha('#ffffff', 0.25),
+                      bgcolor: alpha('#ffffff', 0.3),
+                      boxShadow: 'none',
                     },
                   },
                 },
@@ -147,14 +165,18 @@ export function ShopDetailsCarousel({ images, name }: Props) {
               selected={index === carousel.thumbs.selectedIndex}
               onClick={() => carousel.thumbs.onClickThumb(index)}
               sx={{
-                opacity: index === carousel.thumbs.selectedIndex ? 1 : 0.55,
+                opacity: index === carousel.thumbs.selectedIndex ? 1 : 0.45,
                 border:
                   index === carousel.thumbs.selectedIndex
-                    ? `2px solid ${USER_COLORS.gold}`
-                    : `2px solid ${alpha('#ffffff', 0.1)}`,
-                borderRadius: 0,
-                transition: 'opacity 0.25s ease, border-color 0.25s ease',
-                '&:hover': { opacity: 1 },
+                    ? `2px solid ${GOLD}`
+                    : `1px solid ${alpha('#ffffff', 0.15)}`,
+                clipPath: 'polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)',
+                boxShadow:
+                  index === carousel.thumbs.selectedIndex
+                    ? `0 0 16px ${goldAlpha(0.35)}`
+                    : 'none',
+                transition: 'all 0.25s ease',
+                '&:hover': { opacity: 1, borderColor: GOLD },
               }}
             />
           ))}
@@ -163,3 +185,4 @@ export function ShopDetailsCarousel({ images, name }: Props) {
     </Box>
   );
 }
+

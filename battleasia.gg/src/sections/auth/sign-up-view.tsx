@@ -20,7 +20,6 @@ import {
   InputAdornment,
   FormControlLabel,
 } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -43,16 +42,16 @@ import { AuthSocialButtons } from './auth-social-buttons';
 import { AuthStepProgress } from './auth-step-progress';
 import { goldAlpha } from 'src/theme/accent-presets';
 import {
-  authAlertSx,
-  authBackLinkSx,
-  authCardFooterSx,
-  authFieldSlotPropsCompact,
   authLinkSx,
-  authPhoneCountrySx,
-  authPhoneInputSx,
-  authSelectMenuProps,
+  authAlertSx,
   authSelectSx,
+  authBackLinkSx,
   AUTH_TEXT_MUTED,
+  authCardFooterSx,
+  authPhoneInputSx,
+  authPhoneCountrySx,
+  authSelectMenuProps,
+  authFieldSlotPropsCompact,
 } from './auth-form-styles';
 
 const REFERRAL_STORAGE_KEY = 'battleasia_ref';
@@ -96,6 +95,7 @@ export function SignUpView() {
   const showConfirmPassword = useBoolean();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [step, setStep] = useState(1);
+  const [slideDir, setSlideDir] = useState<'forward' | 'backward'>('forward');
 
   useEffect(() => {
     const ref = new URLSearchParams(window.location.search).get('ref');
@@ -126,7 +126,15 @@ export function SignUpView() {
   const goNext = async () => {
     setErrorMessage(null);
     const valid = await trigger(['email', 'password', 'confirmPassword']);
-    if (valid) setStep(2);
+    if (valid) {
+      setSlideDir('forward');
+      setStep(2);
+    }
+  };
+
+  const goBack = () => {
+    setSlideDir('backward');
+    setStep(1);
   };
 
   const onSubmit = handleSubmit(async (data) => {
@@ -190,17 +198,17 @@ export function SignUpView() {
 
   const fieldIcon = (icon: string) => (
     <InputAdornment position="start">
-      <Iconify icon={icon} width={16} sx={{ color: '#9CA3AF' }} />
+      <Iconify icon={icon} width={18} sx={{ color: '#9CA3AF' }} />
     </InputAdornment>
   );
 
-  const compactSelectSx = { ...authSelectSx, minHeight: 42, '& .MuiSelect-select': { py: 1.15 } };
+  const compactSelectSx = { ...authSelectSx, minHeight: 44, '& .MuiSelect-select': { py: 1.25 } };
 
   const phoneSlotProps = {
     inputLabel: authFieldSlotPropsCompact.inputLabel,
     input: {
       ...authFieldSlotPropsCompact.input,
-      sx: { ...authFieldSlotPropsCompact.input.sx, minHeight: 42 },
+      sx: { ...authFieldSlotPropsCompact.input.sx, minHeight: 44 },
     },
   };
 
@@ -212,7 +220,19 @@ export function SignUpView() {
   ] as const;
 
   return (
-    <Box sx={{ width: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Box
+      sx={{
+        width: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        '@keyframes authViewEnter': {
+          '0%': { opacity: 0, transform: 'translateY(16px) scale(0.98)' },
+          '100%': { opacity: 1, transform: 'translateY(0) scale(1)' },
+        },
+        animation: 'authViewEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards',
+      }}
+    >
       <AuthFormShell
         wide
         progress={progress}
@@ -227,9 +247,24 @@ export function SignUpView() {
         )}
 
         <Form methods={methods} onSubmit={onSubmit}>
-          <Stack spacing={1.75}>
+          <Stack spacing={1.75} sx={{ overflow: 'hidden' }}>
             {step === 1 ? (
-              <>
+              <Box
+                key="signup-step-1"
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.75,
+                  animation:
+                    slideDir === 'backward'
+                      ? 'stepSlideInLeft 0.32s cubic-bezier(0.16, 1, 0.3, 1) backwards'
+                      : undefined,
+                  '@keyframes stepSlideInLeft': {
+                    '0%': { opacity: 0, transform: 'translateX(-24px)' },
+                    '100%': { opacity: 1, transform: 'translateX(0)' },
+                  },
+                }}
+              >
                 <Field.Text
                   name="email"
                   label={t('auth.emailAddress')}
@@ -263,7 +298,7 @@ export function SignUpView() {
                           >
                             <Iconify
                               icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'}
-                              width={16}
+                              width={18}
                             />
                           </IconButton>
                         </InputAdornment>
@@ -294,7 +329,7 @@ export function SignUpView() {
                               icon={
                                 showConfirmPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'
                               }
-                              width={16}
+                              width={18}
                             />
                           </IconButton>
                         </InputAdornment>
@@ -307,13 +342,25 @@ export function SignUpView() {
                   type="button"
                   onClick={goNext}
                   startIcon={false}
-                  endIcon={<Iconify icon="eva:arrow-forward-fill" width={16} />}
+                  endIcon={<Iconify icon="eva:arrow-forward-fill" width={18} />}
                 >
                   {t('auth.continue')}
                 </AuthSubmitButton>
-              </>
+              </Box>
             ) : (
-              <>
+              <Box
+                key="signup-step-2"
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1.75,
+                  animation: 'stepSlideInRight 0.32s cubic-bezier(0.16, 1, 0.3, 1) backwards',
+                  '@keyframes stepSlideInRight': {
+                    '0%': { opacity: 0, transform: 'translateX(24px)' },
+                    '100%': { opacity: 1, transform: 'translateX(0)' },
+                  },
+                }}
+              >
                 <Field.Text
                   name="inGameUserName"
                   label={t('auth.inGameUserName')}
@@ -400,7 +447,14 @@ export function SignUpView() {
                             sx={{
                               color: goldAlpha(0.45),
                               mt: -0.25,
-                              '&.Mui-checked': { color: 'var(--ba-gold)' },
+                              transition: 'all 0.2s ease',
+                              '&.Mui-checked': {
+                                color: 'var(--ba-gold)',
+                                filter: 'drop-shadow(0 0 4px rgba(245,158,11,0.6))',
+                              },
+                              '&:hover': {
+                                bgcolor: goldAlpha(0.08),
+                              },
                             }}
                           />
                         }
@@ -430,17 +484,28 @@ export function SignUpView() {
                 <Link
                   component="button"
                   type="button"
-                  onClick={() => setStep(1)}
-                  sx={authBackLinkSx}
+                  onClick={goBack}
+                  sx={{
+                    ...authBackLinkSx,
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      color: '#ffe066',
+                      transform: 'translateX(-3px)',
+                    },
+                  }}
                 >
-                  <Iconify icon="eva:arrow-back-fill" width={14} />
+                  <Iconify icon="eva:arrow-back-fill" width={16} />
                   {t('auth.back')}
                 </Link>
 
-                <AuthSubmitButton loading={isSubmitting} loadingIndicator={t('auth.creatingAccount')}>
+                <AuthSubmitButton
+                  loading={isSubmitting}
+                  loadingIndicator={t('auth.creatingAccount')}
+                  endIcon={<Iconify icon="solar:user-plus-bold" width={18} />}
+                >
                   {t('auth.createAccount')}
                 </AuthSubmitButton>
-              </>
+              </Box>
             )}
 
             <AuthFooterLinks
@@ -455,7 +520,19 @@ export function SignUpView() {
         </Box>
       </AuthFormShell>
 
-      <Box sx={{ width: 1, maxWidth: { xs: 1, sm: 420, md: 440 }, mt: 1.5 }}>
+      <Box
+        sx={{
+          width: 1,
+          maxWidth: { xs: 1, sm: 420, md: 440 },
+          mt: 1.5,
+          animation: 'authViewEnter 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both',
+          '@keyframes authViewEnter': {
+            '0%': { opacity: 0, transform: 'scale(1.1) translateY(-4px)', filter: 'blur(8px)' },
+            '100%': { opacity: 1, transform: 'scale(1) translateY(0)', filter: 'blur(0px)' },
+          },
+          '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+        }}
+      >
         <AuthSocialButtons />
       </Box>
     </Box>

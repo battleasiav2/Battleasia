@@ -1,18 +1,18 @@
-import { Box, Stack, Typography } from '@mui/material';
-import { alpha } from '@mui/material/styles';
+import { Box, Stack, Container, Typography } from '@mui/material';
+import { alpha, useTheme } from '@mui/material/styles';
 
 import { RouterLink } from 'src/routes/components';
-
 import { Logo } from 'src/components/logo';
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
-import { createMenuClickHandler } from '../menu-items-config';
+import { Iconify } from 'src/components/iconify';
 import { useRouter, usePathname } from 'src/routes/hooks';
 import { useTranslate } from 'src/locales/use-locales';
-import { goldAlpha } from 'src/theme/accent-presets';
 
-const GOLD = 'var(--ba-gold)';
+import { createMenuClickHandler } from '../menu-items-config';
 
-/** Trusted partner / affiliate domain pills */
+// ----------------------------------------------------------------------
+// CONSTANTS & EXISTING DATA
+// ----------------------------------------------------------------------
+
 const FOOTER_PARTNERS = [
   { label: 'battleasia.com', href: 'https://battleasia.com', icon: '/logo/logo.webp' },
   { label: 'baccoin.shop', href: 'https://baccoin.shop', icon: '/assets/images/currency.webp' },
@@ -22,135 +22,343 @@ const FOOTER_PARTNERS = [
   { label: 'nagadwallet.net', href: 'https://nagadwallet.net', icon: '/assets/images/nagad.webp' },
 ] as const;
 
-const linkSx = {
-  color: alpha('#ffffff', 0.55),
-  textDecoration: 'none',
-  fontSize: { xs: 12, sm: 13 },
-  lineHeight: 1.4,
-  cursor: 'pointer',
-  transition: 'color 0.2s ease',
-  '&:hover': { color: GOLD },
-};
+const SOCIAL_LINKS = [
+  { labelKey: 'footer.facebook', icon: 'solar:facebook-bold', href: 'https://www.facebook.com/share/14XUaoaUgUL/?mibextid=wwXIfr' },
+  { labelKey: 'footer.discord', icon: 'ic:baseline-discord', href: 'https://discord.gg/battleasia' },
+  { labelKey: 'footer.tiktok', icon: 'ic:baseline-tiktok', href: 'https://www.tiktok.com/@battleasia?_r=1&_t=ZN-93nBYQnjiGU' },
+  { labelKey: 'footer.instagram', icon: 'ri:instagram-fill', href: 'https://www.instagram.com/battleasia' },
+  { labelKey: 'footer.youtube', icon: 'ri:youtube-fill', href: 'https://www.youtube.com/@BattleAsia' },
+  { labelKey: 'footer.telegram', icon: 'ic:baseline-telegram', href: 'https://t.me/battleasiaofficial' },
+] as const;
+
+// ----------------------------------------------------------------------
+// TOP SLOPED CONTOUR WITH CENTER HORNS / CREST & GREEN AMBIENT GLOW
+// ----------------------------------------------------------------------
+
+function FooterTopContour({ accentColor }: { accentColor: string }) {
+  return (
+    <Box
+      sx={{
+        position: 'absolute',
+        top: { xs: -36, sm: -48, md: -58 },
+        left: 0,
+        right: 0,
+        height: { xs: 52, sm: 64, md: 74 },
+        pointerEvents: 'none',
+        zIndex: 3,
+        overflow: 'visible',
+      }}
+    >
+      {/* Soft Ambient Lime / Green Backlight Radiating Up Behind the Center Horns */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: { xs: '12%', md: '5%' },
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: { xs: 180, sm: 260, md: 340 },
+          height: { xs: 70, sm: 90, md: 110 },
+          background: `radial-gradient(ellipse 65% 55% at 50% 85%, ${alpha(accentColor, 0.75)} 0%, ${alpha(accentColor, 0.28)} 40%, transparent 75%)`,
+          filter: 'blur(16px)',
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* SVG Path: Sloped V Contour with Curved Upward Horns in Center */}
+      <Box
+        component="svg"
+        viewBox="0 0 1920 80"
+        preserveAspectRatio="none"
+        sx={{
+          width: 1,
+          height: 1,
+          display: 'block',
+          overflow: 'visible',
+        }}
+      >
+        <defs>
+          <linearGradient id="footerLineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={alpha(accentColor, 0.25)} />
+            <stop offset="25%" stopColor={alpha(accentColor, 0.85)} />
+            <stop offset="50%" stopColor={accentColor} />
+            <stop offset="75%" stopColor={alpha(accentColor, 0.85)} />
+            <stop offset="100%" stopColor={alpha(accentColor, 0.25)} />
+          </linearGradient>
+
+          <filter id="lineGlow" x="-20%" y="-40%" width="140%" height="180%">
+            <feGaussianBlur stdDeviation="3" result="glow" />
+            <feMerge>
+              <feMergeNode in="glow" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Black silhouette fill below the sloped contour to seamlessly connect */}
+        <path
+          d="
+            M 0 20
+            L 900 48
+            C 925 50 942 46 947 34
+            C 951 24 947 12 943 5
+            C 941 2 944 1 947 4
+            C 953 9 957 20 957 36
+            C 957 46 958 50 960 50
+            C 962 50 963 46 963 36
+            C 963 20 967 9 973 4
+            C 976 1 979 2 977 5
+            C 973 12 969 24 973 34
+            C 978 46 995 50 1020 48
+            L 1920 20
+            L 1920 80
+            L 0 80
+            Z
+          "
+          fill="#060706"
+        />
+
+        {/* The Glowing Lime Contour Stroke */}
+        <path
+          d="
+            M 0 20
+            L 900 48
+            C 925 50 942 46 947 34
+            C 951 24 947 12 943 5
+            C 941 2 944 1 947 4
+            C 953 9 957 20 957 36
+            C 957 46 958 50 960 50
+            C 962 50 963 46 963 36
+            C 963 20 967 9 973 4
+            C 976 1 979 2 977 5
+            C 973 12 969 24 973 34
+            C 978 46 995 50 1020 48
+            L 1920 20
+          "
+          fill="none"
+          stroke="url(#footerLineGrad)"
+          strokeWidth="2.2"
+          filter="url(#lineGlow)"
+        />
+      </Box>
+    </Box>
+  );
+}
+
+// ----------------------------------------------------------------------
+// STEALTH WING BACKGROUND GRAPHICS (MATCHING ATTACHED DESIGN)
+// ----------------------------------------------------------------------
+
+function StealthWingBackdrop({ accentColor }: { accentColor: string }) {
+  return (
+    <Box
+      sx={{
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        zIndex: 0,
+        overflow: 'hidden',
+      }}
+    >
+      <Box
+        component="svg"
+        viewBox="0 0 1920 260"
+        preserveAspectRatio="none"
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          width: 1,
+          height: 1,
+          opacity: 0.45,
+        }}
+      >
+        {/* Left Stealth Facets */}
+        <polygon points="960,50 820,90 540,160 300,180 960,260" fill="rgba(255,255,255,0.015)" />
+        <polygon points="960,50 880,120 720,200 960,250" fill="rgba(0,0,0,0.4)" />
+        <line x1="960" y1="50" x2="400" y2="170" stroke={alpha(accentColor, 0.08)} strokeWidth="1" />
+        <line x1="960" y1="50" x2="680" y2="220" stroke={alpha('#ffffff', 0.04)} strokeWidth="1" />
+
+        {/* Right Stealth Facets */}
+        <polygon points="960,50 1100,90 1380,160 1620,180 960,260" fill="rgba(255,255,255,0.015)" />
+        <polygon points="960,50 1040,120 1200,200 960,250" fill="rgba(0,0,0,0.4)" />
+        <line x1="960" y1="50" x2="1520" y2="170" stroke={alpha(accentColor, 0.08)} strokeWidth="1" />
+        <line x1="960" y1="50" x2="1240" y2="220" stroke={alpha('#ffffff', 0.04)} strokeWidth="1" />
+      </Box>
+    </Box>
+  );
+}
+
+// ----------------------------------------------------------------------
+// MAIN FOOTER SECTION COMPONENT
+// ----------------------------------------------------------------------
 
 export function FooterSection() {
-  const { t, currentLang } = useTranslate();
-  const isBengali = currentLang?.value === 'bn';
-
+  const theme = useTheme();
+  const { t } = useTranslate();
   const pathname = usePathname();
   const router = useRouter();
   const handleMenuClick = createMenuClickHandler(pathname, router);
 
-  const navSections = [
-    {
-      titleKey: 'footer.information',
-      links: [
-        { labelKey: 'footer.home', href: '/dashboard', scrollTarget: 'home' },
-        { labelKey: 'footer.aboutUs', href: '/dashboard/about-us', scrollTarget: 'about-us' },
-        { labelKey: 'footer.howToPlay', href: '/dashboard/how-to-play', scrollTarget: 'how-to-play' },
-        { labelKey: 'footer.rules', href: '/dashboard/rules', scrollTarget: 'rules' },
-      ],
+  // Lime-green accent matching the attached image design
+  const accentColor = theme.palette.primary.main || '#a3e635';
+
+  const linkStyle = {
+    color: alpha('#ffffff', 0.72),
+    fontSize: { xs: 12, md: 13 },
+    fontWeight: 500,
+    textDecoration: 'none',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+    '&:hover': {
+      color: accentColor,
+      textDecoration: 'underline',
     },
-    {
-      titleKey: 'footer.social',
-      links: [
-        { labelKey: 'footer.facebook', href: 'https://www.facebook.com/share/14XUaoaUgUL/?mibextid=wwXIfr' },
-        { labelKey: 'footer.tiktok', href: 'https://www.tiktok.com/@battleasia?_r=1&_t=ZN-93nBYQnjiGU' },
-        { labelKey: 'footer.instagram', href: 'https://www.instagram.com/battleasia' },
-        { labelKey: 'footer.youtube', href: 'https://www.youtube.com/@BattleAsia' },
-        { labelKey: 'footer.telegram', href: 'https://t.me/battleasiaofficial' },
-      ],
-    },
-    {
-      titleKey: 'footer.payments',
-      links: [
-        { labelKey: 'footer.bkash' },
-        { labelKey: 'footer.nagad' },
-        { labelKey: 'footer.crypto' },
-      ],
-    },
-    {
-      titleKey: 'footer.securityAndConfidentiality',
-      links: [
-        { labelKey: 'footer.privacyPolicy', href: '/privacy-policy' },
-        { labelKey: 'footer.termsAndConditions', href: '/terms-and-conditions' },
-      ],
-    },
-  ];
+  };
 
   return (
     <Box
       component="footer"
       sx={{
         position: 'relative',
-        overflowX: 'hidden',
-        bgcolor: '#0a0a0a',
-        // Reserve footer footprint early — reduces attributed CLS when main grows
-        minHeight: { xs: 640, md: 520 },
-        borderTop: `1px solid ${alpha('#ffffff', 0.06)}`,
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          inset: 0,
-          background: `radial-gradient(ellipse 60% 40% at 50% 0%, ${goldAlpha(0.06)} 0%, transparent 55%)`,
-          pointerEvents: 'none',
-        },
+        bgcolor: '#060706',
+        color: '#ffffff',
+        pt: { xs: 3.5, sm: 4.5, md: 5.5 },
+        pb: { xs: 3, md: 4 },
+        mt: { xs: 5, md: 7 },
+        overflow: 'visible',
+        // Raster horizontal scanlines across entire footer matching the attached image
+        backgroundImage: `
+          repeating-linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0) 0px,
+            rgba(0, 0, 0, 0) 3px,
+            rgba(0, 0, 0, 0.72) 3px,
+            rgba(0, 0, 0, 0.72) 6px
+          ),
+          linear-gradient(
+            180deg,
+            #080a08 0%,
+            #060706 60%,
+            #030403 100%
+          )
+        `,
       }}
     >
-      <Stack
-        spacing={{ xs: 2.5, md: 3.5 }}
+      {/* Top sloped contour line with center horns and lime back-glow */}
+      <FooterTopContour accentColor={accentColor} />
+
+      {/* Symmetrical stealth wing backdrop geometry */}
+      <StealthWingBackdrop accentColor={accentColor} />
+
+      <Container
+        maxWidth="xl"
         sx={{
           position: 'relative',
-          zIndex: 1,
-          px: { xs: 2, sm: 3, md: 4 },
-          pt: { xs: 3, md: 4.5 },
-          pb: { xs: 2.5, md: 3.5 },
-          maxWidth: 1280,
-          mx: 'auto',
+          zIndex: 2,
+          px: { xs: 2, sm: 3, md: 5 },
         }}
       >
-        {/* Brand — logo + title + gold line (matches header / arena strip) */}
-        <Box sx={{ width: 1, maxWidth: { xs: 340, sm: 380, md: 420 } }}>
+        {/* ============================================================= */}
+        {/* PRIMARY FOOTER ROW: MATCHES ATTACHED IMAGE 100% */}
+        {/* [Social Circles]  [Brand Logo + Name]  [Legal & Links / Copyright]  [User Support] */}
+        {/* ============================================================= */}
+        <Stack
+          direction={{ xs: 'column', md: 'row' }}
+          alignItems={{ xs: 'center', md: 'center' }}
+          justifyContent="space-between"
+          spacing={{ xs: 2.5, md: 3 }}
+          sx={{
+            py: { xs: 1, md: 1.5 },
+          }}
+        >
+          {/* ----------------------------------------------------------- */}
+          {/* FAR LEFT: CIRCULAR SOCIAL ICONS (Lime icons on dark circle) */}
+          {/* ----------------------------------------------------------- */}
           <Stack
             direction="row"
             alignItems="center"
-            spacing={{ xs: 1.25, sm: 1.5 }}
-            sx={{ minWidth: 0 }}
+            spacing={1.2}
+            sx={{
+              flexShrink: 0,
+              order: { xs: 3, md: 1 },
+            }}
+          >
+            {SOCIAL_LINKS.map((item) => (
+              <Box
+                key={item.labelKey}
+                component="a"
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={t(item.labelKey)}
+                sx={{
+                  width: { xs: 32, md: 34 },
+                  height: { xs: 32, md: 34 },
+                  borderRadius: '50%',
+                  bgcolor: '#0e130e',
+                  border: `1.2px solid ${alpha(accentColor, 0.4)}`,
+                  color: accentColor,
+                  display: 'grid',
+                  placeItems: 'center',
+                  textDecoration: 'none',
+                  transition: 'all 0.22s ease',
+                  '&:hover': {
+                    bgcolor: alpha(accentColor, 0.2),
+                    borderColor: accentColor,
+                    boxShadow: `0 0 12px ${alpha(accentColor, 0.65)}`,
+                    transform: 'translateY(-2px)',
+                    color: '#ffffff',
+                  },
+                }}
+              >
+                <Iconify icon={item.icon} width={17} />
+              </Box>
+            ))}
+          </Stack>
+
+          {/* ----------------------------------------------------------- */}
+          {/* MID-LEFT: BRAND LOGO + NAME (Matches NetEase Games logo position) */}
+          {/* ----------------------------------------------------------- */}
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1.5}
+            sx={{
+              flexShrink: 0,
+              order: { xs: 1, md: 2 },
+            }}
           >
             <Logo
               sx={{
-                width: { xs: 58, sm: 68, md: 78 },
-                height: { xs: 58, sm: 68, md: 78 },
-                flexShrink: 0,
+                width: { xs: 56, md: 66 },
+                height: { xs: 56, md: 66 },
+                filter: `drop-shadow(0 0 12px ${alpha(accentColor, 0.35)})`,
               }}
             />
-            <Box sx={{ minWidth: 0, flex: 1 }}>
+            <Box>
               <Typography
                 className="font-brand-gaming"
                 sx={{
-                  fontSize: isBengali
-                    ? { xs: 14, sm: 18, md: 20 }
-                    : { xs: 16, sm: 20, md: 22 },
-                  fontWeight: 800,
+                  fontSize: { xs: 22, md: 27 },
+                  fontWeight: 900,
+                  fontStyle: 'italic',
                   lineHeight: 1.1,
-                  color: GOLD,
-                  background: `linear-gradient(180deg, #ffe08a 0%, ${GOLD} 48%, #d4a017 100%)`,
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
+                  letterSpacing: 0.5,
+                  color: '#ffffff',
+                  textTransform: 'uppercase',
                 }}
               >
                 {t('common.brandName')}
               </Typography>
               <Typography
-                className="font-tr"
                 sx={{
-                  mt: 0.35,
-                  fontSize: { xs: 9, sm: 11, md: 12 },
-                  color: alpha('#ffffff', 0.5),
-                  fontWeight: 600,
-                  letterSpacing: { xs: 0.5, md: 0.9 },
+                  fontFamily: 'monospace',
+                  fontSize: { xs: 9, md: 10 },
+                  fontWeight: 700,
+                  letterSpacing: 1.2,
+                  color: alpha('#ffffff', 0.55),
                   textTransform: 'uppercase',
-                  lineHeight: 1.25,
+                  lineHeight: 1.2,
+                  mt: 0.2,
                 }}
               >
                 {t('common.brandTagline')}
@@ -158,201 +366,265 @@ export function FooterSection() {
             </Box>
           </Stack>
 
-          <BattleGoldDivider
-            variant="title"
-            sx={{
-              mt: 1.25,
-              width: 1,
-              maxWidth: 1,
-            }}
-          />
-        </Box>
-
-        {/* Link columns — 2 on mobile, 4 on desktop */}
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: 'repeat(2, minmax(0, 1fr))',
-              md: 'repeat(4, minmax(0, 1fr))',
-            },
-            gap: { xs: 2.5, sm: 3, md: 3.5 },
-            rowGap: { xs: 2.75, md: 3 },
-          }}
-        >
-          {navSections.map((section) => (
-            <Box key={section.titleKey} sx={{ minWidth: 0 }}>
-              <Typography
-                sx={{
-                  fontWeight: 800,
-                  mb: { xs: 1, md: 1.25 },
-                  letterSpacing: 0.8,
-                  color: '#ffffff',
-                  textTransform: 'uppercase',
-                  fontSize: { xs: 11, sm: 12 },
-                  lineHeight: 1.3,
-                }}
-              >
-                {t(section.titleKey)}
-              </Typography>
-              <Stack spacing={{ xs: 0.7, md: 0.85 }}>
-                {section.links.map((link: { labelKey: string; href?: string; scrollTarget?: string }) => {
-                  const isExternalLink =
-                    link.href?.startsWith('http://') || link.href?.startsWith('https://');
-
-                  if (isExternalLink) {
-                    return (
-                      <Typography
-                        key={link.labelKey}
-                        component="a"
-                        href={link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        sx={linkSx}
-                      >
-                        {t(link.labelKey)}
-                      </Typography>
-                    );
-                  }
-
-                  return (
-                    <Typography
-                      key={link.labelKey}
-                      component={link.href ? RouterLink : 'span'}
-                      {...(link.href ? { href: link.href } : {})}
-                      onClick={(e: React.MouseEvent<HTMLAnchorElement>) =>
-                        handleMenuClick(e, {
-                          labelKey: link.labelKey,
-                          href: link.href || '',
-                          scrollTarget: link.scrollTarget || '',
-                          isActive: () => false,
-                        })
-                      }
-                      sx={linkSx}
-                    >
-                      {t(link.labelKey)}
-                    </Typography>
-                  );
-                })}
-              </Stack>
-            </Box>
-          ))}
-        </Box>
-
-        {/* Trusted partners — centered pills with icons */}
-        <Box
-          sx={{
-            pt: { xs: 2.25, md: 3 },
-            mt: { xs: 0.5, md: 1 },
-            borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
-          }}
-        >
-          <Typography
-            sx={{
-              mb: { xs: 1.75, md: 2.25 },
-              textAlign: 'center',
-              fontSize: { xs: 12, sm: 13 },
-              fontWeight: 500,
-              color: alpha('#ffffff', 0.45),
-            }}
-          >
-            {t('footer.trustedPartners')}
-          </Typography>
-
+          {/* ----------------------------------------------------------- */}
+          {/* CENTER: LEGAL & NAVIGATION LINKS + COPYRIGHT */}
+          {/* ----------------------------------------------------------- */}
           <Box
             sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: { xs: 1, sm: 1.25 },
-              maxWidth: 980,
-              mx: 'auto',
+              textAlign: { xs: 'center', md: 'left' },
+              order: { xs: 2, md: 3 },
+              flexGrow: 1,
+              px: { md: 2 },
+              maxWidth: { md: 540 },
             }}
           >
-            {FOOTER_PARTNERS.map((partner) => (
-              <Box
-                key={partner.label}
-                component="a"
-                href={partner.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  px: { xs: 1.25, sm: 1.5 },
-                  py: { xs: 0.75, sm: 0.9 },
-                  minHeight: { xs: 36, sm: 40 },
-                  borderRadius: '10px',
-                  border: `1px solid ${alpha('#ffffff', 0.16)}`,
-                  bgcolor: alpha('#ffffff', 0.04),
-                  color: '#ffffff',
-                  textDecoration: 'none',
-                  transition: 'border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease',
-                  '&:hover': {
-                    borderColor: goldAlpha(0.55),
-                    bgcolor: goldAlpha(0.08),
-                    transform: 'translateY(-1px)',
-                    '& .partner-label': { color: GOLD },
-                  },
-                }}
+            {/* Top Row: Primary Legal & Navigation Links */}
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent={{ xs: 'center', md: 'flex-start' }}
+              flexWrap="wrap"
+              spacing={1.5}
+              sx={{ mb: 0.6 }}
+            >
+              <Typography
+                component={RouterLink}
+                href="/privacy-policy"
+                sx={linkStyle}
               >
-                <Box
-                  component="img"
-                  src={partner.icon}
-                  alt=""
-                  width={22}
-                  height={22}
-                  loading="lazy"
-                  decoding="async"
-                  sx={{
-                    width: { xs: 20, sm: 22 },
-                    height: { xs: 20, sm: 22 },
-                    objectFit: 'contain',
-                    borderRadius: '4px',
-                    flexShrink: 0,
-                    bgcolor: alpha('#000000', 0.25),
-                  }}
-                />
-                <Typography
-                  className="partner-label"
-                  sx={{
-                    color: '#ffffff',
-                    fontSize: { xs: 12, sm: 13 },
-                    fontWeight: 700,
-                    lineHeight: 1.2,
-                    whiteSpace: 'nowrap',
-                    transition: 'color 0.2s ease',
-                  }}
-                >
-                  {partner.label}
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-        </Box>
+                {t('footer.privacyPolicy')}
+              </Typography>
 
-        {/* Bottom bar */}
+              <Typography sx={{ color: alpha('#ffffff', 0.3), fontSize: 12 }}>,</Typography>
+
+              <Typography
+                component={RouterLink}
+                href="/terms-and-conditions"
+                sx={linkStyle}
+              >
+                {t('footer.termsAndConditions')}
+              </Typography>
+
+              <Typography sx={{ color: alpha('#ffffff', 0.2), fontSize: 12 }}>·</Typography>
+
+              <Typography
+                component="span"
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) =>
+                  handleMenuClick(e, {
+                    labelKey: 'footer.rules',
+                    href: '/dashboard/rules',
+                    scrollTarget: 'rules',
+                    isActive: () => false,
+                  })
+                }
+                sx={linkStyle}
+              >
+                {t('footer.rules')}
+              </Typography>
+
+              <Typography sx={{ color: alpha('#ffffff', 0.2), fontSize: 12 }}>·</Typography>
+
+              <Typography
+                component="span"
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) =>
+                  handleMenuClick(e, {
+                    labelKey: 'footer.howToPlay',
+                    href: '/dashboard/how-to-play',
+                    scrollTarget: 'how-to-play',
+                    isActive: () => false,
+                  })
+                }
+                sx={linkStyle}
+              >
+                {t('footer.howToPlay')}
+              </Typography>
+
+              <Typography sx={{ color: alpha('#ffffff', 0.2), fontSize: 12 }}>·</Typography>
+
+              <Typography
+                component="span"
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) =>
+                  handleMenuClick(e, {
+                    labelKey: 'footer.aboutUs',
+                    href: '/dashboard/about-us',
+                    scrollTarget: 'about-us',
+                    isActive: () => false,
+                  })
+                }
+                sx={linkStyle}
+              >
+                {t('footer.aboutUs')}
+              </Typography>
+            </Stack>
+
+            {/* Bottom Row: Exact Copyright Line */}
+            <Typography
+              sx={{
+                fontSize: { xs: 11.5, md: 12.5 },
+                color: alpha('#ffffff', 0.55),
+                lineHeight: 1.4,
+              }}
+            >
+              {t('footer.copyright', { year: new Date().getFullYear() })}
+            </Typography>
+          </Box>
+
+          {/* ----------------------------------------------------------- */}
+          {/* FAR RIGHT: USER SUPPORT (Matches attached image) */}
+          {/* ----------------------------------------------------------- */}
+          <Box
+            sx={{
+              textAlign: { xs: 'center', md: 'right' },
+              flexShrink: 0,
+              order: { xs: 4, md: 4 },
+            }}
+          >
+            <Typography
+              sx={{
+                fontSize: { xs: 12, md: 13 },
+                fontWeight: 600,
+                color: alpha('#ffffff', 0.85),
+                lineHeight: 1.3,
+              }}
+            >
+              User Support:
+            </Typography>
+            <Typography
+              component="a"
+              href="mailto:support@battleasia.gg"
+              sx={{
+                display: 'block',
+                fontSize: { xs: 12, md: 13 },
+                color: alpha('#ffffff', 0.65),
+                textDecoration: 'none',
+                mt: 0.3,
+                transition: 'color 0.2s ease',
+                '&:hover': {
+                  color: accentColor,
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              support@battleasia.gg
+            </Typography>
+            <Typography
+              component={RouterLink}
+              href="/support"
+              sx={{
+                display: 'inline-block',
+                fontSize: 11,
+                fontFamily: 'monospace',
+                fontWeight: 700,
+                color: accentColor,
+                textDecoration: 'none',
+                mt: 0.4,
+                letterSpacing: 0.5,
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              [ LIVE SUPPORT RELAY ]
+            </Typography>
+          </Box>
+        </Stack>
+
+        {/* ============================================================= */}
+        {/* SECONDARY INTEGRATED STRIP: PARTNERS & PAYMENT METHODS */}
+        {/* Preserves all existing links, domains, and payment information */}
+        {/* ============================================================= */}
         <Box
           sx={{
-            pt: { xs: 1.5, md: 2 },
-            mt: { xs: 0.5, md: 1 },
+            mt: { xs: 2.5, md: 3 },
+            pt: 2,
             borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
           }}
         >
-          <Typography
-            sx={{
-              color: alpha('#ffffff', 0.35),
-              textAlign: 'center',
-              fontSize: { xs: 11, sm: 12 },
-              lineHeight: 1.5,
-            }}
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            alignItems="center"
+            justifyContent="space-between"
+            spacing={2}
+            flexWrap="wrap"
           >
-            {t('footer.copyright', { year: new Date().getFullYear() })}
-          </Typography>
+            {/* Payment Gateways Information */}
+            <Stack direction="row" alignItems="center" spacing={1.5} flexWrap="wrap">
+              <Typography
+                sx={{
+                  fontFamily: 'monospace',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: 1.2,
+                  color: alpha('#ffffff', 0.4),
+                  textTransform: 'uppercase',
+                }}
+              >
+                {t('footer.payments')}:
+              </Typography>
+              <Typography sx={{ fontSize: 11, color: alpha('#ffffff', 0.6) }}>
+                {t('footer.bkash')} · {t('footer.nagad')} · {t('footer.crypto')}
+              </Typography>
+            </Stack>
+
+            {/* Trusted Partners Links */}
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={1}
+              flexWrap="wrap"
+              justifyContent={{ xs: 'center', sm: 'flex-end' }}
+            >
+              <Typography
+                sx={{
+                  fontFamily: 'monospace',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: 1.2,
+                  color: alpha('#ffffff', 0.4),
+                  textTransform: 'uppercase',
+                }}
+              >
+                {t('footer.trustedPartners')}:
+              </Typography>
+              {FOOTER_PARTNERS.map((partner) => (
+                <Box
+                  key={partner.label}
+                  component="a"
+                  href={partner.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 0.6,
+                    px: 1,
+                    py: 0.35,
+                    borderRadius: '6px',
+                    border: `1px solid ${alpha('#ffffff', 0.1)}`,
+                    bgcolor: alpha('#ffffff', 0.03),
+                    color: alpha('#ffffff', 0.7),
+                    fontSize: 11,
+                    fontWeight: 600,
+                    textDecoration: 'none',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      borderColor: alpha(accentColor, 0.5),
+                      bgcolor: alpha(accentColor, 0.08),
+                      color: accentColor,
+                    },
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={partner.icon}
+                    alt=""
+                    sx={{ width: 14, height: 14, objectFit: 'contain', borderRadius: '2px' }}
+                  />
+                  <span>{partner.label}</span>
+                </Box>
+              ))}
+            </Stack>
+          </Stack>
         </Box>
-      </Stack>
+      </Container>
     </Box>
   );
 }

@@ -130,19 +130,32 @@ const ItemRoot = styled(ButtonBase, { shouldForwardProp })<StyledState>(({
   const rootItemStyles: CSSObject = {
     textAlign: 'center',
     flexDirection: 'column',
-    minHeight: 'var(--nav-item-root-height)',
-    padding: 'var(--nav-item-root-padding)',
+    minHeight: 56,
+    padding: '8px 4px',
+    margin: '3px 0',
+    borderRadius: '7px',
+    border: '1px solid rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.07)',
+      borderColor: 'rgba(255, 255, 255, 0.2)',
+      transform: 'translateY(-1px)',
+    },
     ...(open && {
-      color: 'var(--nav-item-root-open-color)',
-      backgroundColor: 'var(--nav-item-root-open-bg)',
+      color: '#ffffff',
+      backgroundColor: 'rgba(255, 255, 255, 0.06)',
+      borderColor: 'rgba(255, 255, 255, 0.18)',
     }),
     ...(active && {
-      color: 'var(--nav-item-root-active-color)',
-      backgroundColor: 'var(--nav-item-root-active-bg)',
-      '&:hover': { backgroundColor: 'var(--nav-item-root-active-hover-bg)' },
-      ...theme.applyStyles('dark', {
-        color: 'var(--nav-item-root-active-color-on-dark)',
-      }),
+      color: '#ffffff',
+      backgroundColor: 'rgba(var(--ba-gold-rgb, 203, 251, 36), 0.18)',
+      borderColor: 'var(--ba-gold, #cbfb24)',
+      boxShadow: '0 0 14px rgba(var(--ba-gold-rgb, 203, 251, 36), 0.35), inset 0 0 10px rgba(var(--ba-gold-rgb, 203, 251, 36), 0.1)',
+      '&:hover': {
+        backgroundColor: 'rgba(var(--ba-gold-rgb, 203, 251, 36), 0.24)',
+        borderColor: 'var(--ba-gold, #cbfb24)',
+      },
     }),
   };
 
@@ -150,13 +163,16 @@ const ItemRoot = styled(ButtonBase, { shouldForwardProp })<StyledState>(({
     minHeight: 'var(--nav-item-sub-height)',
     padding: 'var(--nav-item-sub-padding)',
     color: theme.vars.palette.text.secondary,
+    borderRadius: '6px',
+    transition: 'all 0.2s ease',
     ...(open && {
-      color: 'var(--nav-item-sub-open-color)',
-      backgroundColor: 'var(--nav-item-sub-open-bg)',
+      color: '#ffffff',
+      backgroundColor: 'rgba(255, 255, 255, 0.04)',
     }),
     ...(active && {
-      color: 'var(--nav-item-sub-active-color)',
-      backgroundColor: 'var(--nav-item-sub-active-bg)',
+      color: '#ffffff',
+      backgroundColor: 'rgba(var(--ba-gold-rgb, 203, 251, 36), 0.14)',
+      borderColor: 'rgba(var(--ba-gold-rgb, 203, 251, 36), 0.4)',
     }),
   };
 
@@ -164,7 +180,6 @@ const ItemRoot = styled(ButtonBase, { shouldForwardProp })<StyledState>(({
     width: '100%',
     color: 'var(--nav-item-color)',
     borderRadius: 'var(--nav-item-radius)',
-    '&:hover': { backgroundColor: 'var(--nav-item-hover-bg)' },
     variants: [
       { props: { variant: 'rootItem' }, style: rootItemStyles },
       { props: { variant: 'subItem' }, style: subItemStyles },
@@ -176,11 +191,12 @@ const ItemRoot = styled(ButtonBase, { shouldForwardProp })<StyledState>(({
 /**
  * @slot icon
  */
-const ItemIcon = styled('span', { shouldForwardProp })<StyledState>(() => ({
+const ItemIcon = styled('span', { shouldForwardProp })<StyledState>(({ active }) => ({
   ...navItemStyles.icon,
-  width: 'var(--nav-icon-size)',
-  height: 'var(--nav-icon-size)',
+  width: 22,
+  height: 22,
   margin: 'var(--nav-icon-root-margin)',
+  color: active ? 'var(--ba-gold, #cbfb24)' : 'rgba(255, 255, 255, 0.8)',
   variants: [{ props: { variant: 'subItem' }, style: { margin: 'var(--nav-icon-sub-margin)' } }],
 }));
 
@@ -189,13 +205,16 @@ const ItemIcon = styled('span', { shouldForwardProp })<StyledState>(() => ({
  */
 const ItemTitle = styled('span', { shouldForwardProp })<StyledState>(({ active, theme }) => ({
   ...navItemStyles.title(theme),
-  lineHeight: '16px',
-  fontSize: theme.typography.pxToRem(10),
-  fontWeight: theme.typography.fontWeightSemiBold,
+  lineHeight: '14px',
+  fontSize: 10,
+  letterSpacing: '0.04em',
+  textTransform: 'uppercase',
+  fontWeight: active ? 800 : 600,
+  color: active ? '#ffffff' : 'rgba(255, 255, 255, 0.65)',
   variants: [
     {
       props: { variant: 'rootItem' },
-      style: { ...(active && { fontWeight: theme.typography.fontWeightBold }) },
+      style: { ...(active && { fontWeight: 800, textShadow: '0 0 8px rgba(var(--ba-gold-rgb, 203, 251, 36), 0.4)' }) },
     },
     {
       props: { variant: 'subItem' },

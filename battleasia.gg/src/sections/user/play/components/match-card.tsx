@@ -18,7 +18,7 @@ import {
   getGoldTopLineShellSx,
 } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, userSolidGoldButtonSx, userGhostButtonSx, goldAlpha } from 'src/layouts/user';
+import { USER_COLORS, userGoldButtonSx, goldAlpha } from 'src/layouts/user';
 
 import { MatchStatPill } from './match-stat-pill';
 import { MatchRoomDialog } from './match-room-dialog';
@@ -57,8 +57,6 @@ export function MatchCard({
   const buttonDisabled =
     joining || isJoined || !canJoin || isMatchFull || (isPremiumMatch && !isPremiumUser);
   const winningPool = estimateMatchWinningPool(match);
-  const showJoinCta =
-    !isJoined && !(isPremiumMatch && !isPremiumUser) && !joining && !isMatchFull;
 
   const goToDetail = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -284,8 +282,11 @@ export function MatchCard({
               router.push(paths.user.matchResult(match.id));
             }}
             sx={{
-              ...userGhostButtonSx,
-              py: 1.1,
+              ...userGoldButtonSx,
+              minHeight: 44,
+              height: 44,
+              py: 0,
+              fontSize: 13,
             }}
           >
             View Results
@@ -293,38 +294,33 @@ export function MatchCard({
         ) : (
           <Button
             fullWidth
-            variant={showJoinCta ? 'contained' : 'outlined'}
+            variant="outlined"
             disableElevation
             disabled={buttonDisabled && !isJoined}
             onClick={(e) => {
               e.stopPropagation();
               onJoin(match);
             }}
-            sx={
-              showJoinCta
-                ? userSolidGoldButtonSx
-                : {
-                    ...userGhostButtonSx,
-                    minHeight: 40,
-                    height: 40,
-                    py: 0,
-                    fontSize: 12,
-                    opacity: 0.92,
-                  }
-            }
+            sx={{
+              ...userGoldButtonSx,
+              minHeight: 44,
+              height: 44,
+              py: 0,
+              fontSize: 13,
+            }}
           >
             {isJoined ? (
               <Stack direction="row" alignItems="center" spacing={0.5}>
                 <CoinValue value={match.entryFee} size={14} />
-                <Typography sx={{ fontSize: 12, fontWeight: 800 }}>SPECTATE</Typography>
+                <Typography sx={{ fontSize: 13, fontWeight: 800, color: 'inherit' }}>SPECTATE</Typography>
               </Stack>
             ) : isPremiumMatch && !isPremiumUser ? (
               <Stack direction="row" alignItems="center" spacing={0.5}>
                 <Iconify icon="solar:crown-bold" width={16} />
-                <Typography sx={{ fontSize: 12, fontWeight: 800 }}>PREMIUM ONLY</Typography>
+                <Typography sx={{ fontSize: 13, fontWeight: 800, color: 'inherit' }}>PREMIUM ONLY</Typography>
               </Stack>
             ) : isMatchFull ? (
-              <Typography sx={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6 }}>
+              <Typography sx={{ fontSize: 13, fontWeight: 800, letterSpacing: 0.6, color: 'inherit' }}>
                 {t('match.matchFull')}
               </Typography>
             ) : joining ? (

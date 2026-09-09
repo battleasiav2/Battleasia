@@ -173,7 +173,7 @@ export default function TermsAndConditionsPage() {
         </LegalSection>
 
         <LegalSection title="16) Contact">
-          <Typography>Questions about these Terms: support@battleasia.net</Typography>
+          <Typography>Questions about these Terms: support@battleasia.gg</Typography>
         </LegalSection>
       </LegalPageShell>
       </main>

@@ -18,6 +18,8 @@ import { ShopFeatures, ShopArenaHero, ShopPageSkeleton, ShopSectionNav } from '.
 
 export { SHOP_IMAGE_PATHS } from './shop-constants';
 
+const GOLD = USER_COLORS.gold;
+
 // ----------------------------------------------------------------------
 
 export function ShopView() {
@@ -82,7 +84,8 @@ export function ShopView() {
         ]}
       />
 
-      <Stack spacing={{ xs: 3.5, md: 4.5 }}>
+      <Stack spacing={{ xs: 4, md: 5 }}>
+        {/* Featured Store Section */}
         <Box>
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
@@ -96,38 +99,41 @@ export function ShopView() {
                 className="font-tr"
                 sx={{
                   fontSize: { xs: 22, md: 28 },
-                  fontWeight: 800,
+                  fontWeight: 900,
                   textTransform: 'uppercase',
                   color: USER_COLORS.textPrimary,
-                  letterSpacing: 0.5,
+                  letterSpacing: 0.8,
+                  textShadow: `0 0 20px ${goldAlpha(0.2)}`,
                 }}
               >
                 {t('shop.bacTitle')}
               </Typography>
-              <BattleGoldDivider variant="section" sx={{ mt: 0.75, width: 120 }} />
+              <BattleGoldDivider variant="section" sx={{ mt: 0.75, width: 140 }} />
             </Box>
 
             <Stack
               direction="row"
               alignItems="center"
-              spacing={0.6}
+              spacing={0.8}
               sx={{
                 alignSelf: { xs: 'flex-start', sm: 'center' },
-                px: 1.25,
-                py: 0.55,
-                border: `1px solid ${goldAlpha(0.35)}`,
-                bgcolor: alpha('#000000', 0.45),
+                px: 1.5,
+                py: 0.6,
+                border: `1px solid ${goldAlpha(0.4)}`,
+                bgcolor: alpha('#000000', 0.65),
+                boxShadow: `0 4px 14px ${alpha('#000000', 0.5)}, inset 0 0 10px ${goldAlpha(0.08)}`,
+                clipPath: 'polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)',
                 flexShrink: 0,
               }}
             >
-              <Iconify icon="solar:star-bold" width={12} sx={{ color: USER_COLORS.gold }} />
+              <Iconify icon="solar:star-bold" width={14} sx={{ color: GOLD }} />
               <Typography
                 sx={{
-                  fontSize: 10,
+                  fontSize: 10.5,
                   fontWeight: 800,
-                  letterSpacing: 0.8,
+                  letterSpacing: 1,
                   textTransform: 'uppercase',
-                  color: USER_COLORS.gold,
+                  color: GOLD,
                 }}
               >
                 {t('shop.featured')}
@@ -135,83 +141,96 @@ export function ShopView() {
             </Stack>
           </Stack>
 
-          <Grid container spacing={2} alignItems="stretch">
+          <Grid container spacing={2.5} alignItems="stretch">
+            {/* Left Carousel Column */}
             <Grid size={{ xs: 12, lg: 8 }}>
               <UserGlassCard noPadding sx={{ p: { xs: 1.25, md: 1.75 }, height: 1 }}>
                 <ShopDetailsCarousel images={[...SHOP_IMAGE_PATHS]} name={t('shop.bacShopName')} />
               </UserGlassCard>
             </Grid>
 
+            {/* Right Partner HUD Card Column */}
             <Grid size={{ xs: 12, lg: 4 }}>
-              <UserGlassCard
+              <Box
                 sx={{
                   height: 1,
-                  p: { xs: 2, md: 2.5 },
-                  pt: { xs: 2.5, md: 3 },
+                  p: { xs: 2.25, md: 2.75 },
                   display: 'flex',
                   flexDirection: 'column',
+                  bgcolor: alpha('#06090e', 0.75),
+                  backdropFilter: 'blur(18px)',
+                  WebkitBackdropFilter: 'blur(18px)',
+                  border: `1px solid ${goldAlpha(0.28)}`,
+                  borderTop: `2px solid ${GOLD}`,
+                  boxShadow: `0 12px 32px ${alpha('#000000', 0.65)}, inset 0 0 20px ${goldAlpha(0.05)}`,
+                  clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
                 }}
               >
-                <Stack spacing={2} sx={{ height: 1 }}>
+                <Stack spacing={2.25} sx={{ height: 1 }}>
                   <Typography
                     className="font-tr"
                     sx={{
-                      fontSize: 16,
-                      fontWeight: 800,
+                      fontSize: 17,
+                      fontWeight: 900,
                       textTransform: 'uppercase',
                       color: USER_COLORS.textPrimary,
-                      letterSpacing: 0.4,
+                      letterSpacing: 0.6,
                     }}
                   >
                     {t('shop.officialPartner')}
                   </Typography>
 
-                  <Typography sx={{ fontSize: 13, color: USER_COLORS.textMuted, lineHeight: 1.65 }}>
+                  <Typography sx={{ fontSize: 13, color: alpha('#ffffff', 0.7), lineHeight: 1.65 }}>
                     {t('shop.partnerBlurb')}
                   </Typography>
 
+                  {/* Currency Telemetry Box */}
                   <Stack
                     direction="row"
                     alignItems="center"
-                    spacing={1.25}
+                    spacing={1.5}
                     sx={{
-                      p: 1.5,
-                      border: `1px solid ${goldAlpha(0.28)}`,
-                      bgcolor: goldAlpha(0.06),
+                      p: 1.75,
+                      border: `1px solid ${goldAlpha(0.35)}`,
+                      bgcolor: goldAlpha(0.08),
+                      clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
                     }}
                   >
                     <Box
                       sx={{
-                        width: 44,
-                        height: 44,
+                        width: 48,
+                        height: 48,
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        bgcolor: goldAlpha(0.12),
-                        border: `1px solid ${goldAlpha(0.28)}`,
-                        color: USER_COLORS.gold,
+                        bgcolor: goldAlpha(0.18),
+                        border: `1px solid ${GOLD}`,
+                        boxShadow: `0 0 14px ${goldAlpha(0.3)}`,
+                        color: GOLD,
+                        flexShrink: 0,
                       }}
                     >
-                      <Iconify icon="solar:wallet-money-bold-duotone" width={22} />
+                      <Iconify icon="solar:wallet-money-bold-duotone" width={24} />
                     </Box>
-                    <Box>
+                    <Box sx={{ minWidth: 0 }}>
                       <Typography
                         sx={{
-                          fontSize: 11,
+                          fontSize: 10.5,
                           fontWeight: 700,
-                          letterSpacing: 0.6,
+                          letterSpacing: 1,
                           textTransform: 'uppercase',
-                          color: USER_COLORS.textMuted,
+                          color: alpha('#ffffff', 0.55),
                         }}
                       >
                         {t('shop.currency')}
                       </Typography>
-                      <Typography sx={{ fontSize: 15, fontWeight: 800, color: USER_COLORS.gold }}>
-                        BAC
+                      <Typography sx={{ fontSize: 17, fontWeight: 900, color: GOLD, textShadow: `0 0 10px ${goldAlpha(0.4)}` }}>
+                        BAC COINS
                       </Typography>
                     </Box>
                   </Stack>
 
+                  {/* Action CTA Button */}
                   <UserActionButton
                     href={shopHref}
                     target="_blank"
@@ -224,40 +243,47 @@ export function ShopView() {
                       mt: 'auto',
                       height: { xs: 48, md: 52 },
                       fontSize: { xs: 13, md: 14 },
+                      fontWeight: 800,
+                      letterSpacing: 0.8,
                       borderRadius: 0,
+                      clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
+                      boxShadow: `0 8px 24px ${goldAlpha(0.3)}`,
                     }}
                   >
                     {t('shop.goToBacShop')}
                   </UserActionButton>
 
+                  {/* Trust Footer Badges */}
                   <Stack
                     direction="row"
                     flexWrap="wrap"
                     useFlexGap
                     justifyContent="center"
-                    spacing={1}
+                    spacing={1.25}
                     sx={{ pt: 0.5, rowGap: 0.75 }}
                   >
                     {[
                       { icon: 'solar:shield-check-bold', label: t('shop.trustSecure') },
                       { icon: 'solar:clock-circle-bold', label: t('shop.trustInstant') },
                     ].map((item) => (
-                      <Stack key={item.label} direction="row" alignItems="center" spacing={0.4} sx={{ flexShrink: 0 }}>
-                        <Iconify icon={item.icon} width={12} sx={{ color: goldAlpha(0.7), flexShrink: 0 }} />
-                        <Typography sx={{ fontSize: 9.5, fontWeight: 700, color: alpha('#ffffff', 0.45), letterSpacing: 0.2, whiteSpace: 'nowrap' }}>
+                      <Stack key={item.label} direction="row" alignItems="center" spacing={0.5} sx={{ flexShrink: 0 }}>
+                        <Iconify icon={item.icon} width={13} sx={{ color: GOLD, flexShrink: 0 }} />
+                        <Typography sx={{ fontSize: 10, fontWeight: 700, color: alpha('#ffffff', 0.55), letterSpacing: 0.3, whiteSpace: 'nowrap' }}>
                           {item.label}
                         </Typography>
                       </Stack>
                     ))}
                   </Stack>
                 </Stack>
-              </UserGlassCard>
+              </Box>
             </Grid>
           </Grid>
         </Box>
 
+        {/* Why BAC Features Section */}
         <ShopFeatures title={t('shop.whyBac')} features={features} />
       </Stack>
     </UserPageShell>
   );
 }
+

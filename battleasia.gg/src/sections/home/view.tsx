@@ -1,32 +1,24 @@
-
 import { lazy, Suspense, useState } from 'react';
 
-import { Box, Stack, SvgIcon, Collapse, Typography } from '@mui/material';
+import { Box, Stack, SvgIcon, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
-import { CONFIG } from 'src/global-config';
 import { useImagePreloader } from 'src/hooks';
 import { useAppDownload } from 'src/hooks/use-app-download';
 
-import { Image } from 'src/components/image';
 import { Iconify } from 'src/components/iconify/iconify';
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
-import { HeroMeshButtons } from 'src/components/mesh-buttons';
+import { ScrollReveal } from 'src/components/animate';
 import { HeroStickyCta } from './hero-sticky-cta';
-import { HeroTrustRow } from './hero-trust-row';
-import { HOME_GAME_ARTS } from './home-game-arts';
-import { HOME_ROW_LINE, HomeBlurPanel } from './home-blur-panel';
-import { homeMobileScrollGridSx, homeMobileScrollItemSx } from './home-horizontal-scroll';
-import { HeroRotatingBanner } from './hero-rotating-banner';
-import { HOME_HERO_SLIDES, readHeroSlideIndex } from './hero-slides';
+import { HeroVideoBanner } from './hero-video-banner';
+import { Hero3dDeck } from './hero-3d-deck';
+import { HeroGamingHud } from './hero-gaming-hud';
+
 import { AboutBattleAsiaSection } from './about-battleasia-section';
+import { TournamentRulesSection } from './tournament-rules-section';
 import { useTranslate } from 'src/locales/use-locales';
 import { goldAlpha } from 'src/theme/accent-presets';
 
-// Below-fold + non-LCP FX: code-split (never block hero paint)
-const HeroFxOverlay = lazy(() =>
-  import('./hero-fx-overlay').then((m) => ({ default: m.HeroFxOverlay }))
-);
+// Below-fold: code-split (never block hero paint)
 const LandingDashboardSection = lazy(() =>
   import('./dashboard-widgets').then((m) => ({ default: m.LandingDashboardSection }))
 );
@@ -37,38 +29,8 @@ const PlayYourGameSection = lazy(() =>
 // ----------------------------------------------------------------------
 
 const GOLD = 'var(--ba-gold)';
-
-const cardReveal = keyframes`
-  from { opacity: 0; transform: translateY(24px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-`;
-
-const titleGlow = keyframes`
-  0%, 100% { text-shadow: 0 0 0 transparent; }
-  50% { text-shadow: 0 0 24px ${goldAlpha(0.35)}; }
-`;
-
-const borderPulse = keyframes`
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 0.85; }
-`;
-
-const logoEnter = keyframes`
-  0% { opacity: 0; transform: translateY(16px) scale(0.96); }
-  100% { opacity: 1; transform: translateY(0) scale(1); }
-`;
-
-const logoShimmer = keyframes`
-  0% { transform: translateX(-120%) skewX(-16deg); opacity: 0; }
-  15% { opacity: 0.75; }
-  35% { opacity: 0.3; }
-  50%, 100% { transform: translateX(160%) skewX(-16deg); opacity: 0; }
-`;
-
-const copyEnter = keyframes`
-  0% { opacity: 0; transform: translateY(12px); }
-  100% { opacity: 1; transform: translateY(0); }
-`;
+const CHEVRONS_LABEL = '////// ➔';
+const STATUS_ARMED_LABEL = '[ STATUS // ARMED ]';
 
 /** Tiny top-of-hero gold sweep — opacity/transform only, no layout cost */
 const heroTopSweep = keyframes`
@@ -83,192 +45,22 @@ const heroTopGlow = keyframes`
   50% { opacity: 0.7; }
 `;
 
-type TournamentRuleItemProps = {
-  question: string;
-  answer: string;
-};
-
-function TournamentRuleItem({
-  question,
-  answer,
-  defaultOpen = false,
-}: TournamentRuleItemProps & { defaultOpen?: boolean }) {
-  const [open, setOpen] = useState(defaultOpen);
-
-  return (
-    <Box sx={{ borderBottom: `1px solid ${alpha('#ffffff', 0.1)}` }}>
-      <Box
-        component="button"
-        type="button"
-        onClick={() => setOpen((prev) => !prev)}
-        aria-expanded={open}
-        sx={{
-          width: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 2,
-          py: { xs: 1.5, md: 1.65 },
-          px: { xs: 1, md: 1.25 },
-          mx: { xs: -1, md: -1.25 },
-          border: 'none',
-          borderLeft: `2px solid ${open ? GOLD : 'transparent'}`,
-          bgcolor: open ? goldAlpha(0.06) : 'transparent',
-          cursor: 'pointer',
-          textAlign: 'left',
-          color: 'inherit',
-          transition: 'background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease',
-          '&:hover': {
-            bgcolor: goldAlpha(0.08),
-            borderLeftColor: goldAlpha(0.75),
-            transform: 'translateX(2px)',
-          },
-        }}
-      >
-        <Typography
-          className="font-tr"
-          sx={{
-            flex: 1,
-            fontSize: { xs: 12, sm: 13, md: 14 },
-            fontWeight: 800,
-            textTransform: 'uppercase',
-            letterSpacing: { xs: 0.4, md: 0.6 },
-            color: '#ffffff',
-            lineHeight: 1.35,
-            wordBreak: 'break-word',
-          }}
-        >
-          {question}
-        </Typography>
-
-        <Box
-          aria-hidden
-          sx={{
-            width: { xs: 34, md: 38 },
-            height: { xs: 34, md: 38 },
-            flexShrink: 0,
-            display: 'grid',
-            placeItems: 'center',
-            borderRadius: '50%',
-            border: `2px solid ${open ? GOLD : goldAlpha(0.72)}`,
-            color: GOLD,
-            transition: 'transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease',
-            transform: open ? 'rotate(45deg)' : 'none',
-            bgcolor: open ? goldAlpha(0.12) : 'transparent',
-          }}
-        >
-          <Box
-            sx={{
-              position: 'relative',
-              width: 13,
-              height: 13,
-              '&::before, &::after': {
-                content: '""',
-                position: 'absolute',
-                left: '50%',
-                top: '50%',
-                bgcolor: 'currentColor',
-                borderRadius: 1,
-              },
-              '&::before': {
-                width: 2.5,
-                height: 13,
-                transform: 'translate(-50%, -50%)',
-              },
-              '&::after': {
-                width: 13,
-                height: 2.5,
-                transform: 'translate(-50%, -50%)',
-              },
-            }}
-          />
-        </Box>
-      </Box>
-
-      <Collapse in={open} timeout="auto" unmountOnExit>
-        <Typography
-          className="font-tr"
-          sx={{
-            pb: { xs: 1.5, md: 1.65 },
-            px: { xs: 1, md: 1.25 },
-            fontSize: { xs: 12, sm: 13 },
-            color: alpha('#ffffff', 0.58),
-            lineHeight: 1.6,
-          }}
-        >
-          {answer}
-        </Typography>
-      </Collapse>
-    </Box>
-  );
-}
-
-function blackGamingSectionSx(art?: string) {
-  return {
-    scrollMarginTop: { xs: '80px', md: '100px' },
-    position: 'relative' as const,
-    overflowX: 'clip' as const,
-    overflowY: 'visible' as const,
-    bgcolor: '#0a0a0a',
-    py: { xs: 3.25, md: 5 },
-    px: { xs: 2, md: 4 },
-    ...(art
-      ? {
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            inset: 0,
-            backgroundImage: `url(${art})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center top',
-            opacity: 0.18,
-            filter: 'grayscale(0.35) contrast(1.05)',
-            pointerEvents: 'none',
-            zIndex: 0,
-          },
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            inset: 0,
-            background: `
-              linear-gradient(180deg, ${alpha('#0a0a0a', 0.82)} 0%, ${alpha('#0a0a0a', 0.92)} 45%, #0a0a0a 100%),
-              radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha(0.08)} 0%, transparent 55%)
-            `,
-            pointerEvents: 'none',
-            zIndex: 0,
-          },
-        }
-      : {
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            inset: 0,
-            background: `
-              radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha(0.08)} 0%, transparent 55%),
-              radial-gradient(ellipse 40% 30% at 10% 100%, ${alpha('#38bdf8', 0.04)} 0%, transparent 50%)
-            `,
-            pointerEvents: 'none',
-          },
-        }),
-  };
-}
-
 const HOME_IMAGE_PATHS = {
   heroTitleLogo: '/assets/images/hero-title-battleasia.webp',
 } as const;
 
 const HOME_MODE_ARTS = {
-  solo: '/assets/images/home/modes/mode-solo.webp',
-  duo: '/assets/images/home/modes/mode-duo.webp',
-  squad: '/assets/images/home/modes/mode-squad.webp',
-  tdm: '/assets/images/home/modes/mode-tdm.webp',
+  solo: '/landing/single.webp',
+  duo: '/landing/duo.webp',
+  squad: '/landing/squad.webp',
+  tdm: '/landing/mutiple.webp',
 } as const;
 
 const MODE_ART_PNG_FALLBACK: Record<keyof typeof HOME_MODE_ARTS, string> = {
-  solo: '/assets/images/home/modes/mode-solo.png',
-  duo: '/assets/images/home/modes/mode-duo.png',
-  squad: '/assets/images/home/modes/mode-squad.png',
-  tdm: '/assets/images/home/modes/mode-tdm.png',
+  solo: '/landing/single.png',
+  duo: '/landing/duo.png',
+  squad: '/landing/squad.png',
+  tdm: '/landing/mutiple.png',
 };
 
 function modeArtKeyFromSrc(src: string): keyof typeof HOME_MODE_ARTS | null {
@@ -279,94 +71,46 @@ function modeArtKeyFromSrc(src: string): keyof typeof HOME_MODE_ARTS | null {
 }
 
 // ----------------------------------------------------------------------
-// Preload active hero slide only (restored index if any) — avoid competing with LCP.
-const imagePaths = [HOME_HERO_SLIDES[readHeroSlideIndex()]?.src].filter(Boolean) as string[];
+// Preload hero video poster and top assets
+const imagePaths = [
+  '/hero-poster.webp',
+  '/assets/images/hero-title-battleasia.webp',
+  '/landing/single.webp',
+];
 
 export function HomeView() {
   const { t } = useTranslate();
   const appDownload = useAppDownload();
+  const [activeModeIndex, setActiveModeIndex] = useState(0);
 
   useImagePreloader(imagePaths, {
     delay: 100,
     continueOnError: true,
   });
 
-  const FAQ = [
-    {
-      question: t('home.faq.noHacks'),
-      answer: t('home.faq.noHacksAnswer')
-    },
-    {
-      question: t('home.faq.matchJoinTime'),
-      answer: t('home.faq.matchJoinTimeAnswer')
-    },
-    {
-      question: t('home.faq.nameMustMatch'),
-      answer: t('home.faq.nameMustMatchAnswer')
-    },
-    {
-      question: t('home.faq.killPrizeClaims'),
-      answer: t('home.faq.killPrizeClaimsAnswer')
-    },
-    {
-      question: t('home.faq.noTeaming'),
-      answer: t('home.faq.noTeamingAnswer')
-    },
-    {
-      question: t('home.faq.paymentRules'),
-      answer: t('home.faq.paymentRulesAnswer')
-    },
-    {
-      question: t('home.faq.disconnectNoRefund'),
-      answer: t('home.faq.disconnectNoRefundAnswer')
-    },
-    {
-      question: t('home.faq.abusiveBehaviour'),
-      answer: t('home.faq.abusiveBehaviourAnswer')
-    },
-    {
-      question: t('home.faq.prizeDistribution'),
-      answer: t('home.faq.prizeDistributionAnswer')
-    },
-    {
-      question: t('home.faq.finalDecision'),
-      answer: t('home.faq.finalDecisionAnswer')
-    },
-  ];
 
   const sectionSlide = (
-    <Box id="home" sx={{
-      scrollMarginTop: { xs: '80px', md: '100px' },
-      height: { xs: 520, sm: 680, md: 860, lg: 920 },
-      bgcolor: '#000000',
-      position: 'relative',
-      overflow: 'hidden',
-      '&::before': {
-        content: "''",
-        position: 'absolute',
-        inset: 0,
-        background: {
-          xs: 'linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.12) 32%, rgba(0,0,0,0.14) 62%, rgba(0,0,0,0.55) 100%)',
-          // Keep art readable behind hero copy — no heavy black plate on the right
-          md: 'linear-gradient(90deg, rgba(0,0,0,0.06) 0%, rgba(0,0,0,0.02) 42%, rgba(0,0,0,0.12) 72%, rgba(0,0,0,0.22) 100%)',
-        },
-        zIndex: 1,
-      },
-      '&::after': {
-        content: "''",
-        position: 'absolute',
-        inset: 0,
-        background: {
-          xs: 'linear-gradient(180deg, rgba(0,0,0,0.28) 0%, transparent 24%, transparent 72%, rgba(0,0,0,0.35) 100%)',
-          md: 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.35) 100%)',
-        },
-        zIndex: 1,
-      },
-    }}>
-      {/* Full hero image — rotates every ~12s; last slide kept across reload */}
-      <HeroRotatingBanner />
+    <Box
+      id="home"
+      sx={{
+        scrollMarginTop: { xs: '80px', md: '100px' },
+        position: 'relative',
+        overflow: 'hidden',
+        bgcolor: '#000000',
+        aspectRatio: { md: '16 / 9', lg: '16 / 9' },
+        height: { xs: 'auto', md: 'calc(100vw * 9 / 16)' },
+        minHeight: { xs: 620, sm: 680, md: 760, lg: 820 },
+        maxHeight: { md: 940, lg: 1000 },
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        perspective: '1200px',
+      }}
+    >
+      {/* 16:9 Full HD Hero Background Video */}
+      <HeroVideoBanner />
 
-      {/* Tiny gold sweep under nav — CSS only, md+, reduced-motion off */}
+      {/* Tiny gold sweep under nav */}
       <Box
         aria-hidden
         sx={{
@@ -375,7 +119,7 @@ export function HomeView() {
           left: 0,
           right: 0,
           height: { xs: 2, md: 3 },
-          zIndex: 3,
+          zIndex: 4,
           pointerEvents: 'none',
           overflow: 'hidden',
           background: `linear-gradient(90deg, transparent 0%, ${goldAlpha(0.15)} 50%, transparent 100%)`,
@@ -396,215 +140,35 @@ export function HomeView() {
         }}
       />
 
-      <Suspense fallback={null}>
-        <HeroFxOverlay />
-      </Suspense>
+      {/* Left 3D Holographic Combat HUD Card (Desktop) */}
+      <HeroGamingHud />
 
-      {/* Copy + mobile CTAs — mid-hero cluster (not stuck in the black fade) */}
-      <Stack
-        spacing={{ xs: 1, sm: 1.25, md: 1.5 }}
+      {/* Main 3D Gaming Command Deck (Center on Mobile, Right on Desktop) */}
+      <Box
         sx={{
-          position: 'absolute',
-          zIndex: 2,
-          top: { xs: 72, sm: 84, md: 0 },
-          bottom: { xs: 28, sm: 40, md: 0 },
-          left: { xs: 16, sm: 24, md: 'auto' },
-          right: { xs: 16, sm: 24, md: 32, lg: 48 },
-          width: { xs: 'auto', md: 'min(480px, 46vw)' },
-          maxWidth: { xs: 'calc(100% - 32px)', md: 480 },
-          boxSizing: 'border-box',
-          overflow: 'hidden',
-          justifyContent: { xs: 'center', md: 'center' },
-          alignItems: { xs: 'center', md: 'flex-end' },
-          textAlign: { xs: 'center', md: 'right' },
-        }}
-      >
-        <Typography
-          sx={{
-            fontSize: { xs: 10, sm: 11 },
-            fontWeight: 700,
-            letterSpacing: { xs: 1.4, sm: 1.8 },
-            textTransform: 'uppercase',
-            color: goldAlpha(0.92),
-            textShadow: '0 1px 10px rgba(0,0,0,0.85)',
-            width: 1,
-            animation: `${copyEnter} 0.7s 0.35s cubic-bezier(0.22, 1, 0.36, 1) both`,
-            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-          }}
-        >
-          {t('common.brandTagline')}
-        </Typography>
-
-        <Box
-          sx={{
-            position: 'relative',
-            width: 1,
-            maxWidth: 1,
-            display: 'flex',
-            justifyContent: { xs: 'center', md: 'flex-end' },
-            overflow: 'hidden',
-            // CLS: reserved box before logo image loads
-            minHeight: { xs: 64, sm: 76, md: 96 },
-            animation: `${logoEnter} 1s 0.2s cubic-bezier(0.22, 1, 0.36, 1) both`,
-            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              inset: { xs: '12% 8%', md: '8% 0' },
-              zIndex: 0,
-              background: `radial-gradient(ellipse 80% 70% at 50% 50%, ${goldAlpha(0.22)} 0%, transparent 72%)`,
-              pointerEvents: 'none',
-              filter: 'blur(8px)',
-            },
-          }}
-        >
-          <Box
-            component="img"
-            src={HOME_IMAGE_PATHS.heroTitleLogo}
-            alt="Battle Asia"
-            width={840}
-            height={168}
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-            sx={{
-              position: 'relative',
-              zIndex: 1,
-              width: { xs: 'min(100%, 300px)', sm: 'min(100%, 360px)', md: '100%' },
-              maxWidth: { xs: 300, sm: 360, md: 460 },
-              height: 'auto',
-              aspectRatio: '5 / 1',
-              display: 'block',
-              objectFit: 'contain',
-              objectPosition: { xs: 'center', md: 'right' },
-              filter: `
-                drop-shadow(0 3px 10px rgba(0, 0, 0, 0.8))
-                drop-shadow(0 0 32px ${goldAlpha(0.42)})
-                drop-shadow(0 0 64px ${goldAlpha(0.18)})
-              `,
-              animation: `${titleGlow} 4.5s 2s ease-in-out infinite`,
-              '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-            }}
-          />
-          <Box
-            aria-hidden
-            sx={{
-              display: { xs: 'none', md: 'block' },
-              position: 'absolute',
-              inset: 0,
-              zIndex: 2,
-              background: `linear-gradient(90deg,
-                transparent 0%,
-                ${alpha('#ffffff', 0.05)} 35%,
-                ${goldAlpha(0.45)} 50%,
-                ${alpha('#ffffff', 0.08)} 65%,
-                transparent 100%)`,
-              mixBlendMode: 'screen',
-              pointerEvents: 'none',
-              animation: `${logoShimmer} 5.5s 2s ease-in-out infinite`,
-              '@media (prefers-reduced-motion: reduce)': { display: 'none' },
-            }}
-          />
-        </Box>
-
-        <Box
-          sx={{
-            position: 'relative',
-            width: 1,
-            maxWidth: { xs: 340, sm: 400, md: '100%' },
-            px: { xs: 0.75, md: 0 },
-            py: { xs: 0.65, md: 0 },
-            borderRadius: { xs: 1, md: 0 },
-            // Soft dark plate behind subtitle so it stays readable on bright hero art
-            background: {
-              xs: `linear-gradient(180deg, ${alpha('#000000', 0.55)} 0%, ${alpha('#000000', 0.35)} 100%)`,
-              md: 'transparent',
-            },
-            boxShadow: {
-              xs: `0 0 24px ${alpha('#000000', 0.35)}`,
-              md: 'none',
-            },
-            animation: `${copyEnter} 0.75s 0.55s cubic-bezier(0.22, 1, 0.36, 1) both`,
-            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-          }}
-        >
-          <Typography
-            className="font-tr"
-            sx={{
-              fontSize: { xs: 13, sm: 15, md: 17, lg: 18 },
-              color: '#ffffff',
-              lineHeight: 1.4,
-              textShadow: `
-                0 1px 2px ${alpha('#000000', 0.95)},
-                0 2px 14px ${alpha('#000000', 0.9)},
-                0 0 20px ${alpha('#000000', 0.55)}
-              `,
-              wordBreak: 'break-word',
-              overflowWrap: 'anywhere',
-              width: 1,
-            }}
-          >
-            {t('home.subtitle')}
-          </Typography>
-        </Box>
-
-        <BattleGoldDivider
-          variant="hero"
-          sx={{
-            width: { xs: 140, sm: 180, md: 220 },
-            alignSelf: { xs: 'center', md: 'flex-end' },
-            animation: `${copyEnter} 0.7s 0.7s cubic-bezier(0.22, 1, 0.36, 1) both`,
-            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-          }}
-        />
-
-        {/* Mobile: CTAs sit under the divider (higher, on the art — not in the black band) */}
-        <Box
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            width: 1,
-            pt: { xs: 1.25, sm: 1.5 },
-            animation: `${copyEnter} 0.7s 0.85s cubic-bezier(0.22, 1, 0.36, 1) both`,
-            '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-          }}
-        >
-          <HeroMeshButtons
-            downloadLabel={t('home.downloadApkButton')}
-            downloadHref={appDownload.href}
-            downloadFileName={appDownload.fileName}
-            showDownload={appDownload.enabled}
-          />
-          <HeroTrustRow align="center" />
-        </Box>
-      </Stack>
-
-      {/* Desktop CTAs — anchored lower */}
-      <Stack
-        spacing={1.25}
-        sx={{
-          display: { xs: 'none', md: 'flex' },
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: { md: 52, lg: 60 },
-          zIndex: 2,
+          position: 'relative',
+          zIndex: 3,
+          width: '100%',
+          maxWidth: '1360px',
+          mx: 'auto',
+          px: { xs: 2, sm: 3, md: 4, lg: 5 },
+          pt: { xs: 4, sm: 5, md: 2 },
+          pb: { xs: 7, sm: 8, md: 4 },
+          display: 'flex',
+          justifyContent: { xs: 'center', md: 'flex-end' },
           alignItems: 'center',
-          px: { md: 4 },
-          animation: `${copyEnter} 0.85s 0.95s cubic-bezier(0.22, 1, 0.36, 1) both`,
-          '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+          boxSizing: 'border-box',
         }}
       >
-        <HeroMeshButtons
-          downloadLabel={t('home.downloadApkButton')}
+        <Hero3dDeck
+          logoSrc={HOME_IMAGE_PATHS.heroTitleLogo}
           downloadHref={appDownload.href}
           downloadFileName={appDownload.fileName}
           showDownload={appDownload.enabled}
         />
-        <Box sx={{ width: '100%', maxWidth: 640 }}>
-          <HeroTrustRow align="center" />
-        </Box>
-      </Stack>
+      </Box>
 
+      {/* Mobile Sticky CTA Trigger */}
       <HeroStickyCta
         downloadLabel={t('home.downloadApkButton')}
         downloadHref={appDownload.href}
@@ -612,18 +176,16 @@ export function HomeView() {
         showDownload={appDownload.enabled}
       />
 
+      {/* Seamless bottom fade into next section */}
       <Box
         sx={{
           position: 'absolute',
           bottom: 0,
           left: 0,
           right: 0,
-          height: { xs: 40, md: 80 },
-          background: {
-            xs: 'linear-gradient(180deg, transparent, rgba(0,0,0,0.72))',
-            md: 'linear-gradient(180deg, transparent, #000000)',
-          },
-          zIndex: 2,
+          height: { xs: 50, md: 90 },
+          background: 'linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.85) 60%, #000000 100%)',
+          zIndex: 3,
           pointerEvents: 'none',
         }}
       />
@@ -694,287 +256,319 @@ export function HomeView() {
     },
   ];
 
+  const activeMode = gameModes[activeModeIndex] ?? gameModes[0];
+
   const sectionHowToPlay = (
-    <Box id="how-to-play" sx={blackGamingSectionSx(HOME_GAME_ARTS[2])}>
-      <Box sx={{ position: 'relative', zIndex: 1, maxWidth: 1280, mx: 'auto' }}>
-        <HomeBlurPanel>
-          <Stack spacing={{ xs: 2, md: 2.75 }}>
-            <Stack spacing={1.25} alignItems="center">
+    <Box
+      id="how-to-play"
+      sx={{
+        scrollMarginTop: { xs: '80px', md: '100px' },
+        position: 'relative',
+        overflowX: 'clip',
+        overflowY: 'visible',
+        bgcolor: '#06080c',
+        py: { xs: 6, sm: 8, md: 10 },
+        px: { xs: 2, sm: 3, md: 5 },
+        borderTop: `1px solid ${alpha('#ffffff', 0.06)}`,
+        borderBottom: `1px solid ${alpha('#ffffff', 0.06)}`,
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          inset: 0,
+          background: `
+            linear-gradient(180deg, #000000 0%, transparent 15%, transparent 85%, #000000 100%),
+            radial-gradient(ellipse 65% 55% at 75% 50%, ${goldAlpha(0.12)} 0%, transparent 70%),
+            radial-gradient(ellipse 50% 40% at 20% 30%, ${goldAlpha(0.06)} 0%, transparent 60%)
+          `,
+          pointerEvents: 'none',
+          zIndex: 0,
+        },
+      }}
+    >
+      <Box sx={{ position: 'relative', zIndex: 1, maxWidth: 1440, mx: 'auto' }}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', lg: '0.92fr 1.08fr', xl: '0.88fr 1.12fr' },
+            gap: { xs: 4, md: 5, lg: 6 },
+            alignItems: 'center',
+          }}
+        >
+          {/* Left Column: Tactical Typography & Mode Details */}
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            {/* Tactical Label with Chevrons */}
+            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1.5 }}>
               <Typography
                 sx={{
                   fontSize: { xs: 11, md: 12 },
-                  fontWeight: 700,
-                  letterSpacing: 2.5,
-                  color: GOLD,
+                  fontWeight: 900,
+                  letterSpacing: 3,
+                  color: alpha('#ffffff', 0.6),
                   textTransform: 'uppercase',
+                  fontFamily: `'Barlow', sans-serif`,
                 }}
               >
                 {t('home.playYourGame.brandLabel')}
               </Typography>
               <Typography
-                variant="h2"
-                className="font-tr"
                 sx={{
-                  fontSize: { xs: 22, sm: 32, md: 40 },
-                  fontWeight: 800,
-                  textAlign: 'center',
-                  textTransform: 'uppercase',
-                  letterSpacing: { xs: 1, md: 2 },
-                  color: '#ffffff',
+                  fontSize: 13,
+                  fontWeight: 900,
+                  letterSpacing: 2,
+                  color: GOLD,
+                  fontFamily: 'monospace',
+                  lineHeight: 1,
                 }}
               >
-                {t('home.howToPlay')}
+                {CHEVRONS_LABEL}
               </Typography>
-              <Typography
-                className="font-tr"
-                sx={{
-                  fontSize: { xs: 12, sm: 14 },
-                  color: alpha('#ffffff', 0.5),
-                  textAlign: 'center',
-                  maxWidth: 520,
-                  lineHeight: 1.6,
-                }}
-              >
-                {t('home.howToPlaySubtitle')}
-              </Typography>
-              <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
             </Stack>
 
-            <Box
-              sx={homeMobileScrollGridSx(
-                {
-                  xs: 'repeat(4, minmax(280px, 1fr))',
-                  lg: 'repeat(4, minmax(0, 1fr))',
-                },
-                { xs: 1.5, md: 2.5 }
-              )}
-            >
-          {gameModes.map((mode, index) => (
-            <Box
-              key={mode.title}
+            {/* Big Distressed / Italic Military Heading */}
+            <Typography
+              variant="h2"
+              className="font-tr"
               sx={{
-                ...homeMobileScrollItemSx,
-                minWidth: { xs: 280, lg: 0 },
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                height: 1,
-                borderRadius: 0,
-                overflow: 'hidden',
-                bgcolor: '#161618',
-                border: `1px solid ${alpha('#ffffff', 0.08)}`,
-                isolation: 'isolate',
-                animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) ${index * 0.1}s both`,
-                transition:
-                  'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.4s ease, border-color 0.35s ease',
-                boxShadow: `0 10px 28px ${alpha('#000000', 0.5)}`,
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  inset: 0,
-                  border: `1px solid ${goldAlpha(0.55)}`,
-                  opacity: 0,
-                  zIndex: 2,
-                  pointerEvents: 'none',
-                  transition: 'opacity 0.35s ease',
-                },
-                '&:hover': {
-                  transform: 'translateY(-8px)',
-                  borderColor: goldAlpha(0.45),
-                  boxShadow: `
-                    0 22px 48px ${alpha('#000000', 0.7)},
-                    0 0 0 1px ${goldAlpha(0.2)},
-                    0 0 32px ${goldAlpha(0.12)}
-                  `,
-                  '&::before': { opacity: 1, animation: `${borderPulse} 1.8s ease-in-out infinite` },
-                  '& .mode-card-bar': { transform: 'scaleX(1)' },
-                  '& .mode-card-title': { color: GOLD },
-                  '& .mode-card-art': { transform: 'scale(1.06)' },
-                },
+                fontSize: { xs: 36, sm: 48, md: 58, lg: 66 },
+                fontWeight: 900,
+                fontStyle: 'italic',
+                lineHeight: 0.95,
+                letterSpacing: { xs: 1.5, md: 2.5 },
+                textTransform: 'uppercase',
+                color: '#ffffff',
+                textShadow: `0 4px 20px rgba(0,0,0,0.9), 0 0 35px ${goldAlpha(0.2)}`,
               }}
             >
-              <Box
-                sx={{
-                  position: 'relative',
-                  height: { xs: 160, md: 190 },
-                  overflow: 'hidden',
-                  bgcolor: '#0a0a0a',
-                }}
-              >
+              {t('home.howToPlay')}
+            </Typography>
+
+            {/* Site-Selected Tactical Accent Bar */}
+            <Box
+              sx={{
+                width: { xs: 52, md: 68 },
+                height: 4,
+                bgcolor: GOLD,
+                boxShadow: `0 0 16px ${goldAlpha(0.85)}`,
+                mt: { xs: 1.5, md: 2 },
+                mb: { xs: 1.5, md: 2 },
+              }}
+            />
+
+            {/* Subtitle */}
+            <Typography
+              className="font-tr"
+              sx={{
+                fontSize: { xs: 12, sm: 13, md: 14 },
+                fontWeight: 700,
+                letterSpacing: { xs: 0.8, md: 1.2 },
+                color: alpha('#ffffff', 0.65),
+                textTransform: 'uppercase',
+                lineHeight: 1.6,
+                maxWidth: 580,
+                mb: { xs: 3, md: 3.5 },
+              }}
+            >
+              {t('home.howToPlaySubtitle')}
+            </Typography>
+
+            {/* Interactive Mode Selector Tabs */}
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(4, 1fr)' },
+                gap: 1.25,
+                mb: 3,
+              }}
+            >
+              {gameModes.map((mode, idx) => {
+                const isSelected = idx === activeModeIndex;
+                return (
+                  <Box
+                    key={mode.title}
+                    component="button"
+                    type="button"
+                    onClick={() => setActiveModeIndex(idx)}
+                    sx={{
+                      px: { xs: 1.5, sm: 1.75 },
+                      py: 1.25,
+                      cursor: 'pointer',
+                      outline: 'none',
+                      textAlign: 'left',
+                      bgcolor: isSelected ? goldAlpha(0.14) : alpha('#ffffff', 0.03),
+                      border: '1px solid',
+                      borderColor: isSelected ? GOLD : alpha('#ffffff', 0.12),
+                      borderRadius: 0,
+                      position: 'relative',
+                      transition: 'all 0.25s ease',
+                      boxShadow: isSelected ? `0 0 18px ${goldAlpha(0.35)}` : 'none',
+                      '&:hover': {
+                        borderColor: isSelected ? GOLD : goldAlpha(0.6),
+                        bgcolor: isSelected ? goldAlpha(0.18) : alpha('#ffffff', 0.06),
+                      },
+                    }}
+                  >
+                    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 0.5 }}>
+                      <Typography
+                        sx={{
+                          fontSize: 10,
+                          fontWeight: 900,
+                          color: isSelected ? GOLD : alpha('#ffffff', 0.4),
+                          fontFamily: 'monospace',
+                        }}
+                      >
+                        {`//0${idx + 1}`}
+                      </Typography>
+                      <Typography
+                        className="font-tr"
+                        sx={{
+                          fontSize: 10,
+                          fontWeight: 800,
+                          color: isSelected ? GOLD : alpha('#ffffff', 0.35),
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        {mode.playersLabel}
+                      </Typography>
+                    </Stack>
+                    <Typography
+                      className="font-tr"
+                      sx={{
+                        fontSize: { xs: 12, sm: 13 },
+                        fontWeight: 800,
+                        letterSpacing: 0.8,
+                        color: isSelected ? '#ffffff' : alpha('#ffffff', 0.75),
+                        textTransform: 'uppercase',
+                        lineHeight: 1.1,
+                      }}
+                    >
+                      {mode.title}
+                    </Typography>
+                    {isSelected && (
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          bottom: -1,
+                          left: 0,
+                          right: 0,
+                          height: 2,
+                          bgcolor: GOLD,
+                          boxShadow: `0 0 10px ${GOLD}`,
+                        }}
+                      />
+                    )}
+                  </Box>
+                );
+              })}
+            </Box>
+
+            {/* Active Mode Details & Features Panel */}
+            <Box
+              sx={{
+                p: { xs: 2, sm: 2.75 },
+                bgcolor: alpha('#0d1117', 0.85),
+                border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                borderLeft: `3px solid ${GOLD}`,
+                position: 'relative',
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1.5 }}>
                 <Box
-                  className="mode-card-art"
-                  component="img"
-                  src={mode.art}
-                  alt={mode.playersLabel}
-                  width={800}
-                  height={533}
-                  loading="eager"
-                  decoding="async"
-                  onError={(event) => {
-                    const img = event.currentTarget;
-                    if (img.dataset.fallbackApplied === '1') return;
-                    const key = modeArtKeyFromSrc(mode.art);
-                    const fallback = key
-                      ? MODE_ART_PNG_FALLBACK[key]
-                      : mode.art.replace(/\.webp$/i, '.png');
-                    if (!fallback) return;
-                    img.dataset.fallbackApplied = '1';
-                    img.src = fallback;
-                  }}
                   sx={{
-                    width: 1,
-                    height: 1,
-                    objectFit: 'cover',
-                    objectPosition: 'center center',
-                    display: 'block',
-                    transition: 'transform 0.6s cubic-bezier(0.22, 1, 0.36, 1)',
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: `linear-gradient(180deg, ${alpha('#000000', 0.1)} 0%, ${alpha('#161618', 0.45)} 65%, #161618 100%)`,
-                    pointerEvents: 'none',
-                  }}
-                />
-                {/* Step number */}
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 10,
-                    right: 10,
-                    zIndex: 1,
-                    width: 28,
-                    height: 28,
+                    width: 38,
+                    height: 38,
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    bgcolor: goldAlpha(0.9),
+                    bgcolor: goldAlpha(0.1),
+                    border: `1px solid ${goldAlpha(0.4)}`,
                   }}
                 >
-                  <Typography sx={{ fontSize: 13, fontWeight: 900, color: '#111', lineHeight: 1 }}>
-                    {index + 1}
-                  </Typography>
+                  <SvgIcon sx={{ fontSize: 22, color: GOLD }}>
+                    <path d={activeMode.iconPath} />
+                  </SvgIcon>
                 </Box>
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 10,
-                    left: 10,
-                    zIndex: 1,
-                    px: 1,
-                    py: 0.4,
-                    bgcolor: alpha('#000000', 0.72),
-                    border: `1px solid ${goldAlpha(0.55)}`,
-                  }}
-                >
+                <Box>
+                  <Typography
+                    className="font-tr"
+                    sx={{
+                      fontSize: { xs: 16, sm: 18 },
+                      fontWeight: 800,
+                      letterSpacing: 1,
+                      color: '#ffffff',
+                      textTransform: 'uppercase',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {activeMode.title}
+                  </Typography>
                   <Typography
                     className="font-tr"
                     sx={{
                       fontSize: 11,
-                      fontWeight: 800,
-                      letterSpacing: 1,
+                      fontWeight: 700,
                       color: GOLD,
+                      letterSpacing: 1,
                       textTransform: 'uppercase',
-                      lineHeight: 1.2,
                     }}
                   >
-                    {mode.playersLabel}
+                    {activeMode.playersLabel}
                   </Typography>
                 </Box>
-              </Box>
+              </Stack>
 
-              <Stack
-                spacing={1.5}
+              <Typography
+                className="font-tr"
                 sx={{
-                  px: { xs: 2, md: 2.25 },
-                  pt: { xs: 1.75, md: 2 },
-                  pb: { xs: 2, md: 2.25 },
-                  flex: 1,
+                  fontSize: { xs: 12, sm: 13 },
+                  color: alpha('#ffffff', 0.7),
+                  lineHeight: 1.6,
+                  mb: 2.5,
                 }}
               >
-                <Box
-                  sx={{
-                    width: 52,
-                    height: 52,
-                    bgcolor: alpha('#000000', 0.45),
-                    border: `1px solid ${goldAlpha(0.35)}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <SvgIcon sx={{ fontSize: 28, color: GOLD }}>
-                    <path d={mode.iconPath} />
-                  </SvgIcon>
-                </Box>
+                {activeMode.description}
+              </Typography>
 
-                <Box>
-                  <Typography
-                    className="mode-card-title font-tr"
+              {/* 4 Features Preserved */}
+              <Box
+                sx={{
+                  display: 'grid',
+                  gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+                  gap: 1.25,
+                  mb: 3,
+                }}
+              >
+                {activeMode.features.map((feature) => (
+                  <Stack
+                    key={feature.text}
+                    direction="row"
+                    spacing={1}
+                    alignItems="flex-start"
                     sx={{
-                      fontSize: { xs: 16, md: 18 },
-                      fontWeight: 800,
-                      letterSpacing: 0.6,
-                      color: '#ffffff',
-                      textTransform: 'uppercase',
-                      lineHeight: 1.2,
-                      transition: 'color 0.3s ease',
-                      mb: 0.75,
+                      p: 1.1,
+                      bgcolor: alpha('#000000', 0.45),
+                      border: `1px solid ${goldAlpha(0.12)}`,
                     }}
                   >
-                    {mode.title}
-                  </Typography>
-                  <Typography
-                    className="font-tr"
-                    sx={{
-                      fontSize: { xs: 12, md: 13 },
-                      color: alpha('#ffffff', 0.5),
-                      lineHeight: 1.55,
-                    }}
-                  >
-                    {mode.description}
-                  </Typography>
-                </Box>
+                    <SvgIcon sx={{ fontSize: 16, color: GOLD, flexShrink: 0, mt: 0.2 }}>
+                      <path d={feature.iconPath} />
+                    </SvgIcon>
+                    <Typography
+                      className="font-tr"
+                      sx={{
+                        fontSize: { xs: 11, sm: 12 },
+                        color: alpha('#ffffff', 0.8),
+                        lineHeight: 1.45,
+                        fontWeight: 500,
+                      }}
+                    >
+                      {feature.text}
+                    </Typography>
+                  </Stack>
+                ))}
+              </Box>
 
-                <Box
-                  className="mode-card-bar"
-                  sx={{
-                    height: 2,
-                    bgcolor: GOLD,
-                    transform: 'scaleX(0)',
-                    transformOrigin: 'left center',
-                    transition: 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)',
-                    boxShadow: `0 0 12px ${goldAlpha(0.45)}`,
-                  }}
-                />
-
-                <Stack spacing={1} sx={{ mt: 'auto' }}>
-                  {mode.features.map((feature) => (
-                    <Stack key={feature.text} direction="row" spacing={1} alignItems="flex-start">
-                      <SvgIcon sx={{ fontSize: 16, color: GOLD, flexShrink: 0, mt: 0.15 }}>
-                        <path d={feature.iconPath} />
-                      </SvgIcon>
-                      <Typography
-                        className="font-tr"
-                        sx={{
-                          fontSize: { xs: 11, md: 12 },
-                          color: alpha('#ffffff', 0.65),
-                          lineHeight: 1.45,
-                        }}
-                      >
-                        {feature.text}
-                      </Typography>
-                    </Stack>
-                  ))}
-                </Stack>
-              </Stack>
-            </Box>
-          ))}
-            </Box>
-
-            <Stack alignItems="center">
+              {/* CTA Button */}
               <Box
                 component="a"
                 href="/play"
@@ -982,124 +576,121 @@ export function HomeView() {
                   display: 'inline-flex',
                   alignItems: 'center',
                   gap: 1,
-                  px: 4,
-                  minHeight: 44,
-                  bgcolor: goldAlpha(0.1),
-                  border: `1px solid ${goldAlpha(0.35)}`,
-                  color: GOLD,
+                  px: 3.5,
+                  minHeight: 42,
+                  bgcolor: goldAlpha(0.14),
+                  border: `1px solid ${GOLD}`,
+                  color: '#ffffff',
                   fontSize: 13,
                   fontWeight: 800,
                   letterSpacing: 1.2,
                   textTransform: 'uppercase',
                   textDecoration: 'none',
-                  transition: 'background 0.2s, border-color 0.2s, box-shadow 0.2s',
+                  transition: 'all 0.2s ease',
+                  boxShadow: `0 0 16px ${goldAlpha(0.25)}`,
                   '&:hover': {
-                    bgcolor: goldAlpha(0.18),
-                    borderColor: goldAlpha(0.55),
-                    boxShadow: `0 0 20px ${goldAlpha(0.15)}`,
+                    bgcolor: GOLD,
+                    color: 'var(--ba-gold-ink)',
+                    boxShadow: `0 0 28px ${goldAlpha(0.7)}`,
                   },
                 }}
               >
                 {t('home.startPlaying')}
                 <Iconify icon="solar:arrow-right-bold" width={16} />
               </Box>
-            </Stack>
-          </Stack>
-        </HomeBlurPanel>
-      </Box>
-    </Box>
-  );
+            </Box>
+          </Box>
 
-  const sectionRoules = (
-    <Box id="rules" sx={blackGamingSectionSx(HOME_GAME_ARTS[4])}>
-      <Stack
-        spacing={{ xs: 2.25, md: 3 }}
-        sx={{ position: 'relative', zIndex: 1, maxWidth: 1100, mx: 'auto', width: 1 }}
-      >
-        <Stack spacing={1.25} alignItems="center">
-          <Typography
-            sx={{
-              fontSize: { xs: 11, md: 12 },
-              fontWeight: 700,
-              letterSpacing: 2.5,
-              color: GOLD,
-              textTransform: 'uppercase',
-            }}
-          >
-            {t('home.playYourGame.brandLabel')}
-          </Typography>
-          <Typography
-            variant="h2"
-            className="font-tr"
-            sx={{
-              fontSize: { xs: 22, sm: 32, md: 40 },
-              fontWeight: 800,
-              textAlign: 'center',
-              textTransform: 'uppercase',
-              letterSpacing: { xs: 1, md: 2 },
-              color: '#ffffff',
-              animation: `${titleGlow} 4s ease-in-out infinite`,
-            }}
-          >
-            {t('home.tournamentRules')}
-          </Typography>
-          <Typography
-            className="font-tr"
-            sx={{
-              fontSize: { xs: 12, sm: 14 },
-              color: alpha('#ffffff', 0.5),
-              textAlign: 'center',
-              maxWidth: 520,
-              lineHeight: 1.6,
-            }}
-          >
-            {t('home.officialRegulations')}
-          </Typography>
-          <BattleGoldDivider variant="hero" sx={{ mt: 0.5 }} />
-        </Stack>
-
-        <HomeBlurPanel sx={{ px: { xs: 1.5, md: 2 }, py: { xs: 0.5, md: 0.75 } }}>
+          {/* Right Column: High-Impact Larger Transparent Cutout Gamer Visual */}
           <Box
             sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-              columnGap: { md: 4, lg: 6 },
-              alignItems: 'start',
+              position: 'relative',
+              height: { xs: 380, sm: 500, md: 620, lg: 720, xl: 780 },
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              overflow: 'visible',
             }}
           >
-            {FAQ.map((faq, idx) => (
-              <TournamentRuleItem
-                key={faq.question}
-                question={faq.question}
-                answer={faq.answer}
-                defaultOpen={idx === 0}
+            {/* Ambient Radial Backlight Glow in Site Color */}
+            <Box
+              sx={{
+                position: 'absolute',
+                inset: 0,
+                background: `
+                  radial-gradient(ellipse 75% 70% at 50% 50%, ${goldAlpha(0.24)} 0%, ${goldAlpha(0.06)} 48%, transparent 75%)
+                `,
+                filter: 'blur(40px)',
+                pointerEvents: 'none',
+                zIndex: 0,
+              }}
+            />
+
+            {/* Tactical HUD Corner Elements */}
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 12,
+                right: 12,
+                fontFamily: 'monospace',
+                fontSize: 10,
+                letterSpacing: 1.5,
+                color: goldAlpha(0.85),
+                zIndex: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+                gap: 0.5,
+              }}
+            >
+              <span>{STATUS_ARMED_LABEL}</span>
+              <span>{`[ OPERATOR // 0${activeModeIndex + 1} ]`}</span>
+            </Box>
+
+            {/* Cutout Gamer Images - Bigger Scale & Clean Drop Shadow */}
+            {gameModes.map((mode, idx) => (
+              <Box
+                key={mode.title}
+                component="img"
+                src={mode.art}
+                alt={mode.title}
+                width={1200}
+                height={800}
+                loading={idx === activeModeIndex ? 'eager' : 'lazy'}
+                decoding="async"
+                onError={(event) => {
+                  const img = event.currentTarget;
+                  if (img.dataset.fallbackApplied === '1') return;
+                  const key = modeArtKeyFromSrc(mode.art);
+                  const fallback = key
+                    ? MODE_ART_PNG_FALLBACK[key]
+                    : mode.art.replace(/\.webp$/i, '.png');
+                  if (!fallback) return;
+                  img.dataset.fallbackApplied = '1';
+                  img.src = fallback;
+                }}
+                sx={{
+                  position: 'absolute',
+                  inset: { xs: -10, sm: -20, md: -30 },
+                  width: { xs: 'calc(100% + 20px)', sm: 'calc(100% + 40px)', md: 'calc(100% + 60px)' },
+                  height: { xs: 'calc(100% + 20px)', sm: 'calc(100% + 40px)', md: 'calc(100% + 60px)' },
+                  objectFit: 'contain',
+                  objectPosition: 'center center',
+                  display: 'block',
+                  zIndex: 1,
+                  opacity: idx === activeModeIndex ? 1 : 0,
+                  transform: idx === activeModeIndex ? 'scale(1.12) translateY(0)' : 'scale(1.02) translateY(14px)',
+                  transition: 'opacity 0.4s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)',
+                  pointerEvents: 'none',
+                  filter: `drop-shadow(0 25px 50px rgba(0,0,0,0.95)) drop-shadow(0 0 35px ${goldAlpha(0.35)})`,
+                }}
               />
             ))}
           </Box>
-        </HomeBlurPanel>
-
-        <Stack direction="row" justifyContent="center" spacing={1} alignItems="center" sx={{ pt: 1 }}>
-          <Iconify icon="solar:chat-round-dots-bold" width={16} sx={{ color: alpha('#ffffff', 0.4) }} />
-          <Typography sx={{ fontSize: 12, color: alpha('#ffffff', 0.4) }}>
-            {t('home.needHelp')}{' '}
-            <Box
-              component="a"
-              href="/support"
-              sx={{
-                color: GOLD,
-                fontWeight: 700,
-                textDecoration: 'none',
-                '&:hover': { textDecoration: 'underline' },
-              }}
-            >
-              {t('home.contactSupport')}
-            </Box>
-          </Typography>
-        </Stack>
-      </Stack>
+        </Box>
+      </Box>
     </Box>
   );
-
 
   return (
     <Box
@@ -1115,17 +706,29 @@ export function HomeView() {
       {/* LCP: hero only — no framer-motion */}
       {sectionSlide}
 
-      <Suspense fallback={<Box sx={{ minHeight: { xs: 520, md: 440 } }} />}>
-        <LandingDashboardSection />
-      </Suspense>
+      <ScrollReveal repeat preset="cinematic" distance={36} amount={0.06}>
+        <Suspense fallback={<Box sx={{ minHeight: { xs: 520, md: 440 } }} />}>
+          <LandingDashboardSection />
+        </Suspense>
+      </ScrollReveal>
 
-      <Suspense fallback={<Box sx={{ minHeight: { xs: 420, md: 380 } }} />}>
-        <PlayYourGameSection />
-      </Suspense>
+      <ScrollReveal repeat preset="cinematic" distance={36} amount={0.06}>
+        <Suspense fallback={<Box sx={{ minHeight: { xs: 420, md: 380 } }} />}>
+          <PlayYourGameSection />
+        </Suspense>
+      </ScrollReveal>
 
-      <AboutBattleAsiaSection />
-      {sectionHowToPlay}
-      {sectionRoules}
+      <ScrollReveal repeat preset="cinematic" distance={36} amount={0.06}>
+        <AboutBattleAsiaSection />
+      </ScrollReveal>
+
+      <ScrollReveal repeat preset="cinematic" distance={36} amount={0.06}>
+        {sectionHowToPlay}
+      </ScrollReveal>
+
+      <ScrollReveal repeat preset="cinematic" distance={36} amount={0.06}>
+        <TournamentRulesSection />
+      </ScrollReveal>
     </Box>
   );
 }

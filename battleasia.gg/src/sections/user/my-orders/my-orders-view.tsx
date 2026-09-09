@@ -12,21 +12,20 @@ import {
 
 import { paths } from 'src/routes/paths';
 import {
+  goldAlpha,
+  USER_COLORS,
+  UserStatTile,
   UserPageShell,
   UserGlassCard,
-  UserActionButton,
-  UserStatTile,
+  getUserChipSx,
   UserEmptyState,
-  USER_COLORS,
-  userMutedTextSx,
-  getUserChipSx, goldAlpha } from 'src/layouts/user';
+  userMutedTextSx, UserActionButton , UserAnimatedStat } from 'src/layouts/user';
 
 import { Image } from 'src/components/image';
 import { Iconify } from 'src/components/iconify';
 import { PlayTabs } from 'src/components/play-tabs';
 import { CoinValue } from 'src/components/coin-value';
-import { UserAnimatedStat } from 'src/layouts/user';
-import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
+import { getGlassInnerSx, getDefaultGlassTokens } from 'src/components/battle-glass-card';
 import useApi from 'src/hooks/use-api';
 import { useLiveSync, LIVE_SYNC_TOPICS } from 'src/hooks/use-live-sync';
 import { toast } from 'react-hot-toast';
@@ -188,10 +187,15 @@ export function MyOrdersView() {
                         display: 'flex',
                         flexDirection: { xs: 'column', md: 'row' },
                         gap: 2.5,
-                        transition: 'transform 0.2s, border-color 0.2s',
+                        bgcolor: alpha('#10141c', 0.8),
+                        backdropFilter: 'blur(16px)',
+                        border: `1px solid ${alpha('#ffffff', 0.1)}`,
+                        boxShadow: `0 10px 30px ${alpha('#000000', 0.55)}`,
+                        transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s ease, box-shadow 0.3s ease',
                         '&:hover': {
-                          transform: 'translateY(-2px)',
-                          borderColor: goldAlpha(0.35),
+                          transform: 'translateY(-5px)',
+                          borderColor: goldAlpha(0.45),
+                          boxShadow: `0 18px 44px ${alpha('#000000', 0.7)}, 0 0 24px ${goldAlpha(0.12)}`,
                         },
                       }}
                     >
@@ -200,8 +204,10 @@ export function MyOrdersView() {
                           width: { xs: '100%', md: 180 },
                           height: { xs: 180, md: 180 },
                           flexShrink: 0,
-                          borderRadius: 1.5,
+                          borderRadius: '6px',
                           overflow: 'hidden',
+                          border: `1px solid ${goldAlpha(0.25)}`,
+                          boxShadow: `0 4px 16px ${alpha('#000000', 0.5)}`,
                         }}
                       >
                         <Image

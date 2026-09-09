@@ -21,6 +21,7 @@ export const paths = {
   },
   termsOfService: '/terms-and-conditions',
   privacyPolicy: '/privacy-policy',
+  support: '/support',
   // DASHBOARD
   dashboard: {
     root: ROOTS.DASHBOARD,

@@ -1,5 +1,9 @@
 @import './components/scrollbar/styles.css';
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html {
   --ba-gold: #f5c518;
   --ba-gold-light: #fbbf24;
@@ -8,6 +12,58 @@ html {
   --ba-gold-rgb: 245, 197, 24;
   --ba-gold-light-rgb: 251, 191, 36;
   --ba-gold-dark-rgb: 217, 119, 6;
+}
+
+/** **************************************
+* Cyberpunk / Esports HUD Animations
+*************************************** */
+@keyframes cyber-shimmer {
+  0% {
+    transform: translateX(-160%) skewX(-25deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translateX(280%) skewX(-25deg);
+    opacity: 0;
+  }
+}
+
+@keyframes plasma-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 5px var(--ba-gold, #cbfb24));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 12px var(--ba-gold, #cbfb24)) drop-shadow(0 0 18px rgba(var(--ba-gold-rgb, 203, 251, 36), 0.7));
+  }
+}
+
+@keyframes orbit-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes radar-ping {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.25;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
 }
 
 /** **************************************
@@ -182,3 +238,91 @@ input[type='number']::-webkit-inner-spin-button {
   margin: 0;
   -webkit-appearance: none;
 }
+
+/* ---------------------------------------------------------------------- */
+/* Tactical 3D Gaming Cursor & Interaction Modes                          */
+/* ---------------------------------------------------------------------- */
+@media (pointer: fine) {
+  body.tactical-cursor-active,
+  body.tactical-cursor-active a,
+  body.tactical-cursor-active button,
+  body.tactical-cursor-active [role="button"],
+  body.tactical-cursor-active select,
+  body.tactical-cursor-active label,
+  body.tactical-cursor-active [role="tab"] {
+    cursor: none !important;
+  }
+
+  body.tactical-cursor-active input,
+  body.tactical-cursor-active textarea,
+  body.tactical-cursor-active [contenteditable="true"] {
+    cursor: text !important;
+  }
+}
+
+/* ---------------------------------------------------------------------- */
+/* Smooth UI Micro-Animations & Dynamic Hover Effects                     */
+/* ---------------------------------------------------------------------- */
+@keyframes smooth-fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes smooth-pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(245, 197, 24, 0.15), 0 0 30px rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(245, 197, 24, 0.3), 0 0 45px rgba(245, 197, 24, 0.15);
+  }
+}
+
+@keyframes ambient-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.smooth-animate-fade-in {
+  animation: smooth-fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.smooth-animate-glow {
+  animation: smooth-pulse-glow 3s infinite ease-in-out;
+}
+
+.smooth-animate-float {
+  animation: ambient-float 4s infinite ease-in-out;
+}
+
+.smooth-card-hover {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+}
+
+.smooth-card-hover:hover {
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.45), 0 0 18px rgba(245, 197, 24, 0.2);
+}
+
+.smooth-button-hover {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.smooth-button-hover:hover {
+  transform: translateY(-1px) scale(1.02);
+  filter: brightness(1.08);
+}
+
+.smooth-button-hover:active {
+  transform: translateY(1px) scale(0.98);
+}
+

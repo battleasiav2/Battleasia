@@ -7,10 +7,10 @@ import { getImageUrl } from 'src/utils/get-image-url';
 
 import { useTranslate } from 'src/locales/use-locales';
 import {
-  UserActionButton,
-  UserArenaStrip,
+  goldAlpha,
+  USER_COLORS,
   UserArenaChip,
-  USER_COLORS, goldAlpha } from 'src/layouts/user';
+  UserArenaStrip, UserActionButton } from 'src/layouts/user';
 
 import { Iconify } from 'src/components/iconify';
 import { Logo } from 'src/components/logo';
@@ -105,8 +105,22 @@ export function ProfileBanner({
       <Box
         sx={{
           p: { xs: 2, md: 2.5 },
-          bgcolor: alpha('#000000', 0.55),
-          border: `1px solid ${alpha('#ffffff', 0.1)}`,
+          borderRadius: '8px',
+          bgcolor: alpha('#10141c', 0.82),
+          backdropFilter: 'blur(16px)',
+          border: `1px solid ${goldAlpha(0.28)}`,
+          boxShadow: `0 12px 32px ${alpha('#000000', 0.6)}, inset 0 1px 0 ${alpha('#ffffff', 0.08)}`,
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '2px',
+            background: `linear-gradient(90deg, transparent, ${USER_COLORS.gold}, #ffffff, ${USER_COLORS.gold}, transparent)`,
+          },
         }}
       >
         <Stack
@@ -124,7 +138,7 @@ export function ProfileBanner({
                   border: `3px solid ${USER_COLORS.gold}`,
                   bgcolor: USER_COLORS.gold,
                   borderRadius: '50%',
-                  boxShadow: `0 0 28px ${goldAlpha(0.3)}`,
+                  boxShadow: `0 0 32px ${goldAlpha(0.45)}`,
                 }}
               />
             ) : (
@@ -136,7 +150,7 @@ export function ProfileBanner({
                   height: { xs: 88, md: 104 },
                   border: `3px solid ${USER_COLORS.gold}`,
                   bgcolor: alpha(USER_COLORS.surface, 0.8),
-                  boxShadow: `0 0 28px ${goldAlpha(0.3)}`,
+                  boxShadow: `0 0 32px ${goldAlpha(0.4)}`,
                 }}
               />
             )}

@@ -1,7 +1,7 @@
 import { alpha } from '@mui/material/styles';
 import { inputBaseClasses } from '@mui/material/InputBase';
 
-import { HOME_ROW_LINE, HOME_TEXT_MUTED, HOME_TEXT_SECONDARY, homeBlurPanelSx } from 'src/sections/home/home-blur-panel';
+import { HOME_ROW_LINE, homeBlurPanelSx, HOME_TEXT_MUTED, HOME_TEXT_SECONDARY } from 'src/sections/home/home-blur-panel';
 import { HOME_GAME_ARTS } from 'src/sections/home/home-game-arts';
 import { goldAlpha } from 'src/theme/accent-presets';
 
@@ -64,11 +64,11 @@ export const baccoinPasswordFieldSlotProps = {
 };
 
 export const baccoinForgotLinkSx = {
-  color: '#ffb400',
+  color: 'var(--ba-gold)',
   fontWeight: 600,
   textDecoration: 'none',
   fontSize: 13,
-  '&:hover': { textDecoration: 'underline', color: '#ffc933' },
+  '&:hover': { textDecoration: 'underline', color: 'var(--ba-gold-light)' },
 };
 
 export const baccoinSubmitButtonSx = {
@@ -77,11 +77,11 @@ export const baccoinSubmitButtonSx = {
   fontSize: 15,
   fontWeight: 700,
   textTransform: 'none' as const,
-  bgcolor: '#ffb400',
-  color: '#fff',
+  bgcolor: 'var(--ba-gold)',
+  color: 'var(--ba-gold-ink, #080a0e)',
   boxShadow: 'none',
   '&:hover': {
-    bgcolor: '#e6a200',
+    bgcolor: 'var(--ba-gold-light)',
     boxShadow: 'none',
   },
 };
@@ -99,11 +99,30 @@ export const AUTH_RADIUS = {
   button: '0',
 } as const;
 
-/** Same flat blur surface as home HomeBlurPanel */
 export const authCardSx = {
-  ...homeBlurPanelSx,
+  position: 'relative' as const,
   overflow: 'hidden' as const,
-  borderRadius: AUTH_RADIUS.card,
+  borderRadius: '16px',
+  bgcolor: alpha('#0d0f14', 0.45),
+  background: `linear-gradient(145deg, ${alpha('#161922', 0.62)} 0%, ${alpha('#0a0c10', 0.42)} 100%)`,
+  backdropFilter: 'blur(32px) saturate(190%)',
+  WebkitBackdropFilter: 'blur(32px) saturate(190%)',
+  border: `1px solid ${alpha('#ffffff', 0.16)}`,
+  borderTop: `1px solid ${alpha('#ffffff', 0.32)}`,
+  boxShadow: `
+    0 30px 70px rgba(0, 0, 0, 0.65),
+    inset 0 1px 1px ${alpha('#ffffff', 0.22)},
+    0 0 50px ${goldAlpha(0.12)}
+  `,
+  transition: 'transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease',
+  '&:hover': {
+    boxShadow: `
+      0 36px 80px rgba(0, 0, 0, 0.75),
+      inset 0 1px 1.5px ${alpha('#ffffff', 0.3)},
+      0 0 60px ${goldAlpha(0.18)}
+    `,
+    borderColor: alpha('#ffffff', 0.24),
+  },
 };
 
 const authInputAutofillSx = {
@@ -137,29 +156,31 @@ export const authFieldSlotProps = {
       transform: 'none',
       fontSize: 13,
       fontWeight: 600,
-      letterSpacing: 0,
+      letterSpacing: 0.2,
       lineHeight: 1.2,
       color: AUTH_TEXT_SECONDARY,
-      mb: 0.6,
+      mb: 0.7,
       textTransform: 'none' as const,
       '&.MuiInputLabel-shrink': {
         transform: 'none',
         fontSize: 13,
         color: AUTH_TEXT_SECONDARY,
-        '&.Mui-focused': { color: goldAlpha(0.9) },
+        '&.Mui-focused': { color: goldAlpha(0.95) },
       },
-      '&.Mui-focused': { color: goldAlpha(0.9) },
+      '&.Mui-focused': { color: goldAlpha(0.95) },
     },
   },
   input: {
     sx: {
       color: '#ffffff',
-      bgcolor: alpha(AUTH_INPUT_BG, 0.65),
-      borderRadius: AUTH_RADIUS.control,
+      bgcolor: alpha('#06080c', 0.48),
+      backdropFilter: 'blur(12px)',
+      WebkitBackdropFilter: 'blur(12px)',
+      borderRadius: '8px',
       fontSize: 14,
-      minHeight: 42,
-      boxShadow: 'none',
-      transition: 'border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease',
+      minHeight: 44,
+      boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.08)}`,
+      transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
       '& input': {
         fontSize: 14.5,
         paddingTop: '11px',
@@ -167,25 +188,26 @@ export const authFieldSlotProps = {
       },
       '& input::placeholder': {
         color: AUTH_PLACEHOLDER,
-        opacity: 1,
-        fontSize: 14.5,
+        opacity: 0.85,
+        fontSize: 14,
       },
       '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
       '& fieldset': {
-        border: `1px solid ${alpha('#ffffff', 0.12)}`,
+        border: `1px solid ${alpha('#ffffff', 0.14)}`,
+        transition: 'border-color 0.2s ease',
       },
       '&:hover fieldset': {
-        borderColor: alpha('#ffffff', 0.22),
+        borderColor: goldAlpha(0.4),
       },
       '&:hover': {
-        boxShadow: 'none',
+        bgcolor: alpha('#06080c', 0.65),
       },
       '&.Mui-focused': {
-        bgcolor: alpha(AUTH_INPUT_BG, 0.8),
-        boxShadow: `0 0 0 2px ${goldAlpha(0.28)}`,
+        bgcolor: alpha('#05070a', 0.75),
+        boxShadow: `0 0 0 3px ${goldAlpha(0.22)}, inset 0 1px 0 ${alpha('#ffffff', 0.12)}`,
       },
       '&.Mui-focused fieldset': {
-        borderColor: goldAlpha(0.5),
+        borderColor: goldAlpha(0.75),
         borderWidth: '1px',
       },
       '& .MuiSelect-select': {
@@ -194,17 +216,28 @@ export const authFieldSlotProps = {
       },
       '& .MuiSelect-icon': {
         color: AUTH_PLACEHOLDER,
+        transition: 'color 0.2s ease, transform 0.2s ease',
+      },
+      '&.Mui-focused .MuiSelect-icon': {
+        color: 'var(--ba-gold)',
       },
       '& .MuiInputAdornment-root': {
         color: AUTH_PLACEHOLDER,
+        transition: 'color 0.2s ease',
       },
       '& .MuiInputAdornment-root .iconify, & .MuiInputAdornment-root svg': {
         color: `${AUTH_PLACEHOLDER} !important`,
-        opacity: 1,
+        opacity: 0.9,
+        transition: 'color 0.2s ease, filter 0.2s ease',
+      },
+      '&:focus-within .MuiInputAdornment-root .iconify, &:focus-within .MuiInputAdornment-root svg': {
+        color: 'var(--ba-gold) !important',
+        filter: 'drop-shadow(0 0 6px goldAlpha(0.5))',
       },
       '& .MuiIconButton-root': {
         color: AUTH_PLACEHOLDER,
-        '&:hover': { color: '#D1D5DB' },
+        transition: 'color 0.2s ease',
+        '&:hover': { color: '#ffffff' },
       },
       ...authInputAutofillSx,
     },
@@ -220,7 +253,7 @@ export const authPhoneInputSx = {
   '--popover-button-mr': '10px',
   [`& .${inputBaseClasses.input}`]: {
     pl: 'calc(var(--popover-button-width) + var(--popover-button-mr) + 2px) !important',
-    fontSize: 16,
+    fontSize: 15,
     letterSpacing: 0,
   },
   '& .MuiFormHelperText-root': {
@@ -236,35 +269,47 @@ export const authPhoneCountrySx = {
   left: '10px !important',
   height: '32px !important',
   alignItems: 'center',
-  borderRadius: AUTH_RADIUS.control,
-  bgcolor: alpha('#ffffff', 0.06),
-  px: 0.5,
+  borderRadius: '3px',
+  bgcolor: alpha('#ffffff', 0.08),
+  border: `1px solid ${alpha('#ffffff', 0.1)}`,
+  px: 0.6,
+  transition: 'all 0.2s ease',
   '&:hover': {
-    bgcolor: alpha('#ffffff', 0.1),
+    bgcolor: alpha('#ffffff', 0.14),
+    borderColor: goldAlpha(0.4),
   },
   '& .iconify': {
-    color: `${alpha('#ffffff', 0.7)} !important`,
+    color: `${alpha('#ffffff', 0.85)} !important`,
   },
   '& > span': {
-    bgcolor: `${alpha('#ffffff', 0.2)} !important`,
+    bgcolor: `${alpha('#ffffff', 0.25)} !important`,
   },
 };
 
 export const authSelectMenuProps = {
   PaperProps: {
     sx: {
-      mt: 0.5,
-      bgcolor: alpha('#0a0a0a', 0.96),
-      border: `1px solid ${alpha('#ffffff', 0.14)}`,
-      backdropFilter: 'blur(12px)',
-      boxShadow: `0 16px 40px ${alpha('#000000', 0.65)}`,
+      mt: 0.75,
+      bgcolor: alpha('#0b0e14', 0.98),
+      border: `1px solid ${goldAlpha(0.25)}`,
+      backdropFilter: 'blur(16px)',
+      boxShadow: `0 20px 48px rgba(0, 0, 0, 0.8), 0 0 20px ${goldAlpha(0.12)}`,
+      borderRadius: '6px',
       '& .MuiMenuItem-root': {
-        color: alpha('#ffffff', 0.88),
-        fontSize: 16,
-        '&:hover': { bgcolor: alpha('#f59e0b', 0.12) },
+        color: alpha('#ffffff', 0.9),
+        fontSize: 14.5,
+        py: 1.1,
+        transition: 'all 0.15s ease',
+        '&:hover': {
+          bgcolor: goldAlpha(0.15),
+          color: '#ffffff',
+          pl: 2.2,
+        },
         '&.Mui-selected': {
-          bgcolor: alpha('#f59e0b', 0.18),
-          '&:hover': { bgcolor: alpha('#f59e0b', 0.22) },
+          bgcolor: goldAlpha(0.22),
+          color: 'var(--ba-gold)',
+          fontWeight: 700,
+          '&:hover': { bgcolor: goldAlpha(0.28) },
         },
         '&.Mui-disabled': {
           color: alpha('#ffffff', 0.35),
@@ -277,83 +322,105 @@ export const authSelectMenuProps = {
 export const authSelectSx = {
   mt: 0,
   color: '#ffffff',
-  bgcolor: alpha(AUTH_INPUT_BG, 0.65),
-  borderRadius: AUTH_RADIUS.control,
+  bgcolor: alpha('#0d0f14', 0.75),
+  borderRadius: '4px',
   fontSize: 14,
-  minHeight: 42,
+  minHeight: 44,
   boxShadow: 'none',
+  transition: 'border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease',
   '& .MuiOutlinedInput-notchedOutline': { border: 'none' },
   '& fieldset': {
     border: `1px solid ${alpha('#ffffff', 0.12)}`,
+    transition: 'border-color 0.2s ease',
   },
   '&:hover fieldset': {
-    borderColor: alpha('#ffffff', 0.22),
+    borderColor: goldAlpha(0.4),
+  },
+  '&:hover': {
+    bgcolor: alpha('#0d0f14', 0.88),
   },
   '&.Mui-focused': {
-    bgcolor: alpha(AUTH_INPUT_BG, 0.8),
-    boxShadow: `0 0 0 2px ${goldAlpha(0.28)}`,
+    bgcolor: alpha('#0b0d12', 0.95),
+    boxShadow: `0 0 0 1px ${goldAlpha(0.55)}, 0 0 16px ${goldAlpha(0.2)}, inset 0 0 8px ${goldAlpha(0.06)}`,
   },
   '&.Mui-focused fieldset': {
-    borderColor: goldAlpha(0.5),
+    borderColor: goldAlpha(0.75),
     borderWidth: '1px',
   },
   '& .MuiSelect-select': {
-    py: 1.35,
-    fontSize: 16,
+    py: 1.25,
+    fontSize: 14.5,
   },
 };
 
 export const authSubmitButtonSx = {
-  borderRadius: AUTH_RADIUS.button,
-  py: 1.25,
-  minHeight: 46,
+  position: 'relative' as const,
+  borderRadius: '4px',
+  clipPath: 'polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px)',
+  py: 1.35,
+  minHeight: 48,
   height: 'auto',
-  fontSize: 14,
-  fontWeight: 700,
-  letterSpacing: 0,
-  textTransform: 'none' as const,
-  color: 'var(--ba-gold-ink)',
+  fontSize: 14.5,
+  fontWeight: 800,
+  letterSpacing: 0.6,
+  textTransform: 'uppercase' as const,
+  color: 'var(--ba-gold-ink, #080a0e) !important',
   width: '100%',
   backdropFilter: 'none',
   WebkitBackdropFilter: 'none',
   filter: 'none',
-  textShadow: 'none',
-  backgroundImage: 'none',
-  // Use backgroundColor — MUI dark "contained + inherit" sets backgroundColor:white
-  // after shorthand `background`, which made production Sign In buttons look white.
-  backgroundColor: 'var(--ba-gold)',
-  border: `1px solid ${goldAlpha(0.85)}`,
-  boxShadow: 'none',
-  transition: 'background-color 0.15s ease, border-color 0.15s ease',
-  '&.MuiButton-contained.MuiButton-containedInherit': {
-    color: 'var(--ba-gold-ink)',
-    backgroundColor: 'var(--ba-gold)',
+  textShadow: '0 1px 1px rgba(255,255,255,0.4)',
+  backgroundColor: 'var(--ba-gold) !important',
+  background: 'linear-gradient(135deg, var(--ba-gold-light) 0%, var(--ba-gold) 50%, var(--ba-gold-dark) 100%) !important',
+  border: `1px solid ${goldAlpha(0.7)}`,
+  boxShadow: `0 4px 20px ${goldAlpha(0.35)}, inset 0 1px 1px rgba(255, 255, 255, 0.4)`,
+  transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+  '&::before': {
+    content: '""',
+    position: 'absolute',
+    top: 0,
+    left: '-100%',
+    width: '60%',
+    height: '100%',
+    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent)',
+    transform: 'skewX(-25deg)',
+    transition: 'left 0.6s ease',
+    pointerEvents: 'none',
   },
-  '&.MuiButton-root:hover': { boxShadow: 'none' },
+  '&.MuiButton-contained.MuiButton-containedInherit': {
+    color: 'var(--ba-gold-ink, #080a0e) !important',
+    backgroundColor: 'var(--ba-gold) !important',
+    background: 'linear-gradient(135deg, var(--ba-gold-light) 0%, var(--ba-gold) 50%, var(--ba-gold-dark) 100%) !important',
+  },
   '@media (hover: hover)': {
     '&:hover': {
-      backgroundColor: 'var(--ba-gold-light)',
+      backgroundColor: 'var(--ba-gold-light) !important',
+      background: 'linear-gradient(135deg, #ffffff 0%, var(--ba-gold-light) 50%, var(--ba-gold) 100%) !important',
       borderColor: goldAlpha(0.9),
-      boxShadow: 'none',
-      transform: 'none',
-      filter: 'none',
+      boxShadow: `0 6px 28px ${goldAlpha(0.55)}, inset 0 1px 1px rgba(255, 255, 255, 0.6)`,
+      transform: 'translateY(-1.5px)',
+      '&::before': {
+        left: '140%',
+      },
     },
     '&.MuiButton-contained.MuiButton-containedInherit:hover': {
-      color: 'var(--ba-gold-ink)',
-      backgroundColor: 'var(--ba-gold-light)',
+      color: 'var(--ba-gold-ink, #080a0e) !important',
+      backgroundColor: 'var(--ba-gold-light) !important',
+      background: 'linear-gradient(135deg, #ffffff 0%, var(--ba-gold-light) 50%, var(--ba-gold) 100%) !important',
     },
   },
   '&:active, &.Mui-focusVisible': {
-    backgroundColor: 'var(--ba-gold-dark)',
+    backgroundColor: 'var(--ba-gold-dark) !important',
+    background: 'linear-gradient(135deg, var(--ba-gold) 0%, var(--ba-gold-dark) 100%) !important',
     borderColor: 'var(--ba-gold-dark)',
-    boxShadow: 'none',
-    transform: 'none',
-    filter: 'none',
+    boxShadow: `0 2px 10px ${goldAlpha(0.4)}`,
+    transform: 'translateY(1px)',
   },
   '&.Mui-disabled': {
-    backgroundColor: goldAlpha(0.28),
-    color: alpha('#111111', 0.45),
-    borderColor: goldAlpha(0.22),
+    backgroundColor: `${goldAlpha(0.25)} !important`,
+    background: 'none !important',
+    color: `${alpha('#ffffff', 0.4)} !important`,
+    borderColor: goldAlpha(0.2),
     boxShadow: 'none',
     transform: 'none',
     filter: 'none',
@@ -361,25 +428,27 @@ export const authSubmitButtonSx = {
 };
 
 export const authSecondaryButtonSx = {
-  borderRadius: AUTH_RADIUS.button,
+  borderRadius: '4px',
   py: 1.25,
   minHeight: 46,
   height: 'auto',
   fontSize: 14,
   fontWeight: 600,
-  letterSpacing: 0,
+  letterSpacing: 0.3,
   textTransform: 'none' as const,
   color: AUTH_TEXT_SECONDARY,
-  bgcolor: 'transparent',
+  bgcolor: alpha('#ffffff', 0.04),
   border: `1px solid ${alpha('#ffffff', 0.14)}`,
   boxShadow: 'none',
   flexShrink: 0,
-  transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease',
+  transition: 'all 0.2s ease',
   '@media (hover: hover)': {
     '&:hover': {
-      bgcolor: alpha('#ffffff', 0.06),
-      borderColor: alpha('#ffffff', 0.22),
-      color: alpha('#ffffff', 0.88),
+      bgcolor: alpha('#ffffff', 0.08),
+      borderColor: goldAlpha(0.4),
+      color: '#ffffff',
+      boxShadow: `0 4px 14px ${goldAlpha(0.12)}`,
+      transform: 'translateY(-1px)',
     },
   },
 };
@@ -408,7 +477,7 @@ export const authBackLinkSx = {
   p: 0,
   mb: 0.5,
   textDecoration: 'none',
-  '&:hover': { color: '#ffe066', textDecoration: 'underline', textDecorationColor: '#ffe066' },
+  '&:hover': { color: 'var(--ba-gold-light)', textDecoration: 'underline', textDecorationColor: 'var(--ba-gold-light)' },
 };
 
 /** Divider above in-card footer (trust row) */
@@ -425,36 +494,37 @@ export const authSocialIconButtonSx = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  minHeight: 40,
-  height: 40,
+  minHeight: 42,
+  height: 42,
   minWidth: 0,
   py: 0,
   px: 0,
-  borderRadius: AUTH_RADIUS.control,
-  bgcolor: alpha(AUTH_INPUT_BG, 0.72),
-  backgroundColor: alpha(AUTH_INPUT_BG, 0.72),
+  borderRadius: '4px',
+  clipPath: 'polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)',
+  bgcolor: alpha('#0d0f14', 0.8),
+  backgroundColor: alpha('#0d0f14', 0.8),
   backgroundImage: 'none',
   border: `1px solid ${alpha('#ffffff', 0.12)}`,
   boxShadow: 'none',
   color: 'inherit',
-  transition: 'border-color 0.15s ease, background-color 0.15s ease',
+  transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
   '&.MuiButton-root:hover': { boxShadow: 'none' },
   '@media (hover: hover)': {
     '&:hover': {
-      bgcolor: alpha(AUTH_INPUT_BG, 0.88),
-      backgroundColor: alpha(AUTH_INPUT_BG, 0.88),
-      borderColor: goldAlpha(0.32),
-      boxShadow: 'none',
-      transform: 'none',
+      bgcolor: alpha('#151922', 0.95),
+      backgroundColor: alpha('#151922', 0.95),
+      borderColor: goldAlpha(0.45),
+      boxShadow: `0 4px 16px rgba(0,0,0,0.5), 0 0 12px ${goldAlpha(0.15)}`,
+      transform: 'translateY(-1.5px)',
       filter: 'none',
     },
   },
   '&:active, &.Mui-focusVisible': {
-    bgcolor: alpha(AUTH_INPUT_BG, 0.92),
-    backgroundColor: alpha(AUTH_INPUT_BG, 0.92),
-    borderColor: goldAlpha(0.4),
+    bgcolor: alpha('#0b0e14', 0.98),
+    backgroundColor: alpha('#0b0e14', 0.98),
+    borderColor: goldAlpha(0.6),
     boxShadow: 'none',
-    transform: 'none',
+    transform: 'translateY(1px)',
     filter: 'none',
   },
 };

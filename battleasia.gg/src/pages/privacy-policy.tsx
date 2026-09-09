@@ -155,7 +155,7 @@ export default function PrivacyPolicyPage() {
 
           <LegalSection title="10) Contact">
             <Typography>
-              If you have questions, concerns, or requests about privacy, contact us at: support@battleasia.net
+              If you have questions, concerns, or requests about privacy, contact us at: support@battleasia.gg
             </Typography>
           </LegalSection>
         </LegalPageShell>

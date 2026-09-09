@@ -1,13 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 
 import { alpha } from '@mui/material/styles';
 import {
   Box,
   Stack,
+  Divider,
   TextField,
   Typography,
   CircularProgress,
-  Divider,
 } from '@mui/material';
 
 import { toast } from 'react-hot-toast';
@@ -17,21 +17,22 @@ import { useLiveSync, LIVE_SYNC_TOPICS } from 'src/hooks/use-live-sync';
 import { useTranslate } from 'src/locales/use-locales';
 import { useSelector } from 'src/store';
 import {
+  goldAlpha,
+  USER_COLORS,
+  userFieldSx,
+  UserStatTile,
   UserPageShell,
   UserGlassCard,
-  UserActionButton,
-  UserStatTile,
   UserEmptyState,
-  USER_COLORS,
   userMutedTextSx,
-  userFieldSx,
+  UserActionButton,
   userFieldLabelProps,
 } from 'src/layouts/user';
 
 import { Iconify } from 'src/components/iconify';
 import { CoinValue } from 'src/components/coin-value';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
-import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
+import { getGlassInnerSx, getDefaultGlassTokens } from 'src/components/battle-glass-card';
 
 import { ShopSectionNav } from './components';
 
@@ -209,31 +210,33 @@ export function ShopWalletView() {
     <UserPageShell>
       <ShopSectionNav />
 
-      <Stack spacing={{ xs: 2.5, md: 3.5 }}>
+      <Stack spacing={{ xs: 3, md: 4 }}>
         <Box>
           <Typography
             className="font-tr"
             sx={{
               fontSize: { xs: 22, md: 28 },
-              fontWeight: 800,
+              fontWeight: 900,
               textTransform: 'uppercase',
               color: USER_COLORS.textPrimary,
-              letterSpacing: 0.5,
+              letterSpacing: 0.8,
+              textShadow: `0 0 20px ${goldAlpha(0.25)}`,
             }}
           >
             {t('shop.transferTitle')}
           </Typography>
-          <BattleGoldDivider variant="section" sx={{ mt: 0.75, mb: 1.25, width: 120 }} />
-          <Typography sx={{ ...userMutedTextSx, fontSize: 13, maxWidth: 560, lineHeight: 1.6 }}>
+          <BattleGoldDivider variant="section" sx={{ mt: 0.75, mb: 1.5, width: 140 }} />
+          <Typography sx={{ ...userMutedTextSx, fontSize: 13.5, maxWidth: 580, lineHeight: 1.6 }}>
             {t('shop.transferSubtitle')}
           </Typography>
         </Box>
 
+        {/* Telemetry Stat Tiles Grid */}
         <Box
           sx={{
             display: 'grid',
             gridTemplateColumns: { xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)' },
-            gap: 1.5,
+            gap: 1.75,
           }}
         >
           <UserStatTile label={t('shop.transferYourBalance')} value={String(balance)} suffix="BAC" />
@@ -249,10 +252,22 @@ export function ShopWalletView() {
           </Box>
         </Box>
 
-        <UserGlassCard sx={{ p: { xs: 2, md: 2.5 } }}>
+        {/* Transfer Form Vault Card */}
+        <Box
+          sx={{
+            p: { xs: 2.25, md: 3 },
+            bgcolor: alpha('#06090e', 0.75),
+            backdropFilter: 'blur(18px)',
+            WebkitBackdropFilter: 'blur(18px)',
+            border: `1px solid ${goldAlpha(0.28)}`,
+            borderTop: `2px solid ${USER_COLORS.gold}`,
+            boxShadow: `0 12px 36px ${alpha('#000000', 0.7)}, inset 0 0 20px ${goldAlpha(0.04)}`,
+            clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+          }}
+        >
           {settingsLoading ? (
             <Stack alignItems="center" py={4}>
-              <CircularProgress size={28} sx={{ color: USER_COLORS.gold }} />
+              <CircularProgress size={32} sx={{ color: USER_COLORS.gold }} />
             </Stack>
           ) : !settings?.enabled ? (
             <UserEmptyState
@@ -261,10 +276,24 @@ export function ShopWalletView() {
               description={t('shop.transferDisabled')}
             />
           ) : (
-            <Stack spacing={2}>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Iconify icon="solar:transfer-horizontal-bold" width={20} sx={{ color: USER_COLORS.gold }} />
-                <Typography sx={{ fontSize: 15, fontWeight: 800, color: USER_COLORS.textPrimary }}>
+            <Stack spacing={2.25}>
+              <Stack direction="row" alignItems="center" spacing={1.25}>
+                <Box
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    bgcolor: goldAlpha(0.16),
+                    border: `1px solid ${goldAlpha(0.35)}`,
+                    color: USER_COLORS.gold,
+                  }}
+                >
+                  <Iconify icon="solar:transfer-horizontal-bold" width={18} />
+                </Box>
+                <Typography sx={{ fontSize: 16, fontWeight: 900, textTransform: 'uppercase', letterSpacing: 0.5, color: USER_COLORS.textPrimary }}>
                   {t('shop.transferFormTitle')}
                 </Typography>
               </Stack>
@@ -304,24 +333,32 @@ export function ShopWalletView() {
               />
 
               {parsedAmount > 0 ? (
-                <Box sx={getGlassInnerSx(tokens, { p: 1.5 })}>
-                  <Stack spacing={0.75}>
+                <Box
+                  sx={{
+                    p: 2,
+                    bgcolor: alpha('#000000', 0.65),
+                    border: `1px solid ${goldAlpha(0.35)}`,
+                    clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
+                    boxShadow: `0 8px 24px ${alpha('#000000', 0.6)}, inset 0 0 14px ${goldAlpha(0.06)}`,
+                  }}
+                >
+                  <Stack spacing={1.25}>
                     <Stack direction="row" justifyContent="space-between">
-                      <Typography sx={{ ...userMutedTextSx, fontSize: 12 }}>{t('shop.transferAmount')}</Typography>
+                      <Typography sx={{ ...userMutedTextSx, fontSize: 12.5 }}>{t('shop.transferAmount')}</Typography>
                       <CoinValue value={parsedAmount} />
                     </Stack>
                     <Stack direction="row" justifyContent="space-between">
-                      <Typography sx={{ ...userMutedTextSx, fontSize: 12 }}>
+                      <Typography sx={{ ...userMutedTextSx, fontSize: 12.5 }}>
                         {t('shop.transferFee', { percent: settings.feePercent })}
                       </Typography>
                       <CoinValue value={feePreview.feeAmount} />
                     </Stack>
-                    <Divider sx={{ borderColor: alpha('#ffffff', 0.08) }} />
+                    <Divider sx={{ borderColor: alpha('#ffffff', 0.12) }} />
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      <Typography sx={{ fontSize: 12, fontWeight: 700, color: USER_COLORS.textPrimary }}>
+                      <Typography sx={{ fontSize: 13.5, fontWeight: 900, color: USER_COLORS.textPrimary, letterSpacing: 0.5 }}>
                         {t('shop.transferTotalDebit')}
                       </Typography>
-                      <CoinValue value={feePreview.totalDebited} sx={{ fontWeight: 800, color: USER_COLORS.gold }} />
+                      <CoinValue value={feePreview.totalDebited} sx={{ fontWeight: 900, color: USER_COLORS.gold, fontSize: 17 }} />
                     </Stack>
                   </Stack>
                 </Box>
@@ -340,24 +377,44 @@ export function ShopWalletView() {
                     <Iconify icon="solar:plain-bold" width={18} />
                   )
                 }
-                sx={{ height: { xs: 48, md: 52 } }}
+                sx={{
+                  height: { xs: 50, md: 54 },
+                  fontSize: 14,
+                  fontWeight: 900,
+                  letterSpacing: 1,
+                  borderRadius: 0,
+                  clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
+                  boxShadow: `0 8px 24px ${goldAlpha(0.35)}`,
+                }}
               >
                 {submitting ? t('shop.transferSending') : t('shop.transferSend')}
               </UserActionButton>
             </Stack>
           )}
-        </UserGlassCard>
+        </Box>
 
-        <UserGlassCard sx={{ p: { xs: 2, md: 2.5 } }}>
+        {/* Transfer History Card */}
+        <Box
+          sx={{
+            p: { xs: 2.25, md: 3 },
+            bgcolor: alpha('#06090e', 0.75),
+            backdropFilter: 'blur(18px)',
+            WebkitBackdropFilter: 'blur(18px)',
+            border: `1px solid ${goldAlpha(0.28)}`,
+            borderTop: `2px solid ${USER_COLORS.gold}`,
+            boxShadow: `0 12px 36px ${alpha('#000000', 0.7)}, inset 0 0 20px ${goldAlpha(0.04)}`,
+            clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+          }}
+        >
           <Typography
             className="font-tr"
             sx={{
               fontSize: { xs: 16, md: 18 },
-              fontWeight: 800,
+              fontWeight: 900,
               textTransform: 'uppercase',
-              letterSpacing: 0.6,
+              letterSpacing: 0.8,
               color: USER_COLORS.gold,
-              mb: 2,
+              mb: 2.5,
             }}
           >
             {t('shop.transferHistoryTitle')}
@@ -374,20 +431,20 @@ export function ShopWalletView() {
               description={t('shop.transferHistoryEmptyHint')}
             />
           ) : (
-            <Stack spacing={1.25}>
+            <Stack spacing={1.5}>
               {history.map((item) => {
                 const isSent = item.direction === 'sent';
                 return (
-                  <Box key={item.id} sx={getGlassInnerSx(tokens, { p: 1.5 })}>
+                  <Box key={item.id} sx={getGlassInnerSx(tokens, { p: 1.75, borderRadius: 0 })}>
                     <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1.5}>
                       <Stack spacing={0.5} sx={{ minWidth: 0 }}>
-                        <Stack direction="row" alignItems="center" spacing={0.75}>
+                        <Stack direction="row" alignItems="center" spacing={0.8}>
                           <Iconify
                             icon={isSent ? 'solar:arrow-right-up-bold' : 'solar:arrow-left-down-bold'}
-                            width={14}
+                            width={16}
                             sx={{ color: isSent ? '#f87171' : USER_COLORS.gold, flexShrink: 0 }}
                           />
-                          <Typography sx={{ fontSize: 13, fontWeight: 800, color: USER_COLORS.textPrimary }}>
+                          <Typography sx={{ fontSize: 13.5, fontWeight: 800, color: USER_COLORS.textPrimary }}>
                             {isSent ? t('shop.transferSentTo') : t('shop.transferReceivedFrom')}{' '}
                             @{item.counterpartyUsername}
                           </Typography>
@@ -411,8 +468,8 @@ export function ShopWalletView() {
                           <Typography
                             component="span"
                             sx={{
-                              fontWeight: 800,
-                              fontSize: 14,
+                              fontWeight: 900,
+                              fontSize: 15,
                               color: isSent ? '#f87171' : USER_COLORS.gold,
                             }}
                           >
@@ -421,12 +478,13 @@ export function ShopWalletView() {
                           <CoinValue
                             value={isSent ? item.totalDebited : item.amount}
                             textSx={{
-                              fontWeight: 800,
+                              fontWeight: 900,
+                              fontSize: 15,
                               color: isSent ? '#f87171' : USER_COLORS.gold,
                             }}
                           />
                         </Stack>
-                        <Typography sx={{ ...userMutedTextSx, fontSize: 10 }}>BAC</Typography>
+                        <Typography sx={{ ...userMutedTextSx, fontSize: 10, fontWeight: 700 }}>BAC</Typography>
                       </Stack>
                     </Stack>
                   </Box>
@@ -434,8 +492,9 @@ export function ShopWalletView() {
               })}
             </Stack>
           )}
-        </UserGlassCard>
+        </Box>
       </Stack>
     </UserPageShell>
   );
 }
+

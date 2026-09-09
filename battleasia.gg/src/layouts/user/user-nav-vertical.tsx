@@ -3,8 +3,8 @@ import type { Theme, SxProps, CSSObject, Breakpoint } from '@mui/material/styles
 
 import { varAlpha, mergeClasses } from 'minimal-shared/utils';
 
-import { styled, alpha } from '@mui/material/styles';
-import { Box, Stack, Typography, Divider } from '@mui/material';
+import { alpha, styled } from '@mui/material/styles';
+import { Box, Stack, Divider, Typography } from '@mui/material';
 
 import { Logo } from 'src/components/logo';
 import { NavSectionMini, NavSectionVertical } from 'src/components/nav-section';
@@ -66,10 +66,10 @@ export function UserNavVertical({
             sx={{
               fontSize: isBengali ? { md: 18, lg: 20 } : { md: 20, lg: 22 },
               fontWeight: 800,
-              color: USER_COLORS.gold,
+              color: 'var(--ba-gold, #cbfb24)',
               lineHeight: 1,
               whiteSpace: 'nowrap',
-              background: `linear-gradient(180deg, #ffe08a 0%, ${USER_COLORS.gold} 48%, #d4a017 100%)`,
+              background: `linear-gradient(180deg, var(--ba-gold-light, #e2ff58) 0%, var(--ba-gold, #cbfb24) 48%, var(--ba-gold-dark, #9de006) 100%)`,
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text',
@@ -95,7 +95,7 @@ export function UserNavVertical({
                 fontSize: 11,
                 fontWeight: 800,
                 letterSpacing: 0.6,
-                color: USER_COLORS.gold,
+                color: 'var(--ba-gold, #cbfb24)',
                 lineHeight: 1.2,
               }}
             >
@@ -140,16 +140,46 @@ export function UserNavVertical({
         sx={{
           mx: 2,
           mb: 2,
-          p: 1.5,
+          p: 1.75,
           borderRadius: `${GLASS_CARD_RADIUS}px`,
-          bgcolor: alpha('#000000', 0.42),
-          border: `1px solid ${goldAlpha(0.18)}`,
+          bgcolor: alpha('#10141c', 0.8),
+          backdropFilter: 'blur(16px)',
+          border: `1px solid ${goldAlpha(0.24)}`,
+          boxShadow: `0 8px 24px ${alpha('#000000', 0.5)}`,
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '2px',
+            background: `linear-gradient(90deg, var(--ba-gold, #cbfb24), #22c55e, var(--ba-gold, #cbfb24))`,
+          },
         }}
       >
-        <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 1, color: USER_COLORS.gold, textTransform: 'uppercase' }}>
-          Battle Asia
-        </Typography>
-        <Typography sx={{ mt: 0.5, fontSize: 11, color: alpha('#ffffff', 0.5), lineHeight: 1.45 }}>
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <Box
+            sx={{
+              width: 7,
+              height: 7,
+              borderRadius: '50%',
+              bgcolor: '#22c55e',
+              boxShadow: '0 0 8px #22c55e',
+              animation: 'pulse 2s infinite',
+              '@keyframes pulse': {
+                '0%': { transform: 'scale(0.95)', opacity: 0.8 },
+                '50%': { transform: 'scale(1.2)', opacity: 1 },
+                '100%': { transform: 'scale(0.95)', opacity: 0.8 },
+              },
+            }}
+          />
+          <Typography sx={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.2, color: 'var(--ba-gold, #cbfb24)', textTransform: 'uppercase' }}>
+            Battle Asia
+          </Typography>
+        </Stack>
+        <Typography sx={{ mt: 0.75, fontSize: 11, color: alpha('#ffffff', 0.6), lineHeight: 1.45 }}>
           Premium esports arena
         </Typography>
       </Box>

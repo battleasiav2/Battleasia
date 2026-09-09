@@ -19,6 +19,8 @@ const PublicProfilePage = lazy(() => lazyRetry(() => import('src/pages/dashboard
 const PrivacyPolicyPage = lazy(() => lazyRetry(() => import('src/pages/privacy-policy')));
 // terms and conditions
 const TermsAndConditionsPage = lazy(() => lazyRetry(() => import('src/pages/terms-and-conditions')));
+// customer support
+const CustomerSupportPage = lazy(() => lazyRetry(() => import('src/pages/user/customer-support')));
 // ----------------------------------------------------------------------
 
 function SuspenseOutlet() {
@@ -65,6 +67,14 @@ export const dashboardRoutes: RouteObject[] = [
     element: dashboardLayout(),
     children: [
       { element: <PublicProfilePage />, index: true },
+    ],
+  },
+  // customer support
+  {
+    path: 'support',
+    element: dashboardLayout(),
+    children: [
+      { element: <CustomerSupportPage />, index: true },
     ],
   },
 ];

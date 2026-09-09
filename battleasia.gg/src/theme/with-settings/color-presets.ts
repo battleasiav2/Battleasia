@@ -7,7 +7,8 @@ import { secondary } from '../core/palette';
 // ----------------------------------------------------------------------
 
 export const primaryColorPresets: Record<string, PaletteColorNoChannels> = {
-  default: ACCENT_PALETTES.gold.primary,
+  default: ACCENT_PALETTES.lime.primary,
+  lime: ACCENT_PALETTES.lime.primary,
   gold: ACCENT_PALETTES.gold.primary,
   ember: ACCENT_PALETTES.ember.primary,
   jade: ACCENT_PALETTES.jade.primary,

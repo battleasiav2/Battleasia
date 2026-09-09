@@ -4,34 +4,40 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#000000" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <script>
       (function () {
         var palettes = {
-          gold: ['#f5c518', '#fbbf24', '#d97706', '#111111', '245, 197, 24'],
-          ember: ['#ff8a1a', '#ffb347', '#e05d00', '#111111', '255, 138, 26'],
-          jade: ['#34d399', '#6ee7b7', '#059669', '#042f1e', '52, 211, 153'],
-          cyan: ['#22d3ee', '#67e8f9', '#0891b2', '#082f38', '34, 211, 238'],
-          violet: ['#a78bfa', '#c4b5fd', '#7c3aed', '#1e1038', '167, 139, 250'],
-          rose: ['#fb7185', '#fda4af', '#e11d48', '#3f0a14', '251, 113, 133'],
-          sky: ['#38bdf8', '#7dd3fc', '#0284c7', '#0b2838', '56, 189, 248'],
+          lime: ['#cbfb24', '#e2ff58', '#9de006', '#081401', '203, 251, 36', '226, 255, 88'],
+          gold: ['#f5c518', '#fbbf24', '#d97706', '#111111', '245, 197, 24', '251, 191, 36'],
+          ember: ['#ff8a1a', '#ffb347', '#e05d00', '#111111', '255, 138, 26', '255, 179, 71'],
+          jade: ['#34d399', '#6ee7b7', '#059669', '#042f1e', '52, 211, 153', '110, 231, 183'],
+          cyan: ['#22d3ee', '#67e8f9', '#0891b2', '#082f38', '34, 211, 238', '103, 232, 249'],
+          violet: ['#a78bfa', '#c4b5fd', '#7c3aed', '#1e1038', '167, 139, 250', '196, 181, 253'],
+          rose: ['#fb7185', '#fda4af', '#e11d48', '#3f0a14', '251, 113, 133', '253, 164, 175'],
+          sky: ['#38bdf8', '#7dd3fc', '#0284c7', '#0b2838', '56, 189, 248', '125, 211, 252'],
         };
         var legacy = { default: 'gold', preset1: 'sky', preset2: 'violet', preset3: 'cyan', preset4: 'ember', preset5: 'rose' };
-        var id = 'gold';
+        var id = 'lime';
         try {
           id = localStorage.getItem('ba-accent') || '';
           if (!palettes[id]) {
             var s = JSON.parse(localStorage.getItem('app-settings') || '{}');
-            id = s.primaryColor || 'gold';
+            id = s.primaryColor || 'lime';
           }
         } catch (e) {}
         if (legacy[id]) id = legacy[id];
-        var p = palettes[id] || palettes.gold;
+        var p = palettes[id] || palettes.lime;
         var r = document.documentElement;
         r.style.setProperty('--ba-gold', p[0]);
         r.style.setProperty('--ba-gold-light', p[1]);
         r.style.setProperty('--ba-gold-dark', p[2]);
         r.style.setProperty('--ba-gold-ink', p[3]);
         r.style.setProperty('--ba-gold-rgb', p[4]);
+        r.style.setProperty('--ba-gold-light-rgb', p[5]);
+        r.dataset.accent = id;
       })();
     </script>
     <meta
@@ -42,12 +48,21 @@
     <link rel="apple-touch-icon" href="/logo/logo.webp" />
     <link rel="manifest" href="/manifest.json" />
 
-    <!-- LCP: hero image must win the network race before JS (src patched below if restored) -->
+    <!-- Lost Light loader background preload -->
     <link
-      id="boot-hero-preload"
+      id="boot-loader-preload"
       rel="preload"
       as="image"
-      href="/assets/images/hero/hero-pubg-wide.webp"
+      href="/loader.webp"
+      type="image/webp"
+      fetchpriority="high"
+    />
+    <!-- Brand logo preload -->
+    <link
+      id="boot-logo-preload"
+      rel="preload"
+      as="image"
+      href="/logo/logo.webp"
       type="image/webp"
       fetchpriority="high"
     />
@@ -58,23 +73,134 @@
         margin: 0;
         background: #000;
       }
-      /* Fixed overlay — removing it cannot cause CLS */
       #boot-shell {
         position: fixed;
         inset: 0;
         z-index: 2147483000;
         background: #000;
-        pointer-events: none;
-      }
-      #boot-shell img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center center;
-        display: block;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       #boot-shell[hidden] {
         display: none !important;
+      }
+      #boot-loader-bg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 48%;
+        pointer-events: none;
+        user-select: none;
+      }
+      .boot-vignette {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 15%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.92) 85%, #000000 100%);
+        pointer-events: none;
+      }
+      .boot-vignette-linear {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, transparent 18%, transparent 80%, rgba(0,0,0,0.95) 100%);
+        pointer-events: none;
+      }
+      #boot-loader-center {
+        position: relative;
+        z-index: 10;
+        width: min(400px, 84vw);
+        margin-top: 4vh;
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .boot-bar-track {
+        position: relative;
+        width: 100%;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.18);
+      }
+      .boot-bar-track::before,
+      .boot-bar-track::after {
+        content: "";
+        position: absolute;
+        top: -2px;
+        width: 1px;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.35);
+      }
+      .boot-bar-track::before { left: 0; }
+      .boot-bar-track::after { right: 0; }
+      #boot-loader-bar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0%;
+        background: linear-gradient(90deg, rgba(var(--ba-gold-rgb), 0.25) 0%, rgba(var(--ba-gold-light-rgb, var(--ba-gold-rgb)), 0.92) 70%, var(--ba-gold) 100%);
+        box-shadow: 0 0 10px rgba(var(--ba-gold-rgb), 0.9), 0 0 20px rgba(var(--ba-gold-rgb), 0.45);
+      }
+      #boot-loader-spark {
+        position: absolute;
+        right: -1px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 4px;
+        height: 5px;
+        border-radius: 1px;
+        background: #ffffff;
+        box-shadow: 0 0 8px #ffffff, 0 0 16px var(--ba-gold);
+      }
+      #boot-loader-moth {
+        position: absolute;
+        left: 0%;
+        top: -8px;
+        transform: translate(-50%, -100%);
+        pointer-events: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .boot-moth-aura {
+        position: absolute;
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: radial-gradient(circle at center, rgba(var(--ba-gold-rgb), 0.75) 0%, rgba(var(--ba-gold-light-rgb, var(--ba-gold-rgb)), 0.35) 35%, rgba(var(--ba-gold-rgb), 0.12) 60%, transparent 75%);
+        filter: drop-shadow(0 0 16px rgba(var(--ba-gold-rgb), 0.9));
+        animation: boot-pulse 2.2s ease-in-out infinite alternate;
+      }
+      @keyframes boot-pulse {
+        0% { transform: scale(0.88); opacity: 0.8; }
+        100% { transform: scale(1.14); opacity: 1; }
+      }
+      .boot-logo-icon {
+        position: relative;
+        z-index: 2;
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+        filter: drop-shadow(0 0 8px rgba(var(--ba-gold-rgb), 0.85)) drop-shadow(0 0 16px rgba(var(--ba-gold-rgb), 0.45)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+        animation: boot-hover 2.4s ease-in-out infinite;
+      }
+      @keyframes boot-hover {
+        0%, 100% { transform: translateY(0) scale(1); }
+        35% { transform: translateY(-4px) scale(1.06); }
+        70% { transform: translateY(-1.5px) scale(0.98); }
+      }
+      #boot-loader-percent {
+        margin-top: 14px;
+        text-align: right;
+        font-family: 'Barlow', sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
+        font-weight: 700;
+        font-size: 13.5px;
+        letter-spacing: 1.2px;
+        color: rgba(255, 255, 255, 0.88);
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95);
+        user-select: none;
       }
     </style>
 
@@ -82,44 +208,69 @@
   </head>
 
   <body>
-    <!-- Instant LCP paint on home before React boots (fixed → no CLS on dismiss) -->
+    <!-- Instant paint Lost Light tactical loader on first open -->
     <div id="boot-shell" hidden>
       <img
-        id="boot-hero-img"
-        src="/assets/images/hero/hero-pubg-wide.webp"
-        width="1920"
-        height="1080"
-        alt="BattleAsia"
+        id="boot-loader-bg"
+        src="/loader.webp"
+        onerror="this.src='/loader.jpeg'"
+        alt="BattleAsia Loading"
         fetchpriority="high"
         decoding="sync"
       />
+      <div class="boot-vignette"></div>
+      <div class="boot-vignette-linear"></div>
+
+      <div id="boot-loader-center">
+        <div class="boot-bar-track">
+          <div id="boot-loader-bar">
+            <div id="boot-loader-spark"></div>
+          </div>
+          <div id="boot-loader-moth">
+            <div class="boot-moth-aura"></div>
+            <img
+              class="boot-logo-icon"
+              src="/logo/logo.webp"
+              alt="BattleAsia"
+              width="32"
+              height="32"
+            />
+          </div>
+        </div>
+        <div id="boot-loader-percent">0%</div>
+      </div>
     </div>
     <script>
       (function () {
-        var p = location.pathname;
-        if (p !== '/' && p !== '/dashboard' && p !== '/dashboard/') return;
-
-        var slides = [
-          '/assets/images/hero/hero-pubg-wide.webp',
-          '/assets/images/hero/hero-free-fire-wide.webp',
-          '/assets/images/hero/hero-cod-mobile-wide.webp',
-          '/assets/images/hero/hero-valorant-wide.webp',
-          '/assets/images/hero/hero-mobile-legends-wide.webp',
-        ];
-        var idx = 0;
+        var path = window.location.pathname || '';
+        var isHome = path === '/' || path === '/index.html' || path === '';
+        var hasShown = false;
         try {
-          var n = parseInt(sessionStorage.getItem('ba_hero_slide') || '', 10);
-          if (!isNaN(n) && n >= 0 && n < slides.length) idx = n;
+          hasShown = !!sessionStorage.getItem('ba_home_loader_shown');
         } catch (e) {}
 
-        var src = slides[idx];
-        var preload = document.getElementById('boot-hero-preload');
-        if (preload) preload.setAttribute('href', src);
-        var img = document.getElementById('boot-hero-img');
-        if (img) img.src = src;
-
         var el = document.getElementById('boot-shell');
+        if (!isHome || hasShown) {
+          if (el) el.remove();
+          return;
+        }
+
         if (el) el.hidden = false;
+        var start = Date.now();
+        var bar = document.getElementById('boot-loader-bar');
+        var moth = document.getElementById('boot-loader-moth');
+        var pct = document.getElementById('boot-loader-percent');
+        function tick() {
+          if (!el || el.hasAttribute('hidden') || !document.body.contains(el)) return;
+          var elapsed = Date.now() - start;
+          var p = Math.min(65, (elapsed / 650) * 65);
+          var rounded = Math.round(p);
+          if (bar) bar.style.width = p + '%';
+          if (moth) moth.style.left = p + '%';
+          if (pct) pct.textContent = rounded + '%';
+          if (p < 65) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
       })();
     </script>
     <div id="root"></div>

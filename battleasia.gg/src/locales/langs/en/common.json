@@ -148,7 +148,7 @@
   },
   "home": {
     "title": "It's all about Gaming means BattleAsia",
-    "subtitle": "Worldwide mobile tournament arena — win BAC coins and cash out anytime.",
+    "subtitle": "Worldwide mobile tournament arena win BAC coins and cash out anytime.",
     "downloadApk": "APK Download",
     "downloadApkButton": "BattleAsia Apk",
     "joinNow": "Join Now",
@@ -341,6 +341,7 @@
     "siteColor": "Site color",
     "siteColorHint": "Accent updates buttons, borders, and highlights.",
     "accent": {
+      "lime": "Lime",
       "gold": "Gold",
       "ember": "Ember",
       "jade": "Jade",

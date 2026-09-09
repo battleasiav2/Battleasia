@@ -6,7 +6,7 @@ import 'package:battleasia_app/core/theme/app_colors.dart';
 class AccentProvider extends ChangeNotifier {
   static const _storageKey = 'ba-accent';
 
-  AccentId _id = AccentId.gold;
+  AccentId _id = AccentId.lime;
 
   AccentProvider() {
     AppColors.bind(palette);
