@@ -137,6 +137,17 @@ export function createApp() {
     })
   );
 
+  // Global No-Cache Middleware for real-time dynamic API data (excluding static /uploads)
+  app.use((req, res, next) => {
+    if (!req.path.startsWith('/uploads') && !req.path.startsWith('/api/uploads')) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.setHeader('Surrogate-Control', 'no-store');
+    }
+    next();
+  });
+
   // Coolify/Traefik domain path `/api` often strips the prefix before Node.
   // Restore `/api` so `/v3/...` still hits `/api/v3/...`.
   app.use((req, _res, next) => {

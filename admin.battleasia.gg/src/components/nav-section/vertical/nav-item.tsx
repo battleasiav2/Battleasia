@@ -40,10 +40,14 @@ export default function NavItem({
       {...other}
     >
       <>
-        {icon && <StyledIcon size={config.iconSize}>{icon}</StyledIcon>}
+        {icon && (
+          <StyledIcon size={config.iconSize} active={active}>
+            {icon}
+          </StyledIcon>
+        )}
 
         {subItem && (
-          <StyledIcon size={config.iconSize}>
+          <StyledIcon size={config.iconSize} active={active}>
             <StyledDotIcon active={active} />
           </StyledIcon>
         )}
@@ -62,8 +66,14 @@ export default function NavItem({
           primaryTypographyProps={{
             noWrap: true,
             typography: 'body2',
-            textTransform: 'capitalize',
-            fontWeight: active ? 'fontWeightSemiBold' : 'fontWeightMedium',
+            sx: {
+              textTransform: 'uppercase',
+              letterSpacing: '0.04em',
+              fontSize: 13,
+              fontWeight: active ? 800 : 600,
+              color: active ? '#ffffff' : 'rgba(255, 255, 255, 0.82)',
+              textShadow: active ? '0 0 12px rgba(245, 166, 35, 0.45)' : 'none',
+            },
           }}
           secondaryTypographyProps={{
             noWrap: true,

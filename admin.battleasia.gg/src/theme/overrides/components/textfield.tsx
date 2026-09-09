@@ -95,7 +95,9 @@ export function textField(theme: Theme) {
         root: {
           [`&.${outlinedInputClasses.focused}`]: {
             [`& .${outlinedInputClasses.notchedOutline}`]: {
-              borderColor: color.focused,
+              borderColor: theme.palette.primary.main,
+              borderWidth: 1.5,
+              boxShadow: `0 0 10px ${alpha(theme.palette.primary.main, 0.22)}`,
             },
           },
           [`&.${outlinedInputClasses.error}`]: {
@@ -110,8 +112,11 @@ export function textField(theme: Theme) {
           },
         },
         notchedOutline: {
-          borderColor: alpha(theme.palette.grey[500], 0.2),
-          transition: theme.transitions.create(['border-color'], {
+          borderColor:
+            theme.palette.mode === 'dark'
+              ? 'rgba(255, 255, 255, 0.12)'
+              : alpha(theme.palette.grey[500], 0.2),
+          transition: theme.transitions.create(['border-color', 'box-shadow'], {
             duration: theme.transitions.duration.shortest,
           }),
         },

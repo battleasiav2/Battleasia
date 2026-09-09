@@ -1,3 +1,4 @@
+import React from 'react';
 // @mui
 import { alpha, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -56,48 +57,91 @@ export default function AuthClassicLayout({ children, image, title }: Props) {
       sx={{
         width: 1,
         mx: 'auto',
-        maxWidth: 480,
-        px: { xs: 2, md: 8 },
-        pt: { xs: 15, md: 20 },
-        pb: { xs: 15, md: 0 },
+        maxWidth: 500,
+        px: { xs: 2.5, md: 5 },
+        pt: { xs: 15, md: 18 },
+        pb: { xs: 12, md: 0 },
+        justifyContent: 'center',
       }}
     >
-      {children}
+      <Box
+        sx={{
+          p: { xs: 3, md: 4.5 },
+          borderRadius: 2.5,
+          bgcolor:
+            theme.palette.mode === 'dark' ? 'rgba(17, 23, 38, 0.85)' : 'background.paper',
+          border:
+            theme.palette.mode === 'dark'
+              ? '1px solid rgba(245, 166, 35, 0.22)'
+              : `1px solid ${theme.palette.divider}`,
+          boxShadow:
+            theme.palette.mode === 'dark'
+              ? '0 20px 60px rgba(0, 0, 0, 0.75), 0 0 24px rgba(245, 166, 35, 0.1)'
+              : (theme.customShadows?.card || theme.shadows[2]),
+          backdropFilter: 'blur(16px)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '2px',
+            background:
+              theme.palette.mode === 'dark'
+                ? 'linear-gradient(90deg, transparent, rgba(245, 166, 35, 0.8), transparent)'
+                : 'transparent',
+          },
+        }}
+      >
+        {children}
+      </Box>
     </Stack>
   );
 
   const renderSection = (
     <Stack
       flexGrow={1}
-      spacing={10}
+      spacing={6}
       alignItems="center"
       justifyContent="center"
       sx={{
-        ...bgGradient({
-          color: alpha(
-            theme.palette.background.default,
-            theme.palette.mode === 'light' ? 0.88 : 0.94
-          ),
-          imgUrl: assetPath('/assets/background/overlay_2.webp'),
-        }),
+        position: 'relative',
+        bgcolor: 'rgba(10, 14, 23, 0.35)',
+        backdropFilter: 'blur(4px)',
+        borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+        p: 4,
       }}
     >
-      <Typography variant="h3" sx={{ maxWidth: 480, textAlign: 'center' }}>
+      <Typography
+        variant="h3"
+        sx={{
+          maxWidth: 480,
+          textAlign: 'center',
+          color: '#ffffff',
+          fontWeight: 700,
+          textShadow: '0 4px 20px rgba(0, 0, 0, 0.8)',
+          letterSpacing: '-0.5px',
+        }}
+      >
         {title || 'Hi, Welcome back'}
       </Typography>
 
-      <Box
-        component="img"
-        alt="auth"
-        src={image || assetPath('/assets/illustrations/illustration_dashboard.webp')}
-        sx={{
-          maxWidth: {
-            xs: 480,
-            lg: 560,
-            xl: 720,
-          },
-        }}
-      />
+      {image && (
+        <Box
+          component="img"
+          alt="auth"
+          src={image}
+          sx={{
+            maxWidth: {
+              xs: 480,
+              lg: 560,
+              xl: 720,
+            },
+          }}
+        />
+      )}
 
       <Stack direction="row" spacing={2}>
         {METHODS.map((option) => (
@@ -128,6 +172,12 @@ export default function AuthClassicLayout({ children, image, title }: Props) {
       direction="row"
       sx={{
         minHeight: '100vh',
+        position: 'relative',
+        backgroundImage: `linear-gradient(rgba(10, 14, 23, 0.65), rgba(10, 14, 23, 0.65)), url(${assetPath('/auth-background.jpeg')})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
       }}
     >
       {renderLogo}

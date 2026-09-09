@@ -4,3 +4,128 @@
   display: none !important;
 }
 
+/* ==========================================================================
+   BATTLEASIA ADMIN - CYBER COMMAND DECK AESTHETICS & ANIMATIONS
+   ========================================================================== */
+
+@keyframes laserSweep {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes radarBlip {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(245, 166, 35, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 8px rgba(245, 166, 35, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(245, 166, 35, 0);
+  }
+}
+
+@keyframes cyberPulse {
+  0%, 100% {
+    opacity: 0.85;
+    filter: drop-shadow(0 0 8px rgba(245, 166, 35, 0.4));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 16px rgba(245, 166, 35, 0.8));
+  }
+}
+
+@keyframes gridGlow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Custom Tactical Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(11, 15, 23, 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(245, 166, 35, 0.25);
+  border-radius: 3px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(245, 166, 35, 0.55);
+}
+
+/* Selection */
+::selection {
+  background: rgba(245, 166, 35, 0.35);
+  color: #FFFFFF;
+}
+
+/* Smooth Micro-Interactions & Hover Polish for Admin UI */
+@keyframes adminFadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-card-smooth {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+}
+
+.admin-card-smooth:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.5), 0 0 16px rgba(245, 166, 35, 0.2);
+}
+
+.admin-table-row-smooth {
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.admin-table-row-smooth:hover {
+  background-color: rgba(245, 166, 35, 0.06) !important;
+}
+
+.admin-animate-fade {
+  animation: adminFadeInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Tactical Esports Button Helper Classes */
+.btn-tactical {
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  position: relative !important;
+  overflow: hidden !important;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-tactical:hover {
+  transform: translateY(-2px) !important;
+}
+
+.btn-tactical:active {
+  transform: translateY(0) scale(0.98) !important;
+}

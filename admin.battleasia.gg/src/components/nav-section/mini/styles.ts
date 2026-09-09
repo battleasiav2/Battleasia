@@ -18,18 +18,21 @@ export const StyledItem = styled(ListItemButton, {
 
   const activeStyles = {
     root: {
-      color:
-        theme.palette.mode === 'light' ? theme.palette.primary.main : theme.palette.primary.light,
-      backgroundColor: alpha(theme.palette.primary.main, 0.08),
+      color: '#ffffff',
+      backgroundColor: 'rgba(var(--ba-gold-rgb, 203, 251, 36), 0.18)',
+      borderColor: 'var(--ba-gold, #cbfb24)',
+      boxShadow: '0 0 14px rgba(var(--ba-gold-rgb, 203, 251, 36), 0.35), inset 0 0 10px rgba(var(--ba-gold-rgb, 203, 251, 36), 0.1)',
       '&:hover': {
-        backgroundColor: alpha(theme.palette.primary.main, 0.16),
+        backgroundColor: 'rgba(var(--ba-gold-rgb, 203, 251, 36), 0.24)',
+        borderColor: 'var(--ba-gold, #cbfb24)',
       },
     },
     sub: {
-      color: theme.palette.text.primary,
-      backgroundColor: theme.palette.action.selected,
+      color: '#ffffff',
+      backgroundColor: 'rgba(var(--ba-gold-rgb, 203, 251, 36), 0.14)',
+      borderColor: 'rgba(var(--ba-gold-rgb, 203, 251, 36), 0.4)',
       '&:hover': {
-        backgroundColor: theme.palette.action.hover,
+        backgroundColor: 'rgba(var(--ba-gold-rgb, 203, 251, 36), 0.2)',
       },
     },
   };
@@ -38,14 +41,19 @@ export const StyledItem = styled(ListItemButton, {
     // Root item
     flexDirection: 'column',
     justifyContent: 'center',
-    borderRadius: config.itemRadius,
-    minHeight: config.itemRootHeight,
-    color: theme.palette.text.secondary,
-    margin: `0 ${config.itemGap}px ${config.itemGap}px ${config.itemGap}px`,
-    ...(config.hiddenLabel &&
-      !subItem && {
-        padding: config.itemPadding,
-      }),
+    borderRadius: '7px',
+    minHeight: 56,
+    padding: '8px 4px',
+    margin: '3px 4px',
+    border: '1px solid rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.02)',
+    color: alpha('#ffffff', 0.75),
+    transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.07)',
+      borderColor: 'rgba(255, 255, 255, 0.2)',
+      transform: 'translateY(-1px)',
+    },
 
     // Active root item
     ...(active && {
@@ -67,8 +75,9 @@ export const StyledItem = styled(ListItemButton, {
     // Open
     ...(open &&
       !active && {
-        color: theme.palette.text.primary,
-        backgroundColor: theme.palette.action.hover,
+        color: '#ffffff',
+        backgroundColor: 'rgba(255, 255, 255, 0.06)',
+        borderColor: 'rgba(255, 255, 255, 0.18)',
       }),
   };
 });

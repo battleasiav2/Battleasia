@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 // @mui
 import {
   Avatar,
+  Box,
   Button,
   Container,
   Card,
@@ -291,9 +292,24 @@ function UserCell({ row }: UserCellProps) {
 
   return (
     <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0 }}>
-      <Avatar src={row.avatar ? `${API_URL}${row.avatar}` : undefined} alt={row.username} />
+      <Box sx={{ position: 'relative' }}>
+        <Avatar src={row.avatar ? `${API_URL}${row.avatar}` : undefined} alt={row.username} />
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            bgcolor: '#22C55E',
+            border: '2px solid #111726',
+            animation: 'radarBlip 2s infinite ease-in-out',
+          }}
+        />
+      </Box>
       <Stack minWidth={0}>
-        <Typography variant="subtitle2" noWrap>
+        <Typography variant="subtitle2" noWrap sx={{ fontWeight: 700 }}>
           {row.username}
         </Typography>
         <Typography variant="caption" color="text.secondary" noWrap>

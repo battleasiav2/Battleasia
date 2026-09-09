@@ -16,10 +16,25 @@ export function table(theme: Theme) {
     MuiTableRow: {
       styleOverrides: {
         root: {
+          transition: theme.transitions.create(['background-color'], {
+            duration: theme.transitions.duration.shortest,
+          }),
+          '&:hover': {
+            backgroundColor:
+              theme.palette.mode === 'dark'
+                ? 'rgba(245, 166, 35, 0.06)'
+                : alpha(theme.palette.primary.main, 0.04),
+          },
           [`&.${tableRowClasses.selected}`]: {
-            backgroundColor: alpha(theme.palette.primary.dark, 0.04),
+            backgroundColor:
+              theme.palette.mode === 'dark'
+                ? 'rgba(245, 166, 35, 0.12)'
+                : alpha(theme.palette.primary.dark, 0.04),
             '&:hover': {
-              backgroundColor: alpha(theme.palette.primary.dark, 0.08),
+              backgroundColor:
+                theme.palette.mode === 'dark'
+                  ? 'rgba(245, 166, 35, 0.18)'
+                  : alpha(theme.palette.primary.dark, 0.08),
             },
           },
           '&:last-of-type': {
@@ -33,13 +48,23 @@ export function table(theme: Theme) {
     MuiTableCell: {
       styleOverrides: {
         root: {
-          borderBottomStyle: 'dashed',
+          borderBottom:
+            theme.palette.mode === 'dark'
+              ? '1px solid rgba(255, 255, 255, 0.06)'
+              : `1px dashed ${theme.palette.divider}`,
         },
         head: {
-          fontSize: 14,
-          color: theme.palette.text.secondary,
-          fontWeight: theme.typography.fontWeightSemiBold,
-          backgroundColor: theme.palette.background.neutral,
+          fontSize: 13,
+          letterSpacing: '0.04em',
+          textTransform: 'uppercase',
+          color: theme.palette.mode === 'dark' ? '#F5A623' : theme.palette.text.secondary,
+          fontWeight: 700,
+          backgroundColor:
+            theme.palette.mode === 'dark' ? '#0D121D' : theme.palette.background.neutral,
+          borderBottom:
+            theme.palette.mode === 'dark'
+              ? '2px solid rgba(245, 166, 35, 0.25)'
+              : `1px solid ${theme.palette.divider}`,
         },
         stickyHeader: {
           backgroundColor: theme.palette.background.paper,

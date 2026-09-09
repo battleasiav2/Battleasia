@@ -75,9 +75,15 @@ export function chip(theme: Theme) {
         // SOFT
         ...(softVariant && {
           color: theme.palette[color][lightMode ? 'dark' : 'light'],
-          backgroundColor: alpha(theme.palette[color].main, 0.16),
+          backgroundColor: alpha(theme.palette[color].main, 0.14),
+          border: `1px solid ${alpha(theme.palette[color].main, 0.32)}`,
+          fontWeight: 700,
+          letterSpacing: '0.03em',
+          boxShadow: `0 0 10px ${alpha(theme.palette[color].main, 0.12)}`,
           '&:hover': {
-            backgroundColor: alpha(theme.palette[color].main, 0.32),
+            backgroundColor: alpha(theme.palette[color].main, 0.26),
+            borderColor: alpha(theme.palette[color].main, 0.6),
+            boxShadow: `0 0 14px ${alpha(theme.palette[color].main, 0.25)}`,
           },
         }),
       }),
