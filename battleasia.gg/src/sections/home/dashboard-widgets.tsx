@@ -137,7 +137,10 @@ function CyberCardPanel({
                     backdropFilter: 'blur(16px)',
                     WebkitBackdropFilter: 'blur(16px)',
                     border: `1px solid ${accentBorder ? safeAlpha(accentColor, 0.4) : alpha('#ffffff', 0.1)}`,
-                    boxShadow: `0 12px 32px rgba(0, 0, 0, 0.7), 0 0 20px ${safeAlpha(accentColor, 0.12)}`,
+                    boxShadow: {
+                        xs: `0 8px 20px rgba(0, 0, 0, 0.55)`,
+                        md: `0 12px 32px rgba(0, 0, 0, 0.7), 0 0 20px ${safeAlpha(accentColor, 0.12)}`,
+                    },
                     p: { xs: 1.5, sm: 2.25, md: 2.5 },
                     overflow: 'hidden',
                     transition: 'all 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -145,13 +148,16 @@ function CyberCardPanel({
                     flexDirection: 'column',
                     '&:hover': {
                         borderColor: safeAlpha(accentColor, 0.5),
-                        boxShadow: `0 14px 38px rgba(0, 0, 0, 0.75), 0 0 24px ${safeAlpha(accentColor, 0.22)}`,
+                        boxShadow: {
+                            xs: `0 8px 20px rgba(0, 0, 0, 0.55)`,
+                            md: `0 14px 38px rgba(0, 0, 0, 0.75), 0 0 24px ${safeAlpha(accentColor, 0.22)}`,
+                        },
                     },
                 },
                 ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
             ]}
         >
-            {/* Left Neon Laser Rail */}
+            {/* Left Neon Laser Rail — muted on mobile (avoids harsh side glow) */}
             <Box
                 aria-hidden
                 sx={{
@@ -159,9 +165,13 @@ function CyberCardPanel({
                     left: 0,
                     top: 0,
                     bottom: 0,
-                    width: '3.5px',
+                    width: { xs: '2px', md: '3.5px' },
                     bgcolor: accentColor,
-                    boxShadow: `0 0 14px ${accentColor}`,
+                    opacity: { xs: 0.55, md: 1 },
+                    boxShadow: {
+                        xs: 'none',
+                        md: `0 0 14px ${accentColor}`,
+                    },
                     transition: 'all 0.25s ease',
                     zIndex: 2,
                 }}
@@ -171,6 +181,7 @@ function CyberCardPanel({
             <Box
                 aria-hidden
                 sx={{
+                    display: { xs: 'none', sm: 'block' },
                     position: 'absolute',
                     top: 6,
                     right: 8,
@@ -283,14 +294,17 @@ function TacticalCardHeader({
                     {/* Chamfered Index Badge */}
                     <Box
                         sx={{
-                            width: 32,
-                            height: 32,
+                            width: { xs: 28, sm: 32 },
+                            height: { xs: 28, sm: 32 },
                             clipPath: 'polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)',
                             bgcolor: accentColor,
                             color: accentContrast,
                             display: 'grid',
                             placeItems: 'center',
-                            boxShadow: `0 0 14px ${safeAlpha(accentColor, 0.45)}`,
+                            boxShadow: {
+                                xs: 'none',
+                                md: `0 0 14px ${safeAlpha(accentColor, 0.45)}`,
+                            },
                             flexShrink: 0,
                             transition: 'all 0.25s ease',
                         }}
@@ -357,13 +371,13 @@ function TacticalCardHeader({
                     {rightIcon ? (
                         <Box
                             sx={{
+                                display: { xs: 'none', sm: 'grid' },
                                 width: 30,
                                 height: 30,
                                 borderRadius: '50%',
                                 bgcolor: safeAlpha(accentColor, 0.15),
                                 border: `1.5px solid ${accentColor}`,
                                 color: accentColor,
-                                display: 'grid',
                                 placeItems: 'center',
                                 flexShrink: 0,
                                 boxShadow: `0 0 12px ${safeAlpha(accentColor, 0.4)}`,
@@ -412,16 +426,20 @@ function DashboardSplitGoldRule({ orientation }: { orientation: 'vertical' | 'ho
                 background: isVertical
                     ? `linear-gradient(180deg, transparent 0%, ${safeAlpha(accentColor, 0.25)} 20%, ${accentColor} 50%, ${safeAlpha(accentColor, 0.25)} 80%, transparent 100%)`
                     : `linear-gradient(90deg, transparent 0%, ${safeAlpha(accentColor, 0.25)} 20%, ${accentColor} 50%, ${safeAlpha(accentColor, 0.25)} 80%, transparent 100%)`,
-                boxShadow: `0 0 12px ${safeAlpha(accentColor, 0.35)}`,
+                boxShadow: {
+                    xs: 'none',
+                    md: `0 0 12px ${safeAlpha(accentColor, 0.35)}`,
+                },
+                opacity: { xs: 0.7, md: 1 },
             }}
         >
             <Box
                 sx={{
-                    width: 6,
-                    height: 6,
+                    width: { xs: 4, md: 6 },
+                    height: { xs: 4, md: 6 },
                     bgcolor: accentColor,
                     borderRadius: '50%',
-                    boxShadow: `0 0 10px ${accentColor}`,
+                    boxShadow: { xs: 'none', md: `0 0 10px ${accentColor}` },
                     animation: `${coreGlowPulse} 2.5s ease-in-out infinite`,
                 }}
             />
@@ -470,22 +488,31 @@ function HolographicStatPod({
                 bgcolor: alpha('#090d15', 0.85),
                 borderRadius: '4px',
                 border: `1px solid ${safeAlpha(accentColor, 0.25)}`,
-                clipPath: 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)',
-                boxShadow: `inset 0 0 18px ${safeAlpha(accentColor, 0.05)}, 0 4px 16px rgba(0, 0, 0, 0.4)`,
+                clipPath: {
+                    xs: 'none',
+                    sm: 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)',
+                },
+                boxShadow: {
+                    xs: '0 4px 14px rgba(0, 0, 0, 0.4)',
+                    md: `inset 0 0 18px ${safeAlpha(accentColor, 0.05)}, 0 4px 16px rgba(0, 0, 0, 0.4)`,
+                },
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 overflow: 'hidden',
                 transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
                 '&:hover': {
-                    transform: 'translateY(-2px)',
+                    transform: { xs: 'none', md: 'translateY(-2px)' },
                     borderColor: safeAlpha(accentColor, 0.55),
                     bgcolor: alpha('#0f1522', 0.94),
-                    boxShadow: `0 8px 24px ${safeAlpha(accentColor, 0.2)}, inset 0 0 16px ${safeAlpha(accentColor, 0.08)}`,
+                    boxShadow: {
+                        xs: '0 4px 14px rgba(0, 0, 0, 0.4)',
+                        md: `0 8px 24px ${safeAlpha(accentColor, 0.2)}, inset 0 0 16px ${safeAlpha(accentColor, 0.08)}`,
+                    },
                 },
             }}
         >
-            {/* Left Micro Laser Rail */}
+            {/* Left Micro Laser Rail — soft on mobile */}
             <Box
                 aria-hidden
                 sx={{
@@ -493,9 +520,10 @@ function HolographicStatPod({
                     left: 0,
                     top: 0,
                     bottom: 0,
-                    width: '3px',
+                    width: { xs: '2px', md: '3px' },
                     bgcolor: accentColor,
-                    boxShadow: `0 0 10px ${accentColor}`,
+                    opacity: { xs: 0.5, md: 1 },
+                    boxShadow: { xs: 'none', md: `0 0 10px ${accentColor}` },
                 }}
             />
 
@@ -503,6 +531,7 @@ function HolographicStatPod({
             <Box
                 aria-hidden
                 sx={{
+                    display: { xs: 'none', sm: 'block' },
                     position: 'absolute',
                     top: 4,
                     right: 6,

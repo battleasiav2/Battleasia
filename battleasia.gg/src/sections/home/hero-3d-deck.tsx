@@ -81,7 +81,7 @@ export function Hero3dDeck({
   };
 
   const titleSize = {
-    xs: 'clamp(2.35rem, 9vw, 2.75rem)',
+    xs: 'clamp(2rem, 8.5vw, 2.45rem)',
     sm: 'clamp(2.75rem, 7vw, 3.35rem)',
     md: 'clamp(2.85rem, 4.6vw, 3.75rem)',
     lg: 'clamp(3.1rem, 4.2vw, 4.25rem)',
@@ -89,7 +89,7 @@ export function Hero3dDeck({
 
   return (
     <Stack
-      spacing={{ xs: 1.5, sm: 1.75, md: 2 }}
+      spacing={{ xs: 1.25, sm: 1.75, md: 2 }}
       sx={{
         position: 'relative',
         zIndex: 2,
@@ -97,9 +97,8 @@ export function Hero3dDeck({
         maxWidth: { xs: '100%', sm: 480, md: 'min(520px, calc(100vw - 64px))', lg: 'min(560px, calc(100vw - 96px))' },
         minWidth: 0,
         boxSizing: 'border-box',
-        alignItems: { xs: 'center', md: 'flex-end' },
+        alignItems: { xs: 'stretch', md: 'flex-end' },
         textAlign: { xs: 'center', md: 'right' },
-        // Keep 3D float mild so perspective + parent overflow:hidden don't clip the right edge.
         animation: `${deckEnter} 0.9s cubic-bezier(0.16, 1, 0.3, 1) both, ${floatDeck3d} 8s 1s ease-in-out infinite`,
         '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
       }}
@@ -110,6 +109,7 @@ export function Hero3dDeck({
         alignItems="center"
         spacing={1}
         sx={{
+          alignSelf: { xs: 'center', md: 'flex-end' },
           px: 1.5,
           py: 0.5,
           borderRadius: '20px',
@@ -150,7 +150,7 @@ export function Hero3dDeck({
           display: 'flex',
           flexDirection: 'column',
           alignItems: { xs: 'center', md: 'flex-end' },
-          minHeight: { xs: 72, sm: 88, md: 104 },
+          minHeight: { xs: 56, sm: 88, md: 104 },
         }}
       >
         {/* Soft gold bloom behind the mark */}
@@ -395,15 +395,19 @@ export function Hero3dDeck({
       {/* 3D Cyber Action Deck with High-Impact Creative Hover Effects */}
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
-        spacing={1.5}
+        spacing={1.25}
         useFlexGap
         sx={{
           width: '100%',
           maxWidth: '100%',
           justifyContent: { xs: 'center', md: 'flex-end' },
           flexWrap: 'wrap',
-          pt: 0.5,
+          pt: { xs: 0.75, sm: 0.5 },
+          pb: { xs: 0.5, md: 0 },
           boxSizing: 'border-box',
+          flexShrink: 0,
+          position: 'relative',
+          zIndex: 4,
         }}
       >
         {/* Primary 3D Tactical Cyber Download Button (Active State matching screenshot) */}
