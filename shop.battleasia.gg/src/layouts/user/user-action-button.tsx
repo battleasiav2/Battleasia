@@ -7,11 +7,14 @@ import {
   userGhostButtonSx,
   userGoldButtonSx,
   userMeshButtonSx,
+  userSuccessButtonSx,
+  userErrorButtonSx,
+  userSolidGoldButtonSx,
 } from './user-theme';
 
 // ----------------------------------------------------------------------
 
-type UserActionButtonVariant = 'gold' | 'mesh' | 'ghost';
+type UserActionButtonVariant = 'gold' | 'mesh' | 'ghost' | 'success' | 'error' | 'solidGold';
 
 type UserActionButtonProps = Omit<ButtonProps, 'sx'> & {
   actionVariant?: UserActionButtonVariant;
@@ -25,6 +28,9 @@ const VARIANT_SX = {
   gold: userGoldButtonSx,
   mesh: userMeshButtonSx,
   ghost: userGhostButtonSx,
+  success: userSuccessButtonSx,
+  error: userErrorButtonSx,
+  solidGold: userSolidGoldButtonSx,
 } as const;
 
 export function UserActionButton({
@@ -39,6 +45,8 @@ export function UserActionButton({
 
   return (
     <Button
+      variant="outlined"
+      disableElevation
       sx={mergedSx}
       {...other}
     />

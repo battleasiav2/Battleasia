@@ -2,6 +2,7 @@ import type { ListSubheaderProps } from '@mui/material/ListSubheader';
 
 import { mergeClasses } from 'minimal-shared/utils';
 
+import Box from '@mui/material/Box';
 import { styled } from '@mui/material/styles';
 import ListSubheader from '@mui/material/ListSubheader';
 
@@ -19,8 +20,20 @@ export const NavSubheader = styled(({ open, children, className, ...other }: Nav
     {...other}
     className={mergeClasses([navSectionClasses.subheader, className])}
   >
+    <Box
+      component="span"
+      sx={{
+        width: 5,
+        height: 5,
+        borderRadius: '1px',
+        bgcolor: 'var(--ba-gold, #cbfb24)',
+        boxShadow: '0 0 8px var(--ba-gold, #cbfb24)',
+        mr: 0.5,
+        display: 'inline-block',
+      }}
+    />
     <Iconify
-      width={16}
+      width={14}
       icon={open ? 'eva:arrow-ios-downward-fill' : 'eva:arrow-ios-forward-fill'}
     />
     {children}
@@ -30,13 +43,17 @@ export const NavSubheader = styled(({ open, children, className, ...other }: Nav
   cursor: 'pointer',
   alignItems: 'center',
   position: 'relative',
-  gap: theme.spacing(1),
+  gap: theme.spacing(0.75),
   display: 'inline-flex',
   alignSelf: 'flex-start',
-  color: 'var(--nav-subheader-color)',
-  padding: theme.spacing(2, 1, 1, 1.5),
-  fontSize: theme.typography.pxToRem(11),
-  transition: theme.transitions.create(['color', 'padding-left'], {
+  color: 'var(--ba-gold, #cbfb24)',
+  padding: theme.spacing(2, 1, 0.75, 1.25),
+  fontSize: 10.5,
+  fontWeight: 900,
+  letterSpacing: '0.12em',
+  textTransform: 'uppercase',
+  opacity: 0.85,
+  transition: theme.transitions.create(['color', 'padding-left', 'opacity'], {
     duration: theme.transitions.duration.standard,
   }),
   [`& .${iconifyClasses.root}`]: {
@@ -49,7 +66,8 @@ export const NavSubheader = styled(({ open, children, className, ...other }: Nav
   },
   '&:hover': {
     paddingLeft: theme.spacing(2),
-    color: 'var(--nav-subheader-hover-color)',
+    color: '#ffffff',
+    opacity: 1,
     [`& .${iconifyClasses.root}`]: { opacity: 1 },
   },
 }));

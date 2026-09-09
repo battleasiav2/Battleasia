@@ -431,105 +431,269 @@ export function WalletView() {
 
     const renderBalanceCard = () => (
         <Grid container spacing={2.5}>
+            {/* Total Balance Card */}
             <Grid size={{ xs: 12, md: 6 }}>
-                <UserGlassCard sx={{ p: { xs: 2.5, md: 3.5 }, height: '100%' }}>
-                    <Stack spacing={3}>
-                        <Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>                       
-                                <Typography sx={{ ...userMutedTextSx, fontWeight: 600, mb: 1 }}>
-                                    Total Balance
+                <UserGlassCard
+                    sx={{
+                        p: { xs: 2.5, md: 3.5 },
+                        height: '100%',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        bgcolor: alpha('#060912', 0.8),
+                        border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
+                        borderTop: `2px solid ${USER_COLORS.gold}`,
+                        boxShadow: `0 16px 40px ${alpha('#000000', 0.85)}, inset 0 1px 0 ${alpha(USER_COLORS.gold, 0.2)}`,
+                        clipPath: 'polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%)',
+                    }}
+                >
+                    {/* Background glow */}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: -40,
+                            right: -40,
+                            width: 160,
+                            height: 160,
+                            borderRadius: '50%',
+                            background: `radial-gradient(circle, ${alpha(USER_COLORS.gold, 0.18)} 0%, transparent 70%)`,
+                            pointerEvents: 'none',
+                        }}
+                    />
+
+                    <Stack spacing={2.5}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Stack direction="row" alignItems="center" spacing={1}>
+                                <Box
+                                    sx={{
+                                        width: 8,
+                                        height: 8,
+                                        borderRadius: '50%',
+                                        bgcolor: USER_COLORS.gold,
+                                        boxShadow: `0 0 10px ${USER_COLORS.gold}`,
+                                    }}
+                                />
+                                <Typography sx={{ color: USER_COLORS.gold, fontSize: 11, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase' }}>
+                                    TOTAL ASSET BALANCE
                                 </Typography>
-                            </Box>
+                            </Stack>
+                            <Chip
+                                size="small"
+                                label="REAL-TIME"
+                                sx={{
+                                    height: 20,
+                                    fontSize: 9,
+                                    fontWeight: 800,
+                                    letterSpacing: 1,
+                                    color: USER_COLORS.gold,
+                                    bgcolor: alpha(USER_COLORS.gold, 0.1),
+                                    border: `1px solid ${alpha(USER_COLORS.gold, 0.3)}`,
+                                    borderRadius: 0,
+                                }}
+                            />
+                        </Box>
+
+                        <Box>
                             <Typography
                                 sx={{
                                     color: USER_COLORS.gold,
-                                    fontWeight: 800,
-                                    fontSize: { xs: 28, md: 36 },
+                                    fontWeight: 900,
+                                    fontSize: { xs: 32, sm: 38, md: 44 },
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: 1,
+                                    gap: 1.5,
+                                    letterSpacing: 0.5,
+                                    filter: `drop-shadow(0 2px 10px ${alpha(USER_COLORS.gold, 0.3)})`,
                                 }}
                             >
-                                <Box component="img" src="/assets/images/currency.webp" alt="Currency" sx={{ width: 32, height: 32 }} />
-                                {fNumber(user?.balance, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} BAC
+                                <Box
+                                    component="img"
+                                    src="/assets/images/currency.webp"
+                                    alt="BAC"
+                                    sx={{
+                                        width: { xs: 36, md: 44 },
+                                        height: { xs: 36, md: 44 },
+                                        filter: `drop-shadow(0 0 12px ${alpha(USER_COLORS.gold, 0.6)})`,
+                                    }}
+                                />
+                                {fNumber(user?.balance, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                <Typography component="span" sx={{ fontSize: { xs: 18, md: 22 }, color: alpha('#ffffff', 0.8), fontWeight: 800 }}>
+                                    BAC
+                                </Typography>
                             </Typography>
-                            <Stack spacing={0.5} sx={{ mt: 1, maxWidth: 200 }}>
+                        </Box>
+
+                        <Divider sx={{ borderColor: alpha('#ffffff', 0.1) }} />
+
+                        {/* Fiat Valuation Breakdown */}
+                        <Box>
+                            <Typography variant="caption" sx={{ ...userMutedTextSx, display: 'block', mb: 1, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', fontSize: 10 }}>
+                                FIAT ESTIMATED EQUIVALENT
+                            </Typography>
+                            <Grid container spacing={1}>
                                 {userBalanceTotals.map((item) => (
+                                    <Grid size={{ xs: 6, sm: 3 }} key={item.code}>
                                         <Box
-                                            key={item.code}
                                             sx={{
+                                                p: 1,
+                                                bgcolor: alpha('#000000', 0.4),
+                                                border: `1px solid ${alpha('#ffffff', 0.08)}`,
                                                 display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                gap: 1,
+                                                flexDirection: 'column',
+                                                gap: 0.5,
                                             }}
                                         >
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
                                                 <Box
                                                     component="img"
                                                     src={`/assets/images/flags/${item.code.toLowerCase()}.gif`}
-                                                    alt={`${item.code} flag`}
-                                                    sx={{ width: 20, height: 14, borderRadius: 0.5, objectFit: 'cover', border:"1px silver solid" }}
+                                                    alt={item.code}
+                                                    sx={{ width: 18, height: 12, borderRadius: 0.5, objectFit: 'cover', border: '1px silver solid' }}
                                                 />
-                                                <Typography variant="body2" sx={userMutedTextSx}>
+                                                <Typography sx={{ fontSize: 10, color: alpha('#ffffff', 0.6), fontWeight: 700 }}>
                                                     {item.code}
                                                 </Typography>
                                             </Box>
-                                            <Typography variant="body2" sx={{ color: USER_COLORS.textPrimary, fontWeight: 600 }}>
+                                            <Typography sx={{ color: '#ffffff', fontWeight: 800, fontSize: 13 }}>
                                                 {item.amount != null
                                                     ? fNumber(item.amount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                                                     : '--'}
                                             </Typography>
                                         </Box>
-                                    ))}
-                            </Stack>
+                                    </Grid>
+                                ))}
+                            </Grid>
                         </Box>
                     </Stack>
                 </UserGlassCard>
             </Grid>
 
+            {/* Withdrawable Amount Card */}
             <Grid size={{ xs: 12, md: 6 }}>
-                <UserGlassCard sx={{ p: { xs: 2.5, md: 3.5 }, height: '100%' }}>
-                    <Stack spacing={3}>
+                <UserGlassCard
+                    sx={{
+                        p: { xs: 2.5, md: 3.5 },
+                        height: '100%',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        bgcolor: alpha('#060912', 0.8),
+                        border: `1px solid ${hasPendingWithdrawal ? alpha(USER_COLORS.error, 0.4) : alpha(USER_COLORS.gold, 0.35)}`,
+                        borderTop: `2px solid ${hasPendingWithdrawal ? USER_COLORS.error : USER_COLORS.gold}`,
+                        boxShadow: `0 16px 40px ${alpha('#000000', 0.85)}, inset 0 1px 0 ${alpha('#ffffff', 0.1)}`,
+                        clipPath: 'polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%)',
+                    }}
+                >
+                    {/* Background glow */}
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: -40,
+                            right: -40,
+                            width: 160,
+                            height: 160,
+                            borderRadius: '50%',
+                            background: `radial-gradient(circle, ${hasPendingWithdrawal ? alpha(USER_COLORS.error, 0.15) : alpha(USER_COLORS.gold, 0.15)} 0%, transparent 70%)`,
+                            pointerEvents: 'none',
+                        }}
+                    />
+
+                    <Stack spacing={2.5} justifyContent="space-between" sx={{ height: '100%' }}>
                         <Box>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>                       
-                                <Typography sx={{ ...userMutedTextSx, fontWeight: 600, mb: 1 }}>
-                                    Withdrawable Amount
-                                </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                                <Stack direction="row" alignItems="center" spacing={1}>
+                                    <Box
+                                        sx={{
+                                            width: 8,
+                                            height: 8,
+                                            borderRadius: '50%',
+                                            bgcolor: hasPendingWithdrawal ? USER_COLORS.error : USER_COLORS.gold,
+                                            boxShadow: `0 0 10px ${hasPendingWithdrawal ? USER_COLORS.error : USER_COLORS.gold}`,
+                                        }}
+                                    />
+                                    <Typography sx={{ color: hasPendingWithdrawal ? USER_COLORS.error : USER_COLORS.gold, fontSize: 11, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase' }}>
+                                        WITHDRAWABLE BALANCE
+                                    </Typography>
+                                </Stack>
+
+                                {hasPendingWithdrawal && (
+                                    <Chip
+                                        size="small"
+                                        icon={<Iconify icon="solar:clock-circle-bold" width={12} sx={{ color: `${USER_COLORS.error} !important` }} />}
+                                        label="PENDING DISPATCH"
+                                        sx={{
+                                            height: 20,
+                                            fontSize: 9,
+                                            fontWeight: 800,
+                                            letterSpacing: 1,
+                                            color: USER_COLORS.error,
+                                            bgcolor: alpha(USER_COLORS.error, 0.12),
+                                            border: `1px solid ${alpha(USER_COLORS.error, 0.4)}`,
+                                            borderRadius: 0,
+                                        }}
+                                    />
+                                )}
                             </Box>
+
                             <Typography
                                 sx={{
-                                    color: hasPendingWithdrawal ? USER_COLORS.textMuted : USER_COLORS.gold,
-                                    fontWeight: 800,
-                                    fontSize: { xs: 28, md: 36 },
+                                    color: hasPendingWithdrawal ? alpha('#ffffff', 0.5) : USER_COLORS.gold,
+                                    fontWeight: 900,
+                                    fontSize: { xs: 32, sm: 38, md: 44 },
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: 1,
+                                    gap: 1.5,
+                                    letterSpacing: 0.5,
+                                    filter: hasPendingWithdrawal ? 'none' : `drop-shadow(0 2px 10px ${alpha(USER_COLORS.gold, 0.3)})`,
                                 }}
                             >
-                                <Box component="img" src="/assets/images/currency.webp" alt="Currency" sx={{ width: 32, height: 32, opacity: hasPendingWithdrawal ? 0.5 : 1 }} />
-                                {hasPendingWithdrawal ? '0.00' : fNumber(withdrawableAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} BAC
-                            </Typography>
-                            {hasPendingWithdrawal && (
-                                <Typography variant="caption" sx={{ color: USER_COLORS.error, mt: 0.5, display: 'block' }}>
-                                    Pending withdrawal: {fNumber(pendingWithdrawalAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} BAC
+                                <Box
+                                    component="img"
+                                    src="/assets/images/currency.webp"
+                                    alt="BAC"
+                                    sx={{
+                                        width: { xs: 36, md: 44 },
+                                        height: { xs: 36, md: 44 },
+                                        opacity: hasPendingWithdrawal ? 0.5 : 1,
+                                    }}
+                                />
+                                {hasPendingWithdrawal ? '0.00' : fNumber(withdrawableAmount, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                <Typography component="span" sx={{ fontSize: { xs: 18, md: 22 }, color: alpha('#ffffff', 0.7), fontWeight: 800 }}>
+                                    BAC
                                 </Typography>
-                            )}
-                            {!hasPendingWithdrawal && (
-                                <Typography variant="caption" sx={{ ...userMutedTextSx, mt: 1, display: 'block', lineHeight: 1.5 }}>
-                                    * Calculation: Min(Total match bets × 70% - Already withdrawn, Current balance)
+                            </Typography>
+
+                            {hasPendingWithdrawal ? (
+                                <Box sx={{ mt: 1.5, p: 1.25, bgcolor: alpha(USER_COLORS.error, 0.1), border: `1px solid ${alpha(USER_COLORS.error, 0.3)}` }}>
+                                    <Typography variant="caption" sx={{ color: USER_COLORS.error, fontWeight: 700, display: 'block' }}>
+                                        Active pending payout: {fNumber(pendingWithdrawalAmount, { minimumFractionDigits: 2 })} BAC
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ color: alpha('#ffffff', 0.7), fontSize: 11 }}>
+                                        Wait for current request completion before initiating another withdrawal.
+                                    </Typography>
+                                </Box>
+                            ) : (
+                                <Typography variant="caption" sx={{ ...userMutedTextSx, mt: 1.5, display: 'block', lineHeight: 1.5, fontSize: 11 }}>
+                                    * Formula: Min(Total Match Bets × 70% − Already Withdrawn, Current Balance)
                                 </Typography>
                             )}
                         </Box>
 
-                        {/* Withdrawal Button */}
+                        {/* Withdrawal CTA Button */}
                         <UserActionButton
                             onClick={handleOpenWithdrawalModal}
                             actionVariant="gold"
                             size="large"
                             fullWidth
-                            startIcon={<Iconify icon="solar:transfer-horizontal-bold" />}
-                            sx={{ py: 1.5, fontSize: '1rem', fontWeight: 700 }}
+                            startIcon={<Iconify icon="solar:card-send-bold" width={20} />}
+                            disabled={hasPendingWithdrawal || withdrawableAmount <= 0}
+                            sx={{
+                                py: 1.5,
+                                fontSize: '0.95rem',
+                                fontWeight: 800,
+                                letterSpacing: 1,
+                                textTransform: 'uppercase',
+                                boxShadow: `0 8px 24px ${alpha(USER_COLORS.gold, 0.3)}`,
+                                clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)',
+                            }}
                         >
                             Request Withdrawal
                         </UserActionButton>
@@ -539,8 +703,117 @@ export function WalletView() {
         </Grid>
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const renderSummaryCards = () => null;
+    const renderSummaryCards = () => (
+        <Grid container spacing={2}>
+            <Grid size={{ xs: 12, sm: 4 }}>
+                <UserGlassCard
+                    sx={{
+                        p: 2.25,
+                        bgcolor: alpha('#060912', 0.7),
+                        border: `1px solid ${alpha('#22c55e', 0.3)}`,
+                        borderLeft: '4px solid #22c55e',
+                    }}
+                >
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                        <Box
+                            sx={{
+                                width: 44,
+                                height: 44,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                bgcolor: alpha('#22c55e', 0.15),
+                                border: `1px solid ${alpha('#22c55e', 0.4)}`,
+                                color: '#22c55e',
+                            }}
+                        >
+                            <Iconify icon="solar:cup-star-bold" width={24} />
+                        </Box>
+                        <Box>
+                            <Typography variant="caption" sx={{ ...userMutedTextSx, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', fontSize: 10 }}>
+                                MATCH EARNINGS
+                            </Typography>
+                            <Typography variant="h6" sx={{ color: '#22c55e', fontWeight: 800, lineHeight: 1.2 }}>
+                                {fNumber(walletData.winMoney, { minimumFractionDigits: 2 })} BAC
+                            </Typography>
+                        </Box>
+                    </Stack>
+                </UserGlassCard>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 4 }}>
+                <UserGlassCard
+                    sx={{
+                        p: 2.25,
+                        bgcolor: alpha('#060912', 0.7),
+                        border: `1px solid ${alpha('#0284c7', 0.3)}`,
+                        borderLeft: '4px solid #0284c7',
+                    }}
+                >
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                        <Box
+                            sx={{
+                                width: 44,
+                                height: 44,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                bgcolor: alpha('#0284c7', 0.15),
+                                border: `1px solid ${alpha('#0284c7', 0.4)}`,
+                                color: '#0284c7',
+                            }}
+                        >
+                            <Iconify icon="solar:gamepad-bold" width={24} />
+                        </Box>
+                        <Box>
+                            <Typography variant="caption" sx={{ ...userMutedTextSx, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', fontSize: 10 }}>
+                                MATCH ENTRY WAGERS
+                            </Typography>
+                            <Typography variant="h6" sx={{ color: '#38bdf8', fontWeight: 800, lineHeight: 1.2 }}>
+                                {fNumber(walletData.joinMoney, { minimumFractionDigits: 2 })} BAC
+                            </Typography>
+                        </Box>
+                    </Stack>
+                </UserGlassCard>
+            </Grid>
+
+            <Grid size={{ xs: 12, sm: 4 }}>
+                <UserGlassCard
+                    sx={{
+                        p: 2.25,
+                        bgcolor: alpha('#060912', 0.7),
+                        border: `1px solid ${alpha(USER_COLORS.gold, 0.3)}`,
+                        borderLeft: `4px solid ${USER_COLORS.gold}`,
+                    }}
+                >
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                        <Box
+                            sx={{
+                                width: 44,
+                                height: 44,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                bgcolor: alpha(USER_COLORS.gold, 0.15),
+                                border: `1px solid ${alpha(USER_COLORS.gold, 0.4)}`,
+                                color: USER_COLORS.gold,
+                            }}
+                        >
+                            <Iconify icon="solar:card-send-bold" width={24} />
+                        </Box>
+                        <Box>
+                            <Typography variant="caption" sx={{ ...userMutedTextSx, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', fontSize: 10 }}>
+                                TOTAL WITHDRAWALS
+                            </Typography>
+                            <Typography variant="h6" sx={{ color: USER_COLORS.gold, fontWeight: 800, lineHeight: 1.2 }}>
+                                {fNumber(walletData.totalPayout, { minimumFractionDigits: 2 })} BAC
+                            </Typography>
+                        </Box>
+                    </Stack>
+                </UserGlassCard>
+            </Grid>
+        </Grid>
+    );
 
     const getTransactionTitle = (transaction: BalanceHistoryItem): string => {
         const detail = transaction.detail || {};
@@ -604,7 +877,7 @@ export function WalletView() {
             tone = 'info';
         } else if (reason === 'match_winnings' || reason === 'match_result_update' || reason === 'match_winner_refund_return' || reason === 'match_reward') {
             label = 'Earning';
-            tone = 'gold';
+            tone = 'success';
         } else if (reason === 'withdrawal_approved') {
             label = 'Withdrawal';
             tone = 'warning';
@@ -626,7 +899,7 @@ export function WalletView() {
         const status = transaction.status || 'completed';
 
         if (status === 'completed') {
-            return { label: 'Completed', tone: 'gold' };
+            return { label: 'Completed', tone: 'success' };
         }
         if (status === 'pending') {
             return { label: 'Pending', tone: 'warning' };
@@ -638,7 +911,7 @@ export function WalletView() {
             return { label: 'Failed', tone: 'error' };
         }
 
-        return { label: 'Completed', tone: 'gold' };
+        return { label: 'Completed', tone: 'success' };
     };
 
     const renderTransactionHistory = () => {
@@ -689,19 +962,25 @@ export function WalletView() {
                 flex: 1,
                 minWidth: 250,
                 valueGetter: (value, row) => getTransactionTitle(row),
+                renderCell: (params) => (
+                    <Typography variant="body2" sx={{ color: '#ffffff', fontWeight: 600 }}>
+                        {params.value}
+                    </Typography>
+                ),
             },
             {
                 field: 'amount',
                 headerName: 'Amount',
-                width: 150,
+                width: 160,
                 renderCell: (params) => (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <Box component="img" src="/assets/images/currency.webp" alt="Currency" sx={{ width: 16, height: 16 }} />
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                        <Box component="img" src="/assets/images/currency.webp" alt="Currency" sx={{ width: 18, height: 18 }} />
                         <Typography
                             variant="body2"
                             sx={{
-                                color: params.row.type === 'withdraw' ? USER_COLORS.error : USER_COLORS.gold,
-                                fontWeight: 600,
+                                color: params.row.type === 'withdraw' ? '#ff4d4d' : '#00e676',
+                                fontWeight: 800,
+                                filter: `drop-shadow(0 0 6px ${params.row.type === 'withdraw' ? alpha('#ff4d4d', 0.4) : alpha('#00e676', 0.4)})`,
                             }}
                         >
                             {params.row.type === 'withdraw' ? '-' : '+'} {fNumber(params.value)} BAC
@@ -715,8 +994,8 @@ export function WalletView() {
                 width: 150,
                 renderCell: (params) => (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                        <Box component="img" src="/assets/images/currency.webp" alt="Currency" sx={{ width: 16, height: 16 }} />
-                        <Typography variant="body2" sx={userMutedTextSx}>
+                        <Box component="img" src="/assets/images/currency.webp" alt="Currency" sx={{ width: 14, height: 14, opacity: 0.7 }} />
+                        <Typography variant="body2" sx={{ ...userMutedTextSx, fontWeight: 600 }}>
                             {fNumber(params.value)} BAC
                         </Typography>
                     </Box>
@@ -724,18 +1003,59 @@ export function WalletView() {
             },
             {
                 field: 'createdAt',
-                headerName: 'Date/Time',
+                headerName: 'Date / Time',
                 width: 180,
                 valueFormatter: (value) => formatDate(value),
+                renderCell: (params) => (
+                    <Typography variant="caption" sx={{ color: alpha('#ffffff', 0.75), fontFamily: 'monospace' }}>
+                        {formatDate(params.value)}
+                    </Typography>
+                ),
             },
         ];
 
         return (
             <Box>
-                <Typography className="font-tr" sx={{ fontSize: 18, fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: USER_COLORS.gold, mb: 2 }}>
-                    Wallet History
-                </Typography>
-                <UserGlassCard sx={{ height: 600, width: '100%', p: 0, overflow: 'hidden' }}>
+                <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                        <Box sx={{ width: 4, height: 18, bgcolor: USER_COLORS.gold }} />
+                        <Typography
+                            className="font-tr"
+                            sx={{
+                                fontSize: 16,
+                                fontWeight: 800,
+                                letterSpacing: 1,
+                                textTransform: 'uppercase',
+                                color: USER_COLORS.gold,
+                            }}
+                        >
+                            ASSET LEDGER HISTORY
+                        </Typography>
+                    </Stack>
+                    <Chip
+                        size="small"
+                        label={`${transactions.length} RECORDS`}
+                        sx={{
+                            fontSize: 10,
+                            fontWeight: 800,
+                            color: alpha('#ffffff', 0.7),
+                            bgcolor: alpha('#ffffff', 0.06),
+                            border: `1px solid ${alpha('#ffffff', 0.12)}`,
+                            borderRadius: 0,
+                        }}
+                    />
+                </Stack>
+
+                <UserGlassCard
+                    sx={{
+                        height: 600,
+                        width: '100%',
+                        p: 0,
+                        overflow: 'hidden',
+                        border: `1px solid ${alpha(USER_COLORS.gold, 0.25)}`,
+                        boxShadow: `0 16px 40px ${alpha('#000000', 0.85)}`,
+                    }}
+                >
                     <DataGrid
                         rows={transactions}
                         columns={columns}
@@ -761,20 +1081,38 @@ export function WalletView() {
                             border: 'none',
                             color: USER_COLORS.textPrimary,
                             '& .MuiDataGrid-columnHeaders': {
-                                bgcolor: alpha('#000000', 0.45),
+                                bgcolor: alpha('#030509', 0.85),
                                 color: USER_COLORS.gold,
-                                borderBottom: `1px solid ${alpha('#ffffff', 0.12)}`,
+                                borderBottom: `1px solid ${alpha(USER_COLORS.gold, 0.25)}`,
+                                fontSize: 12,
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                                letterSpacing: 0.8,
                             },
                             '& .MuiDataGrid-cell': {
                                 display: 'flex',
                                 alignItems: 'center',
-                                borderColor: alpha('#ffffff', 0.08),
+                                borderColor: alpha('#ffffff', 0.06),
                             },
                             '& .MuiDataGrid-cell:focus': { outline: 'none' },
-                            '& .MuiDataGrid-row:hover': { bgcolor: alpha(USER_COLORS.gold, 0.06) },
+                            '& .MuiDataGrid-row:hover': { bgcolor: alpha(USER_COLORS.gold, 0.05) },
                             '& .MuiDataGrid-footerContainer': {
-                                borderTop: `1px solid ${alpha('#ffffff', 0.12)}`,
-                                bgcolor: alpha('#000000', 0.35),
+                                borderTop: `1px solid ${alpha(USER_COLORS.gold, 0.2)}`,
+                                bgcolor: alpha('#030509', 0.85),
+                                color: alpha('#ffffff', 0.8),
+                            },
+                            '& .MuiTablePagination-root': {
+                                color: alpha('#ffffff', 0.8),
+                            },
+                            '& .MuiDataGrid-toolbarContainer': {
+                                p: 1.5,
+                                bgcolor: alpha('#000000', 0.4),
+                                borderBottom: `1px solid ${alpha('#ffffff', 0.08)}`,
+                                '& .MuiTextField-root': {
+                                    bgcolor: alpha('#ffffff', 0.04),
+                                    borderRadius: 0,
+                                    '& fieldset': { borderColor: alpha('#ffffff', 0.15) },
+                                },
                             },
                         }}
                     />
@@ -799,8 +1137,9 @@ export function WalletView() {
                     </UserActionButton>
                 }
             />
-            <Stack spacing={3}>
+            <Stack spacing={3.5}>
                 {renderBalanceCard()}
+                {renderSummaryCards()}
                 {renderTransactionHistory()}
             </Stack>
 

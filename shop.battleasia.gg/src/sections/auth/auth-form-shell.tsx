@@ -8,9 +8,20 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import { authCardSx } from './auth-form-styles';
 
-const cardReveal = keyframes`
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
+const zoomOutEnter = keyframes`
+  0% {
+    opacity: 0;
+    transform: scale(1.14) translateY(-8px);
+    filter: blur(12px);
+  }
+  65% {
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0px);
+  }
 `;
 
 const GOLD = '#f5c518';
@@ -45,7 +56,7 @@ export function AuthFormShell({
         maxWidth: wide ? { xs: 1, sm: 420, md: 440 } : { xs: 1, sm: 400, md: 420 },
         display: 'flex',
         flexDirection: 'column',
-        animation: `${cardReveal} 0.65s cubic-bezier(0.22, 1, 0.36, 1) both`,
+        animation: `${zoomOutEnter} 0.75s cubic-bezier(0.16, 1, 0.3, 1) both`,
         '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
       }}
     >

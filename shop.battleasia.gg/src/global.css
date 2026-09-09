@@ -117,3 +117,53 @@ input[type='number']::-webkit-inner-spin-button {
   margin: 0;
   -webkit-appearance: none;
 }
+
+/* ---------------------------------------------------------------------- */
+/* Shop Smooth Animations & Interactive Hover Effects                     */
+/* ---------------------------------------------------------------------- */
+@keyframes shop-card-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shop-glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(245, 197, 24, 0.12), 0 4px 16px rgba(0, 0, 0, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(245, 197, 24, 0.28), 0 8px 24px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.shop-animate-fade-in {
+  animation: shop-card-fade-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.shop-card-smooth {
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.28s ease;
+}
+
+.shop-card-smooth:hover {
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: 0 14px 32px -8px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 197, 24, 0.22);
+}
+
+.shop-btn-smooth {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.shop-btn-smooth:hover {
+  transform: translateY(-1px) scale(1.025);
+  filter: brightness(1.1);
+}
+
+.shop-btn-smooth:active {
+  transform: translateY(1px) scale(0.97);
+}
+

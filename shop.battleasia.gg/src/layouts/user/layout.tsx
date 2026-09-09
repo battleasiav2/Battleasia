@@ -4,7 +4,8 @@ import type { NavSectionProps } from 'src/components/nav-section';
 import { merge } from 'es-toolkit';
 
 import { useTheme, alpha } from '@mui/material/styles';
-import { Box, Alert, Stack, Button, Typography } from '@mui/material';
+import { Box, Alert, Stack, Button, Typography, IconButton } from '@mui/material';
+import { Iconify } from 'src/components/iconify';
 
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
@@ -130,6 +131,8 @@ export function UserLayout({
       },
     };
 
+    const isShopPage = pathname === paths.user.shop;
+
     const headerSlots: HeaderSectionProps['slots'] = {
       topArea: (
         <Alert severity="info" sx={{ display: 'none', borderRadius: 0 }}>
@@ -140,14 +143,14 @@ export function UserLayout({
         <Stack
           direction="row"
           alignItems="center"
-          spacing={{ xs: 1, sm: 1.25 }}
+          spacing={{ xs: 1, sm: 1.5 }}
           sx={{ flexShrink: 0, minWidth: 0 }}
         >
           <Logo
             href={paths.user.shop}
             sx={{
-              width: { xs: 52, sm: 64, md: 72 },
-              height: { xs: 52, sm: 64, md: 72 },
+              width: { xs: 52, sm: 60, md: 68 },
+              height: { xs: 52, sm: 60, md: 68 },
               flexShrink: 0,
               '& img': {
                 borderRadius: 0.5,
@@ -155,60 +158,93 @@ export function UserLayout({
               },
             }}
           />
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={0.65}
-            sx={{ display: { xs: 'flex', md: 'none' }, minWidth: 0 }}
-          >
-            <Typography
-              component={RouterLink}
-              href={paths.user.shop}
-              className="font-brand-gaming"
+
+          {/* Badges next to logo on Shop Page matching reference design */}
+          <Stack direction="row" alignItems="center" spacing={1.25}>
+            {/* OFFICIAL STORE */}
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={0.85}
               sx={{
-                fontSize: { xs: 16, sm: 18 },
-                fontWeight: 800,
-                color: USER_COLORS.gold,
-                textDecoration: 'none',
-                whiteSpace: 'nowrap',
-                lineHeight: 1,
-                background: `linear-gradient(180deg, #ffe08a 0%, ${USER_COLORS.gold} 48%, #d4a017 100%)`,
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
+                px: 1.5,
+                py: 0.5,
+                bgcolor: alpha('#070c18', 0.85),
+                border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}`,
+                borderRadius: '6px',
+                boxShadow: `0 4px 14px ${alpha('#000000', 0.5)}`,
               }}
             >
-              BattleAsia
-            </Typography>
-            <Box
-              sx={{
-                px: 0.55,
-                py: 0.15,
-                borderRadius: '3px',
-                border: `1px solid ${alpha(USER_COLORS.gold, 0.65)}`,
-                bgcolor: alpha(USER_COLORS.gold, 0.08),
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Typography
-                className="font-tr"
+              <Box
                 sx={{
-                  fontSize: 10,
+                  width: 7,
+                  height: 7,
+                  borderRadius: '50%',
+                  bgcolor: '#22c55e',
+                  boxShadow: '0 0 8px #22c55e',
+                }}
+              />
+              <Typography
+                sx={{
+                  fontSize: 11,
                   fontWeight: 800,
-                  letterSpacing: 0.5,
-                  color: USER_COLORS.gold,
-                  lineHeight: 1.2,
+                  letterSpacing: 1.2,
+                  textTransform: 'uppercase',
+                  color: '#dcdcdc',
+                  lineHeight: 1,
+                  whiteSpace: 'nowrap',
                 }}
               >
-                2.0
+                OFFICIAL STORE
               </Typography>
-            </Box>
+            </Stack>
+
+            {/* VERIFIED STORE */}
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={0.75}
+              sx={{
+                px: 1.5,
+                py: 0.5,
+                bgcolor: alpha('#070c18', 0.85),
+                border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}`,
+                borderRadius: '6px',
+                boxShadow: `0 4px 14px ${alpha('#000000', 0.5)}`,
+              }}
+            >
+              <Box
+                sx={{
+                  width: 14,
+                  height: 14,
+                  borderRadius: '50%',
+                  bgcolor: alpha(USER_COLORS.gold, 0.18),
+                  border: `1px solid ${USER_COLORS.gold}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Iconify icon="eva:checkmark-fill" width={10} sx={{ color: USER_COLORS.gold }} />
+              </Box>
+              <Typography
+                sx={{
+                  fontSize: 11,
+                  fontWeight: 800,
+                  letterSpacing: 1.2,
+                  textTransform: 'uppercase',
+                  color: USER_COLORS.gold,
+                  lineHeight: 1,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                VERIFIED STORE
+              </Typography>
+            </Stack>
           </Stack>
         </Stack>
       ),
-      centerArea: (
+      centerArea: isShopPage ? null : (
         <Stack
           direction="row"
           alignItems="center"
@@ -250,7 +286,7 @@ export function UserLayout({
         </Stack>
       ),
       rightArea: (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.75 } }}>
           {isLoggedIn ? (
             <>
               {/* Balance Display */}
@@ -308,6 +344,17 @@ export function UserLayout({
 
           {/** @slot Language popover */}
           <LanguagePopover data={allLangs} />
+
+          {/* Search Icon button matching reference header */}
+          <IconButton
+            sx={{
+              color: alpha('#ffffff', 0.8),
+              p: 1,
+              '&:hover': { color: USER_COLORS.gold, bgcolor: alpha(USER_COLORS.gold, 0.1) },
+            }}
+          >
+            <Iconify icon="eva:search-fill" width={20} />
+          </IconButton>
         </Box>
       ),
     };

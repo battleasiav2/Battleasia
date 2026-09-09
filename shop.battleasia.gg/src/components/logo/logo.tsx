@@ -15,7 +15,7 @@ import { logoClasses } from './classes';
 
 // ----------------------------------------------------------------------
 
-/** Same asset as nixbazar.com — public/logo/logo.webp */
+/** Brand mark — public/logo/logo.webp (shop.battleasia.gg) */
 const LOGO_SRC = `${CONFIG.assetsDir}/logo/logo.webp`;
 
 export type LogoProps = LinkProps & {

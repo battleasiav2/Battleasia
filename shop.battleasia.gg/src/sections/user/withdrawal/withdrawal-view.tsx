@@ -192,10 +192,10 @@ export function WithdrawalView() {
   return (
     <UserPageShell>
       <WalletHero
-        title={t('withdrawal.title')}
-        badge={t('withdrawal.badge')}
-        subtitle={t('withdrawal.subtitle')}
-        chipLabel={t('withdrawal.chip')}
+        title={t('withdrawal.title') || 'WITHDRAWAL TERMINAL'}
+        badge="PAYOUT DISPATCH ENGINE"
+        subtitle={t('withdrawal.subtitle') || 'Convert your match winnings and BAC balance directly into your preferred mobile bank or crypto wallet'}
+        chipLabel="DISPATCH PORTAL"
         chipIcon="solar:card-send-bold"
         action={
           <UserActionButton
@@ -206,7 +206,7 @@ export function WithdrawalView() {
             startIcon={<Iconify icon="solar:wallet-bold" />}
             sx={{ px: 2.5 }}
           >
-            {t('nav.wallet')}
+            {t('nav.wallet') || 'Wallet Overview'}
           </UserActionButton>
         }
       />
@@ -217,51 +217,58 @@ export function WithdrawalView() {
           width: 1,
           maxWidth: { xs: 1, md: 980 },
           mx: 'auto',
-          boxShadow: `0 24px 60px ${alpha('#000000', 0.55)}`,
+          bgcolor: alpha('#060912', 0.85),
+          border: `1px solid ${alpha(GOLD, 0.35)}`,
+          borderTop: `3px solid ${GOLD}`,
+          boxShadow: `0 24px 60px ${alpha('#000000', 0.95)}, inset 0 1px 0 ${alpha(GOLD, 0.2)}`,
+          clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%)',
+          position: 'relative',
+          overflow: 'hidden',
         }}
       >
         {/* Balance strip */}
         <Box
           sx={{
-            px: { xs: 2, sm: 2.5, md: 3.5 },
-            pt: { xs: 2, md: 3 },
-            pb: { xs: 1.5, md: 2 },
+            px: { xs: 2.5, sm: 3, md: 4 },
+            pt: { xs: 2.5, md: 3.5 },
+            pb: { xs: 2, md: 2.5 },
             borderBottom: `1px solid ${alpha('#ffffff', 0.08)}`,
             background: `
-              linear-gradient(135deg, ${alpha(GOLD, 0.06)} 0%, transparent 45%),
-              ${alpha('#000000', 0.25)}
+              linear-gradient(135deg, ${alpha(GOLD, 0.08)} 0%, transparent 55%),
+              ${alpha('#000000', 0.3)}
             `,
           }}
         >
           {hasPendingWithdrawal ? (
             <Box
               sx={{
-                mb: 2,
-                p: 1.5,
+                mb: 2.5,
+                p: 2,
                 display: 'flex',
-                gap: 1.25,
-                alignItems: 'flex-start',
-                bgcolor: alpha(USER_COLORS.error, 0.1),
-                border: `1px solid ${alpha(USER_COLORS.error, 0.35)}`,
+                gap: 1.5,
+                alignItems: 'center',
+                bgcolor: alpha(USER_COLORS.error, 0.12),
+                border: `1px solid ${alpha(USER_COLORS.error, 0.4)}`,
+                borderLeft: `4px solid ${USER_COLORS.error}`,
               }}
             >
-              <Iconify icon="solar:danger-triangle-bold" width={22} sx={{ color: USER_COLORS.error, mt: 0.15 }} />
+              <Iconify icon="solar:danger-triangle-bold" width={26} sx={{ color: USER_COLORS.error, flexShrink: 0 }} />
               <Box>
-                <Typography sx={{ color: USER_COLORS.error, fontWeight: 800, fontSize: 13 }}>
-                  {t('withdrawal.pendingTitle')}
+                <Typography sx={{ color: USER_COLORS.error, fontWeight: 800, fontSize: 14, letterSpacing: 0.5 }}>
+                  {t('withdrawal.pendingTitle') || 'DISPATCH LOCKED — PENDING PAYOUT'}
                 </Typography>
                 <Typography sx={{ ...userMutedTextSx, fontSize: 12, mt: 0.35 }}>
-                  Pending {fNumber(pendingWithdrawalAmount, { minimumFractionDigits: 2 })} BAC — {t('withdrawal.pendingBody')}
+                  Pending payout of {fNumber(pendingWithdrawalAmount, { minimumFractionDigits: 2 })} BAC is currently being processed. Wait for completion before submitting a new request.
                 </Typography>
               </Box>
             </Box>
           ) : null}
 
-          <Grid container spacing={{ xs: 1.25, md: 2 }}>
+          <Grid container spacing={{ xs: 1.5, md: 2.5 }}>
             <Grid size={{ xs: 12, sm: 6 }}>
               <UserStatTile
                 icon="solar:wallet-money-bold"
-                label={t('wallet.availableBalance')}
+                label={t('wallet.availableBalance') || 'Total Balance'}
                 value={fNumber(user?.balance || 0, { minimumFractionDigits: 2 })}
                 suffix="BAC"
               />
@@ -270,11 +277,11 @@ export function WithdrawalView() {
               <Stack spacing={0.75}>
                 <UserStatTile
                   icon="solar:card-send-bold"
-                  label={t('wallet.withdrawableAmount')}
+                  label={t('wallet.withdrawableAmount') || 'Withdrawable Balance'}
                   value={fNumber(effectiveWithdrawable, { minimumFractionDigits: 2 })}
                   suffix="BAC"
                 />
-                <Typography sx={{ ...userMutedTextSx, fontSize: 12, px: 0.5, lineHeight: 1.45 }}>
+                <Typography sx={{ ...userMutedTextSx, fontSize: 11, px: 0.5, lineHeight: 1.45 }}>
                   {withdrawableHint}
                 </Typography>
               </Stack>
@@ -282,121 +289,272 @@ export function WithdrawalView() {
           </Grid>
         </Box>
 
-        {/* Form */}
-        <Box sx={{ px: { xs: 2, sm: 2.5, md: 3.5 }, py: { xs: 2.5, md: 3.5 } }}>
-          <Grid container spacing={{ xs: 2, md: 2.5 }}>
+        {/* Interactive Cyber Form */}
+        <Box sx={{ px: { xs: 2.5, sm: 3, md: 4 }, py: { xs: 3, md: 4 } }}>
+          <Grid container spacing={{ xs: 2.5, md: 3 }}>
+            {/* Step 1 Header */}
+            <Grid size={12}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <Box sx={{ width: 6, height: 16, bgcolor: GOLD }} />
+                <Typography sx={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase', color: GOLD }}>
+                  STEP 1: SELECT CURRENCY & AMOUNT
+                </Typography>
+              </Stack>
+            </Grid>
+
             <Grid size={{ xs: 12, md: 6 }}>
               <TextField
                 select
                 fullWidth
-                label={t('wallet.selectCurrency')}
+                label={t('wallet.selectCurrency') || 'Payout Currency'}
                 value={selectedCurrency}
                 onChange={(e) => setSelectedCurrency(e.target.value)}
-                helperText="Payout currency for this request"
+                helperText="Choose target currency for conversion"
                 InputLabelProps={fieldLabelProps}
                 sx={SHOP_FIELD_SX}
                 SelectProps={{ MenuProps: SHOP_SELECT_MENU_PROPS }}
               >
                 {CURRENCY_OPTIONS.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
-                    {option.label}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                      <Box
+                        component="img"
+                        src={`/assets/images/flags/${option.flag}.gif`}
+                        alt={option.value}
+                        sx={{ width: 22, height: 14, borderRadius: 0.5, objectFit: 'cover', border: '1px silver solid' }}
+                      />
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{option.label}</Typography>
+                    </Box>
                   </MenuItem>
                 ))}
               </TextField>
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
-              <TextField
-                fullWidth
-                type="number"
-                label={t('wallet.coinAmount')}
-                value={coinAmount}
-                onChange={(e) => setCoinAmount(e.target.value)}
-                error={amountTooHigh}
-                disabled={effectiveWithdrawable <= 0}
-                helperText={
-                  amountTooHigh
-                    ? `Exceeds maximum of ${fNumber(effectiveWithdrawable)} BAC`
-                    : `Maximum: ${fNumber(effectiveWithdrawable)} BAC`
-                }
-                placeholder="0.00"
-                InputLabelProps={fieldLabelProps}
-                inputProps={{ min: 0, step: '0.01', inputMode: 'decimal' }}
-                sx={SHOP_FIELD_SX}
-              />
+              <Stack spacing={1}>
+                <TextField
+                  fullWidth
+                  type="number"
+                  label={t('wallet.coinAmount') || 'Withdrawal Amount (BAC)'}
+                  value={coinAmount}
+                  onChange={(e) => setCoinAmount(e.target.value)}
+                  error={amountTooHigh}
+                  disabled={effectiveWithdrawable <= 0}
+                  helperText={
+                    amountTooHigh
+                      ? `Exceeds withdrawable maximum of ${fNumber(effectiveWithdrawable)} BAC`
+                      : `Maximum available: ${fNumber(effectiveWithdrawable)} BAC`
+                  }
+                  placeholder="0.00"
+                  InputLabelProps={fieldLabelProps}
+                  inputProps={{ min: 0, step: '0.01', inputMode: 'decimal' }}
+                  sx={SHOP_FIELD_SX}
+                  InputProps={{
+                    startAdornment: (
+                      <Box component="img" src="/assets/images/currency.webp" alt="BAC" sx={{ width: 22, height: 22, mr: 1 }} />
+                    ),
+                  }}
+                />
+
+                {/* Quick Percentage Presets */}
+                {!hasPendingWithdrawal && effectiveWithdrawable > 0 && (
+                  <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    {[
+                      { label: '25%', ratio: 0.25 },
+                      { label: '50%', ratio: 0.50 },
+                      { label: '75%', ratio: 0.75 },
+                      { label: 'MAX', ratio: 1.00 },
+                    ].map((preset) => (
+                      <Box
+                        key={preset.label}
+                        onClick={() => setCoinAmount((effectiveWithdrawable * preset.ratio).toFixed(2))}
+                        sx={{
+                          px: 1.25,
+                          py: 0.35,
+                          fontSize: 10,
+                          fontWeight: 800,
+                          color: GOLD,
+                          bgcolor: alpha(GOLD, 0.1),
+                          border: `1px solid ${alpha(GOLD, 0.3)}`,
+                          cursor: 'pointer',
+                          userSelect: 'none',
+                          transition: 'all 0.2s',
+                          '&:hover': {
+                            bgcolor: alpha(GOLD, 0.25),
+                            borderColor: GOLD,
+                          },
+                        }}
+                      >
+                        {preset.label}
+                      </Box>
+                    ))}
+                  </Stack>
+                )}
+              </Stack>
             </Grid>
 
+            {/* Calculated Amount Display Box */}
             {coinAmount && parseFloat(coinAmount) > 0 ? (
               <Grid size={12}>
                 <Box
                   sx={{
-                    p: { xs: 1.75, md: 2 },
+                    p: 2.25,
                     display: 'flex',
                     flexDirection: { xs: 'column', sm: 'row' },
                     alignItems: { sm: 'center' },
                     justifyContent: 'space-between',
-                    gap: 1.25,
+                    gap: 1.5,
                     bgcolor: alpha(GOLD, 0.08),
-                    border: `1px solid ${alpha(GOLD, 0.3)}`,
+                    border: `1px solid ${alpha(GOLD, 0.35)}`,
+                    boxShadow: `0 8px 24px ${alpha('#000000', 0.4)}, inset 0 0 16px ${alpha(GOLD, 0.05)}`,
                   }}
                 >
-                  <Box>
-                    <Typography sx={{ ...userMutedTextSx, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>
-                      {t('wallet.youWillReceive')}
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Box
+                      component="img"
+                      src={`/assets/images/flags/${selectedCurrency.toLowerCase()}.gif`}
+                      alt={selectedCurrency}
+                      sx={{ width: 32, height: 20, borderRadius: 0.5, objectFit: 'cover', border: '1px silver solid' }}
+                    />
+                    <Box>
+                      <Typography sx={{ ...userMutedTextSx, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1, fontWeight: 700 }}>
+                        {t('wallet.youWillReceive') || 'ESTIMATED PAYOUT RECEIPT'}
+                      </Typography>
+                      <Typography sx={{ color: GOLD, fontWeight: 900, fontSize: { xs: 24, md: 28 }, lineHeight: 1.1, mt: 0.25 }}>
+                        {fNumber(calculatedAmount, { minimumFractionDigits: 2 })} {selectedCurrency}
+                      </Typography>
+                    </Box>
+                  </Box>
+                  <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
+                    <Typography sx={{ color: alpha('#ffffff', 0.8), fontSize: 12, fontWeight: 700 }}>
+                      EXCHANGE RATE
                     </Typography>
-                    <Typography sx={{ color: GOLD, fontWeight: 800, fontSize: { xs: 22, md: 24 }, mt: 0.35 }}>
-                      {fNumber(calculatedAmount, { minimumFractionDigits: 2 })} {selectedCurrency}
+                    <Typography sx={{ ...userMutedTextSx, fontSize: 12, fontFamily: 'monospace' }}>
+                      1 BAC = {fNumber(currentRate, { minimumFractionDigits: 2 })} {selectedCurrency}
                     </Typography>
                   </Box>
-                  <Typography sx={{ ...userMutedTextSx, fontSize: 12 }}>
-                    1 BAC = {fNumber(currentRate, { minimumFractionDigits: 2 })} {selectedCurrency}
-                  </Typography>
                 </Box>
               </Grid>
             ) : null}
 
-            <Grid size={{ xs: 12, md: 6 }}>
-              <TextField
-                select
-                fullWidth
-                label={t('wallet.paymentChannel')}
-                value={paymentChannel}
-                onChange={(e) => setPaymentChannel(e.target.value)}
-                InputLabelProps={fieldLabelProps}
-                sx={SHOP_FIELD_SX}
-                SelectProps={{
-                  displayEmpty: true,
-                  MenuProps: SHOP_SELECT_MENU_PROPS,
-                  renderValue: (selected) => {
-                    if (!selected) {
-                      return (
-                        <Typography sx={{ color: alpha('#ffffff', 0.4) }}>Select channel</Typography>
-                      );
-                    }
-                    return (PAYMENT_META as any)[selected as string]?.label || String(selected);
-                  },
-                }}
-              >
-                {PAYMENT_OPTIONS.map((method) => (
-                  <MenuItem key={method} value={method}>
-                    {(PAYMENT_META as any)[method]?.label || method}
-                  </MenuItem>
-                ))}
-              </TextField>
+            {/* Step 2 Header */}
+            <Grid size={12} sx={{ mt: 1 }}>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                <Box sx={{ width: 6, height: 16, bgcolor: GOLD }} />
+                <Typography sx={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.5, textTransform: 'uppercase', color: GOLD }}>
+                  STEP 2: SELECT PAYMENT METHOD & DESTINATION
+                </Typography>
+              </Stack>
             </Grid>
 
-            <Grid size={{ xs: 12, md: 6 }}>
+            {/* Payment Channel Visual Selector Cards */}
+            <Grid size={12}>
+              <Typography variant="caption" sx={{ ...userMutedTextSx, display: 'block', mb: 1.25, fontWeight: 700, letterSpacing: 0.8, textTransform: 'uppercase', fontSize: 10 }}>
+                PAYMENT GATEWAY METHOD
+              </Typography>
+              <Grid container spacing={1.5}>
+                {PAYMENT_OPTIONS.map((method) => {
+                  const meta = (PAYMENT_META as any)[method];
+                  const isSelected = paymentChannel === method;
+                  return (
+                    <Grid size={{ xs: 6, sm: 4, md: 3 }} key={method}>
+                      <Box
+                        onClick={() => setPaymentChannel(method)}
+                        sx={{
+                          p: 1.5,
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 1,
+                          cursor: 'pointer',
+                          bgcolor: isSelected ? alpha(GOLD, 0.15) : alpha('#000000', 0.4),
+                          border: `1px solid ${isSelected ? GOLD : alpha('#ffffff', 0.12)}`,
+                          boxShadow: isSelected ? `0 0 16px ${alpha(GOLD, 0.3)}` : 'none',
+                          transition: 'all 0.2s',
+                          '&:hover': {
+                            borderColor: alpha(GOLD, 0.6),
+                            bgcolor: alpha(GOLD, 0.08),
+                          },
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            backgroundImage: `url(${meta?.imgurl})`,
+                            backgroundSize: 'contain',
+                            backgroundPosition: 'center',
+                            backgroundRepeat: 'no-repeat',
+                            width: 50,
+                            height: 32,
+                          }}
+                        />
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontSize: 12,
+                            fontWeight: isSelected ? 800 : 600,
+                            color: isSelected ? GOLD : '#ffffff',
+                            textAlign: 'center',
+                          }}
+                        >
+                          {meta?.label || method}
+                        </Typography>
+                      </Box>
+                    </Grid>
+                  );
+                })}
+              </Grid>
+            </Grid>
+
+            {/* Wallet Address Input */}
+            <Grid size={12}>
               <TextField
                 fullWidth
-                label={t('wallet.walletAddress')}
+                label={t('wallet.walletAddress') || 'Destination Wallet / Account Number'}
                 value={walletAddress}
                 onChange={(e) => setWalletAddress(e.target.value)}
-                placeholder="Wallet / account number"
+                placeholder="Enter your bKash/Nagad/Rocket number or USDT wallet address"
+                helperText="Ensure the address matches your selected payment method"
                 InputLabelProps={fieldLabelProps}
                 sx={SHOP_FIELD_SX}
               />
             </Grid>
 
+            {/* Micro Telemetry Bar */}
+            <Grid size={12}>
+              <Grid container spacing={1.5}>
+                <Grid size={{ xs: 12, sm: 4 }}>
+                  <Box sx={{ p: 1.25, bgcolor: alpha('#000000', 0.3), border: `1px solid ${alpha('#ffffff', 0.08)}`, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Iconify icon="solar:clock-circle-bold" width={18} sx={{ color: GOLD }} />
+                    <Box>
+                      <Typography sx={{ fontSize: 9, color: alpha('#ffffff', 0.5), fontWeight: 700, textTransform: 'uppercase' }}>ESTIMATED SPEED</Typography>
+                      <Typography sx={{ fontSize: 11, color: '#ffffff', fontWeight: 700 }}>~15 MINS PROCESSING</Typography>
+                    </Box>
+                  </Box>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 4 }}>
+                  <Box sx={{ p: 1.25, bgcolor: alpha('#000000', 0.3), border: `1px solid ${alpha('#ffffff', 0.08)}`, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Iconify icon="solar:shield-check-bold" width={18} sx={{ color: '#22c55e' }} />
+                    <Box>
+                      <Typography sx={{ fontSize: 9, color: alpha('#ffffff', 0.5), fontWeight: 700, textTransform: 'uppercase' }}>NETWORK FEE</Typography>
+                      <Typography sx={{ fontSize: 11, color: '#22c55e', fontWeight: 700 }}>0.00 BAC (100% FREE)</Typography>
+                    </Box>
+                  </Box>
+                </Grid>
+                <Grid size={{ xs: 12, sm: 4 }}>
+                  <Box sx={{ p: 1.25, bgcolor: alpha('#000000', 0.3), border: `1px solid ${alpha('#ffffff', 0.08)}`, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Iconify icon="solar:lock-keyhole-bold" width={18} sx={{ color: GOLD }} />
+                    <Box>
+                      <Typography sx={{ fontSize: 9, color: alpha('#ffffff', 0.5), fontWeight: 700, textTransform: 'uppercase' }}>SECURITY</Typography>
+                      <Typography sx={{ fontSize: 11, color: '#ffffff', fontWeight: 700 }}>ENCRYPTED DISPATCH</Typography>
+                    </Box>
+                  </Box>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            {/* Action CTA Button */}
             <Grid size={12}>
               <UserActionButton
                 actionVariant="gold"
@@ -404,20 +562,26 @@ export function WithdrawalView() {
                 fullWidth
                 onClick={handleOpenConfirmModal}
                 disabled={!canSubmit || submitting}
-                startIcon={<Iconify icon="solar:card-send-bold" />}
+                startIcon={<Iconify icon="solar:card-send-bold" width={22} />}
                 sx={{
-                  mt: { xs: 0.5, md: 1 },
-                  minHeight: { xs: 52, md: 50 },
-                  fontSize: { xs: 14, md: 13 },
+                  mt: 1,
+                  minHeight: 54,
+                  fontSize: '1rem',
+                  fontWeight: 900,
+                  letterSpacing: 1.5,
+                  textTransform: 'uppercase',
+                  boxShadow: `0 12px 32px ${alpha(GOLD, 0.35)}`,
+                  clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
                 }}
               >
-                {t('withdrawal.requestWithdrawal')}
+                {t('withdrawal.requestWithdrawal') || 'INITIATE PAYOUT DISPATCH'}
               </UserActionButton>
             </Grid>
           </Grid>
         </Box>
       </UserGlassCard>
 
+      {/* Cyber Confirmation Dialog */}
       <Dialog
         open={openConfirmModal}
         onClose={() => !submitting && setOpenConfirmModal(false)}
@@ -428,37 +592,72 @@ export function WithdrawalView() {
         <Box sx={userPolishedDialogRailSx} />
         <DialogTitle sx={userPolishedDialogTitleSx}>
           <Box sx={{ minWidth: 0 }}>
-            <Typography sx={userPolishedDialogEyebrowSx}>Wallet</Typography>
-            <Typography sx={userPolishedDialogHeadingSx}>{t('wallet.confirmWithdrawal')}</Typography>
+            <Typography sx={userPolishedDialogEyebrowSx}>PAYOUT CONFIRMATION</Typography>
+            <Typography sx={userPolishedDialogHeadingSx}>{t('wallet.confirmWithdrawal') || 'Confirm Payout Request'}</Typography>
           </Box>
         </DialogTitle>
         <DialogContent dividers sx={userPolishedDialogContentSx}>
-          <Box sx={{ p: 2, bgcolor: alpha('#000000', 0.35), border: `1px solid ${USER_COLORS.border}` }}>
-            <Stack spacing={1.5}>
-              <Typography sx={userMutedTextSx}>Withdraw Amount</Typography>
-              <Typography sx={{ color: USER_COLORS.textPrimary, fontWeight: 700, fontSize: 20 }}>
-                {coinAmount} BAC
-              </Typography>
-              <Divider sx={{ borderColor: USER_COLORS.border }} />
-              <Typography sx={userMutedTextSx}>You will receive</Typography>
-              <Typography sx={{ color: GOLD, fontWeight: 700, fontSize: 20 }}>
-                {fNumber(calculatedAmount, { minimumFractionDigits: 2 })} {selectedCurrency}
-              </Typography>
+          <Stack spacing={2.5}>
+            <Box sx={{ p: 2.25, bgcolor: alpha('#000000', 0.45), border: `1px solid ${alpha(GOLD, 0.3)}` }}>
+              <Stack spacing={1.5}>
+                <Typography sx={{ ...userMutedTextSx, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Withdrawal Amount
+                </Typography>
+                <Typography sx={{ color: '#ffffff', fontWeight: 800, fontSize: 22 }}>
+                  {coinAmount} BAC
+                </Typography>
+                <Divider sx={{ borderColor: alpha('#ffffff', 0.1) }} />
+                <Typography sx={{ ...userMutedTextSx, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>
+                  Estimated Fiat Receipt
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Box
+                    component="img"
+                    src={`/assets/images/flags/${selectedCurrency.toLowerCase()}.gif`}
+                    alt={selectedCurrency}
+                    sx={{ width: 24, height: 16, borderRadius: 0.5, objectFit: 'cover', border: '1px silver solid' }}
+                  />
+                  <Typography sx={{ color: GOLD, fontWeight: 900, fontSize: 22 }}>
+                    {fNumber(calculatedAmount, { minimumFractionDigits: 2 })} {selectedCurrency}
+                  </Typography>
+                </Box>
+              </Stack>
+            </Box>
+
+            <Stack spacing={1.5} sx={{ px: 0.5 }}>
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" sx={userMutedTextSx}>Payment Method</Typography>
+                <Typography variant="body2" fontWeight={700} sx={{ color: GOLD }}>
+                  {(PAYMENT_META as any)[paymentChannel]?.label || paymentChannel}
+                </Typography>
+              </Stack>
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" sx={userMutedTextSx}>Destination Wallet</Typography>
+                <Typography variant="body2" fontWeight={700} sx={{ maxWidth: '60%', textAlign: 'right', wordBreak: 'break-all', fontFamily: 'monospace' }}>
+                  {walletAddress}
+                </Typography>
+              </Stack>
+              <Stack direction="row" justifyContent="space-between">
+                <Typography variant="body2" sx={userMutedTextSx}>Conversion Rate</Typography>
+                <Typography variant="body2" fontWeight={700}>
+                  1 BAC = {fNumber(currentRate, { minimumFractionDigits: 2 })} {selectedCurrency}
+                </Typography>
+              </Stack>
             </Stack>
-          </Box>
+          </Stack>
         </DialogContent>
         <DialogActions
           sx={{
-            px: 2,
-            py: 1.5,
-            gap: 1,
+            px: 3,
+            py: 2,
+            gap: 1.5,
             flexDirection: { xs: 'column-reverse', sm: 'row' },
-            borderTop: `1px solid ${USER_COLORS.border}`,
+            borderTop: `1px solid ${alpha('#ffffff', 0.1)}`,
             '& > :not(style)': { m: '0 !important', width: { xs: 1, sm: 'auto' } },
           }}
         >
           <UserActionButton actionVariant="ghost" onClick={() => setOpenConfirmModal(false)} disabled={submitting}>
-            {t('wallet.cancel')}
+            {t('wallet.cancel') || 'Cancel'}
           </UserActionButton>
           <UserActionButton
             actionVariant="gold"
@@ -466,10 +665,11 @@ export function WithdrawalView() {
             disabled={submitting}
             startIcon={submitting ? <CircularProgress size={16} color="inherit" /> : undefined}
           >
-            {submitting ? t('wallet.processing') : t('wallet.confirmSubmit')}
+            {submitting ? (t('wallet.processing') || 'Processing...') : (t('wallet.confirmSubmit') || 'Confirm & Submit')}
           </UserActionButton>
         </DialogActions>
       </Dialog>
     </UserPageShell>
   );
 }
+

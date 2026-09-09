@@ -32,6 +32,8 @@ import {
 } from 'src/layouts/user';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
+const goldAlpha = (opacity: number) => alpha(USER_COLORS.gold, opacity);
+
 import { Image } from 'src/components/image';
 import useApi from 'src/hooks/use-api';
 import { Iconify } from 'src/components/iconify';
@@ -445,284 +447,520 @@ export function ShopView() {
         <UserPageShell>
             <ShopHero />
 
-            <Grid container spacing={2} sx={{ mb: 2.5 }}>
-                <Grid size={{ xs: 6, md: 4 }}>
-                    <UserStatTile icon="solar:wallet-money-bold" label={t('shop.yourBalance')} value={fNumber(balance ?? 0)} suffix="BAC" />
+            {/* Stat Tiles Grid matching reference image */}
+            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
+                <Grid size={{ xs: 12, sm: 4 }}>
+                    <Box
+                        sx={{
+                            p: 2,
+                            bgcolor: alpha('#0d1526', 0.9),
+                            borderRadius: '10px',
+                            border: `1px solid ${goldAlpha(0.45)}`,
+                            boxShadow: `0 8px 24px ${alpha('#000000', 0.65)}`,
+                            transition: 'all 0.25s ease',
+                            '&:hover': {
+                                borderColor: USER_COLORS.gold,
+                                boxShadow: `0 12px 30px ${alpha('#000000', 0.85)}, 0 0 16px ${goldAlpha(0.25)}`,
+                            },
+                        }}
+                    >
+                        <Stack direction="row" alignItems="center" spacing={2}>
+                            <Box
+                                sx={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    bgcolor: goldAlpha(0.15),
+                                    border: `1px solid ${goldAlpha(0.45)}`,
+                                    color: USER_COLORS.gold,
+                                    flexShrink: 0,
+                                }}
+                            >
+                                <Iconify icon="solar:wallet-money-bold" width={22} />
+                            </Box>
+                            <Box sx={{ minWidth: 0 }}>
+                                <Typography
+                                    sx={{
+                                        fontSize: 11,
+                                        fontWeight: 700,
+                                        letterSpacing: 1,
+                                        textTransform: 'uppercase',
+                                        color: alpha('#ffffff', 0.6),
+                                        lineHeight: 1.2,
+                                    }}
+                                >
+                                    YOUR BALANCE
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        mt: 0.35,
+                                        fontSize: { xs: 18, md: 20 },
+                                        fontWeight: 800,
+                                        color: '#ffffff',
+                                        lineHeight: 1.1,
+                                    }}
+                                >
+                                    {fNumber(balance ?? 0)} <Typography component="span" sx={{ fontSize: 13, fontWeight: 700, color: USER_COLORS.gold }}>BAC</Typography>
+                                </Typography>
+                            </Box>
+                        </Stack>
+                    </Box>
                 </Grid>
-                <Grid size={{ xs: 6, md: 4 }}>
-                    <UserStatTile icon="solar:bag-check-bold" label={t('shop.coinPacks')} value={filteredShopItems.length} suffix={t('shop.available')} />
+
+                <Grid size={{ xs: 12, sm: 4 }}>
+                    <Box
+                        sx={{
+                            p: 2,
+                            bgcolor: alpha('#0d1526', 0.9),
+                            borderRadius: '10px',
+                            border: `1px solid ${goldAlpha(0.45)}`,
+                            boxShadow: `0 8px 24px ${alpha('#000000', 0.65)}`,
+                            transition: 'all 0.25s ease',
+                            '&:hover': {
+                                borderColor: USER_COLORS.gold,
+                                boxShadow: `0 12px 30px ${alpha('#000000', 0.85)}, 0 0 16px ${goldAlpha(0.25)}`,
+                            },
+                        }}
+                    >
+                        <Stack direction="row" alignItems="center" spacing={2}>
+                            <Box
+                                sx={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    bgcolor: goldAlpha(0.15),
+                                    border: `1px solid ${goldAlpha(0.45)}`,
+                                    color: USER_COLORS.gold,
+                                    flexShrink: 0,
+                                }}
+                            >
+                                <Iconify icon="solar:bag-check-bold" width={22} />
+                            </Box>
+                            <Box sx={{ minWidth: 0 }}>
+                                <Typography
+                                    sx={{
+                                        fontSize: 11,
+                                        fontWeight: 700,
+                                        letterSpacing: 1,
+                                        textTransform: 'uppercase',
+                                        color: alpha('#ffffff', 0.6),
+                                        lineHeight: 1.2,
+                                    }}
+                                >
+                                    COIN PACKS
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        mt: 0.35,
+                                        fontSize: { xs: 18, md: 20 },
+                                        fontWeight: 800,
+                                        color: '#ffffff',
+                                        lineHeight: 1.1,
+                                    }}
+                                >
+                                    {filteredShopItems.length} <Typography component="span" sx={{ fontSize: 13, fontWeight: 500, color: alpha('#ffffff', 0.7) }}>available</Typography>
+                                </Typography>
+                            </Box>
+                        </Stack>
+                    </Box>
                 </Grid>
-                <Grid size={{ xs: 12, md: 4 }}>
-                    <UserStatTile icon="solar:card-transfer-bold" label={t('shop.paymentChannels')} value={paymentChannels.length} suffix={t('shop.active')} />
+
+                <Grid size={{ xs: 12, sm: 4 }}>
+                    <Box
+                        sx={{
+                            p: 2,
+                            bgcolor: alpha('#0d1526', 0.9),
+                            borderRadius: '10px',
+                            border: `1px solid ${goldAlpha(0.45)}`,
+                            boxShadow: `0 8px 24px ${alpha('#000000', 0.65)}`,
+                            transition: 'all 0.25s ease',
+                            '&:hover': {
+                                borderColor: USER_COLORS.gold,
+                                boxShadow: `0 12px 30px ${alpha('#000000', 0.85)}, 0 0 16px ${goldAlpha(0.25)}`,
+                            },
+                        }}
+                    >
+                        <Stack direction="row" alignItems="center" spacing={2}>
+                            <Box
+                                sx={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: '8px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    bgcolor: goldAlpha(0.15),
+                                    border: `1px solid ${goldAlpha(0.45)}`,
+                                    color: USER_COLORS.gold,
+                                    flexShrink: 0,
+                                }}
+                            >
+                                <Iconify icon="solar:card-transfer-bold" width={22} />
+                            </Box>
+                            <Box sx={{ minWidth: 0 }}>
+                                <Typography
+                                    sx={{
+                                        fontSize: 11,
+                                        fontWeight: 700,
+                                        letterSpacing: 1,
+                                        textTransform: 'uppercase',
+                                        color: alpha('#ffffff', 0.6),
+                                        lineHeight: 1.2,
+                                    }}
+                                >
+                                    PAYMENT CHANNELS
+                                </Typography>
+                                <Typography
+                                    sx={{
+                                        mt: 0.35,
+                                        fontSize: { xs: 18, md: 20 },
+                                        fontWeight: 800,
+                                        color: '#ffffff',
+                                        lineHeight: 1.1,
+                                    }}
+                                >
+                                    {paymentChannels.length} <Typography component="span" sx={{ fontSize: 13, fontWeight: 500, color: alpha('#ffffff', 0.7) }}>active</Typography>
+                                </Typography>
+                            </Box>
+                        </Stack>
+                    </Box>
                 </Grid>
             </Grid>
 
             <Grid container spacing={2.5}>
-                        {/* Filters */}
-                        <Grid size={{ xs: 12, md: 3 }}>
-                            <UserGlassCard sx={{ p: 2, position: { md: 'sticky' }, top: { md: 120 } }}>
-                                <Typography className="font-tr" sx={{ mb: 1, fontSize: 13, fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: USER_COLORS.gold }}>
-                                    {t('shop.payment')}
-                                </Typography>
-                                <TextField
-                                    select
-                                    fullWidth
-                                    label={t('shop.choosePayment')}
-                                    value={paymentFilter}
-                                    onChange={(e) => {setPaymentFilter(e.target.value); setPaymentMethod(e.target.value)}}
-                                    InputLabelProps={SHOP_FIELD_LABEL_PROPS}
-                                    sx={{ mb: 2, ...SHOP_FILTER_FIELD_SX }}
-                                    SelectProps={{ MenuProps: SHOP_SELECT_MENU_PROPS }}
-                                >
-                                    {paymentChannels.length === 0 ? (
-                                        <MenuItem value="" disabled>
-                                            No payment channels
-                                        </MenuItem>
-                                    ) : (
-                                    paymentChannels.map((channel) => (
-                                        <MenuItem
-                                            key={channel._id}
-                                            value={channel.channel_name.toLowerCase()}
-                                            sx={{ textTransform: 'capitalize' }}
-                                        >
-                                            <Stack direction="row" spacing={1.5} alignItems="center">
-                                                <Box
-                                                    component="img"
-                                                    src={resolvePaymentChannelIcon(channel.channel_name, channel.icon)}
-                                                    alt={channel.channel_name}
-                                                    sx={{
-                                                        width: 48,
-                                                        height: 32,
-                                                        borderRadius: 1,
-                                                        objectFit: 'contain',
-                                                    }}
-                                                />
-                                                <Typography variant="body2" sx={{ color: USER_COLORS.textPrimary }}>
-                                                    {channel.channel_name}
-                                                </Typography>
-                                            </Stack>
-                                        </MenuItem>
-                                    ))
-                                    )}
-                                </TextField>
+                {/* Vault Filters Sidebar matching reference image */}
+                <Grid size={{ xs: 12, md: 3 }}>
+                    <Box
+                        sx={{
+                            p: { xs: 2.25, md: 2.5 },
+                            bgcolor: alpha('#0d1526', 0.9),
+                            borderRadius: '12px',
+                            border: `1px solid ${goldAlpha(0.45)}`,
+                            boxShadow: `0 12px 32px ${alpha('#000000', 0.7)}`,
+                            position: { md: 'sticky' },
+                            top: { md: 100 },
+                        }}
+                    >
+                        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2.5 }}>
+                            <Box
+                                sx={{
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: '50%',
+                                    bgcolor: '#22c55e',
+                                    boxShadow: '0 0 8px #22c55e',
+                                }}
+                            />
+                            <Typography sx={{ fontSize: 13, fontWeight: 900, letterSpacing: 1.2, textTransform: 'uppercase', color: '#dcdcdc' }}>
+                                VAULT FILTERS
+                            </Typography>
+                        </Stack>
 
-                                <Typography className="font-tr" sx={{ mb: 1, fontSize: 13, fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: USER_COLORS.gold }}>
-                                    {t('shop.priceRange')}
-                                </Typography>
-                                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-                                    <TextField
-                                        label={t('shop.min')}
-                                        value={minPrice}
-                                        onChange={(e) => setMinPrice(e.target.value)}
-                                        InputLabelProps={SHOP_FIELD_LABEL_PROPS}
-                                        sx={SHOP_FILTER_FIELD_SX}
-                                    />
-                                    <TextField
-                                        label={t('shop.max')}
-                                        value={maxPrice}
-                                        onChange={(e) => setMaxPrice(e.target.value)}
-                                        InputLabelProps={SHOP_FIELD_LABEL_PROPS}
-                                        sx={SHOP_FILTER_FIELD_SX}
-                                    />
-                                </Stack>
-                                <UserActionButton
-                                    actionVariant="ghost"
-                                    size="small"
-                                    sx={{ mt: 2 }}
-                                    onClick={() => {
-                                        setPaymentFilter('');
-                                        setMinPrice('');
-                                        setMaxPrice('');
-                                    }}
-                                >
-                                    Clear
-                                </UserActionButton>
-                            </UserGlassCard>
-                        </Grid>
+                        <Typography sx={{ fontSize: 11, fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: alpha('#ffffff', 0.6), mb: 1 }}>
+                            PAYMENT
+                        </Typography>
 
-                        {/* Offers */}
-                        <Grid size={{ xs: 12, md: 9 }}>
-                            {loading ? (
-                                <Grid container spacing={3}>
-                                    {Array.from({ length: 6 }).map((_, idx) => (
-                                        <Grid key={idx} size={{ xs: 12, sm: 6, md: 4 }}>
-                                            <UserGlassCard sx={{ p: 2 }}>
-                                                <Skeleton variant="rectangular" height={160} sx={{ borderRadius: 1, mb: 2, bgcolor: alpha('#ffffff', 0.06) }} />
-                                                <Skeleton variant="text" sx={{ bgcolor: alpha('#ffffff', 0.06) }} />
-                                                <Skeleton variant="text" width="60%" sx={{ bgcolor: alpha('#ffffff', 0.04) }} />
-                                            </UserGlassCard>
-                                        </Grid>
-                                    ))}
-                                </Grid>
-                            ) : filteredShopItems.length === 0 ? (
-                                <UserEmptyState
-                                    icon="solar:bag-smile-bold-duotone"
-                                    title={t('shop.noOffers')}
-                                    description="Try clearing your filters or check back later for new offers."
-                                    actionLabel="Clear filters"
-                                    onAction={() => {
-                                        setPaymentFilter('');
-                                        setMinPrice('');
-                                        setMaxPrice('');
-                                    }}
-                                />
+                        <TextField
+                            select
+                            fullWidth
+                            label="CHOOSE PAYMENT"
+                            value={paymentFilter}
+                            onChange={(e) => {setPaymentFilter(e.target.value); setPaymentMethod(e.target.value)}}
+                            InputLabelProps={SHOP_FIELD_LABEL_PROPS}
+                            sx={{ mb: 2.5, ...SHOP_FILTER_FIELD_SX }}
+                            SelectProps={{ MenuProps: SHOP_SELECT_MENU_PROPS }}
+                        >
+                            {paymentChannels.length === 0 ? (
+                                <MenuItem value="" disabled>
+                                    CHOOSE Option
+                                </MenuItem>
                             ) : (
-                                <Grid container spacing={{ xs: 2, md: 2.5 }}>
-                                    {filteredShopItems.map((shopItem) => {
-                                        const badgeLabel = shopItem.badge?.trim() || '';
-                                        const showBadge = Boolean(badgeLabel) && badgeLabel.toLowerCase() !== 'none';
-                                        const hasDiscount = Number(shopItem.discountPercent) > 0;
-                                        const isFeatured = ['popular', 'best', 'hot'].includes(badgeLabel.toLowerCase());
+                            paymentChannels.map((channel) => (
+                                <MenuItem
+                                    key={channel._id}
+                                    value={channel.channel_name.toLowerCase()}
+                                    sx={{ textTransform: 'capitalize' }}
+                                >
+                                    <Stack direction="row" spacing={1.5} alignItems="center">
+                                        <Box
+                                            component="img"
+                                            src={resolvePaymentChannelIcon(channel.channel_name, channel.icon)}
+                                            alt={channel.channel_name}
+                                            sx={{
+                                                width: 44,
+                                                height: 30,
+                                                borderRadius: 1,
+                                                objectFit: 'contain',
+                                            }}
+                                        />
+                                        <Typography variant="body2" sx={{ color: USER_COLORS.textPrimary, fontWeight: 700 }}>
+                                            {channel.channel_name}
+                                        </Typography>
+                                    </Stack>
+                                </MenuItem>
+                            ))
+                            )}
+                        </TextField>
 
-                                        return (
-                                        <Grid key={`${shopItem.amount}-${shopItem.symbol}`} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
-                                            <UserGlassCard
+                        <Typography sx={{ fontSize: 11, fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: alpha('#ffffff', 0.6), mb: 1 }}>
+                            PRICE RANGE
+                        </Typography>
+
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ mb: 2.5 }}>
+                            <TextField
+                                label={t('shop.min')}
+                                value={minPrice}
+                                onChange={(e) => setMinPrice(e.target.value)}
+                                InputLabelProps={SHOP_FIELD_LABEL_PROPS}
+                                sx={SHOP_FILTER_FIELD_SX}
+                            />
+                            <TextField
+                                label={t('shop.max')}
+                                value={maxPrice}
+                                onChange={(e) => setMaxPrice(e.target.value)}
+                                InputLabelProps={SHOP_FIELD_LABEL_PROPS}
+                                sx={SHOP_FILTER_FIELD_SX}
+                            />
+                        </Stack>
+
+                        <UserActionButton
+                            actionVariant="ghost"
+                            size="small"
+                            sx={{
+                                width: '100%',
+                                py: 1,
+                                fontSize: 11,
+                                fontWeight: 800,
+                                letterSpacing: 1,
+                                borderRadius: '6px',
+                            }}
+                            onClick={() => {
+                                setPaymentFilter('');
+                                setMinPrice('');
+                                setMaxPrice('');
+                            }}
+                        >
+                            CLEAR ALL FILTERS
+                        </UserActionButton>
+                    </Box>
+                </Grid>
+
+                {/* Coin Pack Offers Grid matching reference image */}
+                <Grid size={{ xs: 12, md: 9 }}>
+                    {loading ? (
+                        <Grid container spacing={2.5}>
+                            {Array.from({ length: 4 }).map((_, idx) => (
+                                <Grid key={idx} size={{ xs: 12, sm: 6, md: 3 }}>
+                                    <Box sx={{ p: 2, bgcolor: alpha('#0d1526', 0.7), border: `1px solid ${goldAlpha(0.3)}`, borderRadius: '12px' }}>
+                                        <Skeleton variant="rectangular" height={160} sx={{ borderRadius: 1, mb: 2, bgcolor: alpha('#ffffff', 0.06) }} />
+                                        <Skeleton variant="text" sx={{ bgcolor: alpha('#ffffff', 0.06) }} />
+                                        <Skeleton variant="text" width="60%" sx={{ bgcolor: alpha('#ffffff', 0.04) }} />
+                                    </Box>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    ) : filteredShopItems.length === 0 ? (
+                        <UserEmptyState
+                            icon="solar:bag-smile-bold-duotone"
+                            title={t('shop.noOffers')}
+                            description="Try clearing your filters or check back later for new offers."
+                            actionLabel="Clear filters"
+                            onAction={() => {
+                                setPaymentFilter('');
+                                setMinPrice('');
+                                setMaxPrice('');
+                            }}
+                        />
+                    ) : (
+                        <Grid container spacing={{ xs: 2, md: 2.5 }}>
+                            {filteredShopItems.map((shopItem) => {
+                                const badgeLabel = shopItem.badge?.trim() || '';
+                                const showBadge = Boolean(badgeLabel) && badgeLabel.toLowerCase() !== 'none';
+                                const hasDiscount = Number(shopItem.discountPercent) > 0;
+
+                                const badgeType = badgeLabel.toLowerCase();
+                                const isPopular = badgeType === 'popular';
+                                const isNew = badgeType === 'new';
+                                const isHot = badgeType === 'hot';
+                                const isBest = badgeType === 'best';
+                                const isFeatured = isPopular || isNew || isHot || isBest;
+
+                                const tierColor = isPopular
+                                    ? '#F5C518'
+                                    : isNew
+                                    ? '#38BDF8'
+                                    : isHot
+                                    ? '#EF4444'
+                                    : isBest
+                                    ? '#22C55E'
+                                    : USER_COLORS.gold;
+
+                                return (
+                                <Grid key={`${shopItem.amount}-${shopItem.symbol}`} size={{ xs: 12, sm: 6, md: 3 }}>
+                                    <Box
+                                        sx={{
+                                            position: 'relative',
+                                            p: { xs: 2, md: 2.25 },
+                                            pt: showBadge ? 3.5 : 2.5,
+                                            minHeight: 290,
+                                            height: '100%',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            textAlign: 'center',
+                                            gap: 1.25,
+                                            overflow: 'hidden',
+                                            borderRadius: '12px',
+                                            bgcolor: alpha('#0d1526', 0.9),
+                                            border: `1px solid ${goldAlpha(0.45)}`,
+                                            boxShadow: `0 10px 28px ${alpha('#000000', 0.7)}`,
+                                            transition: 'all 0.3s ease',
+                                            '&:hover': {
+                                                borderColor: USER_COLORS.gold,
+                                                transform: 'translateY(-4px)',
+                                                boxShadow: `0 16px 36px ${alpha('#000000', 0.85)}, 0 0 20px ${goldAlpha(0.2)}`,
+                                                '& .coin-img-box': {
+                                                    transform: 'scale(1.08)',
+                                                },
+                                            },
+                                        }}
+                                    >
+                                        {/* Ornate Arch Filigree Line Overlay inside top of card */}
+                                        <Box
+                                            sx={{
+                                                position: 'absolute',
+                                                top: 0,
+                                                left: '50%',
+                                                transform: 'translateX(-50%)',
+                                                width: '80%',
+                                                height: 30,
+                                                borderTop: `1px solid ${goldAlpha(0.35)}`,
+                                                borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
+                                                pointerEvents: 'none',
+                                            }}
+                                        />
+
+                                        {/* Tier Ribbon Badge */}
+                                        {showBadge && (
+                                            <Box
                                                 sx={{
-                                                    position: 'relative',
-                                                    p: { xs: 2, md: 2.25 },
-                                                    pt: showBadge ? 2.75 : 2.25,
-                                                    height: '100%',
-                                                    display: 'flex',
-                                                    flexDirection: 'column',
-                                                    alignItems: 'center',
-                                                    textAlign: 'center',
-                                                    gap: 1.25,
-                                                    overflow: 'hidden',
-                                                    borderColor: isFeatured
-                                                        ? alpha(USER_COLORS.gold, 0.38)
-                                                        : alpha('#ffffff', 0.1),
-                                                    background: isFeatured
-                                                        ? `linear-gradient(165deg, ${alpha(USER_COLORS.gold, 0.12)} 0%, ${alpha('#000000', 0.55)} 48%, ${alpha('#050505', 0.92)} 100%)`
-                                                        : undefined,
-                                                    transition: 'border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
-                                                    '&:hover': {
-                                                        borderColor: alpha(USER_COLORS.gold, 0.5),
-                                                        transform: 'translateY(-3px)',
-                                                        boxShadow: `0 12px 28px ${alpha('#000000', 0.45)}`,
-                                                    },
+                                                    position: 'absolute',
+                                                    top: 10,
+                                                    left: 10,
+                                                    px: 1.25,
+                                                    py: 0.35,
+                                                    bgcolor: alpha('#000000', 0.8),
+                                                    color: `${tierColor} !important`,
+                                                    border: `1px solid ${alpha(tierColor, 0.6)}`,
+                                                    borderRadius: '4px',
+                                                    boxShadow: `0 0 10px ${alpha(tierColor, 0.4)}`,
                                                 }}
                                             >
-                                                {showBadge && (
-                                                    <Chip
-                                                        label={badgeLabel}
-                                                        size="small"
-                                                        sx={{
-                                                            position: 'absolute',
-                                                            top: 12,
-                                                            left: 12,
-                                                            height: 24,
-                                                            bgcolor: alpha('#0a0a0a', 0.72),
-                                                            color: `${USER_COLORS.gold} !important`,
-                                                            border: `1px solid ${alpha(USER_COLORS.gold, 0.5)}`,
-                                                            fontWeight: 800,
-                                                            letterSpacing: 0.4,
-                                                            '& .MuiChip-label': {
-                                                              color: `${USER_COLORS.gold} !important`,
-                                                              fontWeight: 800,
-                                                              px: 1,
-                                                              fontSize: 11,
-                                                            },
-                                                        }}
-                                                    />
-                                                )}
-                                                <Box
-                                                    sx={{
-                                                        width: { xs: 112, md: 128 },
-                                                        height: { xs: 112, md: 128 },
-                                                        display: 'grid',
-                                                        placeItems: 'center',
-                                                        borderRadius: '50%',
-                                                        background: `radial-gradient(circle, ${alpha(USER_COLORS.gold, 0.18)} 0%, transparent 68%)`,
-                                                    }}
-                                                >
-                                                    <Image
-                                                        draggable="false"
-                                                        src={resolveItemImage(shopItem.image)}
-                                                        alt={`${shopItem.amount} ${shopItem.symbol}`}
-                                                        ratio="1/1"
-                                                        sx={{
-                                                            width: { xs: 96, md: 112 },
-                                                            height: { xs: 96, md: 112 },
-                                                            objectFit: 'contain',
-                                                        }}
-                                                    />
-                                                </Box>
-
                                                 <Typography
-                                                    className="font-tr"
                                                     sx={{
-                                                        mt: 0.25,
-                                                        fontSize: { xs: 20, md: 22 },
-                                                        fontWeight: 800,
-                                                        letterSpacing: 0.3,
-                                                        color: USER_COLORS.textPrimary,
-                                                        lineHeight: 1.15,
+                                                        fontSize: 10,
+                                                        fontWeight: 900,
+                                                        letterSpacing: 1.2,
+                                                        textTransform: 'uppercase',
+                                                        color: tierColor,
+                                                        lineHeight: 1.2,
                                                     }}
                                                 >
-                                                    {fNumber(shopItem.amount)} {shopItem.symbol}
+                                                    {badgeLabel}
                                                 </Typography>
+                                            </Box>
+                                        )}
 
-                                                <Stack direction="row" alignItems="baseline" justifyContent="center" spacing={0.75}>
-                                                    <Typography
-                                                        sx={{
-                                                            fontSize: { xs: 20, md: 22 },
-                                                            fontWeight: 800,
-                                                            color: USER_COLORS.gold,
-                                                            lineHeight: 1,
-                                                        }}
-                                                    >
-                                                        ${Number(shopItem.price).toFixed(2)}
-                                                    </Typography>
-                                                    {hasDiscount && (
-                                                        <Typography
-                                                            sx={{
-                                                                ...userMutedTextSx,
-                                                                fontSize: 13,
-                                                                textDecoration: 'line-through',
-                                                            }}
-                                                        >
-                                                            ${Number(shopItem.originalPrice).toFixed(2)}
-                                                        </Typography>
-                                                    )}
-                                                </Stack>
+                                        {/* Coin Image Container */}
+                                        <Box
+                                            className="coin-img-box"
+                                            sx={{
+                                                width: { xs: 96, md: 110 },
+                                                height: { xs: 96, md: 110 },
+                                                mt: showBadge ? 1 : 0.5,
+                                                display: 'grid',
+                                                placeItems: 'center',
+                                                borderRadius: '50%',
+                                                background: `radial-gradient(circle, ${goldAlpha(0.2)} 0%, transparent 72%)`,
+                                                transition: 'all 0.35s ease',
+                                            }}
+                                        >
+                                            <Image
+                                                draggable="false"
+                                                src={resolveItemImage(shopItem.image)}
+                                                alt={`${shopItem.amount} ${shopItem.symbol}`}
+                                                ratio="1/1"
+                                                sx={{
+                                                    width: { xs: 84, md: 96 },
+                                                    height: { xs: 84, md: 96 },
+                                                    objectFit: 'contain',
+                                                    filter: `drop-shadow(0 6px 16px ${alpha('#000000', 0.8)})`,
+                                                }}
+                                            />
+                                        </Box>
 
-                                                {hasDiscount && (
-                                                    <Chip
-                                                        label={`Save ${shopItem.discountPercent}%`}
-                                                        size="small"
-                                                        sx={{
-                                                            height: 22,
-                                                            bgcolor: alpha(USER_COLORS.gold, 0.14),
-                                                            color: `${USER_COLORS.gold} !important`,
-                                                            fontWeight: 700,
-                                                            border: `1px solid ${alpha(USER_COLORS.gold, 0.4)}`,
-                                                            '& .MuiChip-label': {
-                                                              color: `${USER_COLORS.gold} !important`,
-                                                              fontWeight: 700,
-                                                              fontSize: 11,
-                                                              px: 1,
-                                                            },
-                                                        }}
-                                                    />
-                                                )}
+                                        {/* Coin Amount Title */}
+                                        <Typography
+                                            className="font-tr"
+                                            sx={{
+                                                mt: 0.5,
+                                                fontSize: { xs: 18, md: 21 },
+                                                fontWeight: 900,
+                                                letterSpacing: 0.5,
+                                                color: '#ffffff',
+                                                lineHeight: 1.1,
+                                            }}
+                                        >
+                                            {fNumber(shopItem.amount)} {shopItem.symbol}
+                                        </Typography>
 
-                                                <UserActionButton
-                                                    fullWidth
-                                                    size="medium"
-                                                    actionVariant="gold"
-                                                    onClick={() => handleOpenModal(shopItem)}
-                                                    sx={{ mt: 'auto', minHeight: 40, fontWeight: 800, letterSpacing: 0.8 }}
-                                                >
-                                                    {t('shop.buy')}
-                                                </UserActionButton>
-                                            </UserGlassCard>
-                                        </Grid>
-                                        );
-                                    })}
+                                        {/* Pricing Box */}
+                                        <Stack direction="row" alignItems="baseline" justifyContent="center" spacing={0.85}>
+                                            <Typography
+                                                sx={{
+                                                    fontSize: { xs: 18, md: 20 },
+                                                    fontWeight: 900,
+                                                    color: USER_COLORS.gold,
+                                                }}
+                                            >
+                                                ৳ {fNumber(shopItem.price * (currencyRates.find(r => r.currency?.toLowerCase() === 'bdt')?.rate || 1))} BDT
+                                            </Typography>
+                                        </Stack>
+
+                                        <Box sx={{ flexGrow: 1 }} />
+
+                                        {/* Purchase CTA Button */}
+                                        <UserActionButton
+                                            onClick={() => handleOpenModal(shopItem)}
+                                            actionVariant="gold"
+                                            size="medium"
+                                            fullWidth
+                                            startIcon={<Iconify icon="solar:cart-large-bold" width={18} />}
+                                            sx={{
+                                                mt: 1,
+                                                py: 1,
+                                                fontSize: 12,
+                                                fontWeight: 900,
+                                                letterSpacing: 1,
+                                                borderRadius: '6px',
+                                            }}
+                                        >
+                                            {t('shop.buyNow')}
+                                        </UserActionButton>
+                                    </Box>
                                 </Grid>
-                            )}
+                                );
+                            })}
                         </Grid>
-                    </Grid>
+                    )}
+                </Grid>
+            </Grid>
 
             <Dialog open={!!selectedItem} onClose={handleCloseModal} maxWidth="md" fullWidth PaperProps={{ sx: SHOP_DIALOG_PAPER_SX }}>
                 <Box sx={userPolishedDialogRailSx} />

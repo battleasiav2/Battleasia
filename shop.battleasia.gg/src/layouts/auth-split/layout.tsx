@@ -129,6 +129,7 @@ export function AuthSplitLayout({
           href={`${mainAppUrl.replace(/\/$/, '')}/dashboard`}
           startIcon={<Iconify icon="solar:arrow-left-linear" width={16} />}
           sx={{
+            mt: { xs: 2, md: 2.5 },
             minHeight: 36,
             height: 36,
             px: 1.5,
@@ -165,8 +166,15 @@ export function AuthSplitLayout({
         slotProps={merge(headerSlotProps, slotProps?.header?.slotProps ?? {})}
         sx={[
           {
-            position: 'sticky',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 10,
             bgcolor: 'transparent',
+            backgroundColor: 'transparent !important',
+            backgroundImage: 'none !important',
+            boxShadow: 'none',
           },
           ...(Array.isArray(slotProps?.header?.sx)
             ? (slotProps?.header?.sx ?? [])
@@ -191,25 +199,24 @@ export function AuthSplitLayout({
           ? (slotProps?.main?.sx ?? [])
           : [slotProps?.main?.sx]),
         {
-          bgcolor: '#0a0a0a',
+          bgcolor: '#070708',
+          backgroundColor: '#070708 !important',
           backgroundImage: `url(${AUTH_BG_IMAGE})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center top',
           backgroundRepeat: 'no-repeat',
           position: 'relative',
           overflowX: 'clip',
-          overflowY: 'visible',
-          minHeight: {
-            xs: 'calc(100dvh - var(--layout-header-mobile-height, 36px))',
-            md: 'calc(100dvh - var(--layout-header-desktop-height, 40px))',
-          },
+          overflowY: 'auto',
+          minHeight: '100vh',
+          width: '100%',
           '&::before': {
             content: "''",
             position: 'absolute',
             inset: 0,
             background: `
-              radial-gradient(ellipse 55% 50% at 50% 45%, ${alpha(GOLD, 0.12)} 0%, transparent 62%),
-              linear-gradient(180deg, ${alpha('#070708', 0.9)} 0%, ${alpha('#070708', 0.95)} 100%)
+              radial-gradient(ellipse 60% 55% at 50% 45%, ${alpha(GOLD, 0.1)} 0%, transparent 65%),
+              linear-gradient(180deg, ${alpha('#070708', 0.4)} 0%, ${alpha('#070708', 0.65)} 100%)
             `,
             zIndex: 0,
           },
@@ -217,7 +224,7 @@ export function AuthSplitLayout({
             content: "''",
             position: 'absolute',
             inset: 0,
-            background: `radial-gradient(ellipse 120% 80% at 50% 50%, transparent 40%, ${alpha('#050506', 0.85)} 100%)`,
+            background: `radial-gradient(ellipse 120% 80% at 50% 50%, transparent 35%, ${alpha('#050506', 0.6)} 100%)`,
             zIndex: 0,
           },
         },
@@ -229,13 +236,14 @@ export function AuthSplitLayout({
         sx={{
           position: 'relative',
           zIndex: 1,
-          minHeight: { xs: 'auto', md: 'calc(100dvh - var(--layout-header-desktop-height, 40px))' },
+          minHeight: '100vh',
+          width: '100%',
           display: 'flex',
           justifyContent: 'center',
-          alignItems: { xs: 'flex-start', md: 'center' },
+          alignItems: 'center',
           overflowX: 'clip',
           overflowY: 'visible',
-          py: { xs: 3, md: 4 },
+          py: { xs: 4, md: 5 },
         }}
       >
         {children}
@@ -255,7 +263,12 @@ export function AuthSplitLayout({
         '--layout-main-mobile-margin-top': '0px',
         ...cssVars,
       }}
-      sx={sx}
+      sx={{
+        bgcolor: '#070708',
+        backgroundColor: '#070708 !important',
+        minHeight: '100vh',
+        ...sx,
+      }}
     >
       {renderMain()}
     </LayoutSection>

@@ -207,7 +207,19 @@ export function SignInView() {
         </Box>
       </AuthFormShell>
 
-      <Box sx={{ width: 1, maxWidth: { xs: 1, sm: 400, md: 420 }, mt: 1.5 }}>
+      <Box
+        sx={{
+          width: 1,
+          maxWidth: { xs: 1, sm: 400, md: 420 },
+          mt: 1.5,
+          animation: 'authViewEnter 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both',
+          '@keyframes authViewEnter': {
+            '0%': { opacity: 0, transform: 'scale(1.1) translateY(-4px)', filter: 'blur(8px)' },
+            '100%': { opacity: 1, transform: 'scale(1) translateY(0)', filter: 'blur(0px)' },
+          },
+          '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+        }}
+      >
         <AuthSocialButtons />
       </Box>
     </Box>

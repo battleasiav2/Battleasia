@@ -20,6 +20,8 @@ export const ICON_ALIASES: Record<string, string> = {
   'ri:twitter-fill': 'mingcute:twitter-fill',
   'ri:twitter-x-fill': 'mingcute:twitter-fill',
   'mynaui:chat-messages': 'solar:chat-round-dots-bold',
+  'solar:shop-2-bold-duotone': 'solar:shop-bold-duotone',
+  'solar:shop-2-bold': 'solar:shop-bold',
 };
 
 export function resolveIconName(icon: string): string {

@@ -6,7 +6,7 @@ export const BAC_COIN_IMAGE = '/assets/images/currency.webp';
 /** Official site header logo (same as nav header). */
 export const SHOP_HEADER_LOGO = '/logo/logo.webp';
 
-export const SHOP_HERO_IMAGE = '/assets/images/shop/bac-store-hero.webp';
+export const SHOP_HERO_IMAGE = '/assets/images/shop/bac-store-hero.png';
 
 export const SHOP_COIN_IMAGE = BAC_COIN_IMAGE;
 
