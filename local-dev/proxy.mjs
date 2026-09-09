@@ -23,6 +23,11 @@ const proxy = httpProxy.createProxyServer({
 
 proxy.on('error', (error, req, res) => {
   console.error(`[proxy] ${req.headers.host}${req.url}:`, error.message);
+  // WS upgrade errors pass a net.Socket (no writeHead); don't crash the proxy.
+  if (!res || typeof res.writeHead !== 'function') {
+    if (res && typeof res.destroy === 'function') res.destroy();
+    return;
+  }
   if (!res.headersSent) {
     res.writeHead(502, { 'Content-Type': 'text/plain' });
   }
