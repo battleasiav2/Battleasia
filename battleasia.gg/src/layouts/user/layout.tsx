@@ -259,7 +259,7 @@ export function UserLayout({
                     direction="row"
                     alignItems="center"
                     justifyContent="flex-end"
-                    spacing={{ xs: 0.75, sm: 1.25 }}
+                    spacing={{ xs: 0.5, sm: 1.25 }}
                     sx={{
                         ...headerRightAreaSx,
                         display: 'flex',
@@ -267,6 +267,8 @@ export function UserLayout({
                         ml: 'auto',
                         justifySelf: 'flex-end',
                         flexShrink: 0,
+                        minWidth: 0,
+                        maxWidth: { xs: '58%', sm: 'none' },
                     }}
                 >
                     {isLoggedIn ? (

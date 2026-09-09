@@ -13,20 +13,20 @@ import { startAppDownload } from 'src/utils/app-download-url';
 const deckEnter = keyframes`
   0% {
     opacity: 0;
-    transform: perspective(1000px) translateY(30px) rotateX(10deg) scale(0.96);
+    transform: translateY(24px) scale(0.97);
   }
   100% {
     opacity: 1;
-    transform: perspective(1000px) translateY(0) rotateX(0deg) scale(1);
+    transform: translateY(0) scale(1);
   }
 `;
 
 const floatDeck3d = keyframes`
   0%, 100% {
-    transform: perspective(1000px) translateY(0px) rotateX(0deg) rotateY(0deg);
+    transform: translateY(0px);
   }
   50% {
-    transform: perspective(1000px) translateY(-5px) rotateX(1deg) rotateY(-1deg);
+    transform: translateY(-5px);
   }
 `;
 
@@ -80,16 +80,26 @@ export function Hero3dDeck({
     }
   };
 
+  const titleSize = {
+    xs: 'clamp(2.35rem, 9vw, 2.75rem)',
+    sm: 'clamp(2.75rem, 7vw, 3.35rem)',
+    md: 'clamp(2.85rem, 4.6vw, 3.75rem)',
+    lg: 'clamp(3.1rem, 4.2vw, 4.25rem)',
+  } as const;
+
   return (
     <Stack
       spacing={{ xs: 1.5, sm: 1.75, md: 2 }}
       sx={{
         position: 'relative',
         zIndex: 2,
-        width: '100%',
-        maxWidth: { xs: '100%', sm: 480, md: 520, lg: 560 },
+        width: { xs: '100%', md: 'auto' },
+        maxWidth: { xs: '100%', sm: 480, md: 'min(520px, calc(100vw - 64px))', lg: 'min(560px, calc(100vw - 96px))' },
+        minWidth: 0,
+        boxSizing: 'border-box',
         alignItems: { xs: 'center', md: 'flex-end' },
         textAlign: { xs: 'center', md: 'right' },
+        // Keep 3D float mild so perspective + parent overflow:hidden don't clip the right edge.
         animation: `${deckEnter} 0.9s cubic-bezier(0.16, 1, 0.3, 1) both, ${floatDeck3d} 8s 1s ease-in-out infinite`,
         '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
       }}
@@ -150,9 +160,9 @@ export function Hero3dDeck({
             position: 'absolute',
             top: '42%',
             right: { xs: '50%', md: 0 },
-            transform: { xs: 'translate(50%, -50%)', md: 'translate(8%, -50%)' },
-            width: { xs: 220, sm: 280, md: 340 },
-            height: { xs: 70, sm: 90, md: 110 },
+            transform: { xs: 'translate(50%, -50%)', md: 'translateY(-50%)' },
+            width: { xs: 220, sm: 280, md: 300 },
+            height: { xs: 70, sm: 90, md: 100 },
             borderRadius: '50%',
             background: `radial-gradient(ellipse, ${goldAlpha(0.35)} 0%, transparent 70%)`,
             filter: 'blur(22px)',
@@ -168,13 +178,17 @@ export function Hero3dDeck({
             position: 'relative',
             zIndex: 1,
             m: 0,
+            width: '100%',
+            maxWidth: '100%',
             display: 'flex',
             flexWrap: 'wrap',
             alignItems: 'baseline',
             justifyContent: { xs: 'center', md: 'flex-end' },
-            gap: { xs: 1, sm: 1.25, md: 1.5 },
+            columnGap: { xs: 1, sm: 1.25, md: 1.5 },
+            rowGap: 0,
             lineHeight: 0.88,
             userSelect: 'none',
+            boxSizing: 'border-box',
           }}
         >
           {/* Chromatic ghost layers */}
@@ -187,11 +201,11 @@ export function Hero3dDeck({
               flexWrap: 'wrap',
               alignItems: 'baseline',
               justifyContent: { xs: 'center', md: 'flex-end' },
-              gap: { xs: 1, sm: 1.25, md: 1.5 },
+              columnGap: { xs: 1, sm: 1.25, md: 1.5 },
               color: alpha('#38bdf8', 0.35),
               fontFamily: `'Barlow', sans-serif`,
               fontWeight: 800,
-              fontSize: { xs: 42, sm: 56, md: 68, lg: 76 },
+              fontSize: titleSize,
               letterSpacing: { xs: '-0.02em', md: '-0.03em' },
               textTransform: 'uppercase',
               transform: 'translate(-2px, 1px)',
@@ -213,11 +227,11 @@ export function Hero3dDeck({
               flexWrap: 'wrap',
               alignItems: 'baseline',
               justifyContent: { xs: 'center', md: 'flex-end' },
-              gap: { xs: 1, sm: 1.25, md: 1.5 },
+              columnGap: { xs: 1, sm: 1.25, md: 1.5 },
               color: alpha('#fb7185', 0.28),
               fontFamily: `'Barlow', sans-serif`,
               fontWeight: 800,
-              fontSize: { xs: 42, sm: 56, md: 68, lg: 76 },
+              fontSize: titleSize,
               letterSpacing: { xs: '-0.02em', md: '-0.03em' },
               textTransform: 'uppercase',
               transform: 'translate(2px, -1px)',
@@ -238,7 +252,7 @@ export function Hero3dDeck({
               zIndex: 1,
               fontFamily: `'Barlow', sans-serif`,
               fontWeight: 800,
-              fontSize: { xs: 42, sm: 56, md: 68, lg: 76 },
+              fontSize: titleSize,
               letterSpacing: { xs: '-0.02em', md: '-0.03em' },
               textTransform: 'uppercase',
               backgroundImage: `
@@ -278,7 +292,7 @@ export function Hero3dDeck({
               zIndex: 1,
               fontFamily: `'Barlow', sans-serif`,
               fontWeight: 800,
-              fontSize: { xs: 42, sm: 56, md: 68, lg: 76 },
+              fontSize: titleSize,
               letterSpacing: { xs: '-0.02em', md: '-0.03em' },
               textTransform: 'uppercase',
               backgroundImage: `
@@ -349,7 +363,8 @@ export function Hero3dDeck({
         sx={{
           position: 'relative',
           width: '100%',
-          maxWidth: { xs: '100%', sm: 480, md: '100%' },
+          maxWidth: '100%',
+          boxSizing: 'border-box',
           px: { xs: 1.5, sm: 2 },
           py: 1.25,
           borderRadius: '8px',
@@ -370,6 +385,7 @@ export function Hero3dDeck({
             lineHeight: 1.5,
             fontWeight: 500,
             textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
+            overflowWrap: 'anywhere',
           }}
         >
           {t('home.subtitle')}
@@ -380,10 +396,14 @@ export function Hero3dDeck({
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         spacing={1.5}
+        useFlexGap
         sx={{
           width: '100%',
+          maxWidth: '100%',
           justifyContent: { xs: 'center', md: 'flex-end' },
+          flexWrap: 'wrap',
           pt: 0.5,
+          boxSizing: 'border-box',
         }}
       >
         {/* Primary 3D Tactical Cyber Download Button (Active State matching screenshot) */}

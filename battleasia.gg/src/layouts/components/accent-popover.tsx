@@ -10,6 +10,7 @@ import { CustomPopover } from 'src/components/custom-popover';
 import { Iconify } from 'src/components/iconify/iconify';
 import { useSettingsContext } from 'src/components/settings';
 import { useTranslate } from 'src/locales/use-locales';
+import { headerAccentButtonSx } from './header-chrome';
 import {
   ACCENT_IDS,
   ACCENT_PALETTES,
@@ -53,44 +54,15 @@ export function AccentPopover() {
           disableRipple
           aria-label={t('navigation.siteColor')}
           onClick={onOpen}
-          sx={{
-            width: 36,
-            minWidth: 36,
-            height: 34,
-            p: 0,
-            position: 'relative',
-            display: 'grid',
-            placeItems: 'center',
-            bgcolor: open ? alpha('#080d14', 0.95) : alpha('#06090e', 0.85),
-            backdropFilter: 'blur(10px)',
-            border: `1.5px solid ${open ? 'var(--ba-gold)' : alpha('#ffffff', 0.18)}`,
-            borderRadius: '4px',
-            clipPath: 'polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)',
-            boxShadow: open
-              ? `0 0 18px ${goldAlpha(0.5)}, inset 0 0 8px ${goldAlpha(0.25)}`
-              : '0 2px 8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-            transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-            '&:hover': {
-              borderColor: 'var(--ba-gold)',
-              transform: 'translateY(-2px)',
-              boxShadow: `0 0 20px ${goldAlpha(0.6)}, inset 0 0 10px ${goldAlpha(0.3)}`,
-              '& .prism-ring': {
-                borderColor: 'var(--ba-gold)',
-                animationDuration: '4s',
-              },
-              '& .prism-gem': {
-                transform: 'scale(1.2) rotate(45deg)',
-              },
-            },
-          }}
+          sx={headerAccentButtonSx(open)}
         >
           {/* Rotating Chromatic Reticle Ring (Clean solid micro-ticks, no dashes) */}
           <Box
             className="prism-ring"
             sx={{
               position: 'absolute',
-              width: 22,
-              height: 22,
+              width: { xs: 16, sm: 22 },
+              height: { xs: 16, sm: 22 },
               borderRadius: '50%',
               border: `1px solid ${goldAlpha(0.4)}`,
               animation: `${prismRotate} 10s linear infinite`,

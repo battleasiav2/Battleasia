@@ -100,24 +100,24 @@ export function HomeHeader({
           <Logo
             disabled
             sx={{
-              width: { xs: 52, sm: 56, md: 60 },
-              height: { xs: 52, sm: 56, md: 60 },
+              width: { xs: 40, sm: 52, md: 60 },
+              height: { xs: 40, sm: 52, md: 60 },
               flexShrink: 0,
             }}
           />
 
           <Stack spacing={0.25} sx={{ minWidth: 0, position: 'relative' }}>
-            <Stack direction="row" alignItems="center" spacing={0.6}>
+            <Stack direction="row" alignItems="center" spacing={0.45}>
               <Typography
                 component="span"
                 sx={{
                   fontFamily: "'Barlow', sans-serif",
                   fontSize: isBengali
-                    ? { xs: 16, sm: 18, md: 20 }
-                    : { xs: 18, sm: 20, md: 23 },
+                    ? { xs: 13, sm: 16, md: 20 }
+                    : { xs: 14, sm: 18, md: 23 },
                   fontWeight: 900,
                   lineHeight: 1,
-                  letterSpacing: '1.8px',
+                  letterSpacing: { xs: '1px', md: '1.8px' },
                   textTransform: 'uppercase',
                   whiteSpace: 'nowrap',
                   background: 'linear-gradient(180deg, #FFFFFF 15%, #E2E8F0 60%, #94A3B8 100%)',
@@ -135,11 +135,11 @@ export function HomeHeader({
                 sx={{
                   fontFamily: "'Barlow', sans-serif",
                   fontSize: isBengali
-                    ? { xs: 16, sm: 18, md: 20 }
-                    : { xs: 18, sm: 20, md: 23 },
+                    ? { xs: 13, sm: 16, md: 20 }
+                    : { xs: 14, sm: 18, md: 23 },
                   fontWeight: 900,
                   lineHeight: 1,
-                  letterSpacing: '1.8px',
+                  letterSpacing: { xs: '1px', md: '1.8px' },
                   textTransform: 'uppercase',
                   whiteSpace: 'nowrap',
                   background:
@@ -177,8 +177,10 @@ export function HomeHeader({
           ...headerRightAreaSx,
           display: 'flex',
           height: 1,
-          gap: { xs: 0.75, sm: 1.25 },
+          gap: { xs: 0.5, sm: 1, md: 1.25 },
           justifyContent: 'flex-end',
+          minWidth: 0,
+          maxWidth: { xs: '52%', sm: 'none' },
         }}
       >
         {isLoggedIn ? (

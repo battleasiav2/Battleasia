@@ -22,20 +22,21 @@ class AppHeader extends StatelessWidget {
     final isMobile = AppUtils.isMobile(context);
     final horizontalPadding = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 12.0,
-    ).clamp(10.0, 24.0);
+      baseSize: isMobile ? 8.0 : 12.0,
+    ).clamp(isMobile ? 8.0 : 10.0, 24.0);
     final logoSize = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 64.0,
-    ).clamp(48.0, 72.0);
+      baseSize: isMobile ? 44.0 : 64.0,
+    ).clamp(isMobile ? 40.0 : 48.0, 72.0);
     final topInset = MediaQuery.of(context).padding.top;
+    final gap = isMobile ? 6.0 : 12.0;
 
     return Container(
       padding: EdgeInsets.fromLTRB(
         horizontalPadding,
-        topInset + 10,
+        topInset + (isMobile ? 6 : 10),
         horizontalPadding,
-        12,
+        isMobile ? 8 : 12,
       ),
       decoration: BoxDecoration(
         color: const Color(0xF00A0A0A),
@@ -52,9 +53,9 @@ class AppHeader extends StatelessWidget {
           ),
           const Spacer(),
           const AccentToggle(),
-          const SizedBox(width: 8),
+          SizedBox(width: gap),
           const LocaleToggle(),
-          const SizedBox(width: 12),
+          SizedBox(width: gap),
           Consumer<AuthProvider>(
             builder: (context, authProvider, _) {
               if (authProvider.isAuthenticated) {
@@ -63,7 +64,7 @@ class AppHeader extends StatelessWidget {
               return const SizedBox.shrink();
             },
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: gap),
           Consumer<AuthProvider>(
             builder: (context, authProvider, _) {
               if (authProvider.isAuthenticated) {
@@ -71,6 +72,12 @@ class AppHeader extends StatelessWidget {
               }
               return IconButton(
                 tooltip: 'nav.login'.tr(),
+                visualDensity: isMobile ? VisualDensity.compact : VisualDensity.standard,
+                padding: EdgeInsets.all(isMobile ? 6 : 8),
+                constraints: BoxConstraints(
+                  minWidth: isMobile ? 36 : 48,
+                  minHeight: isMobile ? 36 : 48,
+                ),
                 onPressed: () {
                   Navigator.push(
                     context,

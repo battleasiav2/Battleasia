@@ -97,14 +97,18 @@ export function HomeView() {
         position: 'relative',
         overflow: 'hidden',
         bgcolor: '#000000',
-        aspectRatio: { md: '16 / 9', lg: '16 / 9' },
-        height: { xs: 'auto', md: 'calc(100vw * 9 / 16)' },
-        minHeight: { xs: 620, sm: 680, md: 760, lg: 820 },
-        maxHeight: { md: 940, lg: 1000 },
+        // Lock width to the viewport. NEVER pair aspect-ratio with a large
+        // minHeight and a 100vw-based height — that expands width past 100vw
+        // (e.g. minHeight 820 → width 1458) and clips the right-aligned deck.
+        width: '100%',
+        maxWidth: '100%',
+        boxSizing: 'border-box',
+        aspectRatio: { md: '16 / 9' },
+        minHeight: { xs: 620, sm: 680, md: 640 },
+        maxHeight: { md: 'min(900px, 92vh)', lg: 'min(960px, 92vh)' },
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        perspective: '1200px',
       }}
     >
       {/* 16:9 Full HD Hero Background Video */}
@@ -152,12 +156,15 @@ export function HomeView() {
           maxWidth: '1360px',
           mx: 'auto',
           px: { xs: 2, sm: 3, md: 4, lg: 5 },
+          // Keep the right-aligned deck inside the clipped hero (overflow:hidden).
+          pr: { xs: 2, sm: 3, md: 5, lg: 6, xl: 7 },
           pt: { xs: 4, sm: 5, md: 2 },
           pb: { xs: 7, sm: 8, md: 4 },
           display: 'flex',
           justifyContent: { xs: 'center', md: 'flex-end' },
           alignItems: 'center',
           boxSizing: 'border-box',
+          minWidth: 0,
         }}
       >
         <Hero3dDeck

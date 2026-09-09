@@ -22,14 +22,18 @@ export function getHeaderBarSx(isScrolled = false): SystemStyleObject<Theme> {
 export const headerBarSx = getHeaderBarSx(false);
 
 export const headerContainerSx: SystemStyleObject<Theme> = {
-  minHeight: { xs: 54, md: 58 },
-  height: { xs: 54, md: 58 },
-  px: { xs: 2, sm: 2.5, md: 3 },
+  minHeight: { xs: 50, md: 58 },
+  height: { xs: 50, md: 58 },
+  px: { xs: 1.25, sm: 2, md: 3 },
   py: 0,
   alignItems: 'center',
   display: { xs: 'flex', lg: 'grid' },
   gridTemplateColumns: { lg: 'minmax(0, 1fr) auto minmax(0, 1fr)' },
   columnGap: { lg: 2 },
+  width: '100%',
+  maxWidth: '100%',
+  boxSizing: 'border-box',
+  minWidth: 0,
 };
 
 export const headerLeftAreaSx: SystemStyleObject<Theme> = {
@@ -157,20 +161,21 @@ export const headerNavDividerSx: SystemStyleObject<Theme> = {
 
 /** Tactical Cyber Sign-In / Login Button with Holographic Shimmer */
 export const headerSignInButtonSx: SystemStyleObject<Theme> = {
-  height: 40,
-  px: { xs: 1.5, sm: 2 },
+  height: { xs: 32, sm: 36, md: 40 },
+  px: { xs: 1, sm: 1.5, md: 2 },
   position: 'relative',
   overflow: 'hidden',
   display: 'inline-flex',
   alignItems: 'center',
-  gap: 0.85,
+  gap: { xs: 0.5, sm: 0.85 },
   textDecoration: 'none',
   fontFamily: "'Barlow', sans-serif",
   fontWeight: 800,
-  fontSize: 14,
-  letterSpacing: '1.4px',
+  fontSize: { xs: 11, sm: 13, md: 14 },
+  letterSpacing: { xs: '0.8px', md: '1.4px' },
   textTransform: 'uppercase',
   color: '#ffffff',
+  flexShrink: 0,
   background:
     'linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(18, 22, 28, 0.9) 45%, rgba(6, 8, 12, 0.98) 100%)',
   border: '1px solid rgba(255, 255, 255, 0.16)',
@@ -204,8 +209,8 @@ export const headerSignInButtonSx: SystemStyleObject<Theme> = {
 
 export const headerSignInIconButtonSx: SystemStyleObject<Theme> = {
   ...headerSignInButtonSx,
-  px: 1.15,
-  width: 40,
+  px: { xs: 0.85, sm: 1.15 },
+  width: { xs: 32, sm: 36, md: 40 },
   justifyContent: 'center',
 };
 
@@ -213,11 +218,13 @@ export const headerSignInIconButtonSx: SystemStyleObject<Theme> = {
 export const headerLanguagePillSx = (open: boolean): SystemStyleObject<Theme> => ({
   display: 'inline-flex',
   alignItems: 'center',
-  gap: 0.85,
-  px: 1.35,
+  gap: { xs: 0.4, sm: 0.85 },
+  px: { xs: 0.7, sm: 1.1, md: 1.35 },
   py: 0,
-  minHeight: 40,
-  height: 40,
+  minHeight: { xs: 32, sm: 36, md: 40 },
+  height: { xs: 32, sm: 36, md: 40 },
+  minWidth: 0,
+  flexShrink: 0,
   position: 'relative',
   overflow: 'hidden',
   background: open
@@ -247,20 +254,23 @@ export const headerLanguagePillSx = (open: boolean): SystemStyleObject<Theme> =>
 
 export const headerLanguageCodeSx: SystemStyleObject<Theme> = {
   fontFamily: "'Barlow', sans-serif",
-  fontSize: 14,
+  fontSize: { xs: 11, sm: 13, md: 14 },
   fontWeight: 800,
-  letterSpacing: '1px',
+  letterSpacing: { xs: '0.6px', md: '1px' },
   color: '#ffffff',
   lineHeight: 1,
   textTransform: 'uppercase',
+  // Compact on the narrowest phones — flag alone is enough.
+  display: { xs: 'none', sm: 'inline' },
 };
 
 /** Tactical Plasma Reactor Core Button for Accent Popover */
 export const headerAccentButtonSx = (open: boolean): SystemStyleObject<Theme> => ({
-  width: 40,
-  minWidth: 40,
-  height: 40,
+  width: { xs: 30, sm: 36, md: 40 },
+  minWidth: { xs: 30, sm: 36, md: 40 },
+  height: { xs: 30, sm: 36, md: 40 },
   p: 0,
+  flexShrink: 0,
   position: 'relative',
   display: 'grid',
   placeItems: 'center',

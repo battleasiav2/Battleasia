@@ -166,14 +166,15 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
         onClick={onOpen}
         sx={[
           {
-            width: { xs: 34, sm: 36 },
-            height: { xs: 34, sm: 36 },
+            width: { xs: 30, sm: 36 },
+            height: { xs: 30, sm: 36 },
             p: 0,
             borderRadius: '6px',
             bgcolor: open ? goldAlpha(0.14) : alpha('#080c14', 0.55),
             border: '1.5px solid',
             borderColor: open ? goldAlpha(0.55) : alpha('#ffffff', 0.18),
             boxShadow: `inset 0 0 0 1px ${alpha('#000000', 0.25)}`,
+            flexShrink: 0,
             transition: 'transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease',
             '&:hover': {
               bgcolor: alpha('#0c121c', 0.72),

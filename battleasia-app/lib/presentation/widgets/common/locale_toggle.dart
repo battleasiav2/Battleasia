@@ -27,6 +27,7 @@ class LocaleToggle extends StatelessWidget {
     final code = context.locale.languageCode;
     final current = code.toUpperCase();
     final flag = _flagEmoji[code] ?? '🌐';
+    final isMobile = MediaQuery.sizeOf(context).width < 600;
 
     return PopupMenuButton<Locale>(
       tooltip: 'Language',
@@ -64,7 +65,10 @@ class LocaleToggle extends StatelessWidget {
           )
           .toList(),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        padding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 7 : 10,
+          vertical: isMobile ? 5 : 6,
+        ),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(999),
@@ -73,17 +77,19 @@ class LocaleToggle extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(flag, style: const TextStyle(fontSize: 14, height: 1)),
-            const SizedBox(width: 6),
-            Text(
-              current,
-              style: AppTheme.bodySmall.copyWith(
-                color: Colors.white.withValues(alpha: 0.88),
-                fontWeight: FontWeight.w600,
-                fontSize: 13,
-                letterSpacing: 0.2,
+            Text(flag, style: TextStyle(fontSize: isMobile ? 12 : 14, height: 1)),
+            if (!isMobile) ...[
+              const SizedBox(width: 6),
+              Text(
+                current,
+                style: AppTheme.bodySmall.copyWith(
+                  color: Colors.white.withValues(alpha: 0.88),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13,
+                  letterSpacing: 0.2,
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),

@@ -196,8 +196,8 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         <Box
           sx={{
             position: 'relative',
-            width: 19,
-            height: 19,
+            width: { xs: 15, sm: 19 },
+            height: { xs: 15, sm: 19 },
             borderRadius: '50%',
             overflow: 'hidden',
             flexShrink: 0,
@@ -219,8 +219,8 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
           <FlagIcon
             code={currentLang?.countryCode}
             sx={{
-              width: 19,
-              height: 19,
+              width: { xs: 15, sm: 19 },
+              height: { xs: 15, sm: 19 },
               borderRadius: '50%',
             }}
           />
@@ -231,12 +231,13 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         <Iconify
           icon="solar:alt-arrow-down-bold"
           className="lang-chevron"
-          width={11}
+          width={10}
           sx={{
             color: open ? 'var(--ba-nav-badge-main, #cbfb24)' : 'rgba(255, 255, 255, 0.55)',
             transform: open ? 'rotate(180deg)' : 'none',
             transition: 'transform 0.2s ease, color 0.2s ease',
-            ml: -0.25,
+            ml: { xs: 0, sm: -0.25 },
+            display: { xs: 'none', sm: 'block' },
           }}
         />
       </ButtonBase>

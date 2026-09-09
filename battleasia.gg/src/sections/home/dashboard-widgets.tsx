@@ -125,13 +125,20 @@ function CyberCardPanel({
             sx={[
                 {
                     position: 'relative',
-                    clipPath: 'polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)',
+                    width: '100%',
+                    maxWidth: '100%',
+                    minWidth: 0,
+                    boxSizing: 'border-box',
+                    clipPath: {
+                        xs: 'none',
+                        sm: 'polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)',
+                    },
                     bgcolor: alpha('#090c12', 0.88),
                     backdropFilter: 'blur(16px)',
                     WebkitBackdropFilter: 'blur(16px)',
                     border: `1px solid ${accentBorder ? safeAlpha(accentColor, 0.4) : alpha('#ffffff', 0.1)}`,
                     boxShadow: `0 12px 32px rgba(0, 0, 0, 0.7), 0 0 20px ${safeAlpha(accentColor, 0.12)}`,
-                    p: { xs: 2, sm: 2.25, md: 2.5 },
+                    p: { xs: 1.5, sm: 2.25, md: 2.5 },
                     overflow: 'hidden',
                     transition: 'all 0.28s cubic-bezier(0.16, 1, 0.3, 1)',
                     display: 'flex',
@@ -294,17 +301,19 @@ function TacticalCardHeader({
                     </Box>
 
                     {/* Question / Title Text & Badge */}
-                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                    <Box sx={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
                         <Typography
+                            noWrap
                             sx={{
                                 fontFamily: 'monospace',
-                                fontSize: 9.5,
+                                fontSize: { xs: 8.5, sm: 9.5 },
                                 fontWeight: 800,
-                                letterSpacing: 1.2,
+                                letterSpacing: { xs: 0.6, sm: 1.2 },
                                 color: accentColor,
                                 textTransform: 'uppercase',
                                 lineHeight: 1.2,
                                 mb: 0.3,
+                                maxWidth: '100%',
                             }}
                         >
                             {badge}
@@ -451,9 +460,13 @@ function HolographicStatPod({
         <Box
             sx={{
                 position: 'relative',
-                p: { xs: 1.4, sm: 1.7 },
-                minHeight: { xs: 95, sm: 108 },
+                p: { xs: 1.1, sm: 1.7 },
+                minHeight: { xs: 88, sm: 108 },
                 height: '100%',
+                width: '100%',
+                maxWidth: '100%',
+                minWidth: 0,
+                boxSizing: 'border-box',
                 bgcolor: alpha('#090d15', 0.85),
                 borderRadius: '4px',
                 border: `1px solid ${safeAlpha(accentColor, 0.25)}`,
@@ -536,15 +549,19 @@ function HolographicStatPod({
                             ) : null}
                             <Typography
                                 variant="overline"
-                                noWrap
                                 sx={{
-                                    letterSpacing: 0.8,
+                                    letterSpacing: 0.6,
                                     color: alpha('#ffffff', 0.72),
-                                    fontSize: { xs: '0.68rem', sm: '0.74rem' },
+                                    fontSize: { xs: '0.58rem', sm: '0.74rem' },
                                     lineHeight: 1.2,
                                     fontWeight: 700,
                                     textTransform: 'uppercase',
                                     fontFamily: 'monospace',
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden',
+                                    whiteSpace: { xs: 'normal', sm: 'nowrap' },
                                 }}
                             >
                                 {label}
@@ -697,9 +714,9 @@ function PulseHeroTactical({
                 sx={{
                     position: 'absolute',
                     top: '-50%',
-                    right: '-20%',
-                    width: 520,
-                    height: 520,
+                    right: { xs: '-40%', md: '-20%' },
+                    width: { xs: 280, md: 520 },
+                    height: { xs: 280, md: 520 },
                     borderRadius: '50%',
                     border: `1px dashed ${safeAlpha(accentColor, 0.12)}`,
                     pointerEvents: 'none',
@@ -729,11 +746,13 @@ function PulseHeroTactical({
                         alignItems="center"
                         spacing={0.8}
                         sx={{
+                            display: { xs: 'none', sm: 'flex' },
                             px: 1,
                             py: 0.35,
                             borderRadius: '3px',
                             bgcolor: safeAlpha(accentColor, 0.1),
                             border: `1px solid ${safeAlpha(accentColor, 0.3)}`,
+                            flexShrink: 0,
                         }}
                     >
                         <LivePulseDot color="green" size={7} />
@@ -753,18 +772,19 @@ function PulseHeroTactical({
                 }
             />
 
-            <Grid container spacing={{ xs: 2.5, md: 3.5 }} alignItems="center" sx={{ position: 'relative', zIndex: 1, flex: 1 }}>
-                <Grid item xs={12} md={5}>
-                    <Stack spacing={2}>
+            <Grid container spacing={{ xs: 2, md: 3.5 }} alignItems="center" sx={{ position: 'relative', zIndex: 1, flex: 1, width: '100%', maxWidth: '100%', m: 0 }}>
+                <Grid item xs={12} md={5} sx={{ minWidth: 0, maxWidth: '100%' }}>
+                    <Stack spacing={2} sx={{ minWidth: 0, maxWidth: '100%' }}>
                         {/* Description */}
                         <Typography
                             variant="body2"
                             sx={{
                                 color: alpha('#ffffff', 0.78),
-                                fontSize: { xs: '0.875rem', sm: '0.9375rem' },
+                                fontSize: { xs: '0.8125rem', sm: '0.9375rem' },
                                 lineHeight: 1.65,
                                 letterSpacing: 0.2,
-                                maxWidth: 480,
+                                maxWidth: '100%',
+                                overflowWrap: 'anywhere',
                             }}
                         >
                             {description}
@@ -804,11 +824,11 @@ function PulseHeroTactical({
                 </Grid>
 
                 {/* 4 Pods Grid */}
-                <Grid item xs={12} md={7}>
-                    <Grid container spacing={{ xs: 1.25, sm: 1.5 }}>
+                <Grid item xs={12} md={7} sx={{ minWidth: 0, maxWidth: '100%' }}>
+                    <Grid container spacing={{ xs: 1, sm: 1.5 }} sx={{ width: '100%', m: 0 }}>
                         {statTiles.map((tile, idx) => (
-                            <Grid key={tile.key} item xs={6} sx={{ display: 'flex' }}>
-                                <Box sx={{ width: 1 }}>
+                            <Grid key={tile.key} item xs={6} sx={{ display: 'flex', minWidth: 0, maxWidth: '50%' }}>
+                                <Box sx={{ width: 1, minWidth: 0, maxWidth: '100%' }}>
                                     <HolographicStatPod
                                         index={`0${idx + 1}`}
                                         label={tile.label}
@@ -1739,6 +1759,9 @@ export function LandingDashboardSection() {
                 position: 'relative',
                 overflowX: 'clip',
                 overflowY: 'visible',
+                width: '100%',
+                maxWidth: '100%',
+                boxSizing: 'border-box',
                 bgcolor: '#07080b',
                 py: { xs: 4, md: 6 },
                 color: '#f5f5f5',
@@ -1772,7 +1795,17 @@ export function LandingDashboardSection() {
                 },
             }}
         >
-            <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
+            <Container
+                maxWidth="lg"
+                sx={{
+                    position: 'relative',
+                    zIndex: 1,
+                    width: '100%',
+                    maxWidth: '100%',
+                    px: { xs: 1.5, sm: 2, md: 3 },
+                    boxSizing: 'border-box',
+                }}
+            >
                 <Stack spacing={{ xs: 3.5, sm: 4, md: 4.5 }}>
                     {/* Hero Pulse Command Terminal */}
                     <PulseHeroTactical
