@@ -438,7 +438,7 @@ export const userHeaderPillSx: SxProps<Theme> = {
   gap: 0.75,
   px: 1.35,
   py: 0.45,
-  minHeight: { xs: 28, sm: 30 },
+  minHeight: { xs: 34, sm: 36 },
   borderRadius: `${GLASS_CARD_RADIUS}px`,
   bgcolor: alpha('#10141c', 0.82),
   border: `1px solid ${goldAlpha(0.32)}`,

@@ -107,8 +107,8 @@ export function AuthSplitLayout({
           overflowX: 'clip',
           overflowY: 'visible',
           minHeight: {
-            xs: 'calc(100dvh - var(--layout-header-mobile-height, 48px))',
-            md: 'calc(100dvh - var(--layout-header-desktop-height, 50px))',
+            xs: 'calc(100dvh - var(--layout-header-mobile-height, 56px))',
+            md: 'calc(100dvh - var(--layout-header-desktop-height, 60px))',
           },
           '&::before': {
             content: "''",
@@ -200,7 +200,7 @@ export function AuthSplitLayout({
         sx={{
           position: 'relative',
           zIndex: 3,
-          minHeight: { xs: 'auto', md: 'calc(100dvh - var(--layout-header-desktop-height, 50px))' },
+          minHeight: { xs: 'auto', md: 'calc(100dvh - var(--layout-header-desktop-height, 60px))' },
           display: 'flex',
           justifyContent: 'center',
           alignItems: { xs: 'flex-start', md: 'center' },
@@ -248,8 +248,8 @@ export function AuthSplitLayout({
       footerSection={null}
       cssVars={{
         '--layout-auth-content-width': '620px',
-        '--layout-header-desktop-height': '50px',
-        '--layout-header-mobile-height': '48px',
+        '--layout-header-desktop-height': '60px',
+        '--layout-header-mobile-height': '56px',
         '--layout-main-margin-top': '0px',
         '--layout-main-mobile-margin-top': '0px',
         ...cssVars,

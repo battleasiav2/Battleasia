@@ -257,8 +257,8 @@ export function AuthSplitLayout({
       footerSection={null}
       cssVars={{
         '--layout-auth-content-width': '620px',
-        '--layout-header-desktop-height': '40px',
-        '--layout-header-mobile-height': '36px',
+        '--layout-header-desktop-height': '56px',
+        '--layout-header-mobile-height': '52px',
         '--layout-main-margin-top': '0px',
         '--layout-main-mobile-margin-top': '0px',
         ...cssVars,

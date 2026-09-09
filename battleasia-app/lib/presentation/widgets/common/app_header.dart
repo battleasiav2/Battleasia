@@ -26,16 +26,16 @@ class AppHeader extends StatelessWidget {
     ).clamp(10.0, 24.0);
     final logoSize = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 56.0,
-    ).clamp(40.0, 60.0);
+      baseSize: 64.0,
+    ).clamp(48.0, 72.0);
     final topInset = MediaQuery.of(context).padding.top;
 
     return Container(
       padding: EdgeInsets.fromLTRB(
         horizontalPadding,
-        topInset + 6,
+        topInset + 10,
         horizontalPadding,
-        8,
+        12,
       ),
       decoration: BoxDecoration(
         color: const Color(0xF00A0A0A),

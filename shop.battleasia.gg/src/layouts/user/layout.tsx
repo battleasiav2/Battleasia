@@ -149,8 +149,8 @@ export function UserLayout({
           <Logo
             href={paths.user.shop}
             sx={{
-              width: { xs: 52, sm: 60, md: 68 },
-              height: { xs: 52, sm: 60, md: 68 },
+              width: { xs: 60, sm: 68, md: 76 },
+              height: { xs: 60, sm: 68, md: 76 },
               flexShrink: 0,
               '& img': {
                 borderRadius: 0.5,

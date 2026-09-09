@@ -5,7 +5,7 @@ import { alpha } from '@mui/material/styles';
 
 /**
  * Tactical military/sci-fi gaming header bar — matching Lost Light aesthetic.
- * Clean, compact height (50px) with razor-sharp vector cutouts and no blurry glow.
+ * Slightly taller bar for easier tap targets and clearer branding.
  */
 export function getHeaderBarSx(isScrolled = false): SystemStyleObject<Theme> {
   return {
@@ -22,8 +22,8 @@ export function getHeaderBarSx(isScrolled = false): SystemStyleObject<Theme> {
 export const headerBarSx = getHeaderBarSx(false);
 
 export const headerContainerSx: SystemStyleObject<Theme> = {
-  minHeight: { xs: 42, md: 44 },
-  height: { xs: 42, md: 44 },
+  minHeight: { xs: 54, md: 58 },
+  height: { xs: 54, md: 58 },
   px: { xs: 2, sm: 2.5, md: 3 },
   py: 0,
   alignItems: 'center',
@@ -62,13 +62,13 @@ export const headerRightAreaSx: SystemStyleObject<Theme> = {
 export const headerActiveTrapezoidSx: SxProps<Theme> = {
   position: 'relative',
   height: '100%',
-  minWidth: { xs: 120, lg: 126, xl: 138 },
+  minWidth: { xs: 128, lg: 136, xl: 148 },
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   textDecoration: 'none',
   cursor: 'pointer',
-  px: { lg: 3.5, xl: 4 },
+  px: { lg: 3.75, xl: 4.25 },
   filter: 'none',
   boxShadow: 'none',
   '&::before': {
@@ -91,7 +91,7 @@ export const headerActiveTrapezoidSx: SxProps<Theme> = {
     zIndex: 1,
     fontFamily: "'Barlow', sans-serif",
     fontWeight: 800,
-    fontSize: { lg: 14, xl: 14.5 },
+    fontSize: { lg: 15, xl: 15.5 },
     letterSpacing: '1.2px',
     textTransform: 'uppercase',
     color: '#ffffff',
@@ -112,14 +112,14 @@ export const headerInactiveNavLinkSx: SxProps<Theme> = {
   justifyContent: 'center',
   textDecoration: 'none',
   cursor: 'pointer',
-  px: { lg: 2.25, xl: 2.75 },
+  px: { lg: 2.5, xl: 3 },
   transition: 'color 0.15s ease',
   filter: 'none',
   boxShadow: 'none',
   '& .nav-label': {
     fontFamily: "'Barlow', sans-serif",
     fontWeight: 600,
-    fontSize: { lg: 13.5, xl: 14 },
+    fontSize: { lg: 14.5, xl: 15 },
     letterSpacing: '1.2px',
     textTransform: 'uppercase',
     color: 'rgba(255, 255, 255, 0.68)',
@@ -142,7 +142,7 @@ export function getHeaderNavLinkSx(isActive: boolean): SxProps<Theme> {
 /** Thin tactical divider between nav links */
 export const headerNavDividerSx: SystemStyleObject<Theme> = {
   width: '1px',
-  height: '13px',
+  height: '16px',
   bgcolor: 'rgba(255, 255, 255, 0.14)',
   alignSelf: 'center',
   flexShrink: 0,
@@ -157,8 +157,8 @@ export const headerNavDividerSx: SystemStyleObject<Theme> = {
 
 /** Tactical Cyber Sign-In / Login Button with Holographic Shimmer */
 export const headerSignInButtonSx: SystemStyleObject<Theme> = {
-  height: 34,
-  px: { xs: 1.35, sm: 1.85 },
+  height: 40,
+  px: { xs: 1.5, sm: 2 },
   position: 'relative',
   overflow: 'hidden',
   display: 'inline-flex',
@@ -167,7 +167,7 @@ export const headerSignInButtonSx: SystemStyleObject<Theme> = {
   textDecoration: 'none',
   fontFamily: "'Barlow', sans-serif",
   fontWeight: 800,
-  fontSize: 13,
+  fontSize: 14,
   letterSpacing: '1.4px',
   textTransform: 'uppercase',
   color: '#ffffff',
@@ -204,8 +204,8 @@ export const headerSignInButtonSx: SystemStyleObject<Theme> = {
 
 export const headerSignInIconButtonSx: SystemStyleObject<Theme> = {
   ...headerSignInButtonSx,
-  px: 1.1,
-  width: 34,
+  px: 1.15,
+  width: 40,
   justifyContent: 'center',
 };
 
@@ -214,10 +214,10 @@ export const headerLanguagePillSx = (open: boolean): SystemStyleObject<Theme> =>
   display: 'inline-flex',
   alignItems: 'center',
   gap: 0.85,
-  px: 1.25,
+  px: 1.35,
   py: 0,
-  minHeight: 34,
-  height: 34,
+  minHeight: 40,
+  height: 40,
   position: 'relative',
   overflow: 'hidden',
   background: open
@@ -247,7 +247,7 @@ export const headerLanguagePillSx = (open: boolean): SystemStyleObject<Theme> =>
 
 export const headerLanguageCodeSx: SystemStyleObject<Theme> = {
   fontFamily: "'Barlow', sans-serif",
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: 800,
   letterSpacing: '1px',
   color: '#ffffff',
@@ -257,9 +257,9 @@ export const headerLanguageCodeSx: SystemStyleObject<Theme> = {
 
 /** Tactical Plasma Reactor Core Button for Accent Popover */
 export const headerAccentButtonSx = (open: boolean): SystemStyleObject<Theme> => ({
-  width: 34,
-  minWidth: 34,
-  height: 34,
+  width: 40,
+  minWidth: 40,
+  height: 40,
   p: 0,
   position: 'relative',
   display: 'grid',
@@ -298,7 +298,7 @@ export const headerRightStackSx: SystemStyleObject<Theme> = {
   gap: { xs: 0.85, sm: 1.25 },
 };
 
-export const headerControlHeight = { xs: 28, sm: 30 } as const;
+export const headerControlHeight = { xs: 34, sm: 36 } as const;
 
 export const headerCompactSearchSx: SystemStyleObject<Theme> = {
   height: headerControlHeight,
@@ -306,8 +306,8 @@ export const headerCompactSearchSx: SystemStyleObject<Theme> = {
   maxHeight: headerControlHeight,
   alignItems: 'center',
   '& .MuiIconButton-root': {
-    width: 30,
-    height: 30,
+    width: 36,
+    height: 36,
     p: 0.5,
   },
 };

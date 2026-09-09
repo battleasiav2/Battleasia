@@ -12,7 +12,7 @@ export const headerLanguagePillSx = (open: boolean): SxProps<Theme> => ({
   gap: 0.75,
   px: 1.1,
   py: 0.45,
-  minHeight: 34,
+  minHeight: 40,
   borderRadius: '999px',
   bgcolor: open ? alpha('#ffffff', 0.1) : alpha('#ffffff', 0.06),
   border: `1px solid ${open ? alpha(GOLD, 0.28) : alpha('#ffffff', 0.1)}`,
@@ -24,7 +24,7 @@ export const headerLanguagePillSx = (open: boolean): SxProps<Theme> => ({
 });
 
 export const headerLanguageCodeSx: SxProps<Theme> = {
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: 600,
   letterSpacing: 0.02,
   color: alpha('#ffffff', 0.88),

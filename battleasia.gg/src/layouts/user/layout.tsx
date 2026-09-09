@@ -132,8 +132,8 @@ export function UserLayout({
             container: {
                 maxWidth: false,
                 sx: {
-                    minHeight: { xs: 40, md: 42 },
-                    height: { xs: 40, md: 42 },
+                    minHeight: { xs: 54, md: 58 },
+                    height: { xs: 54, md: 58 },
                     px: { xs: 2, sm: 2.5, [layoutQuery]: 3 },
                     py: 0,
                     display: 'flex',
@@ -174,8 +174,8 @@ export function UserLayout({
                     {/* Mobile-only: logo image */}
                     <Logo
                         sx={{
-                            width: { xs: 40, sm: 44 },
-                            height: { xs: 40, sm: 44 },
+                            width: { xs: 48, sm: 52 },
+                            height: { xs: 48, sm: 52 },
                             flexShrink: 0,
                             display: 'flex',
                             alignItems: 'center',

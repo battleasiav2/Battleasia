@@ -166,8 +166,8 @@ export function DashboardLayout({
         cssVars={{
           ...dashboardLayoutVars(theme),
           ...navVars.layout,
-          '--layout-header-mobile-height': '40px',
-          '--layout-header-desktop-height': '42px',
+          '--layout-header-mobile-height': '54px',
+          '--layout-header-desktop-height': '58px',
           ...cssVars,
         }}
         sx={[

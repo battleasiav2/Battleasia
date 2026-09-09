@@ -100,8 +100,8 @@ export function HomeHeader({
           <Logo
             disabled
             sx={{
-              width: { xs: 44, sm: 48, md: 52 },
-              height: { xs: 44, sm: 48, md: 52 },
+              width: { xs: 52, sm: 56, md: 60 },
+              height: { xs: 52, sm: 56, md: 60 },
               flexShrink: 0,
             }}
           />
