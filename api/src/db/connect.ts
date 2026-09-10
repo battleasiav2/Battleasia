@@ -1,8 +1,20 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import mongoose from 'mongoose';
 import { env } from '../config/env.js';
 import { restoreDump } from '../restore-dump.js';
 
 let mongodInstance: any = null;
+
+const API_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const REPO_ROOT = path.resolve(API_ROOT, '..');
+
+/** Keep API + seed on the same DB name (memory-server URI often omits it). */
+function withBattleasiaDb(uri: string): string {
+  const parsed = new URL(uri);
+  parsed.pathname = '/battleasia';
+  return parsed.toString();
+}
 
 export async function connectDb() {
   mongoose.set('strictQuery', true);
@@ -37,7 +49,7 @@ export async function connectDb() {
       },
     });
 
-    const memoryUri = mongodInstance.getUri();
+    const memoryUri = withBattleasiaDb(mongodInstance.getUri());
     console.log(`[DB] Embedded MongoDB started at ${memoryUri}`);
 
     await mongoose.connect(memoryUri, { maxPoolSize: 20 });
@@ -48,9 +60,11 @@ export async function connectDb() {
     if (!collections || collections.length === 0) {
       const dumpCandidates = [
         process.env.MONGO_DUMP_PATH,
-        new URL('../../db/mongo/battleasia', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'),
-        `${process.cwd()}/backups/battleasia-all-seed-20260906-145755/mongo/battleasia`,
-        `${process.cwd()}/backups/battleasia-demo-20260906-144120/mongo/battleasia`,
+        path.join(REPO_ROOT, 'db/mongo/battleasia'),
+        path.join(REPO_ROOT, 'backups/battleasia-all-seed-20260906-145755/mongo/battleasia'),
+        path.join(REPO_ROOT, 'backups/battleasia-demo-20260906-144120/mongo/battleasia'),
+        path.join(process.cwd(), 'backups/battleasia-all-seed-20260906-145755/mongo/battleasia'),
+        path.join(process.cwd(), 'backups/battleasia-demo-20260906-144120/mongo/battleasia'),
       ].filter(Boolean) as string[];
 
       const { existsSync } = await import('node:fs');

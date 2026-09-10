@@ -891,24 +891,151 @@ const formatDateTime = (value?: string | null) => {
 };
 
 // ----------------------------------------------------------------------
-// Redesigned Top Players Matrix (Operative Dossier Leaderboard)
+// Leaderboard shell — Download-APK glass, square corners (content unchanged)
 // ----------------------------------------------------------------------
+
+function GlassApkCardShell({
+    children,
+    accentColor,
+    statusText,
+    refId,
+}: {
+    children: React.ReactNode;
+    accentColor: string;
+    statusText?: string;
+    refId?: string;
+}) {
+    return (
+        <Box
+            sx={{
+                position: 'relative',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                overflow: 'hidden',
+                borderRadius: 0,
+                boxSizing: 'border-box',
+                background: `linear-gradient(135deg, ${safeAlpha(accentColor, 0.14)} 0%, rgba(10, 14, 22, 0.88) 42%, rgba(17, 24, 39, 0.82) 100%)`,
+                backdropFilter: 'blur(14px)',
+                WebkitBackdropFilter: 'blur(14px)',
+                border: `1px solid ${safeAlpha(accentColor, 0.45)}`,
+                boxShadow: `
+                    inset 0 1px 0 ${alpha('#ffffff', 0.1)},
+                    0 0 20px ${safeAlpha(accentColor, 0.18)},
+                    0 8px 24px ${alpha('#000000', 0.45)}
+                `,
+                p: { xs: 1.5, sm: 2.25, md: 2.5 },
+                transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
+                '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: '-140%',
+                    width: '55%',
+                    height: '100%',
+                    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent)',
+                    transform: 'skewX(-20deg)',
+                    transition: 'left 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
+                    pointerEvents: 'none',
+                    zIndex: 1,
+                },
+                '&:hover': {
+                    borderColor: accentColor,
+                    boxShadow: `
+                        inset 0 0 24px ${safeAlpha(accentColor, 0.14)},
+                        0 0 24px ${safeAlpha(accentColor, 0.32)},
+                        0 10px 28px ${alpha('#000000', 0.55)}
+                    `,
+                    '&::before': { left: '160%' },
+                },
+            }}
+        >
+            <Box
+                aria-hidden
+                sx={{
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: 3.5,
+                    bgcolor: accentColor,
+                    boxShadow: `0 0 14px ${accentColor}`,
+                    zIndex: 2,
+                }}
+            />
+
+            <Box sx={{ position: 'relative', zIndex: 2, flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+                {children}
+            </Box>
+
+            {statusText ? (
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    sx={{
+                        mt: 2,
+                        pt: 1.2,
+                        borderTop: `1px solid ${alpha('#ffffff', 0.07)}`,
+                        flexShrink: 0,
+                        position: 'relative',
+                        zIndex: 2,
+                    }}
+                >
+                    <Stack direction="row" alignItems="center" spacing={0.75}>
+                        <Box
+                            sx={{
+                                width: 5,
+                                height: 5,
+                                borderRadius: '50%',
+                                bgcolor: '#22c55e',
+                                boxShadow: '0 0 8px #22c55e',
+                                flexShrink: 0,
+                            }}
+                        />
+                        <Typography
+                            sx={{
+                                fontFamily: 'monospace',
+                                fontSize: { xs: 9, sm: 9.5 },
+                                color: '#22c55e',
+                                fontWeight: 700,
+                                letterSpacing: 0.5,
+                                textTransform: 'uppercase',
+                            }}
+                        >
+                            {statusText}
+                        </Typography>
+                    </Stack>
+                    {refId ? (
+                        <Typography
+                            sx={{
+                                fontFamily: 'monospace',
+                                fontSize: { xs: 9, sm: 9.5 },
+                                color: alpha('#ffffff', 0.35),
+                                letterSpacing: 0.5,
+                            }}
+                        >
+                            REF_ID: #{refId}
+                        </Typography>
+                    ) : null}
+                </Stack>
+            ) : null}
+        </Box>
+    );
+}
 
 function PlayerListCardTactical({
     title,
-    hint,
     players,
     loading,
     metricKey,
     translations,
 }: {
     title: string;
-    hint: string;
     players: DashboardTopPlayer[];
     loading?: boolean;
     metricKey: 'totalWinnings' | 'winRate' | 'totalKills' | 'averageScore';
     translations: {
-        live: string;
         noDataYet: string;
         lastPlayed: string;
         winnings: string;
@@ -920,58 +1047,39 @@ function PlayerListCardTactical({
     const theme = useTheme();
     const accentColor = theme.palette.primary.main || '#cbfb24';
     const accentContrast = theme.palette.primary.contrastText || '#081401';
-    const isWinnings = metricKey === 'totalWinnings';
-    const cardId = isWinnings ? '02' : '03';
-    const cardBadge = isWinnings ? 'HIGH ROLLER ARCHIVE // EARNINGS' : 'COMBAT OPERATIVES // ELITE STATS';
-    const cardIcon = isWinnings ? 'solar:cup-star-bold' : 'solar:target-bold';
-    const statusText = isWinnings ? 'SETTLEMENT VERIFIED // LIVE PAYOUTS' : 'COMBAT TELEMETRY // ARBITRATION ACTIVE';
 
     return (
-        <CyberCardPanel
-            glowColor={accentColor}
-            accentBorder
-            statusText={statusText}
-            refId={cardId}
-            sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-        >
-            <TacticalCardHeader
-                id={cardId}
-                badge={cardBadge}
-                title={title}
-                hint={hint}
-                rightIcon={cardIcon}
-                accentColor={accentColor}
-                accentContrast={accentContrast}
-                statusBadge={
-                    <Stack
-                        direction="row"
-                        alignItems="center"
-                        spacing={0.6}
-                        sx={{
-                            px: 0.9,
-                            py: 0.35,
-                            borderRadius: '3px',
-                            bgcolor: alpha('#10b981', 0.12),
-                            border: `1px solid ${alpha('#10b981', 0.3)}`,
-                        }}
-                    >
-                        <LivePulseDot color="green" size={6} />
-                        <Typography
-                            sx={{
-                                fontSize: '0.7rem',
-                                fontWeight: 800,
-                                letterSpacing: 0.8,
-                                textTransform: 'uppercase',
-                                color: '#10b981',
-                                lineHeight: 1.3,
-                                fontFamily: 'monospace',
-                            }}
-                        >
-                            {translations.live}
-                        </Typography>
-                    </Stack>
-                }
-            />
+        <GlassApkCardShell accentColor={accentColor}>
+            {/* Simple title only — APK glass, square corners */}
+            <Box
+                sx={{
+                    position: 'relative',
+                    overflow: 'hidden',
+                    borderRadius: 0,
+                    mb: 1.5,
+                    px: { xs: 1.5, sm: 1.75 },
+                    py: { xs: 1.15, sm: 1.25 },
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: `linear-gradient(90deg, ${safeAlpha(accentColor, 0.2)} 0%, rgba(10, 14, 22, 0.85) 100%)`,
+                    border: `1px solid ${safeAlpha(accentColor, 0.5)}`,
+                    boxShadow: `0 0 16px ${safeAlpha(accentColor, 0.22)}, inset 0 1px 0 ${alpha('#ffffff', 0.08)}`,
+                }}
+            >
+                <Typography
+                    sx={{
+                        fontSize: { xs: 13, sm: 14, md: 15 },
+                        fontWeight: 900,
+                        letterSpacing: '0.07em',
+                        textTransform: 'uppercase',
+                        color: '#ffffff',
+                        lineHeight: 1.2,
+                        textShadow: `0 0 12px ${safeAlpha(accentColor, 0.45)}`,
+                    }}
+                >
+                    {title}
+                </Typography>
+            </Box>
 
             <Box sx={{ flex: 1 }}>
                 {loading ? (
@@ -1193,7 +1301,7 @@ function PlayerListCardTactical({
                     </Stack>
                 )}
             </Box>
-        </CyberCardPanel>
+        </GlassApkCardShell>
     );
 }
 
@@ -1503,14 +1611,12 @@ function DashboardMatchTileTactical({
 
 function DashboardMatchPanelTactical({
     title,
-    badgeLabel,
     matches,
     loading,
     variant,
     emptyLabel,
 }: {
     title: string;
-    badgeLabel: string;
     matches: DashboardMatchSummary[];
     loading?: boolean;
     variant: 'prize' | 'ongoing';
@@ -1518,62 +1624,42 @@ function DashboardMatchPanelTactical({
 }) {
     const theme = useTheme();
     const accentColor = theme.palette.primary.main || '#cbfb24';
-    const accentContrast = theme.palette.primary.contrastText || '#081401';
-    const isPrize = variant === 'prize';
-    const cardId = isPrize ? '04' : '05';
-    const cardBadge = isPrize ? 'WARZONE BOUNTY // ESCROW POOLS' : 'SATELLITE BROADCAST // LIVE LOBBIES';
-    const cardIcon = isPrize ? 'solar:crown-bold' : 'solar:fire-bold';
-    const statusText = isPrize ? 'ESCROW LOCKED // GUARANTEED PRIZE' : 'SATELLITE RADAR // ACTIVE BROADCAST';
 
     const count = matches.length;
     const tilesToRender = matches.slice(0, TARGET_MATCH_TILES);
-    const isOngoing = variant === 'ongoing';
 
     return (
-        <CyberCardPanel
-            glowColor={accentColor}
-            accentBorder
-            statusText={statusText}
-            refId={cardId}
-            sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-        >
-            <TacticalCardHeader
-                id={cardId}
-                badge={cardBadge}
-                title={title}
-                rightIcon={cardIcon}
-                accentColor={accentColor}
-                accentContrast={accentContrast}
-                statusBadge={
-                    <Stack
-                        direction="row"
-                        alignItems="center"
-                        spacing={0.6}
-                        sx={{
-                            px: 0.9,
-                            py: 0.35,
-                            borderRadius: '3px',
-                            bgcolor: isOngoing ? alpha('#ef4444', 0.12) : safeAlpha(accentColor, 0.12),
-                            border: `1px solid ${isOngoing ? alpha('#ef4444', 0.3) : safeAlpha(accentColor, 0.3)}`,
-                        }}
-                    >
-                        {isOngoing ? <LivePulseDot color="red" size={6} /> : null}
-                        <Typography
-                            sx={{
-                                fontSize: '0.7rem',
-                                fontWeight: 800,
-                                letterSpacing: 0.8,
-                                textTransform: 'uppercase',
-                                color: isOngoing ? '#ef4444' : accentColor,
-                                lineHeight: 1.3,
-                                fontFamily: 'monospace',
-                            }}
-                        >
-                            {badgeLabel}
-                        </Typography>
-                    </Stack>
-                }
-            />
+        <GlassApkCardShell accentColor={accentColor}>
+            {/* Simple title only — APK glass, square corners */}
+            <Box
+                sx={{
+                    position: 'relative',
+                    overflow: 'hidden',
+                    borderRadius: 0,
+                    mb: 1.5,
+                    px: { xs: 1.5, sm: 1.75 },
+                    py: { xs: 1.15, sm: 1.25 },
+                    display: 'flex',
+                    alignItems: 'center',
+                    background: `linear-gradient(90deg, ${safeAlpha(accentColor, 0.2)} 0%, rgba(10, 14, 22, 0.85) 100%)`,
+                    border: `1px solid ${safeAlpha(accentColor, 0.5)}`,
+                    boxShadow: `0 0 16px ${safeAlpha(accentColor, 0.22)}, inset 0 1px 0 ${alpha('#ffffff', 0.08)}`,
+                }}
+            >
+                <Typography
+                    sx={{
+                        fontSize: { xs: 13, sm: 14, md: 15 },
+                        fontWeight: 900,
+                        letterSpacing: '0.07em',
+                        textTransform: 'uppercase',
+                        color: '#ffffff',
+                        lineHeight: 1.2,
+                        textShadow: `0 0 12px ${safeAlpha(accentColor, 0.45)}`,
+                    }}
+                >
+                    {title}
+                </Typography>
+            </Box>
 
             <Box sx={{ flex: 1 }}>
                 {loading ? (
@@ -1610,7 +1696,7 @@ function DashboardMatchPanelTactical({
                     </Typography>
                 )}
             </Box>
-        </CyberCardPanel>
+        </GlassApkCardShell>
     );
 }
 
@@ -1872,12 +1958,10 @@ export function LandingDashboardSection() {
                         >
                             <PlayerListCardTactical
                                 title={t('home.dashboard.topProfitGenerators')}
-                                hint={t('home.dashboard.mostWinningsHint')}
                                 players={data?.topProfitPlayers || []}
                                 loading={loading}
                                 metricKey="totalWinnings"
                                 translations={{
-                                    live: t('home.dashboard.live'),
                                     noDataYet: t('home.dashboard.noDataYet'),
                                     lastPlayed: t('home.dashboard.lastPlayed'),
                                     winnings: t('home.dashboard.winnings'),
@@ -1900,12 +1984,10 @@ export function LandingDashboardSection() {
                         >
                             <PlayerListCardTactical
                                 title={t('home.dashboard.topPlayers')}
-                                hint={t('home.dashboard.topPlayersHint')}
                                 players={data?.topPlayers || []}
                                 loading={loading}
                                 metricKey="totalKills"
                                 translations={{
-                                    live: t('home.dashboard.live'),
                                     noDataYet: t('home.dashboard.noDataYet'),
                                     lastPlayed: t('home.dashboard.lastPlayed'),
                                     winnings: t('home.dashboard.winnings'),
@@ -1928,7 +2010,6 @@ export function LandingDashboardSection() {
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                             <DashboardMatchPanelTactical
                                 title={t('home.dashboard.highPrizeBattles')}
-                                badgeLabel={t('home.dashboard.topN')}
                                 matches={data?.highPrizeMatches || []}
                                 loading={loading}
                                 variant="prize"
@@ -1942,11 +2023,6 @@ export function LandingDashboardSection() {
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                             <DashboardMatchPanelTactical
                                 title={t('home.dashboard.ongoingMatchesTitle')}
-                                badgeLabel={
-                                    data?.ongoingMatches?.length
-                                        ? `${data.ongoingMatches.length} ${t('home.dashboard.listed')}`
-                                        : t('home.dashboard.upcoming')
-                                }
                                 matches={data?.ongoingMatches || []}
                                 loading={loading}
                                 variant="ongoing"
