@@ -715,13 +715,13 @@ export function HomeView() {
       {sectionSlide}
 
       <ScrollReveal repeat preset="cinematic" distance={36} amount={0.06}>
-        <Suspense fallback={<Box sx={{ minHeight: { xs: 520, md: 440 } }} />}>
+        <Suspense fallback={<Box sx={{ minHeight: { xs: 420, md: 360 } }} />}>
           <LandingDashboardSection />
         </Suspense>
       </ScrollReveal>
 
-      <ScrollReveal repeat preset="cinematic" distance={36} amount={0.06}>
-        <Suspense fallback={<Box sx={{ minHeight: { xs: 420, md: 380 } }} />}>
+      <ScrollReveal repeat preset="cinematic" distance={28} amount={0.06}>
+        <Suspense fallback={<Box sx={{ minHeight: { xs: 360, md: 320 } }} />}>
           <PlayYourGameSection />
         </Suspense>
       </ScrollReveal>

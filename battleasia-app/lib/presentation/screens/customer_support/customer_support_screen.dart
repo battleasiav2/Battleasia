@@ -15,6 +15,7 @@ import 'package:battleasia_app/core/utils/time_utils.dart';
 import 'package:battleasia_app/data/models/customer_support_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
 
 enum _SupportMode { list, create, detail }
 
@@ -403,7 +404,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                 setState(() => _mode = _SupportMode.list);
               }
             },
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           ),
         Expanded(
           child: Text(
@@ -411,9 +412,9 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTheme.heading2.copyWith(
-              color: Colors.black,
+              color: AppColors.textPrimary,
               fontWeight: FontWeight.w700,
-              fontSize: 24,
+              fontSize: 22,
             ),
           ),
         ),
@@ -480,9 +481,16 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                     _loadTickets();
                   },
                   selectedColor: AppColors.gold.withValues(alpha: 0.25),
+                  backgroundColor: AppColors.surface.withValues(alpha: 0.6),
+                  side: BorderSide(
+                    color: selected
+                        ? AppColors.gold.withValues(alpha: 0.55)
+                        : Colors.white.withValues(alpha: 0.12),
+                  ),
                   labelStyle: TextStyle(
-                    color: selected ? Colors.black : Colors.black54,
-                    fontWeight: FontWeight.w600,
+                    color: selected ? AppColors.gold : AppColors.textMuted,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
                   ),
                 ),
               );
@@ -500,7 +508,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                       child: Text(
                         'support.noTickets'.tr(),
                         style: AppTheme.bodyMedium
-                            .copyWith(color: AppTheme.textSecondary),
+                            .copyWith(color: AppColors.textMuted),
                       ),
                     )
                   : RefreshIndicator(
@@ -510,12 +518,11 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                         separatorBuilder: (_, __) => const SizedBox(height: 10),
                         itemBuilder: (context, index) {
                           final t = _tickets[index];
-                          return Material(
-                            color: AppTheme.surfaceColor,
-                            borderRadius: BorderRadius.circular(8),
+                          return GlassCard(
+                            padding: EdgeInsets.zero,
                             child: InkWell(
                               onTap: () => _openTicket(t),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(12),
                               child: Padding(
                                 padding: const EdgeInsets.all(14),
                                 child: Column(
@@ -528,7 +535,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                                             t.subject,
                                             style: AppTheme.bodyLarge.copyWith(
                                               fontWeight: FontWeight.w700,
-                                              color: Colors.black,
+                                              color: AppColors.textPrimary,
                                             ),
                                           ),
                                         ),
@@ -537,7 +544,8 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                                     ),
                                     const SizedBox(height: 6),
                                     Text(
-                                      _supportCategoryLabel(t.category).toUpperCase(),
+                                      _supportCategoryLabel(t.category)
+                                          .toUpperCase(),
                                       style: AppTheme.bodySmall.copyWith(
                                         color: AppColors.gold,
                                         fontWeight: FontWeight.w700,
@@ -550,18 +558,20 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                         style: AppTheme.bodySmall.copyWith(
-                                          color: AppTheme.textSecondary,
+                                          color: AppColors.textMuted,
                                         ),
                                       ),
                                     ],
                                     if (t.attachmentCount > 0) ...[
                                       const SizedBox(height: 6),
                                       Text(
-                                        'support.attachmentsCount'.tr(namedArgs: {
-                                          'count': '${t.attachmentCount}',
-                                        }),
+                                        'support.attachmentsCount'.tr(
+                                          namedArgs: {
+                                            'count': '${t.attachmentCount}',
+                                          },
+                                        ),
                                         style: AppTheme.bodySmall.copyWith(
-                                          color: AppTheme.textSecondary,
+                                          color: AppColors.textMuted,
                                         ),
                                       ),
                                     ],

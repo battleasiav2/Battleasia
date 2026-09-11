@@ -5,12 +5,11 @@ import {
   Chip,
   Stack,
   TextField,
-  ButtonBase,
   IconButton,
   Typography,
   CircularProgress,
 } from '@mui/material';
-import { alpha, useTheme, keyframes } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 import { toast } from 'react-hot-toast';
 
 import { CONFIG } from 'src/global-config';
@@ -23,8 +22,12 @@ import {
   userFieldSx,
   getUserChipSx,
   UserPageShell,
+  UserGlassCard,
+  UserEmptyState,
+  UserActionButton,
   userMutedTextSx,
   userFieldLabelProps,
+  goldAlpha,
 } from 'src/layouts/user';
 import { socketService } from 'src/lib/socket';
 import { useTranslate } from 'src/locales/use-locales';
@@ -49,10 +52,10 @@ import { useMessagesScroll } from './hooks/use-messages-scroll';
 // ----------------------------------------------------------------------
 
 const CATEGORIES: { value: TicketCategory; label: string; icon: string; desc: string }[] = [
-  { value: 'payment', label: 'Payment & BAC Wallet', icon: 'solar:wallet-money-bold-duotone', desc: 'Deposits, withdrawals, balance disputes' },
-  { value: 'match', label: 'Match & Anti-Cheat', icon: 'solar:shield-check-bold-duotone', desc: 'Score disputes, referee review, anti-cheat' },
-  { value: 'account', label: 'Account & Security', icon: 'solar:lock-keyhole-minimalistic-bold-duotone', desc: '2FA reset, credentials, device link' },
-  { value: 'other', label: 'VIP / Other Comms', icon: 'solar:headphones-round-sound-bold-duotone', desc: 'General queries, tournaments, partnerships' },
+  { value: 'payment', label: 'Payment & Wallet', icon: 'solar:wallet-money-bold-duotone', desc: 'Deposits, withdrawals, balance' },
+  { value: 'match', label: 'Match & Fair Play', icon: 'solar:shield-check-bold-duotone', desc: 'Scores, disputes, anti-cheat' },
+  { value: 'account', label: 'Account & Security', icon: 'solar:lock-keyhole-minimalistic-bold-duotone', desc: 'Login, 2FA, profile' },
+  { value: 'other', label: 'Other', icon: 'solar:headphones-round-sound-bold-duotone', desc: 'General questions' },
 ];
 
 function mapTicket(raw: any): SupportTicket {
@@ -69,23 +72,12 @@ function mapTicket(raw: any): SupportTicket {
   };
 }
 
-const pulseDot = keyframes`
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.9); }
-`;
-
-
-
 // ----------------------------------------------------------------------
 
 export function CustomerSupportView() {
-  const theme = useTheme();
   const { t } = useTranslate();
   const { user, isLoggedIn } = useSelector((state) => state.auth);
   const api = useApi();
-
-  const themeAccent = theme.palette.primary.main || USER_COLORS.gold;
-  const accentContrast = theme.palette.primary.contrastText || '#081401';
 
   const fileRef = useRef<HTMLInputElement>(null);
   const createFileRef = useRef<HTMLInputElement>(null);
@@ -114,10 +106,10 @@ export function CustomerSupportView() {
 
   const statusTabs = useMemo(
     () => [
-      { value: 'all' as const, label: 'All Transmissions' },
-      { value: 'open' as const, label: 'Active / Open' },
-      { value: 'pending' as const, label: 'Under Review' },
-      { value: 'closed' as const, label: 'Resolved' },
+      { value: 'all' as const, label: 'All' },
+      { value: 'open' as const, label: 'Open' },
+      { value: 'pending' as const, label: 'Pending' },
+      { value: 'closed' as const, label: 'Closed' },
     ],
     []
   );
@@ -393,562 +385,387 @@ export function CustomerSupportView() {
     setMessage('');
   }, []);
 
-  // ------------------------------------------------------------------ LIST VIEW
+  const filterButtons = (
+    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+      {statusTabs.map((tab) => (
+        <UserActionButton
+          key={tab.value}
+          size="small"
+          actionVariant={statusFilter === tab.value ? 'gold' : 'ghost'}
+          onClick={() => setStatusFilter(tab.value)}
+        >
+          {tab.label}
+        </UserActionButton>
+      ))}
+    </Stack>
+  );
+
+  const newTicketBtn = (
+    <UserActionButton
+      size="small"
+      actionVariant="solidGold"
+      startIcon={<Iconify icon="solar:add-circle-bold" width={16} />}
+      onClick={() => setViewMode('create')}
+    >
+      New ticket
+    </UserActionButton>
+  );
+
   if (viewMode === 'list') {
     return (
-      <UserPageShell contentSx={{ maxWidth: 1120, mx: 'auto' }}>
-        {/* Top Hero Command Terminal */}
+      <UserPageShell>
         <SupportHero
-          title={t('customerSupport.title') || 'COMMAND SUPPORT'}
-          subtitle={t('customerSupport.subtitle') || 'Direct satellite relay and rapid incident dispatch for BattleAsia operatives.'}
+          title={t('customerSupport.title') || 'Customer Support'}
+          subtitle={
+            t('customerSupport.subtitle') ||
+            'Open a ticket and our team will help you quickly.'
+          }
+          action={<Box sx={{ display: { xs: 'none', md: 'block' } }}>{newTicketBtn}</Box>}
         />
 
-        {/* 3D Tactical Stat HUD */}
+        <Box sx={{ mb: 1.5, display: { xs: 'block', md: 'none' } }}>{newTicketBtn}</Box>
+
         <Box
           sx={{
             display: 'grid',
-            gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
-            gap: 2,
-            mb: 3,
+            gridTemplateColumns: { xs: 'repeat(3, minmax(0, 1fr))' },
+            width: 1,
+            mb: 1.75,
+            bgcolor: alpha('#06090e', 0.72),
+            border: `1px solid ${goldAlpha(0.28)}`,
+            borderTop: `2px solid ${USER_COLORS.gold}`,
+            boxShadow: `0 8px 24px ${alpha('#000000', 0.45)}`,
           }}
         >
-          {/* Stat 1: Total */}
-          <Box
-            sx={{
-              p: 2.2,
-              borderRadius: '12px',
-              bgcolor: '#0a0c10',
-              border: `1px solid ${alpha('#ffffff', 0.1)}`,
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
-            }}
-          >
-            <Typography sx={{ fontFamily: 'monospace', fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: alpha('#ffffff', 0.45), mb: 0.5 }}>
-              TOTAL DISPATCHES
-            </Typography>
-            <Typography sx={{ fontSize: 24, fontWeight: 900, color: '#ffffff', fontFamily: `'Barlow', sans-serif` }}>
-              {stats.total}
-            </Typography>
-            <Typography sx={{ fontSize: 10, fontWeight: 600, color: alpha('#ffffff', 0.4), mt: 0.3 }}>
-              Lifetime tickets logged
-            </Typography>
-          </Box>
-
-          {/* Stat 2: Active */}
-          <Box
-            sx={{
-              p: 2.2,
-              borderRadius: '12px',
-              bgcolor: '#0a0c10',
-              border: `1px solid ${alpha('#22c55e', 0.3)}`,
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
-            }}
-          >
-            <Stack direction="row" alignItems="center" spacing={0.7} sx={{ mb: 0.5 }}>
-              <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: '#22c55e', animation: `${pulseDot} 1.5s infinite` }} />
-              <Typography sx={{ fontFamily: 'monospace', fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: '#22c55e' }}>
-                ACTIVE COMMS
+          {[
+            { label: 'Tickets', value: stats.total },
+            { label: 'Open', value: stats.open },
+            { label: 'Closed', value: stats.closed },
+          ].map((stat, index, arr) => (
+            <Box
+              key={stat.label}
+              sx={{
+                minWidth: 0,
+                px: { xs: 1.25, md: 1.5 },
+                py: { xs: 1.25, md: 1.5 },
+                borderRight:
+                  index < arr.length - 1 ? `1px solid ${alpha('#ffffff', 0.1)}` : 'none',
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: 0.5,
+                  textTransform: 'uppercase',
+                  color: alpha('#ffffff', 0.55),
+                  mb: 0.35,
+                }}
+              >
+                {stat.label}
               </Typography>
-            </Stack>
-            <Typography sx={{ fontSize: 24, fontWeight: 900, color: '#22c55e', fontFamily: `'Barlow', sans-serif` }}>
-              {stats.open}
-            </Typography>
-            <Typography sx={{ fontSize: 10, fontWeight: 600, color: alpha('#ffffff', 0.4), mt: 0.3 }}>
-              Open / In arbitration
-            </Typography>
-          </Box>
-
-          {/* Stat 3: Resolved */}
-          <Box
-            sx={{
-              p: 2.2,
-              borderRadius: '12px',
-              bgcolor: '#0a0c10',
-              border: `1px solid ${alpha(themeAccent, 0.3)}`,
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
-            }}
-          >
-            <Typography sx={{ fontFamily: 'monospace', fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: themeAccent, mb: 0.5 }}>
-              RESOLVED CASES
-            </Typography>
-            <Typography sx={{ fontSize: 24, fontWeight: 900, color: themeAccent, fontFamily: `'Barlow', sans-serif` }}>
-              {stats.closed}
-            </Typography>
-            <Typography sx={{ fontSize: 10, fontWeight: 600, color: alpha('#ffffff', 0.4), mt: 0.3 }}>
-              Successfully closed
-            </Typography>
-          </Box>
-
-          {/* Stat 4: Average SLA */}
-          <Box
-            sx={{
-              p: 2.2,
-              borderRadius: '12px',
-              bgcolor: '#0a0c10',
-              border: `1px solid ${alpha('#3b82f6', 0.3)}`,
-              position: 'relative',
-              overflow: 'hidden',
-              boxShadow: '0 8px 24px rgba(0,0,0,0.6)',
-            }}
-          >
-            <Typography sx={{ fontFamily: 'monospace', fontSize: 10, fontWeight: 700, letterSpacing: 1.2, color: '#3b82f6', mb: 0.5 }}>
-              RESPONSE TIME
-            </Typography>
-            <Typography sx={{ fontSize: 24, fontWeight: 900, color: '#3b82f6', fontFamily: `'Barlow', sans-serif` }}>
-              &lt; 5 MINS
-            </Typography>
-            <Typography sx={{ fontSize: 10, fontWeight: 600, color: alpha('#ffffff', 0.4), mt: 0.3 }}>
-              Live dispatch SLA
-            </Typography>
-          </Box>
+              <Typography
+                sx={{
+                  fontSize: { xs: 18, md: 20 },
+                  fontWeight: 800,
+                  color: USER_COLORS.textPrimary,
+                }}
+              >
+                {stat.value}
+              </Typography>
+            </Box>
+          ))}
         </Box>
 
-        {/* Tactical Status Filter Tabs & Deploy Button */}
-        <Stack
-          direction={{ xs: 'column', sm: 'row' }}
-          spacing={2}
-          sx={{ mb: 2.5 }}
-          alignItems={{ sm: 'center' }}
-          justifyContent="space-between"
-        >
-          {/* Chamfered Filter Tabs */}
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-            {statusTabs.map((tab) => {
-              const isActive = statusFilter === tab.value;
+        <Box sx={{ mb: 1.75 }}>{filterButtons}</Box>
 
-              return (
-                <ButtonBase
-                  key={tab.value}
-                  onClick={() => setStatusFilter(tab.value)}
-                  sx={{
-                    px: { xs: 1.5, sm: 2 },
-                    py: 0.85,
-                    clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
-                    bgcolor: isActive ? themeAccent : alpha('#141720', 0.85),
-                    color: isActive ? accentContrast : alpha('#ffffff', 0.65),
-                    fontWeight: 800,
-                    fontSize: 11,
-                    letterSpacing: 1,
-                    textTransform: 'uppercase',
-                    border: isActive ? 'none' : `1px solid ${alpha('#ffffff', 0.12)}`,
-                    boxShadow: isActive ? `0 0 16px ${alpha(themeAccent, 0.45)}` : 'none',
-                    transition: 'all 0.2s ease',
-                    '&:hover': {
-                      bgcolor: isActive ? themeAccent : alpha('#202430', 0.95),
-                      color: isActive ? accentContrast : '#ffffff',
-                      transform: 'translateY(-1px)',
-                    },
-                  }}
-                >
-                  {tab.label}
-                </ButtonBase>
-              );
-            })}
-          </Box>
-
-          {/* Chamfered "Deploy Ticket" Button */}
-          <ButtonBase
-            onClick={() => setViewMode('create')}
-            sx={{
-              px: 3,
-              py: 1.1,
-              clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
-              bgcolor: themeAccent,
-              color: accentContrast,
-              fontWeight: 900,
-              fontSize: 12,
-              letterSpacing: 1.4,
-              textTransform: 'uppercase',
-              boxShadow: `0 6px 20px ${alpha(themeAccent, 0.45)}`,
-              transition: 'all 0.25s ease',
-              '&:hover': {
-                transform: 'translateY(-2px)',
-                boxShadow: `0 10px 28px ${alpha(themeAccent, 0.65)}`,
-              },
-            }}
-          >
-            <Stack direction="row" alignItems="center" spacing={1}>
-              <Iconify icon="solar:ticket-bold" width={16} />
-              <span>Deploy New Ticket</span>
-            </Stack>
-          </ButtonBase>
-        </Stack>
-
-        {/* Tickets List or Empty State */}
         {loading ? (
           <SupportPageSkeleton />
         ) : tickets.length === 0 ? (
-          <Box
-            sx={{
-              p: { xs: 4, sm: 6 },
-              borderRadius: '16px',
-              bgcolor: '#090b0e',
-              border: `1px dashed ${alpha(themeAccent, 0.3)}`,
-              textAlign: 'center',
-              boxShadow: '0 8px 32px rgba(0,0,0,0.6)',
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
-            <Box
-              sx={{
-                width: 64,
-                height: 64,
-                borderRadius: '50%',
-                bgcolor: alpha(themeAccent, 0.12),
-                border: `1.5px solid ${themeAccent}`,
-                color: themeAccent,
-                display: 'grid',
-                placeItems: 'center',
-                mx: 'auto',
-                mb: 2,
-                boxShadow: `0 0 20px ${alpha(themeAccent, 0.35)}`,
-              }}
-            >
-              <Iconify icon="solar:ticket-bold-duotone" width={32} />
-            </Box>
-
-            <Typography
-              sx={{
-                fontFamily: `'Barlow', sans-serif`,
-                fontSize: 20,
-                fontWeight: 800,
-                color: '#ffffff',
-                textTransform: 'uppercase',
-                letterSpacing: 0.8,
-                mb: 0.5,
-              }}
-            >
-              No Transmissions Found
-            </Typography>
-            <Typography sx={{ fontSize: 13, color: alpha('#ffffff', 0.6), maxWidth: 440, mx: 'auto', mb: 3 }}>
-              You currently have no active or historical support tickets. Transmit a new dispatch whenever you need assistance.
-            </Typography>
-
-            <ButtonBase
-              onClick={() => setViewMode('create')}
-              sx={{
-                px: 3,
-                py: 1.1,
-                clipPath: 'polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)',
-                bgcolor: themeAccent,
-                color: accentContrast,
-                fontWeight: 900,
-                fontSize: 12,
-                letterSpacing: 1.2,
-                textTransform: 'uppercase',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  transform: 'translateY(-1px)',
-                  boxShadow: `0 0 20px ${alpha(themeAccent, 0.5)}`,
-                },
-              }}
-            >
-              <Stack direction="row" alignItems="center" spacing={0.8}>
-                <Iconify icon="solar:add-circle-bold" width={16} />
-                <span>Create First Ticket</span>
-              </Stack>
-            </ButtonBase>
-          </Box>
+          <UserEmptyState
+            icon="solar:ticket-bold-duotone"
+            title="No tickets yet"
+            description="Create a ticket when you need help with payments, matches, or your account."
+            actionLabel="New ticket"
+            onAction={() => setViewMode('create')}
+          />
         ) : (
-          <Stack spacing={1.5}>
+          <Stack spacing={1.25}>
             {tickets.map((ticket) => {
               const thumb = ticket.previewAttachments?.[0];
               const isClosed = ticket.status === 'closed';
               const isPending = ticket.status === 'pending';
 
               return (
-                <Box
+                <UserGlassCard
                   key={ticket.id}
                   onClick={() => openTicket(ticket)}
                   sx={{
-                    p: { xs: 2, md: 2.4 },
-                    borderRadius: '12px',
-                    bgcolor: '#0a0c10',
-                    border: `1px solid ${alpha('#ffffff', 0.1)}`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 2,
                     cursor: 'pointer',
-                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
-                    '&:hover': {
-                      transform: 'translateY(-2px) scale(1.005)',
-                      borderColor: themeAccent,
-                      boxShadow: `0 8px 24px -4px ${alpha(themeAccent, 0.3)}`,
-                      '& .ticket-arrow': {
-                        transform: 'translateX(4px)',
-                        color: themeAccent,
-                      },
-                    },
+                    p: { xs: 1.5, md: 1.75 },
+                    pt: { xs: 1.5, md: 1.75 },
+                    '&:hover': { borderColor: goldAlpha(0.45) },
                   }}
                 >
-                  {/* Left Thumbnail or Icon */}
-                  <Box
-                    sx={{
-                      width: 54,
-                      height: 54,
-                      borderRadius: '8px',
-                      flexShrink: 0,
-                      bgcolor: alpha('#000000', 0.6),
-                      border: `1px solid ${alpha('#ffffff', 0.12)}`,
-                      display: 'grid',
-                      placeItems: 'center',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    {thumb ? (
-                      <Image
-                        src={getImageUrl(thumb) || thumb}
-                        alt=""
-                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                    ) : (
-                      <Iconify icon="solar:ticket-bold" width={24} sx={{ color: themeAccent }} />
-                    )}
-                  </Box>
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <Box
+                      sx={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: '8px',
+                        flexShrink: 0,
+                        bgcolor: alpha('#000000', 0.45),
+                        border: `1px solid ${alpha('#ffffff', 0.1)}`,
+                        display: 'grid',
+                        placeItems: 'center',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {thumb ? (
+                        <Image
+                          src={getImageUrl(thumb) || thumb}
+                          alt=""
+                          sx={{ width: 1, height: 1, objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <Iconify
+                          icon="solar:ticket-bold"
+                          width={20}
+                          sx={{ color: USER_COLORS.gold }}
+                        />
+                      )}
+                    </Box>
 
-                  {/* Main Ticket Info */}
-                  <Box sx={{ flex: 1, minWidth: 0 }}>
-                    <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.4 }} flexWrap="wrap" useFlexGap>
-                      <Typography
-                        sx={{
-                          fontWeight: 800,
-                          color: '#ffffff',
-                          fontSize: { xs: 14, sm: 15.5 },
-                          fontFamily: `'Barlow', sans-serif`,
-                        }}
-                        noWrap
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <Stack
+                        direction="row"
+                        spacing={0.75}
+                        alignItems="center"
+                        flexWrap="wrap"
+                        useFlexGap
+                        sx={{ mb: 0.35 }}
                       >
-                        {ticket.subject}
+                        <Typography
+                          className="font-tr"
+                          sx={{
+                            fontWeight: 800,
+                            color: USER_COLORS.textPrimary,
+                            fontSize: { xs: 14, sm: 15 },
+                          }}
+                          noWrap
+                        >
+                          {ticket.subject}
+                        </Typography>
+                        <Chip
+                          label={ticket.category}
+                          size="small"
+                          sx={{
+                            height: 18,
+                            fontSize: 9,
+                            fontWeight: 700,
+                            textTransform: 'capitalize',
+                            ...getUserChipSx('gold'),
+                          }}
+                        />
+                        <Chip
+                          label={ticket.status}
+                          size="small"
+                          sx={{
+                            height: 18,
+                            fontSize: 9,
+                            fontWeight: 700,
+                            textTransform: 'capitalize',
+                            ...getUserChipSx(
+                              isClosed ? 'neutral' : isPending ? 'info' : 'success'
+                            ),
+                          }}
+                        />
+                      </Stack>
+                      <Typography sx={{ ...userMutedTextSx, fontSize: 12.5 }} noWrap>
+                        {ticket.previewBody || 'Open ticket to continue the conversation'}
                       </Typography>
-
-                      <Chip
-                        label={ticket.category.toUpperCase()}
-                        size="small"
-                        sx={{ height: 20, fontSize: 9.5, fontWeight: 800, ...getUserChipSx('gold') }}
-                      />
-
-                      <Chip
-                        label={ticket.status.toUpperCase()}
-                        size="small"
-                        sx={{
-                          height: 20,
-                          fontSize: 9.5,
-                          fontWeight: 800,
-                          ...getUserChipSx(isClosed ? 'neutral' : isPending ? 'info' : 'success'),
-                        }}
-                      />
-                    </Stack>
-
-                    <Typography sx={{ ...userMutedTextSx, fontSize: 12.5 }} noWrap>
-                      {ticket.previewBody || 'Transmission initiated — click to review full communication'}
-                    </Typography>
-
-                    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mt: 0.6 }}>
-                      <Typography sx={{ fontFamily: 'monospace', fontSize: 10, color: alpha('#ffffff', 0.4) }}>
-                        #BAC-TK-{ticket.id.slice(-6).toUpperCase()}
-                      </Typography>
-                      <Typography sx={{ fontSize: 11, color: alpha('#ffffff', 0.45) }}>
+                      <Typography sx={{ ...userMutedTextSx, fontSize: 11, mt: 0.4 }}>
                         Updated {ticket.lastMessageAt.toLocaleString()}
-                        {ticket.attachmentCount ? ` · ${ticket.attachmentCount} image(s)` : ''}
+                        {ticket.attachmentCount
+                          ? ` · ${ticket.attachmentCount} image(s)`
+                          : ''}
                       </Typography>
-                    </Stack>
-                  </Box>
+                    </Box>
 
-                  {/* Right Arrow */}
-                  <Iconify
-                    className="ticket-arrow"
-                    icon="solar:arrow-right-bold"
-                    width={18}
-                    sx={{ color: alpha('#ffffff', 0.4), flexShrink: 0, transition: 'transform 0.2s, color 0.2s' }}
-                  />
-                </Box>
+                    <Iconify
+                      icon="solar:arrow-right-bold"
+                      width={16}
+                      sx={{ color: alpha('#ffffff', 0.35), flexShrink: 0 }}
+                    />
+                  </Stack>
+                </UserGlassCard>
               );
             })}
           </Stack>
         )}
-
       </UserPageShell>
     );
   }
 
-  // ------------------------------------------------------------------ CREATE VIEW (INCIDENT REPORT DOSSIER)
   if (viewMode === 'create') {
     return (
-      <UserPageShell contentSx={{ maxWidth: 840, mx: 'auto' }}>
+      <UserPageShell contentSx={{ maxWidth: 720, mx: 'auto' }}>
         <SupportHero
-          title="INCIDENT REPORT DOSSIER"
-          subtitle="Submit an encrypted operational dispatch to BattleAsia HQ staff. Include screenshot evidence for expedited resolution."
+          title="New ticket"
+          subtitle="Describe your issue clearly. Screenshots help us resolve faster."
+          action={
+            <UserActionButton
+              size="small"
+              actionVariant="ghost"
+              startIcon={<Iconify icon="solar:arrow-left-bold" width={16} />}
+              onClick={backToList}
+            >
+              Back
+            </UserActionButton>
+          }
         />
 
-        <Box
-          sx={{
-            p: { xs: 2.5, md: 3.5 },
-            borderRadius: '16px',
-            bgcolor: '#090b0e',
-            border: `1px solid ${alpha(themeAccent, 0.25)}`,
-            boxShadow: `0 12px 36px rgba(0,0,0,0.8), inset 0 1px 0 0 ${alpha('#ffffff', 0.08)}`,
-            position: 'relative',
-            overflow: 'hidden',
-          }}
-        >
-          <Stack spacing={3}>
-            {/* Top Return Header */}
-            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ pb: 2, borderBottom: `1px solid ${alpha('#ffffff', 0.08)}` }}>
-              <IconButton
-                onClick={backToList}
+        <UserGlassCard sx={{ p: { xs: 2, md: 2.5 }, pt: { xs: 2, md: 2.5 } }}>
+          <Stack spacing={2.25}>
+            <Box>
+              <Typography
                 sx={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: '6px',
-                  bgcolor: alpha('#ffffff', 0.05),
-                  border: `1px solid ${alpha('#ffffff', 0.12)}`,
-                  color: themeAccent,
-                  '&:hover': { bgcolor: alpha(themeAccent, 0.15) },
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.6,
+                  color: alpha('#ffffff', 0.55),
+                  textTransform: 'uppercase',
+                  mb: 1,
                 }}
               >
-                <Iconify icon="solar:arrow-left-bold" width={18} />
-              </IconButton>
-              <Box>
-                <Typography sx={{ fontFamily: `'Barlow', sans-serif`, fontSize: 17, fontWeight: 900, color: '#ffffff', textTransform: 'uppercase' }}>
-                  TRANSMIT INCIDENT DISPATCH
-                </Typography>
-                <Typography sx={{ fontSize: 11.5, color: alpha('#ffffff', 0.5) }}>
-                  Fill out the mission parameters below
-                </Typography>
-              </Box>
-            </Stack>
-
-            {/* Category Selector Cards */}
-            <Box>
-              <Typography sx={{ fontSize: 11, fontWeight: 800, letterSpacing: 1.2, color: themeAccent, textTransform: 'uppercase', mb: 1.2 }}>
-                SELECT INCIDENT CLASSIFICATION
+                Category
               </Typography>
               <Box
                 sx={{
                   display: 'grid',
                   gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
-                  gap: 1.5,
+                  gap: 1,
                 }}
               >
                 {CATEGORIES.map((cat) => {
                   const isSelected = createCategory === cat.value;
-
                   return (
-                    <ButtonBase
+                    <Box
                       key={cat.value}
+                      component="button"
+                      type="button"
                       onClick={() => setCreateCategory(cat.value)}
                       sx={{
-                        p: 1.8,
+                        p: 1.25,
                         borderRadius: '10px',
-                        bgcolor: isSelected ? alpha(themeAccent, 0.1) : alpha('#ffffff', 0.03),
-                        border: `1px solid ${isSelected ? themeAccent : alpha('#ffffff', 0.1)}`,
+                        bgcolor: isSelected ? goldAlpha(0.1) : alpha('#ffffff', 0.03),
+                        border: `1px solid ${isSelected ? goldAlpha(0.55) : alpha('#ffffff', 0.1)}`,
                         textAlign: 'left',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: 1.5,
-                        transition: 'all 0.2s ease',
-                        boxShadow: isSelected ? `0 0 16px -2px ${alpha(themeAccent, 0.3)}` : 'none',
-                        '&:hover': {
-                          borderColor: themeAccent,
-                          bgcolor: alpha(themeAccent, 0.06),
-                        },
+                        gap: 1.25,
+                        cursor: 'pointer',
+                        color: 'inherit',
+                        font: 'inherit',
+                        '&:hover': { borderColor: goldAlpha(0.4) },
                       }}
                     >
                       <Box
                         sx={{
-                          width: 38,
-                          height: 38,
+                          width: 34,
+                          height: 34,
                           borderRadius: '8px',
                           display: 'grid',
                           placeItems: 'center',
-                          bgcolor: isSelected ? themeAccent : alpha('#ffffff', 0.06),
-                          color: isSelected ? accentContrast : themeAccent,
+                          bgcolor: isSelected ? USER_COLORS.gold : alpha('#ffffff', 0.06),
+                          color: isSelected ? '#081401' : USER_COLORS.gold,
                           flexShrink: 0,
                         }}
                       >
-                        <Iconify icon={cat.icon} width={20} />
+                        <Iconify icon={cat.icon} width={18} />
                       </Box>
                       <Box sx={{ minWidth: 0 }}>
-                        <Typography sx={{ fontSize: 13.5, fontWeight: 800, color: '#ffffff' }} noWrap>
+                        <Typography
+                          sx={{ fontSize: 13, fontWeight: 800, color: USER_COLORS.textPrimary }}
+                          noWrap
+                        >
                           {cat.label}
                         </Typography>
                         <Typography sx={{ fontSize: 11, color: alpha('#ffffff', 0.5) }} noWrap>
                           {cat.desc}
                         </Typography>
                       </Box>
-                    </ButtonBase>
+                    </Box>
                   );
                 })}
               </Box>
             </Box>
 
-            {/* Subject Input */}
             <TextField
-              label="Incident Subject / Headline"
+              label="Subject"
               value={createSubject}
               onChange={(e) => setCreateSubject(e.target.value)}
               InputLabelProps={userFieldLabelProps}
               sx={userFieldSx}
-              placeholder="e.g. Withdrawal pending on transaction #0981"
+              placeholder="Short summary of your issue"
             />
 
-            {/* Description Body */}
             <TextField
-              label="Incident Detailed Telemetry"
+              label="Description"
               value={createBody}
               onChange={(e) => setCreateBody(e.target.value)}
               InputLabelProps={userFieldLabelProps}
               sx={userFieldSx}
               multiline
-              minRows={5}
-              placeholder="Provide exact match IDs, wallet addresses, error codes or details so our tactical operatives can resolve your dispatch rapidly…"
+              minRows={4}
+              placeholder="Share match IDs, transaction details, or anything that helps us help you"
             />
 
-            {/* Cyber Evidence Dropzone & Attachments */}
             <Box>
-              <Typography sx={{ fontSize: 11, fontWeight: 800, letterSpacing: 1.2, color: themeAccent, textTransform: 'uppercase', mb: 1.2 }}>
-                SUPPORTING EVIDENCE / SCREENSHOTS
+              <Typography
+                sx={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.6,
+                  color: alpha('#ffffff', 0.55),
+                  textTransform: 'uppercase',
+                  mb: 1,
+                }}
+              >
+                Attachments
               </Typography>
 
               {createAttachments.length > 0 && (
-                <Stack direction="row" spacing={1.5} flexWrap="wrap" useFlexGap sx={{ mb: 2 }}>
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 1.25 }}>
                   {createAttachments.map((url, idx) => (
                     <Box
                       key={`${url}-${idx}`}
                       sx={{
                         position: 'relative',
-                        width: 80,
-                        height: 80,
+                        width: 72,
+                        height: 72,
                         borderRadius: '8px',
                         overflow: 'hidden',
-                        border: `1.5px solid ${themeAccent}`,
-                        boxShadow: `0 0 12px ${alpha(themeAccent, 0.3)}`,
+                        border: `1px solid ${goldAlpha(0.35)}`,
                       }}
                     >
                       <Image
                         src={getImageUrl(url) || url}
                         alt=""
-                        sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        sx={{ width: 1, height: 1, objectFit: 'cover' }}
                       />
                       <IconButton
                         size="small"
-                        onClick={() => setCreateAttachments((prev) => prev.filter((_, i) => i !== idx))}
+                        onClick={() =>
+                          setCreateAttachments((prev) => prev.filter((_, i) => i !== idx))
+                        }
                         sx={{
                           position: 'absolute',
                           top: 2,
                           right: 2,
                           width: 22,
                           height: 22,
-                          bgcolor: alpha('#000000', 0.8),
+                          bgcolor: alpha('#000000', 0.75),
                           color: '#ffffff',
                           '&:hover': { bgcolor: '#ef4444' },
                         }}
@@ -960,53 +777,22 @@ export function CustomerSupportView() {
                 </Stack>
               )}
 
-              {/* Upload Drop Button */}
-              <ButtonBase
-                onClick={() => createFileRef.current?.click()}
+              <UserActionButton
+                fullWidth
+                actionVariant="ghost"
                 disabled={uploading}
-                sx={{
-                  width: 1,
-                  p: 3,
-                  borderRadius: '10px',
-                  border: `1.5px dashed ${alpha(themeAccent, 0.4)}`,
-                  bgcolor: alpha(themeAccent, 0.03),
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 1,
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    borderColor: themeAccent,
-                    bgcolor: alpha(themeAccent, 0.07),
-                  },
-                }}
+                startIcon={
+                  uploading ? (
+                    <CircularProgress size={16} sx={{ color: USER_COLORS.gold }} />
+                  ) : (
+                    <Iconify icon="solar:gallery-add-bold" width={18} />
+                  )
+                }
+                onClick={() => createFileRef.current?.click()}
+                sx={{ py: 1.5, borderStyle: 'dashed' }}
               >
-                {uploading ? (
-                  <CircularProgress size={26} sx={{ color: themeAccent }} />
-                ) : (
-                  <>
-                    <Box
-                      sx={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: '50%',
-                        bgcolor: alpha(themeAccent, 0.15),
-                        display: 'grid',
-                        placeItems: 'center',
-                      }}
-                    >
-                      <Iconify icon="solar:gallery-add-bold" width={22} sx={{ color: themeAccent }} />
-                    </Box>
-                    <Typography sx={{ fontSize: 13, fontWeight: 700, color: '#ffffff' }}>
-                      Click to upload match screenshots or evidence
-                    </Typography>
-                    <Typography sx={{ fontSize: 11, color: alpha('#ffffff', 0.5) }}>
-                      Supports PNG, JPG, WebP up to 10MB each
-                    </Typography>
-                  </>
-                )}
-              </ButtonBase>
+                {uploading ? 'Uploading…' : 'Add screenshots'}
+              </UserActionButton>
 
               <input
                 ref={createFileRef}
@@ -1021,95 +807,52 @@ export function CustomerSupportView() {
               />
             </Box>
 
-            {/* Submit & Cancel Buttons */}
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ pt: 1 }}>
-              <ButtonBase
-                onClick={handleCreateTicket}
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25}>
+              <UserActionButton
+                actionVariant="solidGold"
                 disabled={creating || uploading}
-                sx={{
-                  flex: 1,
-                  py: 1.35,
-                  clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
-                  bgcolor: themeAccent,
-                  color: accentContrast,
-                  fontWeight: 900,
-                  fontSize: 13,
-                  letterSpacing: 1.5,
-                  textTransform: 'uppercase',
-                  boxShadow: `0 6px 20px ${alpha(themeAccent, 0.45)}`,
-                  transition: 'all 0.25s ease',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: `0 10px 28px ${alpha(themeAccent, 0.65)}`,
-                  },
-                }}
-              >
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  {creating ? (
-                    <CircularProgress size={18} sx={{ color: 'inherit' }} />
+                onClick={handleCreateTicket}
+                startIcon={
+                  creating ? (
+                    <CircularProgress size={16} color="inherit" />
                   ) : (
-                    <>
-                      <Iconify icon="solar:plain-bold" width={16} />
-                      <span>Transmit Dispatch Report</span>
-                    </>
-                  )}
-                </Stack>
-              </ButtonBase>
-
-              <ButtonBase
-                onClick={backToList}
-                disabled={creating}
-                sx={{
-                  px: 3,
-                  py: 1.35,
-                  clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
-                  bgcolor: alpha('#ffffff', 0.06),
-                  border: `1px solid ${alpha('#ffffff', 0.15)}`,
-                  color: alpha('#ffffff', 0.8),
-                  fontWeight: 800,
-                  fontSize: 12,
-                  letterSpacing: 1,
-                  textTransform: 'uppercase',
-                  transition: 'all 0.2s ease',
-                  '&:hover': {
-                    bgcolor: alpha('#ffffff', 0.12),
-                    color: '#ffffff',
-                  },
-                }}
+                    <Iconify icon="solar:plain-bold" width={16} />
+                  )
+                }
+                sx={{ flex: 1 }}
               >
-                Cancel / Abort
-              </ButtonBase>
+                {creating ? 'Submitting…' : 'Submit ticket'}
+              </UserActionButton>
+              <UserActionButton actionVariant="ghost" disabled={creating} onClick={backToList}>
+                Cancel
+              </UserActionButton>
             </Stack>
           </Stack>
-        </Box>
+        </UserGlassCard>
       </UserPageShell>
     );
   }
 
-  // ------------------------------------------------------------------ DETAIL / COMMS CHAT VIEW
   return (
-    <UserPageShell contentSx={{ maxWidth: 1040, mx: 'auto' }}>
+    <UserPageShell contentSx={{ maxWidth: 960, mx: 'auto' }}>
       <SupportHero
-        title={selectedTicket?.subject || 'OPERATIVE COMMS'}
-        subtitle="Live tactical chat with BattleAsia HQ staff. Transmissions stream in real time."
+        title={selectedTicket?.subject || 'Support chat'}
+        subtitle="Chat with BattleAsia support. Replies appear in real time."
       />
 
       {detailLoading && messages.length === 0 ? (
         <SupportPageSkeleton />
       ) : (
-        <Box
+        <UserGlassCard
+          noPadding
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            height: { xs: 'calc(100vh - 17rem)', md: 'calc(100vh - 15rem)' },
-            borderRadius: '16px',
-            bgcolor: '#080a0f',
-            border: `1px solid ${alpha(themeAccent, 0.25)}`,
+            height: { xs: 'calc(100vh - 16rem)', md: 'calc(100vh - 14rem)' },
             overflow: 'hidden',
-            boxShadow: `0 16px 40px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 ${alpha('#ffffff', 0.08)}`,
+            '&:hover': { transform: 'none', boxShadow: 'none' },
           }}
         >
-          {/* Tactical Chat Header */}
           <SupportChatHeader
             onlineLabel={t('customerSupport.online') || 'Online'}
             loading={detailLoading}
@@ -1122,32 +865,23 @@ export function CustomerSupportView() {
             closing={closing}
           />
 
-          {/* Messages Scroll Area */}
-          <Box sx={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column', bgcolor: '#07080c' }}>
-            <Scrollbar sx={{ flex: 1, p: { xs: 2, md: 3 } }}>
+          <Box
+            sx={{
+              flex: 1,
+              overflow: 'hidden',
+              display: 'flex',
+              flexDirection: 'column',
+              bgcolor: alpha('#07080c', 0.85),
+            }}
+          >
+            <Scrollbar sx={{ flex: 1, p: { xs: 1.75, md: 2.25 } }}>
               {messages.length === 0 ? (
-                <Box sx={{ py: 8, textAlign: 'center' }}>
-                  <Box
-                    sx={{
-                      width: 52,
-                      height: 52,
-                      borderRadius: '50%',
-                      bgcolor: alpha(themeAccent, 0.1),
-                      border: `1px solid ${themeAccent}`,
-                      color: themeAccent,
-                      display: 'grid',
-                      placeItems: 'center',
-                      mx: 'auto',
-                      mb: 1.5,
-                    }}
-                  >
-                    <Iconify icon="solar:chat-round-dots-bold-duotone" width={26} />
-                  </Box>
-                  <Typography sx={{ fontFamily: `'Barlow', sans-serif`, fontSize: 16, fontWeight: 800, color: '#ffffff', textTransform: 'uppercase' }}>
-                    {t('customerSupport.noMessagesYet') || 'No Messages In Stream'}
+                <Box sx={{ py: 6, textAlign: 'center' }}>
+                  <Typography sx={{ fontWeight: 800, color: USER_COLORS.textPrimary, mb: 0.5 }}>
+                    {t('customerSupport.noMessagesYet') || 'No messages yet'}
                   </Typography>
-                  <Typography sx={{ fontSize: 12, color: alpha('#ffffff', 0.5), mt: 0.5 }}>
-                    Transmit your first message below to alert the on-duty operative.
+                  <Typography sx={{ ...userMutedTextSx, fontSize: 13 }}>
+                    Send the first message below.
                   </Typography>
                 </Box>
               ) : (
@@ -1167,17 +901,22 @@ export function CustomerSupportView() {
             </Scrollbar>
           </Box>
 
-          {/* Bottom Composer or Closed Banner */}
           {selectedTicket?.status === 'closed' ? (
-            <Box sx={{ p: 2.2, borderTop: `1px solid ${alpha('#ffffff', 0.1)}`, bgcolor: '#0b0d13', textAlign: 'center' }}>
-              <Typography sx={{ fontSize: 13, fontWeight: 600, color: alpha('#ffffff', 0.6) }}>
-                This tactical dispatch is marked as resolved. Deploy a new ticket if you require further assistance.
+            <Box
+              sx={{
+                p: 2,
+                borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
+                textAlign: 'center',
+              }}
+            >
+              <Typography sx={{ fontSize: 13, color: alpha('#ffffff', 0.6) }}>
+                This ticket is closed. Open a new one if you still need help.
               </Typography>
             </Box>
           ) : (
             <SupportComposer
               message={message}
-              placeholder={t('customerSupport.typeYourMessage') || 'Type tactical transmission…'}
+              placeholder={t('customerSupport.typeYourMessage') || 'Type your message…'}
               sending={sending}
               uploading={uploading}
               disabled={!selectedTicket}
@@ -1196,7 +935,7 @@ export function CustomerSupportView() {
               onSendClick={handleSendClick}
             />
           )}
-        </Box>
+        </UserGlassCard>
       )}
     </UserPageShell>
   );

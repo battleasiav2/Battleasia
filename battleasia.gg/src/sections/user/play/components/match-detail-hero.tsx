@@ -1,8 +1,7 @@
-import { Box, Stack, Typography } from '@mui/material';
+﻿import { Box, Stack, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
 import { fDateTime } from 'src/utils/format-time';
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
 import { USER_COLORS } from 'src/layouts/user';
 
@@ -118,7 +117,6 @@ export function MatchDetailHero({ match, bannerUrl }: MatchDetailHeroProps) {
           {match.matchName}
         </Typography>
 
-        <BattleGoldDivider variant="title" sx={{ width: { xs: 120, md: 160 } }} />
 
         <Stack direction="row" flexWrap="wrap" gap={1} alignItems="center">
           {match.matchSchedule ? (

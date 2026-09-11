@@ -1,10 +1,9 @@
-import { Box, Stack, Typography } from '@mui/material';
+﻿import { Box, Stack, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
 import { fDateTime } from 'src/utils/format-time';
 
 import { Iconify } from 'src/components/iconify';
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
 import { USER_COLORS } from 'src/layouts/user';
 import { useTranslate } from 'src/locales/use-locales';
@@ -148,7 +147,6 @@ export function MatchResultHero({ match, mapImageUrl, onMapError }: MatchResultH
           {match.matchName}
         </Typography>
 
-        <BattleGoldDivider variant="title" sx={{ width: { xs: 120, md: 160 } }} />
 
         {match.matchSchedule ? (
           <Stack direction="row" alignItems="center" spacing={0.75}>

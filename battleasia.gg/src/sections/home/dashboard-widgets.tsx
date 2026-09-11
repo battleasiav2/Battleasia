@@ -1,7 +1,6 @@
-import { useMemo, useState, useEffect, useCallback } from 'react';
+﻿import { useMemo, useState, useEffect, useCallback } from 'react';
 import {
     Box,
-    Grid,
     Stack,
     Avatar,
     Button,
@@ -17,7 +16,7 @@ import useApi from 'src/hooks/use-api';
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 import { useSelector } from 'src/store';
-import { fNumber, fShortenNumber } from 'src/utils/format-number';
+import { fNumber } from 'src/utils/format-number';
 import { getAvatarUrl } from 'src/utils/get-image-url';
 import { signInWithReturn } from 'src/utils/auth-return';
 import { useTranslate } from 'src/locales/use-locales';
@@ -52,11 +51,6 @@ type SectionState = {
 // ----------------------------------------------------------------------
 // Animations
 // ----------------------------------------------------------------------
-
-const radarSweep = keyframes`
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-`;
 
 const laserSweepX = keyframes`
   0% { left: -100%; opacity: 0; }
@@ -165,12 +159,12 @@ function CyberCardPanel({
                     left: 0,
                     top: 0,
                     bottom: 0,
-                    width: { xs: '2px', md: '3.5px' },
-                    bgcolor: accentColor,
-                    opacity: { xs: 0.55, md: 1 },
+                    width: { xs: '2px', md: '2.5px' },
+                    bgcolor: safeAlpha(accentColor, 0.5),
+                    opacity: { xs: 0.55, md: 0.85 },
                     boxShadow: {
                         xs: 'none',
-                        md: `0 0 14px ${accentColor}`,
+                        md: `0 0 8px ${safeAlpha(accentColor, 0.28)}`,
                     },
                     transition: 'all 0.25s ease',
                     zIndex: 2,
@@ -424,22 +418,22 @@ function DashboardSplitGoldRule({ orientation }: { orientation: 'vertical' | 'ho
                 minHeight: isVertical ? 160 : 2,
                 position: 'relative',
                 background: isVertical
-                    ? `linear-gradient(180deg, transparent 0%, ${safeAlpha(accentColor, 0.25)} 20%, ${accentColor} 50%, ${safeAlpha(accentColor, 0.25)} 80%, transparent 100%)`
-                    : `linear-gradient(90deg, transparent 0%, ${safeAlpha(accentColor, 0.25)} 20%, ${accentColor} 50%, ${safeAlpha(accentColor, 0.25)} 80%, transparent 100%)`,
+                    ? `linear-gradient(180deg, transparent 0%, ${safeAlpha(accentColor, 0.12)} 20%, ${safeAlpha(accentColor, 0.5)} 50%, ${safeAlpha(accentColor, 0.12)} 80%, transparent 100%)`
+                    : `linear-gradient(90deg, transparent 0%, ${safeAlpha(accentColor, 0.12)} 20%, ${safeAlpha(accentColor, 0.5)} 50%, ${safeAlpha(accentColor, 0.12)} 80%, transparent 100%)`,
                 boxShadow: {
                     xs: 'none',
-                    md: `0 0 12px ${safeAlpha(accentColor, 0.35)}`,
+                    md: `0 0 6px ${safeAlpha(accentColor, 0.18)}`,
                 },
-                opacity: { xs: 0.7, md: 1 },
+                opacity: { xs: 0.55, md: 0.75 },
             }}
         >
             <Box
                 sx={{
-                    width: { xs: 4, md: 6 },
-                    height: { xs: 4, md: 6 },
-                    bgcolor: accentColor,
+                    width: { xs: 4, md: 5 },
+                    height: { xs: 4, md: 5 },
+                    bgcolor: safeAlpha(accentColor, 0.65),
                     borderRadius: '50%',
-                    boxShadow: { xs: 'none', md: `0 0 10px ${accentColor}` },
+                    boxShadow: { xs: 'none', md: `0 0 6px ${safeAlpha(accentColor, 0.35)}` },
                     animation: `${coreGlowPulse} 2.5s ease-in-out infinite`,
                 }}
             />
@@ -448,218 +442,100 @@ function DashboardSplitGoldRule({ orientation }: { orientation: 'vertical' | 'ho
 }
 
 // ----------------------------------------------------------------------
-// 3D Holographic Stat Pod (Mini Tactical Cyber Codex Card)
+// Simple glass title — APK style, square corners (title left, LIVE right)
 // ----------------------------------------------------------------------
 
-function HolographicStatPod({
-    index,
-    label,
-    value,
-    suffix,
-    icon,
-    loading,
-    color,
-    sparkle = false,
+function GlassSimpleTitle({
+    title,
+    liveLabel,
+    accentColor,
 }: {
-    index?: string;
-    label: string;
-    value: React.ReactNode;
-    suffix?: string;
-    icon: string;
-    loading?: boolean;
-    color?: string;
-    sparkle?: boolean;
+    title: string;
+    liveLabel: string;
+    accentColor: string;
 }) {
-    const theme = useTheme();
-    const accentColor = color || theme.palette.primary.main || '#cbfb24';
-    const accentContrast = theme.palette.primary.contrastText || '#081401';
-
     return (
         <Box
             sx={{
                 position: 'relative',
-                p: { xs: 1.1, sm: 1.7 },
-                minHeight: { xs: 88, sm: 108 },
-                height: '100%',
-                width: '100%',
-                maxWidth: '100%',
-                minWidth: 0,
-                boxSizing: 'border-box',
-                bgcolor: alpha('#090d15', 0.85),
-                borderRadius: '4px',
-                border: `1px solid ${safeAlpha(accentColor, 0.25)}`,
+                overflow: 'hidden',
+                borderRadius: 0,
+                mb: 1.5,
+                px: { xs: 1.5, sm: 1.85 },
+                py: { xs: 1.2, sm: 1.35 },
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 1.5,
                 clipPath: {
                     xs: 'none',
-                    sm: 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)',
+                    sm: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
                 },
-                boxShadow: {
-                    xs: '0 4px 14px rgba(0, 0, 0, 0.4)',
-                    md: `inset 0 0 18px ${safeAlpha(accentColor, 0.05)}, 0 4px 16px rgba(0, 0, 0, 0.4)`,
-                },
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                overflow: 'hidden',
-                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                '&:hover': {
-                    transform: { xs: 'none', md: 'translateY(-2px)' },
-                    borderColor: safeAlpha(accentColor, 0.55),
-                    bgcolor: alpha('#0f1522', 0.94),
-                    boxShadow: {
-                        xs: '0 4px 14px rgba(0, 0, 0, 0.4)',
-                        md: `0 8px 24px ${safeAlpha(accentColor, 0.2)}, inset 0 0 16px ${safeAlpha(accentColor, 0.08)}`,
-                    },
-                },
-            }}
-        >
-            {/* Left Micro Laser Rail — soft on mobile */}
-            <Box
-                aria-hidden
-                sx={{
+                background: `linear-gradient(105deg, ${safeAlpha(accentColor, 0.12)} 0%, rgba(8, 12, 20, 0.94) 45%, rgba(12, 18, 28, 0.9) 100%)`,
+                border: `1px solid ${safeAlpha(accentColor, 0.28)}`,
+                boxShadow: `
+                    inset 0 1px 0 ${alpha('#ffffff', 0.08)},
+                    0 0 10px ${safeAlpha(accentColor, 0.1)},
+                    0 4px 14px ${alpha('#000000', 0.4)}
+                `,
+                '&::after': {
+                    content: '""',
                     position: 'absolute',
                     left: 0,
                     top: 0,
                     bottom: 0,
-                    width: { xs: '2px', md: '3px' },
-                    bgcolor: accentColor,
-                    opacity: { xs: 0.5, md: 1 },
-                    boxShadow: { xs: 'none', md: `0 0 10px ${accentColor}` },
-                }}
-            />
-
-            {/* Corner Reticle Marks */}
-            <Box
-                aria-hidden
+                    width: 2,
+                    bgcolor: safeAlpha(accentColor, 0.5),
+                    boxShadow: `0 0 6px ${safeAlpha(accentColor, 0.28)}`,
+                },
+            }}
+        >
+            <Typography
                 sx={{
-                    display: { xs: 'none', sm: 'block' },
-                    position: 'absolute',
-                    top: 4,
-                    right: 6,
-                    fontFamily: 'monospace',
-                    fontSize: 8,
-                    color: safeAlpha(accentColor, 0.5),
-                    userSelect: 'none',
-                    letterSpacing: 1,
+                    position: 'relative',
+                    zIndex: 1,
+                    fontSize: { xs: 13, sm: 14, md: 15 },
+                    fontWeight: 900,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: '#ffffff',
+                    lineHeight: 1.2,
+                    textShadow: `0 0 8px ${safeAlpha(accentColor, 0.22)}`,
+                    minWidth: 0,
                 }}
             >
-                ⌜ ⌝
-            </Box>
-
-            {loading ? (
-                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ pl: 0.5 }}>
-                    <Skeleton variant="circular" width={36} height={36} />
-                    <Stack spacing={0.75} sx={{ flex: 1 }}>
-                        <Skeleton width="55%" />
-                        <Skeleton width="40%" />
-                    </Stack>
-                </Stack>
-            ) : (
-                <Stack spacing={1} sx={{ pl: 0.5 }}>
-                    {/* Header: Index Badge + Label + Right Icon Halo */}
-                    <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-                        <Stack direction="row" alignItems="center" spacing={0.8} sx={{ minWidth: 0, flex: 1 }}>
-                            {index ? (
-                                <Box
-                                    sx={{
-                                        px: 0.6,
-                                        py: 0.15,
-                                        clipPath: 'polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%)',
-                                        bgcolor: accentColor,
-                                        color: accentContrast,
-                                        fontFamily: 'monospace',
-                                        fontSize: 9.5,
-                                        fontWeight: 900,
-                                        flexShrink: 0,
-                                        boxShadow: `0 0 8px ${safeAlpha(accentColor, 0.35)}`,
-                                    }}
-                                >
-                                    {index}
-                                </Box>
-                            ) : null}
-                            <Typography
-                                variant="overline"
-                                sx={{
-                                    letterSpacing: 0.6,
-                                    color: alpha('#ffffff', 0.72),
-                                    fontSize: { xs: '0.58rem', sm: '0.74rem' },
-                                    lineHeight: 1.2,
-                                    fontWeight: 700,
-                                    textTransform: 'uppercase',
-                                    fontFamily: 'monospace',
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: 'vertical',
-                                    overflow: 'hidden',
-                                    whiteSpace: { xs: 'normal', sm: 'nowrap' },
-                                }}
-                            >
-                                {label}
-                            </Typography>
-                        </Stack>
-
-                        {/* Right Circular Halo Icon */}
-                        <Box
-                            sx={{
-                                width: 26,
-                                height: 26,
-                                borderRadius: '50%',
-                                bgcolor: safeAlpha(accentColor, 0.12),
-                                border: `1px solid ${safeAlpha(accentColor, 0.35)}`,
-                                color: accentColor,
-                                display: 'grid',
-                                placeItems: 'center',
-                                flexShrink: 0,
-                                boxShadow: `0 0 8px ${safeAlpha(accentColor, 0.25)}`,
-                            }}
-                        >
-                            <Iconify icon={icon} width={14} />
-                        </Box>
-                    </Stack>
-
-                    {/* Value */}
-                    <Typography
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'baseline',
-                            gap: 0.5,
-                            minWidth: 0,
-                            color: '#ffffff',
-                            fontSize: {
-                                xs: 'clamp(1.1rem, 3.8vw, 1.3rem)',
-                                sm: '1.4rem',
-                                md: '1.55rem',
-                            },
-                            fontWeight: 800,
-                            lineHeight: 1.15,
-                            fontFamily: 'monospace',
-                            textShadow: sparkle ? `0 0 14px ${safeAlpha(accentColor, 0.6)}` : 'none',
-                            '& > *': {
-                                minWidth: 0,
-                                maxWidth: '100%',
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
-                            },
-                        }}
-                    >
-                        {value}
-                        {suffix ? (
-                            <Typography
-                                component="span"
-                                sx={{
-                                    color: accentColor,
-                                    fontSize: { xs: '0.75rem', sm: '0.8rem' },
-                                    fontWeight: 700,
-                                    letterSpacing: 0.5,
-                                    fontFamily: 'monospace',
-                                }}
-                            >
-                                {suffix}
-                            </Typography>
-                        ) : null}
-                    </Typography>
-                </Stack>
-            )}
+                {title}
+            </Typography>
+            <Stack
+                direction="row"
+                alignItems="center"
+                spacing={0.65}
+                sx={{
+                    position: 'relative',
+                    zIndex: 1,
+                    flexShrink: 0,
+                    px: 0.9,
+                    py: 0.4,
+                    clipPath: 'polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%)',
+                    bgcolor: alpha('#10b981', 0.14),
+                    border: `1px solid ${alpha('#10b981', 0.45)}`,
+                    boxShadow: `0 0 10px ${alpha('#10b981', 0.25)}`,
+                }}
+            >
+                <LivePulseDot color="green" size={7} />
+                <Typography
+                    sx={{
+                        fontSize: { xs: '0.68rem', sm: '0.72rem' },
+                        fontWeight: 800,
+                        letterSpacing: 1.2,
+                        textTransform: 'uppercase',
+                        color: '#34d399',
+                        fontFamily: 'monospace',
+                    }}
+                >
+                    {liveLabel}
+                </Typography>
+            </Stack>
         </Box>
     );
 }
@@ -668,10 +544,32 @@ function HolographicStatPod({
 // Redesigned Pulse Hero Terminal
 // ----------------------------------------------------------------------
 
+const PULSE_GAMES: Array<{ apiNames: string[]; shortKey: string }> = [
+    { apiNames: ['PUBG Mobile'], shortKey: 'pubg' },
+    { apiNames: ['Free Fire'], shortKey: 'freeFire' },
+    { apiNames: ['Call of Duty Mobile', 'COD Mobile'], shortKey: 'cod' },
+    { apiNames: ['Valorant Mobile', 'Valorant'], shortKey: 'valorant' },
+    { apiNames: ['Mobile Legends'], shortKey: 'mlbb' },
+];
+
+function pulseLiveCountForGame(
+    liveCountByGame: Record<string, number> | undefined,
+    apiNames: string[]
+) {
+    if (!liveCountByGame) return 0;
+    for (const name of apiNames) {
+        if (typeof liveCountByGame[name] === 'number') return liveCountByGame[name];
+    }
+    return 0;
+}
+
 function PulseHeroTactical({
     badgeLabel,
     title,
     description,
+    gamesCoveredLabel,
+    gameShortLabels,
+    liveCountByGame,
     liveSuffix,
     labels,
     stats,
@@ -681,6 +579,9 @@ function PulseHeroTactical({
     badgeLabel: string;
     title: string;
     description: string;
+    gamesCoveredLabel: string;
+    gameShortLabels: Record<string, string>;
+    liveCountByGame?: Record<string, number>;
     liveSuffix: string;
     labels: PulseCardLabels;
     stats: PulseCardStats;
@@ -689,7 +590,12 @@ function PulseHeroTactical({
 }) {
     const theme = useTheme();
     const accentColor = theme.palette.primary.main || '#cbfb24';
-    const accentContrast = theme.palette.primary.contrastText || '#081401';
+
+    const gameChips = PULSE_GAMES.map((game) => {
+        const short = gameShortLabels[game.shortKey] || game.shortKey.toUpperCase();
+        const live = pulseLiveCountForGame(liveCountByGame, game.apiNames);
+        return { key: game.shortKey, label: short, live };
+    });
 
     const statTiles = [
         {
@@ -731,150 +637,223 @@ function PulseHeroTactical({
     ] as const;
 
     return (
-        <CyberCardPanel
-            accentBorder
-            glowColor={accentColor}
+        <GlassApkCardShell
+            accentColor={accentColor}
             statusText="TELEMETRY LINKED // REAL-TIME SYNC"
             refId="01"
         >
-            {/* Ambient Holographic Radar Circle in background */}
-            <Box
-                aria-hidden
-                sx={{
-                    position: 'absolute',
-                    top: '-50%',
-                    right: { xs: '-40%', md: '-20%' },
-                    width: { xs: 280, md: 520 },
-                    height: { xs: 280, md: 520 },
-                    borderRadius: '50%',
-                    border: `1px dashed ${safeAlpha(accentColor, 0.12)}`,
-                    pointerEvents: 'none',
-                    animation: `${radarSweep} 30s linear infinite`,
-                    '&::before': {
-                        content: '""',
-                        position: 'absolute',
-                        inset: 40,
-                        borderRadius: '50%',
-                        border: `1px solid ${safeAlpha(accentColor, 0.08)}`,
-                    },
-                }}
-            />
+            <GlassSimpleTitle title={title} liveLabel={liveSuffix} accentColor={accentColor} />
 
-            {/* Tactical Card Header matching reference codex card */}
-            <TacticalCardHeader
-                id="01"
-                badge={`${badgeLabel} // TELEMETRY PROTOCOL`}
-                title={title}
-                hint={description}
-                rightIcon="solar:radar-bold"
-                accentColor={accentColor}
-                accentContrast={accentContrast}
-                statusBadge={
-                    <Stack
-                        direction="row"
-                        alignItems="center"
-                        spacing={0.8}
+            <Typography
+                sx={{
+                    mb: 0.75,
+                    fontFamily: 'monospace',
+                    fontSize: { xs: '0.68rem', sm: '0.72rem' },
+                    fontWeight: 700,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: safeAlpha(accentColor, 0.75),
+                }}
+            >
+                {`${badgeLabel} // TELEMETRY PROTOCOL`}
+            </Typography>
+
+            <Typography
+                variant="body2"
+                sx={{
+                    mb: 1,
+                    color: alpha('#ffffff', 0.72),
+                    fontSize: { xs: '0.8125rem', sm: '0.875rem' },
+                    lineHeight: 1.45,
+                    maxWidth: 720,
+                }}
+            >
+                {description}
+            </Typography>
+
+            <Stack
+                direction="row"
+                alignItems="center"
+                flexWrap="wrap"
+                useFlexGap
+                spacing={0.75}
+                sx={{ mb: lastUpdatedLabel ? 1 : 1.25, rowGap: 0.65 }}
+            >
+                <Typography
+                    sx={{
+                        fontFamily: 'monospace',
+                        fontSize: { xs: '0.65rem', sm: '0.7rem' },
+                        fontWeight: 800,
+                        letterSpacing: '0.06em',
+                        textTransform: 'uppercase',
+                        color: alpha('#ffffff', 0.55),
+                        mr: 0.25,
+                    }}
+                >
+                    {gamesCoveredLabel}
+                </Typography>
+                {gameChips.map((chip) => (
+                    <Box
+                        key={chip.key}
+                        component="span"
                         sx={{
-                            display: { xs: 'none', sm: 'flex' },
-                            px: 1,
-                            py: 0.35,
-                            borderRadius: '3px',
-                            bgcolor: safeAlpha(accentColor, 0.1),
-                            border: `1px solid ${safeAlpha(accentColor, 0.3)}`,
-                            flexShrink: 0,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 0.4,
+                            px: 0.7,
+                            py: 0.25,
+                            borderRadius: '4px',
+                            border: `1px solid ${safeAlpha(accentColor, 0.22)}`,
+                            bgcolor: safeAlpha(accentColor, 0.06),
+                            fontFamily: 'monospace',
+                            fontSize: { xs: '0.65rem', sm: '0.7rem' },
+                            fontWeight: 700,
+                            letterSpacing: '0.04em',
+                            color: alpha('#ffffff', 0.82),
                         }}
                     >
-                        <LivePulseDot color="green" size={7} />
-                        <Typography
+                        {chip.label}
+                        <Box
+                            component="span"
                             sx={{
-                                fontSize: '0.72rem',
+                                color: chip.live > 0 ? safeAlpha(accentColor, 0.9) : alpha('#ffffff', 0.4),
                                 fontWeight: 800,
-                                letterSpacing: 1.2,
-                                textTransform: 'uppercase',
-                                color: accentColor,
-                                fontFamily: 'monospace',
                             }}
                         >
-                            STREAM ONLINE
-                        </Typography>
-                    </Stack>
-                }
-            />
+                            {chip.live}
+                        </Box>
+                    </Box>
+                ))}
+            </Stack>
 
-            <Grid container spacing={{ xs: 2, md: 3.5 }} alignItems="center" sx={{ position: 'relative', zIndex: 1, flex: 1, width: '100%', maxWidth: '100%', m: 0 }}>
-                <Grid item xs={12} md={5} sx={{ minWidth: 0, maxWidth: '100%' }}>
-                    <Stack spacing={2} sx={{ minWidth: 0, maxWidth: '100%' }}>
-                        {/* Description */}
-                        <Typography
-                            variant="body2"
-                            sx={{
-                                color: alpha('#ffffff', 0.78),
-                                fontSize: { xs: '0.8125rem', sm: '0.9375rem' },
-                                lineHeight: 1.65,
-                                letterSpacing: 0.2,
-                                maxWidth: '100%',
-                                overflowWrap: 'anywhere',
-                            }}
+            {lastUpdatedLabel ? (
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={0.75}
+                    sx={{ mb: 1.25, minWidth: 0 }}
+                >
+                    <Iconify icon="solar:clock-circle-bold" width={14} sx={{ color: safeAlpha(accentColor, 0.7), flexShrink: 0 }} />
+                    <Typography
+                        variant="caption"
+                        sx={{
+                            color: HOME_TEXT_MUTED,
+                            fontWeight: 600,
+                            fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                            lineHeight: 1.4,
+                            fontFamily: 'monospace',
+                        }}
+                    >
+                        {lastUpdatedLabel}
+                    </Typography>
+                </Stack>
+            ) : null}
+
+            {/* One merged stats strip — 4 metrics, no nested boxes */}
+            <Box
+                sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' },
+                    width: 1,
+                    minWidth: 0,
+                    border: `1px solid ${safeAlpha(accentColor, 0.2)}`,
+                    background: `linear-gradient(180deg, ${safeAlpha(accentColor, 0.04)} 0%, rgba(6, 10, 18, 0.55) 100%)`,
+                    clipPath: {
+                        xs: 'none',
+                        sm: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
+                    },
+                }}
+            >
+                {statTiles.map((tile, idx) => (
+                    <Box
+                        key={tile.key}
+                        sx={{
+                            position: 'relative',
+                            minWidth: 0,
+                            px: { xs: 1.25, sm: 1.75 },
+                            py: { xs: 1.35, sm: 1.6 },
+                            borderRight: {
+                                xs: idx % 2 === 0 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                                md: idx < 3 ? `1px solid ${alpha('#ffffff', 0.1)}` : 'none',
+                            },
+                            borderBottom: {
+                                xs: idx < 2 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                                md: 'none',
+                            },
+                        }}
+                    >
+                        <Stack
+                            direction="row"
+                            alignItems="flex-start"
+                            justifyContent="space-between"
+                            spacing={1}
+                            sx={{ mb: 0.85 }}
                         >
-                            {description}
-                        </Typography>
-
-                        {/* Last updated timestamp */}
-                        {lastUpdatedLabel ? (
-                            <Stack
-                                direction="row"
-                                alignItems="center"
-                                spacing={0.9}
+                            <Typography
                                 sx={{
-                                    py: 0.75,
-                                    px: 1.25,
-                                    width: 'fit-content',
-                                    borderRadius: '4px',
-                                    bgcolor: alpha('#ffffff', 0.04),
-                                    border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                                    color: alpha('#ffffff', 0.65),
+                                    fontSize: { xs: '0.62rem', sm: '0.7rem' },
+                                    fontWeight: 700,
+                                    letterSpacing: 0.5,
+                                    textTransform: 'uppercase',
+                                    fontFamily: 'monospace',
+                                    lineHeight: 1.25,
+                                    minWidth: 0,
                                 }}
                             >
-                                <Iconify icon="solar:clock-circle-bold" width={14} sx={{ color: accentColor }} />
-                                <Typography
-                                    variant="caption"
-                                    sx={{
-                                        color: HOME_TEXT_MUTED,
-                                        fontWeight: 600,
-                                        fontSize: { xs: '0.75rem', sm: '0.8125rem' },
-                                        lineHeight: 1.4,
-                                        fontFamily: 'monospace',
-                                    }}
-                                >
-                                    {lastUpdatedLabel}
-                                </Typography>
-                            </Stack>
-                        ) : null}
-                    </Stack>
-                </Grid>
+                                {tile.label}
+                            </Typography>
+                            <Iconify
+                                icon={tile.icon}
+                                width={16}
+                                sx={{ color: safeAlpha(accentColor, 0.72), flexShrink: 0 }}
+                            />
+                        </Stack>
 
-                {/* 4 Pods Grid */}
-                <Grid item xs={12} md={7} sx={{ minWidth: 0, maxWidth: '100%' }}>
-                    <Grid container spacing={{ xs: 1, sm: 1.5 }} sx={{ width: '100%', m: 0 }}>
-                        {statTiles.map((tile, idx) => (
-                            <Grid key={tile.key} item xs={6} sx={{ display: 'flex', minWidth: 0, maxWidth: '50%' }}>
-                                <Box sx={{ width: 1, minWidth: 0, maxWidth: '100%' }}>
-                                    <HolographicStatPod
-                                        index={`0${idx + 1}`}
-                                        label={tile.label}
-                                        value={tile.value}
-                                        suffix={tile.suffix}
-                                        icon={tile.icon}
-                                        loading={loading}
-                                        color={tile.color}
-                                        sparkle={tile.sparkle}
-                                    />
-                                </Box>
-                            </Grid>
-                        ))}
-                    </Grid>
-                </Grid>
-            </Grid>
-        </CyberCardPanel>
+                        {loading ? (
+                            <Skeleton width="70%" height={28} />
+                        ) : (
+                            <Typography
+                                sx={{
+                                    display: 'flex',
+                                    alignItems: 'baseline',
+                                    gap: 0.5,
+                                    minWidth: 0,
+                                    color: '#ffffff',
+                                    fontSize: { xs: '1.15rem', sm: '1.35rem', md: '1.45rem' },
+                                    fontWeight: 800,
+                                    lineHeight: 1.15,
+                                    fontFamily: 'monospace',
+                                    textShadow: tile.sparkle ? `0 0 8px ${safeAlpha(accentColor, 0.22)}` : 'none',
+                                    '& > *': {
+                                        minWidth: 0,
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                    },
+                                }}
+                            >
+                                {tile.value}
+                                {tile.suffix ? (
+                                    <Typography
+                                        component="span"
+                                        sx={{
+                                            color: accentColor,
+                                            fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                                            fontWeight: 700,
+                                            letterSpacing: 0.4,
+                                            fontFamily: 'monospace',
+                                        }}
+                                    >
+                                        {tile.suffix}
+                                    </Typography>
+                                ) : null}
+                            </Typography>
+                        )}
+                    </Box>
+                ))}
+            </Box>
+        </GlassApkCardShell>
     );
 }
 
@@ -915,14 +894,22 @@ function GlassApkCardShell({
                 overflow: 'hidden',
                 borderRadius: 0,
                 boxSizing: 'border-box',
-                background: `linear-gradient(135deg, ${safeAlpha(accentColor, 0.14)} 0%, rgba(10, 14, 22, 0.88) 42%, rgba(17, 24, 39, 0.82) 100%)`,
-                backdropFilter: 'blur(14px)',
-                WebkitBackdropFilter: 'blur(14px)',
-                border: `1px solid ${safeAlpha(accentColor, 0.45)}`,
+                clipPath: {
+                    xs: 'none',
+                    sm: 'polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px)',
+                },
+                background: `
+                    radial-gradient(ellipse 80% 60% at 100% 0%, ${safeAlpha(accentColor, 0.06)} 0%, transparent 55%),
+                    linear-gradient(145deg, ${safeAlpha(accentColor, 0.05)} 0%, rgba(6, 10, 18, 0.96) 38%, rgba(10, 14, 24, 0.92) 100%)
+                `,
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                border: `1px solid ${safeAlpha(accentColor, 0.22)}`,
                 boxShadow: `
-                    inset 0 1px 0 ${alpha('#ffffff', 0.1)},
-                    0 0 20px ${safeAlpha(accentColor, 0.18)},
-                    0 8px 24px ${alpha('#000000', 0.45)}
+                    inset 0 1px 0 ${alpha('#ffffff', 0.08)},
+                    inset 0 0 40px ${safeAlpha(accentColor, 0.02)},
+                    0 0 16px ${safeAlpha(accentColor, 0.06)},
+                    0 12px 32px ${alpha('#000000', 0.55)}
                 `,
                 p: { xs: 1.5, sm: 2.25, md: 2.5 },
                 transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
@@ -933,18 +920,18 @@ function GlassApkCardShell({
                     left: '-140%',
                     width: '55%',
                     height: '100%',
-                    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent)',
+                    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent)',
                     transform: 'skewX(-20deg)',
                     transition: 'left 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
                     pointerEvents: 'none',
                     zIndex: 1,
                 },
                 '&:hover': {
-                    borderColor: accentColor,
+                    borderColor: safeAlpha(accentColor, 0.35),
                     boxShadow: `
-                        inset 0 0 24px ${safeAlpha(accentColor, 0.14)},
-                        0 0 24px ${safeAlpha(accentColor, 0.32)},
-                        0 10px 28px ${alpha('#000000', 0.55)}
+                        inset 0 0 20px ${safeAlpha(accentColor, 0.06)},
+                        0 0 20px ${safeAlpha(accentColor, 0.12)},
+                        0 14px 36px ${alpha('#000000', 0.6)}
                     `,
                     '&::before': { left: '160%' },
                 },
@@ -957,9 +944,9 @@ function GlassApkCardShell({
                     left: 0,
                     top: 0,
                     bottom: 0,
-                    width: 3.5,
-                    bgcolor: accentColor,
-                    boxShadow: `0 0 14px ${accentColor}`,
+                    width: 2,
+                    bgcolor: safeAlpha(accentColor, 0.45),
+                    boxShadow: `0 0 8px ${safeAlpha(accentColor, 0.25)}`,
                     zIndex: 2,
                 }}
             />
@@ -1026,12 +1013,14 @@ function GlassApkCardShell({
 
 function PlayerListCardTactical({
     title,
+    liveLabel = 'LIVE',
     players,
     loading,
     metricKey,
     translations,
 }: {
     title: string;
+    liveLabel?: string;
     players: DashboardTopPlayer[];
     loading?: boolean;
     metricKey: 'totalWinnings' | 'winRate' | 'totalKills' | 'averageScore';
@@ -1050,36 +1039,7 @@ function PlayerListCardTactical({
 
     return (
         <GlassApkCardShell accentColor={accentColor}>
-            {/* Simple title only — APK glass, square corners */}
-            <Box
-                sx={{
-                    position: 'relative',
-                    overflow: 'hidden',
-                    borderRadius: 0,
-                    mb: 1.5,
-                    px: { xs: 1.5, sm: 1.75 },
-                    py: { xs: 1.15, sm: 1.25 },
-                    display: 'flex',
-                    alignItems: 'center',
-                    background: `linear-gradient(90deg, ${safeAlpha(accentColor, 0.2)} 0%, rgba(10, 14, 22, 0.85) 100%)`,
-                    border: `1px solid ${safeAlpha(accentColor, 0.5)}`,
-                    boxShadow: `0 0 16px ${safeAlpha(accentColor, 0.22)}, inset 0 1px 0 ${alpha('#ffffff', 0.08)}`,
-                }}
-            >
-                <Typography
-                    sx={{
-                        fontSize: { xs: 13, sm: 14, md: 15 },
-                        fontWeight: 900,
-                        letterSpacing: '0.07em',
-                        textTransform: 'uppercase',
-                        color: '#ffffff',
-                        lineHeight: 1.2,
-                        textShadow: `0 0 12px ${safeAlpha(accentColor, 0.45)}`,
-                    }}
-                >
-                    {title}
-                </Typography>
-            </Box>
+            <GlassSimpleTitle title={title} liveLabel={liveLabel} accentColor={accentColor} />
 
             <Box sx={{ flex: 1 }}>
                 {loading ? (
@@ -1200,13 +1160,13 @@ function PlayerListCardTactical({
                                                 alignItems: 'center',
                                                 justifyContent: 'center',
                                                 clipPath: 'polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%)',
-                                                bgcolor: isTop1 ? accentColor : rankBg,
+                                                bgcolor: isTop1 ? safeAlpha(accentColor, 0.75) : rankBg,
                                                 border: `1px solid ${safeAlpha(rankColor, 0.4)}`,
                                                 color: isTop1 ? accentContrast : rankColor,
                                                 fontWeight: 900,
                                                 fontSize: '0.75rem',
                                                 fontFamily: 'monospace',
-                                                boxShadow: isTop1 ? `0 0 10px ${safeAlpha(accentColor, 0.4)}` : 'none',
+                                                boxShadow: isTop1 ? `0 0 6px ${safeAlpha(accentColor, 0.25)}` : 'none',
                                                 animation: isTop1 ? `${rankShine} 3s ease-in-out infinite` : 'none',
                                             }}
                                         >
@@ -1226,7 +1186,7 @@ function PlayerListCardTactical({
                                                 fontSize: { xs: '0.7rem', sm: '0.82rem' },
                                                 flexShrink: 0,
                                                 border: `1.5px solid ${safeAlpha(rankColor, 0.5)}`,
-                                                boxShadow: isTop1 ? `0 0 10px ${safeAlpha(accentColor, 0.35)}` : 'none',
+                                                boxShadow: isTop1 ? `0 0 6px ${safeAlpha(accentColor, 0.2)}` : 'none',
                                             }}
                                         >
                                             {player.username?.[0]?.toUpperCase() || '?'}
@@ -1265,7 +1225,7 @@ function PlayerListCardTactical({
                                             <Typography
                                                 variant="subtitle2"
                                                 sx={{
-                                                    color: isTop1 ? accentColor : '#ffffff',
+                                                    color: isTop1 ? safeAlpha(accentColor, 0.85) : '#ffffff',
                                                     fontSize: { xs: '0.85rem', sm: '0.92rem' },
                                                     fontWeight: 800,
                                                     fontVariantNumeric: 'tabular-nums',
@@ -1339,6 +1299,7 @@ function DashboardMatchTileTactical({
     const full = isMatchFull(match);
     const matchPath = isRealMatchId(match.id) ? paths.user.match(match.id) : '';
     const showJoin = Boolean(matchPath);
+    const isPrize = variant === 'prize';
 
     const handleJoin = () => {
         if (!matchPath) return;
@@ -1349,7 +1310,6 @@ function DashboardMatchTileTactical({
         router.push(matchPath);
     };
 
-    // Calculate capacity percent
     const maxPlayers = match.totalPlayer || 100;
     const currentPlayers = match.participantsCount || 0;
     const capacityPct = Math.min(100, Math.round((currentPlayers / maxPlayers) * 100));
@@ -1360,113 +1320,39 @@ function DashboardMatchTileTactical({
           ? '#f59e0b'
           : '#10b981';
 
+    const accent = isPrize ? 'var(--ba-gold)' : '#ef4444';
+
     return (
         <Box
             sx={{
-                py: { xs: 1.35, sm: 1.4 },
-                px: { xs: 1, sm: 1.25 },
-                borderRadius: '4px',
-                borderBottom: isLast ? 'none' : HOME_ROW_LINE,
-                transition: 'all 0.2s ease',
                 position: 'relative',
+                py: { xs: 1, sm: 1.1 },
+                px: { xs: 1, sm: 1.15 },
+                mb: isLast ? 0 : 0.75,
+                borderRadius: '8px',
+                bgcolor: alpha('#0a0c10', 0.55),
+                border: `1px solid ${alpha('#ffffff', 0.07)}`,
+                boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.04)}`,
+                overflow: 'hidden',
+                transition: 'border-color 0.2s ease, background-color 0.2s ease',
+                '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    left: 0,
+                    top: 8,
+                    bottom: 8,
+                    width: 2,
+                    borderRadius: 1,
+                    bgcolor: accent,
+                    boxShadow: `0 0 8px ${alpha(isPrize ? '#f5c518' : '#ef4444', 0.45)}`,
+                },
                 '&:hover': {
-                    bgcolor: alpha('#ffffff', 0.04),
-                    transform: 'translateX(3px)',
+                    bgcolor: alpha('#10141c', 0.72),
+                    borderColor: isPrize ? goldAlpha(0.35) : alpha('#ef4444', 0.28),
                 },
             }}
         >
-            <Stack spacing={1}>
-                {/* Header line: Game tag + Match Name + Rank Index */}
-                <Stack
-                    direction="row"
-                    alignItems="flex-start"
-                    justifyContent="space-between"
-                    spacing={1}
-                    sx={{ minWidth: 0 }}
-                >
-                    <Stack spacing={0.3} sx={{ minWidth: 0, flex: 1 }}>
-                        <Stack direction="row" alignItems="center" spacing={0.75}>
-                            <Box
-                                component="span"
-                                sx={{
-                                    px: 0.75,
-                                    py: 0.15,
-                                    borderRadius: '2px',
-                                    bgcolor: variant === 'ongoing' ? alpha('#ef4444', 0.15) : alpha('#f59e0b', 0.15),
-                                    border: `1px solid ${variant === 'ongoing' ? alpha('#ef4444', 0.3) : alpha('#f59e0b', 0.3)}`,
-                                    fontSize: '0.68rem',
-                                    fontWeight: 800,
-                                    letterSpacing: 0.5,
-                                    textTransform: 'uppercase',
-                                    color: variant === 'ongoing' ? '#ef4444' : 'var(--ba-gold)',
-                                    fontFamily: 'monospace',
-                                    lineHeight: 1.2,
-                                }}
-                            >
-                                {match.gameName || 'Match'}
-                            </Box>
-                            {variant === 'ongoing' && (
-                                <LivePulseDot color="red" size={5} />
-                            )}
-                        </Stack>
-
-                        <Typography
-                            sx={{
-                                color: '#ffffff',
-                                fontSize: { xs: '0.88rem', sm: '0.95rem' },
-                                fontWeight: 700,
-                                lineHeight: 1.35,
-                                display: '-webkit-box',
-                                WebkitLineClamp: { xs: 2, sm: 1 },
-                                WebkitBoxOrient: 'vertical',
-                                overflow: 'hidden',
-                            }}
-                        >
-                            {match.matchName}
-                        </Typography>
-                    </Stack>
-
-                    <Typography
-                        sx={{
-                            flexShrink: 0,
-                            fontSize: { xs: '0.72rem', sm: '0.78rem' },
-                            fontWeight: 800,
-                            color: HOME_TEXT_MUTED,
-                            fontVariantNumeric: 'tabular-nums',
-                            fontFamily: 'monospace',
-                            lineHeight: 1.3,
-                            pt: 0.15,
-                        }}
-                    >
-                        #{index + 1}/{total}
-                    </Typography>
-                </Stack>
-
-                {/* Capacity segmented meter */}
-                <Box sx={{ width: 1 }}>
-                    <Box
-                        sx={{
-                            width: 1,
-                            height: 3,
-                            bgcolor: alpha('#ffffff', 0.08),
-                            borderRadius: '2px',
-                            overflow: 'hidden',
-                            position: 'relative',
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                width: `${capacityPct}%`,
-                                height: '100%',
-                                bgcolor: capacityColor,
-                                boxShadow: `0 0 8px ${capacityColor}`,
-                                transition: 'width 0.5s ease',
-                            }}
-                        />
-                    </Box>
-                </Box>
-
-                {/* Lower line: Spots, Entry, Prize, and CTA Button */}
+            <Stack spacing={0.75} sx={{ pl: 0.75 }}>
                 <Stack
                     direction="row"
                     alignItems="center"
@@ -1474,65 +1360,141 @@ function DashboardMatchTileTactical({
                     spacing={1}
                     sx={{ minWidth: 0 }}
                 >
-                    <Stack spacing={0.2} sx={{ minWidth: 0, flex: 1 }}>
-                        <Typography
-                            sx={{
-                                color: HOME_TEXT_SECONDARY,
-                                fontSize: { xs: '0.75rem', sm: '0.8125rem' },
-                                fontWeight: 600,
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 0.4,
-                                minWidth: 0,
-                                lineHeight: 1.4,
-                            }}
-                        >
-                            {variant === 'prize' ? `${t('home.dashboard.entry')}:` : `${t('home.dashboard.prizeEst')}`}
-                            {variant === 'prize' ? (
-                                <CoinValue value={match.entryFee || 0} size={13} />
-                            ) : (
-                                <CoinValue value={match.prizeEstimate || 0} size={13} />
-                            )}
-                        </Typography>
+                    <Stack spacing={0.25} sx={{ minWidth: 0, flex: 1 }}>
+                        <Stack direction="row" alignItems="center" spacing={0.6} sx={{ minWidth: 0 }}>
+                            <Box
+                                component="span"
+                                sx={{
+                                    px: 0.6,
+                                    py: 0.1,
+                                    borderRadius: '3px',
+                                    bgcolor: isPrize ? goldAlpha(0.12) : alpha('#ef4444', 0.12),
+                                    border: `1px solid ${isPrize ? goldAlpha(0.32) : alpha('#ef4444', 0.28)}`,
+                                    fontSize: 9,
+                                    fontWeight: 800,
+                                    letterSpacing: 0.4,
+                                    textTransform: 'uppercase',
+                                    color: isPrize ? 'var(--ba-gold)' : '#ef4444',
+                                    lineHeight: 1.25,
+                                    flexShrink: 0,
+                                }}
+                            >
+                                {match.gameName || 'Match'}
+                            </Box>
+                            {variant === 'ongoing' && <LivePulseDot color="red" size={5} />}
+                            <Typography
+                                sx={{
+                                    flexShrink: 0,
+                                    fontSize: 9,
+                                    fontWeight: 700,
+                                    color: HOME_TEXT_MUTED,
+                                    fontVariantNumeric: 'tabular-nums',
+                                }}
+                            >
+                                #{index + 1}/{total}
+                            </Typography>
+                        </Stack>
 
                         <Typography
                             sx={{
-                                color: HOME_TEXT_MUTED,
-                                fontSize: { xs: '0.72rem', sm: '0.78rem' },
-                                fontWeight: 600,
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: 0.4,
-                                fontVariantNumeric: 'tabular-nums',
-                                lineHeight: 1.4,
+                                color: '#ffffff',
+                                fontSize: { xs: '0.82rem', sm: '0.88rem' },
+                                fontWeight: 700,
+                                lineHeight: 1.25,
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap',
                             }}
                         >
-                            {variant === 'prize' ? (
-                                <>
-                                    {fShortenNumber(match.prizeEstimate || 0)} · {t('home.dashboard.spots')}:{' '}
-                                    <Box component="span" sx={{ color: capacityColor, fontWeight: 700 }}>
-                                        {match.participantsCount}/{match.totalPlayer || '∞'}
-                                    </Box>
-                                </>
-                            ) : match.entryFee ? (
-                                <>
-                                    {t('home.dashboard.spots')}:{' '}
-                                    <Box component="span" sx={{ color: capacityColor, fontWeight: 700 }}>
-                                        {match.participantsCount}/{match.totalPlayer || '∞'}
-                                    </Box>{' '}
-                                    · {t('home.dashboard.entry')} <CoinValue value={match.entryFee || 0} size={13} />
-                                </>
-                            ) : (
-                                <>
-                                    {t('home.dashboard.spots')}:{' '}
-                                    <Box component="span" sx={{ color: capacityColor, fontWeight: 700 }}>
-                                        {match.participantsCount}/{match.totalPlayer || '∞'}
-                                    </Box>{' '}
-                                    · {t('home.dashboard.entry')} {t('home.dashboard.free')}
-                                </>
-                            )}
+                            {match.matchName}
                         </Typography>
                     </Stack>
+
+                    {isPrize ? (
+                        <Stack alignItems="flex-end" spacing={0.15} sx={{ flexShrink: 0 }}>
+                            <Typography
+                                sx={{
+                                    fontSize: 9,
+                                    fontWeight: 700,
+                                    letterSpacing: 0.5,
+                                    textTransform: 'uppercase',
+                                    color: goldAlpha(0.75),
+                                }}
+                            >
+                                {t('home.dashboard.prizeEst')}
+                            </Typography>
+                            <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.35 }}>
+                                <CoinValue value={match.prizeEstimate || 0} size={14} />
+                            </Box>
+                        </Stack>
+                    ) : null}
+                </Stack>
+
+                <Box
+                    sx={{
+                        width: 1,
+                        height: 2,
+                        bgcolor: alpha('#ffffff', 0.06),
+                        borderRadius: 1,
+                        overflow: 'hidden',
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: `${capacityPct}%`,
+                            height: '100%',
+                            bgcolor: capacityColor,
+                            boxShadow: `0 0 6px ${capacityColor}`,
+                            transition: 'width 0.45s ease',
+                        }}
+                    />
+                </Box>
+
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    spacing={1}
+                    sx={{ minWidth: 0 }}
+                >
+                    <Typography
+                        sx={{
+                            color: HOME_TEXT_MUTED,
+                            fontSize: { xs: '0.7rem', sm: '0.74rem' },
+                            fontWeight: 600,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            gap: 0.35,
+                            minWidth: 0,
+                            lineHeight: 1.3,
+                            fontVariantNumeric: 'tabular-nums',
+                        }}
+                    >
+                        <Box component="span" sx={{ color: capacityColor, fontWeight: 700 }}>
+                            {match.participantsCount}/{match.totalPlayer || '∞'}
+                        </Box>
+                        <Box component="span" sx={{ opacity: 0.45 }}>
+                            ·
+                        </Box>
+                        {t('home.dashboard.entry')}
+                        {match.entryFee ? (
+                            <CoinValue value={match.entryFee} size={12} />
+                        ) : (
+                            <Box component="span" sx={{ color: HOME_TEXT_SECONDARY, fontWeight: 700 }}>
+                                {t('home.dashboard.free')}
+                            </Box>
+                        )}
+                        {!isPrize && match.prizeEstimate ? (
+                            <>
+                                <Box component="span" sx={{ opacity: 0.45 }}>
+                                    ·
+                                </Box>
+                                {t('home.dashboard.prizeEst')}
+                                <CoinValue value={match.prizeEstimate} size={12} />
+                            </>
+                        ) : null}
+                    </Typography>
 
                     {showJoin ? (
                         <Button
@@ -1549,50 +1511,30 @@ function DashboardMatchTileTactical({
                             }
                             sx={{
                                 flexShrink: 0,
-                                minWidth: { xs: 84, sm: 94 },
-                                minHeight: 34,
-                                height: 34,
-                                px: 1.5,
-                                borderRadius: '3px',
-                                clipPath: 'polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)',
-                                fontSize: 11,
+                                minWidth: { xs: 72, sm: 82 },
+                                minHeight: 28,
+                                height: 28,
+                                px: 1.15,
+                                borderRadius: '6px',
+                                fontSize: 10,
                                 fontWeight: 800,
-                                letterSpacing: 0.8,
+                                letterSpacing: 0.5,
                                 textTransform: 'uppercase',
                                 color: 'var(--ba-gold-ink) !important',
-                                background: 'linear-gradient(135deg, var(--ba-gold-light) 0%, var(--ba-gold) 50%, var(--ba-gold-dark) 100%) !important',
+                                background:
+                                    'linear-gradient(135deg, var(--ba-gold-light) 0%, var(--ba-gold) 55%, var(--ba-gold-dark) 100%) !important',
                                 border: '1px solid var(--ba-gold-light)',
-                                boxShadow: `0 2px 12px ${goldAlpha(0.3)}`,
-                                position: 'relative',
-                                overflow: 'hidden',
-                                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                                '&::before': {
-                                    content: '""',
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: '-100%',
-                                    width: '60%',
-                                    height: '100%',
-                                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
-                                    transform: 'skewX(-25deg)',
-                                    transition: 'left 0.5s ease',
-                                    pointerEvents: 'none',
-                                },
+                                boxShadow: `0 2px 10px ${goldAlpha(0.28)}`,
+                                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                                 '&:hover': {
-                                    background: 'linear-gradient(135deg, var(--ba-gold-light) 0%, var(--ba-gold) 60%, var(--ba-gold-light) 100%) !important',
-                                    boxShadow: `0 4px 18px ${goldAlpha(0.55)}`,
+                                    boxShadow: `0 4px 14px ${goldAlpha(0.45)}`,
                                     transform: 'translateY(-1px)',
-                                    '&::before': {
-                                        left: '140%',
-                                    },
                                 },
                                 '&.Mui-disabled': {
                                     background: `${alpha('#ffffff', 0.08)} !important`,
                                     color: `${alpha('#ffffff', 0.35)} !important`,
                                     borderColor: alpha('#ffffff', 0.1),
                                     boxShadow: 'none',
-                                    clipPath: 'none',
-                                    borderRadius: '3px',
                                 },
                             }}
                         >
@@ -1611,12 +1553,14 @@ function DashboardMatchTileTactical({
 
 function DashboardMatchPanelTactical({
     title,
+    liveLabel = 'LIVE',
     matches,
     loading,
     variant,
     emptyLabel,
 }: {
     title: string;
+    liveLabel?: string;
     matches: DashboardMatchSummary[];
     loading?: boolean;
     variant: 'prize' | 'ongoing';
@@ -1630,36 +1574,7 @@ function DashboardMatchPanelTactical({
 
     return (
         <GlassApkCardShell accentColor={accentColor}>
-            {/* Simple title only — APK glass, square corners */}
-            <Box
-                sx={{
-                    position: 'relative',
-                    overflow: 'hidden',
-                    borderRadius: 0,
-                    mb: 1.5,
-                    px: { xs: 1.5, sm: 1.75 },
-                    py: { xs: 1.15, sm: 1.25 },
-                    display: 'flex',
-                    alignItems: 'center',
-                    background: `linear-gradient(90deg, ${safeAlpha(accentColor, 0.2)} 0%, rgba(10, 14, 22, 0.85) 100%)`,
-                    border: `1px solid ${safeAlpha(accentColor, 0.5)}`,
-                    boxShadow: `0 0 16px ${safeAlpha(accentColor, 0.22)}, inset 0 1px 0 ${alpha('#ffffff', 0.08)}`,
-                }}
-            >
-                <Typography
-                    sx={{
-                        fontSize: { xs: 13, sm: 14, md: 15 },
-                        fontWeight: 900,
-                        letterSpacing: '0.07em',
-                        textTransform: 'uppercase',
-                        color: '#ffffff',
-                        lineHeight: 1.2,
-                        textShadow: `0 0 12px ${safeAlpha(accentColor, 0.45)}`,
-                    }}
-                >
-                    {title}
-                </Typography>
-            </Box>
+            <GlassSimpleTitle title={title} liveLabel={liveLabel} accentColor={accentColor} />
 
             <Box sx={{ flex: 1 }}>
                 {loading ? (
@@ -1678,7 +1593,7 @@ function DashboardMatchPanelTactical({
                         ))}
                     </Stack>
                 ) : count ? (
-                    <Box sx={{ pt: 0.5 }}>
+                    <Box sx={{ pt: 0.35 }}>
                         {tilesToRender.map((match, index) => (
                             <DashboardMatchTileTactical
                                 key={match.id || index}
@@ -1878,7 +1793,8 @@ export function LandingDashboardSection() {
                 maxWidth: '100%',
                 boxSizing: 'border-box',
                 bgcolor: '#07080b',
-                py: { xs: 4, md: 6 },
+                pt: { xs: 3.5, md: 5 },
+                pb: { xs: 2, md: 2.5 },
                 color: '#f5f5f5',
                 '&:before': {
                     content: "''",
@@ -1927,6 +1843,15 @@ export function LandingDashboardSection() {
                         badgeLabel={t('home.dashboard.liveDashboardChip')}
                         title={t('home.dashboard.battleAsiaPulse')}
                         description={t('home.dashboard.pulseDescription')}
+                        gamesCoveredLabel={t('home.dashboard.gamesCoveredLabel')}
+                        gameShortLabels={{
+                            pubg: t('home.dashboard.gamesCoveredShort.pubg'),
+                            freeFire: t('home.dashboard.gamesCoveredShort.freeFire'),
+                            cod: t('home.dashboard.gamesCoveredShort.cod'),
+                            valorant: t('home.dashboard.gamesCoveredShort.valorant'),
+                            mlbb: t('home.dashboard.gamesCoveredShort.mlbb'),
+                        }}
+                        liveCountByGame={data?.liveCountByGame}
                         liveSuffix={t('home.dashboard.live')}
                         labels={pulseLabels}
                         stats={stats}
@@ -1958,6 +1883,7 @@ export function LandingDashboardSection() {
                         >
                             <PlayerListCardTactical
                                 title={t('home.dashboard.topProfitGenerators')}
+                                liveLabel={t('home.dashboard.live')}
                                 players={data?.topProfitPlayers || []}
                                 loading={loading}
                                 metricKey="totalWinnings"
@@ -1984,6 +1910,7 @@ export function LandingDashboardSection() {
                         >
                             <PlayerListCardTactical
                                 title={t('home.dashboard.topPlayers')}
+                                liveLabel={t('home.dashboard.live')}
                                 players={data?.topPlayers || []}
                                 loading={loading}
                                 metricKey="totalKills"
@@ -2010,6 +1937,7 @@ export function LandingDashboardSection() {
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                             <DashboardMatchPanelTactical
                                 title={t('home.dashboard.highPrizeBattles')}
+                                liveLabel={t('home.dashboard.live')}
                                 matches={data?.highPrizeMatches || []}
                                 loading={loading}
                                 variant="prize"
@@ -2023,6 +1951,7 @@ export function LandingDashboardSection() {
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                             <DashboardMatchPanelTactical
                                 title={t('home.dashboard.ongoingMatchesTitle')}
+                                liveLabel={t('home.dashboard.live')}
                                 matches={data?.ongoingMatches || []}
                                 loading={loading}
                                 variant="ongoing"

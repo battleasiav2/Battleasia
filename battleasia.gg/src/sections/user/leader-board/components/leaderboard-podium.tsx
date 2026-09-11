@@ -14,18 +14,8 @@ import { LEADERBOARD_PODIUM_ORDER, LEADERBOARD_PODIUM_COLORS } from '../leader-b
 // ----------------------------------------------------------------------
 
 const crownPulse = keyframes`
-  0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 8px ${alpha('#f5c518', 0.55)}); }
-  50% { transform: translateY(-3px) scale(1.06); filter: drop-shadow(0 0 16px ${alpha('#f5c518', 0.9)}); }
-`;
-
-const champAura = keyframes`
-  0%, 100% { opacity: 0.55; transform: scale(1); }
-  50% { opacity: 0.9; transform: scale(1.08); }
-`;
-
-const borderScan = keyframes`
-  0% { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
+  0%, 100% { transform: translateY(0) scale(1); filter: drop-shadow(0 0 4px ${alpha('#f5c518', 0.45)}); }
+  50% { transform: translateY(-1px) scale(1.04); filter: drop-shadow(0 0 8px ${alpha('#f5c518', 0.8)}); }
 `;
 
 type LeaderboardPodiumProps = {
@@ -51,38 +41,13 @@ export function LeaderboardPodium({
     <Box
       sx={{
         position: 'relative',
-        px: { xs: 0, md: 1 },
-        py: { xs: 1, md: 2.5 },
-        borderRadius: '14px',
+        px: { xs: 0, md: 0.25 },
+        py: { xs: 0.35, md: 0.75 },
+        borderRadius: '10px',
         overflow: 'hidden',
         bgcolor: alpha('#030509', 0.72),
-        border: `1px solid ${alpha('#f5c518', 0.14)}`,
-        boxShadow: `inset 0 0 60px ${alpha('#f5c518', 0.04)}, 0 24px 60px ${alpha('#000000', 0.55)}`,
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          inset: 0,
-          pointerEvents: 'none',
-          background: `
-            radial-gradient(ellipse 45% 55% at 50% 42%, ${alpha('#f5c518', 0.16)} 0%, transparent 70%),
-            radial-gradient(ellipse 30% 40% at 18% 70%, ${alpha('#c0c0c0', 0.05)} 0%, transparent 70%),
-            radial-gradient(ellipse 30% 40% at 82% 70%, ${alpha('#cd7f32', 0.06)} 0%, transparent 70%)
-          `,
-        },
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          inset: 0,
-          pointerEvents: 'none',
-          opacity: 0.35,
-          backgroundImage: `repeating-linear-gradient(
-            0deg,
-            transparent 0px,
-            transparent 3px,
-            ${alpha('#ffffff', 0.012)} 3px,
-            ${alpha('#ffffff', 0.012)} 4px
-          )`,
-        },
+        border: `1px solid ${alpha('#f5c518', 0.12)}`,
+        boxShadow: `inset 0 0 32px ${alpha('#f5c518', 0.03)}, 0 12px 32px ${alpha('#000000', 0.45)}`,
       }}
     >
       <Box
@@ -90,15 +55,16 @@ export function LeaderboardPodium({
           position: 'relative',
           zIndex: 1,
           display: 'grid',
-          gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' },
-          gap: { xs: 1.75, md: 2 },
+          // Always 3-up so mobile also shows #2 #1 #3 in one row
+          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+          gap: { xs: 0.5, sm: 0.75, md: 1.25 },
           alignItems: 'end',
         }}
       >
         {LEADERBOARD_PODIUM_ORDER.map((rank) => {
           const player = podiumMap.get(rank);
           if (!player) {
-            return <Box key={rank} sx={{ display: { xs: 'none', md: 'block' } }} />;
+            return <Box key={rank} />;
           }
 
           const rankColor =
@@ -111,220 +77,136 @@ export function LeaderboardPodium({
               key={player.id}
               sx={{
                 position: 'relative',
-                order: { xs: isChamp ? 0 : rank === 2 ? 1 : 2, md: 'unset' },
+                minWidth: 0,
                 transform: {
-                  xs: 'none',
-                  md: isChamp ? 'translateY(-18px) scale(1.06)' : 'translateY(0) scale(0.96)',
+                  xs: isChamp ? 'translateY(-4px)' : 'none',
+                  md: isChamp ? 'translateY(-6px) scale(1.02)' : 'translateY(0) scale(0.97)',
                 },
                 zIndex: isChamp ? 3 : 1,
-                transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
-                '&:hover': {
-                  transform: {
-                    xs: 'translateY(-4px)',
-                    md: isChamp ? 'translateY(-24px) scale(1.08)' : 'translateY(-8px) scale(0.98)',
-                  },
-                },
               }}
             >
-              {/* Champion spotlight bloom */}
-              {isChamp && (
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: '8%',
-                    left: '50%',
-                    width: 180,
-                    height: 180,
-                    ml: '-90px',
-                    borderRadius: '50%',
-                    background: `radial-gradient(circle, ${alpha(rankColor, 0.45)} 0%, transparent 70%)`,
-                    filter: 'blur(18px)',
-                    animation: `${champAura} 3.2s ease-in-out infinite`,
-                    pointerEvents: 'none',
-                    zIndex: 0,
-                    '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-                  }}
-                />
-              )}
-
               <Box
                 sx={{
                   position: 'relative',
                   zIndex: 1,
-                  p: { xs: 2.25, md: isChamp ? 2.75 : 2.1 },
-                  minHeight: { xs: 'auto', md: isChamp ? 300 : rank === 2 ? 250 : 230 },
+                  p: { xs: 0.65, sm: 0.9, md: isChamp ? 1.35 : 1.1 },
+                  minHeight: { xs: 'auto', md: isChamp ? 168 : 148 },
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'flex-end',
                   textAlign: 'center',
                   overflow: 'hidden',
-                  borderRadius: '12px',
+                  borderRadius: { xs: '8px', md: '10px' },
                   bgcolor: isChamp ? alpha('#0c1008', 0.92) : alpha('#080b10', 0.88),
                   border: isChamp
-                    ? `1.5px solid ${alpha(rankColor, 0.85)}`
-                    : `1px solid ${alpha(rankColor, 0.28)}`,
+                    ? `1.5px solid ${alpha(rankColor, 0.8)}`
+                    : `1px solid ${alpha(rankColor, 0.26)}`,
                   boxShadow: isChamp
-                    ? `
-                      0 0 0 1px ${alpha(rankColor, 0.35)},
-                      0 28px 56px ${alpha('#000000', 0.75)},
-                      0 0 48px ${alpha(rankColor, 0.35)},
-                      inset 0 1px 0 ${alpha('#ffffff', 0.18)},
-                      inset 0 -40px 60px ${alpha(rankColor, 0.08)}
-                    `
-                    : `
-                      0 14px 32px ${alpha('#000000', 0.55)},
-                      0 0 18px ${alpha(rankColor, 0.1)},
-                      inset 0 1px 0 ${alpha('#ffffff', 0.08)}
-                    `,
-                  opacity: isChamp ? 1 : 0.88,
-                  filter: isChamp ? 'none' : 'saturate(0.85)',
-                  clipPath: isChamp
-                    ? 'polygon(0 10px, 10px 0, calc(100% - 10px) 0, 100% 10px, 100% calc(100% - 10px), calc(100% - 10px) 100%, 10px 100%, 0 calc(100% - 10px))'
-                    : 'polygon(0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px))',
+                    ? `0 8px 20px ${alpha('#000000', 0.55)}, 0 0 16px ${alpha(rankColor, 0.22)}`
+                    : `0 6px 14px ${alpha('#000000', 0.4)}`,
+                  opacity: isChamp ? 1 : 0.92,
                 }}
               >
-                {/* Animated gold scan line — champion only */}
-                {isChamp && (
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      height: 3,
-                      background: `linear-gradient(90deg, transparent, ${rankColor}, #fff8c8, ${rankColor}, transparent)`,
-                      backgroundSize: '200% 100%',
-                      boxShadow: `0 0 14px ${rankColor}`,
-                      animation: `${borderScan} 2.8s linear infinite`,
-                      '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-                    }}
-                  />
-                )}
-
-                {/* HUD corner brackets */}
                 <Box
                   sx={{
                     position: 'absolute',
-                    top: 8,
-                    left: 8,
-                    width: isChamp ? 16 : 12,
-                    height: isChamp ? 16 : 12,
-                    borderTop: `2px solid ${alpha(rankColor, isChamp ? 0.9 : 0.45)}`,
-                    borderLeft: `2px solid ${alpha(rankColor, isChamp ? 0.9 : 0.45)}`,
+                    top: { xs: 4, md: 6 },
+                    left: { xs: 4, md: 6 },
+                    width: { xs: 7, md: isChamp ? 11 : 8 },
+                    height: { xs: 7, md: isChamp ? 11 : 8 },
+                    borderTop: `1.5px solid ${alpha(rankColor, isChamp ? 0.85 : 0.4)}`,
+                    borderLeft: `1.5px solid ${alpha(rankColor, isChamp ? 0.85 : 0.4)}`,
                     pointerEvents: 'none',
                   }}
                 />
                 <Box
                   sx={{
                     position: 'absolute',
-                    top: 8,
-                    right: 8,
-                    width: isChamp ? 16 : 12,
-                    height: isChamp ? 16 : 12,
-                    borderTop: `2px solid ${alpha(rankColor, isChamp ? 0.9 : 0.45)}`,
-                    borderRight: `2px solid ${alpha(rankColor, isChamp ? 0.9 : 0.45)}`,
-                    pointerEvents: 'none',
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    bottom: 8,
-                    left: 8,
-                    width: isChamp ? 16 : 12,
-                    height: isChamp ? 16 : 12,
-                    borderBottom: `2px solid ${alpha(rankColor, isChamp ? 0.9 : 0.45)}`,
-                    borderLeft: `2px solid ${alpha(rankColor, isChamp ? 0.9 : 0.45)}`,
-                    pointerEvents: 'none',
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    bottom: 8,
-                    right: 8,
-                    width: isChamp ? 16 : 12,
-                    height: isChamp ? 16 : 12,
-                    borderBottom: `2px solid ${alpha(rankColor, isChamp ? 0.9 : 0.45)}`,
-                    borderRight: `2px solid ${alpha(rankColor, isChamp ? 0.9 : 0.45)}`,
+                    top: { xs: 4, md: 6 },
+                    right: { xs: 4, md: 6 },
+                    width: { xs: 7, md: isChamp ? 11 : 8 },
+                    height: { xs: 7, md: isChamp ? 11 : 8 },
+                    borderTop: `1.5px solid ${alpha(rankColor, isChamp ? 0.85 : 0.4)}`,
+                    borderRight: `1.5px solid ${alpha(rankColor, isChamp ? 0.85 : 0.4)}`,
                     pointerEvents: 'none',
                   }}
                 />
 
-                <Box sx={{ mb: 1.25, position: 'relative', zIndex: 1 }}>
+                <Box sx={{ mb: { xs: 0.35, md: 0.55 }, position: 'relative', zIndex: 1 }}>
                   <Iconify
-                    icon={isChamp ? 'solar:crown-bold' : 'solar:trophy-bold'}
-                    width={isChamp ? 40 : 26}
+                    icon={isChamp ? 'solar:crown-bold' : 'solar:medal-ribbons-star-bold'}
+                    width={isChamp ? 20 : 14}
                     sx={{
+                      width: {
+                        xs: isChamp ? 16 : 12,
+                        sm: isChamp ? 20 : 14,
+                        md: isChamp ? 24 : 16,
+                      },
+                      height: {
+                        xs: isChamp ? 16 : 12,
+                        sm: isChamp ? 20 : 14,
+                        md: isChamp ? 24 : 16,
+                      },
                       color: rankColor,
-                      filter: `drop-shadow(0 0 ${isChamp ? 12 : 6}px ${alpha(rankColor, 0.7)})`,
+                      filter: `drop-shadow(0 0 ${isChamp ? 6 : 3}px ${alpha(rankColor, 0.55)})`,
                       animation: isChamp ? `${crownPulse} 2.4s ease-in-out infinite` : 'none',
                       '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
                     }}
                   />
                 </Box>
 
-                <Box sx={{ position: 'relative', mb: 1.25 }}>
-                  {isChamp && (
-                    <Box
-                      sx={{
-                        position: 'absolute',
-                        inset: -8,
-                        borderRadius: '50%',
-                        background: `conic-gradient(from 0deg, ${alpha(rankColor, 0.0)}, ${alpha(rankColor, 0.7)}, ${alpha('#ffffff', 0.5)}, ${alpha(rankColor, 0.7)}, ${alpha(rankColor, 0.0)})`,
-                        filter: 'blur(1px)',
-                        opacity: 0.85,
-                        pointerEvents: 'none',
-                      }}
-                    />
-                  )}
-                  <Avatar
-                    src={avatarSrc}
-                    sx={{
-                      position: 'relative',
-                      width: isChamp ? 84 : 56,
-                      height: isChamp ? 84 : 56,
-                      border: `${isChamp ? 3 : 2}px solid ${rankColor}`,
-                      boxShadow: isChamp
-                        ? `0 0 0 4px ${alpha(rankColor, 0.2)}, 0 0 28px ${alpha(rankColor, 0.55)}`
-                        : `0 0 14px ${alpha(rankColor, 0.35)}`,
-                      bgcolor: alpha('#000000', 0.55),
-                      fontWeight: 800,
-                      fontSize: isChamp ? 28 : 20,
-                    }}
-                  >
-                    {player.username.charAt(0).toUpperCase()}
-                  </Avatar>
-                </Box>
+                <Avatar
+                  src={avatarSrc}
+                  sx={{
+                    width: { xs: isChamp ? 34 : 28, sm: isChamp ? 42 : 34, md: isChamp ? 52 : 40 },
+                    height: { xs: isChamp ? 34 : 28, sm: isChamp ? 42 : 34, md: isChamp ? 52 : 40 },
+                    mb: { xs: 0.35, md: 0.55 },
+                    border: `${isChamp ? 2 : 1.5}px solid ${rankColor}`,
+                    boxShadow: isChamp
+                      ? `0 0 0 2px ${alpha(rankColor, 0.16)}, 0 0 12px ${alpha(rankColor, 0.4)}`
+                      : `0 0 8px ${alpha(rankColor, 0.25)}`,
+                    bgcolor: alpha('#000000', 0.55),
+                    fontWeight: 800,
+                    fontSize: { xs: 12, md: isChamp ? 18 : 14 },
+                  }}
+                >
+                  {player.username.charAt(0).toUpperCase()}
+                </Avatar>
 
                 <Typography
                   sx={{
-                    fontSize: isChamp ? 12 : 11,
+                    fontSize: { xs: 8, sm: 9, md: isChamp ? 10 : 9 },
                     fontWeight: 900,
                     color: rankColor,
-                    letterSpacing: isChamp ? 2 : 1.2,
-                    mb: 0.5,
-                    textShadow: isChamp ? `0 0 16px ${alpha(rankColor, 0.65)}` : 'none',
+                    letterSpacing: { xs: 0.4, md: 1 },
+                    mb: 0.15,
+                    lineHeight: 1.1,
                   }}
                 >
                   #{rank}
-                  {isChamp ? ' CHAMPION' : ''}
+                  {isChamp ? (
+                    <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                      {' '}
+                      CHAMPION
+                    </Box>
+                  ) : null}
                 </Typography>
 
                 <Typography
                   className="font-tr"
                   sx={{
-                    fontSize: isChamp ? 20 : 15,
+                    fontSize: { xs: 10, sm: 11, md: isChamp ? 14 : 12 },
                     fontWeight: 800,
                     color: USER_COLORS.textPrimary,
                     textTransform: 'uppercase',
-                    mb: 0.75,
+                    mb: { xs: 0.25, md: 0.4 },
                     maxWidth: 1,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    textShadow: isChamp ? `0 0 20px ${alpha(rankColor, 0.35)}` : 'none',
+                    lineHeight: 1.15,
+                    px: 0.25,
                   }}
                 >
                   {player.username}
@@ -334,57 +216,90 @@ export function LeaderboardPodium({
                   label={player.badge}
                   size="small"
                   sx={{
-                    mb: 1.25,
-                    height: 22,
-                    fontSize: 10,
-                    letterSpacing: 0.4,
+                    mb: { xs: 0.35, md: 0.55 },
+                    height: { xs: 14, md: 18 },
+                    fontSize: { xs: 7, md: 9 },
+                    letterSpacing: 0.2,
+                    '& .MuiChip-label': { px: { xs: 0.5, md: 0.75 } },
+                    display: { xs: 'none', sm: 'inline-flex' },
                     ...getUserChipSx(isChamp ? 'gold' : 'success'),
-                    ...(isChamp && {
-                      boxShadow: `0 0 12px ${alpha(rankColor, 0.35)}`,
-                    }),
                   }}
                 />
 
-                <Stack direction="row" spacing={0.6} alignItems="center" justifyContent="center" sx={{ mb: 0.5 }}>
+                <Stack
+                  direction="row"
+                  spacing={0.35}
+                  alignItems="center"
+                  justifyContent="center"
+                  sx={{ mb: 0.15, maxWidth: 1, minWidth: 0 }}
+                >
                   <Box
                     component="img"
                     src={CONFIG.currencyIcon}
                     alt=""
                     sx={{
-                      width: isChamp ? 18 : 14,
-                      height: isChamp ? 18 : 14,
-                      filter: isChamp ? `drop-shadow(0 0 6px ${alpha(rankColor, 0.7)})` : 'none',
+                      width: { xs: 10, md: isChamp ? 13 : 11 },
+                      height: { xs: 10, md: isChamp ? 13 : 11 },
+                      flexShrink: 0,
                     }}
                   />
                   <Typography
                     sx={{
-                      fontSize: isChamp ? 15 : 12,
+                      fontSize: { xs: 9, sm: 10, md: isChamp ? 12 : 11 },
                       fontWeight: 800,
                       color: USER_COLORS.textPrimary,
-                      letterSpacing: 0.2,
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      lineHeight: 1.2,
                     }}
                   >
-                    {formatScore(player.totalScore)}{' '}
-                    <Box component="span" sx={{ color: alpha('#ffffff', 0.65), fontWeight: 700, fontSize: '0.85em' }}>
+                    {formatScore(player.totalScore)}
+                    <Box
+                      component="span"
+                      sx={{
+                        color: alpha('#ffffff', 0.55),
+                        fontWeight: 700,
+                        fontSize: '0.85em',
+                        display: { xs: 'none', sm: 'inline' },
+                      }}
+                    >
+                      {' '}
                       {pointsLabel}
                     </Box>
                   </Typography>
                 </Stack>
 
-                <Typography sx={{ ...userMutedTextSx, fontSize: 11, fontWeight: 600 }}>
-                  {player.gamesPlayed.toLocaleString()} {gamesLabel} · {averageLabel}:{' '}
-                  {player.averageScore.toFixed(1)}%
+                <Typography
+                  sx={{
+                    ...userMutedTextSx,
+                    fontSize: { xs: 7.5, sm: 8.5, md: 10 },
+                    fontWeight: 600,
+                    lineHeight: 1.2,
+                    px: 0.25,
+                    maxWidth: 1,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>
+                    {player.gamesPlayed.toLocaleString()} {gamesLabel} · {averageLabel}:{' '}
+                    {player.averageScore.toFixed(1)}%
+                  </Box>
+                  <Box component="span" sx={{ display: { xs: 'inline', md: 'none' } }}>
+                    {player.gamesPlayed}G · {player.averageScore.toFixed(0)}%
+                  </Box>
                 </Typography>
 
-                {/* Pedestal rank bar */}
                 <Box
                   sx={{
-                    mt: 1.75,
-                    width: isChamp ? '72%' : '55%',
-                    height: isChamp ? 6 : 4,
+                    mt: { xs: 0.5, md: 0.85 },
+                    width: isChamp ? '55%' : '42%',
+                    height: { xs: 2, md: isChamp ? 3 : 2 },
                     borderRadius: 1,
                     background: `linear-gradient(90deg, transparent, ${rankColor}, transparent)`,
-                    boxShadow: isChamp ? `0 0 14px ${alpha(rankColor, 0.7)}` : `0 0 8px ${alpha(rankColor, 0.3)}`,
+                    boxShadow: isChamp ? `0 0 8px ${alpha(rankColor, 0.45)}` : 'none',
                   }}
                 />
               </Box>

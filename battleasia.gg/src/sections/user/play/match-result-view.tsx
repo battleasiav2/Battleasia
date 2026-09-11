@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router';
+﻿import { useParams, useNavigate } from 'react-router';
 import { useMemo, useState, useEffect, useCallback } from 'react';
 
 import { Box, Stack, Typography } from '@mui/material';
@@ -18,7 +18,6 @@ import {
   USER_COLORS,
 } from 'src/layouts/user';
 
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { Iconify } from 'src/components/iconify';
 import CoinValue from 'src/components/coin-value';
 
@@ -208,7 +207,6 @@ export function MatchResultView() {
                 </Typography>
               ) : null}
             </Stack>
-            <BattleGoldDivider variant="section" sx={{ mt: 1, width: 140 }} />
           </Box>
 
           <Box sx={{ px: { xs: 2, md: 3 }, pb: 3 }}>

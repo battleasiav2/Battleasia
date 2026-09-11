@@ -22,10 +22,10 @@ const VARIANT_PRESETS: Record<
   GoldDividerVariant,
   { width: DividerWidth; mt: number; showCenterGem: boolean }
 > = {
-  title: { width: { xs: 140, sm: 200, md: 240 }, mt: 1, showCenterGem: true },
-  hero: { width: { xs: 140, sm: 200 }, mt: 2, showCenterGem: true },
-  section: { width: { xs: 120, sm: 180 }, mt: 1.5, showCenterGem: true },
-  compact: { width: 120, mt: 0.5, showCenterGem: true },
+  title: { width: { xs: 140, sm: 200, md: 240 }, mt: 1, showCenterGem: false },
+  hero: { width: { xs: 140, sm: 200 }, mt: 2, showCenterGem: false },
+  section: { width: { xs: 120, sm: 180 }, mt: 1.5, showCenterGem: false },
+  compact: { width: 120, mt: 0.5, showCenterGem: false },
   full: { width: '100%', mt: 1, showCenterGem: false },
 };
 

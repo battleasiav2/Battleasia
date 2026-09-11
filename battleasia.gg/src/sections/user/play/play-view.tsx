@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+﻿import { useState, useEffect, useMemo } from 'react';
 
 import { Box, Stack, Typography, Grid2 as Grid } from '@mui/material';
 import { alpha } from '@mui/material/styles';
@@ -15,7 +15,6 @@ import { UserPageShell, UserEmptyState } from 'src/layouts/user';
 import { USER_COLORS } from 'src/layouts/user/user-theme';
 import { goldAlpha } from 'src/theme/accent-presets';
 
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { ScrollReveal } from 'src/components/animate';
 
 import type { PublicDashboardStats } from 'src/types';
@@ -71,7 +70,7 @@ export function PlayView() {
         participantsByGame: data?.participantsByGame,
       });
     } catch {
-      // Non-blocking — cards still render without counts
+      // Non-blocking â€” cards still render without counts
     }
   };
 
@@ -194,7 +193,6 @@ export function PlayView() {
                   >
                     {t('play.tournament')}
                   </Typography>
-                  <BattleGoldDivider variant="section" sx={{ mt: 0.75, width: 120 }} />
                 </Box>
                 <Typography sx={{ fontSize: 13, color: USER_COLORS.textMuted }}>
                   {t('play.selectTitleHint')}

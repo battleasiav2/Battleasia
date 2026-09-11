@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+﻿import { useRef, useState } from 'react';
 
 
 
@@ -36,7 +36,6 @@ import { getImageUrl } from 'src/utils/get-image-url';
 
 import { Iconify } from 'src/components/iconify';
 
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
 import { Image } from 'src/components/image';
 
@@ -219,7 +218,6 @@ export function FeedComposer({ onPosted }: FeedComposerProps) {
 
         </Stack>
 
-        <BattleGoldDivider variant="title" sx={{ opacity: 0.65 }} />
 
 
 

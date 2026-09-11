@@ -1,18 +1,17 @@
-import { useMemo } from 'react';
+﻿import { useMemo } from 'react';
 
 import { alpha } from '@mui/material/styles';
 import { Box, Stack, Typography, Grid2 as Grid } from '@mui/material';
 
 import { useTranslate } from 'src/locales/use-locales';
 import { useImagePreloader } from 'src/hooks';
-import { USER_COLORS, UserPageShell, UserActionButton, UserGlassCard, goldAlpha } from 'src/layouts/user';
+import { USER_COLORS, UserPageShell, UserGlassCard, goldAlpha } from 'src/layouts/user';
 
 import { Iconify } from 'src/components/iconify';
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
 import { ShopDetailsCarousel } from './shop-details-carousel';
 import { SHOP_HERO_IMAGE, SHOP_IMAGE_PATHS, getBacShopEntryUrl } from './shop-constants';
-import { ShopFeatures, ShopArenaHero, ShopPageSkeleton, ShopSectionNav } from './components';
+import { ShopFeatures, ShopArenaHero, ShopPageSkeleton } from './components';
 
 // ----------------------------------------------------------------------
 
@@ -67,8 +66,6 @@ export function ShopView() {
 
   return (
     <UserPageShell>
-      <ShopSectionNav />
-
       <ShopArenaHero
         badge={t('shop.badgeOfficialStore')}
         title={t('shop.bacShopName')}
@@ -108,7 +105,6 @@ export function ShopView() {
               >
                 {t('shop.bacTitle')}
               </Typography>
-              <BattleGoldDivider variant="section" sx={{ mt: 0.75, width: 140 }} />
             </Box>
 
             <Stack
@@ -194,6 +190,7 @@ export function ShopView() {
                       border: `1px solid ${goldAlpha(0.35)}`,
                       bgcolor: goldAlpha(0.08),
                       clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
+                      mt: 'auto',
                     }}
                   >
                     <Box
@@ -230,30 +227,7 @@ export function ShopView() {
                     </Box>
                   </Stack>
 
-                  {/* Action CTA Button */}
-                  <UserActionButton
-                    href={shopHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    actionVariant="gold"
-                    size="large"
-                    fullWidth
-                    startIcon={<Iconify icon="solar:arrow-right-up-bold" width={18} />}
-                    sx={{
-                      mt: 'auto',
-                      height: { xs: 48, md: 52 },
-                      fontSize: { xs: 13, md: 14 },
-                      fontWeight: 800,
-                      letterSpacing: 0.8,
-                      borderRadius: 0,
-                      clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
-                      boxShadow: `0 8px 24px ${goldAlpha(0.3)}`,
-                    }}
-                  >
-                    {t('shop.goToBacShop')}
-                  </UserActionButton>
-
-                  {/* Trust Footer Badges */}
+                  {/* Trust Footer Badges â€” CTA lives only in hero */}
                   <Stack
                     direction="row"
                     flexWrap="wrap"

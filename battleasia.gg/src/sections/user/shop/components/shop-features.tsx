@@ -1,8 +1,7 @@
-import { Box, Stack, Typography, Grid2 as Grid } from '@mui/material';
+﻿import { Box, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
@@ -38,104 +37,87 @@ export function ShopFeatures({ title, features }: ShopFeaturesProps) {
         </Typography>
       </Stack>
 
-      <BattleGoldDivider variant="section" sx={{ mt: 0.5, mb: 3, width: 120 }} />
 
-      <Grid container spacing={2.5} alignItems="stretch">
+      {/* One merged panel â€” 4 features, no separate cards */}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, minmax(0, 1fr))' },
+          width: 1,
+          bgcolor: alpha('#06090e', 0.72),
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
+          border: `1px solid ${goldAlpha(0.28)}`,
+          borderTop: `2px solid ${GOLD}`,
+          boxShadow: `0 10px 28px ${alpha('#000000', 0.55)}, inset 0 0 16px ${goldAlpha(0.04)}`,
+          clipPath: {
+            xs: 'none',
+            md: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+          },
+        }}
+      >
         {features.map((feature, index) => (
-          <Grid key={feature.title} size={{ xs: 12, sm: 6, md: 3 }}>
-            <Box
-              sx={{
-                position: 'relative',
-                height: 1,
-                p: { xs: 2.25, md: 2.5 },
-                display: 'flex',
-                flexDirection: 'column',
-                bgcolor: alpha('#06090e', 0.7),
-                backdropFilter: 'blur(18px)',
-                WebkitBackdropFilter: 'blur(18px)',
-                border: `1px solid ${goldAlpha(0.22)}`,
-                borderTop: `2px solid ${GOLD}`,
-                boxShadow: `0 10px 28px ${alpha('#000000', 0.55)}, inset 0 0 16px ${goldAlpha(0.04)}`,
-                clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                '&:hover': {
-                  transform: 'translateY(-4px)',
-                  borderColor: GOLD,
-                  bgcolor: alpha('#06090e', 0.88),
-                  boxShadow: `0 16px 36px ${alpha('#000000', 0.75)}, 0 0 20px ${goldAlpha(0.2)}`,
-                  '& .feature-icon-box': {
-                    bgcolor: goldAlpha(0.25),
-                    borderColor: GOLD,
-                    boxShadow: `0 0 16px ${goldAlpha(0.4)}`,
-                    transform: 'scale(1.05)',
-                  },
-                },
-              }}
-            >
-              {/* Feature Step Number Pill */}
-              <Typography
-                sx={{
-                  position: 'absolute',
-                  top: 12,
-                  right: 14,
-                  fontSize: 11,
-                  fontWeight: 900,
-                  color: goldAlpha(0.4),
-                  letterSpacing: 1,
-                }}
-              >
-                0{index + 1}
-              </Typography>
-
-              {/* Icon Container */}
+          <Box
+            key={feature.title}
+            sx={{
+              minWidth: 0,
+              p: { xs: 2.25, md: 2.5 },
+              borderRight: {
+                xs: 'none',
+                sm: index % 2 === 0 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                md: index < features.length - 1 ? `1px solid ${alpha('#ffffff', 0.1)}` : 'none',
+              },
+              borderBottom: {
+                xs: index < features.length - 1 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                sm: index < 2 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                md: 'none',
+              },
+            }}
+          >
+            <Stack direction="row" alignItems="center" spacing={1.25} sx={{ mb: 1.35 }}>
               <Box
-                className="feature-icon-box"
                 sx={{
-                  width: 48,
-                  height: 48,
-                  mb: 2,
+                  width: 40,
+                  height: 40,
+                  flexShrink: 0,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   bgcolor: goldAlpha(0.12),
                   border: `1px solid ${goldAlpha(0.35)}`,
                   color: GOLD,
-                  transition: 'all 0.3s ease',
                   clipPath: 'polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)',
                 }}
               >
-                <Iconify icon={feature.icon} width={24} />
+                <Iconify icon={feature.icon} width={20} />
               </Box>
-
-              {/* Title & Description */}
               <Typography
                 sx={{
-                  fontSize: 14,
+                  fontSize: { xs: 13, md: 14 },
                   fontWeight: 800,
                   letterSpacing: 0.5,
                   textTransform: 'uppercase',
                   color: USER_COLORS.textPrimary,
-                  mb: 1,
                   lineHeight: 1.3,
+                  minWidth: 0,
                 }}
               >
                 {feature.title}
               </Typography>
+            </Stack>
 
-              <Typography
-                sx={{
-                  fontSize: 12.5,
-                  color: alpha('#ffffff', 0.65),
-                  lineHeight: 1.6,
-                }}
-              >
-                {feature.description}
-              </Typography>
-            </Box>
-          </Grid>
+            <Typography
+              sx={{
+                fontSize: 12.5,
+                color: alpha('#ffffff', 0.65),
+                lineHeight: 1.6,
+              }}
+            >
+              {feature.description}
+            </Typography>
+          </Box>
         ))}
-      </Grid>
+      </Box>
     </Box>
   );
 }
-

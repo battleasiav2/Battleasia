@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useCallback } from 'react';
+﻿import { useMemo, useState, useEffect, useCallback } from 'react';
 
 import { alpha } from '@mui/material/styles';
 import {
@@ -31,10 +31,7 @@ import {
 
 import { Iconify } from 'src/components/iconify';
 import { CoinValue } from 'src/components/coin-value';
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { getGlassInnerSx, getDefaultGlassTokens } from 'src/components/battle-glass-card';
-
-import { ShopSectionNav } from './components';
 
 // ----------------------------------------------------------------------
 
@@ -70,9 +67,9 @@ function getApiErrorMessage(error: unknown, fallback: string): string {
 }
 
 function formatTransferDate(value: string | Date | null, locale: string) {
-  if (!value) return '—';
+  if (!value) return 'â€”';
   const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
+  if (Number.isNaN(date.getTime())) return 'â€”';
   return date.toLocaleString(locale, {
     month: 'short',
     day: 'numeric',
@@ -208,8 +205,6 @@ export function ShopWalletView() {
 
   return (
     <UserPageShell>
-      <ShopSectionNav />
-
       <Stack spacing={{ xs: 3, md: 4 }}>
         <Box>
           <Typography
@@ -225,7 +220,6 @@ export function ShopWalletView() {
           >
             {t('shop.transferTitle')}
           </Typography>
-          <BattleGoldDivider variant="section" sx={{ mt: 0.75, mb: 1.5, width: 140 }} />
           <Typography sx={{ ...userMutedTextSx, fontSize: 13.5, maxWidth: 580, lineHeight: 1.6 }}>
             {t('shop.transferSubtitle')}
           </Typography>
@@ -242,12 +236,12 @@ export function ShopWalletView() {
           <UserStatTile label={t('shop.transferYourBalance')} value={String(balance)} suffix="BAC" />
           <UserStatTile
             label={t('shop.transferFeeRate')}
-            value={settingsLoading ? '…' : `${settings?.feePercent ?? 0}%`}
+            value={settingsLoading ? 'â€¦' : `${settings?.feePercent ?? 0}%`}
           />
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             <UserStatTile
               label={t('shop.transferLimit')}
-              value={settings ? `${settings.minAmount}–${settings.maxAmount}` : '—'}
+              value={settings ? `${settings.minAmount}â€“${settings.maxAmount}` : 'â€”'}
             />
           </Box>
         </Box>
@@ -473,7 +467,7 @@ export function ShopWalletView() {
                               color: isSent ? '#f87171' : USER_COLORS.gold,
                             }}
                           >
-                            {isSent ? '−' : '+'}
+                            {isSent ? 'âˆ’' : '+'}
                           </Typography>
                           <CoinValue
                             value={isSent ? item.totalDebited : item.amount}

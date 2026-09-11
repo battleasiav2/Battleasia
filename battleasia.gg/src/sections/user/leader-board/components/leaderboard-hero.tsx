@@ -19,6 +19,7 @@ export function LeaderboardHero({ title, subtitle, action }: LeaderboardHeroProp
 
   return (
     <UserArenaStrip
+      dense
       badge={t('leaderboard.badgeGlobalRankings')}
       title={title}
       subtitle={subtitle}

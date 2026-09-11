@@ -2,88 +2,29 @@ import { Box, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
-import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
 import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
-type ReferralStepCardProps = {
-  icon: string;
-  label: string;
-  step: number;
-};
-
-export function ReferralStepCard({ icon, label, step }: ReferralStepCardProps) {
-  const tokens = getDefaultGlassTokens();
-
-  return (
-    <Box sx={getGlassInnerSx(tokens, { p: { xs: 2, md: 2.5 }, height: 1, textAlign: 'center' })}>
-      <Typography
-        sx={{
-          fontSize: 10,
-          fontWeight: 800,
-          letterSpacing: 1.2,
-          color: goldAlpha(0.8),
-          textTransform: 'uppercase',
-          mb: 1.5,
-        }}
-      >
-        Step {step}
-      </Typography>
-
-      <Box
-        sx={{
-          width: { xs: 64, md: 72 },
-          height: { xs: 64, md: 72 },
-          borderRadius: '50%',
-          mx: 'auto',
-          mb: 1.5,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          bgcolor: goldAlpha(0.12),
-          border: `2px solid ${goldAlpha(0.35)}`,
-          boxShadow: `0 0 24px ${goldAlpha(0.12)}`,
-        }}
-      >
-        <Iconify icon={icon} sx={{ color: USER_COLORS.gold, width: { xs: 30, md: 34 }, height: { xs: 30, md: 34 } }} />
-      </Box>
-
-      <Typography
-        className="font-tr"
-        sx={{
-          color: USER_COLORS.textPrimary,
-          fontWeight: 700,
-          fontSize: { xs: 13, md: 14 },
-          letterSpacing: 0.4,
-          textTransform: 'uppercase',
-          lineHeight: 1.35,
-        }}
-      >
-        {label}
-      </Typography>
-    </Box>
-  );
-}
-
-// ----------------------------------------------------------------------
+const GOLD = USER_COLORS.gold;
 
 type ReferralStepsFlowProps = {
   title: string;
   steps: Array<{ icon: string; label: string }>;
 };
 
+/** One merged “How it works” strip — no separate step cards. */
 export function ReferralStepsFlow({ title, steps }: ReferralStepsFlowProps) {
   return (
-    <Stack spacing={2.5}>
+    <Box>
       <Typography
         className="font-tr"
         sx={{
-          color: USER_COLORS.gold,
+          mb: 1.25,
+          color: GOLD,
           fontWeight: 800,
-          textAlign: 'center',
-          fontSize: { xs: 18, md: 22 },
+          fontSize: { xs: 15, md: 16 },
           letterSpacing: 0.8,
           textTransform: 'uppercase',
         }}
@@ -91,42 +32,79 @@ export function ReferralStepsFlow({ title, steps }: ReferralStepsFlowProps) {
         {title}
       </Typography>
 
-      <Stack
-        direction={{ xs: 'column', md: 'row' }}
-        alignItems="stretch"
-        spacing={{ xs: 1.5, md: 1 }}
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', sm: `repeat(${steps.length}, minmax(0, 1fr))` },
+          width: 1,
+          bgcolor: alpha('#06090e', 0.55),
+          border: `1px solid ${goldAlpha(0.22)}`,
+          borderTop: `2px solid ${GOLD}`,
+        }}
       >
         {steps.map((step, index) => (
-          <Stack
+          <Box
             key={step.label}
-            direction={{ xs: 'column', md: 'row' }}
-            alignItems="center"
-            sx={{ flex: 1, minWidth: 0 }}
+            sx={{
+              minWidth: 0,
+              p: { xs: 1.5, md: 1.75 },
+              borderRight: {
+                xs: 'none',
+                sm: index < steps.length - 1 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+              },
+              borderBottom: {
+                xs: index < steps.length - 1 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                sm: 'none',
+              },
+            }}
           >
-            <Box sx={{ flex: 1, width: 1 }}>
-              <ReferralStepCard icon={step.icon} label={step.label} step={index + 1} />
-            </Box>
-
-            {index < steps.length - 1 ? (
+            <Stack direction="row" alignItems="center" spacing={1.25}>
               <Box
                 sx={{
+                  width: 36,
+                  height: 36,
+                  flexShrink: 0,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  px: { xs: 0, md: 0.5 },
-                  py: { xs: 0.5, md: 0 },
-                  transform: { xs: 'rotate(90deg)', md: 'none' },
+                  bgcolor: goldAlpha(0.12),
+                  border: `1px solid ${goldAlpha(0.35)}`,
+                  color: GOLD,
                 }}
               >
-                <Iconify
-                  icon="eva:arrow-ios-forward-fill"
-                  sx={{ color: USER_COLORS.gold, width: { xs: 20, md: 24 }, height: { xs: 20, md: 24 } }}
-                />
+                <Iconify icon={step.icon} width={18} />
               </Box>
-            ) : null}
-          </Stack>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography
+                  sx={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: 1,
+                    color: goldAlpha(0.75),
+                    textTransform: 'uppercase',
+                    mb: 0.25,
+                  }}
+                >
+                  Step {index + 1}
+                </Typography>
+                <Typography
+                  className="font-tr"
+                  sx={{
+                    color: USER_COLORS.textPrimary,
+                    fontWeight: 700,
+                    fontSize: { xs: 12.5, md: 13 },
+                    letterSpacing: 0.3,
+                    textTransform: 'uppercase',
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {step.label}
+                </Typography>
+              </Box>
+            </Stack>
+          </Box>
         ))}
-      </Stack>
-    </Stack>
+      </Box>
+    </Box>
   );
 }

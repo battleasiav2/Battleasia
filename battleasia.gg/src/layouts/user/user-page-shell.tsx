@@ -5,7 +5,6 @@ import Box from '@mui/material/Box';
 import { keyframes } from '@mui/material/styles';
 
 import { DashboardContent } from 'src/layouts/dashboard';
-import { goldAlpha } from 'src/theme/accent-presets';
 
 import { USER_COLORS, getUserPageShellOverlays } from './user-theme';
 
@@ -20,12 +19,6 @@ const pageEnter = keyframes`
     opacity: 1;
     transform: translateY(0) scale(1);
   }
-`;
-
-const laserConduit = keyframes`
-  0% { transform: translateX(-100%); }
-  50% { transform: translateX(100%); }
-  100% { transform: translateX(100%); }
 `;
 
 type UserPageShellProps = {
@@ -67,37 +60,6 @@ export function UserPageShell({
         ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
       ]}
     >
-      {/* Top Cyber Laser Conduit */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '2px',
-          overflow: 'hidden',
-          zIndex: 10,
-          pointerEvents: 'none',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            inset: 0,
-            background: `linear-gradient(90deg, transparent 0%, ${goldAlpha(0.2)} 20%, ${goldAlpha(0.5)} 50%, ${goldAlpha(0.2)} 80%, transparent 100%)`,
-          },
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '40%',
-            height: '100%',
-            background: `linear-gradient(90deg, transparent, ${USER_COLORS.gold}, #ffffff, ${USER_COLORS.gold}, transparent)`,
-            animation: `${laserConduit} 4.5s cubic-bezier(0.4, 0, 0.2, 1) infinite`,
-            filter: `drop-shadow(0 0 6px ${USER_COLORS.gold})`,
-          },
-        }}
-      />
-
       <DashboardContent
         disablePadding
         maxWidth={maxWidth}

@@ -10,6 +10,7 @@ export { UserEmptyState } from './user-empty-state';
 export { UserStatTile } from './user-stat-tile';
 export { UserAnimatedStat } from './user-animated-stat';
 export { UserNavVertical } from './user-nav-vertical';
+export { GoToBacShopButton } from './go-to-bac-shop-button';
 
 export {
   USER_COLORS,

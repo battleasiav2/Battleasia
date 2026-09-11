@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -190,27 +192,39 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
       left: 0,
       right: 0,
       bottom: 0,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: const Color(0xF2141414),
-          border: Border(
-            top: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.45),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
+      child: ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  const Color(0xFF161618).withValues(alpha: 0.55),
+                  const Color(0xFF050508).withValues(alpha: 0.72),
+                ],
+              ),
+              border: Border(
+                top: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.35),
+                  blurRadius: 20,
+                  offset: const Offset(0, -6),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(6, 8, 6, 8 + bottomInset),
-          child: Row(
-            children: navItems(context).map((item) {
-              final isActive = _isActive(item.route, _currentRoute);
-              return Expanded(child: _buildNavItem(context, item, isActive));
-            }).toList(),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(6, 8, 6, 8 + bottomInset),
+              child: Row(
+                children: navItems(context).map((item) {
+                  final isActive = _isActive(item.route, _currentRoute);
+                  return Expanded(child: _buildNavItem(context, item, isActive));
+                }).toList(),
+              ),
+            ),
           ),
         ),
       ),

@@ -608,6 +608,10 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
         open={open}
         onClose={onClose}
         anchor="right"
+        sx={{
+          // Above FloatingFooterNav (zIndex 1300) so Logout stays visible on mobile
+          zIndex: (theme) => theme.zIndex.modal + 4,
+        }}
         slotProps={{
           backdrop: {
             sx: {
@@ -849,14 +853,21 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
           {renderList()}
         </Scrollbar>
 
-        {/* Bottom Sign Out CTA */}
+        {/* Bottom Sign Out CTA — pinned above mobile safe area / footer */}
         <Box
           sx={{
+            flexShrink: 0,
             px: { xs: 2.25, sm: 3 },
-            py: 2,
+            pt: 2,
+            pb: {
+              xs: 'max(20px, calc(12px + env(safe-area-inset-bottom, 0px)))',
+              sm: 2.5,
+            },
             mt: 'auto',
             borderTop: `1px solid ${goldAlpha(0.16)}`,
-            background: 'rgba(5, 8, 14, 0.95)',
+            background: 'rgba(5, 8, 14, 0.98)',
+            position: 'relative',
+            zIndex: 2,
           }}
         >
           <SignOutButton
@@ -864,21 +875,22 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
             variant="outlined"
             sx={{
               width: 1,
-              py: 1.15,
+              minHeight: 48,
+              py: 1.25,
               borderRadius: 0,
               clipPath: 'polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)',
               fontWeight: 800,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              fontSize: 13.5,
-              color: '#f87171',
-              bgcolor: alpha('#ef4444', 0.08),
-              border: `1px solid ${alpha('#ef4444', 0.35)}`,
+              fontSize: { xs: 14, sm: 13.5 },
+              color: '#fecaca !important',
+              bgcolor: `${alpha('#ef4444', 0.14)} !important`,
+              border: `1px solid ${alpha('#ef4444', 0.55)} !important`,
               transition: 'all 0.22s ease',
               '&:hover': {
-                bgcolor: alpha('#ef4444', 0.2),
-                borderColor: '#ef4444',
-                color: '#ffffff',
+                bgcolor: `${alpha('#ef4444', 0.28)} !important`,
+                borderColor: '#ef4444 !important',
+                color: '#ffffff !important',
                 boxShadow: '0 0 18px rgba(239, 68, 68, 0.4)',
                 transform: 'translateY(-2px)',
               },

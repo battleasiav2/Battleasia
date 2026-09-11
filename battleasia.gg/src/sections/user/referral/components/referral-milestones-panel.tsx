@@ -56,7 +56,7 @@ function ReferralTierCard({
   return (
     <Box
       sx={{
-        ...getGlassInnerSx(glassTokens, { p: { xs: 1.75, md: 2 } }),
+        ...getGlassInnerSx(glassTokens, { p: { xs: 1.25, md: 1.5 } }),
         ...getEarnClaimFlashSx(flash),
         ...getEarnReadyPulseSx(isReady && !flash),
       }}
@@ -157,12 +157,12 @@ export function ReferralMilestonesPanel({ referral, claimingKey, flashKey, onCla
   const completed = referral.tiers.filter((item) => item.status === 'claimed').length;
 
   return (
-    <Stack spacing={1.25}>
-      <UserGlassCard sx={{ p: { xs: 1.75, md: 2.25 } }}>
-        <Typography className="font-tr" sx={{ fontSize: { xs: 15, md: 16 }, fontWeight: 800, color: USER_COLORS.textPrimary }}>
+    <Stack spacing={1}>
+      <UserGlassCard sx={{ p: { xs: 1.25, md: 1.5 } }}>
+        <Typography className="font-tr" sx={{ fontSize: { xs: 14, md: 15 }, fontWeight: 800, color: USER_COLORS.textPrimary }}>
           {t('referral.milestonesTitle')}
         </Typography>
-        <Typography sx={{ ...userMutedTextSx, fontSize: 12.5, mt: 0.5 }}>
+        <Typography sx={{ ...userMutedTextSx, fontSize: 12, mt: 0.35 }}>
           {t('referral.milestonesSubtitle', {
             completed,
             total: referral.tiers.length,
@@ -170,7 +170,7 @@ export function ReferralMilestonesPanel({ referral, claimingKey, flashKey, onCla
           })}
         </Typography>
         {pending > 0 ? (
-          <Typography sx={{ mt: 1, fontSize: 12, color: EARN_HUB_GOLD, fontWeight: 700 }}>
+          <Typography sx={{ mt: 0.75, fontSize: 12, color: EARN_HUB_GOLD, fontWeight: 700 }}>
             {t('referral.milestonesReadyCount', { count: pending })}
           </Typography>
         ) : null}

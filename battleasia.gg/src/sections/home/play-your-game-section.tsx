@@ -290,7 +290,8 @@ export function PlayYourGameSection() {
         overflowY: 'visible',
         bgcolor: '#07080a',
         color: '#ffffff',
-        py: { xs: 5, md: 8 },
+        pt: { xs: 2.5, md: 3.5 },
+        pb: { xs: 4, md: 6 },
         borderTop: `1px solid ${alpha('#ffffff', 0.06)}`,
         borderBottom: `1px solid ${alpha('#ffffff', 0.06)}`,
         '&::before': {
@@ -311,8 +312,8 @@ export function PlayYourGameSection() {
       <Box
         sx={{
           position: 'absolute',
-          top: { xs: 16, md: 28 },
-          left: { xs: 16, md: 36 },
+          top: { xs: 10, md: 16 },
+          left: { xs: 12, md: 28 },
           pointerEvents: 'none',
           zIndex: 1,
           animation: `${reticlePulse} 4s ease-in-out infinite`,

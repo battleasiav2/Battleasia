@@ -71,7 +71,9 @@ export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: G
     lineHeight: 1.25,
     fontWeight: 700,
     textTransform: 'uppercase' as const,
-    wordBreak: 'break-word' as const,
+    whiteSpace: 'nowrap' as const,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
   };
 
   const valueSx = {

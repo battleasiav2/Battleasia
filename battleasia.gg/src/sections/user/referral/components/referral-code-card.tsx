@@ -6,7 +6,9 @@ import { Box, Stack, Typography, IconButton } from '@mui/material';
 import {
   UserGlassCard,
   UserActionButton,
-  USER_COLORS, goldAlpha } from 'src/layouts/user';
+  USER_COLORS,
+  goldAlpha,
+} from 'src/layouts/user';
 import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
@@ -36,14 +38,14 @@ export function ReferralCodeCard({ referralCode, referralUrl }: ReferralCodeCard
   };
 
   return (
-    <UserGlassCard sx={{ p: { xs: 2, md: 2.5 }, height: 1 }}>
+    <UserGlassCard sx={{ p: { xs: 1.5, md: 2 }, height: 1 }}>
       <Typography
         className="font-tr"
         sx={{
-          mb: 2,
+          mb: 1.25,
           color: USER_COLORS.gold,
           fontWeight: 800,
-          fontSize: 16,
+          fontSize: 15,
           letterSpacing: 0.8,
           textTransform: 'uppercase',
         }}
@@ -51,9 +53,9 @@ export function ReferralCodeCard({ referralCode, referralUrl }: ReferralCodeCard
         {t('referral.yourReferralCode')}
       </Typography>
 
-      <Stack spacing={1.5}>
-        <Box sx={getGlassInnerSx(tokens, { p: { xs: 1.5, md: 2 } })}>
-          <Typography sx={{ fontSize: 11, color: USER_COLORS.textMuted, mb: 0.75, textTransform: 'uppercase' }}>
+      <Stack spacing={1}>
+        <Box sx={getGlassInnerSx(tokens, { p: { xs: 1.25, md: 1.5 } })}>
+          <Typography sx={{ fontSize: 11, color: USER_COLORS.textMuted, mb: 0.5, textTransform: 'uppercase' }}>
             {t('referral.yourCode')}
           </Typography>
           <Stack direction="row" alignItems="center" spacing={1}>
@@ -62,7 +64,7 @@ export function ReferralCodeCard({ referralCode, referralUrl }: ReferralCodeCard
                 flex: 1,
                 color: USER_COLORS.gold,
                 fontWeight: 800,
-                fontSize: { xs: 18, md: 22 },
+                fontSize: { xs: 16, md: 20 },
                 letterSpacing: 1.2,
                 fontFamily: 'monospace',
               }}
@@ -78,13 +80,13 @@ export function ReferralCodeCard({ referralCode, referralUrl }: ReferralCodeCard
                 border: `1px solid ${goldAlpha(0.28)}`,
               }}
             >
-              <Iconify icon={copiedField === 'code' ? 'solar:check-circle-bold' : 'solar:copy-bold'} width={22} />
+              <Iconify icon={copiedField === 'code' ? 'solar:check-circle-bold' : 'solar:copy-bold'} width={20} />
             </IconButton>
           </Stack>
         </Box>
 
-        <Box sx={getGlassInnerSx(tokens, { p: { xs: 1.5, md: 2 } })}>
-          <Typography sx={{ fontSize: 11, color: USER_COLORS.textMuted, mb: 0.75, textTransform: 'uppercase' }}>
+        <Box sx={getGlassInnerSx(tokens, { p: { xs: 1.25, md: 1.5 } })}>
+          <Typography sx={{ fontSize: 11, color: USER_COLORS.textMuted, mb: 0.5, textTransform: 'uppercase' }}>
             {t('referral.yourReferralLink')}
           </Typography>
           <Stack direction="row" alignItems="center" spacing={1}>
@@ -108,7 +110,7 @@ export function ReferralCodeCard({ referralCode, referralUrl }: ReferralCodeCard
                 border: `1px solid ${goldAlpha(0.28)}`,
               }}
             >
-              <Iconify icon={copiedField === 'link' ? 'solar:check-circle-bold' : 'solar:copy-bold'} width={22} />
+              <Iconify icon={copiedField === 'link' ? 'solar:check-circle-bold' : 'solar:copy-bold'} width={20} />
             </IconButton>
           </Stack>
         </Box>
@@ -120,7 +122,7 @@ export function ReferralCodeCard({ referralCode, referralUrl }: ReferralCodeCard
         startIcon={<Iconify icon="solar:copy-bold" width={18} />}
         onClick={() => handleCopy(referralUrl, 'link')}
         disabled={!referralUrl}
-        sx={{ mt: 2 }}
+        sx={{ mt: 1.25 }}
       >
         {copiedField === 'link' ? t('referral.copiedToClipboard') : t('referral.copyCode')}
       </UserActionButton>

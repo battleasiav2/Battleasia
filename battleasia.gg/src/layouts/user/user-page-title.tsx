@@ -3,11 +3,8 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { alpha } from '@mui/material/styles';
 
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
-
-import { USER_COLORS, userMutedTextSx, userPageTitleSx } from './user-theme';
+import { userMutedTextSx, userPageTitleSx } from './user-theme';
 import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
@@ -57,8 +54,6 @@ export function UserPageTitle({ title, subtitle, badge, action, sx }: UserPageTi
             {subtitle}
           </Typography>
         ) : null}
-
-        <BattleGoldDivider variant="title" />
       </Box>
 
       {action ? <Box sx={{ flexShrink: 0 }}>{action}</Box> : null}

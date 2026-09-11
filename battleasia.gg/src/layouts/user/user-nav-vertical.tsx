@@ -8,13 +8,11 @@ import { Box, Stack, Divider, Typography } from '@mui/material';
 
 import { Logo } from 'src/components/logo';
 import { NavSectionMini, NavSectionVertical } from 'src/components/nav-section';
-import { GLASS_CARD_RADIUS } from 'src/components/battle-glass-card';
 
 import { useTranslate } from 'src/locales/use-locales';
 
 import { layoutClasses } from '../core/classes';
 import { NavToggleButton } from '../components/nav-toggle-button';
-import { USER_COLORS } from './user-theme';
 import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
@@ -134,54 +132,6 @@ export function UserNavVertical({
         })}
       >
         <NavSectionVertical data={data} cssVars={cssVars} sx={{ px: 1.5, py: 1.5, flex: '1 1 auto' }} />
-      </Box>
-
-      <Box
-        sx={{
-          mx: 2,
-          mb: 2,
-          p: 1.75,
-          borderRadius: `${GLASS_CARD_RADIUS}px`,
-          bgcolor: alpha('#10141c', 0.8),
-          backdropFilter: 'blur(16px)',
-          border: `1px solid ${goldAlpha(0.24)}`,
-          boxShadow: `0 8px 24px ${alpha('#000000', 0.5)}`,
-          position: 'relative',
-          overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '2px',
-            background: `linear-gradient(90deg, var(--ba-gold, #cbfb24), #22c55e, var(--ba-gold, #cbfb24))`,
-          },
-        }}
-      >
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <Box
-            sx={{
-              width: 7,
-              height: 7,
-              borderRadius: '50%',
-              bgcolor: '#22c55e',
-              boxShadow: '0 0 8px #22c55e',
-              animation: 'pulse 2s infinite',
-              '@keyframes pulse': {
-                '0%': { transform: 'scale(0.95)', opacity: 0.8 },
-                '50%': { transform: 'scale(1.2)', opacity: 1 },
-                '100%': { transform: 'scale(0.95)', opacity: 0.8 },
-              },
-            }}
-          />
-          <Typography sx={{ fontSize: 10, fontWeight: 800, letterSpacing: 1.2, color: 'var(--ba-gold, #cbfb24)', textTransform: 'uppercase' }}>
-            Battle Asia
-          </Typography>
-        </Stack>
-        <Typography sx={{ mt: 0.75, fontSize: 11, color: alpha('#ffffff', 0.6), lineHeight: 1.45 }}>
-          Premium esports arena
-        </Typography>
       </Box>
     </>
   );

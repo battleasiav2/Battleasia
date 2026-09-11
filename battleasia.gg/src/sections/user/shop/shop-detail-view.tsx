@@ -14,7 +14,6 @@ import {
   UserPageShell,
   UserGlassCard,
   UserBackButton,
-  UserActionButton,
   UserStatTile,
   UserEmptyState,
   USER_COLORS,
@@ -24,10 +23,9 @@ import {
 } from 'src/layouts/user';
 
 import { Image } from 'src/components/image';
-import { Iconify } from 'src/components/iconify';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
-import { ShopHero, ShopDetailSkeleton } from './components';
+import { ShopHero, ShopDetailSkeleton, GoToBacShopButton } from './components';
 import { getBacShopEntryUrl } from './shop-constants';
 
 // ----------------------------------------------------------------------
@@ -138,39 +136,22 @@ export function ShopDetailView() {
         shopName={itemTitle}
         subtitle={t('shop.detailSubtitle')}
         action={
-          <UserActionButton
+          <GoToBacShopButton
             href={shopHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            actionVariant="gold"
             disabled={isSoldOut}
-            startIcon={<Iconify icon="solar:cart-check-bold" width={18} />}
-            sx={{
-              borderRadius: 0,
-              clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
-            }}
-          >
-            {isSoldOut ? t('shop.soldOut') : t('shop.buyNow')}
-          </UserActionButton>
+            label={isSoldOut ? t('shop.soldOut') : t('shop.buyNow')}
+            sx={{ width: 'auto' }}
+          />
         }
       />
 
       <Stack sx={{ mb: 2.5, display: { xs: 'flex', md: 'none' } }}>
-        <UserActionButton
+        <GoToBacShopButton
           href={shopHref}
-          target="_blank"
-          rel="noopener noreferrer"
-          actionVariant="gold"
-          disabled={isSoldOut}
-          startIcon={<Iconify icon="solar:cart-check-bold" width={18} />}
           fullWidth
-          sx={{
-            borderRadius: 0,
-            clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
-          }}
-        >
-          {isSoldOut ? t('shop.soldOut') : t('shop.buyNow')}
-        </UserActionButton>
+          disabled={isSoldOut}
+          label={isSoldOut ? t('shop.soldOut') : t('shop.buyNow')}
+        />
       </Stack>
 
       <Box
@@ -345,27 +326,12 @@ export function ShopDetailView() {
               </Box>
             ) : null}
 
-            <UserActionButton
+            <GoToBacShopButton
               href={shopHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              actionVariant="gold"
-              size="large"
               fullWidth
               disabled={isSoldOut}
-              startIcon={<Iconify icon="solar:arrow-right-up-bold" width={18} />}
-              sx={{
-                height: { xs: 48, md: 52 },
-                fontSize: { xs: 13, md: 14 },
-                fontWeight: 900,
-                letterSpacing: 0.8,
-                borderRadius: 0,
-                clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
-                boxShadow: `0 8px 24px ${goldAlpha(0.35)}`,
-              }}
-            >
-              {isSoldOut ? t('shop.soldOut') : t('shop.goToBacShop')}
-            </UserActionButton>
+              label={isSoldOut ? t('shop.soldOut') : undefined}
+            />
           </Stack>
         </Grid>
       </Grid>

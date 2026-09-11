@@ -19,6 +19,7 @@ export function ReferralHero({ title, subtitle, action }: ReferralHeroProps) {
 
   return (
     <UserArenaStrip
+      dense
       badge={t('referral.badgeInviteEarn')}
       title={title}
       subtitle={subtitle}

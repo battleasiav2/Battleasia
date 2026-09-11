@@ -13,8 +13,6 @@ import 'package:battleasia_app/data/models/referral_item_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
-import 'package:battleasia_app/presentation/widgets/common/glass_stat_tile.dart';
-import 'package:battleasia_app/presentation/widgets/common/gold_divider.dart';
 
 /// Earn / referral hub aligned with battleasia.gg referral dashboard.
 class ReferralScreen extends StatefulWidget {
@@ -198,7 +196,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 4),
                               Text(
                                 widget.showInviteSection
                                     ? 'REFER & EARN'
@@ -209,24 +207,22 @@ class _ReferralScreenState extends State<ReferralScreen>
                                   letterSpacing: 1,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 4),
                               Text(
                                 'Invite friends and earn $_commissionRate% on their deposits',
                                 style: AppTheme.bodyMedium.copyWith(
                                   color: AppColors.textMuted,
                                 ),
                               ),
-                              const SizedBox(height: 12),
-                              const GoldDivider(),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 8),
                               _buildStatsGrid(),
                               if (widget.showInviteSection) ...[
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 10),
                                 _buildInviteCard(code, referralUrl),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 10),
                                 _buildHowItWorks(),
                               ],
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 10),
                               GlassCard(
                                 padding: EdgeInsets.zero,
                                 child: Column(
@@ -276,48 +272,107 @@ class _ReferralScreenState extends State<ReferralScreen>
 
   Widget _buildStatsGrid() {
     final items = [
-      _StatData('Total', '$_totalReferrals', Icons.groups_outlined),
+      _StatData('Referrals', '$_totalReferrals', Icons.groups_outlined),
       _StatData('Active', '$_activeReferrals', Icons.verified_user_outlined),
       _StatData(
         'Earnings',
-        _totalEarnings.toStringAsFixed(2),
+        _totalEarnings.toStringAsFixed(0),
         Icons.account_balance_wallet_outlined,
         showCoin: true,
       ),
       _StatData('Rate', '$_commissionRate%', Icons.percent),
       _StatData(
         'Deposits',
-        _totalDeposits.toStringAsFixed(2),
+        _totalDeposits.toStringAsFixed(0),
         Icons.savings_outlined,
         showCoin: true,
       ),
       _StatData('Events', '$_commissionEvents', Icons.receipt_long_outlined),
     ];
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: items.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 10,
-        childAspectRatio: 1.55,
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xB806090E),
+        border: Border.all(color: AppColors.gold.withValues(alpha: 0.28)),
+        borderRadius: BorderRadius.circular(2),
       ),
-      itemBuilder: (_, i) {
-        final item = items[i];
-        final valueText = item.showCoin ? item.value : item.value;
-        return GlassStatTile(
-          label: item.label,
-          value: valueText,
-          icon: item.icon,
-        );
-      },
+      foregroundDecoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: AppColors.gold, width: 2),
+        ),
+      ),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: items.length,
+        padding: EdgeInsets.zero,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisSpacing: 0,
+          crossAxisSpacing: 0,
+          childAspectRatio: 2.35,
+        ),
+        itemBuilder: (_, i) {
+          final item = items[i];
+          final isRightCol = i.isOdd;
+          final isBottomRow = i >= 4;
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              border: Border(
+                right: !isRightCol
+                    ? BorderSide(color: Colors.white.withValues(alpha: 0.08))
+                    : BorderSide.none,
+                bottom: !isBottomRow
+                    ? BorderSide(color: Colors.white.withValues(alpha: 0.08))
+                    : BorderSide.none,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Icon(item.icon, size: 14, color: AppColors.gold),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        item.label.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTheme.bodySmall.copyWith(
+                          color: AppColors.textMuted,
+                          fontWeight: FontWeight.w700,
+                          fontSize: 10,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  item.value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTheme.heading3.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 18,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 
   Widget _buildInviteCard(String code, String link) {
     return GlassCard(
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -329,14 +384,14 @@ class _ReferralScreenState extends State<ReferralScreen>
               letterSpacing: 0.8,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           _copyRow(
             value: code.isEmpty ? '—' : code,
             copied: _copiedCode,
             onCopy: () => _copy(code, isCode: true),
             large: true,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           Text(
             'YOUR REFERRAL LINK',
             style: AppTheme.bodySmall.copyWith(
@@ -345,7 +400,7 @@ class _ReferralScreenState extends State<ReferralScreen>
               letterSpacing: 0.8,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           _copyRow(
             value: link.isEmpty ? 'Loading...' : link,
             copied: _copiedLink,
@@ -402,45 +457,51 @@ class _ReferralScreenState extends State<ReferralScreen>
     ];
 
     return GlassCard(
+      padding: const EdgeInsets.all(12),
+      showGoldBar: true,
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'How It Works',
-            style: AppTheme.heading3.copyWith(
+            style: AppTheme.bodySmall.copyWith(
               color: AppColors.gold,
               fontWeight: FontWeight.w800,
+              letterSpacing: 0.8,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10),
           Row(
             children: [
               for (var i = 0; i < steps.length; i++) ...[
                 if (i > 0)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: Icon(Icons.chevron_right, color: AppColors.gold),
+                  Container(
+                    width: 1,
+                    height: 40,
+                    margin: const EdgeInsets.symmetric(horizontal: 6),
+                    color: Colors.white.withValues(alpha: 0.08),
                   ),
                 Expanded(
-                  child: Column(
+                  child: Row(
                     children: [
                       Container(
-                        width: 52,
-                        height: 52,
+                        width: 32,
+                        height: 32,
                         decoration: BoxDecoration(
-                          shape: BoxShape.circle,
                           color: AppColors.gold.withValues(alpha: 0.12),
-                          border: Border.all(color: AppColors.gold),
+                          border: Border.all(color: AppColors.gold.withValues(alpha: 0.45)),
                         ),
-                        child: Icon(steps[i].$1, color: AppColors.gold),
+                        child: Icon(steps[i].$1, color: AppColors.gold, size: 16),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        steps[i].$2,
-                        textAlign: TextAlign.center,
-                        style: AppTheme.bodySmall.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 11,
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          steps[i].$2,
+                          style: AppTheme.bodySmall.copyWith(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 11,
+                          ),
                         ),
                       ),
                     ],

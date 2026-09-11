@@ -1,8 +1,7 @@
-import { Box, Stack, Button, Typography } from '@mui/material';
+﻿import { Box, Stack, Button, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { WatchLiveButton } from 'src/components/watch-live-button';
 
 import { USER_COLORS, userGoldButtonSx } from 'src/layouts/user/user-theme';
@@ -58,7 +57,7 @@ type PlayArenaHeroProps = {
   onSecondary?: () => void;
 };
 
-/** Post-login arena hero — mirrors the home hero composition inside the user shell. */
+/** Post-login arena hero â€” mirrors the home hero composition inside the user shell. */
 export function PlayArenaHero({
   badge,
   title,
@@ -156,7 +155,7 @@ export function PlayArenaHero({
       </Box>
 
       <Stack
-        spacing={{ xs: 1, md: 2 }}
+        spacing={{ xs: 1.35, md: 2.35 }}
         alignItems={{ xs: 'flex-start', md: 'center' }}
         sx={{
           position: 'relative',
@@ -164,7 +163,7 @@ export function PlayArenaHero({
           width: 1,
           mx: 'auto',
           px: { xs: 2.25, sm: 3.5, md: 6, lg: 8 },
-          py: { xs: 2.25, md: 4.25 },
+          py: { xs: 2.5, md: 4.5 },
           maxWidth: { xs: 760, md: 920 },
           textAlign: { xs: 'left', md: 'center' },
         }}
@@ -246,28 +245,32 @@ export function PlayArenaHero({
           {description}
         </Typography>
 
-        <BattleGoldDivider variant="hero" sx={{ width: { xs: 100, md: 220 }, mx: { md: 'auto' } }} />
 
         {stats.length > 0 && (
           <Box
             sx={{
               display: { xs: 'none', md: 'grid' },
               gridTemplateColumns: `repeat(${Math.min(stats.length, 3)}, minmax(0, 1fr))`,
-              gap: 2,
               width: 1,
               maxWidth: 560,
-              pt: 0.5,
+              mt: { md: 0.5 },
+              mb: { md: 0.75 },
+              border: `1px solid ${goldAlpha(0.28)}`,
+              bgcolor: alpha('#000000', 0.42),
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
             }}
           >
-            {stats.map((stat) => (
+            {stats.map((stat, idx) => (
               <Box
                 key={stat.label}
                 sx={{
-                  px: 1.5,
-                  py: 1.25,
-                  border: `1px solid ${goldAlpha(0.22)}`,
-                  bgcolor: alpha('#000000', 0.4),
+                  px: 1.75,
+                  py: 1.35,
                   textAlign: 'center',
+                  borderRight:
+                    idx < stats.length - 1 ? `1px solid ${alpha('#ffffff', 0.12)}` : 'none',
                 }}
               >
                 <Typography
@@ -277,13 +280,14 @@ export function PlayArenaHero({
                     color: GOLD,
                     lineHeight: 1.1,
                     fontVariantNumeric: 'tabular-nums',
+                    textShadow: `0 0 12px ${goldAlpha(0.35)}`,
                   }}
                 >
                   {stat.value}
                 </Typography>
                 <Typography
                   sx={{
-                    mt: 0.5,
+                    mt: 0.55,
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: 0.8,
@@ -300,11 +304,11 @@ export function PlayArenaHero({
 
         <Stack
           direction="row"
-          spacing={1}
+          spacing={{ xs: 1.25, md: 1.75 }}
           flexWrap="wrap"
           useFlexGap
           justifyContent={{ xs: 'flex-start', md: 'center' }}
-          sx={{ pt: 0.15 }}
+          sx={{ pt: { xs: 0.75, md: 1.25 } }}
         >
           <Button
             variant="outlined"

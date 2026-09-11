@@ -82,8 +82,9 @@ export function ProfileBanner({
   };
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={1.5} sx={{ mb: 1.75 }}>
       <UserArenaStrip
+        dense
         badge={t('profile.badgePlayerProfile') || 'Player Profile'}
         title={username}
         imageUrl={PROFILE_IMAGE_PATHS.war2}
@@ -104,7 +105,7 @@ export function ProfileBanner({
 
       <Box
         sx={{
-          p: { xs: 2, md: 2.5 },
+          p: { xs: 1.5, md: 2 },
           borderRadius: '8px',
           bgcolor: alpha('#10141c', 0.82),
           backdropFilter: 'blur(16px)',
@@ -112,29 +113,20 @@ export function ProfileBanner({
           boxShadow: `0 12px 32px ${alpha('#000000', 0.6)}, inset 0 1px 0 ${alpha('#ffffff', 0.08)}`,
           position: 'relative',
           overflow: 'hidden',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '2px',
-            background: `linear-gradient(90deg, transparent, ${USER_COLORS.gold}, #ffffff, ${USER_COLORS.gold}, transparent)`,
-          },
         }}
       >
         <Stack
           direction={{ xs: 'column', sm: 'row' }}
           alignItems={{ xs: 'center', sm: 'flex-start' }}
-          spacing={2}
+          spacing={1.5}
         >
           <Box sx={{ position: 'relative', flexShrink: 0 }}>
             {isOfficial ? (
               <Logo
                 sx={{
                   p: 1.25,
-                  width: { xs: 88, md: 104 },
-                  height: { xs: 88, md: 104 },
+                  width: { xs: 72, md: 88 },
+                  height: { xs: 72, md: 88 },
                   border: `3px solid ${USER_COLORS.gold}`,
                   bgcolor: USER_COLORS.gold,
                   borderRadius: '50%',
@@ -146,8 +138,8 @@ export function ProfileBanner({
                 src={resolvedAvatar}
                 alt={username}
                 sx={{
-                  width: { xs: 88, md: 104 },
-                  height: { xs: 88, md: 104 },
+                  width: { xs: 72, md: 88 },
+                  height: { xs: 72, md: 88 },
                   border: `3px solid ${USER_COLORS.gold}`,
                   bgcolor: alpha(USER_COLORS.surface, 0.8),
                   boxShadow: `0 0 32px ${goldAlpha(0.4)}`,
@@ -157,7 +149,7 @@ export function ProfileBanner({
           </Box>
 
           <Stack
-            spacing={1.25}
+            spacing={1}
             sx={{
               flex: 1,
               minWidth: 0,
@@ -177,7 +169,7 @@ export function ProfileBanner({
                 sx={{
                   color: USER_COLORS.textPrimary,
                   fontWeight: 800,
-                  fontSize: { xs: 22, md: 28 },
+                  fontSize: { xs: 20, md: 24 },
                   textTransform: 'uppercase',
                   letterSpacing: 0.5,
                   maxWidth: 360,

@@ -1,6 +1,7 @@
 import { useMemo, useState, useEffect, useCallback } from 'react';
 
-import { Box, Stack } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
 import useApi from 'src/hooks/use-api';
 import { useLiveSync, LIVE_SYNC_TOPICS } from 'src/hooks/use-live-sync';
@@ -9,13 +10,15 @@ import type { ILeaderboardEntry } from 'src/types';
 import {
   UserPageShell,
   UserGlassCard,
-  UserStatTile,
   UserEmptyState,
   UserActionButton,
+  USER_COLORS,
+  goldAlpha,
 } from 'src/layouts/user';
 
 import { toast } from 'react-hot-toast';
 import { useTranslate } from 'src/locales/use-locales';
+import { Iconify } from 'src/components/iconify';
 import { UserAnimatedStat } from 'src/layouts/user';
 
 import type { LeaderboardPeriod } from './leader-board-constants';
@@ -66,7 +69,7 @@ export function LeaderBoardView() {
         setLoading(false);
       }
     },
-    [getLeaderboardApi]
+    [getLeaderboardApi, t]
   );
 
   useEffect(() => {
@@ -105,66 +108,112 @@ export function LeaderBoardView() {
 
   const showInitialSkeleton = loading && rows.length === 0;
 
+  const periodButtons = (
+    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+      {periods.map((period) => (
+        <UserActionButton
+          key={period.value}
+          size="small"
+          actionVariant={selectedPeriod === period.value ? 'gold' : 'ghost'}
+          onClick={() => setSelectedPeriod(period.value)}
+        >
+          {period.label}
+        </UserActionButton>
+      ))}
+    </Stack>
+  );
+
   return (
     <UserPageShell>
       <LeaderboardHero
         title={t('leaderboard.title')}
         subtitle={t('leaderboard.subtitle')}
-        action={
-          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-            {periods.map((period) => (
-              <UserActionButton
-                key={period.value}
-                size="small"
-                actionVariant={selectedPeriod === period.value ? 'gold' : 'ghost'}
-                onClick={() => setSelectedPeriod(period.value)}
-              >
-                {period.label}
-              </UserActionButton>
-            ))}
-          </Stack>
-        }
+        action={<Box sx={{ display: { xs: 'none', md: 'block' } }}>{periodButtons}</Box>}
       />
 
-      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 3, display: { xs: 'flex', md: 'none' } }}>
-        {periods.map((period) => (
-          <UserActionButton
-            key={period.value}
-            size="small"
-            actionVariant={selectedPeriod === period.value ? 'gold' : 'ghost'}
-            onClick={() => setSelectedPeriod(period.value)}
-          >
-            {period.label}
-          </UserActionButton>
-        ))}
-      </Stack>
+      <Box sx={{ mb: 1.5, display: { xs: 'block', md: 'none' } }}>{periodButtons}</Box>
 
       {showInitialSkeleton ? (
         <LeaderboardPageSkeleton />
       ) : (
-        <Stack spacing={3}>
+        <Stack spacing={1.75}>
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
-              gap: 1.5,
+              gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', md: 'repeat(3, minmax(0, 1fr))' },
+              width: 1,
+              bgcolor: alpha('#06090e', 0.72),
+              border: `1px solid ${goldAlpha(0.28)}`,
+              borderTop: `2px solid ${USER_COLORS.gold}`,
+              boxShadow: `0 8px 24px ${alpha('#000000', 0.45)}`,
             }}
           >
-            <UserStatTile
-              label={t('leaderboard.playersCount')}
-              value={<UserAnimatedStat value={stats.players} variant="h5" fontWeight={700} />}
-              loading={loading}
-            />
-            <UserStatTile
-              label={t('leaderboard.totalScore')}
-              value={<UserAnimatedStat value={stats.topScore} variant="h5" fontWeight={700} />}
-              loading={loading}
-            />
-            <UserStatTile
-              label={t('leaderboard.games')}
-              value={<UserAnimatedStat value={stats.topGames} variant="h5" fontWeight={700} />}
-              loading={loading}
-            />
+            {[
+              {
+                icon: 'solar:users-group-rounded-bold',
+                label: t('leaderboard.playersCount'),
+                value: <UserAnimatedStat value={stats.players} variant="h5" fontWeight={700} />,
+              },
+              {
+                icon: 'solar:cup-star-bold',
+                label: t('leaderboard.totalScore'),
+                value: <UserAnimatedStat value={stats.topScore} variant="h5" fontWeight={700} />,
+              },
+              {
+                icon: 'solar:gamepad-bold',
+                label: t('leaderboard.games'),
+                value: <UserAnimatedStat value={stats.topGames} variant="h5" fontWeight={700} />,
+              },
+            ].map((stat, index, arr) => (
+              <Box
+                key={stat.label}
+                sx={{
+                  minWidth: 0,
+                  px: { xs: 1.25, md: 1.5 },
+                  py: { xs: 1.25, md: 1.5 },
+                  borderRight: {
+                    xs: index === 0 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                    md: index < arr.length - 1 ? `1px solid ${alpha('#ffffff', 0.1)}` : 'none',
+                  },
+                  borderBottom: {
+                    xs: index < 2 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                    md: 'none',
+                  },
+                  gridColumn: { xs: index === 2 ? '1 / -1' : 'auto', md: 'auto' },
+                }}
+              >
+                <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 0.5, minWidth: 0 }}>
+                  <Iconify icon={stat.icon} width={14} sx={{ color: USER_COLORS.gold, flexShrink: 0 }} />
+                  <Typography
+                    sx={{
+                      fontSize: { xs: 10, md: 11 },
+                      fontWeight: 700,
+                      letterSpacing: 0.5,
+                      textTransform: 'uppercase',
+                      color: alpha('#ffffff', 0.55),
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {stat.label}
+                  </Typography>
+                </Stack>
+                <Box
+                  sx={{
+                    fontSize: { xs: 18, md: 20 },
+                    fontWeight: 800,
+                    color: USER_COLORS.textPrimary,
+                    lineHeight: 1.15,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {loading ? '—' : stat.value}
+                </Box>
+              </Box>
+            ))}
           </Box>
 
           {loading ? (
@@ -188,7 +237,7 @@ export function LeaderBoardView() {
               />
 
               {tableRows.length > 0 ? (
-                <UserGlassCard sx={{ p: { xs: 1.5, md: 2 } }}>
+                <UserGlassCard sx={{ p: { xs: 1.25, md: 1.75 } }}>
                   <LeaderboardTable
                     rows={tableRows}
                     labels={tableLabels}

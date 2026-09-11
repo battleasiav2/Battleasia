@@ -286,25 +286,42 @@ class _AccountDrawerContent extends StatelessWidget {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.fromLTRB(28, 0, 24, 28),
-          child: TextButton(
-            onPressed: () async {
-              await authProvider.signOut();
-              if (context.mounted) {
-                Navigator.pop(context);
-                Navigator.of(context).pushReplacement(
-                  MaterialPageRoute(builder: (context) => const SignInScreen()),
-                );
-              }
-            },
-            style: TextButton.styleFrom(
-              alignment: Alignment.centerLeft,
-              foregroundColor: Colors.white.withValues(alpha: 0.55),
-              padding: EdgeInsets.zero,
-            ),
-            child: Text(
-              'account.logout'.tr(),
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+          padding: EdgeInsets.fromLTRB(
+            28,
+            8,
+            24,
+            16 + MediaQuery.of(context).padding.bottom,
+          ),
+          child: SizedBox(
+            width: double.infinity,
+            height: 48,
+            child: OutlinedButton.icon(
+              onPressed: () async {
+                await authProvider.signOut();
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => const SignInScreen()),
+                  );
+                }
+              },
+              icon: const Icon(Icons.logout, size: 18),
+              label: Text(
+                'account.logout'.tr().toUpperCase(),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: const Color(0xFFFECACA),
+                backgroundColor: const Color(0x24EF4444),
+                side: BorderSide(color: Colors.red.withValues(alpha: 0.55)),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.zero,
+                ),
+              ),
             ),
           ),
         ),

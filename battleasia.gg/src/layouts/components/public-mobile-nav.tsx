@@ -25,6 +25,19 @@ function getNavIcon(item: MenuItem) {
   return NAV_ICONS[key] || 'solar:menu-dots-bold';
 }
 
+function getMobileLabel(item: MenuItem, t: (key: string) => string) {
+  const key = item.scrollTarget || 'home';
+  if (key === 'how-to-play') {
+    const short = t('navigation.howToPlayShort');
+    return short === 'navigation.howToPlayShort' ? 'GUIDE' : short;
+  }
+  if (key === 'about-us') {
+    const short = t('navigation.aboutUsShort');
+    return short === 'navigation.aboutUsShort' ? 'ABOUT' : short;
+  }
+  return t(item.labelKey);
+}
+
 // ----------------------------------------------------------------------
 
 export function PublicMobileNav() {
@@ -81,20 +94,24 @@ export function PublicMobileNav() {
               WebkitTapHighlightColor: 'transparent',
             }}
           >
-            <Iconify icon={getNavIcon(item)} width={22} />
+            <Iconify icon={getNavIcon(item)} width={20} />
             <Box
               component="span"
               sx={{
-                fontSize: 10.5,
+                fontSize: 9,
                 fontWeight: isActive ? 800 : 600,
-                letterSpacing: 0.35,
+                letterSpacing: 0.2,
                 textTransform: 'uppercase',
-                lineHeight: 1.2,
+                lineHeight: 1.1,
                 textAlign: 'center',
-                maxWidth: 72,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%',
+                px: 0.25,
               }}
             >
-              {t(item.labelKey)}
+              {getMobileLabel(item, t)}
             </Box>
             <Box
               sx={{

@@ -266,12 +266,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     final bottomPadding = 80.0 + MediaQuery.of(context).padding.bottom;
     final spacing16 = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 16.0,
-    ).clamp(12.0, 20.0);
+      baseSize: 10.0,
+    ).clamp(8.0, 14.0);
     final spacing24 = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 24.0,
-    ).clamp(20.0, 32.0);
+      baseSize: 14.0,
+    ).clamp(10.0, 18.0);
     final loadingPadding = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 32.0,
@@ -428,62 +428,62 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   Widget _buildPodium() {
     final podiumPadding = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 16.0,
-    ).clamp(12.0, 20.0);
+      baseSize: 12.0,
+    ).clamp(10.0, 14.0);
     final spacing8 = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 8.0,
-    ).clamp(6.0, 12.0);
+      baseSize: 6.0,
+    ).clamp(4.0, 8.0);
     final spacing4 = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 4.0,
-    ).clamp(2.0, 6.0);
+      baseSize: 3.0,
+    ).clamp(2.0, 4.0);
     final rankIconFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 32.0,
-      min: 28.0,
-      max: 40.0,
-    );
-    final avatarRadius = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 40.0,
-    ).clamp(36.0, 48.0);
-    final avatarFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
       baseSize: 24.0,
       min: 20.0,
       max: 28.0,
     );
+    final avatarRadius = ResponsiveUtils.getResponsiveSpacing(
+      context,
+      baseSize: 28.0,
+    ).clamp(24.0, 32.0);
+    final avatarFontSize = ResponsiveUtils.getResponsiveFontSize(
+      context,
+      baseSize: 16.0,
+      min: 14.0,
+      max: 18.0,
+    );
     final usernameFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
-      baseSize: 18.0,
-      min: 16.0,
-      max: 22.0,
+      baseSize: 15.0,
+      min: 13.0,
+      max: 17.0,
     );
     final badgeFontSize = ResponsiveUtils.getResponsiveFontSize(
+      context,
+      baseSize: 10.0,
+      min: 9.0,
+      max: 11.0,
+    );
+    final badgePaddingH = ResponsiveUtils.getResponsiveSpacing(
+      context,
+      baseSize: 6.0,
+    ).clamp(5.0, 8.0);
+    final badgePaddingV = ResponsiveUtils.getResponsiveSpacing(
+      context,
+      baseSize: 2.0,
+    ).clamp(2.0, 4.0);
+    final statsFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
       baseSize: 11.0,
       min: 10.0,
       max: 12.0,
     );
-    final badgePaddingH = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 8.0,
-    ).clamp(6.0, 12.0);
-    final badgePaddingV = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 4.0,
-    ).clamp(2.0, 6.0);
-    final statsFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 12.0,
-      min: 10.0,
-      max: 14.0,
-    );
     final iconSize = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 16.0,
-    ).clamp(14.0, 18.0);
+      baseSize: 14.0,
+    ).clamp(12.0, 16.0);
 
     return Column(
       children: _topThree.asMap().entries.map((entry) {
@@ -495,26 +495,27 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
           padding: EdgeInsets.only(bottom: spacing8),
           child: Card(
             color: color,
+            margin: EdgeInsets.zero,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Padding(
-              padding: EdgeInsets.all(podiumPadding),
+              padding: EdgeInsets.symmetric(
+                horizontal: podiumPadding,
+                vertical: podiumPadding * 0.85,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // ── Left: medal + avatar side-by-side ─────────────────
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Medal emoji
                       Text(
                         _getRankIcon(player.rank),
                         style: TextStyle(fontSize: rankIconFontSize),
                       ),
                       SizedBox(width: spacing8),
-                      // Avatar
                       _buildPlayerAvatar(
                         avatar: player.avatar,
                         username: player.username,
@@ -525,13 +526,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                     ],
                   ),
                   SizedBox(width: podiumPadding),
-                  // ── Right: username + badge + stats ────────────────────
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Username
                         Text(
                           player.username,
                           style: AppTheme.heading3.copyWith(
@@ -543,7 +542,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: spacing4),
-                        // Badge
                         Container(
                           padding: EdgeInsets.symmetric(
                             horizontal: badgePaddingH,
@@ -551,7 +549,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           ),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
                             player.badge,
@@ -562,8 +560,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(height: spacing8),
-                        // Stats row
+                        SizedBox(height: spacing4),
                         Wrap(
                           spacing: podiumPadding,
                           runSpacing: spacing4,
@@ -585,16 +582,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                               ],
                             ),
                             Text(
-                              '${_formatScore(player.gamesPlayed)} Games',
+                              '${_formatScore(player.gamesPlayed)} Games · Avg ${player.averageScore.toStringAsFixed(1)}%',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontSize: statsFontSize,
-                              ),
-                            ),
-                            Text(
-                              'Avg: ${player.averageScore.toStringAsFixed(1)}%',
-                              style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.white.withOpacity(0.9),
                                 fontSize: statsFontSize,
                               ),
                             ),

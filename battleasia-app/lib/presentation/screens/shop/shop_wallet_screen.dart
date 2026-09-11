@@ -6,7 +6,6 @@ import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_coin_transfer_panel.dart';
-import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
 
 /// Shop wallet tab — user-to-user BAC transfer (web `/user/shop/wallet` parity).
 class ShopWalletScreen extends StatefulWidget {
@@ -49,8 +48,6 @@ class _ShopWalletScreenState extends State<ShopWalletScreen> {
                     ),
                     child: Column(
                       children: [
-                        const ShopSectionNav(current: ShopSectionTab.wallet),
-                        const SizedBox(height: 16),
                         const ShopCoinTransferPanel(),
                         SizedBox(
                           height: ResponsiveUtils.getResponsiveSpacing(context, baseSize: 80).clamp(60, 80),

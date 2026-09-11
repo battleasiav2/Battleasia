@@ -187,7 +187,7 @@ async function buildMatchSummaries(matches: MatchSummarySource[]) {
   }));
 }
 
-/** One highest-prize joinable match per game (up to 5 titles). */
+/** One highest-prize joinable match per game (up to `limit` titles). */
 async function getTopMatchPerGame(statuses: Array<'active' | 'start'>, limit = 5) {
   return Match.aggregate<MatchSummarySource>([
     { $match: { status: { $in: statuses } } },
@@ -204,6 +204,33 @@ async function getTopMatchPerGame(statuses: Array<'active' | 'start'>, limit = 5
     { $sort: { _prize: -1 } },
     { $limit: limit },
   ]);
+}
+
+/** Live matches for Pulse: prefer one per game, then fill remaining slots. */
+async function getOngoingMatchList(limit = 5) {
+  const perGame = await getTopMatchPerGame(['start'], limit);
+  if (perGame.length >= limit) return perGame;
+
+  const usedIds = perGame.map((m) => m._id);
+  const extras = await Match.aggregate<MatchSummarySource>([
+    {
+      $match: {
+        status: 'start',
+        ...(usedIds.length ? { _id: { $nin: usedIds } } : {}),
+      },
+    },
+    {
+      $addFields: {
+        _prize: {
+          $multiply: [{ $ifNull: ['$entryFee', 0] }, { $ifNull: ['$totalPlayer', 0] }],
+        },
+      },
+    },
+    { $sort: { _prize: -1, matchSchedule: 1 } },
+    { $limit: limit - perGame.length },
+  ]);
+
+  return [...perGame, ...extras];
 }
 
 export async function getPublicDashboardStats() {
@@ -235,7 +262,7 @@ export async function getPublicDashboardStats() {
       countTodayJoinedUsers(),
       aggregatePlayerStats('totalWinnings', 5),
       aggregatePlayerStats('totalKills', 5),
-      getTopMatchPerGame(['start'], 5),
+      getOngoingMatchList(5),
       getTopMatchPerGame(['active', 'start'], 5),
     ]);
 

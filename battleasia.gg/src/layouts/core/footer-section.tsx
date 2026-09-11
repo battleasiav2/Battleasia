@@ -202,16 +202,27 @@ export function FooterSection() {
   const accentColor = theme.palette.primary.main || '#a3e635';
 
   const linkStyle = {
-    color: alpha('#ffffff', 0.72),
-    fontSize: { xs: 12, md: 13 },
+    color: alpha('#ffffff', 0.7),
+    fontSize: { xs: 12.5, md: 13.5 },
     fontWeight: 500,
     textDecoration: 'none',
     cursor: 'pointer',
-    transition: 'all 0.2s ease',
+    transition: 'color 0.2s ease',
+    lineHeight: 1.5,
     '&:hover': {
       color: accentColor,
       textDecoration: 'underline',
     },
+  };
+
+  const sectionLabelSx = {
+    fontFamily: 'monospace',
+    fontSize: { xs: 10, md: 11 },
+    fontWeight: 700,
+    letterSpacing: 1.4,
+    color: alpha('#ffffff', 0.42),
+    textTransform: 'uppercase' as const,
+    lineHeight: 1.3,
   };
 
   return (
@@ -221,11 +232,10 @@ export function FooterSection() {
         position: 'relative',
         bgcolor: '#060706',
         color: '#ffffff',
-        pt: { xs: 3.5, sm: 4.5, md: 5.5 },
-        pb: { xs: 3, md: 4 },
-        mt: { xs: 5, md: 7 },
+        pt: { xs: 5, sm: 6, md: 7.5 },
+        pb: { xs: 4.5, sm: 5, md: 6 },
+        mt: { xs: 6, md: 9 },
         overflow: 'visible',
-        // Raster horizontal scanlines across entire footer matching the attached image
         backgroundImage: `
           repeating-linear-gradient(
             to bottom,
@@ -243,10 +253,7 @@ export function FooterSection() {
         `,
       }}
     >
-      {/* Top sloped contour line with center horns and lime back-glow */}
       <FooterTopContour accentColor={accentColor} />
-
-      {/* Symmetrical stealth wing backdrop geometry */}
       <StealthWingBackdrop accentColor={accentColor} />
 
       <Container
@@ -254,32 +261,217 @@ export function FooterSection() {
         sx={{
           position: 'relative',
           zIndex: 2,
-          px: { xs: 2, sm: 3, md: 5 },
+          px: { xs: 2.25, sm: 3.5, md: 5 },
         }}
       >
-        {/* ============================================================= */}
-        {/* PRIMARY FOOTER ROW: MATCHES ATTACHED IMAGE 100% */}
-        {/* [Social Circles]  [Brand Logo + Name]  [Legal & Links / Copyright]  [User Support] */}
-        {/* ============================================================= */}
+        {/* Primary block: brand → links → support → social */}
         <Stack
           direction={{ xs: 'column', md: 'row' }}
-          alignItems={{ xs: 'center', md: 'center' }}
+          alignItems={{ xs: 'center', md: 'flex-start' }}
           justifyContent="space-between"
-          spacing={{ xs: 2.5, md: 3 }}
+          spacing={{ xs: 3.5, md: 4 }}
           sx={{
-            py: { xs: 1, md: 1.5 },
+            pt: { xs: 1, md: 1.5 },
+            pb: { xs: 0.5, md: 1 },
           }}
         >
-          {/* ----------------------------------------------------------- */}
-          {/* FAR LEFT: CIRCULAR SOCIAL ICONS (Lime icons on dark circle) */}
-          {/* ----------------------------------------------------------- */}
+          {/* Brand — strongest signal */}
           <Stack
             direction="row"
             alignItems="center"
-            spacing={1.2}
+            spacing={1.75}
             sx={{
               flexShrink: 0,
-              order: { xs: 3, md: 1 },
+              order: { xs: 1, md: 2 },
+            }}
+          >
+            <Logo
+              sx={{
+                width: { xs: 60, md: 72 },
+                height: { xs: 60, md: 72 },
+                filter: `drop-shadow(0 0 12px ${alpha(accentColor, 0.35)})`,
+              }}
+            />
+            <Box>
+              <Typography
+                className="font-brand-gaming"
+                sx={{
+                  fontSize: { xs: 24, md: 28 },
+                  fontWeight: 900,
+                  fontStyle: 'italic',
+                  lineHeight: 1.05,
+                  letterSpacing: 0.5,
+                  color: '#ffffff',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {t('common.brandName')}
+              </Typography>
+              <Typography
+                sx={{
+                  ...sectionLabelSx,
+                  mt: 0.6,
+                  color: alpha('#ffffff', 0.5),
+                }}
+              >
+                {t('common.brandTagline')}
+              </Typography>
+            </Box>
+          </Stack>
+
+          {/* Legal + nav + copyright */}
+          <Box
+            sx={{
+              textAlign: { xs: 'center', md: 'left' },
+              order: { xs: 2, md: 3 },
+              flexGrow: 1,
+              px: { md: 2.5 },
+              maxWidth: { md: 560 },
+              minWidth: 0,
+            }}
+          >
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent={{ xs: 'center', md: 'flex-start' }}
+              flexWrap="wrap"
+              useFlexGap
+              spacing={{ xs: 1.25, md: 1.75 }}
+              sx={{ rowGap: { xs: 1, md: 1.1 }, mb: { xs: 1.5, md: 1.75 } }}
+            >
+              <Typography component={RouterLink} href="/privacy-policy" sx={linkStyle}>
+                {t('footer.privacyPolicy')}
+              </Typography>
+              <Typography sx={{ color: alpha('#ffffff', 0.22), fontSize: 12, lineHeight: 1 }} aria-hidden>
+                ·
+              </Typography>
+              <Typography component={RouterLink} href="/terms-and-conditions" sx={linkStyle}>
+                {t('footer.termsAndConditions')}
+              </Typography>
+              <Typography sx={{ color: alpha('#ffffff', 0.22), fontSize: 12, lineHeight: 1 }} aria-hidden>
+                ·
+              </Typography>
+              <Typography
+                component="span"
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) =>
+                  handleMenuClick(e, {
+                    labelKey: 'footer.rules',
+                    href: '/dashboard/rules',
+                    scrollTarget: 'rules',
+                    isActive: () => false,
+                  })
+                }
+                sx={linkStyle}
+              >
+                {t('footer.rules')}
+              </Typography>
+              <Typography sx={{ color: alpha('#ffffff', 0.22), fontSize: 12, lineHeight: 1 }} aria-hidden>
+                ·
+              </Typography>
+              <Typography
+                component="span"
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) =>
+                  handleMenuClick(e, {
+                    labelKey: 'footer.howToPlay',
+                    href: '/dashboard/how-to-play',
+                    scrollTarget: 'how-to-play',
+                    isActive: () => false,
+                  })
+                }
+                sx={linkStyle}
+              >
+                {t('footer.howToPlay')}
+              </Typography>
+              <Typography sx={{ color: alpha('#ffffff', 0.22), fontSize: 12, lineHeight: 1 }} aria-hidden>
+                ·
+              </Typography>
+              <Typography
+                component="span"
+                onClick={(e: React.MouseEvent<HTMLAnchorElement>) =>
+                  handleMenuClick(e, {
+                    labelKey: 'footer.aboutUs',
+                    href: '/dashboard/about-us',
+                    scrollTarget: 'about-us',
+                    isActive: () => false,
+                  })
+                }
+                sx={linkStyle}
+              >
+                {t('footer.aboutUs')}
+              </Typography>
+            </Stack>
+
+            <Typography
+              sx={{
+                fontSize: { xs: 12, md: 13 },
+                color: alpha('#ffffff', 0.48),
+                lineHeight: 1.55,
+                letterSpacing: 0.15,
+              }}
+            >
+              {t('footer.copyright', { year: new Date().getFullYear() })}
+            </Typography>
+          </Box>
+
+          {/* Support — secondary column */}
+          <Box
+            sx={{
+              textAlign: { xs: 'center', md: 'right' },
+              flexShrink: 0,
+              order: { xs: 3, md: 4 },
+              pt: { md: 0.25 },
+            }}
+          >
+            <Typography sx={{ ...sectionLabelSx, mb: 0.85, color: alpha('#ffffff', 0.45) }}>
+              User Support
+            </Typography>
+            <Typography
+              component="a"
+              href="mailto:support@battleasia.gg"
+              sx={{
+                display: 'block',
+                fontSize: { xs: 13, md: 14 },
+                fontWeight: 600,
+                color: alpha('#ffffff', 0.88),
+                textDecoration: 'none',
+                lineHeight: 1.35,
+                transition: 'color 0.2s ease',
+                '&:hover': {
+                  color: accentColor,
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              support@battleasia.gg
+            </Typography>
+            <Typography
+              component={RouterLink}
+              href="/support"
+              sx={{
+                display: 'inline-block',
+                fontSize: 11.5,
+                fontFamily: 'monospace',
+                fontWeight: 700,
+                color: accentColor,
+                textDecoration: 'none',
+                mt: 1,
+                letterSpacing: 0.6,
+                '&:hover': { textDecoration: 'underline' },
+              }}
+            >
+              [ LIVE SUPPORT RELAY ]
+            </Typography>
+          </Box>
+
+          {/* Social — quiet utility row on mobile */}
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={1.35}
+            sx={{
+              flexShrink: 0,
+              order: { xs: 4, md: 1 },
+              pt: { xs: 0.5, md: 0.75 },
             }}
           >
             {SOCIAL_LINKS.map((item) => (
@@ -291,8 +483,8 @@ export function FooterSection() {
                 rel="noopener noreferrer"
                 aria-label={t(item.labelKey)}
                 sx={{
-                  width: { xs: 32, md: 34 },
-                  height: { xs: 32, md: 34 },
+                  width: { xs: 34, md: 36 },
+                  height: { xs: 34, md: 36 },
                   borderRadius: '50%',
                   bgcolor: '#0e130e',
                   border: `1.2px solid ${alpha(accentColor, 0.4)}`,
@@ -314,275 +506,53 @@ export function FooterSection() {
               </Box>
             ))}
           </Stack>
-
-          {/* ----------------------------------------------------------- */}
-          {/* MID-LEFT: BRAND LOGO + NAME (Matches NetEase Games logo position) */}
-          {/* ----------------------------------------------------------- */}
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={1.5}
-            sx={{
-              flexShrink: 0,
-              order: { xs: 1, md: 2 },
-            }}
-          >
-            <Logo
-              sx={{
-                width: { xs: 56, md: 66 },
-                height: { xs: 56, md: 66 },
-                filter: `drop-shadow(0 0 12px ${alpha(accentColor, 0.35)})`,
-              }}
-            />
-            <Box>
-              <Typography
-                className="font-brand-gaming"
-                sx={{
-                  fontSize: { xs: 22, md: 27 },
-                  fontWeight: 900,
-                  fontStyle: 'italic',
-                  lineHeight: 1.1,
-                  letterSpacing: 0.5,
-                  color: '#ffffff',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {t('common.brandName')}
-              </Typography>
-              <Typography
-                sx={{
-                  fontFamily: 'monospace',
-                  fontSize: { xs: 9, md: 10 },
-                  fontWeight: 700,
-                  letterSpacing: 1.2,
-                  color: alpha('#ffffff', 0.55),
-                  textTransform: 'uppercase',
-                  lineHeight: 1.2,
-                  mt: 0.2,
-                }}
-              >
-                {t('common.brandTagline')}
-              </Typography>
-            </Box>
-          </Stack>
-
-          {/* ----------------------------------------------------------- */}
-          {/* CENTER: LEGAL & NAVIGATION LINKS + COPYRIGHT */}
-          {/* ----------------------------------------------------------- */}
-          <Box
-            sx={{
-              textAlign: { xs: 'center', md: 'left' },
-              order: { xs: 2, md: 3 },
-              flexGrow: 1,
-              px: { md: 2 },
-              maxWidth: { md: 540 },
-            }}
-          >
-            {/* Top Row: Primary Legal & Navigation Links */}
-            <Stack
-              direction="row"
-              alignItems="center"
-              justifyContent={{ xs: 'center', md: 'flex-start' }}
-              flexWrap="wrap"
-              spacing={1.5}
-              sx={{ mb: 0.6 }}
-            >
-              <Typography
-                component={RouterLink}
-                href="/privacy-policy"
-                sx={linkStyle}
-              >
-                {t('footer.privacyPolicy')}
-              </Typography>
-
-              <Typography sx={{ color: alpha('#ffffff', 0.3), fontSize: 12 }}>,</Typography>
-
-              <Typography
-                component={RouterLink}
-                href="/terms-and-conditions"
-                sx={linkStyle}
-              >
-                {t('footer.termsAndConditions')}
-              </Typography>
-
-              <Typography sx={{ color: alpha('#ffffff', 0.2), fontSize: 12 }}>·</Typography>
-
-              <Typography
-                component="span"
-                onClick={(e: React.MouseEvent<HTMLAnchorElement>) =>
-                  handleMenuClick(e, {
-                    labelKey: 'footer.rules',
-                    href: '/dashboard/rules',
-                    scrollTarget: 'rules',
-                    isActive: () => false,
-                  })
-                }
-                sx={linkStyle}
-              >
-                {t('footer.rules')}
-              </Typography>
-
-              <Typography sx={{ color: alpha('#ffffff', 0.2), fontSize: 12 }}>·</Typography>
-
-              <Typography
-                component="span"
-                onClick={(e: React.MouseEvent<HTMLAnchorElement>) =>
-                  handleMenuClick(e, {
-                    labelKey: 'footer.howToPlay',
-                    href: '/dashboard/how-to-play',
-                    scrollTarget: 'how-to-play',
-                    isActive: () => false,
-                  })
-                }
-                sx={linkStyle}
-              >
-                {t('footer.howToPlay')}
-              </Typography>
-
-              <Typography sx={{ color: alpha('#ffffff', 0.2), fontSize: 12 }}>·</Typography>
-
-              <Typography
-                component="span"
-                onClick={(e: React.MouseEvent<HTMLAnchorElement>) =>
-                  handleMenuClick(e, {
-                    labelKey: 'footer.aboutUs',
-                    href: '/dashboard/about-us',
-                    scrollTarget: 'about-us',
-                    isActive: () => false,
-                  })
-                }
-                sx={linkStyle}
-              >
-                {t('footer.aboutUs')}
-              </Typography>
-            </Stack>
-
-            {/* Bottom Row: Exact Copyright Line */}
-            <Typography
-              sx={{
-                fontSize: { xs: 11.5, md: 12.5 },
-                color: alpha('#ffffff', 0.55),
-                lineHeight: 1.4,
-              }}
-            >
-              {t('footer.copyright', { year: new Date().getFullYear() })}
-            </Typography>
-          </Box>
-
-          {/* ----------------------------------------------------------- */}
-          {/* FAR RIGHT: USER SUPPORT (Matches attached image) */}
-          {/* ----------------------------------------------------------- */}
-          <Box
-            sx={{
-              textAlign: { xs: 'center', md: 'right' },
-              flexShrink: 0,
-              order: { xs: 4, md: 4 },
-            }}
-          >
-            <Typography
-              sx={{
-                fontSize: { xs: 12, md: 13 },
-                fontWeight: 600,
-                color: alpha('#ffffff', 0.85),
-                lineHeight: 1.3,
-              }}
-            >
-              User Support:
-            </Typography>
-            <Typography
-              component="a"
-              href="mailto:support@battleasia.gg"
-              sx={{
-                display: 'block',
-                fontSize: { xs: 12, md: 13 },
-                color: alpha('#ffffff', 0.65),
-                textDecoration: 'none',
-                mt: 0.3,
-                transition: 'color 0.2s ease',
-                '&:hover': {
-                  color: accentColor,
-                  textDecoration: 'underline',
-                },
-              }}
-            >
-              support@battleasia.gg
-            </Typography>
-            <Typography
-              component={RouterLink}
-              href="/support"
-              sx={{
-                display: 'inline-block',
-                fontSize: 11,
-                fontFamily: 'monospace',
-                fontWeight: 700,
-                color: accentColor,
-                textDecoration: 'none',
-                mt: 0.4,
-                letterSpacing: 0.5,
-                '&:hover': { textDecoration: 'underline' },
-              }}
-            >
-              [ LIVE SUPPORT RELAY ]
-            </Typography>
-          </Box>
         </Stack>
 
-        {/* ============================================================= */}
-        {/* SECONDARY INTEGRATED STRIP: PARTNERS & PAYMENT METHODS */}
-        {/* Preserves all existing links, domains, and payment information */}
-        {/* ============================================================= */}
+        {/* Secondary strip: payments + partners */}
         <Box
           sx={{
-            mt: { xs: 2.5, md: 3 },
-            pt: 2,
-            borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
+            mt: { xs: 3.5, md: 4.5 },
+            pt: { xs: 2.75, md: 3.25 },
+            borderTop: `1px solid ${alpha('#ffffff', 0.1)}`,
           }}
         >
           <Stack
             direction={{ xs: 'column', sm: 'row' }}
-            alignItems="center"
+            alignItems={{ xs: 'center', sm: 'flex-start' }}
             justifyContent="space-between"
-            spacing={2}
+            spacing={{ xs: 2.75, sm: 3 }}
             flexWrap="wrap"
           >
-            {/* Payment Gateways Information */}
-            <Stack direction="row" alignItems="center" spacing={1.5} flexWrap="wrap">
+            <Stack
+              direction={{ xs: 'column', sm: 'row' }}
+              alignItems="center"
+              spacing={{ xs: 0.85, sm: 1.5 }}
+              flexWrap="wrap"
+              useFlexGap
+            >
+              <Typography sx={sectionLabelSx}>{t('footer.payments')}</Typography>
               <Typography
                 sx={{
-                  fontFamily: 'monospace',
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: 1.2,
-                  color: alpha('#ffffff', 0.4),
-                  textTransform: 'uppercase',
+                  fontSize: { xs: 12, md: 12.5 },
+                  color: alpha('#ffffff', 0.62),
+                  lineHeight: 1.45,
                 }}
               >
-                {t('footer.payments')}:
-              </Typography>
-              <Typography sx={{ fontSize: 11, color: alpha('#ffffff', 0.6) }}>
                 {t('footer.bkash')} · {t('footer.nagad')} · {t('footer.crypto')}
               </Typography>
             </Stack>
 
-            {/* Trusted Partners Links */}
             <Stack
               direction="row"
               alignItems="center"
-              spacing={1}
+              spacing={1.1}
               flexWrap="wrap"
+              useFlexGap
               justifyContent={{ xs: 'center', sm: 'flex-end' }}
+              sx={{ rowGap: 1 }}
             >
-              <Typography
-                sx={{
-                  fontFamily: 'monospace',
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: 1.2,
-                  color: alpha('#ffffff', 0.4),
-                  textTransform: 'uppercase',
-                }}
-              >
-                {t('footer.trustedPartners')}:
+              <Typography sx={{ ...sectionLabelSx, mr: { sm: 0.25 } }}>
+                {t('footer.trustedPartners')}
               </Typography>
               {FOOTER_PARTNERS.map((partner) => (
                 <Box
@@ -594,14 +564,14 @@ export function FooterSection() {
                   sx={{
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: 0.6,
-                    px: 1,
-                    py: 0.35,
+                    gap: 0.65,
+                    px: 1.15,
+                    py: 0.5,
                     borderRadius: '6px',
                     border: `1px solid ${alpha('#ffffff', 0.1)}`,
                     bgcolor: alpha('#ffffff', 0.03),
                     color: alpha('#ffffff', 0.7),
-                    fontSize: 11,
+                    fontSize: 11.5,
                     fontWeight: 600,
                     textDecoration: 'none',
                     transition: 'all 0.2s ease',

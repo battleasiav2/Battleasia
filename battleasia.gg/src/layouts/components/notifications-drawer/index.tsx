@@ -5,7 +5,6 @@ import { useBoolean } from 'minimal-shared/hooks';
 
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import Badge from '@mui/material/Badge';
 import Drawer from '@mui/material/Drawer';
 import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
@@ -166,61 +165,53 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
         onClick={onOpen}
         sx={[
           {
-            width: { xs: 30, sm: 36 },
-            height: { xs: 30, sm: 36 },
+            position: 'relative',
+            width: { xs: 34, sm: 38 },
+            height: { xs: 34, sm: 38 },
             p: 0,
-            borderRadius: '6px',
-            bgcolor: open ? goldAlpha(0.14) : alpha('#080c14', 0.55),
-            border: '1.5px solid',
-            borderColor: open ? goldAlpha(0.55) : alpha('#ffffff', 0.18),
-            boxShadow: `inset 0 0 0 1px ${alpha('#000000', 0.25)}`,
+            borderRadius: '10px',
+            bgcolor: open ? goldAlpha(0.16) : alpha('#161618', 0.55),
+            backgroundImage: open
+              ? `linear-gradient(145deg, ${goldAlpha(0.22)} 0%, ${alpha('#0a0a0c', 0.5)} 100%)`
+              : `linear-gradient(145deg, ${alpha('#ffffff', 0.07)} 0%, ${alpha('#050508', 0.55)} 100%)`,
+            border: `1px solid ${open ? goldAlpha(0.55) : alpha('#ffffff', 0.1)}`,
+            boxShadow: open
+              ? `0 0 0 1px ${goldAlpha(0.12)}, 0 6px 18px ${alpha('#000000', 0.45)}, inset 0 1px 0 ${alpha('#ffffff', 0.1)}`
+              : `0 4px 14px ${alpha('#000000', 0.35)}, inset 0 1px 0 ${alpha('#ffffff', 0.08)}`,
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
             flexShrink: 0,
-            transition: 'transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease',
+            transition:
+              'transform 0.18s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
             '&:hover': {
-              bgcolor: alpha('#0c121c', 0.72),
-              borderColor: goldAlpha(0.45),
-              transform: 'scale(1.04)',
+              bgcolor: goldAlpha(0.12),
+              borderColor: goldAlpha(0.5),
+              boxShadow: `0 0 0 1px ${goldAlpha(0.15)}, 0 8px 22px ${alpha('#000000', 0.5)}, 0 0 18px ${goldAlpha(0.18)}`,
+              transform: 'translateY(-1px)',
+              '& .notif-bell': {
+                color: USER_COLORS.gold,
+                filter: `drop-shadow(0 0 6px ${goldAlpha(0.55)})`,
+              },
             },
-            '&:active': { transform: 'scale(0.96)' },
+            '&:active': { transform: 'translateY(0) scale(0.97)' },
           },
           ...(Array.isArray(sx) ? sx : [sx]),
         ]}
         {...other}
       >
-        <Badge
-          variant="dot"
-          invisible={!unreadCount}
-          overlap="circular"
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        <Iconify
+          className="notif-bell"
+          icon="solar:bell-bold"
+          width={18}
           sx={{
-            '& .MuiBadge-badge': {
-              width: 9,
-              height: 9,
-              minWidth: 9,
-              borderRadius: '50%',
-              bgcolor: unreadCount > 0 ? '#ef4444' : USER_COLORS.gold,
-              color: 'transparent',
-              border: `2px solid ${alpha('#0a0a0a', 0.92)}`,
-              boxShadow: `0 0 8px ${unreadCount > 0 ? alpha('#ef4444', 0.55) : goldAlpha(0.55)}`,
-              top: 5,
-              right: 5,
-              animation: unreadCount > 0 ? 'notifDotPulse 2s ease-in-out infinite' : 'none',
-            },
-            '@keyframes notifDotPulse': {
-              '0%, 100%': { opacity: 1, transform: 'scale(1)' },
-              '50%': { opacity: 0.72, transform: 'scale(1.14)' },
-            },
+            color: open || unreadCount > 0 ? USER_COLORS.gold : alpha('#ffffff', 0.88),
+            filter:
+              open || unreadCount > 0
+                ? `drop-shadow(0 0 5px ${goldAlpha(0.45)})`
+                : 'none',
+            transition: 'color 0.2s ease, filter 0.2s ease',
           }}
-        >
-          <Iconify
-            icon="solar:bell-bing-bold-duotone"
-            width={20}
-            sx={{
-              color: open ? USER_COLORS.gold : alpha('#ffffff', 0.92),
-              transition: 'color 0.2s ease',
-            }}
-          />
-        </Badge>
+        />
       </IconButton>
 
       <Drawer

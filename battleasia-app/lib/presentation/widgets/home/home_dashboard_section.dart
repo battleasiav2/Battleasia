@@ -242,51 +242,103 @@ class _HomeDashboardSectionState extends State<HomeDashboardSection> {
   }
 
   Widget _matchList(String title, List<DashboardMatchSummary> matches) {
+    final items = matches.take(5).toList();
+
     return _panel(
       title: title,
-      child: matches.isEmpty
+      child: items.isEmpty
           ? Text('No matches', style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted))
           : Column(
-              children: matches.take(5).map((m) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 6),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              m.matchName,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTheme.bodyMedium.copyWith(
-                                color: AppColors.textPrimary,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            Text(
-                              '${m.gameName} · ${m.participantsCount}/${m.totalPlayer}',
-                              style: AppTheme.bodySmall.copyWith(
-                                color: AppColors.textMuted,
-                                fontSize: 11,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        '\$${m.prizeEstimate.toStringAsFixed(0)}',
-                        style: AppTheme.bodySmall.copyWith(
-                          color: AppColors.gold,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
+              children: [
+                for (var index = 0; index < items.length; index++)
+                  _matchTile(items[index], isLast: index == items.length - 1),
+              ],
             ),
+    );
+  }
+
+  Widget _matchTile(DashboardMatchSummary m, {required bool isLast}) {
+    final cap = m.totalPlayer <= 0
+        ? 0.0
+        : (m.participantsCount / m.totalPlayer).clamp(0.0, 1.0);
+    final barColor = cap >= 1
+        ? const Color(0xFFEF4444)
+        : cap > 0.7
+            ? const Color(0xFFF59E0B)
+            : const Color(0xFF10B981);
+
+    return Container(
+      margin: EdgeInsets.only(bottom: isLast ? 0 : 8),
+      padding: const EdgeInsets.fromLTRB(10, 9, 10, 9),
+      decoration: BoxDecoration(
+        color: const Color(0xFF161618).withValues(alpha: 0.55),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.gold.withValues(alpha: 0.12),
+                  border: Border.all(color: AppColors.gold.withValues(alpha: 0.32)),
+                  borderRadius: BorderRadius.circular(3),
+                ),
+                child: Text(
+                  (m.gameName.isNotEmpty ? m.gameName : 'Match').toUpperCase(),
+                  style: AppTheme.bodySmall.copyWith(
+                    color: AppColors.gold,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 9,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '\$${m.prizeEstimate.toStringAsFixed(0)}',
+                style: AppTheme.bodySmall.copyWith(
+                  color: AppColors.gold,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            m.matchName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: AppTheme.bodyMedium.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: LinearProgressIndicator(
+              value: cap,
+              minHeight: 2,
+              backgroundColor: Colors.white.withValues(alpha: 0.06),
+              color: barColor,
+            ),
+          ),
+          const SizedBox(height: 5),
+          Text(
+            '${m.participantsCount}/${m.totalPlayer <= 0 ? '-' : m.totalPlayer} · Entry ${m.entryFee.toStringAsFixed(0)}',
+            style: AppTheme.bodySmall.copyWith(
+              color: AppColors.textMuted,
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
     );
   }
 

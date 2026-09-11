@@ -1,11 +1,12 @@
-import { Box, Stack, Button, Typography } from '@mui/material';
+﻿import { Box, Stack, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
-import { USER_COLORS, userGoldButtonSx } from 'src/layouts/user/user-theme';
+import { USER_COLORS } from 'src/layouts/user/user-theme';
 import { goldAlpha } from 'src/theme/accent-presets';
+
+import { GoToBacShopButton } from './go-to-bac-shop-button';
 
 // ----------------------------------------------------------------------
 
@@ -21,12 +22,6 @@ const pulseBadge = keyframes`
   0%, 100% { opacity: 0.6; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.2); }
 `;
-
-const shimmer = keyframes`
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-`;
-
 // ----------------------------------------------------------------------
 
 type ShopStat = {
@@ -81,64 +76,6 @@ export function ShopArenaHero({
         boxShadow: `0 24px 60px ${alpha('#000000', 0.95)}`,
       }}
     >
-      {/* Visual Frame HUD Brackets */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 12,
-          left: 12,
-          width: 24,
-          height: 24,
-          borderTop: `2px solid ${goldAlpha(0.6)}`,
-          borderLeft: `2px solid ${goldAlpha(0.6)}`,
-          zIndex: 4,
-          pointerEvents: 'none',
-          display: { xs: 'none', sm: 'block' },
-        }}
-      />
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 12,
-          right: 12,
-          width: 24,
-          height: 24,
-          borderTop: `2px solid ${goldAlpha(0.6)}`,
-          borderRight: `2px solid ${goldAlpha(0.6)}`,
-          zIndex: 4,
-          pointerEvents: 'none',
-          display: { xs: 'none', sm: 'block' },
-        }}
-      />
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: 12,
-          left: 12,
-          width: 24,
-          height: 24,
-          borderBottom: `2px solid ${goldAlpha(0.6)}`,
-          borderLeft: `2px solid ${goldAlpha(0.6)}`,
-          zIndex: 4,
-          pointerEvents: 'none',
-          display: { xs: 'none', sm: 'block' },
-        }}
-      />
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: 12,
-          right: 12,
-          width: 24,
-          height: 24,
-          borderBottom: `2px solid ${goldAlpha(0.6)}`,
-          borderRight: `2px solid ${goldAlpha(0.6)}`,
-          zIndex: 4,
-          pointerEvents: 'none',
-          display: { xs: 'none', sm: 'block' },
-        }}
-      />
-
       {/* Background Image & Multi-layer Overlays */}
       <Box
         sx={{
@@ -312,51 +249,13 @@ export function ShopArenaHero({
           {description}
         </Typography>
 
-        <BattleGoldDivider variant="hero" sx={{ width: { xs: 180, md: 240 }, my: 0.5 }} />
 
-        {/* Store CTA Button */}
-        <Box sx={{ position: 'relative', display: 'inline-block', width: { xs: '100%', sm: 'auto' } }}>
-          <Button
-            component="a"
-            href={ctaHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="outlined"
-            disableElevation
-            startIcon={<Iconify icon="solar:shop-bold" width={20} />}
-            endIcon={<Iconify icon="solar:arrow-right-up-bold" width={18} />}
-            sx={{
-              ...userGoldButtonSx,
-              alignSelf: { xs: 'stretch', sm: 'flex-start' },
-              width: { xs: '100%', sm: 'auto' },
-              px: { xs: 3, md: 4 },
-              py: 1.35,
-              fontSize: { xs: 13, sm: 14 },
-              fontWeight: 800,
-              letterSpacing: 1,
-              whiteSpace: 'nowrap',
-              position: 'relative',
-              overflow: 'hidden',
-              clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)',
-              border: `1px solid ${GOLD}`,
-              boxShadow: `0 8px 24px ${goldAlpha(0.3)}, inset 0 0 16px ${goldAlpha(0.15)}`,
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                background: `linear-gradient(90deg, transparent, ${alpha('#ffffff', 0.25)}, transparent)`,
-                animation: `${shimmer} 3.5s infinite ease-in-out`,
-              },
-            }}
-          >
-            {ctaLabel}
-          </Button>
+        {/* Store CTA â€” shared solid gold pulse button */}
+        <Box sx={{ mt: { xs: 0.5, md: 0.75 }, mb: { xs: 0.25, md: 0.5 } }}>
+          <GoToBacShopButton label={ctaLabel} href={ctaHref} />
         </Box>
 
-        {/* Telemetry Stat Cards Bar */}
+        {/* Telemetry stats â€” one strip, no separate boxes */}
         <Box
           sx={{
             pt: 1,
@@ -368,8 +267,14 @@ export function ShopArenaHero({
             sx={{
               display: 'grid',
               gridTemplateColumns: `repeat(${stats.length}, minmax(0, 1fr))`,
-              gap: { xs: 1, sm: 1.5 },
               width: 1,
+              bgcolor: alpha('#06090e', 0.72),
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
+              border: `1px solid ${goldAlpha(0.28)}`,
+              borderTop: `2px solid ${GOLD}`,
+              boxShadow: `0 8px 24px ${alpha('#000000', 0.5)}, inset 0 0 14px ${goldAlpha(0.05)}`,
+              clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)',
             }}
           >
             {stats.map((stat, index) => {
@@ -381,20 +286,11 @@ export function ShopArenaHero({
                     position: 'relative',
                     px: { xs: 1.5, sm: 2 },
                     py: { xs: 1.35, sm: 1.6 },
-                    bgcolor: alpha('#06090e', 0.7),
-                    backdropFilter: 'blur(16px)',
-                    WebkitBackdropFilter: 'blur(16px)',
-                    border: `1px solid ${goldAlpha(0.25)}`,
-                    borderTop: `2px solid ${GOLD}`,
-                    boxShadow: `0 8px 24px ${alpha('#000000', 0.5)}, inset 0 0 14px ${goldAlpha(0.05)}`,
-                    clipPath: 'polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)',
-                    transition: 'all 0.25s ease',
-                    '&:hover': {
-                      borderColor: GOLD,
-                      bgcolor: alpha('#06090e', 0.88),
-                      transform: 'translateY(-2px)',
-                      boxShadow: `0 12px 28px ${alpha('#000000', 0.7)}, 0 0 16px ${goldAlpha(0.2)}`,
-                    },
+                    minWidth: 0,
+                    borderRight:
+                      index < stats.length - 1
+                        ? `1px solid ${alpha('#ffffff', 0.1)}`
+                        : 'none',
                   }}
                 >
                   <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>

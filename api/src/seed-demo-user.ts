@@ -150,6 +150,56 @@ const PER_GAME_DEMO_MATCHES: Record<string, DemoMatchConfig> = {
   },
 };
 
+/** Live (status=start) demo matches for home Pulse “Ongoing matches” (5 tiles). */
+const PER_GAME_LIVE_MATCHES: Record<string, DemoMatchConfig> = {
+  PUBG: {
+    roomId: 'DEMO-LIVE-PUBG',
+    matchName: 'PUBG Premium Squad Live',
+    map: 'Erangel',
+    status: 'start',
+    entryFee: 50,
+    teamType: 'squad',
+    scheduleOffsetHours: -0.5,
+    joinDemoUser: true,
+  },
+  FF: {
+    roomId: 'DEMO-LIVE-FF',
+    matchName: 'Free Fire Clash Live',
+    map: 'Bermuda',
+    status: 'start',
+    entryFee: 25,
+    teamType: 'squad',
+    scheduleOffsetHours: -0.25,
+  },
+  COD: {
+    roomId: 'DEMO-LIVE-COD',
+    matchName: 'COD Domination Live',
+    map: 'Summit',
+    status: 'start',
+    entryFee: 30,
+    teamType: 'squad',
+    scheduleOffsetHours: 0,
+  },
+  VAL: {
+    roomId: 'DEMO-LIVE-VAL',
+    matchName: 'Valorant Spike Rush Live',
+    map: 'Ascent',
+    status: 'start',
+    entryFee: 35,
+    teamType: 'squad',
+    scheduleOffsetHours: 0.25,
+  },
+  ML: {
+    roomId: 'DEMO-LIVE-ML',
+    matchName: 'MLBB Ranked Live',
+    map: 'Land of Dawn',
+    status: 'start',
+    entryFee: 20,
+    teamType: 'squad',
+    scheduleOffsetHours: 0.5,
+  },
+};
+
 const PUBG_MAP_BANNERS = new Set(['Erangel', 'Miramar', 'Sanhok', 'Vikendi', 'Livik']);
 
 function resolveDemoBanner(map: string, fallbackImage?: string) {
@@ -201,11 +251,22 @@ async function createDemoMatchFromConfig(
   game: InstanceType<typeof Game>,
   config: DemoMatchConfig,
   demoUser: InstanceType<typeof User> | null,
-  fakePlayers: InstanceType<typeof User>[]
+  fakePlayers: InstanceType<typeof User>[],
+  opts?: { participantTarget?: number }
 ) {
   const exists = await Match.findOne({ roomId: config.roomId });
   if (exists) {
-    console.log(`  Match ${config.roomId} already exists, skipping`);
+    // Keep live seed matches visible on Pulse (status can drift in local DB).
+    if (config.status === 'start' && exists.status !== 'start') {
+      exists.status = 'start';
+      exists.matchSchedule = hoursFromNow(config.scheduleOffsetHours);
+      exists.matchName = config.matchName;
+      exists.entryFee = config.entryFee;
+      await exists.save();
+      console.log(`  Refreshed live match: ${config.roomId} → start`);
+    } else {
+      console.log(`  Match ${config.roomId} already exists, skipping`);
+    }
     return;
   }
 
@@ -237,8 +298,15 @@ async function createDemoMatchFromConfig(
     results: [],
   });
 
-  const pool = demoUser ? [demoUser, ...fakePlayers.slice(0, 8)] : fakePlayers.slice(0, 8);
-  const participantUsers = pool.slice(0, config.completeWithResults ? 6 : 4);
+  const participantTarget =
+    opts?.participantTarget ??
+    (config.status === 'start'
+      ? 9 + Math.floor(Math.random() * 18)
+      : config.completeWithResults
+        ? 6
+        : 4);
+  const pool = demoUser ? [demoUser, ...fakePlayers] : fakePlayers;
+  const participantUsers = pool.slice(0, Math.min(participantTarget, pool.length));
   const results = [];
 
   for (let i = 0; i < participantUsers.length; i++) {
@@ -302,7 +370,7 @@ async function seedDemoMatches(
   }
 }
 
-/** Ensures one active demo match per game (PUBG, FF, COD, VAL, ML). */
+/** Ensures active + live (status=start) demo matches per game for Pulse tiles. */
 export async function seedPerGameDemoMatches(games?: InstanceType<typeof Game>[]) {
   const playerRole = await Role.findOne({ type: 'player', name: 'Player' });
   if (!playerRole) {
@@ -310,11 +378,15 @@ export async function seedPerGameDemoMatches(games?: InstanceType<typeof Game>[]
     return;
   }
 
+  const prefixes = [
+    ...new Set([...Object.keys(PER_GAME_DEMO_MATCHES), ...Object.keys(PER_GAME_LIVE_MATCHES)]),
+  ];
+
   const gameList =
     games?.length ?
       games
     : await Game.find({
-        idPrefix: { $in: Object.keys(PER_GAME_DEMO_MATCHES) },
+        idPrefix: { $in: prefixes },
         status: true,
       });
 
@@ -322,9 +394,14 @@ export async function seedPerGameDemoMatches(games?: InstanceType<typeof Game>[]
   const fakePlayers = await ensureFakePlayers(playerRole);
 
   for (const game of gameList) {
-    const config = PER_GAME_DEMO_MATCHES[game.idPrefix];
-    if (!config) continue;
-    await createDemoMatchFromConfig(game, config, demoUser, fakePlayers);
+    const activeConfig = PER_GAME_DEMO_MATCHES[game.idPrefix];
+    if (activeConfig) {
+      await createDemoMatchFromConfig(game, activeConfig, demoUser, fakePlayers);
+    }
+    const liveConfig = PER_GAME_LIVE_MATCHES[game.idPrefix];
+    if (liveConfig) {
+      await createDemoMatchFromConfig(game, liveConfig, demoUser, fakePlayers);
+    }
   }
 }
 
@@ -488,6 +565,20 @@ async function seedDemoReferrals(demoUser: InstanceType<typeof User>, playerRole
 }
 
 async function seedDemoSupport(demoUser: InstanceType<typeof User>, admin?: InstanceType<typeof User> | null) {
+  const userMsg =
+    'My balance shows 500 BAC but I am having trouble joining matches.';
+  const adminMsg = 'Your account looks fine. Please check that your PUBG ID is set in your profile.';
+
+  // Keep demo chat English-only (patch older Bangla seed messages if present).
+  await SupportMessage.updateMany(
+    { body: 'আমার 500 BAC ব্যালেন্স দেখাচ্ছে কিন্তু ম্যাচ জয়েন করতে সমস্যা হচ্ছে।' },
+    { $set: { body: userMsg } }
+  );
+  await SupportMessage.updateMany(
+    { body: 'আপনার অ্যাকাউন্ট ঠিক আছে। PUBG ID সেট করা আছে কিনা চেক করুন।' },
+    { $set: { body: adminMsg } }
+  );
+
   let conversation = await SupportConversation.findOne({ userId: demoUser._id });
   if (conversation) return;
 
@@ -499,7 +590,7 @@ async function seedDemoSupport(demoUser: InstanceType<typeof User>, admin?: Inst
 
   await SupportMessage.create({
     conversationId: conversation._id,
-    body: 'আমার 500 BAC ব্যালেন্স দেখাচ্ছে কিন্তু ম্যাচ জয়েন করতে সমস্যা হচ্ছে।',
+    body: userMsg,
     senderId: demoUser._id,
     senderName: demoUser.username,
     senderAvatar: demoUser.avatar || '',
@@ -509,7 +600,7 @@ async function seedDemoSupport(demoUser: InstanceType<typeof User>, admin?: Inst
   if (admin) {
     await SupportMessage.create({
       conversationId: conversation._id,
-      body: 'আপনার অ্যাকাউন্ট ঠিক আছে। PUBG ID সেট করা আছে কিনা চেক করুন।',
+      body: adminMsg,
       senderId: admin._id,
       senderName: admin.username,
       senderAvatar: admin.avatar || '',
@@ -598,4 +689,5 @@ export async function seedDemoUser() {
   console.log(`  Balance:  ${DEMO_BALANCE} BAC`);
   console.log(`  PUBG preview matches: ${DEMO_MATCHES.length} (DEMO-0001 … DEMO-0006)`);
   console.log(`  Per-game demos: ${Object.keys(PER_GAME_DEMO_MATCHES).join(', ')}`);
+  console.log(`  Live Pulse demos: ${Object.keys(PER_GAME_LIVE_MATCHES).map((k) => `DEMO-LIVE-${k}`).join(', ')}`);
 }

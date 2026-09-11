@@ -3,8 +3,6 @@ import type { ReactNode } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
-
 import { USER_COLORS } from './user-theme';
 import { goldAlpha } from 'src/theme/accent-presets';
 
@@ -29,6 +27,8 @@ export type UserArenaStripProps = {
   action?: ReactNode;
   /** Bleed to shell edges like Play/Shop (default true) */
   fullBleed?: boolean;
+  /** Tighter bottom margin for dense hubs (referral, etc.) */
+  dense?: boolean;
 };
 
 /**
@@ -43,6 +43,7 @@ export function UserArenaStrip({
   subtitle,
   action,
   fullBleed = true,
+  dense = false,
 }: UserArenaStripProps) {
   return (
     <Box
@@ -51,14 +52,12 @@ export function UserArenaStrip({
         width: fullBleed ? 'auto' : 1,
         mx: fullBleed ? { xs: -2, sm: -3, md: -4 } : 0,
         mt: fullBleed ? { xs: -4, sm: -5, md: -6 } : 0,
-        mb: { xs: 2.5, md: 3.5 },
-        minHeight: { xs: 168, md: 200 },
+        mb: dense ? { xs: 1.5, md: 2 } : { xs: 2.5, md: 3.5 },
+        minHeight: dense ? { xs: 140, md: 168 } : { xs: 168, md: 200 },
         display: 'flex',
         alignItems: 'flex-end',
         overflow: 'hidden',
         bgcolor: '#000000',
-        borderTop: `1px solid ${goldAlpha(0.14)}`,
-        borderBottom: `1px solid ${goldAlpha(0.14)}`,
       }}
     >
       <Box
@@ -148,8 +147,6 @@ export function UserArenaStrip({
               {subtitle}
             </Typography>
           ) : null}
-
-          <BattleGoldDivider variant="title" sx={{ mt: 1.25, width: { xs: 120, md: 160 } }} />
         </Box>
 
         {action ? (

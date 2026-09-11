@@ -3,4 +3,4 @@ export * from './shop-hero';
 export * from './shop-features';
 export * from './shop-page-skeleton';
 export * from './shop-detail-skeleton';
-export * from './shop-section-nav';
+export * from './go-to-bac-shop-button';

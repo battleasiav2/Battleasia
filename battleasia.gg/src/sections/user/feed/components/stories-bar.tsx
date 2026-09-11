@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback } from 'react';
 
 import { alpha } from '@mui/material/styles';
 import { Box, Stack, Avatar, Typography, Skeleton } from '@mui/material';
@@ -9,7 +9,6 @@ import { useTranslate } from 'src/locales/use-locales';
 import { UserGlassCard, USER_COLORS, goldAlpha } from 'src/layouts/user';
 import { getImageUrl } from 'src/utils/get-image-url';
 import { Iconify } from 'src/components/iconify';
-import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 
 import { StoryViewer } from './story-viewer';
 import { StoryCreateDialog } from './story-create-dialog';
@@ -287,7 +286,6 @@ export function StoriesBar() {
               {t('feed.stories')}
             </Typography>
           </Stack>
-          <BattleGoldDivider variant="title" sx={{ mb: 1.5, opacity: 0.5 }} />
 
           <Box
             sx={{
