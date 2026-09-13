@@ -450,7 +450,6 @@ export function SignUpView() {
                               transition: 'all 0.2s ease',
                               '&.Mui-checked': {
                                 color: 'var(--ba-gold)',
-                                filter: 'drop-shadow(0 0 4px rgba(245,158,11,0.6))',
                               },
                               '&:hover': {
                                 bgcolor: goldAlpha(0.08),

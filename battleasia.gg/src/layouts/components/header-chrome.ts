@@ -60,33 +60,32 @@ export const headerRightAreaSx: SystemStyleObject<Theme> = {
 };
 
 /**
- * Tactical gaming active trapezoid badge:
- * Proportioned to match Lost Light reference.
+ * Simple active nav pill — Pulse-card style (no trapezoid / gaming badge).
  */
 export const headerActiveTrapezoidSx: SxProps<Theme> = {
   position: 'relative',
   height: '100%',
-  minWidth: { xs: 128, lg: 136, xl: 148 },
+  minWidth: { xs: 88, lg: 96, xl: 104 },
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   textDecoration: 'none',
   cursor: 'pointer',
-  px: { lg: 3.75, xl: 4.25 },
+  px: { lg: 2, xl: 2.25 },
   filter: 'none',
   boxShadow: 'none',
   '&::before': {
     content: '""',
     position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
+    top: '50%',
+    left: 6,
+    right: 6,
+    height: 30,
+    transform: 'translateY(-50%)',
     zIndex: 0,
-    clipPath:
-      'polygon(0 0, 100% 0, calc(100% - 26px) 100%, calc(50% + 8px) 100%, 50% calc(100% - 7px), calc(50% - 8px) 100%, 26px 100%)',
-    background:
-      'linear-gradient(180deg, var(--ba-nav-badge-light, #e2ff58) 0%, var(--ba-nav-badge-main, #cbfb24) 100%)',
+    borderRadius: '4px',
+    bgcolor: 'rgba(255, 255, 255, 0.06)',
+    border: '1px solid rgba(255, 255, 255, 0.14)',
     boxShadow: 'none',
     filter: 'none',
   },
@@ -95,11 +94,11 @@ export const headerActiveTrapezoidSx: SxProps<Theme> = {
     zIndex: 1,
     fontFamily: "'Barlow', sans-serif",
     fontWeight: 800,
-    fontSize: { lg: 15, xl: 15.5 },
-    letterSpacing: '1.2px',
+    fontSize: { lg: 14, xl: 14.5 },
+    letterSpacing: '1px',
     textTransform: 'uppercase',
-    color: '#ffffff',
-    textShadow: '0 1px 3px rgba(0, 0, 0, 0.45)',
+    color: 'var(--ba-gold, #cbfb24)',
+    textShadow: 'none',
     lineHeight: 1,
     whiteSpace: 'nowrap',
   },
@@ -154,151 +153,105 @@ export const headerNavDividerSx: SystemStyleObject<Theme> = {
 
 /**
  * ----------------------------------------------------------------------
- * TACTICAL CYBERPUNK HUD RIGHT CONTROLS
- * Creative, modern, animated, full of cyber-military effects
+ * Header right controls — Pulse-simple chips
  * ----------------------------------------------------------------------
  */
 
-/** Tactical Cyber Sign-In / Login Button with Holographic Shimmer */
+/** Simple Pulse-style Sign-In / Login control */
 export const headerSignInButtonSx: SystemStyleObject<Theme> = {
-  height: { xs: 32, sm: 36, md: 40 },
-  px: { xs: 1, sm: 1.5, md: 2 },
+  height: { xs: 32, sm: 34, md: 36 },
+  px: { xs: 1, sm: 1.35, md: 1.5 },
   position: 'relative',
   overflow: 'hidden',
   display: 'inline-flex',
   alignItems: 'center',
-  gap: { xs: 0.5, sm: 0.85 },
+  gap: { xs: 0.5, sm: 0.75 },
   textDecoration: 'none',
   fontFamily: "'Barlow', sans-serif",
-  fontWeight: 800,
-  fontSize: { xs: 11, sm: 13, md: 14 },
-  letterSpacing: { xs: '0.8px', md: '1.4px' },
+  fontWeight: 700,
+  fontSize: { xs: 11, sm: 12, md: 13 },
+  letterSpacing: { xs: '0.6px', md: '0.8px' },
   textTransform: 'uppercase',
-  color: '#ffffff',
+  color: 'rgba(255, 255, 255, 0.88)',
   flexShrink: 0,
-  background:
-    'linear-gradient(135deg, rgba(255, 255, 255, 0.09) 0%, rgba(18, 22, 28, 0.9) 45%, rgba(6, 8, 12, 0.98) 100%)',
-  border: '1px solid rgba(255, 255, 255, 0.16)',
-  borderRadius: '2px',
-  clipPath: 'polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px)',
-  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 2px 8px rgba(0, 0, 0, 0.45)',
-  transition: 'all 0.22s cubic-bezier(0.2, 0.9, 0.3, 1)',
-  '&::after': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '45%',
-    height: '100%',
-    background:
-      'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.25) 50%, transparent 100%)',
-    animation: 'cyber-shimmer 4.2s cubic-bezier(0.4, 0, 0.2, 1) infinite',
-    pointerEvents: 'none',
-  },
+  bgcolor: 'rgba(255, 255, 255, 0.05)',
+  border: '1px solid rgba(255, 255, 255, 0.12)',
+  borderRadius: '4px',
+  boxShadow: 'none',
+  transition: 'background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease',
   '&:hover': {
-    borderColor: 'var(--ba-nav-badge-main, #cbfb24)',
+    bgcolor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.22)',
     color: '#ffffff',
-    transform: 'translateY(-1.5px)',
-    boxShadow:
-      '0 0 18px rgba(203, 251, 36, 0.35), inset 0 0 12px rgba(203, 251, 36, 0.12), 0 4px 14px rgba(0, 0, 0, 0.6)',
   },
   '&:active': {
-    transform: 'translateY(0.5px) scale(0.98)',
+    bgcolor: 'rgba(255, 255, 255, 0.06)',
   },
 };
 
 export const headerSignInIconButtonSx: SystemStyleObject<Theme> = {
   ...headerSignInButtonSx,
-  px: { xs: 0.85, sm: 1.15 },
-  width: { xs: 32, sm: 36, md: 40 },
+  px: { xs: 0.85, sm: 1 },
+  width: { xs: 32, sm: 34, md: 36 },
   justifyContent: 'center',
 };
 
-/** Tactical Cyber Comms Module for Language Popover */
+/** Simple language control — Pulse chip style */
 export const headerLanguagePillSx = (open: boolean): SystemStyleObject<Theme> => ({
   display: 'inline-flex',
   alignItems: 'center',
-  gap: { xs: 0.4, sm: 0.85 },
-  px: { xs: 0.7, sm: 1.1, md: 1.35 },
+  gap: { xs: 0.4, sm: 0.65 },
+  px: { xs: 0.7, sm: 1, md: 1.15 },
   py: 0,
-  minHeight: { xs: 32, sm: 36, md: 40 },
-  height: { xs: 32, sm: 36, md: 40 },
+  minHeight: { xs: 32, sm: 34, md: 36 },
+  height: { xs: 32, sm: 34, md: 36 },
   minWidth: 0,
   flexShrink: 0,
   position: 'relative',
   overflow: 'hidden',
-  background: open
-    ? 'linear-gradient(135deg, rgba(203, 251, 36, 0.14) 0%, rgba(14, 18, 24, 0.92) 50%, rgba(6, 8, 12, 0.98) 100%)'
-    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(14, 18, 24, 0.85) 50%, rgba(6, 8, 12, 0.95) 100%)',
-  border: `1px solid ${open ? 'var(--ba-nav-badge-main, #cbfb24)' : 'rgba(255, 255, 255, 0.15)'}`,
-  borderRadius: '2px',
-  clipPath: 'polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)',
-  boxShadow: open
-    ? '0 0 14px rgba(203, 251, 36, 0.3), inset 0 0 8px rgba(203, 251, 36, 0.1)'
-    : 'inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 6px rgba(0, 0, 0, 0.4)',
-  transition: 'all 0.22s cubic-bezier(0.2, 0.9, 0.3, 1)',
+  bgcolor: open ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.05)',
+  border: `1px solid ${open ? 'rgba(255, 255, 255, 0.22)' : 'rgba(255, 255, 255, 0.12)'}`,
+  borderRadius: '4px',
+  boxShadow: 'none',
+  transition: 'background-color 0.15s ease, border-color 0.15s ease',
   '&:hover': {
-    borderColor: 'var(--ba-nav-badge-main, #cbfb24)',
-    boxShadow:
-      '0 0 14px rgba(203, 251, 36, 0.28), inset 0 0 8px rgba(203, 251, 36, 0.08)',
-    transform: 'translateY(-1.5px)',
+    bgcolor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.22)',
     '& .lang-chevron': {
-      transform: 'translateY(1.5px)',
-      color: 'var(--ba-nav-badge-main, #cbfb24)',
+      color: 'rgba(255, 255, 255, 0.85)',
     },
-  },
-  '&:active': {
-    transform: 'translateY(0.5px) scale(0.98)',
   },
 });
 
 export const headerLanguageCodeSx: SystemStyleObject<Theme> = {
   fontFamily: "'Barlow', sans-serif",
-  fontSize: { xs: 11, sm: 13, md: 14 },
-  fontWeight: 800,
-  letterSpacing: { xs: '0.6px', md: '1px' },
-  color: '#ffffff',
+  fontSize: { xs: 11, sm: 12, md: 13 },
+  fontWeight: 700,
+  letterSpacing: { xs: '0.5px', md: '0.7px' },
+  color: 'rgba(255, 255, 255, 0.88)',
   lineHeight: 1,
   textTransform: 'uppercase',
-  // Compact on the narrowest phones — flag alone is enough.
   display: { xs: 'none', sm: 'inline' },
 };
 
-/** Tactical Plasma Reactor Core Button for Accent Popover */
+/** Simple accent / theme control */
 export const headerAccentButtonSx = (open: boolean): SystemStyleObject<Theme> => ({
-  width: { xs: 30, sm: 36, md: 40 },
-  minWidth: { xs: 30, sm: 36, md: 40 },
-  height: { xs: 30, sm: 36, md: 40 },
+  width: { xs: 30, sm: 34, md: 36 },
+  minWidth: { xs: 30, sm: 34, md: 36 },
+  height: { xs: 30, sm: 34, md: 36 },
   p: 0,
   flexShrink: 0,
   position: 'relative',
   display: 'grid',
   placeItems: 'center',
-  background: open
-    ? 'linear-gradient(135deg, rgba(var(--ba-gold-rgb, 203, 251, 36), 0.18) 0%, rgba(14, 18, 24, 0.95) 50%, rgba(6, 8, 12, 0.98) 100%)'
-    : 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(14, 18, 24, 0.85) 50%, rgba(6, 8, 12, 0.95) 100%)',
-  border: `1px solid ${open ? 'var(--ba-gold, #cbfb24)' : 'rgba(255, 255, 255, 0.15)'}`,
-  borderRadius: '2px',
-  clipPath: 'polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)',
-  boxShadow: open
-    ? '0 0 16px rgba(var(--ba-gold-rgb, 203, 251, 36), 0.35)'
-    : 'inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 6px rgba(0, 0, 0, 0.4)',
-  transition: 'all 0.22s cubic-bezier(0.2, 0.9, 0.3, 1)',
+  bgcolor: open ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.05)',
+  border: `1px solid ${open ? 'rgba(255, 255, 255, 0.22)' : 'rgba(255, 255, 255, 0.12)'}`,
+  borderRadius: '4px',
+  boxShadow: 'none',
+  transition: 'background-color 0.15s ease, border-color 0.15s ease',
   '&:hover': {
-    borderColor: 'var(--ba-gold, #cbfb24)',
-    boxShadow:
-      '0 0 18px rgba(var(--ba-gold-rgb, 203, 251, 36), 0.35), inset 0 0 8px rgba(var(--ba-gold-rgb, 203, 251, 36), 0.12)',
-    transform: 'translateY(-1.5px)',
-    '& .reactor-orbit': {
-      animationDuration: '3.5s',
-      borderColor: 'var(--ba-gold, #cbfb24)',
-    },
-    '& .reactor-core': {
-      transform: 'scale(1.2)',
-    },
-  },
-  '&:active': {
-    transform: 'translateY(0.5px) scale(0.98)',
+    bgcolor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: 'rgba(255, 255, 255, 0.22)',
   },
 });
 

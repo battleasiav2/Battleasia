@@ -1,147 +1,206 @@
-import { Box, Chip, Stack, Avatar, Typography } from '@mui/material';
-import { alpha } from '@mui/material/styles';
+import { Box, Stack, Avatar, Typography } from '@mui/material';
+import { alpha, keyframes } from '@mui/material/styles';
 
 import type { ILeaderboardEntry } from 'src/types';
 import { CONFIG } from 'src/global-config';
 import { getAvatarUrl } from 'src/utils/get-image-url';
 
-import { getGlassInnerSx, getDefaultGlassTokens } from 'src/components/battle-glass-card';
-
-import { goldAlpha, USER_COLORS, getUserChipSx, userMutedTextSx } from 'src/layouts/user';
+import { goldAlpha, USER_COLORS } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
+
+const GOLD = USER_COLORS.gold;
+
+const rowIn = keyframes`
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+`;
 
 type LeaderboardTableProps = {
   rows: ILeaderboardEntry[];
   labels: {
-    rank: string;
-    player: string;
-    totalScore: string;
     games: string;
     average: string;
-    badge: string;
-    lastPlayed: string;
     level: string;
   };
   formatScore: (score: number) => string;
-  getRankIcon: (rank: number) => string;
+  /** Highest score on the board — used for relative strength bars */
+  maxScore?: number;
 };
 
-export function LeaderboardTable({ rows, labels, formatScore, getRankIcon }: LeaderboardTableProps) {
-  const tokens = getDefaultGlassTokens();
+export function LeaderboardTable({
+  rows,
+  labels,
+  formatScore,
+  maxScore = 0,
+}: LeaderboardTableProps) {
+  const peak = Math.max(maxScore, ...rows.map((r) => r.totalScore), 1);
 
   return (
-    <Stack spacing={1}>
-      <Box
-        sx={{
-          display: { xs: 'none', md: 'grid' },
-          gridTemplateColumns: '72px 1.4fr 1fr 0.8fr 0.8fr 0.9fr 1fr',
-          gap: 1,
-          px: 2,
-          py: 1,
-        }}
-      >
-        {[labels.rank, labels.player, labels.totalScore, labels.games, labels.average, labels.badge, labels.lastPlayed].map(
-          (label) => (
-            <Typography
-              key={label}
-              sx={{
-                fontSize: 10,
-                fontWeight: 800,
-                letterSpacing: 0.8,
-                textTransform: 'uppercase',
-                color: USER_COLORS.textMuted,
-              }}
-            >
-              {label}
-            </Typography>
-          )
-        )}
-      </Box>
-
-      {rows.map((player) => {
+    <>
+      {rows.map((player, index) => {
         const avatarSrc = getAvatarUrl(player.avatar);
-        const isTopRank = player.rank <= 3;
+        const isLast = index === rows.length - 1;
+        const strength = Math.min(100, Math.round((player.totalScore / peak) * 100));
+        const meta = [
+          `${labels.level} ${player.level}`,
+          `${player.gamesPlayed.toLocaleString()} ${labels.games}`,
+          `${labels.average} ${player.averageScore.toFixed(1)}%`,
+          player.badge,
+        ]
+          .filter(Boolean)
+          .join(' · ');
 
         return (
           <Box
             key={player.id}
-            sx={getGlassInnerSx(tokens, {
-              p: { xs: 1.5, md: 2 },
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '48px 1fr auto',
-                md: '72px 1.4fr 1fr 0.8fr 0.8fr 0.9fr 1fr',
-              },
-              gap: { xs: 1, md: 1 },
+            sx={{
+              position: 'relative',
+              display: 'flex',
               alignItems: 'center',
-              borderColor: isTopRank ? goldAlpha(0.28) : alpha('#ffffff', 0.08),
-              bgcolor: alpha('#10141c', 0.75),
-              backdropFilter: 'blur(14px)',
-              transition: 'transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease',
-              '&:hover': {
-                transform: 'translateX(4px)',
-                borderColor: goldAlpha(0.5),
-                boxShadow: `0 6px 22px ${alpha('#000000', 0.6)}, 0 0 16px ${goldAlpha(0.12)}`,
+              gap: { xs: 1.25, sm: 1.75 },
+              width: 1,
+              px: { xs: 1.5, sm: 2 },
+              py: { xs: 1.35, sm: 1.6 },
+              borderBottom: isLast ? 'none' : `1px solid ${alpha('#ffffff', 0.08)}`,
+              animation: `${rowIn} 0.35s ease-out ${Math.min(index, 12) * 0.04}s both`,
+              transition: 'background-color 0.2s ease',
+              '&::before': {
+                content: '""',
+                position: 'absolute',
+                left: 0,
+                top: 8,
+                bottom: 8,
+                width: 2,
+                bgcolor: 'transparent',
+                transition: 'background-color 0.2s ease',
               },
-            })}
+              '&:hover': {
+                bgcolor: goldAlpha(0.06),
+                '&::before': { bgcolor: GOLD },
+                '& .lb-title': { color: GOLD },
+                '& .lb-bar': { opacity: 1 },
+              },
+            }}
           >
-            <Typography sx={{ fontSize: 16, fontWeight: 800, color: isTopRank ? USER_COLORS.gold : USER_COLORS.textMuted, textAlign: 'center' }}>
-              {isTopRank ? getRankIcon(player.rank) : `#${player.rank}`}
+            <Typography
+              sx={{
+                width: 40,
+                flexShrink: 0,
+                fontSize: 14,
+                fontWeight: 900,
+                textAlign: 'center',
+                fontVariantNumeric: 'tabular-nums',
+                color: alpha('#ffffff', 0.45),
+              }}
+            >
+              {player.rank}
             </Typography>
 
-            <Stack direction="row" spacing={1.25} alignItems="center" sx={{ minWidth: 0 }}>
-              <Avatar
-                src={avatarSrc}
+            <Avatar
+              src={avatarSrc}
+              sx={{
+                width: { xs: 40, sm: 44 },
+                height: { xs: 40, sm: 44 },
+                flexShrink: 0,
+                bgcolor: '#0a0a0a',
+                border: `1px solid ${alpha('#ffffff', 0.12)}`,
+                fontWeight: 700,
+                fontSize: 14,
+              }}
+            >
+              {player.username.charAt(0).toUpperCase()}
+            </Avatar>
+
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Typography
+                className="lb-title font-tr"
                 sx={{
-                  width: 40,
-                  height: 40,
-                  bgcolor: goldAlpha(0.12),
-                  border: `1px solid ${goldAlpha(0.3)}`,
-                  fontWeight: 700,
+                  fontSize: { xs: 13, sm: 15 },
+                  fontWeight: 800,
+                  color: USER_COLORS.textPrimary,
+                  textTransform: 'uppercase',
+                  lineHeight: 1.2,
+                  transition: 'color 0.2s ease',
+                }}
+                noWrap
+              >
+                {player.username}
+              </Typography>
+
+              <Typography
+                sx={{
+                  mt: 0.4,
+                  fontSize: { xs: 11, sm: 12 },
+                  color: alpha('#ffffff', 0.48),
+                  lineHeight: 1.35,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                {player.username.charAt(0).toUpperCase()}
-              </Avatar>
-              <Box sx={{ minWidth: 0 }}>
-                <Typography sx={{ fontSize: 14, fontWeight: 700, color: USER_COLORS.textPrimary }} noWrap>
-                  {player.username}
-                </Typography>
-                <Typography sx={{ ...userMutedTextSx, fontSize: 11 }}>
-                  {labels.level} {player.level}
-                </Typography>
-              </Box>
-            </Stack>
-
-            <Stack direction="row" spacing={0.5} alignItems="center" justifyContent={{ xs: 'flex-end', md: 'flex-start' }}>
-              <Box component="img" src={CONFIG.currencyIcon} alt="Coin" sx={{ width: 14, height: 14 }} />
-              <Typography sx={{ fontSize: 13, fontWeight: 700, color: USER_COLORS.textPrimary }}>
-                {formatScore(player.totalScore)}
+                {meta}
               </Typography>
-            </Stack>
 
-            <Typography sx={{ fontSize: 13, color: USER_COLORS.textSubtle, display: { xs: 'none', md: 'block' } }}>
-              {player.gamesPlayed.toLocaleString()}
-            </Typography>
-
-            <Typography sx={{ fontSize: 13, color: USER_COLORS.textSubtle, display: { xs: 'none', md: 'block' } }}>
-              {player.averageScore.toFixed(1)}%
-            </Typography>
-
-            <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-              <Chip
-                label={player.badge}
-                size="small"
-                sx={getUserChipSx('gold')}
-              />
+              {/* Relative power bar */}
+              <Box
+                className="lb-bar"
+                sx={{
+                  mt: 0.85,
+                  height: 3,
+                  width: 1,
+                  maxWidth: 220,
+                  bgcolor: alpha('#ffffff', 0.06),
+                  overflow: 'hidden',
+                  opacity: 0.85,
+                }}
+              >
+                <Box
+                  sx={{
+                    height: 1,
+                    width: `${strength}%`,
+                    background: `linear-gradient(90deg, ${goldAlpha(0.35)}, ${GOLD})`,
+                    transition: 'width 0.6s ease',
+                  }}
+                />
+              </Box>
             </Box>
 
-            <Typography sx={{ ...userMutedTextSx, fontSize: 12, display: { xs: 'none', md: 'block' }, color: USER_COLORS.textSubtle }}>
-              {player.lastPlayed || '—'}
-            </Typography>
+            <Stack alignItems="flex-end" spacing={0.25} sx={{ flexShrink: 0 }}>
+              <Stack direction="row" alignItems="center" spacing={0.45}>
+                <Box
+                  component="img"
+                  src={CONFIG.currencyIcon}
+                  alt=""
+                  sx={{ width: 14, height: 14, display: { xs: 'none', sm: 'block' } }}
+                />
+                <Typography
+                  sx={{
+                    fontSize: { xs: 13, sm: 14 },
+                    fontWeight: 800,
+                    color: USER_COLORS.textPrimary,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {formatScore(player.totalScore)}
+                </Typography>
+              </Stack>
+              <Typography
+                sx={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  letterSpacing: 0.5,
+                  color: alpha('#ffffff', 0.35),
+                  textTransform: 'uppercase',
+                  display: { xs: 'none', sm: 'block' },
+                }}
+              >
+                {strength}% power
+              </Typography>
+            </Stack>
           </Box>
         );
       })}
-    </Stack>
+    </>
   );
 }

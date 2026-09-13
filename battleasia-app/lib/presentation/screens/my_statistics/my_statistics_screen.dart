@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/match_history_model.dart';
@@ -21,6 +22,8 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
 
   List<StatisticsItemModel> _statistics = [];
   bool _loading = true;
+
+  static const Color _panelBg = Color(0xD906090E);
 
   @override
   void initState() {
@@ -50,12 +53,10 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
             )
             .toList();
 
-        // Map to statistics items
         final statisticsList = historyItems
             .map((item) => StatisticsItemModel.fromMatchHistory(item))
             .toList();
 
-        // Sort by date descending (most recent first)
         statisticsList.sort((a, b) {
           try {
             final dateA = DateTime.parse(a.date).millisecondsSinceEpoch;
@@ -95,7 +96,7 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
     }
   }
 
-  Map<String, double> get _totals {
+  Map<String, num> get _totals {
     final totalPaid = _statistics.fold<double>(
       0.0,
       (sum, stat) => sum + stat.paid,
@@ -105,10 +106,15 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
       (sum, stat) => sum + stat.won,
     );
     final netProfit = totalWon - totalPaid;
+    final wins = _statistics.where((s) => s.won > 0).length;
+    final losses = _statistics.where((s) => s.won <= 0).length;
     return {
       'totalPaid': totalPaid,
       'totalWon': totalWon,
       'netProfit': netProfit,
+      'wins': wins,
+      'losses': losses,
+      'matches': _statistics.length,
     };
   }
 
@@ -122,14 +128,24 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
     }
   }
 
+  BoxDecoration get _panelDecoration => BoxDecoration(
+        color: _panelBg,
+        border: Border(
+          top: BorderSide(color: AppColors.gold, width: 2),
+          left: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+          right: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+          bottom: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     final isMobile = ResponsiveUtils.isMobile(context);
     final titleFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
-      baseSize: 28.0,
-      min: 24.0,
-      max: 36.0,
+      baseSize: 22.0,
+      min: 20.0,
+      max: 26.0,
     );
     final spacing16 = ResponsiveUtils.getResponsiveSpacing(
       context,
@@ -138,7 +154,7 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
     final spacing24 = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 24.0,
-    ).clamp(20.0, 32.0);
+    ).clamp(16.0, 24.0);
     final horizontalPadding = isMobile ? 16.0 : 24.0;
     final bottomPadding = 80.0 + MediaQuery.of(context).padding.bottom;
 
@@ -158,19 +174,16 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: spacing16),
-                      // Header
                       Text(
                         'MY STATISTICS',
                         style: AppTheme.heading2.copyWith(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w800,
                           fontSize: titleFontSize,
                           letterSpacing: 1,
                         ),
                       ),
                       SizedBox(height: spacing24),
-
-                      // Summary Cards
                       if (_loading)
                         Center(
                           child: Padding(
@@ -180,25 +193,24 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
                                 baseSize: 32.0,
                               ).clamp(24.0, 40.0),
                             ),
-                            child: const CircularProgressIndicator(),
+                            child: CircularProgressIndicator(
+                              color: AppColors.gold,
+                            ),
                           ),
                         )
                       else ...[
-                        _buildSummaryCards(),
+                        _buildMergedStatsPanel(),
                         SizedBox(height: spacing24),
-
-                        // Statistics Table
                         if (_statistics.isEmpty)
                           _buildEmptyState()
                         else
-                          _buildStatisticsTable(),
+                          _buildHistoryPanel(),
                       ],
                       SizedBox(height: spacing24),
                     ],
                   ),
                 ),
               ),
-              // Bottom padding for floating nav
               SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
             ],
           ),
@@ -208,173 +220,100 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
             right: 0,
             child: AppHeader(scrollController: _scrollController),
           ),
-
-          // Bottom menu
           const FloatingBottomNav(),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryCards() {
+  Widget _buildMergedStatsPanel() {
     final totals = _totals;
-    final netProfit = totals['netProfit']!;
-    final isProfit = netProfit >= 0;
+    final net = totals['netProfit']!.toDouble();
+    final isProfit = net >= 0;
+    final display = [
+      ('Matches', '${totals['matches']}', AppColors.textPrimary),
+      ('Paid', totals['totalPaid']!.toDouble().toStringAsFixed(0), AppColors.gold),
+      ('Won', totals['totalWon']!.toDouble().toStringAsFixed(0), AppColors.success),
+      (
+        'Net',
+        '${isProfit && net > 0 ? '+' : ''}${net.toStringAsFixed(0)}',
+        isProfit ? AppColors.success : AppColors.error,
+      ),
+      ('Wins', '${totals['wins']}', AppColors.success),
+      ('Losses', '${totals['losses']}', AppColors.error),
+    ];
 
-    return Column(
-      children: [
-        _buildSummaryCard(
-          'Total Paid',
-          totals['totalPaid']!,
-          AppTheme.primaryColor,
-          Colors.black,
-        ),
-        _buildSummaryCard(
-          'Total Won',
-          totals['totalWon']!,
-          Colors.green,
-          Colors.green,
-        ),
-        _buildSummaryCard(
-          'Net Profit',
-          netProfit,
-          isProfit ? Colors.green : Colors.red,
-          isProfit ? Colors.green : Colors.red,
-          showSign: true,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildSummaryCard(
-    String label,
-    double value,
-    Color iconColor,
-    Color textColor, {
-    bool showSign = false,
-  }) {
-    final cardPadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(12.0, 20.0);
-    final labelFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 13.0,
-      min: 12.0,
-      max: 15.0,
-    );
-    final valueFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 22.0,
-      min: 20.0,
-      max: 28.0,
-    );
-    final currencyIconSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 28.0,
-    ).clamp(24.0, 32.0);
-
-    return Card(
-      color: AppTheme.surfaceColor,
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: cardPadding,
-          vertical: cardPadding * 0.85,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label.toUpperCase(),
-              style: AppTheme.bodySmall.copyWith(
-                color: Colors.grey,
-                fontSize: labelFontSize,
-                letterSpacing: 0.5,
-                fontWeight: FontWeight.w600,
+    return Container(
+      decoration: _panelDecoration,
+      child: GridView.count(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: 2,
+        childAspectRatio: 2.4,
+        children: List.generate(display.length, (i) {
+          final cell = display[i];
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border(
+                right: BorderSide(
+                  color: Colors.white.withValues(alpha: i.isEven ? 0.08 : 0),
+                ),
+                bottom: BorderSide(
+                  color: Colors.white.withValues(alpha: i < 4 ? 0.08 : 0),
+                ),
               ),
             ),
-            Row(
-              mainAxisSize: MainAxisSize.min,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  'assets/images/currency.webp',
-                  width: currencyIconSize,
-                  height: currencyIconSize,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.account_balance_wallet,
-                      color: iconColor,
-                      size: currencyIconSize,
-                    );
-                  },
-                ),
-                const SizedBox(width: 8),
                 Text(
-                  '${showSign && value >= 0 ? '+' : ''}${value.toStringAsFixed(2)}',
-                  style: AppTheme.heading3.copyWith(
-                    color: textColor,
+                  cell.$1.toUpperCase(),
+                  style: AppTheme.bodySmall.copyWith(
+                    color: Colors.white.withValues(alpha: 0.45),
+                    fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    fontSize: valueFontSize,
+                    letterSpacing: 0.6,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  cell.$2,
+                  style: AppTheme.heading3.copyWith(
+                    color: cell.$3,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 18,
                   ),
                 ),
               ],
             ),
-          ],
-        ),
+          );
+        }),
       ),
     );
   }
 
   Widget _buildEmptyState() {
-    final emptyStatePadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 32.0,
-    ).clamp(24.0, 40.0);
-    final iconSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 64.0,
-    ).clamp(48.0, 80.0);
-    final spacing16 = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(12.0, 20.0);
-    final spacing8 = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 8.0,
-    ).clamp(6.0, 12.0);
-    final headingFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 20.0,
-      min: 18.0,
-      max: 24.0,
-    );
-    final bodyFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 16.0,
-    );
-
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(emptyStatePadding),
+        padding: const EdgeInsets.all(32),
         child: Column(
           children: [
-            Icon(Icons.bar_chart_outlined, size: iconSize, color: Colors.grey[400]),
-            SizedBox(height: spacing16),
+            Icon(
+              Icons.bar_chart_outlined,
+              size: 56,
+              color: AppColors.textMuted.withValues(alpha: 0.5),
+            ),
+            const SizedBox(height: 16),
             Text(
               'No statistics found',
-              style: AppTheme.heading3.copyWith(
-                fontSize: headingFontSize,
-                color: Colors.grey,
-              ),
+              style: AppTheme.heading3.copyWith(color: AppColors.textMuted),
             ),
-            SizedBox(height: spacing8),
+            const SizedBox(height: 8),
             Text(
               "You haven't participated in any matches yet",
-              style: AppTheme.bodyMedium.copyWith(
-                fontSize: bodyFontSize,
-                color: Colors.grey,
-              ),
+              style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
               textAlign: TextAlign.center,
             ),
           ],
@@ -383,235 +322,91 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
     );
   }
 
-  Widget _buildStatisticsTable() {
-    final tablePaddingH = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(12.0, 20.0);
-    final tablePaddingV = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 12.0,
-    ).clamp(10.0, 16.0);
-    final headerFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 12.0,
-      min: 11.0,
-      max: 14.0,
-    );
-    final columnWidth = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 80.0,
-    ).clamp(70.0, 100.0);
-    final indexWidth = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 40.0,
-    ).clamp(35.0, 50.0);
-
-    return Card(
-      color: AppTheme.surfaceColor,
+  Widget _buildHistoryPanel() {
+    return Container(
+      decoration: _panelDecoration,
       child: Column(
-        children: [
-          // Table Header
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: tablePaddingH,
-              vertical: tablePaddingV,
-            ),
+        children: List.generate(_statistics.length, (index) {
+          final stat = _statistics[index];
+          final isLast = index == _statistics.length - 1;
+          final isWin = stat.won > 0;
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
-              border: Border(bottom: BorderSide(color: Colors.grey[300]!)),
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withValues(alpha: isLast ? 0 : 0.08),
+                ),
+              ),
             ),
             child: Row(
               children: [
                 SizedBox(
-                  width: indexWidth,
+                  width: 28,
                   child: Text(
-                    '#',
-                    style: AppTheme.bodyMedium.copyWith(
+                    '${index + 1}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.4),
                       fontWeight: FontWeight.w700,
-                      fontSize: headerFontSize,
-                      color: Colors.black,
+                      fontSize: 13,
                     ),
                   ),
                 ),
+                const SizedBox(width: 10),
                 Expanded(
-                  child: Text(
-                    'Match Info',
-                    style: AppTheme.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w700,
-                      fontSize: headerFontSize,
-                      color: Colors.black,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        stat.matchName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTheme.bodyMedium.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _formatDateTime(stat.date),
+                        style: AppTheme.bodySmall.copyWith(
+                          color: Colors.white.withValues(alpha: 0.5),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(
-                  width: columnWidth,
-                  child: Text(
-                    'Paid',
-                    textAlign: TextAlign.right,
-                    style: AppTheme.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w700,
-                      fontSize: headerFontSize,
-                      color: Colors.black,
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'WON',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.4),
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
                     ),
-                  ),
-                ),
-                SizedBox(
-                  width: columnWidth,
-                  child: Text(
-                    'Won',
-                    textAlign: TextAlign.right,
-                    style: AppTheme.bodyMedium.copyWith(
-                      fontWeight: FontWeight.w700,
-                      fontSize: headerFontSize,
-                      color: Colors.black,
+                    const SizedBox(height: 2),
+                    Text(
+                      stat.won.toStringAsFixed(0),
+                      style: TextStyle(
+                        color: isWin ? AppColors.success : AppColors.textMuted,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ),
-          ),
-          // Table Body
-          ..._statistics.asMap().entries.map((entry) {
-            final index = entry.key;
-            final stat = entry.value;
-            final bodyFontSize = ResponsiveUtils.getResponsiveFontSize(
-              context,
-              baseSize: 14.0,
-              min: 12.0,
-              max: 16.0,
-            );
-            final smallFontSize = ResponsiveUtils.getResponsiveFontSize(
-              context,
-              baseSize: 11.0,
-              min: 10.0,
-              max: 12.0,
-            );
-            final currencyIconSize = ResponsiveUtils.getResponsiveSpacing(
-              context,
-              baseSize: 16.0,
-            ).clamp(14.0, 20.0);
-            final spacing4 = ResponsiveUtils.getResponsiveSpacing(
-              context,
-              baseSize: 4.0,
-            ).clamp(2.0, 6.0);
-            final columnWidth = ResponsiveUtils.getResponsiveSpacing(
-              context,
-              baseSize: 80.0,
-            ).clamp(70.0, 100.0);
-            final indexWidth = ResponsiveUtils.getResponsiveSpacing(
-              context,
-              baseSize: 40.0,
-            ).clamp(35.0, 50.0);
-
-            return Container(
-              padding: EdgeInsets.symmetric(
-                horizontal: tablePaddingH,
-                vertical: tablePaddingV,
-              ),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: Colors.grey[200]!, width: 1),
-                ),
-              ),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: indexWidth,
-                    child: Text(
-                      '${index + 1}',
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: Colors.black,
-                        fontSize: bodyFontSize,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          stat.matchName,
-                          style: AppTheme.bodyMedium.copyWith(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                            fontSize: bodyFontSize,
-                          ),
-                        ),
-                        SizedBox(height: spacing4),
-                        Text(
-                          _formatDateTime(stat.date),
-                          style: AppTheme.bodySmall.copyWith(
-                            color: Colors.grey,
-                            fontSize: smallFontSize,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: columnWidth,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Image.asset(
-                          'assets/images/currency.webp',
-                          width: currencyIconSize,
-                          height: currencyIconSize,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                        SizedBox(width: spacing4),
-                        Flexible(
-                          child: Text(
-                            stat.paid.toStringAsFixed(2),
-                            textAlign: TextAlign.right,
-                            style: AppTheme.bodyMedium.copyWith(
-                              color: AppTheme.primaryColor,
-                              fontWeight: FontWeight.w600,
-                              fontSize: bodyFontSize,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    width: columnWidth,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Image.asset(
-                          'assets/images/currency.webp',
-                          width: currencyIconSize,
-                          height: currencyIconSize,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const SizedBox.shrink();
-                          },
-                        ),
-                        SizedBox(width: spacing4),
-                        Flexible(
-                          child: Text(
-                            stat.won.toStringAsFixed(2),
-                            textAlign: TextAlign.right,
-                            style: AppTheme.bodyMedium.copyWith(
-                              color: stat.won > 0 ? Colors.green : Colors.grey,
-                              fontWeight: FontWeight.w600,
-                              fontSize: bodyFontSize,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-        ],
+          );
+        }),
       ),
     );
   }

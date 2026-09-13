@@ -38,7 +38,7 @@ type DemoMatchConfig = {
 const DEMO_MATCHES: DemoMatchConfig[] = [
   {
     roomId: 'DEMO-0001',
-    matchName: 'Erangel Solo Classic — Join Now',
+    matchName: 'Erangel Solo Classic',
     map: 'Erangel',
     status: 'active',
     entryFee: 20,
@@ -57,7 +57,7 @@ const DEMO_MATCHES: DemoMatchConfig[] = [
   },
   {
     roomId: 'DEMO-0003',
-    matchName: 'Sanhok Duo — Completed Win',
+    matchName: 'Sanhok Duo',
     map: 'Sanhok',
     status: 'complete',
     entryFee: 25,
@@ -68,7 +68,7 @@ const DEMO_MATCHES: DemoMatchConfig[] = [
   },
   {
     roomId: 'DEMO-0004',
-    matchName: 'Vikendi Solo — Completed',
+    matchName: 'Vikendi Solo',
     map: 'Vikendi',
     status: 'complete',
     entryFee: 15,
@@ -79,7 +79,7 @@ const DEMO_MATCHES: DemoMatchConfig[] = [
   },
   {
     roomId: 'DEMO-0005',
-    matchName: 'Livik Fast Rush — Upcoming',
+    matchName: 'Livik Fast Rush',
     map: 'Livik',
     status: 'active',
     entryFee: 10,
@@ -264,6 +264,10 @@ async function createDemoMatchFromConfig(
       exists.entryFee = config.entryFee;
       await exists.save();
       console.log(`  Refreshed live match: ${config.roomId} → start`);
+    } else if (exists.matchName !== config.matchName) {
+      exists.matchName = config.matchName;
+      await exists.save();
+      console.log(`  Updated match name: ${config.roomId} → ${config.matchName}`);
     } else {
       console.log(`  Match ${config.roomId} already exists, skipping`);
     }

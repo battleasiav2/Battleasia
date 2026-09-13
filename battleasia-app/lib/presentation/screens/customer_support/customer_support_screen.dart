@@ -15,17 +15,9 @@ import 'package:battleasia_app/core/utils/time_utils.dart';
 import 'package:battleasia_app/data/models/customer_support_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
-import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
+import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 
 enum _SupportMode { list, create, detail }
-
-String _supportFilterLabel(String filter) => switch (filter) {
-      'all' => 'support.filterAll'.tr(),
-      'open' => 'support.filterOpen'.tr(),
-      'pending' => 'support.filterPending'.tr(),
-      'closed' => 'support.filterClosed'.tr(),
-      _ => filter,
-    };
 
 String _supportCategoryLabel(String category) => switch (category) {
       'payment' => 'support.categoryPayment'.tr(),
@@ -387,6 +379,16 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
     );
   }
 
+  BoxDecoration get _panelDecoration => BoxDecoration(
+        color: const Color(0xD906090E),
+        border: Border(
+          top: BorderSide(color: AppColors.gold, width: 2),
+          left: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+          right: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+          bottom: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+        ),
+      );
+
   Widget _buildTitle() {
     final title = switch (_mode) {
       _SupportMode.list => 'support.title'.tr(),
@@ -408,13 +410,14 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
           ),
         Expanded(
           child: Text(
-            title,
+            title.toUpperCase(),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTheme.heading2.copyWith(
               color: AppColors.textPrimary,
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w800,
               fontSize: 22,
+              letterSpacing: 1,
             ),
           ),
         ),
@@ -463,44 +466,88 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   }
 
   Widget _buildList() {
-    const filters = ['all', 'open', 'pending', 'closed'];
+    final openCount = _tickets
+        .where((t) => t.status == 'open' || t.status == 'pending')
+        .length;
+    final closedCount =
+        _tickets.where((t) => t.status.toLowerCase() == 'closed').length;
+    final statCells = [
+      ('Tickets', '${_tickets.length}'),
+      ('Open', '$openCount'),
+      ('Closed', '$closedCount'),
+    ];
+
     return Column(
       children: [
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: filters.map((f) {
-              final selected = _statusFilter == f;
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: ChoiceChip(
-                  label: Text(_supportFilterLabel(f)),
-                  selected: selected,
-                  onSelected: (_) {
-                    setState(() => _statusFilter = f);
-                    _loadTickets();
-                  },
-                  selectedColor: AppColors.gold.withValues(alpha: 0.25),
-                  backgroundColor: AppColors.surface.withValues(alpha: 0.6),
-                  side: BorderSide(
-                    color: selected
-                        ? AppColors.gold.withValues(alpha: 0.55)
-                        : Colors.white.withValues(alpha: 0.12),
+        Container(
+          decoration: _panelDecoration,
+          child: IntrinsicHeight(
+            child: Row(
+              children: List.generate(statCells.length, (i) {
+                final cell = statCells[i];
+                return Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 14,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        right: BorderSide(
+                          color: Colors.white.withValues(
+                            alpha: i < statCells.length - 1 ? 0.08 : 0,
+                          ),
+                        ),
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          cell.$1.toUpperCase(),
+                          style: AppTheme.bodySmall.copyWith(
+                            color: Colors.white.withValues(alpha: 0.45),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.6,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          cell.$2,
+                          style: AppTheme.heading3.copyWith(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  labelStyle: TextStyle(
-                    color: selected ? AppColors.gold : AppColors.textMuted,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
-                  ),
-                ),
-              );
-            }).toList(),
+                );
+              }),
+            ),
           ),
+        ),
+        const SizedBox(height: 16),
+        PlayTabs(
+          tabs: const [
+            {'label': 'ALL', 'value': 'all'},
+            {'label': 'OPEN', 'value': 'open'},
+            {'label': 'PENDING', 'value': 'pending'},
+            {'label': 'CLOSED', 'value': 'closed'},
+          ],
+          activeTab: _statusFilter,
+          onTabChanged: (f) {
+            setState(() => _statusFilter = f);
+            _loadTickets();
+          },
+          fontSize: 13,
         ),
         const SizedBox(height: 12),
         Expanded(
           child: _loading
-              ? const Center(
+              ? Center(
                   child: CircularProgressIndicator(color: AppColors.gold),
                 )
               : _tickets.isEmpty
@@ -512,80 +559,146 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                       ),
                     )
                   : RefreshIndicator(
+                      color: AppColors.gold,
                       onRefresh: _loadTickets,
-                      child: ListView.separated(
-                        itemCount: _tickets.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (context, index) {
-                          final t = _tickets[index];
-                          return GlassCard(
-                            padding: EdgeInsets.zero,
-                            child: InkWell(
-                              onTap: () => _openTicket(t),
-                              borderRadius: BorderRadius.circular(12),
-                              child: Padding(
-                                padding: const EdgeInsets.all(14),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            t.subject,
-                                            style: AppTheme.bodyLarge.copyWith(
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColors.textPrimary,
-                                            ),
+                      child: ListView(
+                        children: [
+                          Container(
+                            decoration: _panelDecoration,
+                            child: Column(
+                              children: List.generate(_tickets.length, (index) {
+                                final t = _tickets[index];
+                                final isLast = index == _tickets.length - 1;
+                                final meta = [
+                                  _supportCategoryLabel(t.category),
+                                  if ((t.previewBody ?? '').isNotEmpty)
+                                    t.previewBody!,
+                                  if (t.attachmentCount > 0)
+                                    'support.attachmentsCount'.tr(
+                                      namedArgs: {
+                                        'count': '${t.attachmentCount}',
+                                      },
+                                    ),
+                                ].join(' · ');
+
+                                return InkWell(
+                                  onTap: () => _openTicket(t),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: Colors.white.withValues(
+                                            alpha: isLast ? 0 : 0.08,
                                           ),
                                         ),
-                                        _StatusChip(status: t.status),
+                                      ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 44,
+                                          height: 44,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF0A0A0A),
+                                            border: Border.all(
+                                              color: Colors.white
+                                                  .withValues(alpha: 0.1),
+                                            ),
+                                          ),
+                                          child: Icon(
+                                            Icons.confirmation_number_outlined,
+                                            size: 20,
+                                            color: AppColors.gold,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      t.subject.toUpperCase(),
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: AppTheme.bodyMedium
+                                                          .copyWith(
+                                                        color: AppColors
+                                                            .textPrimary,
+                                                        fontWeight:
+                                                            FontWeight.w800,
+                                                        fontSize: 13,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    _supportStatusLabel(
+                                                      t.status,
+                                                    ).toUpperCase(),
+                                                    style: TextStyle(
+                                                      color: _statusColor(
+                                                        t.status,
+                                                      ),
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.w800,
+                                                      letterSpacing: 0.5,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                meta,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style:
+                                                    AppTheme.bodySmall.copyWith(
+                                                  color: Colors.white
+                                                      .withValues(alpha: 0.5),
+                                                  fontSize: 11,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Icon(
+                                          Icons.chevron_right,
+                                          size: 18,
+                                          color: Colors.white
+                                              .withValues(alpha: 0.35),
+                                        ),
                                       ],
                                     ),
-                                    const SizedBox(height: 6),
-                                    Text(
-                                      _supportCategoryLabel(t.category)
-                                          .toUpperCase(),
-                                      style: AppTheme.bodySmall.copyWith(
-                                        color: AppColors.gold,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    if ((t.previewBody ?? '').isNotEmpty) ...[
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        t.previewBody!,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: AppTheme.bodySmall.copyWith(
-                                          color: AppColors.textMuted,
-                                        ),
-                                      ),
-                                    ],
-                                    if (t.attachmentCount > 0) ...[
-                                      const SizedBox(height: 6),
-                                      Text(
-                                        'support.attachmentsCount'.tr(
-                                          namedArgs: {
-                                            'count': '${t.attachmentCount}',
-                                          },
-                                        ),
-                                        style: AppTheme.bodySmall.copyWith(
-                                          color: AppColors.textMuted,
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
+                                  ),
+                                );
+                              }),
                             ),
-                          );
-                        },
+                          ),
+                        ],
                       ),
                     ),
         ),
       ],
     );
+  }
+
+  Color _statusColor(String status) {
+    return switch (status.toLowerCase()) {
+      'open' => AppColors.success,
+      'pending' => Colors.orange,
+      'closed' => Colors.white.withValues(alpha: 0.45),
+      _ => AppColors.gold,
+    };
   }
 
   Widget _buildCreateForm() {
@@ -720,7 +833,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: _loading
-                    ? const Center(
+                    ? Center(
                         child: CircularProgressIndicator(color: AppColors.gold),
                       )
                     : _messages.isEmpty
@@ -834,10 +947,13 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (!isMe)
-            const CircleAvatar(
+            CircleAvatar(
               radius: 16,
               backgroundColor: AppColors.gold,
-              child: Text('S', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text(
+                'S',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
           if (!isMe) const SizedBox(width: 8),
           Flexible(

@@ -1,31 +1,15 @@
 import type { SxProps, Theme } from '@mui/material/styles';
 
 import { Box, Button } from '@mui/material';
-import { alpha, keyframes } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
 import { useTranslate } from 'src/locales/use-locales';
 import { getBacShopEntryUrl } from 'src/sections/user/shop/shop-constants';
 
 import { userSolidGoldButtonSx } from './user-theme';
-import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
-
-const ctaPulse = keyframes`
-  0%, 100% {
-    box-shadow:
-      0 0 0 0 ${goldAlpha(0.55)},
-      0 0 28px ${goldAlpha(0.55)},
-      0 10px 28px ${alpha('#000000', 0.45)};
-  }
-  50% {
-    box-shadow:
-      0 0 0 10px ${goldAlpha(0)},
-      0 0 40px ${goldAlpha(0.75)},
-      0 12px 32px ${alpha('#000000', 0.5)};
-  }
-`;
 
 export type GoToBacShopButtonProps = {
   /** Override label (default: shop.goToBacShop) */
@@ -60,21 +44,6 @@ export function GoToBacShopButton({
         width: fullWidth ? 1 : { xs: '100%', sm: 'auto' },
       }}
     >
-      {!compact ? (
-        <Box
-          aria-hidden
-          sx={{
-            display: { xs: 'none', sm: fullWidth ? 'none' : 'block' },
-            position: 'absolute',
-            inset: -10,
-            borderRadius: 1,
-            background: `radial-gradient(ellipse at center, ${goldAlpha(0.35)} 0%, transparent 70%)`,
-            filter: 'blur(12px)',
-            pointerEvents: 'none',
-            zIndex: 0,
-          }}
-        />
-      ) : null}
       <Button
         component="a"
         href={disabled ? undefined : shopHref}
@@ -98,17 +67,14 @@ export function GoToBacShopButton({
             fontWeight: 900,
             letterSpacing: compact ? 0.6 : 1.1,
             whiteSpace: 'nowrap',
-            clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
-            animation: disabled ? 'none' : `${ctaPulse} 2.2s ease-in-out infinite`,
-            '@media (prefers-reduced-motion: reduce)': {
-              animation: 'none',
-              boxShadow: `0 0 28px ${goldAlpha(0.55)}, 0 10px 28px ${alpha('#000000', 0.45)}`,
-            },
+            clipPath: 'none',
+            animation: 'none',
+            boxShadow: 'none',
             '&:hover': {
               animation: 'none',
               background: 'var(--ba-gold-light, #fbbf24) !important',
-              boxShadow: `0 0 36px ${goldAlpha(0.7)}, 0 14px 32px ${alpha('#000000', 0.55)}`,
-              transform: disabled ? 'none' : 'translateY(-2px)',
+              boxShadow: 'none',
+              transform: 'none',
             },
             '&.Mui-disabled': {
               background: `${alpha('#ffffff', 0.12)} !important`,

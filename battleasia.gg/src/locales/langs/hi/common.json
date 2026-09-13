@@ -283,7 +283,10 @@
       "free": "मुफ्त",
       "joinNow": "जॉइन",
       "matchFull": "फुल",
-      "signInToJoin": "जॉइन करने के लिए साइन इन करें"
+      "signInToJoin": "जॉइन करने के लिए साइन इन करें",
+      "playersLabel": "प्लेयर",
+      "matchStatusOpen": "ओपन",
+      "matchBlurb": "{{game}} रूम — लाइव एंट्री, किल रिवॉर्ड और प्राइज़ पूल।"
     }
   },
   "navigation": {

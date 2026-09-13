@@ -1,15 +1,15 @@
-import 'dart:typed_data';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
-import 'package:battleasia_app/core/utils/date_utils.dart' as AppDateUtils;
 import 'package:battleasia_app/data/models/leaderboard_entry_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/common/refresh_overlay.dart';
+import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 import 'package:intl/intl.dart';
 
 class LeaderboardScreen extends StatefulWidget {
@@ -27,17 +27,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   bool _loading = true;
   String _selectedPeriod = 'all';
   bool _isRefreshing = false;
-  double _overscrollAccumulator = 0.0;
   double _dragStartY = 0.0;
   bool _dragStartedAtTop = false;
   bool _dragStartedAtBottom = false;
   double _wheelAccumulator = 0.0;
 
-  final List<Map<String, String>> _periods = [
-    {'value': 'all', 'label': 'All Time'},
-    {'value': 'weekly', 'label': 'This Week'},
-    {'value': 'monthly', 'label': 'This Month'},
-  ];
+  static const Color _panelBg = Color(0xD906090E);
 
   @override
   void initState() {
@@ -102,107 +97,108 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     }
   }
 
-  List<LeaderboardEntryModel> get _topThree {
-    return _leaderboard.take(3).toList();
-  }
+  List<LeaderboardEntryModel> get _topThree => _leaderboard.take(3).toList();
 
-  String _getRankIcon(int rank) {
-    if (rank == 1) return '🥇';
-    if (rank == 2) return '🥈';
-    if (rank == 3) return '🥉';
-    return '#$rank';
-  }
+  String _formatScore(int score) => NumberFormat('#,###').format(score);
 
-  String _formatScore(int score) {
-    return NumberFormat('#,###').format(score);
-  }
-
-  Color _getBadgeColor(String badge) {
-    switch (badge) {
-      case 'Champion':
-        return Colors.red;
-      case 'Elite':
-        return Colors.orange;
-      case 'Master':
-        return Colors.blue;
-      case 'Expert':
-        return Colors.green;
-      case 'Advanced':
-      default:
-        return Colors.grey;
-    }
-  }
-
-  Color _getPodiumColor(int index) {
-    switch (index) {
-      case 0:
-        return AppTheme.primaryColor;
+  Color _podiumRankColor(int rank) {
+    switch (rank) {
       case 1:
-        return const Color(0xFF9E9E9E); // silver
+        return AppColors.gold;
       case 2:
-        return Colors.blue;
+        return const Color(0xFFC0C0C0);
+      case 3:
+        return const Color(0xFFCD7F32);
       default:
-        return Colors.grey;
+        return AppColors.textMuted;
     }
   }
 
-  /// Renders a player avatar correctly for all three storage forms:
-  ///   1. Base64 data URI  → decoded via [MemoryImage]
-  ///   2. HTTP/HTTPS URL   → [NetworkImage] with error fallback
-  ///   3. No avatar        → initial letter on [bgColor] circle
+  double _pedestalHeight(int rank) {
+    switch (rank) {
+      case 1:
+        return 88;
+      case 2:
+        return 58;
+      case 3:
+        return 44;
+      default:
+        return 40;
+    }
+  }
+
+  double _podiumAvatarRadius(int rank) {
+    switch (rank) {
+      case 1:
+        return 34;
+      case 2:
+        return 24;
+      case 3:
+        return 22;
+      default:
+        return 20;
+    }
+  }
+
+  BoxDecoration get _panelDecoration => BoxDecoration(
+        color: _panelBg,
+        border: Border(
+          top: BorderSide(color: AppColors.gold, width: 2),
+          left: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+          right: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+          bottom: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+        ),
+      );
+
   Widget _buildPlayerAvatar({
     required String? avatar,
     required String username,
     required double radius,
-    required double fontSize,
-    required Color bgColor,
+    required Color borderColor,
   }) {
     final size = radius * 2;
-
-    Widget fallback = Text(
+    final fallback = Text(
       username.isNotEmpty ? username[0].toUpperCase() : 'U',
       style: TextStyle(
-        fontSize: fontSize,
+        fontSize: radius * 0.7,
         color: Colors.white,
         fontWeight: FontWeight.bold,
       ),
     );
 
-    // ── 1. Base64 data URI ───────────────────────────────────────────────
+    Widget child = fallback;
     if (ImageUtils.isBase64DataUri(avatar)) {
-      final Uint8List? bytes = ImageUtils.decodeBase64DataUri(avatar!);
+      final bytes = ImageUtils.decodeBase64DataUri(avatar!);
       if (bytes != null) {
-        return CircleAvatar(
-          radius: radius,
-          backgroundColor: bgColor,
-          backgroundImage: MemoryImage(bytes),
+        child = ClipOval(
+          child: Image.memory(bytes, width: size, height: size, fit: BoxFit.cover),
         );
       }
-    }
-
-    // ── 2. Regular HTTP / HTTPS URL ──────────────────────────────────────
-    final resolved = ImageUtils.getImageUrl(avatar);
-    if (resolved != null && resolved.isNotEmpty) {
-      return CircleAvatar(
-        radius: radius,
-        backgroundColor: bgColor,
-        child: ClipOval(
+    } else {
+      final resolved = ImageUtils.getImageUrl(avatar);
+      if (resolved != null && resolved.isNotEmpty) {
+        child = ClipOval(
           child: Image.network(
             resolved,
             width: size,
             height: size,
             fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => fallback,
+            errorBuilder: (_, __, ___) => Center(child: fallback),
           ),
-        ),
-      );
+        );
+      }
     }
 
-    // ── 3. No avatar — initial letter ────────────────────────────────────
-    return CircleAvatar(
-      radius: radius,
-      backgroundColor: bgColor,
-      child: fallback,
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: const Color(0xFF0A0A0A),
+        border: Border.all(color: borderColor.withValues(alpha: 0.55)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Center(child: child),
     );
   }
 
@@ -211,8 +207,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   }
 
   bool _atTop() =>
-      _scrollController.hasClients &&
-      _scrollController.position.pixels <= 0;
+      _scrollController.hasClients && _scrollController.position.pixels <= 0;
 
   bool _atBottom() =>
       _scrollController.hasClients &&
@@ -266,16 +261,18 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     final bottomPadding = 80.0 + MediaQuery.of(context).padding.bottom;
     final spacing16 = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 10.0,
-    ).clamp(8.0, 14.0);
+      baseSize: 16.0,
+    ).clamp(12.0, 16.0);
     final spacing24 = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 14.0,
-    ).clamp(10.0, 18.0);
-    final loadingPadding = ResponsiveUtils.getResponsiveSpacing(
+      baseSize: 24.0,
+    ).clamp(16.0, 24.0);
+    final tabFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
-      baseSize: 32.0,
-    ).clamp(24.0, 40.0);
+      baseSize: 13.0,
+      min: 11.0,
+      max: 15.0,
+    );
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
@@ -291,35 +288,62 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               physics: const ClampingScrollPhysics(),
               slivers: [
                 const SliverToBoxAdapter(child: SizedBox(height: 100)),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: spacing16),
-                      // Header
-                      _buildHeader(),
-                      SizedBox(height: spacing24),
-                      // Top 3 Podium
-                      if (_loading && _leaderboard.isEmpty)
-                        Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(loadingPadding),
-                            child: const CircularProgressIndicator(),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: horizontalPadding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: spacing16),
+                        if (_loading && _leaderboard.isEmpty)
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(32),
+                              child: CircularProgressIndicator(
+                                color: AppColors.gold,
+                              ),
+                            ),
+                          )
+                        else ...[
+                          PlayTabs(
+                            tabs: const [
+                              {'label': 'ALL TIME', 'value': 'all'},
+                              {'label': 'THIS WEEK', 'value': 'weekly'},
+                              {'label': 'THIS MONTH', 'value': 'monthly'},
+                            ],
+                            activeTab: _selectedPeriod,
+                            onTabChanged: (period) {
+                              setState(() => _selectedPeriod = period);
+                              _fetchLeaderboard();
+                            },
+                            fontSize: tabFontSize,
                           ),
-                        )
-                      else if (_topThree.isNotEmpty)
-                        _buildPodium(),
-                      SizedBox(height: spacing24),
-                      // Leaderboard Table
-                      _buildLeaderboardTable(),
-                      SizedBox(height: spacing24),
-                    ],
+                          SizedBox(height: spacing16),
+                          if (_loading)
+                            Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: CircularProgressIndicator(
+                                  color: AppColors.gold,
+                                ),
+                              ),
+                            )
+                          else if (_leaderboard.isEmpty)
+                            _buildEmptyState()
+                          else ...[
+                            if (_topThree.isNotEmpty) ...[
+                              _buildPodium(),
+                              SizedBox(height: spacing24),
+                            ],
+                            _buildLeaderboardTable(),
+                          ],
+                        ],
+                        SizedBox(height: spacing24),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-                // Bottom padding for floating nav
                 SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
               ],
             ),
@@ -329,8 +353,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
               right: 0,
               child: AppHeader(scrollController: _scrollController),
             ),
-
-            // Bottom menu
             const FloatingBottomNav(),
             if (_isRefreshing) const RefreshOverlay(),
           ],
@@ -339,531 +361,345 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     );
   }
 
-  Widget _buildHeader() {
-    final titleFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 28.0,
-      min: 24.0,
-      max: 36.0,
+  Widget _buildPodium() {
+    final byRank = {for (final p in _topThree) p.rank: p};
+    // Stadium order: 2nd · 1st · 3rd
+    final order = [2, 1, 3];
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(color: AppColors.gold, width: 2),
+          left: BorderSide(color: AppColors.gold.withValues(alpha: 0.32)),
+          right: BorderSide(color: AppColors.gold.withValues(alpha: 0.32)),
+          bottom: BorderSide(color: AppColors.gold.withValues(alpha: 0.32)),
+        ),
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.gold.withValues(alpha: 0.1),
+            const Color(0xE004070C),
+          ],
+        ),
+      ),
+      padding: const EdgeInsets.fromLTRB(8, 20, 8, 0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: order.map((rank) {
+          final player = byRank[rank];
+          final color = _podiumRankColor(rank);
+          final isChamp = rank == 1;
+          final flex = isChamp ? 12 : 10;
+
+          return Expanded(
+            flex: flex,
+            child: player == null
+                ? SizedBox(height: _pedestalHeight(rank) + 120)
+                : Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isChamp)
+                        Icon(
+                          Icons.workspace_premium,
+                          color: AppColors.gold,
+                          size: 22,
+                          shadows: [
+                            Shadow(
+                              color: AppColors.gold.withValues(alpha: 0.55),
+                              blurRadius: 10,
+                            ),
+                          ],
+                        )
+                      else
+                        const SizedBox(height: 22),
+                      const SizedBox(height: 6),
+                      Stack(
+                        clipBehavior: Clip.none,
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            decoration: isChamp
+                                ? BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.gold
+                                            .withValues(alpha: 0.35),
+                                        blurRadius: 18,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
+                                  )
+                                : null,
+                            child: _buildPlayerAvatar(
+                              avatar: player.avatar,
+                              username: player.username,
+                              radius: _podiumAvatarRadius(rank),
+                              borderColor: color,
+                            ),
+                          ),
+                          Positioned(
+                            bottom: -6,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 1,
+                              ),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF06090E),
+                                border: Border.all(
+                                  color: color.withValues(alpha: 0.7),
+                                ),
+                              ),
+                              child: Text(
+                                '#$rank',
+                                style: TextStyle(
+                                  color: color,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        player.username.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w900,
+                          fontSize: isChamp ? 13 : 11,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _formatScore(player.totalScore),
+                        style: TextStyle(
+                          color: isChamp ? AppColors.gold : AppColors.textPrimary,
+                          fontWeight: FontWeight.w800,
+                          fontSize: isChamp ? 15 : 12,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      // Pedestal
+                      Container(
+                        height: _pedestalHeight(rank),
+                        width: double.infinity,
+                        alignment: Alignment.topCenter,
+                        padding: const EdgeInsets.only(top: 8),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              color.withValues(alpha: 0.28),
+                              color.withValues(alpha: 0.06),
+                            ],
+                          ),
+                          border: Border(
+                            top: BorderSide(color: color, width: 2),
+                            left: BorderSide(
+                              color: color.withValues(alpha: 0.35),
+                            ),
+                            right: BorderSide(
+                              color: color.withValues(alpha: 0.35),
+                            ),
+                          ),
+                        ),
+                        child: Text(
+                          '$rank',
+                          style: TextStyle(
+                            color: color.withValues(alpha: 0.55),
+                            fontSize: isChamp ? 26 : 18,
+                            fontWeight: FontWeight.w900,
+                            height: 1,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+          );
+        }).toList(),
+      ),
     );
-    final buttonFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 12.0,
-      min: 10.0,
-      max: 14.0,
-    );
-    final buttonPaddingH = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 12.0,
-    ).clamp(10.0, 16.0);
-    final buttonPaddingV = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 8.0,
-    ).clamp(6.0, 12.0);
-    final spacing8 = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 8.0,
-    ).clamp(6.0, 12.0);
+  }
+
+  Widget _buildLeaderboardTable() {
+    final rest = _leaderboard.where((p) => p.rank > 3).toList();
+    if (rest.isEmpty) return const SizedBox.shrink();
+
+    final peak = _leaderboard.isNotEmpty
+        ? _leaderboard.first.totalScore.clamp(1, 1 << 30)
+        : 1;
 
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Leader Board',
-          style: AppTheme.heading2.copyWith(
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
-            fontSize: titleFontSize,
-            letterSpacing: 1,
-          ),
-        ),
-        // Period Filter
-        Row(
-          children: _periods.map((period) {
-            final isActive = _selectedPeriod == period['value'];
-            return Padding(
-              padding: EdgeInsets.only(left: spacing8),
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    _selectedPeriod = period['value']!;
-                  });
-                  _fetchLeaderboard();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isActive
-                      ? Colors.black87
-                      : Colors.white,
-                  foregroundColor: isActive ? Colors.white : Colors.black54,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: buttonPaddingH,
-                    vertical: buttonPaddingV,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    side: BorderSide(
-                      color: isActive
-                          ? Colors.black87
-                          : AppTheme.textSecondary.withOpacity(0.4),
-                    ),
-                  ),
-                  elevation: isActive ? 2 : 0,
-                ),
-                child: Text(
-                  period['label']!,
-                  style: AppTheme.bodySmall.copyWith(
-                    fontSize: buttonFontSize,
-                    fontWeight: isActive ? FontWeight.w700 : FontWeight.normal,
-                    color: isActive ? Colors.white : Colors.black54,
-                  ),
+        Padding(
+          padding: const EdgeInsets.only(left: 2, bottom: 10),
+          child: Row(
+            children: [
+              Icon(Icons.leaderboard, size: 16, color: AppColors.gold),
+              const SizedBox(width: 6),
+              Text(
+                'FULL RANKINGS',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.55),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
                 ),
               ),
-            );
-          }).toList(),
+            ],
+          ),
+        ),
+        Container(
+          decoration: _panelDecoration,
+          child: Column(
+            children: List.generate(rest.length, (index) {
+              final player = rest[index];
+              final isLast = index == rest.length - 1;
+              final strength =
+                  ((player.totalScore / peak) * 100).clamp(0, 100).round();
+              final meta = [
+                'Lvl ${player.level}',
+                '${_formatScore(player.gamesPlayed)} Games',
+                'Avg ${player.averageScore.toStringAsFixed(1)}%',
+                player.badge,
+                if (player.lastPlayed != null && player.lastPlayed!.isNotEmpty)
+                  player.lastPlayed!,
+              ].join(' · ');
+
+              return Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                      color:
+                          Colors.white.withValues(alpha: isLast ? 0 : 0.08),
+                    ),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 36,
+                      child: Text(
+                        '${player.rank}',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white.withValues(alpha: 0.45),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    _buildPlayerAvatar(
+                      avatar: player.avatar,
+                      username: player.username,
+                      radius: 20,
+                      borderColor: Colors.white.withValues(alpha: 0.12),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            player.username.toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTheme.bodyMedium.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 13,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            meta,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTheme.bodySmall.copyWith(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 11,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          ClipRRect(
+                            child: LinearProgressIndicator(
+                              value: strength / 100,
+                              minHeight: 3,
+                              backgroundColor:
+                                  Colors.white.withValues(alpha: 0.06),
+                              color: AppColors.gold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          _formatScore(player.totalScore),
+                          style: const TextStyle(
+                            color: AppColors.textPrimary,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '$strength% PWR',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.35),
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            }),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildPodium() {
-    final podiumPadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 12.0,
-    ).clamp(10.0, 14.0);
-    final spacing8 = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 6.0,
-    ).clamp(4.0, 8.0);
-    final spacing4 = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 3.0,
-    ).clamp(2.0, 4.0);
-    final rankIconFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 24.0,
-      min: 20.0,
-      max: 28.0,
-    );
-    final avatarRadius = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 28.0,
-    ).clamp(24.0, 32.0);
-    final avatarFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 16.0,
-      min: 14.0,
-      max: 18.0,
-    );
-    final usernameFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 15.0,
-      min: 13.0,
-      max: 17.0,
-    );
-    final badgeFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 10.0,
-      min: 9.0,
-      max: 11.0,
-    );
-    final badgePaddingH = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 6.0,
-    ).clamp(5.0, 8.0);
-    final badgePaddingV = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 2.0,
-    ).clamp(2.0, 4.0);
-    final statsFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 11.0,
-      min: 10.0,
-      max: 12.0,
-    );
-    final iconSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 14.0,
-    ).clamp(12.0, 16.0);
-
-    return Column(
-      children: _topThree.asMap().entries.map((entry) {
-        final index = entry.key;
-        final player = entry.value;
-        final color = _getPodiumColor(index);
-
-        return Padding(
-          padding: EdgeInsets.only(bottom: spacing8),
-          child: Card(
-            color: color,
-            margin: EdgeInsets.zero,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: podiumPadding,
-                vertical: podiumPadding * 0.85,
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        _getRankIcon(player.rank),
-                        style: TextStyle(fontSize: rankIconFontSize),
-                      ),
-                      SizedBox(width: spacing8),
-                      _buildPlayerAvatar(
-                        avatar: player.avatar,
-                        username: player.username,
-                        radius: avatarRadius,
-                        fontSize: avatarFontSize,
-                        bgColor: Colors.white.withOpacity(0.2),
-                      ),
-                    ],
-                  ),
-                  SizedBox(width: podiumPadding),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          player.username,
-                          style: AppTheme.heading3.copyWith(
-                            fontSize: usernameFontSize,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: spacing4),
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: badgePaddingH,
-                            vertical: badgePaddingV,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Text(
-                            player.badge,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: badgeFontSize,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: spacing4),
-                        Wrap(
-                          spacing: podiumPadding,
-                          runSpacing: spacing4,
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.star,
-                                    size: iconSize, color: Colors.white),
-                                SizedBox(width: spacing4),
-                                Text(
-                                  '${_formatScore(player.totalScore)} Points',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: statsFontSize,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Text(
-                              '${_formatScore(player.gamesPlayed)} Games · Avg ${player.averageScore.toStringAsFixed(1)}%',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
-                                fontSize: statsFontSize,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildLeaderboardTable() {
-    if (_loading && _leaderboard.isEmpty) {
-      return const SizedBox.shrink();
-    }
-
-    // Entries ranked 4th and beyond — top 3 are already shown in the podium.
-    final rest = _leaderboard.where((p) => p.rank > 3).toList();
-
-    if (rest.isEmpty && _leaderboard.isNotEmpty) {
-      return const SizedBox.shrink(); // only top-3 data available
-    }
-    if (_leaderboard.isEmpty) {
-      return _buildEmptyState();
-    }
-
-    final cardPadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(12.0, 20.0);
-    final spacing8 = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 8.0,
-    ).clamp(6.0, 12.0);
-    final spacing4 = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 4.0,
-    ).clamp(2.0, 6.0);
-    final avatarRadius = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 28.0,
-    ).clamp(24.0, 34.0);
-    final avatarFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 16.0,
-      min: 14.0,
-      max: 18.0,
-    );
-    final rankFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 22.0,
-      min: 18.0,
-      max: 26.0,
-    );
-    final usernameFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 16.0,
-      min: 14.0,
-      max: 18.0,
-    );
-    final badgeFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 11.0,
-      min: 10.0,
-      max: 12.0,
-    );
-    final badgePaddingH = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 8.0,
-    ).clamp(6.0, 12.0);
-    final badgePaddingV = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 4.0,
-    ).clamp(2.0, 6.0);
-    final statsFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 12.0,
-      min: 10.0,
-      max: 14.0,
-    );
-    final iconSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 14.0,
-    ).clamp(12.0, 16.0);
-
-    return Column(
-      children: rest.map((player) {
-        return Padding(
-          padding: EdgeInsets.only(bottom: spacing8),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.grey[350]!,
-                width: 1.2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 6,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(cardPadding),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // ── Rank number ────────────────────────────────────────
-                  SizedBox(
-                    width: 36,
-                    child: Text(
-                      '${player.rank}',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: rankFontSize,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.black54,
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: spacing8),
-                  // ── Avatar ─────────────────────────────────────────────
-                  _buildPlayerAvatar(
-                    avatar: player.avatar,
-                    username: player.username,
-                    radius: avatarRadius,
-                    fontSize: avatarFontSize,
-                    bgColor: AppTheme.primaryColor,
-                  ),
-                  SizedBox(width: cardPadding),
-                  // ── Info ───────────────────────────────────────────────
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // Username
-                        Text(
-                          player.username,
-                          style: TextStyle(
-                            fontSize: usernameFontSize,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.black87,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        SizedBox(height: spacing4),
-                        // Badge
-                        Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: badgePaddingH,
-                            vertical: badgePaddingV,
-                          ),
-                          decoration: BoxDecoration(
-                            color: _getBadgeColor(player.badge),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            player.badge,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: badgeFontSize,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: spacing8),
-                        // Stats
-                        Wrap(
-                          spacing: cardPadding,
-                          runSpacing: spacing4,
-                          children: [
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.star,
-                                    size: iconSize, color: Colors.orange),
-                                SizedBox(width: spacing4),
-                                Text(
-                                  '${_formatScore(player.totalScore)} Points',
-                                  style: TextStyle(
-                                    fontSize: statsFontSize,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black87,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Text(
-                              '${_formatScore(player.gamesPlayed)} Games',
-                              style: TextStyle(
-                                fontSize: statsFontSize,
-                                color: Colors.black54,
-                              ),
-                            ),
-                            Text(
-                              'Avg: ${player.averageScore.toStringAsFixed(1)}%',
-                              style: TextStyle(
-                                fontSize: statsFontSize,
-                                color: Colors.black54,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
   Widget _buildEmptyState() {
-    final emptyStatePadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 32.0,
-    ).clamp(24.0, 40.0);
-    final iconSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 64.0,
-    ).clamp(48.0, 80.0);
-    final spacing16 = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(12.0, 20.0);
-    final spacing8 = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 8.0,
-    ).clamp(6.0, 12.0);
-    final headingFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 20.0,
-      min: 18.0,
-      max: 24.0,
-    );
-    final bodyFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 16.0,
-    );
-
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(emptyStatePadding),
+        padding: const EdgeInsets.all(32),
         child: Column(
           children: [
             Icon(
               Icons.emoji_events_outlined,
-              size: iconSize,
-              color: Colors.grey[400],
+              size: 56,
+              color: AppColors.textMuted.withValues(alpha: 0.5),
             ),
-            SizedBox(height: spacing16),
+            const SizedBox(height: 16),
             Text(
               'No Leaderboard Data',
-              style: AppTheme.heading3.copyWith(
-                fontSize: headingFontSize,
-                color: Colors.grey,
-              ),
+              style: AppTheme.heading3.copyWith(color: AppColors.textMuted),
             ),
-            SizedBox(height: spacing8),
+            const SizedBox(height: 8),
             Text(
               'No players found for the selected period',
-              style: AppTheme.bodyMedium.copyWith(
-                fontSize: bodyFontSize,
-                color: Colors.grey,
-              ),
+              style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
               textAlign: TextAlign.center,
             ),
           ],

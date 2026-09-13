@@ -1,5 +1,5 @@
 import { Box, Stack, Container, Typography } from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 
 import { RouterLink } from 'src/routes/components';
 import { Logo } from 'src/components/logo';
@@ -32,174 +32,14 @@ const SOCIAL_LINKS = [
 ] as const;
 
 // ----------------------------------------------------------------------
-// TOP SLOPED CONTOUR WITH CENTER HORNS / CREST & GREEN AMBIENT GLOW
-// ----------------------------------------------------------------------
-
-function FooterTopContour({ accentColor }: { accentColor: string }) {
-  return (
-    <Box
-      sx={{
-        position: 'absolute',
-        top: { xs: -36, sm: -48, md: -58 },
-        left: 0,
-        right: 0,
-        height: { xs: 52, sm: 64, md: 74 },
-        pointerEvents: 'none',
-        zIndex: 3,
-        overflow: 'visible',
-      }}
-    >
-      {/* Soft Ambient Lime / Green Backlight Radiating Up Behind the Center Horns */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: { xs: '12%', md: '5%' },
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: { xs: 180, sm: 260, md: 340 },
-          height: { xs: 70, sm: 90, md: 110 },
-          background: `radial-gradient(ellipse 65% 55% at 50% 85%, ${alpha(accentColor, 0.75)} 0%, ${alpha(accentColor, 0.28)} 40%, transparent 75%)`,
-          filter: 'blur(16px)',
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* SVG Path: Sloped V Contour with Curved Upward Horns in Center */}
-      <Box
-        component="svg"
-        viewBox="0 0 1920 80"
-        preserveAspectRatio="none"
-        sx={{
-          width: 1,
-          height: 1,
-          display: 'block',
-          overflow: 'visible',
-        }}
-      >
-        <defs>
-          <linearGradient id="footerLineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor={alpha(accentColor, 0.25)} />
-            <stop offset="25%" stopColor={alpha(accentColor, 0.85)} />
-            <stop offset="50%" stopColor={accentColor} />
-            <stop offset="75%" stopColor={alpha(accentColor, 0.85)} />
-            <stop offset="100%" stopColor={alpha(accentColor, 0.25)} />
-          </linearGradient>
-
-          <filter id="lineGlow" x="-20%" y="-40%" width="140%" height="180%">
-            <feGaussianBlur stdDeviation="3" result="glow" />
-            <feMerge>
-              <feMergeNode in="glow" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-
-        {/* Black silhouette fill below the sloped contour to seamlessly connect */}
-        <path
-          d="
-            M 0 20
-            L 900 48
-            C 925 50 942 46 947 34
-            C 951 24 947 12 943 5
-            C 941 2 944 1 947 4
-            C 953 9 957 20 957 36
-            C 957 46 958 50 960 50
-            C 962 50 963 46 963 36
-            C 963 20 967 9 973 4
-            C 976 1 979 2 977 5
-            C 973 12 969 24 973 34
-            C 978 46 995 50 1020 48
-            L 1920 20
-            L 1920 80
-            L 0 80
-            Z
-          "
-          fill="#060706"
-        />
-
-        {/* The Glowing Lime Contour Stroke */}
-        <path
-          d="
-            M 0 20
-            L 900 48
-            C 925 50 942 46 947 34
-            C 951 24 947 12 943 5
-            C 941 2 944 1 947 4
-            C 953 9 957 20 957 36
-            C 957 46 958 50 960 50
-            C 962 50 963 46 963 36
-            C 963 20 967 9 973 4
-            C 976 1 979 2 977 5
-            C 973 12 969 24 973 34
-            C 978 46 995 50 1020 48
-            L 1920 20
-          "
-          fill="none"
-          stroke="url(#footerLineGrad)"
-          strokeWidth="2.2"
-          filter="url(#lineGlow)"
-        />
-      </Box>
-    </Box>
-  );
-}
-
-// ----------------------------------------------------------------------
-// STEALTH WING BACKGROUND GRAPHICS (MATCHING ATTACHED DESIGN)
-// ----------------------------------------------------------------------
-
-function StealthWingBackdrop({ accentColor }: { accentColor: string }) {
-  return (
-    <Box
-      sx={{
-        position: 'absolute',
-        inset: 0,
-        pointerEvents: 'none',
-        zIndex: 0,
-        overflow: 'hidden',
-      }}
-    >
-      <Box
-        component="svg"
-        viewBox="0 0 1920 260"
-        preserveAspectRatio="none"
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          width: 1,
-          height: 1,
-          opacity: 0.45,
-        }}
-      >
-        {/* Left Stealth Facets */}
-        <polygon points="960,50 820,90 540,160 300,180 960,260" fill="rgba(255,255,255,0.015)" />
-        <polygon points="960,50 880,120 720,200 960,250" fill="rgba(0,0,0,0.4)" />
-        <line x1="960" y1="50" x2="400" y2="170" stroke={alpha(accentColor, 0.08)} strokeWidth="1" />
-        <line x1="960" y1="50" x2="680" y2="220" stroke={alpha('#ffffff', 0.04)} strokeWidth="1" />
-
-        {/* Right Stealth Facets */}
-        <polygon points="960,50 1100,90 1380,160 1620,180 960,260" fill="rgba(255,255,255,0.015)" />
-        <polygon points="960,50 1040,120 1200,200 960,250" fill="rgba(0,0,0,0.4)" />
-        <line x1="960" y1="50" x2="1520" y2="170" stroke={alpha(accentColor, 0.08)} strokeWidth="1" />
-        <line x1="960" y1="50" x2="1240" y2="220" stroke={alpha('#ffffff', 0.04)} strokeWidth="1" />
-      </Box>
-    </Box>
-  );
-}
-
-// ----------------------------------------------------------------------
 // MAIN FOOTER SECTION COMPONENT
 // ----------------------------------------------------------------------
 
 export function FooterSection() {
-  const theme = useTheme();
   const { t } = useTranslate();
   const pathname = usePathname();
   const router = useRouter();
   const handleMenuClick = createMenuClickHandler(pathname, router);
-
-  // Lime-green accent matching the attached image design
-  const accentColor = theme.palette.primary.main || '#a3e635';
 
   const linkStyle = {
     color: alpha('#ffffff', 0.7),
@@ -210,7 +50,7 @@ export function FooterSection() {
     transition: 'color 0.2s ease',
     lineHeight: 1.5,
     '&:hover': {
-      color: accentColor,
+      color: alpha('#ffffff', 0.92),
       textDecoration: 'underline',
     },
   };
@@ -230,31 +70,46 @@ export function FooterSection() {
       component="footer"
       sx={{
         position: 'relative',
-        bgcolor: '#060706',
+        bgcolor: '#07080b',
         color: '#ffffff',
         pt: { xs: 5, sm: 6, md: 7.5 },
         pb: { xs: 4.5, sm: 5, md: 6 },
         mt: { xs: 6, md: 9 },
-        overflow: 'visible',
-        backgroundImage: `
-          repeating-linear-gradient(
-            to bottom,
-            rgba(0, 0, 0, 0) 0px,
-            rgba(0, 0, 0, 0) 3px,
-            rgba(0, 0, 0, 0.72) 3px,
-            rgba(0, 0, 0, 0.72) 6px
-          ),
-          linear-gradient(
-            180deg,
-            #080a08 0%,
-            #060706 60%,
-            #030403 100%
-          )
-        `,
+        overflow: 'hidden',
+        borderTop: 'none',
+        backgroundImage: 'none',
       }}
     >
-      <FooterTopContour accentColor={accentColor} />
-      <StealthWingBackdrop accentColor={accentColor} />
+      <Box
+        aria-hidden
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 22,
+          pointerEvents: 'none',
+          zIndex: 4,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <Box sx={{ position: 'absolute', left: 0, right: 0, top: '50%', borderTop: `1px solid ${alpha('#ffffff', 0.08)}` }} />
+        <Box
+          sx={{
+            position: 'relative',
+            zIndex: 1,
+            px: 1,
+            bgcolor: '#07080b',
+            color: alpha('#ffffff', 0.28),
+            display: 'flex',
+            lineHeight: 0,
+          }}
+        >
+          <Iconify icon="solar:alt-arrow-down-bold" width={16} />
+        </Box>
+      </Box>
 
       <Container
         maxWidth="xl"
@@ -289,7 +144,6 @@ export function FooterSection() {
               sx={{
                 width: { xs: 60, md: 72 },
                 height: { xs: 60, md: 72 },
-                filter: `drop-shadow(0 0 12px ${alpha(accentColor, 0.35)})`,
               }}
             />
             <Box>
@@ -437,7 +291,7 @@ export function FooterSection() {
                 lineHeight: 1.35,
                 transition: 'color 0.2s ease',
                 '&:hover': {
-                  color: accentColor,
+                  color: alpha('#ffffff', 0.95),
                   textDecoration: 'underline',
                 },
               }}
@@ -452,11 +306,11 @@ export function FooterSection() {
                 fontSize: 11.5,
                 fontFamily: 'monospace',
                 fontWeight: 700,
-                color: accentColor,
+                color: alpha('#ffffff', 0.45),
                 textDecoration: 'none',
                 mt: 1,
                 letterSpacing: 0.6,
-                '&:hover': { textDecoration: 'underline' },
+                '&:hover': { textDecoration: 'underline', color: alpha('#ffffff', 0.7) },
               }}
             >
               [ LIVE SUPPORT RELAY ]
@@ -486,18 +340,17 @@ export function FooterSection() {
                   width: { xs: 34, md: 36 },
                   height: { xs: 34, md: 36 },
                   borderRadius: '50%',
-                  bgcolor: '#0e130e',
-                  border: `1.2px solid ${alpha(accentColor, 0.4)}`,
-                  color: accentColor,
+                  bgcolor: alpha('#ffffff', 0.04),
+                  border: `1px solid ${alpha('#ffffff', 0.1)}`,
+                  color: alpha('#ffffff', 0.55),
                   display: 'grid',
                   placeItems: 'center',
                   textDecoration: 'none',
-                  transition: 'all 0.22s ease',
+                  transition: 'border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease',
                   '&:hover': {
-                    bgcolor: alpha(accentColor, 0.2),
-                    borderColor: accentColor,
-                    boxShadow: `0 0 12px ${alpha(accentColor, 0.65)}`,
-                    transform: 'translateY(-2px)',
+                    bgcolor: alpha('#ffffff', 0.08),
+                    borderColor: alpha('#ffffff', 0.18),
+                    boxShadow: 'none',
                     color: '#ffffff',
                   },
                 }}
@@ -576,9 +429,9 @@ export function FooterSection() {
                     textDecoration: 'none',
                     transition: 'all 0.2s ease',
                     '&:hover': {
-                      borderColor: alpha(accentColor, 0.5),
-                      bgcolor: alpha(accentColor, 0.08),
-                      color: accentColor,
+                      borderColor: alpha('#ffffff', 0.18),
+                      bgcolor: alpha('#ffffff', 0.06),
+                      color: '#ffffff',
                     },
                   }}
                 >

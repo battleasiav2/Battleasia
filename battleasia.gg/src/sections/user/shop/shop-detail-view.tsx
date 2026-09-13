@@ -186,7 +186,7 @@ export function ShopDetailView() {
               border: `1px solid ${goldAlpha(0.28)}`,
               borderTop: `2px solid ${USER_COLORS.gold}`,
               boxShadow: `0 12px 36px ${alpha('#000000', 0.7)}`,
-              clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+              borderRadius: '12px',
             }}
           >
             <Box
@@ -195,7 +195,7 @@ export function ShopDetailView() {
                 overflow: 'hidden',
                 bgcolor: alpha('#000000', 0.45),
                 border: `1px solid ${goldAlpha(0.2)}`,
-                clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
+                borderRadius: '8px',
               }}
             >
               <Image
@@ -231,7 +231,7 @@ export function ShopDetailView() {
                 border: `1px solid ${goldAlpha(0.28)}`,
                 borderTop: `2px solid ${USER_COLORS.gold}`,
                 boxShadow: `0 12px 36px ${alpha('#000000', 0.7)}`,
-                clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+                borderRadius: '12px',
               }}
             >
               <Typography
@@ -299,7 +299,7 @@ export function ShopDetailView() {
                   WebkitBackdropFilter: 'blur(18px)',
                   border: `1px solid ${goldAlpha(0.28)}`,
                   borderTop: `2px solid ${USER_COLORS.gold}`,
-                  clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)',
+                  borderRadius: '8px',
                 }}
               >
                 <Typography

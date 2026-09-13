@@ -13,7 +13,6 @@ import {
   UserPageShell,
   UserArenaStrip,
   UserBackButton,
-  UserStatTile,
   UserEmptyState,
 } from 'src/layouts/user';
 import { socketService } from 'src/lib/socket';
@@ -222,7 +221,6 @@ export function MatchView() {
 
   const gameName = matches[0]?.gameName ?? 'Matches';
   const activeList = categorizedMatches[activeTab];
-  const totalLiveMatches = categorizedMatches.ongoing.length + categorizedMatches.upcoming.length;
 
   const emptyMessages: Record<MatchTab, { title: string; description: string }> = {
     ongoing: {
@@ -246,51 +244,15 @@ export function MatchView() {
       </Stack>
 
       <UserArenaStrip
-        badge={t('play.badgeMatchArena')}
         title={gameName}
-        subtitle={t('play.matchListSubtitle')}
         imageUrl={PLAY_IMAGE_PATHS.heroBanner}
+        dense
       />
 
       {loading && matches.length === 0 ? (
         <MatchPageSkeleton />
       ) : (
-        <Stack spacing={3}>
-          <Grid container spacing={1.5} alignItems="stretch">
-            <Grid size={{ xs: 6, md: 3 }} sx={{ display: 'flex' }}>
-              <UserStatTile
-                label={t('play.ongoing')}
-                value={categorizedMatches.ongoing.length}
-                suffix={t('play.suffixLive')}
-                icon="solar:play-bold"
-              />
-            </Grid>
-            <Grid size={{ xs: 6, md: 3 }} sx={{ display: 'flex' }}>
-              <UserStatTile
-                label={t('play.upcoming')}
-                value={categorizedMatches.upcoming.length}
-                suffix={t('play.suffixScheduled')}
-                icon="solar:calendar-bold"
-              />
-            </Grid>
-            <Grid size={{ xs: 6, md: 3 }} sx={{ display: 'flex' }}>
-              <UserStatTile
-                label={t('play.results')}
-                value={categorizedMatches.results.length}
-                suffix={t('play.suffixArchived')}
-                icon="solar:document-text-bold"
-              />
-            </Grid>
-            <Grid size={{ xs: 6, md: 3 }} sx={{ display: 'flex' }}>
-              <UserStatTile
-                label={t('play.totalLiveMatches')}
-                value={totalLiveMatches}
-                suffix={t('play.suffixQueued')}
-                icon="solar:gamepad-bold-duotone"
-              />
-            </Grid>
-          </Grid>
-
+        <Stack spacing={2}>
           <PlayTabs
             tabs={[
               { label: `${t('play.ongoing')} (${categorizedMatches.ongoing.length})`, value: 'ongoing' },

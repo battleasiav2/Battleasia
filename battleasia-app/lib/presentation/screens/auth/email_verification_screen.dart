@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/auth_service.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/presentation/widgets/common/battleasia_logo.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_up_screen.dart';
@@ -412,33 +413,46 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
                       // Verify Button
                       SizedBox(
-                        height: 56,
+                        height: 44,
+                        width: double.infinity,
                         child: ElevatedButton(
                           onPressed: _isSubmitting ? null : _handleVerification,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.accentColor,
-                            foregroundColor: Colors.black,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
                             elevation: 0,
+                            foregroundColor: AppColors.goldInk,
+                            disabledForegroundColor:
+                                Colors.white.withValues(alpha: 0.32),
+                            backgroundColor: AppTheme.accentColor,
+                            disabledBackgroundColor:
+                                Colors.white.withValues(alpha: 0.08),
+                            side: BorderSide(
+                              color: AppTheme.accentColor.withValues(alpha: 0.28),
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            textStyle: TextStyle(
+                              fontSize: buttonFontSize,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.5,
+                            ),
                           ),
                           child: _isSubmitting
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
+                              ? SizedBox(
+                                  width: 18,
+                                  height: 18,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        Colors.black),
+                                    color: AppColors.goldInk,
                                   ),
                                 )
                               : Text(
                                   'VERIFY EMAIL',
-                                  style: AppTheme.bodyMedium.copyWith(
+                                  style: TextStyle(
                                     fontSize: buttonFontSize,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 1.5,
+                                    color: AppColors.goldInk,
                                   ),
                                 ),
                         ),

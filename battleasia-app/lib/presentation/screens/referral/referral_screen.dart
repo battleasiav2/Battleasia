@@ -12,7 +12,7 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/referral_item_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
-import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
+import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 
 /// Earn / referral hub aligned with battleasia.gg referral dashboard.
 class ReferralScreen extends StatefulWidget {
@@ -24,12 +24,11 @@ class ReferralScreen extends StatefulWidget {
   State<ReferralScreen> createState() => _ReferralScreenState();
 }
 
-class _ReferralScreenState extends State<ReferralScreen>
-    with SingleTickerProviderStateMixin {
+class _ReferralScreenState extends State<ReferralScreen> {
   final ScrollController _scrollController = ScrollController();
   final UserService _userService = UserService();
 
-  late TabController _tabController;
+  String _activeTab = 'network';
   bool _loading = true;
   bool _copiedCode = false;
   bool _copiedLink = false;
@@ -44,16 +43,16 @@ class _ReferralScreenState extends State<ReferralScreen>
   List<ReferralItemModel> _network = [];
   List<_CommissionItem> _commissions = [];
 
+  static const Color _panelBg = Color(0xD906090E);
+
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
     _fetchAll();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -158,6 +157,16 @@ class _ReferralScreenState extends State<ReferralScreen>
     }
   }
 
+  BoxDecoration get _panelDecoration => BoxDecoration(
+        color: _panelBg,
+        border: Border(
+          top: BorderSide(color: AppColors.gold, width: 2),
+          left: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+          right: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+          bottom: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().user;
@@ -167,6 +176,12 @@ class _ReferralScreenState extends State<ReferralScreen>
         : '';
     final pad = ResponsiveUtils.isMobile(context) ? 16.0 : 24.0;
     final bottom = 80.0 + MediaQuery.of(context).padding.bottom;
+    final titleFontSize = ResponsiveUtils.getResponsiveFontSize(
+      context,
+      baseSize: 22.0,
+      min: 20.0,
+      max: 26.0,
+    );
 
     return Scaffold(
       backgroundColor: AppColors.pageBg,
@@ -185,8 +200,8 @@ class _ReferralScreenState extends State<ReferralScreen>
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: pad),
                     child: _loading
-                        ? const Padding(
-                            padding: EdgeInsets.all(40),
+                        ? Padding(
+                            padding: const EdgeInsets.all(40),
                             child: Center(
                               child: CircularProgressIndicator(
                                 color: AppColors.gold,
@@ -196,7 +211,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                         : Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 8),
                               Text(
                                 widget.showInviteSection
                                     ? 'REFER & EARN'
@@ -204,6 +219,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                                 style: AppTheme.heading2.copyWith(
                                   color: AppColors.textPrimary,
                                   fontWeight: FontWeight.w800,
+                                  fontSize: titleFontSize,
                                   letterSpacing: 1,
                                 ),
                               ),
@@ -214,42 +230,31 @@ class _ReferralScreenState extends State<ReferralScreen>
                                   color: AppColors.textMuted,
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 16),
                               _buildStatsGrid(),
                               if (widget.showInviteSection) ...[
-                                const SizedBox(height: 10),
+                                const SizedBox(height: 16),
                                 _buildInviteCard(code, referralUrl),
-                                const SizedBox(height: 10),
+                                const SizedBox(height: 16),
                                 _buildHowItWorks(),
                               ],
-                              const SizedBox(height: 10),
-                              GlassCard(
-                                padding: EdgeInsets.zero,
-                                child: Column(
-                                  children: [
-                                    TabBar(
-                                      controller: _tabController,
-                                      indicatorColor: AppColors.gold,
-                                      labelColor: AppColors.gold,
-                                      unselectedLabelColor: AppColors.textMuted,
-                                      tabs: const [
-                                        Tab(text: 'NETWORK'),
-                                        Tab(text: 'HISTORY'),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 420,
-                                      child: TabBarView(
-                                        controller: _tabController,
-                                        children: [
-                                          _buildNetworkList(),
-                                          _buildCommissionList(),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              const SizedBox(height: 16),
+                              PlayTabs(
+                                tabs: const [
+                                  {'label': 'NETWORK', 'value': 'network'},
+                                  {'label': 'HISTORY', 'value': 'history'},
+                                ],
+                                activeTab: _activeTab,
+                                onTabChanged: (tab) {
+                                  setState(() => _activeTab = tab);
+                                },
+                                fontSize: 14,
                               ),
+                              const SizedBox(height: 12),
+                              if (_activeTab == 'network')
+                                _buildNetworkList()
+                              else
+                                _buildCommissionList(),
                               SizedBox(height: bottom),
                             ],
                           ),
@@ -278,29 +283,18 @@ class _ReferralScreenState extends State<ReferralScreen>
         'Earnings',
         _totalEarnings.toStringAsFixed(0),
         Icons.account_balance_wallet_outlined,
-        showCoin: true,
       ),
       _StatData('Rate', '$_commissionRate%', Icons.percent),
       _StatData(
         'Deposits',
         _totalDeposits.toStringAsFixed(0),
         Icons.savings_outlined,
-        showCoin: true,
       ),
       _StatData('Events', '$_commissionEvents', Icons.receipt_long_outlined),
     ];
 
     return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xB806090E),
-        border: Border.all(color: AppColors.gold.withValues(alpha: 0.28)),
-        borderRadius: BorderRadius.circular(2),
-      ),
-      foregroundDecoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: AppColors.gold, width: 2),
-        ),
-      ),
+      decoration: _panelDecoration,
       child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -342,7 +336,7 @@ class _ReferralScreenState extends State<ReferralScreen>
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTheme.bodySmall.copyWith(
-                          color: AppColors.textMuted,
+                          color: Colors.white.withValues(alpha: 0.45),
                           fontWeight: FontWeight.w700,
                           fontSize: 10,
                           letterSpacing: 0.5,
@@ -371,8 +365,9 @@ class _ReferralScreenState extends State<ReferralScreen>
   }
 
   Widget _buildInviteCard(String code, String link) {
-    return GlassCard(
-      padding: const EdgeInsets.all(12),
+    return Container(
+      decoration: _panelDecoration,
+      padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -391,7 +386,7 @@ class _ReferralScreenState extends State<ReferralScreen>
             onCopy: () => _copy(code, isCode: true),
             large: true,
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Text(
             'YOUR REFERRAL LINK',
             style: AppTheme.bodySmall.copyWith(
@@ -456,21 +451,21 @@ class _ReferralScreenState extends State<ReferralScreen>
       (Icons.payments_outlined, 'Earn on deposits'),
     ];
 
-    return GlassCard(
-      padding: const EdgeInsets.all(12),
-      showGoldBar: true,
+    return Container(
+      decoration: _panelDecoration,
+      padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'How It Works',
+            'HOW IT WORKS',
             style: AppTheme.bodySmall.copyWith(
               color: AppColors.gold,
               fontWeight: FontWeight.w800,
               letterSpacing: 0.8,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
           Row(
             children: [
               for (var i = 0; i < steps.length; i++) ...[
@@ -489,7 +484,9 @@ class _ReferralScreenState extends State<ReferralScreen>
                         height: 32,
                         decoration: BoxDecoration(
                           color: AppColors.gold.withValues(alpha: 0.12),
-                          border: Border.all(color: AppColors.gold.withValues(alpha: 0.45)),
+                          border: Border.all(
+                            color: AppColors.gold.withValues(alpha: 0.45),
+                          ),
                         ),
                         child: Icon(steps[i].$1, color: AppColors.gold, size: 16),
                       ),
@@ -520,139 +517,200 @@ class _ReferralScreenState extends State<ReferralScreen>
       return _empty('No referrals yet', 'Share your code to grow your network');
     }
 
-    return ListView.separated(
-      padding: const EdgeInsets.all(12),
-      itemCount: _network.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
-      itemBuilder: (_, i) {
-        final item = _network[i];
-        final active = item.status == 'active';
-        return Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.35),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.border(0.14)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      item.playerName,
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
+    return Container(
+      decoration: _panelDecoration,
+      child: Column(
+        children: List.generate(_network.length, (i) {
+          final item = _network[i];
+          final active = item.status == 'active';
+          final isLast = i == _network.length - 1;
+          final meta =
+              'Joined ${_formatDate(item.date)} · Deposits ${item.depositCount} (${item.totalDeposits.toStringAsFixed(0)} BAC)';
+
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withValues(alpha: isLast ? 0 : 0.08),
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0A0A0A),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
                     ),
                   ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: (active ? AppColors.success : AppColors.error)
-                          .withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Text(
-                      active ? 'ACTIVE' : 'INACTIVE',
+                  child: Icon(Icons.person, size: 18, color: AppColors.gold),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              item.playerName.toUpperCase(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTheme.bodyMedium.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            active ? 'ACTIVE' : 'INACTIVE',
+                            style: TextStyle(
+                              color: active
+                                  ? AppColors.success
+                                  : AppColors.error,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        meta,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTheme.bodySmall.copyWith(
+                          color: Colors.white.withValues(alpha: 0.5),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'EARNINGS',
                       style: TextStyle(
-                        color: active ? AppColors.success : AppColors.error,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w800,
+                        color: Colors.white.withValues(alpha: 0.4),
+                        fontSize: 9,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                _formatDate(item.date),
-                style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _miniStat('Deposits', item.totalDeposits.toStringAsFixed(2)),
-                  const SizedBox(width: 12),
-                  _miniStat('Earnings', (item.earnings ?? 0).toStringAsFixed(2)),
-                ],
-              ),
-            ],
-          ),
-        );
-      },
+                    const SizedBox(height: 2),
+                    Text(
+                      (item.earnings ?? 0).toStringAsFixed(0),
+                      style: TextStyle(
+                        color: AppColors.gold,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }),
+      ),
     );
   }
 
   Widget _buildCommissionList() {
     if (_commissions.isEmpty) {
-      return _empty('No commission history', 'Earnings appear after referred deposits');
+      return _empty(
+        'No commission history',
+        'Earnings appear after referred deposits',
+      );
     }
 
-    return ListView.separated(
-      padding: const EdgeInsets.all(12),
-      itemCount: _commissions.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
-      itemBuilder: (_, i) {
-        final item = _commissions[i];
-        return Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.35),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.border(0.14)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      item.playerName,
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    '+${item.commissionAmount.toStringAsFixed(2)} BAC',
-                    style: AppTheme.bodyMedium.copyWith(
-                      color: AppColors.gold,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                '${_formatDate(item.createdAt)} · ${item.sourceLabel} · ${item.commissionRate}%',
-                style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Deposit ${item.depositAmount.toStringAsFixed(2)} BAC',
-                style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+    return Container(
+      decoration: _panelDecoration,
+      child: Column(
+        children: List.generate(_commissions.length, (i) {
+          final item = _commissions[i];
+          final isLast = i == _commissions.length - 1;
+          final meta =
+              '${_formatDate(item.createdAt)} · ${item.sourceLabel} · ${item.commissionRate}% · Deposit ${item.depositAmount.toStringAsFixed(0)} BAC';
 
-  Widget _miniStat(String label, String value) {
-    return Expanded(
-      child: Text(
-        '$label: $value',
-        style: AppTheme.bodySmall.copyWith(
-          color: AppColors.textMuted,
-          fontWeight: FontWeight.w600,
-        ),
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withValues(alpha: isLast ? 0 : 0.08),
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0A0A0A),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.1),
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.payments_outlined,
+                    size: 18,
+                    color: AppColors.gold,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.playerName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTheme.bodyMedium.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 13,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        meta,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTheme.bodySmall.copyWith(
+                          color: Colors.white.withValues(alpha: 0.5),
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  '+${item.commissionAmount.toStringAsFixed(0)}',
+                  style: TextStyle(
+                    color: AppColors.gold,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
       ),
     );
   }
@@ -664,8 +722,11 @@ class _ReferralScreenState extends State<ReferralScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.people_outline,
-                size: 48, color: AppColors.textMuted.withValues(alpha: 0.5)),
+            Icon(
+              Icons.people_outline,
+              size: 48,
+              color: AppColors.textMuted.withValues(alpha: 0.5),
+            ),
             const SizedBox(height: 12),
             Text(
               title,
@@ -688,9 +749,8 @@ class _StatData {
   final String label;
   final String value;
   final IconData icon;
-  final bool showCoin;
 
-  const _StatData(this.label, this.value, this.icon, {this.showCoin = false});
+  const _StatData(this.label, this.value, this.icon);
 }
 
 class _CommissionItem {

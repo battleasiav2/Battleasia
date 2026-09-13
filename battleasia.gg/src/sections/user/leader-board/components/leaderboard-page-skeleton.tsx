@@ -10,18 +10,6 @@ export function LeaderboardPageSkeleton() {
 
   return (
     <Stack spacing={3}>
-      <Box sx={getGlassShellSx(tokens, { height: 140, p: 0, overflow: 'hidden' })}>
-        <Skeleton variant="rectangular" width="100%" height="100%" sx={{ bgcolor: alpha('#ffffff', 0.04) }} />
-      </Box>
-
-      <Skeleton width="35%" sx={{ bgcolor: alpha('#ffffff', 0.06) }} />
-
-      <Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' }, gap: 1.5 }}>
-        {Array.from({ length: 3 }).map((_, index) => (
-          <Skeleton key={index} variant="rounded" height={96} sx={{ borderRadius: `${GLASS_CARD_RADIUS}px`, bgcolor: alpha('#ffffff', 0.04) }} />
-        ))}
-      </Box>
-
       <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 1.5 }}>
         {Array.from({ length: 3 }).map((_, index) => (
           <Skeleton key={index} variant="rounded" height={220} sx={{ borderRadius: `${GLASS_CARD_RADIUS}px`, bgcolor: alpha('#ffffff', 0.04) }} />

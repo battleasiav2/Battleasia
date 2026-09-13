@@ -3,8 +3,6 @@ import type { Theme, SxProps } from '@mui/material/styles';
 
 import LoadingButton from '@mui/lab/LoadingButton';
 
-import { Iconify } from 'src/components/iconify/iconify';
-
 import { authSubmitButtonSx } from './auth-form-styles';
 
 // ----------------------------------------------------------------------
@@ -24,7 +22,6 @@ type AuthSubmitButtonProps = {
 export function AuthSubmitButton({
   children,
   loading,
-  loadingIndicator: _loadingIndicator,
   type = 'submit',
   onClick,
   disabled,
@@ -32,10 +29,7 @@ export function AuthSubmitButton({
   startIcon,
   endIcon,
 }: AuthSubmitButtonProps) {
-  const resolvedStartIcon =
-    startIcon === false
-      ? undefined
-      : startIcon ?? <Iconify icon="game-icons:crossed-swords" width={16} />;
+  const resolvedStartIcon = startIcon === false ? undefined : startIcon || undefined;
 
   return (
     <LoadingButton
@@ -43,9 +37,11 @@ export function AuthSubmitButton({
       size="medium"
       type={type}
       variant="contained"
+      color="inherit"
       disableElevation
+      disableRipple
       loading={loading}
-      loadingPosition="start"
+      loadingPosition="center"
       disabled={disabled}
       onClick={onClick}
       startIcon={resolvedStartIcon}
@@ -54,9 +50,14 @@ export function AuthSubmitButton({
         authSubmitButtonSx,
         {
           overflow: 'hidden',
-          '& .MuiButton-startIcon': { m: 0, mr: resolvedStartIcon ? 1 : 0 },
-          '& .MuiButton-endIcon': { m: 0, ml: endIcon ? 0.75 : 0 },
-          '& .MuiLoadingButton-loadingIndicatorCenter': { display: 'none' },
+          '& .MuiButton-startIcon, & .MuiButton-endIcon, & .MuiLoadingButton-loadingIndicator': {
+            m: 0,
+            color: 'inherit',
+            position: 'relative',
+            zIndex: 2,
+          },
+          '& .MuiButton-startIcon': { mr: resolvedStartIcon ? 1 : 0 },
+          '& .MuiButton-endIcon': { ml: endIcon ? 0.75 : 0 },
         },
         ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
       ]}

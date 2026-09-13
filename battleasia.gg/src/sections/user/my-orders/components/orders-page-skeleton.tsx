@@ -1,41 +1,72 @@
 import { Box, Skeleton, Stack } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
-import { GLASS_CARD_RADIUS, getDefaultGlassTokens, getGlassShellSx } from 'src/components/battle-glass-card';
+import { goldAlpha } from 'src/layouts/user';
 
 // ----------------------------------------------------------------------
 
 export function OrdersPageSkeleton() {
-  const tokens = getDefaultGlassTokens();
-
   return (
-    <Stack spacing={3}>
+    <Stack spacing={2.5}>
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
-          gap: 1.5,
+          gridTemplateColumns: 'repeat(3, 1fr)',
+          border: `1px solid ${goldAlpha(0.2)}`,
+          borderTop: `2px solid ${goldAlpha(0.55)}`,
+          bgcolor: alpha('#06090e', 0.6),
         }}
       >
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton
-            key={i}
-            variant="rounded"
-            height={96}
-            sx={{ borderRadius: `${GLASS_CARD_RADIUS}px`, bgcolor: alpha('#ffffff', 0.04) }}
-          />
+        {Array.from({ length: 3 }).map((_, index) => (
+          <Box
+            key={index}
+            sx={{
+              p: 2,
+              borderRight: index < 2 ? `1px solid ${alpha('#ffffff', 0.06)}` : 'none',
+            }}
+          >
+            <Skeleton width="50%" sx={{ bgcolor: alpha('#ffffff', 0.06) }} />
+            <Skeleton width="30%" sx={{ mt: 1, bgcolor: alpha('#ffffff', 0.04) }} />
+          </Box>
         ))}
       </Box>
 
-      <Skeleton variant="rounded" height={44} sx={{ borderRadius: `${GLASS_CARD_RADIUS}px`, bgcolor: alpha('#ffffff', 0.04) }} />
+      <Skeleton variant="rectangular" height={44} sx={{ bgcolor: alpha('#ffffff', 0.04) }} />
 
-      <Stack spacing={2}>
-        {Array.from({ length: 3 }).map((_, i) => (
-          <Box key={i} sx={getGlassShellSx(tokens, { p: 2 })}>
-            <Skeleton variant="rounded" height={140} sx={{ bgcolor: alpha('#ffffff', 0.04) }} />
-          </Box>
+      <Box
+        sx={{
+          border: `1px solid ${goldAlpha(0.2)}`,
+          borderTop: `2px solid ${goldAlpha(0.55)}`,
+          bgcolor: alpha('#06090e', 0.6),
+          overflow: 'hidden',
+        }}
+      >
+        {Array.from({ length: 4 }).map((_, index) => (
+          <Stack
+            key={index}
+            direction="row"
+            alignItems="center"
+            spacing={1.5}
+            sx={{
+              px: 2,
+              py: 1.5,
+              borderBottom: index < 3 ? `1px solid ${alpha('#ffffff', 0.06)}` : 'none',
+            }}
+          >
+            <Skeleton
+              variant="rectangular"
+              width={64}
+              height={64}
+              sx={{ flexShrink: 0, bgcolor: alpha('#ffffff', 0.05) }}
+            />
+            <Box sx={{ flex: 1 }}>
+              <Skeleton width="45%" sx={{ bgcolor: alpha('#ffffff', 0.06) }} />
+              <Skeleton width="60%" sx={{ mt: 0.75, bgcolor: alpha('#ffffff', 0.04) }} />
+            </Box>
+            <Skeleton width={40} sx={{ display: { xs: 'none', sm: 'block' }, bgcolor: alpha('#ffffff', 0.04) }} />
+          </Stack>
         ))}
-      </Stack>
+      </Box>
     </Stack>
   );
 }

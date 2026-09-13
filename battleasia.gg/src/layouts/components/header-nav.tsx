@@ -290,23 +290,21 @@ export function HeaderNav() {
         aria-hidden="true"
         sx={{
           position: 'absolute',
-          top: 0,
-          bottom: 0,
+          top: '50%',
           left: 0,
-          width: indicator.width > 0 ? `${indicator.width}px` : '128px',
+          width: indicator.width > 0 ? `${indicator.width}px` : '96px',
+          height: 30,
+          marginTop: '-15px',
           transform: `translate3d(${indicator.left}px, 0, 0)`,
           transition: isMounted.current
-            ? 'transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), width 0.38s cubic-bezier(0.22, 1, 0.36, 1)'
+            ? 'transform 0.3s ease, width 0.3s ease'
             : 'none',
           zIndex: 1,
           pointerEvents: 'none',
-          clipPath:
-            'polygon(0 0, 100% 0, calc(100% - 26px) 100%, calc(50% + 8px) 100%, 50% calc(100% - 7px), calc(50% - 8px) 100%, 26px 100%)',
-          background:
-            'linear-gradient(180deg, var(--ba-nav-badge-light, #e2ff58) 0%, var(--ba-nav-badge-main, #cbfb24) 100%)',
+          borderRadius: '4px',
+          bgcolor: 'rgba(255, 255, 255, 0.06)',
+          border: '1px solid rgba(255, 255, 255, 0.14)',
           opacity: activeIndex >= 0 && indicator.ready ? 1 : 0,
-          boxShadow: 'none',
-          filter: 'none',
         }}
       />
 
@@ -351,13 +349,13 @@ export function HeaderNav() {
                 sx={{
                   position: 'relative',
                   height: '100%',
-                  minWidth: { xs: 120, lg: 126, xl: 138 },
+                  minWidth: { xs: 88, lg: 96, xl: 104 },
                   display: 'inline-flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   textDecoration: 'none',
                   cursor: 'pointer',
-                  px: { lg: 2.75, xl: 3.5 },
+                  px: { lg: 2, xl: 2.25 },
                 }}
               >
                 <span
@@ -368,11 +366,11 @@ export function HeaderNav() {
                     fontFamily: "'Barlow', sans-serif",
                     fontWeight: isActive ? 800 : 600,
                     fontSize: isActive ? '14px' : '13.5px',
-                    letterSpacing: '1.2px',
+                    letterSpacing: '1px',
                     textTransform: 'uppercase',
-                    color: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.68)',
-                    textShadow: isActive ? '0 1px 3px rgba(0, 0, 0, 0.45)' : 'none',
-                    transition: 'color 0.22s ease, text-shadow 0.22s ease',
+                    color: isActive ? 'var(--ba-gold, #cbfb24)' : 'rgba(255, 255, 255, 0.68)',
+                    textShadow: 'none',
+                    transition: 'color 0.2s ease',
                     whiteSpace: 'nowrap',
                     lineHeight: 1,
                   }}

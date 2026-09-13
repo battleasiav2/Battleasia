@@ -8,7 +8,6 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/utils/date_utils.dart' as date_utils;
 import 'package:battleasia_app/data/models/match_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
-import 'package:battleasia_app/presentation/widgets/play/match_spots_progress.dart';
 
 class MatchCard extends StatefulWidget {
   final MatchModel match;
@@ -42,64 +41,18 @@ class MatchCard extends StatefulWidget {
 
 class _MatchCardState extends State<MatchCard> {
   Widget _buildMaskedBanner(String bannerUrl) {
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // Banner image
-        ImageUtils.networkImage(
-          bannerUrl,
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
-          memCacheWidth: 900,
-          errorWidget: Image.asset(
-            'assets/images/game.webp',
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-          ),
-        ),
-        // Mask image overlay - positioned on the right center (100% 50% like web version)
-        // The mask creates the decorative edge effect on the right side
-        // Using ShaderMask to apply proper masking effect similar to CSS mask
-        Positioned(
-          right: -50,
-          top: 0,
-          bottom: 0,
-          child: ShaderMask(
-            shaderCallback: (bounds) {
-              return const LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [Colors.transparent, Colors.white],
-              ).createShader(bounds);
-            },
-            blendMode: BlendMode.dstIn,
-            child: Image.asset(
-              'assets/images/bounty-mask.webp',
-              fit: BoxFit.cover,
-              alignment: Alignment.centerRight,
-              width: 100, // Adjust based on mask image size
-              errorBuilder: (context, error, stackTrace) {
-                // If mask image doesn't exist, use a gradient as fallback
-                return Container(
-                  width: 100,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      colors: [
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.2),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      ],
+    return ImageUtils.networkImage(
+      bannerUrl,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      memCacheWidth: 900,
+      errorWidget: Image.asset(
+        'assets/images/game.webp',
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+      ),
     );
   }
 
@@ -113,132 +66,85 @@ class _MatchCardState extends State<MatchCard> {
         ImageUtils.getImageUrl(widget.match.banner) ?? 'assets/images/game.webp';
     final buttonDisabled = widget.joining || widget.isJoined || !widget.canJoin;
 
-    // Responsive sizes
-    final topPadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 12.0,
-    ).clamp(8.0, 12.0);
-
     final cardHeight = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 250.0,
-    ).clamp(220.0, 250.0);
+      baseSize: 220.0,
+    ).clamp(200.0, 230.0);
 
-    final killIconSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 45.0,
-    ).clamp(38.0, 45.0);
-
-    final killIconTop = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: -18.0,
-    ).clamp(-18.0, -16.0);
-
-    return Container(
-      // Add minimal top padding to accommodate the kill icon
-      padding: EdgeInsets.only(top: topPadding),
-      child: Card(
-        color: Colors.transparent,
-        elevation: 0,
-        clipBehavior: Clip.none,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            // Main content - Row layout like web version
-            Container(
-              height: cardHeight,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: const Color(0xFF161618),
-                border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.10),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.35),
-                    blurRadius: 12,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  // Banner section (left) - with mask
-                  Expanded(flex: 1, child: _buildBannerSection(bannerUrl)),
-                  // Match info section (right)
-                  Expanded(
-                    flex: 1,
-                    child: _buildMatchInfoSection(buttonDisabled),
-                  ),
-                ],
+    return Card(
+      color: Colors.transparent,
+      elevation: 0,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: Stack(
+        children: [
+          Container(
+            height: cardHeight,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: const Color(0xFF161618),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.08),
               ),
             ),
-
-            if (widget.showLive)
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: 3,
-                  color: AppColors.gold.withValues(alpha: 0.85),
+            child: Row(
+              children: [
+                Expanded(flex: 1, child: _buildBannerSection(bannerUrl)),
+                Expanded(
+                  flex: 1,
+                  child: _buildMatchInfoSection(buttonDisabled),
                 ),
-              ),
+              ],
+            ),
+          ),
 
-            // Kill icon at top - positioned outside card bounds
+          if (widget.showLive)
             Positioned(
-              top: killIconTop,
+              top: 0,
               left: 0,
               right: 0,
-              child: Center(
-                child: Image.asset(
-                  'assets/images/bounty-kill-icon.webp',
-                  width: killIconSize,
-                  height: killIconSize,
-                  errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-                ),
+              child: Container(
+                height: 2,
+                color: AppColors.gold.withValues(alpha: 0.85),
               ),
             ),
 
-            // PREMIUM badge (top-right corner) – shown when match is premium-only
-            if (widget.match.premiumOnly)
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.shade700,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.workspace_premium,
+          if (widget.match.premiumOnly)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.amber.shade700,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.workspace_premium,
+                      color: Colors.white,
+                      size: 12,
+                    ),
+                    SizedBox(width: 3),
+                    Text(
+                      'PREMIUM',
+                      style: TextStyle(
                         color: Colors.white,
-                        size: 12,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
                       ),
-                      SizedBox(width: 3),
-                      Text(
-                        'PREMIUM',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-          ],
-        ),
+            ),
+        ],
       ),
     );
   }
@@ -267,72 +173,53 @@ class _MatchCardState extends State<MatchCard> {
 
     final contentPaddingTop = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 30.0,
-    ).clamp(24.0, 30.0);
+      baseSize: 12.0,
+    ).clamp(10.0, 14.0);
 
     final contentPaddingRight = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 20.0,
-    ).clamp(12.0, 20.0);
+      baseSize: 14.0,
+    ).clamp(10.0, 14.0);
 
     final contentPaddingBottom = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 20.0,
-    ).clamp(12.0, 20.0);
+      baseSize: 12.0,
+    ).clamp(10.0, 14.0);
 
     final titleFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
-      baseSize: 18.0,
-      min: 14.0,
-      max: 20.0,
+      baseSize: 15.0,
+      min: 13.0,
+      max: 17.0,
     );
 
     final linkFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
-      baseSize: 13.0,
+      baseSize: 12.0,
       min: 11.0,
-      max: 15.0,
+      max: 13.0,
     );
 
     final dateFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
-      baseSize: 13.0,
+      baseSize: 12.0,
       min: 11.0,
-      max: 15.0,
+      max: 13.0,
     );
 
     final labelFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
-      baseSize: 10.0,
-      min: 9.0,
-      max: 12.0,
+      baseSize: 9.0,
+      min: 8.0,
+      max: 11.0,
     );
 
     final valueFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
-      baseSize: 11.0,
-      min: 10.0,
+      baseSize: 12.0,
+      min: 11.0,
       max: 13.0,
     );
-
-    final perKillLabelFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 11.0,
-      min: 10.0,
-      max: 13.0,
-    );
-
-    final perKillValueFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 14.0,
-      min: 12.0,
-      max: 16.0,
-    );
-
-    final bulletSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 6.0,
-    ).clamp(4.0, 6.0);
 
     final spacing8 = ResponsiveUtils.getResponsiveSpacing(
       context,
@@ -346,7 +233,7 @@ class _MatchCardState extends State<MatchCard> {
 
     final spacing12 = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 12.0,
+      baseSize: 10.0,
     ).clamp(8.0, 12.0);
 
     return Container(
@@ -360,38 +247,30 @@ class _MatchCardState extends State<MatchCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Top section
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Match name with bullet
-              Row(
-                children: [
-                  Container(
-                    width: bulletSize,
-                    height: bulletSize,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.5),
-                      shape: BoxShape.circle,
-                    ),
+              GestureDetector(
+                onTap: widget.onMatchNameTap,
+                child: Text(
+                  widget.match.matchName,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTheme.heading3.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: titleFontSize,
                   ),
-                  SizedBox(width: spacing8),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: widget.onMatchNameTap,
-                      child: Text(
-                        widget.match.matchName,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTheme.heading3.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: titleFontSize,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
+              ),
+              SizedBox(height: spacing4),
+
+              Text(
+                '${date_utils.DateUtils.formatDateTime(widget.match.matchSchedule)} · ${capacity.joined}/${capacity.max}',
+                style: AppTheme.bodySmall.copyWith(
+                  color: AppTheme.accentColor,
+                  fontSize: dateFontSize,
+                ),
               ),
               SizedBox(height: spacing8),
 
@@ -402,7 +281,7 @@ class _MatchCardState extends State<MatchCard> {
                   password: widget.match.password,
                   onTap: widget.onShowRoomDetails,
                 )
-              else
+              else if (widget.isJoined)
                 GestureDetector(
                   onTap: widget.onShowRoomDetails,
                   child: Text(
@@ -414,23 +293,6 @@ class _MatchCardState extends State<MatchCard> {
                     ),
                   ),
                 ),
-              SizedBox(height: spacing4),
-
-              // Date and time
-              Text(
-                date_utils.DateUtils.formatDateTime(widget.match.matchSchedule),
-                style: AppTheme.bodySmall.copyWith(
-                  color: AppTheme.accentColor,
-                  fontSize: dateFontSize,
-                ),
-              ),
-              SizedBox(height: spacing12),
-
-              MatchSpotsProgress(
-                participantsCount: widget.match.participantsCount,
-                totalPlayer: widget.match.totalPlayer,
-                variant: MatchSpotsProgressVariant.compact,
-              ),
               SizedBox(height: spacing12),
 
               // Statistics row
@@ -478,7 +340,7 @@ class _MatchCardState extends State<MatchCard> {
                           style: AppTheme.bodySmall.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
-                            fontSize: perKillLabelFontSize,
+                            fontSize: labelFontSize,
                           ),
                         ),
                         SizedBox(height: spacing4),
@@ -487,7 +349,7 @@ class _MatchCardState extends State<MatchCard> {
                           style: AppTheme.bodyMedium.copyWith(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: perKillValueFontSize,
+                            fontSize: valueFontSize,
                           ),
                         ),
                       ],

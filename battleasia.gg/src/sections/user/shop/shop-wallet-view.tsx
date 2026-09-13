@@ -256,7 +256,7 @@ export function ShopWalletView() {
             border: `1px solid ${goldAlpha(0.28)}`,
             borderTop: `2px solid ${USER_COLORS.gold}`,
             boxShadow: `0 12px 36px ${alpha('#000000', 0.7)}, inset 0 0 20px ${goldAlpha(0.04)}`,
-            clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+            borderRadius: '12px',
           }}
         >
           {settingsLoading ? (
@@ -332,7 +332,7 @@ export function ShopWalletView() {
                     p: 2,
                     bgcolor: alpha('#000000', 0.65),
                     border: `1px solid ${goldAlpha(0.35)}`,
-                    clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
+                    borderRadius: '8px',
                     boxShadow: `0 8px 24px ${alpha('#000000', 0.6)}, inset 0 0 14px ${goldAlpha(0.06)}`,
                   }}
                 >
@@ -376,8 +376,7 @@ export function ShopWalletView() {
                   fontSize: 14,
                   fontWeight: 900,
                   letterSpacing: 1,
-                  borderRadius: 0,
-                  clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
+                  borderRadius: '8px',
                   boxShadow: `0 8px 24px ${goldAlpha(0.35)}`,
                 }}
               >
@@ -397,7 +396,7 @@ export function ShopWalletView() {
             border: `1px solid ${goldAlpha(0.28)}`,
             borderTop: `2px solid ${USER_COLORS.gold}`,
             boxShadow: `0 12px 36px ${alpha('#000000', 0.7)}, inset 0 0 20px ${goldAlpha(0.04)}`,
-            clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+            borderRadius: '12px',
           }}
         >
           <Typography

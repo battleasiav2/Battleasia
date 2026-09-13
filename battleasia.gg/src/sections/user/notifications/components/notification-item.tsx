@@ -5,7 +5,7 @@ import { fToNow } from 'src/utils/format-time';
 
 import { CONFIG } from 'src/global-config';
 import { Iconify } from 'src/components/iconify';
-import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
+import { useTranslate } from 'src/locales/use-locales';
 
 import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 
@@ -23,6 +23,7 @@ export type NotificationItemProps = {
     createdAt: string | number | null;
   };
   onMarkRead?: (id: string) => void;
+  isLast?: boolean;
 };
 
 const typeIconMap: Record<string, string> = {
@@ -37,25 +38,21 @@ const typeIconMap: Record<string, string> = {
   engagement_badge_unlocked: 'solar:medal-ribbons-star-bold',
 };
 
-const readerContent = (data: string) => (
-  <Box
-    dangerouslySetInnerHTML={{ __html: data }}
-    sx={{
-      color: USER_COLORS.textSubtle,
-      fontSize: 13,
-      lineHeight: 1.55,
-      '& p': { m: 0 },
-      '& a': { color: USER_COLORS.gold, textDecoration: 'none' },
-      '& strong': { color: USER_COLORS.textPrimary, fontWeight: 700 },
-    }}
-  />
-);
+function stripHtml(html: string) {
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
 
-export function NotificationItem({ notification, onMarkRead }: NotificationItemProps) {
-  const tokens = getDefaultGlassTokens();
-  const combinedTitle = notification.subject
-    ? `<p><strong>${notification.subject}</strong></p>${notification.title}`
-    : notification.title;
+/** Shop-style horizontal row — no nested glass. */
+export function NotificationItem({ notification, onMarkRead, isLast = false }: NotificationItemProps) {
+  const { t } = useTranslate();
+
+  const titleText = notification.subject
+    ? notification.subject
+    : stripHtml(notification.title) || notification.category;
+
+  const previewText = notification.subject
+    ? stripHtml(notification.title)
+    : null;
 
   const legacyIconMap: Record<string, string> = {
     order: 'ic-order',
@@ -66,55 +63,61 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
   const legacyIcon = legacyIconMap[notification.type];
   const iconifyIcon = typeIconMap[notification.type] || typeIconMap.general;
 
+  const statusLabel = notification.isUnRead ? t('notifications.unread') : null;
+  const statusColor = USER_COLORS.info;
+
+  const metaBits = [
+    fToNow(notification.createdAt),
+    notification.category,
+    previewText || null,
+  ].filter(Boolean);
+
   return (
     <Box
+      component="button"
+      type="button"
       onClick={() => onMarkRead?.(notification.id)}
-      sx={getGlassInnerSx(tokens, {
-        p: 2,
-        mb: 1,
+      sx={{
+        all: 'unset',
+        boxSizing: 'border-box',
         display: 'flex',
-        gap: 1.5,
-        alignItems: 'flex-start',
+        alignItems: 'center',
+        gap: { xs: 1.25, sm: 1.75 },
+        width: 1,
+        px: { xs: 1.5, sm: 2 },
+        py: { xs: 1.25, sm: 1.5 },
         cursor: 'pointer',
-        position: 'relative',
-        borderColor: notification.isUnRead ? alpha(USER_COLORS.info, 0.25) : undefined,
-        bgcolor: notification.isUnRead ? alpha(USER_COLORS.info, 0.05) : undefined,
-        transition: 'border-color 0.2s ease, background-color 0.2s ease',
+        borderBottom: isLast ? 'none' : `1px solid ${alpha('#ffffff', 0.08)}`,
+        bgcolor: notification.isUnRead ? goldAlpha(0.04) : 'transparent',
+        transition: 'background-color 0.2s ease',
         '&:hover': {
-          borderColor: goldAlpha(0.25),
-          bgcolor: alpha('#ffffff', 0.04),
+          bgcolor: goldAlpha(0.06),
+          '& .notif-title': { color: USER_COLORS.gold },
         },
-      })}
+      }}
     >
-      {notification.isUnRead ? (
-        <Box
+      {notification.avatarUrl ? (
+        <Avatar
+          src={notification.avatarUrl}
           sx={{
-            position: 'absolute',
-            top: 14,
-            right: 14,
-            width: 8,
-            height: 8,
-            borderRadius: '50%',
-            bgcolor: USER_COLORS.info,
-            boxShadow: `0 0 10px ${alpha(USER_COLORS.info, 0.7)}`,
+            width: { xs: 40, sm: 48 },
+            height: { xs: 40, sm: 48 },
+            flexShrink: 0,
+            borderRadius: 0,
+            border: `1px solid ${alpha('#ffffff', 0.1)}`,
           }}
         />
-      ) : null}
-
-      {notification.avatarUrl ? (
-        <Avatar src={notification.avatarUrl} sx={{ width: 44, height: 44, flexShrink: 0 }} />
       ) : legacyIcon ? (
         <Box
           sx={{
-            width: 44,
-            height: 44,
+            width: { xs: 40, sm: 48 },
+            height: { xs: 40, sm: 48 },
             flexShrink: 0,
             display: 'flex',
-            borderRadius: '50%',
             alignItems: 'center',
             justifyContent: 'center',
-            bgcolor: goldAlpha(0.1),
-            border: `1px solid ${goldAlpha(0.22)}`,
+            bgcolor: '#0a0a0a',
+            border: `1px solid ${alpha('#ffffff', 0.1)}`,
           }}
         >
           <Box
@@ -129,15 +132,14 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
       ) : (
         <Box
           sx={{
-            width: 44,
-            height: 44,
+            width: { xs: 40, sm: 48 },
+            height: { xs: 40, sm: 48 },
             flexShrink: 0,
-            borderRadius: '50%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            bgcolor: goldAlpha(0.12),
-            border: `1px solid ${goldAlpha(0.28)}`,
+            bgcolor: '#0a0a0a',
+            border: `1px solid ${alpha('#ffffff', 0.1)}`,
             color: USER_COLORS.gold,
           }}
         >
@@ -145,27 +147,62 @@ export function NotificationItem({ notification, onMarkRead }: NotificationItemP
         </Box>
       )}
 
-      <Box sx={{ flex: 1, minWidth: 0, pr: notification.isUnRead ? 2 : 0 }}>
-        {readerContent(combinedTitle)}
-
-        <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mt: 1 }} flexWrap="wrap">
-          <Typography sx={{ fontSize: 11, color: USER_COLORS.textMuted }}>
-            {fToNow(notification.createdAt)}
-          </Typography>
-          <Box sx={{ width: 3, height: 3, borderRadius: '50%', bgcolor: USER_COLORS.textMuted }} />
+      <Box sx={{ minWidth: 0, flex: 1 }}>
+        <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap>
           <Typography
+            className="notif-title font-tr"
             sx={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: 0.6,
+              fontSize: { xs: 13, sm: 15 },
+              fontWeight: 800,
+              color: USER_COLORS.textPrimary,
               textTransform: 'uppercase',
-              color: USER_COLORS.gold,
+              lineHeight: 1.2,
+              transition: 'color 0.2s ease',
             }}
           >
-            {notification.category}
+            {titleText}
           </Typography>
+          {statusLabel ? (
+            <Typography
+              sx={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: 0.6,
+                textTransform: 'uppercase',
+                color: statusColor,
+              }}
+            >
+              {statusLabel}
+            </Typography>
+          ) : null}
         </Stack>
+
+        <Typography
+          sx={{
+            mt: 0.5,
+            fontSize: { xs: 11, sm: 12 },
+            color: alpha('#ffffff', 0.5),
+            lineHeight: 1.35,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {metaBits.join(' · ')}
+        </Typography>
       </Box>
+
+      {notification.isUnRead ? (
+        <Box
+          sx={{
+            width: 8,
+            height: 8,
+            flexShrink: 0,
+            borderRadius: '50%',
+            bgcolor: USER_COLORS.info,
+          }}
+        />
+      ) : null}
     </Box>
   );
 }

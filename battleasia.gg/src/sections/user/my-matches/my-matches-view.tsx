@@ -1,7 +1,8 @@
 import { useNavigate } from 'react-router';
 import { useMemo, useState, useEffect, useCallback } from 'react';
 
-import { Box, Grid2 as Grid, Stack } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
 
@@ -11,9 +12,10 @@ import { useApi, useImagePreloader, useLiveSync, LIVE_SYNC_TOPICS } from 'src/ho
 import {
   UserPageShell,
   UserArenaStrip,
-  UserStatTile,
   UserEmptyState,
   UserAnimatedStat,
+  USER_COLORS,
+  goldAlpha,
 } from 'src/layouts/user';
 
 import { CoinValue } from 'src/components/coin-value';
@@ -29,6 +31,8 @@ import {
 } from './my-matches-types';
 
 // ----------------------------------------------------------------------
+
+const GOLD = USER_COLORS.gold;
 
 export function MyMatchesView() {
   const { t } = useTranslate();
@@ -137,46 +141,87 @@ export function MyMatchesView() {
 
   const showInitialSkeleton = loading && matches.length === 0;
 
+  const statCells = [
+    {
+      label: t('myMatches.totalMatches'),
+      value: <UserAnimatedStat value={stats.total} variant="h5" fontWeight={700} />,
+    },
+    {
+      label: t('myMatches.wins'),
+      value: <UserAnimatedStat value={stats.wins} variant="h5" fontWeight={700} />,
+    },
+    {
+      label: t('myMatches.losses'),
+      value: <UserAnimatedStat value={stats.losses} variant="h5" fontWeight={700} />,
+    },
+    {
+      label: t('myMatches.totalPrize'),
+      value: <CoinValue value={stats.totalPrize} size={18} />,
+    },
+  ];
+
   return (
     <UserPageShell>
       <UserArenaStrip
-        badge={t('myMatches.badgeBattleHistory')}
         title={t('myMatches.title')}
-        subtitle={t('myMatches.subtitle')}
         imageUrl={PLAY_IMAGE_PATHS.heroBanner}
+        dense
       />
 
       {showInitialSkeleton ? (
         <MyMatchesPageSkeleton />
       ) : (
-        <Stack spacing={3}>
+        <Stack spacing={2.5}>
+          {/* Shop-style: one merged stats panel (not 4 separate cards) */}
           <Box
             sx={{
               display: 'grid',
-              gridTemplateColumns: { xs: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
-              gap: 1.5,
+              gridTemplateColumns: { xs: 'repeat(2, minmax(0, 1fr))', md: 'repeat(4, minmax(0, 1fr))' },
+              width: 1,
+              bgcolor: alpha('#06090e', 0.72),
+              backdropFilter: 'blur(18px)',
+              WebkitBackdropFilter: 'blur(18px)',
+              border: `1px solid ${goldAlpha(0.28)}`,
+              borderTop: `2px solid ${GOLD}`,
+              boxShadow: `0 10px 28px ${alpha('#000000', 0.55)}, inset 0 0 16px ${goldAlpha(0.04)}`,
+              clipPath: {
+                xs: 'none',
+                md: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+              },
             }}
           >
-            <UserStatTile
-              label={t('myMatches.totalMatches')}
-              value={<UserAnimatedStat value={stats.total} variant="h5" fontWeight={700} />}
-              loading={loading}
-            />
-            <UserStatTile
-              label={t('myMatches.wins')}
-              value={<UserAnimatedStat value={stats.wins} variant="h5" fontWeight={700} />}
-              loading={loading}
-            />
-            <UserStatTile
-              label={t('myMatches.losses')}
-              value={<UserAnimatedStat value={stats.losses} variant="h5" fontWeight={700} />}
-              loading={loading}
-            />
-            <UserStatTile
-              label={t('myMatches.totalPrize')}
-              value={<CoinValue value={stats.totalPrize} size={18} />}
-              loading={loading}
-            />
+            {statCells.map((cell, index) => (
+              <Box
+                key={cell.label}
+                sx={{
+                  minWidth: 0,
+                  px: { xs: 1.75, md: 2.25 },
+                  py: { xs: 1.75, md: 2 },
+                  borderRight: {
+                    xs: index % 2 === 0 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                    md: index < statCells.length - 1 ? `1px solid ${alpha('#ffffff', 0.1)}` : 'none',
+                  },
+                  borderBottom: {
+                    xs: index < 2 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                    md: 'none',
+                  },
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: 0.8,
+                    textTransform: 'uppercase',
+                    color: alpha('#ffffff', 0.45),
+                    mb: 0.75,
+                  }}
+                >
+                  {cell.label}
+                </Typography>
+                <Box sx={{ color: USER_COLORS.textPrimary }}>{cell.value}</Box>
+              </Box>
+            ))}
           </Box>
 
           <PlayTabs
@@ -201,17 +246,31 @@ export function MyMatchesView() {
               onAction={fetchMatches}
             />
           ) : (
-            <Grid container spacing={2}>
-              {filteredMatches.map((match) => (
-                <Grid key={match.id} size={{ xs: 12, sm: 6, lg: 4 }}>
-                  <MyMatchCard
-                    match={match}
-                    onViewDetails={() => handleViewDetails(match.id, match.status)}
-                    translations={cardTranslations}
-                  />
-                </Grid>
+            <Box
+              sx={{
+                bgcolor: alpha('#06090e', 0.72),
+                backdropFilter: 'blur(18px)',
+                WebkitBackdropFilter: 'blur(18px)',
+                border: `1px solid ${goldAlpha(0.28)}`,
+                borderTop: `2px solid ${GOLD}`,
+                boxShadow: `0 10px 28px ${alpha('#000000', 0.55)}, inset 0 0 16px ${goldAlpha(0.04)}`,
+                clipPath: {
+                  xs: 'none',
+                  md: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+                },
+                overflow: 'hidden',
+              }}
+            >
+              {filteredMatches.map((match, index) => (
+                <MyMatchCard
+                  key={match.id}
+                  match={match}
+                  onViewDetails={() => handleViewDetails(match.id, match.status)}
+                  translations={cardTranslations}
+                  isLast={index === filteredMatches.length - 1}
+                />
               ))}
-            </Grid>
+            </Box>
           )}
         </Stack>
       )}

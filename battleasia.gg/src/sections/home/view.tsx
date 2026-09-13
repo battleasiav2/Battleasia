@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState } from 'react';
 
 import { Box, Stack, SvgIcon, Typography } from '@mui/material';
-import { alpha, keyframes } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 
 import { useImagePreloader } from 'src/hooks';
 import { useAppDownload } from 'src/hooks/use-app-download';
@@ -29,21 +29,6 @@ const PlayYourGameSection = lazy(() =>
 // ----------------------------------------------------------------------
 
 const GOLD = 'var(--ba-gold)';
-const CHEVRONS_LABEL = '////// ➔';
-const STATUS_ARMED_LABEL = '[ STATUS // ARMED ]';
-
-/** Tiny top-of-hero gold sweep — opacity/transform only, no layout cost */
-const heroTopSweep = keyframes`
-  0% { transform: translate3d(-40%, 0, 0); opacity: 0; }
-  18% { opacity: 0.85; }
-  42% { opacity: 0.35; }
-  55%, 100% { transform: translate3d(140%, 0, 0); opacity: 0; }
-`;
-
-const heroTopGlow = keyframes`
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 0.7; }
-`;
 
 const HOME_IMAGE_PATHS = {
   heroTitleLogo: '/assets/images/hero-title-battleasia.webp',
@@ -113,7 +98,7 @@ export function HomeView() {
       {/* 16:9 Full HD Hero Background Video */}
       <HeroVideoBanner />
 
-      {/* Tiny gold sweep under nav */}
+      {/* Flat gold hairline under nav */}
       <Box
         aria-hidden
         sx={{
@@ -121,25 +106,10 @@ export function HomeView() {
           top: 0,
           left: 0,
           right: 0,
-          height: { xs: 2, md: 3 },
+          height: 1,
           zIndex: 4,
           pointerEvents: 'none',
-          overflow: 'hidden',
-          background: `linear-gradient(90deg, transparent 0%, ${goldAlpha(0.15)} 50%, transparent 100%)`,
-          animation: `${heroTopGlow} 4.5s ease-in-out infinite`,
-          '@media (prefers-reduced-motion: reduce)': { animation: 'none', opacity: 0.4 },
-          '&::after': {
-            content: "''",
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '42%',
-            height: '100%',
-            background: `linear-gradient(90deg, transparent, ${alpha('#fff', 0.55)}, ${GOLD}, ${alpha('#fff', 0.35)}, transparent)`,
-            animation: `${heroTopSweep} 5.5s 1.2s ease-in-out infinite`,
-            willChange: 'transform, opacity',
-            '@media (prefers-reduced-motion: reduce)': { display: 'none' },
-          },
+          background: `linear-gradient(90deg, transparent 0%, ${goldAlpha(0.35)} 50%, transparent 100%)`,
         }}
       />
 
@@ -285,8 +255,7 @@ export function HomeView() {
           inset: 0,
           background: `
             linear-gradient(180deg, #000000 0%, transparent 15%, transparent 85%, #000000 100%),
-            radial-gradient(ellipse 65% 55% at 75% 50%, ${goldAlpha(0.12)} 0%, transparent 70%),
-            radial-gradient(ellipse 50% 40% at 20% 30%, ${goldAlpha(0.06)} 0%, transparent 60%)
+            radial-gradient(ellipse 65% 55% at 75% 50%, ${goldAlpha(0.06)} 0%, transparent 70%)
           `,
           pointerEvents: 'none',
           zIndex: 0,
@@ -304,33 +273,19 @@ export function HomeView() {
         >
           {/* Left Column: Tactical Typography & Mode Details */}
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-            {/* Tactical Label with Chevrons */}
-            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1.5 }}>
-              <Typography
-                sx={{
-                  fontSize: { xs: 11, md: 12 },
-                  fontWeight: 900,
-                  letterSpacing: 3,
-                  color: alpha('#ffffff', 0.6),
-                  textTransform: 'uppercase',
-                  fontFamily: `'Barlow', sans-serif`,
-                }}
-              >
-                {t('home.playYourGame.brandLabel')}
-              </Typography>
-              <Typography
-                sx={{
-                  fontSize: 13,
-                  fontWeight: 900,
-                  letterSpacing: 2,
-                  color: GOLD,
-                  fontFamily: 'monospace',
-                  lineHeight: 1,
-                }}
-              >
-                {CHEVRONS_LABEL}
-              </Typography>
-            </Stack>
+            <Typography
+              sx={{
+                fontSize: { xs: 11, md: 12 },
+                fontWeight: 900,
+                letterSpacing: 3,
+                color: alpha('#ffffff', 0.6),
+                textTransform: 'uppercase',
+                fontFamily: `'Barlow', sans-serif`,
+                mb: 1.5,
+              }}
+            >
+              {t('home.playYourGame.brandLabel')}
+            </Typography>
 
             {/* Big Distressed / Italic Military Heading */}
             <Typography
@@ -344,7 +299,7 @@ export function HomeView() {
                 letterSpacing: { xs: 1.5, md: 2.5 },
                 textTransform: 'uppercase',
                 color: '#ffffff',
-                textShadow: `0 4px 20px rgba(0,0,0,0.9), 0 0 35px ${goldAlpha(0.2)}`,
+                textShadow: '0 4px 16px rgba(0,0,0,0.75)',
               }}
             >
               {t('home.howToPlay')}
@@ -354,9 +309,9 @@ export function HomeView() {
             <Box
               sx={{
                 width: { xs: 52, md: 68 },
-                height: 4,
+                height: 3,
                 bgcolor: GOLD,
-                boxShadow: `0 0 16px ${goldAlpha(0.85)}`,
+                boxShadow: 'none',
                 mt: { xs: 1.5, md: 2 },
                 mb: { xs: 1.5, md: 2 },
               }}
@@ -407,37 +362,26 @@ export function HomeView() {
                       borderColor: isSelected ? GOLD : alpha('#ffffff', 0.12),
                       borderRadius: 0,
                       position: 'relative',
-                      transition: 'all 0.25s ease',
-                      boxShadow: isSelected ? `0 0 18px ${goldAlpha(0.35)}` : 'none',
+                      transition: 'border-color 0.2s ease, background-color 0.2s ease',
+                      boxShadow: 'none',
                       '&:hover': {
-                        borderColor: isSelected ? GOLD : goldAlpha(0.6),
-                        bgcolor: isSelected ? goldAlpha(0.18) : alpha('#ffffff', 0.06),
+                        borderColor: isSelected ? GOLD : goldAlpha(0.45),
+                        bgcolor: isSelected ? goldAlpha(0.16) : alpha('#ffffff', 0.06),
                       },
                     }}
                   >
-                    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 0.5 }}>
-                      <Typography
-                        sx={{
-                          fontSize: 10,
-                          fontWeight: 900,
-                          color: isSelected ? GOLD : alpha('#ffffff', 0.4),
-                          fontFamily: 'monospace',
-                        }}
-                      >
-                        {`//0${idx + 1}`}
-                      </Typography>
-                      <Typography
-                        className="font-tr"
-                        sx={{
-                          fontSize: 10,
-                          fontWeight: 800,
-                          color: isSelected ? GOLD : alpha('#ffffff', 0.35),
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {mode.playersLabel}
-                      </Typography>
-                    </Stack>
+                    <Typography
+                      className="font-tr"
+                      sx={{
+                        fontSize: 10,
+                        fontWeight: 800,
+                        color: isSelected ? GOLD : alpha('#ffffff', 0.35),
+                        textTransform: 'uppercase',
+                        mb: 0.5,
+                      }}
+                    >
+                      {mode.playersLabel}
+                    </Typography>
                     <Typography
                       className="font-tr"
                       sx={{
@@ -460,7 +404,7 @@ export function HomeView() {
                           right: 0,
                           height: 2,
                           bgcolor: GOLD,
-                          boxShadow: `0 0 10px ${GOLD}`,
+                          boxShadow: 'none',
                         }}
                       />
                     )}
@@ -594,12 +538,12 @@ export function HomeView() {
                   letterSpacing: 1.2,
                   textTransform: 'uppercase',
                   textDecoration: 'none',
-                  transition: 'all 0.2s ease',
-                  boxShadow: `0 0 16px ${goldAlpha(0.25)}`,
+                  transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease',
+                  boxShadow: 'none',
                   '&:hover': {
                     bgcolor: GOLD,
                     color: 'var(--ba-gold-ink)',
-                    boxShadow: `0 0 28px ${goldAlpha(0.7)}`,
+                    boxShadow: 'none',
                   },
                 }}
               >
@@ -620,42 +564,20 @@ export function HomeView() {
               overflow: 'visible',
             }}
           >
-            {/* Ambient Radial Backlight Glow in Site Color */}
+            {/* Soft ambient fill behind art */}
             <Box
               sx={{
                 position: 'absolute',
                 inset: 0,
                 background: `
-                  radial-gradient(ellipse 75% 70% at 50% 50%, ${goldAlpha(0.24)} 0%, ${goldAlpha(0.06)} 48%, transparent 75%)
+                  radial-gradient(ellipse 75% 70% at 50% 50%, ${goldAlpha(0.1)} 0%, transparent 70%)
                 `,
-                filter: 'blur(40px)',
                 pointerEvents: 'none',
                 zIndex: 0,
               }}
             />
 
-            {/* Tactical HUD Corner Elements */}
-            <Box
-              sx={{
-                position: 'absolute',
-                top: 12,
-                right: 12,
-                fontFamily: 'monospace',
-                fontSize: 10,
-                letterSpacing: 1.5,
-                color: goldAlpha(0.85),
-                zIndex: 2,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-end',
-                gap: 0.5,
-              }}
-            >
-              <span>{STATUS_ARMED_LABEL}</span>
-              <span>{`[ OPERATOR // 0${activeModeIndex + 1} ]`}</span>
-            </Box>
-
-            {/* Cutout Gamer Images - Bigger Scale & Clean Drop Shadow */}
+            {/* Cutout Gamer Images */}
             {gameModes.map((mode, idx) => (
               <Box
                 key={mode.title}
@@ -690,7 +612,7 @@ export function HomeView() {
                   transform: idx === activeModeIndex ? 'scale(1.12) translateY(0)' : 'scale(1.02) translateY(14px)',
                   transition: 'opacity 0.4s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1)',
                   pointerEvents: 'none',
-                  filter: `drop-shadow(0 25px 50px rgba(0,0,0,0.95)) drop-shadow(0 0 35px ${goldAlpha(0.35)})`,
+                  filter: 'drop-shadow(0 18px 36px rgba(0,0,0,0.85))',
                 }}
               />
             ))}

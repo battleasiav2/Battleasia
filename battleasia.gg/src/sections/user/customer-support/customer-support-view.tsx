@@ -2,7 +2,6 @@ import { useRef, useMemo, useState, useEffect, useCallback } from 'react';
 
 import {
   Box,
-  Chip,
   Stack,
   TextField,
   IconButton,
@@ -16,15 +15,16 @@ import { CONFIG } from 'src/global-config';
 import useApi from 'src/hooks/use-api';
 import { Iconify } from 'src/components/iconify';
 import { Image } from 'src/components/image';
+import { PlayTabs } from 'src/components/play-tabs';
 import { Scrollbar } from 'src/components/scrollbar';
 import {
   USER_COLORS,
   userFieldSx,
-  getUserChipSx,
   UserPageShell,
   UserGlassCard,
   UserEmptyState,
   UserActionButton,
+  UserAnimatedStat,
   userMutedTextSx,
   userFieldLabelProps,
   goldAlpha,
@@ -48,6 +48,23 @@ import type {
   TicketViewMode,
 } from './customer-support-types';
 import { useMessagesScroll } from './hooks/use-messages-scroll';
+
+// ----------------------------------------------------------------------
+
+const GOLD = USER_COLORS.gold;
+
+function ticketStatusColor(status: string) {
+  switch (status) {
+    case 'closed':
+      return alpha('#ffffff', 0.45);
+    case 'pending':
+      return USER_COLORS.info;
+    case 'open':
+      return USER_COLORS.success;
+    default:
+      return GOLD;
+  }
+}
 
 // ----------------------------------------------------------------------
 
@@ -385,136 +402,158 @@ export function CustomerSupportView() {
     setMessage('');
   }, []);
 
-  const filterButtons = (
-    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-      {statusTabs.map((tab) => (
-        <UserActionButton
-          key={tab.value}
-          size="small"
-          actionVariant={statusFilter === tab.value ? 'gold' : 'ghost'}
-          onClick={() => setStatusFilter(tab.value)}
-        >
-          {tab.label}
-        </UserActionButton>
-      ))}
-    </Stack>
-  );
-
   const newTicketBtn = (
     <UserActionButton
       size="small"
       actionVariant="solidGold"
       startIcon={<Iconify icon="solar:add-circle-bold" width={16} />}
       onClick={() => setViewMode('create')}
+      sx={{ py: 0.75, px: 1.5, fontSize: 12 }}
     >
       New ticket
     </UserActionButton>
   );
 
+  const listPanelSx = {
+    bgcolor: alpha('#06090e', 0.72),
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
+    border: `1px solid ${goldAlpha(0.28)}`,
+    borderTop: `2px solid ${GOLD}`,
+    boxShadow: `0 10px 28px ${alpha('#000000', 0.55)}, inset 0 0 16px ${goldAlpha(0.04)}`,
+    clipPath: {
+      xs: 'none',
+      md: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+    },
+    overflow: 'hidden',
+  } as const;
+
   if (viewMode === 'list') {
+    const statCells = [
+      { label: 'Tickets', value: stats.total },
+      { label: 'Open', value: stats.open },
+      { label: 'Closed', value: stats.closed },
+    ];
+
     return (
       <UserPageShell>
         <SupportHero
           title={t('customerSupport.title') || 'Customer Support'}
-          subtitle={
-            t('customerSupport.subtitle') ||
-            'Open a ticket and our team will help you quickly.'
-          }
           action={<Box sx={{ display: { xs: 'none', md: 'block' } }}>{newTicketBtn}</Box>}
         />
 
-        <Box sx={{ mb: 1.5, display: { xs: 'block', md: 'none' } }}>{newTicketBtn}</Box>
+        <Stack sx={{ mb: 2, display: { xs: 'flex', md: 'none' } }}>{newTicketBtn}</Stack>
 
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: 'repeat(3, minmax(0, 1fr))' },
-            width: 1,
-            mb: 1.75,
-            bgcolor: alpha('#06090e', 0.72),
-            border: `1px solid ${goldAlpha(0.28)}`,
-            borderTop: `2px solid ${USER_COLORS.gold}`,
-            boxShadow: `0 8px 24px ${alpha('#000000', 0.45)}`,
-          }}
-        >
-          {[
-            { label: 'Tickets', value: stats.total },
-            { label: 'Open', value: stats.open },
-            { label: 'Closed', value: stats.closed },
-          ].map((stat, index, arr) => (
-            <Box
-              key={stat.label}
-              sx={{
-                minWidth: 0,
-                px: { xs: 1.25, md: 1.5 },
-                py: { xs: 1.25, md: 1.5 },
-                borderRight:
-                  index < arr.length - 1 ? `1px solid ${alpha('#ffffff', 0.1)}` : 'none',
-              }}
-            >
-              <Typography
+        <Stack spacing={2.5}>
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: 'repeat(3, minmax(0, 1fr))' },
+              width: 1,
+              bgcolor: alpha('#06090e', 0.72),
+              backdropFilter: 'blur(18px)',
+              WebkitBackdropFilter: 'blur(18px)',
+              border: `1px solid ${goldAlpha(0.28)}`,
+              borderTop: `2px solid ${GOLD}`,
+              boxShadow: `0 10px 28px ${alpha('#000000', 0.55)}, inset 0 0 16px ${goldAlpha(0.04)}`,
+              clipPath: {
+                xs: 'none',
+                md: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+              },
+            }}
+          >
+            {statCells.map((cell, index) => (
+              <Box
+                key={cell.label}
                 sx={{
-                  fontSize: 10,
-                  fontWeight: 700,
-                  letterSpacing: 0.5,
-                  textTransform: 'uppercase',
-                  color: alpha('#ffffff', 0.55),
-                  mb: 0.35,
+                  minWidth: 0,
+                  px: { xs: 1.25, md: 2.25 },
+                  py: { xs: 1.5, md: 2 },
+                  borderRight:
+                    index < statCells.length - 1 ? `1px solid ${alpha('#ffffff', 0.1)}` : 'none',
                 }}
               >
-                {stat.label}
-              </Typography>
-              <Typography
-                sx={{
-                  fontSize: { xs: 18, md: 20 },
-                  fontWeight: 800,
-                  color: USER_COLORS.textPrimary,
-                }}
-              >
-                {stat.value}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
-
-        <Box sx={{ mb: 1.75 }}>{filterButtons}</Box>
-
-        {loading ? (
-          <SupportPageSkeleton />
-        ) : tickets.length === 0 ? (
-          <UserEmptyState
-            icon="solar:ticket-bold-duotone"
-            title="No tickets yet"
-            description="Create a ticket when you need help with payments, matches, or your account."
-            actionLabel="New ticket"
-            onAction={() => setViewMode('create')}
-          />
-        ) : (
-          <Stack spacing={1.25}>
-            {tickets.map((ticket) => {
-              const thumb = ticket.previewAttachments?.[0];
-              const isClosed = ticket.status === 'closed';
-              const isPending = ticket.status === 'pending';
-
-              return (
-                <UserGlassCard
-                  key={ticket.id}
-                  onClick={() => openTicket(ticket)}
+                <Typography
                   sx={{
-                    cursor: 'pointer',
-                    p: { xs: 1.5, md: 1.75 },
-                    pt: { xs: 1.5, md: 1.75 },
-                    '&:hover': { borderColor: goldAlpha(0.45) },
+                    fontSize: 10,
+                    fontWeight: 700,
+                    letterSpacing: 0.8,
+                    textTransform: 'uppercase',
+                    color: alpha('#ffffff', 0.45),
+                    mb: 0.75,
                   }}
                 >
-                  <Stack direction="row" spacing={1.5} alignItems="center">
+                  {cell.label}
+                </Typography>
+                <Box sx={{ color: USER_COLORS.textPrimary }}>
+                  <UserAnimatedStat value={cell.value} variant="h5" fontWeight={700} />
+                </Box>
+              </Box>
+            ))}
+          </Box>
+
+          <PlayTabs
+            tabs={statusTabs.map((tab) => ({ label: tab.label, value: tab.value }))}
+            activeTab={statusFilter}
+            onChange={(value) =>
+              setStatusFilter(value as 'all' | 'open' | 'closed' | 'pending')
+            }
+          />
+
+          {loading ? (
+            <SupportPageSkeleton />
+          ) : tickets.length === 0 ? (
+            <UserEmptyState
+              icon="solar:ticket-bold-duotone"
+              title="No tickets yet"
+              description="Create a ticket when you need help with payments, matches, or your account."
+              actionLabel="New ticket"
+              onAction={() => setViewMode('create')}
+            />
+          ) : (
+            <Box sx={listPanelSx}>
+              {tickets.map((ticket, index) => {
+                const thumb = ticket.previewAttachments?.[0];
+                const isLast = index === tickets.length - 1;
+                const meta = [
+                  ticket.category,
+                  `Updated ${ticket.lastMessageAt.toLocaleString()}`,
+                  ticket.attachmentCount ? `${ticket.attachmentCount} image(s)` : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · ');
+
+                return (
+                  <Box
+                    key={ticket.id}
+                    component="button"
+                    type="button"
+                    onClick={() => openTicket(ticket)}
+                    sx={{
+                      all: 'unset',
+                      boxSizing: 'border-box',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: { xs: 1.25, sm: 1.75 },
+                      width: 1,
+                      px: { xs: 1.5, sm: 2 },
+                      py: { xs: 1.25, sm: 1.5 },
+                      cursor: 'pointer',
+                      borderBottom: isLast ? 'none' : `1px solid ${alpha('#ffffff', 0.08)}`,
+                      transition: 'background-color 0.2s ease',
+                      '&:hover': {
+                        bgcolor: goldAlpha(0.06),
+                        '& .ticket-title': { color: GOLD },
+                        '& .ticket-chevron': { color: GOLD, transform: 'translateX(3px)' },
+                      },
+                    }}
+                  >
                     <Box
                       sx={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: '8px',
+                        width: { xs: 44, sm: 52 },
+                        height: { xs: 44, sm: 52 },
                         flexShrink: 0,
-                        bgcolor: alpha('#000000', 0.45),
+                        bgcolor: '#0a0a0a',
                         border: `1px solid ${alpha('#ffffff', 0.1)}`,
                         display: 'grid',
                         placeItems: 'center',
@@ -531,78 +570,91 @@ export function CustomerSupportView() {
                         <Iconify
                           icon="solar:ticket-bold"
                           width={20}
-                          sx={{ color: USER_COLORS.gold }}
+                          sx={{ color: GOLD }}
                         />
                       )}
                     </Box>
 
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Box sx={{ minWidth: 0, flex: 1 }}>
                       <Stack
                         direction="row"
-                        spacing={0.75}
                         alignItems="center"
+                        spacing={1}
                         flexWrap="wrap"
                         useFlexGap
-                        sx={{ mb: 0.35 }}
                       >
                         <Typography
-                          className="font-tr"
+                          className="ticket-title font-tr"
                           sx={{
+                            fontSize: { xs: 13, sm: 15 },
                             fontWeight: 800,
                             color: USER_COLORS.textPrimary,
-                            fontSize: { xs: 14, sm: 15 },
+                            textTransform: 'uppercase',
+                            lineHeight: 1.2,
+                            transition: 'color 0.2s ease',
                           }}
                           noWrap
                         >
                           {ticket.subject}
                         </Typography>
-                        <Chip
-                          label={ticket.category}
-                          size="small"
+                        <Typography
                           sx={{
-                            height: 18,
-                            fontSize: 9,
-                            fontWeight: 700,
-                            textTransform: 'capitalize',
-                            ...getUserChipSx('gold'),
+                            fontSize: 10,
+                            fontWeight: 800,
+                            letterSpacing: 0.6,
+                            textTransform: 'uppercase',
+                            color: ticketStatusColor(ticket.status),
                           }}
-                        />
-                        <Chip
-                          label={ticket.status}
-                          size="small"
-                          sx={{
-                            height: 18,
-                            fontSize: 9,
-                            fontWeight: 700,
-                            textTransform: 'capitalize',
-                            ...getUserChipSx(
-                              isClosed ? 'neutral' : isPending ? 'info' : 'success'
-                            ),
-                          }}
-                        />
+                        >
+                          {ticket.status}
+                        </Typography>
                       </Stack>
-                      <Typography sx={{ ...userMutedTextSx, fontSize: 12.5 }} noWrap>
-                        {ticket.previewBody || 'Open ticket to continue the conversation'}
+
+                      <Typography
+                        sx={{
+                          mt: 0.5,
+                          fontSize: { xs: 11, sm: 12 },
+                          color: alpha('#ffffff', 0.5),
+                          lineHeight: 1.35,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {ticket.previewBody || meta}
                       </Typography>
-                      <Typography sx={{ ...userMutedTextSx, fontSize: 11, mt: 0.4 }}>
-                        Updated {ticket.lastMessageAt.toLocaleString()}
-                        {ticket.attachmentCount
-                          ? ` · ${ticket.attachmentCount} image(s)`
-                          : ''}
-                      </Typography>
+                      {ticket.previewBody ? (
+                        <Typography
+                          sx={{
+                            mt: 0.25,
+                            fontSize: 11,
+                            color: alpha('#ffffff', 0.4),
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {meta}
+                        </Typography>
+                      ) : null}
                     </Box>
 
                     <Iconify
-                      icon="solar:arrow-right-bold"
+                      className="ticket-chevron"
+                      icon="solar:alt-arrow-right-bold"
                       width={16}
-                      sx={{ color: alpha('#ffffff', 0.35), flexShrink: 0 }}
+                      sx={{
+                        flexShrink: 0,
+                        color: alpha('#ffffff', 0.35),
+                        transition: 'color 0.2s ease, transform 0.2s ease',
+                      }}
                     />
-                  </Stack>
-                </UserGlassCard>
-              );
-            })}
-          </Stack>
-        )}
+                  </Box>
+                );
+              })}
+            </Box>
+          )}
+        </Stack>
       </UserPageShell>
     );
   }
@@ -612,7 +664,6 @@ export function CustomerSupportView() {
       <UserPageShell contentSx={{ maxWidth: 720, mx: 'auto' }}>
         <SupportHero
           title="New ticket"
-          subtitle="Describe your issue clearly. Screenshots help us resolve faster."
           action={
             <UserActionButton
               size="small"
@@ -835,10 +886,7 @@ export function CustomerSupportView() {
 
   return (
     <UserPageShell contentSx={{ maxWidth: 960, mx: 'auto' }}>
-      <SupportHero
-        title={selectedTicket?.subject || 'Support chat'}
-        subtitle="Chat with BattleAsia support. Replies appear in real time."
-      />
+      <SupportHero title={selectedTicket?.subject || 'Support chat'} />
 
       {detailLoading && messages.length === 0 ? (
         <SupportPageSkeleton />

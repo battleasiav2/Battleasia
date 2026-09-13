@@ -13,16 +13,14 @@ import { useTranslate } from 'src/locales/use-locales';
 import { Iconify } from 'src/components/iconify';
 import CoinValue from 'src/components/coin-value';
 import {
-  getDefaultGlassTokens,
   getGlassBadgeChipSx,
+  getDefaultGlassTokens,
   getGoldTopLineShellSx,
 } from 'src/components/battle-glass-card';
 
 import { USER_COLORS, userGoldButtonSx, goldAlpha } from 'src/layouts/user';
 
-import { MatchStatPill } from './match-stat-pill';
 import { MatchRoomDialog } from './match-room-dialog';
-import { MatchSpotsProgress } from './match-spots-progress';
 import { estimateMatchWinningPool } from '../match-prize-utils';
 import { getMatchCapacityState } from '../match-capacity-utils';
 import {
@@ -32,6 +30,44 @@ import {
 } from '../match-types';
 
 // ----------------------------------------------------------------------
+
+function StatInline({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Box sx={{ minWidth: 0 }}>
+      <Typography
+        sx={{
+          fontSize: 9,
+          fontWeight: 700,
+          letterSpacing: 0.6,
+          color: USER_COLORS.textMuted,
+          textTransform: 'uppercase',
+          lineHeight: 1.2,
+          mb: 0.35,
+        }}
+      >
+        {label}
+      </Typography>
+      <Box
+        sx={{
+          fontSize: 13,
+          fontWeight: 700,
+          color: USER_COLORS.textPrimary,
+          display: 'flex',
+          alignItems: 'center',
+          minHeight: 18,
+        }}
+      >
+        {children}
+      </Box>
+    </Box>
+  );
+}
 
 export function MatchCard({
   match,
@@ -53,7 +89,7 @@ export function MatchCard({
   }, [primaryBanner]);
 
   const isPremiumMatch = match.premiumOnly === true;
-  const { isFull: isMatchFull } = getMatchCapacityState(match);
+  const { joined, max, isFull: isMatchFull } = getMatchCapacityState(match);
   const buttonDisabled =
     joining || isJoined || !canJoin || isMatchFull || (isPremiumMatch && !isPremiumUser);
   const winningPool = estimateMatchWinningPool(match);
@@ -82,34 +118,16 @@ export function MatchCard({
         flexDirection: 'column',
         overflow: 'hidden',
         cursor: isResult ? 'pointer' : 'default',
-        // Soft glass-morphism over dark gaming surface
-        bgcolor: alpha('#0a0a0c', 0.55),
-        backgroundColor: alpha('#0a0a0c', 0.55),
-        backgroundImage: `
-          linear-gradient(145deg, ${alpha('#ffffff', 0.06)} 0%, transparent 42%, ${goldAlpha(0.04)} 100%)
-        `,
-        backdropFilter: 'blur(18px) saturate(1.15)',
-        WebkitBackdropFilter: 'blur(18px) saturate(1.15)',
-        border: `1px solid ${alpha('#ffffff', 0.12)}`,
-        boxShadow: `
-          inset 0 1px 0 ${alpha('#ffffff', 0.08)},
-          0 12px 36px ${alpha('#000000', 0.45)},
-          0 0 0 1px ${goldAlpha(0.06)}
-        `,
-        transition: 'transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease',
+        bgcolor: '#161618',
+        borderColor: alpha('#ffffff', 0.08),
+        boxShadow: 'none',
+        transition: 'border-color 0.2s ease',
         '&:hover': {
-          transform: 'translateY(-4px)',
-          borderColor: goldAlpha(0.35),
-          boxShadow: `
-            inset 0 1px 0 ${alpha('#ffffff', 0.1)},
-            0 20px 48px ${alpha('#000000', 0.65)},
-            0 0 28px ${goldAlpha(0.12)}
-          `,
+          borderColor: goldAlpha(0.4),
         },
       })}
     >
-      {/* Banner */}
-      <Box sx={{ position: 'relative', height: 148, flexShrink: 0, overflow: 'hidden' }}>
+      <Box sx={{ position: 'relative', height: 120, flexShrink: 0, overflow: 'hidden' }}>
         <Box
           component="img"
           src={bannerSrc}
@@ -132,13 +150,24 @@ export function MatchCard({
           sx={{
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(180deg, transparent 30%, ${alpha('#000000', 0.82)} 100%)`,
+            background: `linear-gradient(180deg, transparent 30%, ${alpha('#000000', 0.8)} 100%)`,
           }}
         />
 
-        <Stack direction="row" spacing={0.75} sx={{ position: 'absolute', top: 10, left: 10, right: 10, flexWrap: 'wrap' }}>
+        <Stack
+          direction="row"
+          spacing={0.75}
+          sx={{ position: 'absolute', top: 10, left: 10, right: 10, flexWrap: 'wrap' }}
+        >
           {isPremiumMatch ? (
-            <Box sx={{ ...getGlassBadgeChipSx(tokens), bgcolor: goldAlpha(0.2), color: USER_COLORS.gold, border: `1px solid ${goldAlpha(0.35)}` }}>
+            <Box
+              sx={{
+                ...getGlassBadgeChipSx(tokens),
+                bgcolor: goldAlpha(0.2),
+                color: USER_COLORS.gold,
+                border: `1px solid ${goldAlpha(0.35)}`,
+              }}
+            >
               <Stack direction="row" alignItems="center" spacing={0.5} sx={{ px: 0.5 }}>
                 <Iconify icon="solar:crown-bold" width={12} />
                 <Typography sx={{ fontSize: 10, fontWeight: 800 }}>PREMIUM</Typography>
@@ -151,25 +180,32 @@ export function MatchCard({
             </Box>
           ) : null}
           {isResult ? (
-            <Box sx={{ ...getGlassBadgeChipSx(tokens), bgcolor: alpha(USER_COLORS.info, 0.15), border: `1px solid ${alpha(USER_COLORS.info, 0.35)}` }}>
-              <Typography sx={{ fontSize: 10, fontWeight: 800, px: 0.5, color: USER_COLORS.info }}>RESULT</Typography>
+            <Box
+              sx={{
+                ...getGlassBadgeChipSx(tokens),
+                bgcolor: alpha(USER_COLORS.info, 0.15),
+                border: `1px solid ${alpha(USER_COLORS.info, 0.35)}`,
+              }}
+            >
+              <Typography sx={{ fontSize: 10, fontWeight: 800, px: 0.5, color: USER_COLORS.info }}>
+                RESULT
+              </Typography>
             </Box>
           ) : null}
         </Stack>
       </Box>
 
-      {/* Body */}
-      <Stack spacing={1.5} sx={{ p: 2, flex: 1, minHeight: 0, display: 'flex' }}>
-        <Box sx={{ minHeight: 58 }}>
+      <Stack spacing={1.25} sx={{ p: 1.75, flex: 1, minHeight: 0, display: 'flex' }}>
+        <Box>
           <Typography
             className="font-tr"
             onClick={goToDetail}
             sx={{
-              fontSize: 18,
+              fontSize: 15,
               fontWeight: 800,
               color: USER_COLORS.textPrimary,
               textTransform: 'uppercase',
-              lineHeight: 1.15,
+              lineHeight: 1.2,
               display: '-webkit-box',
               WebkitLineClamp: 2,
               WebkitBoxOrient: 'vertical',
@@ -181,96 +217,58 @@ export function MatchCard({
             {match.matchName}
           </Typography>
 
-          <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mt: 0.75 }}>
-            <Typography sx={{ fontSize: 12, color: USER_COLORS.gold, fontWeight: 600 }}>
+          <Typography sx={{ mt: 0.5, fontSize: 12, color: USER_COLORS.textMuted }}>
+            <Box component="span" sx={{ color: USER_COLORS.gold, fontWeight: 600 }}>
               {fDateTime(match.matchSchedule, 'DD/MM/YYYY hh:mm a')}
-            </Typography>
-            {match.map ? (
-              <Typography sx={{ fontSize: 12, color: USER_COLORS.textMuted }}>
-                · {match.map}
-              </Typography>
-            ) : null}
-          </Stack>
+            </Box>
+            {match.map ? ` · ${match.map}` : ''}
+            {!isResult ? ` · ${joined}/${max}` : ''}
+          </Typography>
         </Box>
-
-          {!isResult ? (
-          <MatchSpotsProgress
-            variant="compact"
-            participantsCount={match.participantsCount}
-            totalPlayer={match.totalPlayer}
-          />
-        ) : null}
 
         <Box
           sx={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-            gap: 1,
-            alignItems: 'stretch',
+            gap: 1.25,
+            py: 1,
+            borderTop: `1px solid ${alpha('#ffffff', 0.06)}`,
+            borderBottom: `1px solid ${alpha('#ffffff', 0.06)}`,
           }}
         >
-          {(
-            [
-              { label: t('match.entryFee'), value: match.entryFee ?? 0 },
-              { label: t('match.prizePool'), value: winningPool },
-              { label: t('match.perKill'), value: match.perKill ?? 0 },
-            ] as const
-          ).map((stat) => (
-            <MatchStatPill
-              key={stat.label}
-              label={stat.label}
-              minHeight={72}
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                minWidth: 0,
-              }}
-            >
-              <CoinValue
-                value={stat.value}
-                size={14}
-                spacing={0.4}
-                textSx={{
-                  fontSize: 13,
-                  fontWeight: 700,
-                  color: USER_COLORS.textPrimary,
-                  whiteSpace: 'nowrap',
-                  lineHeight: 1.15,
-                }}
-              />
-            </MatchStatPill>
-          ))}
+          <StatInline label={t('match.entryFee')}>
+            <CoinValue value={match.entryFee ?? 0} size={13} />
+          </StatInline>
+          <StatInline label={t('match.prizePool')}>
+            <CoinValue value={winningPool} size={13} />
+          </StatInline>
+          <StatInline label={t('match.perKill')}>
+            <CoinValue value={match.perKill ?? 0} size={13} />
+          </StatInline>
         </Box>
 
-        {!isResult ? (
-          <Box sx={{ minHeight: 22, display: 'flex', alignItems: 'center', mt: 'auto' }}>
-            {isJoined ? (
-              <MatchRoomDialog
-                match={match}
-                trigger={
-                  <Typography
-                    component="span"
-                    sx={{
-                      fontSize: 11,
-                      fontWeight: 700,
-                      letterSpacing: 0.6,
-                      textTransform: 'uppercase',
-                      color: USER_COLORS.gold,
-                      textDecoration: 'underline',
-                      cursor: 'pointer',
-                      '&:hover': { color: goldAlpha(0.8) },
-                    }}
-                  >
-                    {t('match.roomIdPassword')}
-                  </Typography>
-                }
-              />
-            ) : null}
-          </Box>
-        ) : (
-          <Box sx={{ mt: 'auto' }} />
-        )}
+        {!isResult && isJoined ? (
+          <MatchRoomDialog
+            match={match}
+            trigger={
+              <Typography
+                component="span"
+                sx={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: 0.6,
+                  textTransform: 'uppercase',
+                  color: USER_COLORS.gold,
+                  textDecoration: 'underline',
+                  cursor: 'pointer',
+                  '&:hover': { color: goldAlpha(0.8) },
+                }}
+              >
+                {t('match.roomIdPassword')}
+              </Typography>
+            }
+          />
+        ) : null}
 
         {isResult ? (
           <Button
@@ -283,9 +281,8 @@ export function MatchCard({
             }}
             sx={{
               ...userGoldButtonSx,
-              minHeight: 44,
-              height: 44,
-              py: 0,
+              mt: 'auto',
+              py: 0.9,
               fontSize: 13,
             }}
           >
@@ -303,9 +300,8 @@ export function MatchCard({
             }}
             sx={{
               ...userGoldButtonSx,
-              minHeight: 44,
-              height: 44,
-              py: 0,
+              mt: 'auto',
+              py: 0.9,
               fontSize: 13,
             }}
           >
@@ -317,7 +313,9 @@ export function MatchCard({
             ) : isPremiumMatch && !isPremiumUser ? (
               <Stack direction="row" alignItems="center" spacing={0.5}>
                 <Iconify icon="solar:crown-bold" width={16} />
-                <Typography sx={{ fontSize: 13, fontWeight: 800, color: 'inherit' }}>PREMIUM ONLY</Typography>
+                <Typography sx={{ fontSize: 13, fontWeight: 800, color: 'inherit' }}>
+                  PREMIUM ONLY
+                </Typography>
               </Stack>
             ) : isMatchFull ? (
               <Typography sx={{ fontSize: 13, fontWeight: 800, letterSpacing: 0.6, color: 'inherit' }}>

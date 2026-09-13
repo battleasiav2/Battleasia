@@ -1,20 +1,16 @@
-import { Box, Chip, Stack, Button, Typography, Grid2 as Grid } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify';
 import { CoinValue } from 'src/components/coin-value';
-import {
-  getGlassBadgeChipSx,
-  getDefaultGlassTokens,
-  getGoldTopLineShellSx,
-} from 'src/components/battle-glass-card';
 
-import { goldAlpha, USER_COLORS, getUserChipSx, userGoldButtonSx } from 'src/layouts/user';
+import { goldAlpha, USER_COLORS } from 'src/layouts/user';
 
-import { MatchStatPill } from '../../play/components/match-stat-pill';
 import type { MyMatchCardData } from '../my-matches-types';
 
 // ----------------------------------------------------------------------
+
+const GOLD = USER_COLORS.gold;
 
 type MyMatchCardTranslations = {
   won: string;
@@ -33,14 +29,20 @@ type MyMatchCardProps = {
   match: MyMatchCardData;
   onViewDetails: () => void;
   translations: MyMatchCardTranslations;
+  /** Last row in a merged list — hide bottom divider */
+  isLast?: boolean;
 };
 
-export function MyMatchCard({ match, onViewDetails, translations }: MyMatchCardProps) {
-  const tokens = getDefaultGlassTokens();
+/** Shop-style horizontal row — no nested boxes, flat monochrome accents. */
+export function MyMatchCard({ match, onViewDetails, translations, isLast = false }: MyMatchCardProps) {
   const isLoss = match.status === 'loss';
   const isWin = match.status === 'win';
 
-  const statusChipTone = isWin ? 'success' : isLoss ? 'error' : 'gold';
+  const statusColor = isWin
+    ? USER_COLORS.success
+    : isLoss
+      ? USER_COLORS.error
+      : GOLD;
   const statusLabel = isWin ? translations.won : isLoss ? translations.lost : translations.pending;
 
   const matchType = match.matchType?.toLowerCase();
@@ -51,181 +53,119 @@ export function MyMatchCard({ match, onViewDetails, translations }: MyMatchCardP
         ? translations.matchTypeFree
         : match.matchType;
 
+  const metaBits = [
+    match.date,
+    match.gameName,
+    matchTypeLabel,
+    match.kills !== undefined ? `${translations.kills} ${match.kills}` : null,
+    match.rank !== undefined ? `${translations.rank} #${match.rank}` : null,
+  ].filter(Boolean);
+
   return (
     <Box
-      sx={getGoldTopLineShellSx({
-        p: 0,
-        overflow: 'hidden',
-        height: 1,
+      component="button"
+      type="button"
+      onClick={onViewDetails}
+      sx={{
+        all: 'unset',
+        boxSizing: 'border-box',
         display: 'flex',
-        flexDirection: 'column',
-        bgcolor: alpha('#10141c', 0.8),
-        backdropFilter: 'blur(16px)',
-        borderColor: isWin
-          ? alpha(USER_COLORS.success, 0.4)
-          : isLoss
-            ? alpha('#ffffff', 0.08)
-            : goldAlpha(0.25),
-        boxShadow: isWin
-          ? `0 12px 32px ${alpha('#000000', 0.55)}, 0 0 20px ${alpha(USER_COLORS.success, 0.12)}`
-          : `0 12px 32px ${alpha('#000000', 0.55)}`,
-        transition: 'transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.3s ease',
+        alignItems: 'center',
+        gap: { xs: 1.25, sm: 1.75 },
+        width: 1,
+        px: { xs: 1.5, sm: 2 },
+        py: { xs: 1.25, sm: 1.5 },
+        cursor: 'pointer',
+        borderBottom: isLast ? 'none' : `1px solid ${alpha('#ffffff', 0.08)}`,
+        transition: 'background-color 0.2s ease',
         '&:hover': {
-          transform: 'translateY(-6px)',
-          borderColor: isWin ? USER_COLORS.success : goldAlpha(0.55),
-          boxShadow: `0 20px 48px ${alpha('#000000', 0.75)}, 0 0 28px ${isWin ? alpha(USER_COLORS.success, 0.25) : goldAlpha(0.18)}`,
+          bgcolor: goldAlpha(0.06),
+          '& .match-title': { color: GOLD },
+          '& .match-chevron': { color: GOLD, transform: 'translateX(3px)' },
         },
-      })}
+      }}
     >
-      <Box sx={{ position: 'relative', height: 148, overflow: 'hidden' }}>
-        <Box
-          component="img"
-          src={match.heroImage}
-          alt={match.matchName}
-          sx={{
-            width: 1,
-            height: 1,
-            objectFit: 'cover',
-            objectPosition: 'center',
-            display: 'block',
-            filter: isLoss ? 'grayscale(100%)' : 'none',
-          }}
-        />
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            background: `linear-gradient(180deg, transparent 20%, ${alpha('#000000', 0.85)} 100%)`,
-          }}
-        />
+      <Box
+        component="img"
+        src={match.heroImage}
+        alt=""
+        sx={{
+          width: { xs: 56, sm: 72 },
+          height: { xs: 56, sm: 72 },
+          flexShrink: 0,
+          objectFit: 'cover',
+          bgcolor: '#0a0a0a',
+          filter: isLoss ? 'grayscale(100%)' : 'none',
+          border: `1px solid ${alpha('#ffffff', 0.1)}`,
+        }}
+      />
 
-        <Stack
-          direction="row"
-          spacing={0.75}
-          sx={{ position: 'absolute', top: 10, left: 10, right: 10, flexWrap: 'wrap' }}
-        >
-          <Box
-            sx={{
-              ...getGlassBadgeChipSx(tokens),
-              bgcolor: goldAlpha(0.18),
-              border: `1px solid ${goldAlpha(0.35)}`,
-            }}
-          >
-            <Typography sx={{ fontSize: 10, fontWeight: 800, px: 0.5, color: USER_COLORS.gold }}>
-              {matchTypeLabel}
-            </Typography>
-          </Box>
-          {match.map ? (
-            <Box sx={getGlassBadgeChipSx(tokens)}>
-              <Typography sx={{ fontSize: 10, fontWeight: 700, px: 0.5, color: USER_COLORS.gold }}>
-                {match.map}
-              </Typography>
-            </Box>
-          ) : null}
-        </Stack>
-
-        <Box sx={{ position: 'absolute', bottom: 10, right: 10 }}>
-          <Chip
-            size="small"
-            icon={
-              <Iconify
-                icon={
-                  isWin
-                    ? 'solar:cup-star-bold'
-                    : isLoss
-                      ? 'solar:close-circle-bold'
-                      : 'solar:clock-circle-bold'
-                }
-                width={14}
-              />
-            }
-            label={statusLabel}
-            sx={{
-              ...getUserChipSx(statusChipTone),
-              height: 26,
-              fontWeight: 800,
-              letterSpacing: 0.5,
-              '& .MuiChip-icon': { color: 'inherit', ml: 0.75 },
-            }}
-          />
-        </Box>
-      </Box>
-
-      <Stack spacing={1.5} sx={{ p: 2, flex: 1 }}>
-        <Box>
+      <Box sx={{ minWidth: 0, flex: 1 }}>
+        <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap>
           <Typography
-            className="font-tr"
+            className="match-title font-tr"
             sx={{
-              fontSize: 17,
+              fontSize: { xs: 13, sm: 15 },
               fontWeight: 800,
               color: USER_COLORS.textPrimary,
               textTransform: 'uppercase',
-              lineHeight: 1.15,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
+              lineHeight: 1.2,
+              transition: 'color 0.2s ease',
             }}
           >
             {match.matchName}
           </Typography>
+          <Typography
+            sx={{
+              fontSize: 10,
+              fontWeight: 800,
+              letterSpacing: 0.6,
+              textTransform: 'uppercase',
+              color: statusColor,
+            }}
+          >
+            {statusLabel}
+          </Typography>
+        </Stack>
 
-          <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mt: 0.75 }}>
-            <Typography sx={{ fontSize: 12, color: USER_COLORS.gold, fontWeight: 600 }}>
-              {match.date}
-            </Typography>
-            <Typography sx={{ fontSize: 12, color: USER_COLORS.textMuted }}>
-              · {match.gameName}
-            </Typography>
-          </Stack>
-        </Box>
-
-        <Grid container spacing={1}>
-          <Grid size={6}>
-            <MatchStatPill label={translations.entryFee}>
-              <CoinValue value={match.entryFee} size={14} />
-            </MatchStatPill>
-          </Grid>
-          <Grid size={6}>
-            <MatchStatPill label={translations.prizeWon} minHeight={64}>
-              {isWin ? (
-                <Box sx={{ color: USER_COLORS.success }}>
-                  <CoinValue value={match.prizeWon} size={14} />
-                </Box>
-              ) : (
-                <Typography sx={{ fontSize: 13, fontWeight: 700, color: USER_COLORS.textMuted }}>
-                  —
-                </Typography>
-              )}
-            </MatchStatPill>
-          </Grid>
-          {match.kills !== undefined ? (
-            <Grid size={6}>
-              <MatchStatPill label={translations.kills}>{match.kills}</MatchStatPill>
-            </Grid>
-          ) : null}
-          {match.rank !== undefined ? (
-            <Grid size={6}>
-              <MatchStatPill label={translations.rank}>#{match.rank}</MatchStatPill>
-            </Grid>
-          ) : null}
-        </Grid>
-
-        <Button
-          fullWidth
-          variant="outlined"
-          disableElevation
-          onClick={onViewDetails}
-          startIcon={<Iconify icon="solar:eye-bold" width={16} />}
+        <Typography
           sx={{
-            ...userGoldButtonSx,
-            mt: 'auto',
-            py: 1.1,
+            mt: 0.5,
+            fontSize: { xs: 11, sm: 12 },
+            color: alpha('#ffffff', 0.5),
+            lineHeight: 1.35,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
-          {translations.viewDetails}
-        </Button>
+          {metaBits.join(' · ')}
+        </Typography>
+      </Box>
+
+      <Stack alignItems="flex-end" spacing={0.35} sx={{ flexShrink: 0, display: { xs: 'none', sm: 'flex' } }}>
+        <Typography sx={{ fontSize: 9, fontWeight: 700, letterSpacing: 0.6, color: alpha('#ffffff', 0.4), textTransform: 'uppercase' }}>
+          {isWin ? translations.prizeWon : translations.entryFee}
+        </Typography>
+        {isWin ? (
+          <Box sx={{ color: USER_COLORS.success }}>
+            <CoinValue value={match.prizeWon} size={14} />
+          </Box>
+        ) : (
+          <CoinValue value={match.entryFee} size={14} />
+        )}
       </Stack>
+
+      <Iconify
+        className="match-chevron"
+        icon="solar:alt-arrow-right-bold"
+        width={16}
+        sx={{
+          flexShrink: 0,
+          color: alpha('#ffffff', 0.35),
+          transition: 'color 0.2s ease, transform 0.2s ease',
+        }}
+      />
     </Box>
   );
 }

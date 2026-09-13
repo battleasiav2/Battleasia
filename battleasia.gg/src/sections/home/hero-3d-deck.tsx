@@ -30,32 +30,10 @@ const floatDeck3d = keyframes`
   }
 `;
 
-const titleShimmer = keyframes`
-  0% { background-position: 120% 50%; }
-  100% { background-position: -40% 50%; }
-`;
-
-const asiaPulse = keyframes`
-  0%, 100% {
-    filter: drop-shadow(0 0 10px rgba(var(--ba-gold-rgb), 0.45));
-    opacity: 1;
-  }
-  50% {
-    filter: drop-shadow(0 0 22px rgba(var(--ba-gold-rgb), 0.85)) drop-shadow(0 0 40px rgba(var(--ba-gold-rgb), 0.4));
-    opacity: 1;
-  }
-`;
-
 const slashDraw = keyframes`
   0% { transform: scaleX(0); opacity: 0; }
   40% { opacity: 1; }
   100% { transform: scaleX(1); opacity: 1; }
-`;
-
-const ghostDrift = keyframes`
-  0%, 100% { transform: translate(0, 0); opacity: 0.35; }
-  33% { transform: translate(2px, -1px); opacity: 0.55; }
-  66% { transform: translate(-2px, 1px); opacity: 0.4; }
 `;
 
 type Hero3dDeckProps = {
@@ -115,8 +93,8 @@ export function Hero3dDeck({
           borderRadius: '20px',
           bgcolor: alpha('#060a10', 0.82),
           backdropFilter: 'blur(12px)',
-          border: `1px solid ${goldAlpha(0.4)}`,
-          boxShadow: `0 0 16px ${goldAlpha(0.15)}, inset 0 1px 0 rgba(255,255,255,0.15)`,
+          border: `1px solid ${goldAlpha(0.35)}`,
+          boxShadow: 'none',
         }}
       >
         <Box
@@ -125,7 +103,6 @@ export function Hero3dDeck({
             height: 7,
             borderRadius: '50%',
             bgcolor: 'var(--ba-gold)',
-            boxShadow: `0 0 10px var(--ba-gold)`,
           }}
         />
         <Typography
@@ -153,24 +130,6 @@ export function Hero3dDeck({
           minHeight: { xs: 56, sm: 88, md: 104 },
         }}
       >
-        {/* Soft gold bloom behind the mark */}
-        <Box
-          aria-hidden
-          sx={{
-            position: 'absolute',
-            top: '42%',
-            right: { xs: '50%', md: 0 },
-            transform: { xs: 'translate(50%, -50%)', md: 'translateY(-50%)' },
-            width: { xs: 220, sm: 280, md: 300 },
-            height: { xs: 70, sm: 90, md: 100 },
-            borderRadius: '50%',
-            background: `radial-gradient(ellipse, ${goldAlpha(0.35)} 0%, transparent 70%)`,
-            filter: 'blur(22px)',
-            pointerEvents: 'none',
-            zIndex: 0,
-          }}
-        />
-
         <Typography
           component="h1"
           aria-label="Battle Asia"
@@ -191,60 +150,6 @@ export function Hero3dDeck({
             boxSizing: 'border-box',
           }}
         >
-          {/* Chromatic ghost layers */}
-          <Box
-            aria-hidden
-            sx={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'baseline',
-              justifyContent: { xs: 'center', md: 'flex-end' },
-              columnGap: { xs: 1, sm: 1.25, md: 1.5 },
-              color: alpha('#38bdf8', 0.35),
-              fontFamily: `'Barlow', sans-serif`,
-              fontWeight: 800,
-              fontSize: titleSize,
-              letterSpacing: { xs: '-0.02em', md: '-0.03em' },
-              textTransform: 'uppercase',
-              transform: 'translate(-2px, 1px)',
-              animation: `${ghostDrift} 5s ease-in-out infinite`,
-              pointerEvents: 'none',
-              zIndex: 0,
-              '@media (prefers-reduced-motion: reduce)': { animation: 'none', opacity: 0.2 },
-            }}
-          >
-            <Box component="span">Battle</Box>
-            <Box component="span">Asia</Box>
-          </Box>
-          <Box
-            aria-hidden
-            sx={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'baseline',
-              justifyContent: { xs: 'center', md: 'flex-end' },
-              columnGap: { xs: 1, sm: 1.25, md: 1.5 },
-              color: alpha('#fb7185', 0.28),
-              fontFamily: `'Barlow', sans-serif`,
-              fontWeight: 800,
-              fontSize: titleSize,
-              letterSpacing: { xs: '-0.02em', md: '-0.03em' },
-              textTransform: 'uppercase',
-              transform: 'translate(2px, -1px)',
-              animation: `${ghostDrift} 5s ease-in-out infinite reverse`,
-              pointerEvents: 'none',
-              zIndex: 0,
-              '@media (prefers-reduced-motion: reduce)': { animation: 'none', opacity: 0.15 },
-            }}
-          >
-            <Box component="span">Battle</Box>
-            <Box component="span">Asia</Box>
-          </Box>
-
           <Box
             component="span"
             sx={{
@@ -255,31 +160,8 @@ export function Hero3dDeck({
               fontSize: titleSize,
               letterSpacing: { xs: '-0.02em', md: '-0.03em' },
               textTransform: 'uppercase',
-              backgroundImage: `
-                linear-gradient(
-                  115deg,
-                  #9ca3af 0%,
-                  #f8fafc 18%,
-                  #e2e8f0 32%,
-                  #ffffff 48%,
-                  #cbd5e1 62%,
-                  #f1f5f9 78%,
-                  #94a3b8 100%
-                )
-              `,
-              backgroundSize: '220% 100%',
-              animation: `${titleShimmer} 7s linear infinite`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              filter: `
-                drop-shadow(0 10px 18px rgba(0,0,0,0.85))
-                drop-shadow(0 0 18px rgba(255,255,255,0.18))
-              `,
-              '@media (prefers-reduced-motion: reduce)': {
-                animation: 'none',
-                backgroundPosition: '50% 50%',
-              },
+              color: '#f1f5f9',
+              textShadow: '0 2px 12px rgba(0,0,0,0.65)',
             }}
           >
             Battle
@@ -295,45 +177,25 @@ export function Hero3dDeck({
               fontSize: titleSize,
               letterSpacing: { xs: '-0.02em', md: '-0.03em' },
               textTransform: 'uppercase',
-              backgroundImage: `
-                linear-gradient(
-                  125deg,
-                  var(--ba-gold-dark) 0%,
-                  var(--ba-gold) 28%,
-                  #fff4b0 48%,
-                  var(--ba-gold-light) 62%,
-                  var(--ba-gold) 82%,
-                  var(--ba-gold-dark) 100%
-                )
-              `,
-              backgroundSize: '200% 100%',
-              animation: `${titleShimmer} 5.5s linear infinite, ${asiaPulse} 3.2s ease-in-out infinite`,
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-              '@media (prefers-reduced-motion: reduce)': {
-                animation: 'none',
-                backgroundPosition: '40% 50%',
-                filter: `drop-shadow(0 0 12px ${goldAlpha(0.55)})`,
-              },
+              color: 'var(--ba-gold)',
             }}
           >
             Asia
           </Box>
         </Typography>
 
-        {/* Kinetic gold underline under ASIA */}
+        {/* Underline under ASIA */}
         <Box
           aria-hidden
           sx={{
             mt: { xs: 0.75, md: 1 },
             width: { xs: 88, sm: 120, md: 148 },
-            height: 3,
+            height: 2,
             alignSelf: { xs: 'center', md: 'flex-end' },
             mr: { md: 0.5 },
             borderRadius: 1,
-            background: `linear-gradient(90deg, transparent, var(--ba-gold), #fff4b0, var(--ba-gold), transparent)`,
-            boxShadow: `0 0 14px ${goldAlpha(0.7)}`,
+            bgcolor: 'var(--ba-gold)',
+            boxShadow: 'none',
             transformOrigin: { xs: 'center', md: 'right' },
             animation: `${slashDraw} 0.9s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both`,
             '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
@@ -374,7 +236,7 @@ export function Hero3dDeck({
           border: `1px solid ${alpha('#ffffff', 0.08)}`,
           borderRight: { md: `3px solid var(--ba-gold)` },
           borderLeft: { xs: `3px solid var(--ba-gold)`, md: `1px solid ${alpha('#ffffff', 0.08)}` },
-          boxShadow: `0 12px 32px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255,255,255,0.06)`,
+          boxShadow: 'none',
         }}
       >
         <Typography
@@ -384,7 +246,6 @@ export function Hero3dDeck({
             color: alpha('#ffffff', 0.92),
             lineHeight: 1.5,
             fontWeight: 500,
-            textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)',
             overflowWrap: 'anywhere',
           }}
         >
@@ -410,7 +271,7 @@ export function Hero3dDeck({
           zIndex: 4,
         }}
       >
-        {/* Primary 3D Tactical Cyber Download Button (Active State matching screenshot) */}
+        {/* Pulse-simple CTAs */}
         {showDownload && (
           <ButtonBase
             component="a"
@@ -421,228 +282,78 @@ export function Hero3dDeck({
               startAppDownload(downloadHref, downloadFileName);
             }}
             sx={{
-              position: 'relative',
-              overflow: 'hidden',
               display: 'inline-flex',
               alignItems: 'center',
-              justifyContent: 'flex-start',
-              minHeight: { xs: 48, sm: 52 },
-              px: { xs: 2, sm: 2.5 },
-              py: 1.2,
+              justifyContent: 'center',
+              gap: 1,
+              minHeight: { xs: 40, sm: 42 },
+              px: { xs: 1.75, sm: 2.25 },
               width: { xs: 1, sm: 'auto' },
-              minWidth: { sm: 215 },
-              borderRadius: '8px',
-              clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
-              background: `linear-gradient(90deg, ${goldAlpha(0.2)} 0%, rgba(10, 14, 22, 0.85) 100%)`,
-              border: `1px solid ${goldAlpha(0.55)}`,
-              boxShadow: `0 0 20px ${goldAlpha(0.3)}, 0 4px 12px rgba(0, 0, 0, 0.35)`,
-              transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: '-140%',
-                width: '60%',
-                height: '100%',
-                background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent)',
-                transform: 'skewX(-20deg)',
-                transition: 'left 0.6s ease',
-                pointerEvents: 'none',
-              },
+              minWidth: { sm: 180 },
+              borderRadius: '4px',
+              bgcolor: 'rgba(255, 255, 255, 0.05)',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              boxShadow: 'none',
+              transition: 'background-color 0.15s ease, border-color 0.15s ease',
               '&:hover': {
-                bgcolor: goldAlpha(0.25),
-                borderColor: 'var(--ba-gold, #f5c518)',
-                transform: 'translateY(-2px)',
-                boxShadow: `0 8px 24px rgba(0, 0, 0, 0.5), 0 0 24px ${goldAlpha(0.45)}`,
-                '&::before': {
-                  left: '160%',
-                },
-                '& .btn-icon-pod': {
-                  bgcolor: goldAlpha(0.3),
-                  borderColor: 'var(--ba-gold, #f5c518)',
-                  transform: 'scale(1.06)',
-                  boxShadow: `0 0 18px ${goldAlpha(0.4)}`,
-                },
-                '& .btn-label': {
-                  color: 'var(--ba-gold-light, #ffd84d)',
-                },
-              },
-              '&:active': {
-                transform: 'translateY(0)',
+                bgcolor: goldAlpha(0.12),
+                borderColor: goldAlpha(0.45),
               },
             }}
           >
-            {/* Active Glowing Left Strip */}
-            <Box
-              sx={{
-                position: 'absolute',
-                left: 0,
-                top: 0,
-                bottom: 0,
-                width: 3.5,
-                bgcolor: 'var(--ba-gold, #f5c518)',
-                boxShadow: '0 0 14px var(--ba-gold, #f5c518)',
-                zIndex: 2,
-              }}
-            />
-
-            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ minWidth: 0, zIndex: 1 }}>
-              {/* Standalone Icon Pod */}
-              <Box
-                className="btn-icon-pod"
-                sx={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: '6px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  bgcolor: goldAlpha(0.2),
-                  border: `1px solid ${goldAlpha(0.45)}`,
-                  color: 'var(--ba-gold, #f5c518)',
-                  boxShadow: `0 0 14px ${goldAlpha(0.25)}`,
-                  transition: 'all 0.22s ease',
-                  flexShrink: 0,
-                }}
-              >
-                <Iconify icon="solar:download-bold" width={20} />
-              </Box>
-
-              {/* Standalone Label */}
-              <Typography
-                className="btn-label"
-                sx={{
-                  fontSize: { xs: 13.5, sm: 14.5 },
-                  fontWeight: 900,
-                  letterSpacing: '0.07em',
-                  textTransform: 'uppercase',
-                  color: '#ffffff',
-                  textShadow: `0 0 12px ${goldAlpha(0.5)}`,
-                  transition: 'color 0.2s ease',
-                  lineHeight: 1.2,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {t('home.downloadApkButton')}
-              </Typography>
-            </Stack>
-          </ButtonBase>
-        )}
-
-        {/* Secondary 3D Tactical Cyber Button: Explore Arena */}
-        <ButtonBase
-          onClick={handleScrollToTournaments}
-          sx={{
-            position: 'relative',
-            overflow: 'hidden',
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            minHeight: { xs: 48, sm: 52 },
-            px: { xs: 2, sm: 2.5 },
-            py: 1.2,
-            width: { xs: 1, sm: 'auto' },
-            minWidth: { sm: 200 },
-            borderRadius: '8px',
-            clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
-            bgcolor: 'rgba(12, 17, 26, 0.75)',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.35)',
-            transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: '-140%',
-              width: '60%',
-              height: '100%',
-              background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent)',
-              transform: 'skewX(-20deg)',
-              transition: 'left 0.6s ease',
-              pointerEvents: 'none',
-            },
-            '&:hover': {
-              bgcolor: goldAlpha(0.15),
-              borderColor: goldAlpha(0.6),
-              transform: 'translateY(-2px)',
-              boxShadow: `0 8px 24px rgba(0, 0, 0, 0.5), 0 0 18px ${goldAlpha(0.3)}`,
-              '&::before': {
-                left: '160%',
-              },
-              '& .btn-left-strip': {
-                opacity: 1,
-              },
-              '& .btn-icon-pod': {
-                color: 'var(--ba-gold, #f5c518)',
-                bgcolor: goldAlpha(0.22),
-                borderColor: goldAlpha(0.55),
-                boxShadow: `0 0 14px ${goldAlpha(0.25)}`,
-                transform: 'scale(1.06)',
-              },
-              '& .btn-label': {
-                color: 'var(--ba-gold-light, #ffd84d)',
-              },
-            },
-            '&:active': {
-              transform: 'translateY(0)',
-            },
-          }}
-        >
-          {/* Hover Glow Left Strip */}
-          <Box
-            className="btn-left-strip"
-            sx={{
-              position: 'absolute',
-              left: 0,
-              top: 0,
-              bottom: 0,
-              width: 3.5,
-              bgcolor: 'var(--ba-gold, #f5c518)',
-              boxShadow: '0 0 14px var(--ba-gold, #f5c518)',
-              opacity: 0,
-              transition: 'opacity 0.22s ease',
-              zIndex: 2,
-            }}
-          />
-
-          <Stack direction="row" alignItems="center" spacing={1.5} sx={{ minWidth: 0, zIndex: 1 }}>
-            {/* Standalone Icon Pod */}
-            <Box
-              className="btn-icon-pod"
-              sx={{
-                width: 38,
-                height: 38,
-                borderRadius: '6px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                bgcolor: 'rgba(255, 255, 255, 0.06)',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                color: '#ffffff',
-                transition: 'all 0.22s ease',
-                flexShrink: 0,
-              }}
-            >
-              <Iconify icon="solar:gamepad-bold" width={20} />
-            </Box>
-
-            {/* Standalone Label */}
+            <Iconify icon="solar:download-bold" width={18} sx={{ color: 'var(--ba-gold, #cbfb24)' }} />
             <Typography
-              className="btn-label"
               sx={{
-                fontSize: { xs: 13.5, sm: 14.5 },
-                fontWeight: 900,
-                letterSpacing: '0.07em',
+                fontSize: { xs: 12.5, sm: 13.5 },
+                fontWeight: 800,
+                letterSpacing: '0.06em',
                 textTransform: 'uppercase',
                 color: alpha('#ffffff', 0.9),
-                transition: 'color 0.2s ease',
                 lineHeight: 1.2,
                 whiteSpace: 'nowrap',
               }}
             >
-              {t('home.playYourGame.enterArena')}
+              {t('home.downloadApkButton')}
             </Typography>
-          </Stack>
+          </ButtonBase>
+        )}
+
+        <ButtonBase
+          onClick={handleScrollToTournaments}
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 1,
+            minHeight: { xs: 40, sm: 42 },
+            px: { xs: 1.75, sm: 2.25 },
+            width: { xs: 1, sm: 'auto' },
+            minWidth: { sm: 170 },
+            borderRadius: '4px',
+            bgcolor: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            boxShadow: 'none',
+            transition: 'background-color 0.15s ease, border-color 0.15s ease',
+            '&:hover': {
+              bgcolor: goldAlpha(0.12),
+              borderColor: goldAlpha(0.45),
+            },
+          }}
+        >
+          <Iconify icon="solar:gamepad-bold" width={18} sx={{ color: 'var(--ba-gold, #cbfb24)' }} />
+          <Typography
+            sx={{
+              fontSize: { xs: 12.5, sm: 13.5 },
+              fontWeight: 800,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: alpha('#ffffff', 0.9),
+              lineHeight: 1.2,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {t('home.playYourGame.enterArena')}
+          </Typography>
         </ButtonBase>
       </Stack>
 
@@ -672,13 +383,12 @@ export function Hero3dDeck({
               bgcolor: alpha('#06090e', 0.72),
               backdropFilter: 'blur(10px)',
               border: `1px solid ${alpha('#ffffff', 0.1)}`,
-              boxShadow: '0 4px 14px rgba(0,0,0,0.5)',
-              transition: 'all 0.25s ease',
+              boxShadow: 'none',
+              transition: 'border-color 0.2s ease, background-color 0.2s ease',
               '&:hover': {
-                borderColor: 'var(--ba-gold)',
+                borderColor: goldAlpha(0.45),
                 bgcolor: alpha('#06090e', 0.9),
-                transform: 'translateY(-2px)',
-                boxShadow: `0 8px 20px rgba(0,0,0,0.6), 0 0 14px ${goldAlpha(0.3)}`,
+                boxShadow: 'none',
               },
             }}
           >

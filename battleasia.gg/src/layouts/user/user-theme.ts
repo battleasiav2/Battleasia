@@ -1,6 +1,6 @@
 import type { Theme, SxProps } from '@mui/material/styles';
 
-import { alpha, keyframes } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 
 import {
   getGlassShellSx,
@@ -195,8 +195,8 @@ export const userMutedTextSx: SxProps<Theme> = {
 
 /** Shared glass-gold chrome — secondary / tone buttons (success, error, ghost) */
 const userGlassButtonBaseSx: SxProps<Theme> = {
-  borderRadius: 0,
-  clipPath: 'polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%)',
+  borderRadius: '8px',
+  clipPath: 'none',
   fontWeight: 800,
   letterSpacing: '0.08em',
   textTransform: 'uppercase',
@@ -206,23 +206,9 @@ const userGlassButtonBaseSx: SxProps<Theme> = {
   backdropFilter: 'blur(14px)',
   WebkitBackdropFilter: 'blur(14px)',
   backgroundImage: 'none',
-  transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: '-140%',
-    width: '60%',
-    height: '100%',
-    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent)',
-    transform: 'skewX(-20deg)',
-    transition: 'left 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
-    pointerEvents: 'none',
-    zIndex: 1,
-  },
-  '&:hover::before': {
-    left: '160%',
-  },
+  boxShadow: 'none',
+  transform: 'none',
+  transition: 'background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease',
   '& .MuiButton-startIcon, & .MuiButton-endIcon, & .MuiLoadingButton-loadingIndicator': {
     color: 'inherit',
     position: 'relative',
@@ -250,25 +236,17 @@ function createUserGlassToneButtonSx(accent: string, accentLight: string): SxPro
     bgcolor: 'rgba(17, 24, 39, 0.82)',
     backgroundColor: 'rgba(17, 24, 39, 0.82)',
     border: `1px solid ${toneAlpha(accent, 0.45)}`,
-    boxShadow: `
-      inset 0 1px 0 ${alpha('#ffffff', 0.08)},
-      0 0 0 1px ${toneAlpha(accent, 0.08)},
-      0 8px 24px ${alpha('#000000', 0.45)}
-    `,
+    boxShadow: 'none',
     '&:hover': {
       bgcolor: toneAlpha(accent, 0.16),
       backgroundColor: `${toneAlpha(accent, 0.16)} !important`,
       borderColor: accent,
       color: accentLight,
-      boxShadow: `
-        inset 0 0 24px ${toneAlpha(accent, 0.18)},
-        0 0 20px ${toneAlpha(accent, 0.35)},
-        0 10px 28px ${alpha('#000000', 0.55)}
-      `,
-      transform: 'translateY(-2px)',
+      boxShadow: 'none',
+      transform: 'none',
     },
     '&:active': {
-      transform: 'translateY(0) scale(0.98)',
+      transform: 'none',
     },
     '&.Mui-disabled': {
       bgcolor: alpha('#000000', 0.35),
@@ -289,8 +267,8 @@ export const userGoldButtonSx: SxProps<Theme> = createUserGlassToneButtonSx(
 
 /** Solid filled gold CTA — tactical esports contained button (like ENTER ARENA in reference image) */
 export const userSolidGoldButtonSx: SxProps<Theme> = {
-  borderRadius: 0,
-  clipPath: 'polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%)',
+  borderRadius: '8px',
+  clipPath: 'none',
   py: 0,
   px: { xs: 2.5, sm: 3 },
   minHeight: 44,
@@ -308,25 +286,10 @@ export const userSolidGoldButtonSx: SxProps<Theme> = {
   textShadow: 'none',
   backgroundImage: 'none',
   background: 'var(--ba-gold, #f5c518)',
-  border: `1px solid ${goldAlpha(0.85)}`,
-  boxShadow: '0 0 18px rgba(var(--ba-gold-rgb, 245, 197, 24), 0.38)',
-  transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
-  '&::before': {
-    content: '""',
-    position: 'absolute',
-    top: 0,
-    left: '-140%',
-    width: '60%',
-    height: '100%',
-    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent)',
-    transform: 'skewX(-20deg)',
-    transition: 'left 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
-    pointerEvents: 'none',
-    zIndex: 1,
-  },
-  '&:hover::before': {
-    left: '160%',
-  },
+  border: `1px solid ${goldAlpha(0.28)}`,
+  boxShadow: 'none',
+  transform: 'none',
+  transition: 'background-color 0.15s ease, border-color 0.15s ease',
   '& .MuiButton-startIcon, & .MuiButton-endIcon, & .MuiLoadingButton-loadingIndicator': {
     color: '#080a0e !important',
     position: 'relative',
@@ -335,17 +298,17 @@ export const userSolidGoldButtonSx: SxProps<Theme> = {
   '@media (hover: hover)': {
     '&:hover': {
       background: 'var(--ba-gold-light, #fbbf24)',
-      borderColor: goldAlpha(0.95),
-      boxShadow: '0 0 28px rgba(var(--ba-gold-rgb, 245, 197, 24), 0.65)',
-      transform: 'translateY(-2px)',
-      filter: 'brightness(1.08)',
+      borderColor: goldAlpha(0.45),
+      boxShadow: 'none',
+      transform: 'none',
+      filter: 'none',
     },
   },
   '&:active, &.Mui-focusVisible': {
     background: 'var(--ba-gold-dark, #d97706)',
-    borderColor: goldAlpha(0.9),
+    borderColor: goldAlpha(0.4),
     boxShadow: 'none',
-    transform: 'translateY(0) scale(0.98)',
+    transform: 'none',
   },
   '&.Mui-disabled': {
     background: goldAlpha(0.28),
@@ -382,23 +345,16 @@ export const userGhostButtonSx: SxProps<Theme> = {
   letterSpacing: '0.08em',
   border: `1px solid ${alpha('#ffffff', 0.18)}`,
   bgcolor: 'rgba(17, 24, 39, 0.75)',
-  boxShadow: `
-    inset 0 1px 0 ${alpha('#ffffff', 0.06)},
-    0 6px 20px ${alpha('#000000', 0.35)}
-  `,
+  boxShadow: 'none',
   '&:hover': {
     bgcolor: goldAlpha(0.12),
     borderColor: goldAlpha(0.55),
     color: USER_COLORS.gold,
-    boxShadow: `
-      inset 0 0 20px ${goldAlpha(0.12)},
-      0 0 18px ${goldAlpha(0.25)},
-      0 10px 28px ${alpha('#000000', 0.45)}
-    `,
-    transform: 'translateY(-2px)',
+    boxShadow: 'none',
+    transform: 'none',
   },
   '&:active': {
-    transform: 'translateY(0) scale(0.98)',
+    transform: 'none',
   },
   '&.Mui-disabled': {
     bgcolor: alpha('#000000', 0.28),
@@ -408,29 +364,11 @@ export const userGhostButtonSx: SxProps<Theme> = {
   },
 };
 
-const watchLiveGlowPulse = keyframes`
-  0%, 100% {
-    box-shadow:
-      inset 0 0 16px ${alpha('#ef4444', 0.1)},
-      0 0 12px ${alpha('#ef4444', 0.28)};
-    border-color: ${alpha('#ef4444', 0.55)};
-  }
-  50% {
-    box-shadow:
-      inset 0 0 26px ${alpha('#ef4444', 0.18)},
-      0 0 28px ${alpha('#ef4444', 0.52)};
-    border-color: ${USER_COLORS.error};
-  }
-`;
-
-/** Watch Live only — red glass + pulsing live glow */
-export const userWatchLiveButtonSx: SxProps<Theme> = {
-  ...createUserGlassToneButtonSx(USER_COLORS.error, '#fca5a5'),
-  animation: `${watchLiveGlowPulse} 2.2s ease-in-out infinite`,
-  '@media (prefers-reduced-motion: reduce)': {
-    animation: 'none',
-  },
-};
+/** Watch Live only — red glass, same simple shape as other CTAs */
+export const userWatchLiveButtonSx: SxProps<Theme> = createUserGlassToneButtonSx(
+  USER_COLORS.error,
+  '#fca5a5'
+);
 
 export const userHeaderPillSx: SxProps<Theme> = {
   display: 'inline-flex',

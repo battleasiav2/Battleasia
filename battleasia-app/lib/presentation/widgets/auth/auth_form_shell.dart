@@ -1,12 +1,9 @@
-import 'dart:ui';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/widgets/common/battleasia_logo.dart';
-import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
 /// Minimal auth card — matches web zip-style signup shell.
 class AuthFormShell extends StatefulWidget {
@@ -155,19 +152,14 @@ class _AuthPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: Container(
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: const Color(0xFF161618).withValues(alpha: 0.4),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
-          ),
-          foregroundDecoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
-            ),
+            color: const Color(0xFF161618),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -210,12 +202,13 @@ class _AuthPanel extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Text(
+                      Text(
                       'common.brandTagline'.tr(),
                       style: AppTheme.labelUppercase.copyWith(
-                        color: AppColors.gold.withValues(alpha: 0.88),
-                        fontSize: 12,
-                        letterSpacing: 2.5,
+                        color: Colors.white.withValues(alpha: 0.55),
+                        fontSize: 11,
+                        letterSpacing: 1.5,
+                        fontWeight: FontWeight.w700,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -267,7 +260,6 @@ class _AuthPanel extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }
@@ -443,17 +435,39 @@ class AuthPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GoldButton(
-      label: label,
-      onPressed: onPressed,
-      loading: loading,
-      icon: icon,
-      trailingIcon: trailingIcon,
-      uppercase: false,
-      height: 46,
-      fontSize: 14,
-      borderRadius: 4,
-      glow: false,
+    return SizedBox(
+      height: 44,
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: loading ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          foregroundColor: AppColors.goldInk,
+          disabledForegroundColor: Colors.white.withValues(alpha: 0.32),
+          backgroundColor: AppTheme.accentColor,
+          disabledBackgroundColor: Colors.white.withValues(alpha: 0.08),
+          side: BorderSide(color: AppTheme.accentColor.withValues(alpha: 0.28)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          textStyle: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 1.5,
+          ),
+        ),
+        child: loading
+            ? SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: AppColors.goldInk,
+                ),
+              )
+            : Text(
+                label.toUpperCase(),
+                textAlign: TextAlign.center,
+              ),
+      ),
     );
   }
 }
@@ -475,14 +489,19 @@ class AuthSecondaryButton extends StatelessWidget {
     return OutlinedButton.icon(
       onPressed: onPressed,
       icon: Icon(icon ?? Icons.arrow_back, size: 16),
-      label: Text(label),
+      label: Text(label.toUpperCase()),
       style: OutlinedButton.styleFrom(
-        minimumSize: const Size(0, 46),
+        minimumSize: const Size(0, 42),
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        foregroundColor: Colors.white.withValues(alpha: 0.62),
-        side: BorderSide(color: Colors.white.withValues(alpha: 0.14)),
+        foregroundColor: Colors.white.withValues(alpha: 0.88),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+        backgroundColor: Colors.white.withValues(alpha: 0.05),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        textStyle: const TextStyle(
+          fontSize: 12.5,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.8,
+        ),
       ),
     );
   }

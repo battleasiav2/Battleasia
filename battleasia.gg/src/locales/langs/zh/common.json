@@ -283,7 +283,10 @@
       "free": "免费",
       "joinNow": "加入",
       "matchFull": "已满",
-      "signInToJoin": "登录后加入比赛"
+      "signInToJoin": "登录后加入比赛",
+      "playersLabel": "玩家",
+      "matchStatusOpen": "开放",
+      "matchBlurb": "{{game}} 房间：实时报名、击杀奖励与奖池。"
     }
   },
   "navigation": {

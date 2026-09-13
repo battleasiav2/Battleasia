@@ -30,33 +30,7 @@ export function SignInIconButton({ sx, ...other }: SignInIconButtonProps) {
       sx={[headerSignInButtonSx, ...(Array.isArray(sx) ? sx : [sx])]}
       {...other}
     >
-      {/* Tactical User Scope Icon */}
-      <Box
-        sx={{
-          position: 'relative',
-          display: 'grid',
-          placeItems: 'center',
-          width: 20,
-          height: 20,
-          flexShrink: 0,
-        }}
-      >
-        <Iconify icon="solar:user-circle-bold" width={19} sx={{ color: 'inherit' }} />
-        {/* Neon Online Status Pip */}
-        <Box
-          component="span"
-          sx={{
-            position: 'absolute',
-            bottom: 0,
-            right: 0,
-            width: 5,
-            height: 5,
-            borderRadius: '50%',
-            bgcolor: 'var(--ba-nav-badge-main, #cbfb24)',
-            boxShadow: '0 0 6px var(--ba-nav-badge-main, #cbfb24)',
-          }}
-        />
-      </Box>
+      <Iconify icon="solar:user-circle-bold" width={19} sx={{ color: 'inherit' }} />
 
       {/* Label */}
       <Box

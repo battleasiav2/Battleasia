@@ -294,7 +294,7 @@ class _AccountDrawerContent extends StatelessWidget {
           ),
           child: SizedBox(
             width: double.infinity,
-            height: 48,
+            height: 36,
             child: OutlinedButton.icon(
               onPressed: () async {
                 await authProvider.signOut();
@@ -305,11 +305,11 @@ class _AccountDrawerContent extends StatelessWidget {
                   );
                 }
               },
-              icon: const Icon(Icons.logout, size: 18),
+              icon: const Icon(Icons.logout, size: 16),
               label: Text(
                 'account.logout'.tr().toUpperCase(),
                 style: const TextStyle(
-                  fontSize: 13,
+                  fontSize: 12,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 0.8,
                 ),
@@ -318,9 +318,11 @@ class _AccountDrawerContent extends StatelessWidget {
                 foregroundColor: const Color(0xFFFECACA),
                 backgroundColor: const Color(0x24EF4444),
                 side: BorderSide(color: Colors.red.withValues(alpha: 0.55)),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
             ),
           ),
@@ -344,7 +346,7 @@ class _AccountDrawerContent extends StatelessWidget {
         ),
         child: ExpansionTile(
           tilePadding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-          childrenPadding: const EdgeInsets.only(left: 4, bottom: 4),
+          childrenPadding: EdgeInsets.zero,
           title: Row(
             children: [
               Container(
@@ -372,117 +374,144 @@ class _AccountDrawerContent extends StatelessWidget {
         iconColor: Colors.white.withValues(alpha: 0.42),
         collapsedIconColor: Colors.white.withValues(alpha: 0.42),
         children: [
-          AccountMenuTile(
-            label: 'account.profile'.tr(),
-            nested: true,
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AccountScreen()),
-              );
-            },
-          ),
-          AccountMenuTile(
-            label: 'account.wallet'.tr(),
-            nested: true,
-            onTap: () {
-              Navigator.pop(context);
-              openShopRoute(
-                context,
-                const ShopWalletScreen(),
-                routeName: '/shop/wallet',
-              );
-            },
-          ),
-          AccountMenuTile(
-            label: 'account.withdraw'.tr(),
-            nested: true,
-            onTap: () {
-              Navigator.pop(context);
-              openShopRoute(
-                context,
-                const ShopWithdrawalScreen(),
-                routeName: '/shop/withdraw',
-              );
-            },
-          ),
-          AccountMenuTile(
-            label: 'account.myMatches'.tr(),
-            nested: true,
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MyMatchesScreen()),
-              );
-            },
-          ),
-          AccountMenuTile(
-            label: 'account.myOrders'.tr(),
-            nested: true,
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MyOrdersScreen()),
-              );
-            },
-          ),
-          AccountMenuTile(
-            label: 'account.myStatistics'.tr(),
-            nested: true,
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MyStatisticsScreen()),
-              );
-            },
-          ),
-          AccountMenuTile(
-            label: 'account.myReferrals'.tr(),
-            nested: true,
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MyReferralsScreen()),
-              );
-            },
-          ),
-          AccountMenuTile(
-            label: 'account.notifications'.tr(),
-            nested: true,
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const NotificationsScreen()),
-              );
-            },
-          ),
-          AccountMenuTile(
-            label: 'account.leaderboard'.tr(),
-            nested: true,
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const LeaderboardScreen()),
-              );
-            },
-          ),
-          AccountMenuTile(
-            label: 'account.customerSupport'.tr(),
-            nested: true,
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const CustomerSupportScreen()),
-              );
-            },
+          Container(
+            margin: const EdgeInsets.only(left: 14, bottom: 4),
+            decoration: BoxDecoration(
+              border: Border(
+                left: BorderSide(
+                  color: AppColors.gold.withValues(alpha: 0.85),
+                  width: 2,
+                ),
+              ),
+            ),
+            child: Column(
+              children: [
+                AccountMenuTile(
+                  label: 'account.profile'.tr(),
+                  nested: true,
+                  icon: Icons.person_outline,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AccountScreen()),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'account.wallet'.tr(),
+                  nested: true,
+                  icon: Icons.account_balance_wallet_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    openShopRoute(
+                      context,
+                      const ShopWalletScreen(),
+                      routeName: '/shop/wallet',
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'account.withdraw'.tr(),
+                  nested: true,
+                  icon: Icons.payments_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    openShopRoute(
+                      context,
+                      const ShopWithdrawalScreen(),
+                      routeName: '/shop/withdraw',
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'account.myMatches'.tr(),
+                  nested: true,
+                  icon: Icons.sports_esports_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MyMatchesScreen()),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'account.myOrders'.tr(),
+                  nested: true,
+                  icon: Icons.receipt_long_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MyOrdersScreen()),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'account.myStatistics'.tr(),
+                  nested: true,
+                  icon: Icons.bar_chart_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MyStatisticsScreen()),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'account.myReferrals'.tr(),
+                  nested: true,
+                  icon: Icons.group_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const MyReferralsScreen()),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'account.notifications'.tr(),
+                  nested: true,
+                  icon: Icons.notifications_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'account.leaderboard'.tr(),
+                  nested: true,
+                  icon: Icons.emoji_events_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LeaderboardScreen()),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'account.customerSupport'.tr(),
+                  nested: true,
+                  icon: Icons.chat_bubble_outline,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CustomerSupportScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ],
         ),

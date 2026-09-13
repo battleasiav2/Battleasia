@@ -53,7 +53,7 @@ export function HeroStickyCta({
         pb: 'max(10px, env(safe-area-inset-bottom))',
         bgcolor: alpha('#141414', 0.96),
         borderTop: `1px solid ${goldAlpha(0.28)}`,
-        boxShadow: `0 -8px 24px ${alpha('#000000', 0.45)}`,
+        boxShadow: `0 -4px 12px ${alpha('#000000', 0.25)}`,
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
       }}

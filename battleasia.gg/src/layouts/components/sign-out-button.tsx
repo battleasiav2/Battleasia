@@ -35,7 +35,7 @@ export function SignOutButton({ onClose, sx, ...other }: Props) {
       fullWidth
       variant="outlined"
       disableElevation
-      size="large"
+      size={other.size ?? 'medium'}
       onClick={handleLogout}
       sx={mergedSx}
     >

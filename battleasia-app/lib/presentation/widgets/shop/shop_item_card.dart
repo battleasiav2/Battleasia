@@ -35,6 +35,7 @@ class ShopItemCard extends StatelessWidget {
             Ink(
               decoration: BoxDecoration(
                 color: const Color(0xFF161618),
+                borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
               ),
               child: Padding(

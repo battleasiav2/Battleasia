@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 
-/// Aurora Edge profile drawer link — gold dot prefix + hairline stack.
+/// Aurora Edge profile drawer link — flat list row with optional icon.
 class AccountMenuTile extends StatelessWidget {
   final String label;
   final VoidCallback onTap;
   final bool nested;
   final bool active;
+  final IconData? icon;
 
   const AccountMenuTile({
     super.key,
@@ -14,6 +15,7 @@ class AccountMenuTile extends StatelessWidget {
     required this.onTap,
     this.nested = false,
     this.active = false,
+    this.icon,
   });
 
   /// Expandable section wrapper (Account submenu).
@@ -38,17 +40,54 @@ class AccountMenuTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fontSize = nested ? 16.0 : 20.0;
+    if (nested) {
+      return InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: Colors.white.withValues(alpha: 0.08),
+              ),
+            ),
+          ),
+          child: Row(
+            children: [
+              if (icon != null) ...[
+                Icon(
+                  icon,
+                  size: 18,
+                  color: active
+                      ? AppColors.gold
+                      : Colors.white.withValues(alpha: 0.55),
+                ),
+                const SizedBox(width: 12),
+              ],
+              Expanded(
+                child: Text(
+                  label.toUpperCase(),
+                  style: TextStyle(
+                    color: active
+                        ? Colors.white
+                        : Colors.white.withValues(alpha: 0.72),
+                    fontWeight: active ? FontWeight.w800 : FontWeight.w600,
+                    fontSize: 13,
+                    letterSpacing: 0.6,
+                    height: 1.2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
 
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.fromLTRB(
-          nested ? 16 : 0,
-          nested ? 8 : 10,
-          8,
-          nested ? 8 : 10,
-        ),
+        padding: const EdgeInsets.fromLTRB(0, 10, 8, 10),
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
@@ -76,7 +115,7 @@ class AccountMenuTile extends StatelessWidget {
                       ? Colors.white
                       : Colors.white.withValues(alpha: 0.55),
                   fontWeight: active ? FontWeight.w600 : FontWeight.w500,
-                  fontSize: fontSize,
+                  fontSize: 20,
                   height: 1.25,
                 ),
               ),

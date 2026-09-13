@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { Iconify } from 'src/components/iconify';
-import { UserArenaStrip, UserArenaChip, USER_COLORS } from 'src/layouts/user';
-import { useTranslate } from 'src/locales/use-locales';
+import { UserArenaStrip } from 'src/layouts/user';
 
 import { STATISTICS_HERO_IMAGE } from '../my-statistics-constants';
 
@@ -14,22 +12,8 @@ type StatisticsHeroProps = {
   action?: ReactNode;
 };
 
-export function StatisticsHero({ title, subtitle, action }: StatisticsHeroProps) {
-  const { t } = useTranslate();
-
+export function StatisticsHero({ title, action }: StatisticsHeroProps) {
   return (
-    <UserArenaStrip
-      badge={t('myStatistics.badgePerformanceTracker')}
-      title={title}
-      subtitle={subtitle}
-      imageUrl={STATISTICS_HERO_IMAGE}
-      action={action}
-      chip={
-        <UserArenaChip
-          icon={<Iconify icon="solar:chart-bold" width={12} sx={{ color: USER_COLORS.gold }} />}
-          label="STATS"
-        />
-      }
-    />
+    <UserArenaStrip title={title} imageUrl={STATISTICS_HERO_IMAGE} dense action={action} />
   );
 }

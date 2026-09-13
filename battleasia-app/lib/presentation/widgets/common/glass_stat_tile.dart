@@ -21,7 +21,7 @@ class GlassStatTile extends StatelessWidget {
     this.padding = const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
   });
 
-  static const double radius = 0;
+  static const double radius = 8;
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +34,9 @@ class GlassStatTile extends StatelessWidget {
               width: double.infinity,
               padding: padding,
               decoration: BoxDecoration(
-                color: const Color(0xFF161618).withValues(alpha: 0.4),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+                color: const Color(0xFF161618),
+                borderRadius: BorderRadius.circular(radius),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
               ),
               foregroundDecoration: BoxDecoration(
                 border: Border(

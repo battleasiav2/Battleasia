@@ -46,23 +46,22 @@ export function AuthStepProgress({ steps, currentStep }: AuthStepProgressProps) 
             key={step.id}
             sx={{ display: 'flex', flex: 1, alignItems: 'center', gap: 1.25, minWidth: 0 }}
           >
-            {/* Chamfered Step Number Node */}
+            {/* Step number */}
             <Box
               sx={{
-                width: 30,
-                height: 30,
+                width: 28,
+                height: 28,
                 flexShrink: 0,
                 display: 'grid',
                 placeItems: 'center',
-                clipPath: 'polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%)',
-                bgcolor: done ? accentColor : active ? alpha(accentColor, 0.18) : alpha('#ffffff', 0.05),
-                border: `1.5px solid ${done || active ? accentColor : alpha('#ffffff', 0.15)}`,
+                borderRadius: '4px',
+                bgcolor: done ? accentColor : active ? alpha(accentColor, 0.12) : alpha('#ffffff', 0.05),
+                border: `1px solid ${done || active ? accentColor : alpha('#ffffff', 0.12)}`,
                 color: done ? accentContrast : active ? accentColor : AUTH_TEXT_MUTED,
-                boxShadow: active || done ? `0 0 12px ${alpha(accentColor, 0.45)}` : 'none',
-                fontFamily: 'monospace',
+                boxShadow: 'none',
                 fontSize: 12,
-                fontWeight: 900,
-                transition: 'all 0.3s ease',
+                fontWeight: 800,
+                transition: 'border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease',
               }}
             >
               {done ? <Iconify icon="eva:checkmark-fill" width={16} /> : `0${step.id}`}
@@ -107,8 +106,8 @@ export function AuthStepProgress({ steps, currentStep }: AuthStepProgressProps) 
                   flex: 1,
                   minWidth: 16,
                   bgcolor: currentStep > 1 ? accentColor : alpha('#ffffff', 0.12),
-                  boxShadow: currentStep > 1 ? `0 0 8px ${accentColor}` : 'none',
-                  transition: 'all 0.4s ease',
+                  boxShadow: 'none',
+                  transition: 'background-color 0.2s ease',
                 }}
               />
             )}

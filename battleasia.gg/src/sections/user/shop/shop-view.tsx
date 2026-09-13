@@ -5,7 +5,7 @@ import { Box, Stack, Typography, Grid2 as Grid } from '@mui/material';
 
 import { useTranslate } from 'src/locales/use-locales';
 import { useImagePreloader } from 'src/hooks';
-import { USER_COLORS, UserPageShell, UserGlassCard, goldAlpha } from 'src/layouts/user';
+import { USER_COLORS, UserPageShell, goldAlpha } from 'src/layouts/user';
 
 import { Iconify } from 'src/components/iconify';
 
@@ -93,14 +93,12 @@ export function ShopView() {
           >
             <Box>
               <Typography
-                className="font-tr"
                 sx={{
-                  fontSize: { xs: 22, md: 28 },
-                  fontWeight: 900,
+                  fontSize: { xs: 18, md: 22 },
+                  fontWeight: 800,
                   textTransform: 'uppercase',
                   color: USER_COLORS.textPrimary,
-                  letterSpacing: 0.8,
-                  textShadow: `0 0 20px ${goldAlpha(0.2)}`,
+                  letterSpacing: 0.4,
                 }}
               >
                 {t('shop.bacTitle')}
@@ -113,12 +111,11 @@ export function ShopView() {
               spacing={0.8}
               sx={{
                 alignSelf: { xs: 'flex-start', sm: 'center' },
-                px: 1.5,
-                py: 0.6,
-                border: `1px solid ${goldAlpha(0.4)}`,
-                bgcolor: alpha('#000000', 0.65),
-                boxShadow: `0 4px 14px ${alpha('#000000', 0.5)}, inset 0 0 10px ${goldAlpha(0.08)}`,
-                clipPath: 'polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)',
+                px: 1.25,
+                py: 0.5,
+                borderRadius: '8px',
+                border: `1px solid ${goldAlpha(0.32)}`,
+                bgcolor: goldAlpha(0.12),
                 flexShrink: 0,
               }}
             >
@@ -140,9 +137,17 @@ export function ShopView() {
           <Grid container spacing={2.5} alignItems="stretch">
             {/* Left Carousel Column */}
             <Grid size={{ xs: 12, lg: 8 }}>
-              <UserGlassCard noPadding sx={{ p: { xs: 1.25, md: 1.75 }, height: 1 }}>
+              <Box
+                sx={{
+                  height: 1,
+                  p: { xs: 1.25, md: 1.5 },
+                  borderRadius: '12px',
+                  bgcolor: '#161618',
+                  border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                }}
+              >
                 <ShopDetailsCarousel images={[...SHOP_IMAGE_PATHS]} name={t('shop.bacShopName')} />
-              </UserGlassCard>
+              </Box>
             </Grid>
 
             {/* Right Partner HUD Card Column */}
@@ -150,16 +155,13 @@ export function ShopView() {
               <Box
                 sx={{
                   height: 1,
-                  p: { xs: 2.25, md: 2.75 },
+                  minHeight: { xs: 0, lg: 280 },
+                  p: { xs: 2, md: 2.25 },
                   display: 'flex',
                   flexDirection: 'column',
-                  bgcolor: alpha('#06090e', 0.75),
-                  backdropFilter: 'blur(18px)',
-                  WebkitBackdropFilter: 'blur(18px)',
-                  border: `1px solid ${goldAlpha(0.28)}`,
-                  borderTop: `2px solid ${GOLD}`,
-                  boxShadow: `0 12px 32px ${alpha('#000000', 0.65)}, inset 0 0 20px ${goldAlpha(0.05)}`,
-                  clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+                  borderRadius: '12px',
+                  bgcolor: '#161618',
+                  border: `1px solid ${alpha('#ffffff', 0.08)}`,
                 }}
               >
                 <Stack spacing={2.25} sx={{ height: 1 }}>
@@ -186,10 +188,10 @@ export function ShopView() {
                     alignItems="center"
                     spacing={1.5}
                     sx={{
-                      p: 1.75,
-                      border: `1px solid ${goldAlpha(0.35)}`,
+                      p: 1.5,
+                      borderRadius: '8px',
+                      border: `1px solid ${goldAlpha(0.28)}`,
                       bgcolor: goldAlpha(0.08),
-                      clipPath: 'polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%)',
                       mt: 'auto',
                     }}
                   >
@@ -202,7 +204,7 @@ export function ShopView() {
                         justifyContent: 'center',
                         bgcolor: goldAlpha(0.18),
                         border: `1px solid ${GOLD}`,
-                        boxShadow: `0 0 14px ${goldAlpha(0.3)}`,
+                        borderRadius: '8px',
                         color: GOLD,
                         flexShrink: 0,
                       }}
@@ -221,7 +223,7 @@ export function ShopView() {
                       >
                         {t('shop.currency')}
                       </Typography>
-                      <Typography sx={{ fontSize: 17, fontWeight: 900, color: GOLD, textShadow: `0 0 10px ${goldAlpha(0.4)}` }}>
+                      <Typography sx={{ fontSize: 16, fontWeight: 800, color: GOLD }}>
                         BAC COINS
                       </Typography>
                     </Box>

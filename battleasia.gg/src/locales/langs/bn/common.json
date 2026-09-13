@@ -282,7 +282,10 @@
       "free": "বিনামূল্যে",
       "joinNow": "জয়েন",
       "matchFull": "পূর্ণ",
-      "signInToJoin": "জয়েন করতে সাইন ইন করুন"
+      "signInToJoin": "জয়েন করতে সাইন ইন করুন",
+      "playersLabel": "প্লেয়ার",
+      "matchStatusOpen": "ওপেন",
+      "matchBlurb": "{{game}} রুম — লাইভ এন্ট্রি, কিল রিওয়ার্ড আর প্রাইজ পুল।"
     }
   },
   "navigation": {

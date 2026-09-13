@@ -453,7 +453,10 @@
       "free": "Free",
       "joinNow": "Join",
       "matchFull": "Full",
-      "signInToJoin": "Sign in to join this match"
+      "signInToJoin": "Sign in to join this match",
+      "playersLabel": "players",
+      "matchStatusOpen": "Open",
+      "matchBlurb": "{{game}} room with live entry, kill rewards, and a growing prize pool."
     }
   },
   "navigation": {

@@ -283,7 +283,10 @@
       "free": "مفت",
       "joinNow": "جوائن",
       "matchFull": "بھر گیا",
-      "signInToJoin": "جوائن کرنے کے لیے سائن ان کریں"
+      "signInToJoin": "جوائن کرنے کے لیے سائن ان کریں",
+      "playersLabel": "پلیئرز",
+      "matchStatusOpen": "اوپن",
+      "matchBlurb": "{{game}} روم — لائیو انٹری، کل ریوارڈز اور پرائز پول۔"
     }
   },
   "navigation": {

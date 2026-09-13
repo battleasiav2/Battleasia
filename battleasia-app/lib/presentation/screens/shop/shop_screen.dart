@@ -353,7 +353,7 @@ class _ShopScreenState extends State<ShopScreen> {
 
   Widget _buildHero() {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(2),
+      borderRadius: BorderRadius.circular(12),
       child: AspectRatio(
         aspectRatio: 16 / 7,
         child: Stack(

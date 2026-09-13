@@ -19,7 +19,8 @@ const kenBurnsSoft = keyframes`
 // ----------------------------------------------------------------------
 
 export type UserArenaStripProps = {
-  badge: string;
+  /** Optional eyebrow above the title */
+  badge?: string;
   title: string;
   imageUrl: string;
   chip?: ReactNode;
@@ -102,18 +103,20 @@ export function UserArenaStrip({
         }}
       >
         <Box sx={{ minWidth: 0, maxWidth: { md: '70%' } }}>
-          <Typography
-            sx={{
-              fontSize: 11,
-              fontWeight: 800,
-              letterSpacing: 1.8,
-              textTransform: 'uppercase',
-              color: goldAlpha(0.9),
-              mb: 0.75,
-            }}
-          >
-            {badge}
-          </Typography>
+          {badge ? (
+            <Typography
+              sx={{
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: 1.8,
+                textTransform: 'uppercase',
+                color: goldAlpha(0.9),
+                mb: 0.75,
+              }}
+            >
+              {badge}
+            </Typography>
+          ) : null}
 
           <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap>
             <Typography

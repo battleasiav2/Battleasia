@@ -3,7 +3,6 @@ import { alpha } from '@mui/material/styles';
 
 import CoinValue from 'src/components/coin-value';
 import { Iconify } from 'src/components/iconify';
-import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
 
 import { USER_COLORS, goldAlpha } from 'src/layouts/user';
 
@@ -11,136 +10,134 @@ import { formatReferralDate, type ReferralNetworkItem } from '../referral-types'
 
 // ----------------------------------------------------------------------
 
+const GOLD = USER_COLORS.gold;
+
 type ReferralNetworkListProps = {
   items: ReferralNetworkItem[];
   labels: {
-    playerName: string;
     joined: string;
     deposits: string;
     earnings: string;
-    status: string;
     active: string;
     inactive: string;
   };
 };
 
 export function ReferralNetworkList({ items, labels }: ReferralNetworkListProps) {
-  const tokens = getDefaultGlassTokens();
-
   return (
-    <Stack spacing={1}>
-      <Box
-        sx={{
-          display: { xs: 'none', md: 'grid' },
-          gridTemplateColumns: '1.3fr 1fr 0.8fr 0.8fr 0.7fr',
-          gap: 1,
-          px: 2,
-          py: 1,
-        }}
-      >
-        {[labels.playerName, labels.joined, labels.deposits, labels.earnings, labels.status].map((label) => (
-          <Typography
-            key={label}
-            sx={{
-              fontSize: 10,
-              fontWeight: 800,
-              letterSpacing: 0.8,
-              textTransform: 'uppercase',
-              color: USER_COLORS.textMuted,
-              textAlign: label === labels.earnings || label === labels.status ? 'right' : 'left',
-            }}
-          >
-            {label}
-          </Typography>
-        ))}
-      </Box>
-
-      {items.map((item) => {
+    <>
+      {items.map((item, index) => {
         const isActive = item.status === 'active';
+        const isLast = index === items.length - 1;
+        const statusLabel = isActive ? labels.active : labels.inactive;
         const statusColor = isActive ? USER_COLORS.success : USER_COLORS.error;
+        const meta = [
+          `${labels.joined} ${formatReferralDate(item.joinedAt)}`,
+          `${labels.deposits} ${item.depositCount} (${item.totalDeposits} BAC)`,
+        ].join(' · ');
 
         return (
           <Box
             key={item.id}
-            sx={getGlassInnerSx(tokens, {
-              p: { xs: 1.5, md: 2 },
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: '1fr auto',
-                md: '1.3fr 1fr 0.8fr 0.8fr 0.7fr',
-              },
-              gap: 1,
+            sx={{
+              display: 'flex',
               alignItems: 'center',
-            })}
+              gap: { xs: 1.25, sm: 1.75 },
+              width: 1,
+              px: { xs: 1.5, sm: 2 },
+              py: { xs: 1.25, sm: 1.5 },
+              borderBottom: isLast ? 'none' : `1px solid ${alpha('#ffffff', 0.08)}`,
+              transition: 'background-color 0.2s ease',
+              '&:hover': {
+                bgcolor: goldAlpha(0.06),
+                '& .ref-title': { color: GOLD },
+              },
+            }}
           >
-            <Stack direction="row" alignItems="center" spacing={1.25} sx={{ minWidth: 0 }}>
-              <Box
-                sx={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: '50%',
-                  flexShrink: 0,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  bgcolor: goldAlpha(0.1),
-                  border: `1px solid ${goldAlpha(0.22)}`,
-                  color: USER_COLORS.gold,
-                }}
-              >
-                <Iconify icon="solar:user-bold" width={18} />
-              </Box>
-              <Box sx={{ minWidth: 0 }}>
+            <Box
+              sx={{
+                width: { xs: 40, sm: 44 },
+                height: { xs: 40, sm: 44 },
+                flexShrink: 0,
+                display: 'grid',
+                placeItems: 'center',
+                bgcolor: '#0a0a0a',
+                border: `1px solid ${alpha('#ffffff', 0.1)}`,
+                color: GOLD,
+              }}
+            >
+              <Iconify icon="solar:user-bold" width={18} />
+            </Box>
+
+            <Box sx={{ minWidth: 0, flex: 1 }}>
+              <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" useFlexGap>
                 <Typography
-                  className="font-tr"
+                  className="ref-title font-tr"
                   sx={{
-                    fontSize: 14,
-                    fontWeight: 700,
+                    fontSize: { xs: 13, sm: 15 },
+                    fontWeight: 800,
                     color: USER_COLORS.textPrimary,
                     textTransform: 'uppercase',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
+                    lineHeight: 1.2,
+                    transition: 'color 0.2s ease',
                   }}
+                  noWrap
                 >
                   {item.playerName}
                 </Typography>
-                <Typography sx={{ fontSize: 11, color: USER_COLORS.textMuted, display: { xs: 'block', md: 'none' } }}>
-                  {formatReferralDate(item.joinedAt)}
+                <Typography
+                  sx={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: 0.6,
+                    textTransform: 'uppercase',
+                    color: statusColor,
+                  }}
+                >
+                  {statusLabel}
                 </Typography>
-              </Box>
-            </Stack>
+              </Stack>
 
-            <Typography sx={{ fontSize: 13, color: USER_COLORS.textSubtle, display: { xs: 'none', md: 'block' } }}>
-              {formatReferralDate(item.joinedAt)}
-            </Typography>
-
-            <Typography sx={{ fontSize: 13, color: USER_COLORS.textPrimary, textAlign: { md: 'right' } }}>
-              {item.depositCount} ({item.totalDeposits} BAC)
-            </Typography>
-
-            <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-end', md: 'flex-end' } }}>
-              <CoinValue value={item.totalEarnings} size={14} textSx={{ fontWeight: 700, color: USER_COLORS.gold }} />
-            </Box>
-
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <Box
+              <Typography
                 sx={{
-                  px: 1,
-                  py: 0.35,
-                  borderRadius: '4px',
-                  bgcolor: alpha(statusColor, 0.15),
-                  border: `1px solid ${alpha(statusColor, 0.35)}`,
+                  mt: 0.5,
+                  fontSize: { xs: 11, sm: 12 },
+                  color: alpha('#ffffff', 0.5),
+                  lineHeight: 1.35,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
                 }}
               >
-                <Typography sx={{ fontSize: 10, fontWeight: 800, color: statusColor, textTransform: 'uppercase' }}>
-                  {isActive ? labels.active : labels.inactive}
-                </Typography>
-              </Box>
+                {meta}
+              </Typography>
             </Box>
+
+            <Stack
+              alignItems="flex-end"
+              spacing={0.35}
+              sx={{ flexShrink: 0, display: { xs: 'none', sm: 'flex' } }}
+            >
+              <Typography
+                sx={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  letterSpacing: 0.6,
+                  color: alpha('#ffffff', 0.4),
+                  textTransform: 'uppercase',
+                }}
+              >
+                {labels.earnings}
+              </Typography>
+              <CoinValue
+                value={item.totalEarnings}
+                size={14}
+                textSx={{ fontWeight: 700, color: GOLD }}
+              />
+            </Stack>
           </Box>
         );
       })}
-    </Stack>
+    </>
   );
 }

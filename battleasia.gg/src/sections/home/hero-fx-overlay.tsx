@@ -53,16 +53,6 @@ const bracketPulse = keyframes`
   50% { opacity: 0.85; }
 `;
 
-const telemetryFlicker = keyframes`
-  0%, 100% { opacity: 0.6; }
-  45% { opacity: 0.6; }
-  46% { opacity: 0.2; }
-  48% { opacity: 0.7; }
-  72% { opacity: 0.6; }
-  73% { opacity: 0.1; }
-  74% { opacity: 0.8; }
-`;
-
 // Glowing fireflies matched to the video's misty forest fireflies
 const PARTICLES = [
   { top: '22%', left: '15%', size: 4, dx: '32px', dy: '-40px', delay: '0s', duration: '8s', peak: 0.75, color: '#cbfb24' },
@@ -188,24 +178,7 @@ export function HeroFxOverlay() {
         />
       </Box>
 
-      {/* Military Telemetry Coordinate HUD (Top Left) */}
-      <Box
-        sx={{
-          display: { xs: 'none', md: 'block' },
-          position: 'absolute',
-          top: 32,
-          left: 64,
-          fontFamily: 'monospace',
-          fontSize: 10,
-          fontWeight: 700,
-          color: goldAlpha(0.75),
-          letterSpacing: 1.5,
-          textShadow: `0 0 8px ${goldAlpha(0.5)}`,
-          animation: `${telemetryFlicker} 8s infinite`,
-        }}
-      >
-        CAM 01 • SEC ALPHA • 120 FPS • COMBAT ARMED
-      </Box>
+      {/* Military Telemetry Coordinate HUD — removed decorative CAM/FPS chrome */}
 
       {/* Laser Scanline Beam Sweep */}
       <Box

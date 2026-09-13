@@ -158,37 +158,23 @@ export function applyLiveCountsToGames(
 const slideInRight = keyframes`
   0% {
     opacity: 0;
-    transform: translate3d(55px, 0, 0) scale(0.97);
-    filter: blur(4px);
+    transform: translate3d(24px, 0, 0);
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
+    transform: translate3d(0, 0, 0);
   }
 `;
 
 const slideInLeft = keyframes`
   0% {
     opacity: 0;
-    transform: translate3d(-55px, 0, 0) scale(0.97);
-    filter: blur(4px);
+    transform: translate3d(-24px, 0, 0);
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(0);
+    transform: translate3d(0, 0, 0);
   }
-`;
-
-const reticlePulse = keyframes`
-  0%, 100% { opacity: 0.25; transform: scale(1); }
-  50% { opacity: 0.45; transform: scale(1.03); }
-`;
-
-const livePulse = keyframes`
-  0%, 100% { opacity: 1; box-shadow: 0 0 0 0 ${alpha('#22c55e', 0.6)}; }
-  50% { opacity: 0.7; box-shadow: 0 0 0 6px ${alpha('#22c55e', 0)}; }
 `;
 
 const progressFill = keyframes`
@@ -196,7 +182,6 @@ const progressFill = keyframes`
   to { width: 100%; }
 `;
 
-const TACTICAL_STRIPES = '//////';
 const AUTO_SLIDE_INTERVAL_MS = 4500;
 
 // ----------------------------------------------------------------------
@@ -288,47 +273,14 @@ export function PlayYourGameSection() {
         position: 'relative',
         overflowX: 'clip',
         overflowY: 'visible',
-        bgcolor: '#07080a',
+        bgcolor: '#06090e',
         color: '#ffffff',
         pt: { xs: 2.5, md: 3.5 },
         pb: { xs: 4, md: 6 },
-        borderTop: `1px solid ${alpha('#ffffff', 0.06)}`,
-        borderBottom: `1px solid ${alpha('#ffffff', 0.06)}`,
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          inset: 0,
-          background: `
-            radial-gradient(circle at 18% 45%, ${alpha(accentColor, 0.08)} 0%, transparent 45%),
-            radial-gradient(circle at 85% 25%, ${alpha(accentColor, 0.05)} 0%, transparent 50%),
-            linear-gradient(180deg, rgba(7, 8, 10, 0.94) 0%, rgba(10, 11, 15, 0.7) 40%, rgba(7, 8, 10, 0.96) 100%)
-          `,
-          pointerEvents: 'none',
-          zIndex: 0,
-        },
+        borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
+        borderBottom: `1px solid ${alpha('#ffffff', 0.08)}`,
       }}
     >
-      {/* Top Left Tactical Reticle HUD Element */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: { xs: 10, md: 16 },
-          left: { xs: 12, md: 28 },
-          pointerEvents: 'none',
-          zIndex: 1,
-          animation: `${reticlePulse} 4s ease-in-out infinite`,
-        }}
-      >
-        <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
-          <circle cx="23" cy="23" r="16" stroke={accentColor} strokeWidth="1" strokeDasharray="3 3" opacity="0.6" />
-          <circle cx="23" cy="23" r="7" stroke={accentColor} strokeWidth="1" opacity="0.8" />
-          <line x1="23" y1="2" x2="23" y2="10" stroke={accentColor} strokeWidth="1.5" />
-          <line x1="23" y1="36" x2="23" y2="44" stroke={accentColor} strokeWidth="1.5" />
-          <line x1="2" y1="23" x2="10" y2="23" stroke={accentColor} strokeWidth="1.5" />
-          <line x1="36" y1="23" x2="44" y2="23" stroke={accentColor} strokeWidth="1.5" />
-        </svg>
-      </Box>
-
       <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
         <Box
           sx={{
@@ -350,24 +302,7 @@ export function PlayYourGameSection() {
               overflow: 'visible',
             }}
           >
-            {/* Background Halo for the Operative */}
-            <Box
-              sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '42%',
-                transform: 'translate(-50%, -50%)',
-                width: { xs: 340, sm: 460, md: 540 },
-                height: { xs: 340, sm: 460, md: 540 },
-                borderRadius: '50%',
-                background: `radial-gradient(circle, ${alpha(accentColor, 0.16)} 0%, transparent 70%)`,
-                filter: 'blur(36px)',
-                pointerEvents: 'none',
-                zIndex: 1,
-              }}
-            />
-
-            {/* Main Character Image with Transparent Background & Smooth Directional Slide */}
+            {/* Main Character Image */}
             <Box
               key={`hero-${activeGame.key}`}
               component="img"
@@ -383,8 +318,8 @@ export function PlayYourGameSection() {
                 width: 'auto',
                 height: 'auto',
                 objectFit: 'contain',
-                filter: `drop-shadow(0 22px 42px rgba(0,0,0,0.88)) drop-shadow(0 0 36px ${alpha(accentColor, 0.24)})`,
-                animation: `${slideDirection === 'forward' ? slideInRight : slideInLeft} 0.65s cubic-bezier(0.16, 1, 0.3, 1) both`,
+                filter: 'drop-shadow(0 16px 28px rgba(0,0,0,0.55))',
+                animation: `${slideDirection === 'forward' ? slideInRight : slideInLeft} 0.45s ease-out both`,
                 maskImage: 'linear-gradient(to bottom, black 0%, black 88%, transparent 100%)',
                 WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 88%, transparent 100%)',
                 userSelect: 'none',
@@ -401,11 +336,11 @@ export function PlayYourGameSection() {
                 top: { xs: '46%', sm: '43%', md: '44%' },
                 transform: 'translateY(-50%)',
                 zIndex: 3,
-                animation: `${slideDirection === 'forward' ? slideInRight : slideInLeft} 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both`,
+                animation: `${slideDirection === 'forward' ? slideInRight : slideInLeft} 0.45s ease-out 0.04s both`,
                 pointerEvents: 'none',
               }}
             >
-              {/* Spec Header: e.g. Assault Rifle 3.3KG */}
+              {/* Spec Header */}
               <Box sx={{ textAlign: 'right', pr: 1.5, mb: 0.4 }}>
                 <Typography
                   sx={{
@@ -432,7 +367,7 @@ export function PlayYourGameSection() {
                 </Typography>
               </Box>
 
-              {/* Connecting Line with Terminal Dot (●────────) */}
+              {/* Connecting Line with Terminal Dot */}
               <Box
                 sx={{
                   display: 'flex',
@@ -446,17 +381,15 @@ export function PlayYourGameSection() {
                   sx={{
                     flexGrow: 1,
                     height: '1px',
-                    bgcolor: alpha('#ffffff', 0.65),
-                    boxShadow: `0 0 6px ${alpha('#ffffff', 0.3)}`,
+                    bgcolor: alpha('#ffffff', 0.2),
                   }}
                 />
                 <Box
                   sx={{
-                    width: 7,
-                    height: 7,
+                    width: 6,
+                    height: 6,
                     borderRadius: '50%',
-                    bgcolor: '#ffffff',
-                    boxShadow: `0 0 8px ${accentColor}`,
+                    bgcolor: accentColor,
                     flexShrink: 0,
                   }}
                 />
@@ -539,7 +472,7 @@ export function PlayYourGameSection() {
             </Box>
           </Box>
 
-          {/* RIGHT SIDE: DISTRESSED TYPOGRAPHY, BRAND BADGE, LORE BRIEFING & CHAMFERED TABS */}
+          {/* RIGHT SIDE: Title, briefing & game chips */}
           <Stack
             spacing={{ xs: 2.5, md: 3.5 }}
             sx={{
@@ -561,13 +494,12 @@ export function PlayYourGameSection() {
                   color: alpha('#ffffff', 0.9),
                   textTransform: 'uppercase',
                   lineHeight: 1,
-                  textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 0 12px rgba(255,255,255,0.1)',
                 }}
               >
                 {titleLine1}
               </Typography>
 
-              {/* Line 2 + Tactical Badge */}
+              {/* Line 2 + Brand Badge */}
               <Box
                 sx={{
                   display: 'flex',
@@ -589,24 +521,21 @@ export function PlayYourGameSection() {
                     lineHeight: 0.92,
                     color: '#ffffff',
                     textTransform: 'uppercase',
-                    textShadow: `0 4px 20px ${alpha('#000000', 0.9)}`,
                   }}
                 >
                   {titleLine2}
                 </Typography>
 
-                {/* Tactical Badge (100% matched to LOSTLIGHT //////✈ in reference) */}
                 <Box
                   sx={{
                     display: 'inline-flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    borderTop: `1px solid ${alpha('#ffffff', 0.45)}`,
-                    borderBottom: `1px solid ${alpha('#ffffff', 0.45)}`,
-                    py: 0.4,
+                    alignItems: 'center',
+                    borderRadius: '6px',
+                    border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                    py: 0.55,
                     px: 1.2,
                     lineHeight: 1,
-                    bgcolor: alpha('#ffffff', 0.03),
+                    bgcolor: '#161618',
                   }}
                 >
                   <Typography
@@ -620,27 +549,6 @@ export function PlayYourGameSection() {
                   >
                     {t('home.playYourGame.brandLabel') || 'BATTLEASIA'}
                   </Typography>
-                  <Stack direction="row" alignItems="center" spacing={0.5} sx={{ mt: 0.35 }}>
-                    <Typography
-                      sx={{
-                        fontSize: { xs: 8, sm: 9 },
-                        fontWeight: 900,
-                        color: accentColor,
-                        letterSpacing: 1.5,
-                        lineHeight: 1,
-                      }}
-                    >
-                      {TACTICAL_STRIPES}
-                    </Typography>
-                    <Iconify
-                      icon="solar:plain-bold"
-                      width={10}
-                      sx={{
-                        color: accentColor,
-                        transform: 'rotate(45deg)',
-                      }}
-                    />
-                  </Stack>
                 </Box>
               </Box>
             </Box>
@@ -652,7 +560,7 @@ export function PlayYourGameSection() {
               sx={{
                 width: 1,
                 alignItems: { xs: 'center', lg: 'flex-start' },
-                animation: `${slideDirection === 'forward' ? slideInRight : slideInLeft} 0.6s cubic-bezier(0.16, 1, 0.3, 1) both`,
+                animation: `${slideDirection === 'forward' ? slideInRight : slideInLeft} 0.45s ease-out both`,
               }}
             >
               {/* Lore & Subtitle Content (Preserving original translation keys) */}
@@ -698,18 +606,22 @@ export function PlayYourGameSection() {
                     position: 'relative',
                     px: 3.5,
                     py: 1.35,
-                    bgcolor: activeGame.available ? accentColor : alpha('#ffffff', 0.08),
-                    color: activeGame.available ? accentContrast : alpha('#ffffff', 0.5),
+                    borderRadius: '8px',
+                    bgcolor: activeGame.available ? alpha(accentColor, 0.16) : '#161618',
+                    color: activeGame.available ? accentColor : alpha('#ffffff', 0.5),
                     fontWeight: 800,
                     fontSize: 13,
                     letterSpacing: 1.5,
                     textTransform: 'uppercase',
-                    clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
-                    transition: 'all 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
-                    boxShadow: activeGame.available ? `0 6px 20px ${alpha(accentColor, 0.4)}` : 'none',
+                    border: activeGame.available
+                      ? `1px solid ${alpha(accentColor, 0.32)}`
+                      : `1px solid ${alpha('#ffffff', 0.08)}`,
+                    transition: 'background-color 0.2s ease, border-color 0.2s ease',
                     '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: activeGame.available ? `0 10px 28px ${alpha(accentColor, 0.6)}` : 'none',
+                      bgcolor: activeGame.available ? alpha(accentColor, 0.24) : alpha('#ffffff', 0.06),
+                      borderColor: activeGame.available
+                        ? alpha(accentColor, 0.5)
+                        : alpha('#ffffff', 0.14),
                     },
                   }}
                 >
@@ -728,8 +640,9 @@ export function PlayYourGameSection() {
                       gap: 0.8,
                       px: 1.5,
                       py: 0.75,
-                      bgcolor: alpha('#22c55e', 0.12),
-                      border: `1px solid ${alpha('#22c55e', 0.4)}`,
+                      borderRadius: '8px',
+                      bgcolor: alpha('#22c55e', 0.1),
+                      border: `1px solid ${alpha('#22c55e', 0.28)}`,
                     }}
                   >
                     <Box
@@ -738,7 +651,6 @@ export function PlayYourGameSection() {
                         height: 7,
                         borderRadius: '50%',
                         bgcolor: '#22c55e',
-                        animation: `${livePulse} 1.6s ease-out infinite`,
                       }}
                     />
                     <Typography sx={{ fontSize: 11, fontWeight: 800, color: '#22c55e', letterSpacing: 0.8 }}>
@@ -767,7 +679,7 @@ export function PlayYourGameSection() {
               </Stack>
             </Stack>
 
-            {/* BOTTOM RIGHT CHAMFERED GAME TABS WITH BIDIRECTIONAL AUTO-SLIDE NAVIGATION */}
+            {/* Game tabs — flat chips */}
             <Box
               sx={{
                 width: 1,
@@ -783,7 +695,6 @@ export function PlayYourGameSection() {
                   flexWrap: 'wrap',
                 }}
               >
-                {/* Chamfered Game Tabs with Slide Highlight */}
                 {games.map((g, idx) => {
                   const isActive = idx === activeIndex;
                   const label = t(`home.playYourGame.games.${g.key}`);
@@ -797,28 +708,27 @@ export function PlayYourGameSection() {
                         overflow: 'hidden',
                         px: { xs: 1.75, sm: 2.4, md: 3 },
                         py: { xs: 0.9, sm: 1.1 },
-                        clipPath: 'polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%)',
-                        bgcolor: isActive ? accentColor : alpha('#181a20', 0.85),
-                        color: isActive ? accentContrast : alpha('#ffffff', 0.68),
+                        borderRadius: '8px',
+                        bgcolor: isActive ? alpha(accentColor, 0.16) : '#161618',
+                        color: isActive ? accentColor : alpha('#ffffff', 0.68),
                         fontWeight: 800,
                         fontSize: { xs: 11, sm: 12.5 },
                         letterSpacing: 1.2,
                         textTransform: 'uppercase',
-                        border: isActive ? 'none' : `1px solid ${alpha('#ffffff', 0.12)}`,
-                        boxShadow: isActive
-                          ? `0 0 20px ${alpha(accentColor, 0.45)}, 0 4px 12px rgba(0,0,0,0.5)`
-                          : 'none',
-                        transition: 'all 0.25s cubic-bezier(0.22, 1, 0.36, 1)',
+                        border: isActive
+                          ? `1px solid ${alpha(accentColor, 0.32)}`
+                          : `1px solid ${alpha('#ffffff', 0.08)}`,
+                        transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease',
                         '&:hover': {
-                          bgcolor: isActive ? accentColor : alpha('#262a33', 0.95),
-                          color: isActive ? accentContrast : '#ffffff',
-                          borderColor: isActive ? 'none' : alpha(accentColor, 0.35),
-                          transform: 'translateY(-2px)',
+                          bgcolor: isActive ? alpha(accentColor, 0.24) : alpha('#ffffff', 0.06),
+                          color: isActive ? accentColor : '#ffffff',
+                          borderColor: isActive
+                            ? alpha(accentColor, 0.5)
+                            : alpha(accentColor, 0.28),
                         },
                       }}
                     >
                       {label}
-                      {/* Active auto-slide progress line at bottom of tab */}
                       {isActive && !isPaused && (
                         <Box
                           key={`progress-${progressKey}-${activeIndex}`}
@@ -826,9 +736,9 @@ export function PlayYourGameSection() {
                             position: 'absolute',
                             bottom: 0,
                             left: 0,
-                            height: '3px',
-                            bgcolor: accentContrast,
-                            opacity: 0.55,
+                            height: '2px',
+                            bgcolor: accentColor,
+                            opacity: 0.45,
                             animation: `${progressFill} ${AUTO_SLIDE_INTERVAL_MS}ms linear forwards`,
                           }}
                         />

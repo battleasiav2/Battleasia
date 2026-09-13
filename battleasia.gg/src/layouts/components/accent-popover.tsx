@@ -113,10 +113,9 @@ export function AccentPopover() {
               overflow: 'hidden',
               borderRadius: '8px',
               bgcolor: alpha('#06090e', 0.96),
-              border: `1px solid ${goldAlpha(0.35)}`,
-              boxShadow: `0 20px 50px rgba(0, 0, 0, 0.8), 0 0 25px ${goldAlpha(0.2)}`,
-              backdropFilter: 'blur(20px)',
-              clipPath: 'polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px))',
+              border: `1px solid ${alpha('#ffffff', 0.1)}`,
+              boxShadow: '0 12px 32px rgba(0, 0, 0, 0.55)',
+              backdropFilter: 'blur(16px)',
             },
           },
           arrow: { hide: true },
@@ -187,14 +186,13 @@ export function AccentPopover() {
                   px: 0.5,
                   borderRadius: '6px',
                   border: `1px solid ${selected ? palette.gold : alpha('#ffffff', 0.1)}`,
-                  bgcolor: selected ? alpha(palette.gold, 0.16) : alpha('#ffffff', 0.03),
-                  boxShadow: selected ? `0 0 14px ${alpha(palette.gold, 0.45)}` : 'none',
-                  transition: 'all 0.2s ease',
+                  bgcolor: selected ? alpha(palette.gold, 0.12) : alpha('#ffffff', 0.03),
+                  boxShadow: 'none',
+                  transition: 'border-color 0.2s ease, background-color 0.2s ease',
                   '&:hover': {
                     borderColor: palette.gold,
-                    bgcolor: alpha(palette.gold, 0.12),
-                    transform: 'translateY(-2px)',
-                    boxShadow: `0 4px 16px ${alpha(palette.gold, 0.35)}`,
+                    bgcolor: alpha(palette.gold, 0.1),
+                    boxShadow: 'none',
                   },
                 }}
               >
@@ -207,9 +205,7 @@ export function AccentPopover() {
                     bgcolor: palette.gold,
                     transform: 'rotate(45deg)',
                     background: `linear-gradient(135deg, ${palette.goldLight} 0%, ${palette.gold} 60%, ${palette.goldDark} 100%)`,
-                    boxShadow: selected
-                      ? `0 0 12px ${palette.gold}, 0 0 24px ${alpha(palette.gold, 0.6)}`
-                      : `0 0 6px ${alpha(palette.gold, 0.4)}`,
+                    boxShadow: 'none',
                     display: 'grid',
                     placeItems: 'center',
                   }}

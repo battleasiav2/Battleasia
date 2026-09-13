@@ -312,9 +312,12 @@
       "spots": "Spots",
       "prizeEst": "Prize est.",
       "free": "Free",
-      "joinNow": "Join",
+      "joinNow": "Play now",
       "matchFull": "Full",
-      "signInToJoin": "Sign in to join this match"
+      "signInToJoin": "Sign in to join this match",
+      "playersLabel": "players",
+      "matchStatusOpen": "Open",
+      "matchBlurb": "{{game}} room with live entry, kill rewards, and a growing prize pool."
     }
   },
   "navigation": {

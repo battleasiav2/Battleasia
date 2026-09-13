@@ -117,7 +117,8 @@ export function SupportFaqMatrix({ onCreateTicketClick }: SupportFaqMatrixProps)
           sx={{
             px: 2,
             py: 0.85,
-            clipPath: 'polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)',
+            borderRadius: '8px',
+            clipPath: 'none',
             bgcolor: alpha(themeAccent, 0.15),
             border: `1px solid ${alpha(themeAccent, 0.4)}`,
             color: themeAccent,
@@ -125,12 +126,12 @@ export function SupportFaqMatrix({ onCreateTicketClick }: SupportFaqMatrixProps)
             fontSize: 11,
             letterSpacing: 1,
             textTransform: 'uppercase',
-            transition: 'all 0.2s ease',
+            transition: 'background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease',
             '&:hover': {
               bgcolor: themeAccent,
               color: '#081401',
-              transform: 'translateY(-1px)',
-              boxShadow: `0 0 16px ${alpha(themeAccent, 0.4)}`,
+              transform: 'none',
+              boxShadow: 'none',
             },
           }}
         >

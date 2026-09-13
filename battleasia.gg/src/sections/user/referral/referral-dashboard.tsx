@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { useApi } from 'src/hooks';
@@ -11,17 +11,15 @@ import { useTranslate } from 'src/locales/use-locales';
 import { toast } from 'react-hot-toast';
 import {
   UserPageShell,
-  UserGlassCard,
   UserEmptyState,
   USER_COLORS,
   userMutedTextSx,
   goldAlpha,
+  UserAnimatedStat,
 } from 'src/layouts/user';
 
-import { Iconify } from 'src/components/iconify';
 import { CoinValue } from 'src/components/coin-value';
-import { UserAnimatedStat } from 'src/layouts/user';
-import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
+import { PlayTabs } from 'src/components/play-tabs';
 
 import {
   mapApiCommissionItem,
@@ -45,6 +43,8 @@ import {
 
 // ----------------------------------------------------------------------
 
+const GOLD = USER_COLORS.gold;
+
 function HighlightText({ children }: { children: React.ReactNode }) {
   return (
     <Box component="span" sx={{ color: USER_COLORS.gold, fontWeight: 800 }}>
@@ -58,13 +58,24 @@ type ReferralDashboardProps = {
   defaultTab?: 'network' | 'history';
 };
 
-export function ReferralDashboard({ showInviteSection = true, defaultTab = 'network' }: ReferralDashboardProps) {
+export function ReferralDashboard({
+  showInviteSection = true,
+  defaultTab = 'network',
+}: ReferralDashboardProps) {
   const { t } = useTranslate();
   const { user, isLoggedIn } = useSelector((state) => state.auth);
-  const { getReferralSettingsApi, getReferralStatsApi, getReferralsApi, getReferralCommissionsApi, claimReferralMilestoneApi } = useApi();
+  const {
+    getReferralSettingsApi,
+    getReferralStatsApi,
+    getReferralsApi,
+    getReferralCommissionsApi,
+    claimReferralMilestoneApi,
+  } = useApi();
 
   const [stats, setStats] = useState<ReferralStats | null>(null);
-  const [referralMilestones, setReferralMilestones] = useState<ReferralMilestonesState | null>(null);
+  const [referralMilestones, setReferralMilestones] = useState<ReferralMilestonesState | null>(
+    null
+  );
   const [claimingTierKey, setClaimingTierKey] = useState<string | null>(null);
   const [flashKey, setFlashKey] = useState<string | null>(null);
   const [network, setNetwork] = useState<ReferralNetworkItem[]>([]);
@@ -121,7 +132,13 @@ export function ReferralDashboard({ showInviteSection = true, defaultTab = 'netw
     } finally {
       setLoading(false);
     }
-  }, [getReferralCommissionsApi, getReferralSettingsApi, getReferralStatsApi, getReferralsApi, isLoggedIn]);
+  }, [
+    getReferralCommissionsApi,
+    getReferralSettingsApi,
+    getReferralStatsApi,
+    getReferralsApi,
+    isLoggedIn,
+  ]);
 
   useEffect(() => {
     fetchData();
@@ -150,7 +167,8 @@ export function ReferralDashboard({ showInviteSection = true, defaultTab = 'netw
   const displayStats = useMemo(
     () => ({
       totalReferrals: stats?.totalReferrals ?? network.length,
-      activeReferrals: stats?.activeReferrals ?? network.filter((n) => n.status === 'active').length,
+      activeReferrals:
+        stats?.activeReferrals ?? network.filter((n) => n.status === 'active').length,
       totalEarnings: stats?.totalEarnings ?? network.reduce((sum, n) => sum + n.totalEarnings, 0),
       commissionRate: stats?.commissionRate ?? commissionRate,
       totalDeposits: stats?.totalDepositsFromReferrals ?? 0,
@@ -165,7 +183,19 @@ export function ReferralDashboard({ showInviteSection = true, defaultTab = 'netw
     { icon: 'solar:wallet-money-bold', label: t('referral.stepEarnOnDeposit') },
   ];
 
-  const tokens = getDefaultGlassTokens();
+  const listPanelSx = {
+    bgcolor: alpha('#06090e', 0.72),
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
+    border: `1px solid ${goldAlpha(0.28)}`,
+    borderTop: `2px solid ${GOLD}`,
+    boxShadow: `0 10px 28px ${alpha('#000000', 0.55)}, inset 0 0 16px ${goldAlpha(0.04)}`,
+    clipPath: {
+      xs: 'none',
+      md: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+    },
+    overflow: 'hidden',
+  } as const;
 
   if (loading && !stats && network.length === 0) {
     return (
@@ -177,195 +207,180 @@ export function ReferralDashboard({ showInviteSection = true, defaultTab = 'netw
 
   return (
     <UserPageShell>
-      <ReferralHero title={t('referral.title')} subtitle={t('referral.referMoreToEarn')} />
+      <ReferralHero title={t('referral.title')} />
 
-      {/* All 6 stats — short labels, merged strip (no mid-word breaks) */}
-      <Box
-        sx={{
-          mb: 1.75,
-          display: 'grid',
-          gridTemplateColumns: {
-            xs: 'repeat(2, minmax(0, 1fr))',
-            sm: 'repeat(3, minmax(0, 1fr))',
-            lg: 'repeat(6, minmax(0, 1fr))',
-          },
-          width: 1,
-          bgcolor: alpha('#06090e', 0.72),
-          border: `1px solid ${goldAlpha(0.28)}`,
-          borderTop: `2px solid ${USER_COLORS.gold}`,
-          boxShadow: `0 8px 24px ${alpha('#000000', 0.45)}`,
-        }}
-      >
-        {[
-          {
-            icon: 'solar:users-group-rounded-bold',
-            label: t('referral.statReferrals'),
-            value: <UserAnimatedStat value={displayStats.totalReferrals} variant="h5" fontWeight={700} />,
-          },
-          {
-            icon: 'solar:user-check-bold',
-            label: t('referral.statActive'),
-            value: <UserAnimatedStat value={displayStats.activeReferrals} variant="h5" fontWeight={700} />,
-          },
-          {
-            icon: 'solar:wallet-money-bold',
-            label: t('referral.statEarnings'),
-            value: <CoinValue value={displayStats.totalEarnings} size={16} />,
-          },
-          {
-            icon: 'solar:sale-bold',
-            label: t('referral.statRate'),
-            value: `${displayStats.commissionRate}%`,
-          },
-          {
-            icon: 'solar:hand-money-bold',
-            label: t('referral.statDeposits'),
-            value: <CoinValue value={displayStats.totalDeposits} size={16} />,
-          },
-          {
-            icon: 'solar:history-bold',
-            label: t('referral.statEvents'),
-            value: <UserAnimatedStat value={displayStats.commissionEvents} variant="h5" fontWeight={700} />,
-          },
-        ].map((stat, index, arr) => (
-          <Box
-            key={stat.label}
-            sx={{
-              minWidth: 0,
-              px: { xs: 1.25, md: 1.5 },
-              py: { xs: 1.25, md: 1.5 },
-              borderRight: {
-                xs: index % 2 === 0 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
-                sm: index % 3 !== 2 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
-                lg: index < arr.length - 1 ? `1px solid ${alpha('#ffffff', 0.1)}` : 'none',
-              },
-              borderBottom: {
-                xs: index < 4 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
-                sm: index < 3 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
-                lg: 'none',
-              },
-            }}
-          >
-            <Stack direction="row" alignItems="center" spacing={0.75} sx={{ mb: 0.5, minWidth: 0 }}>
-              <Iconify icon={stat.icon} width={14} sx={{ color: USER_COLORS.gold, flexShrink: 0 }} />
+      <Stack spacing={2.5}>
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: 'repeat(2, minmax(0, 1fr))',
+              sm: 'repeat(3, minmax(0, 1fr))',
+              lg: 'repeat(6, minmax(0, 1fr))',
+            },
+            width: 1,
+            bgcolor: alpha('#06090e', 0.72),
+            backdropFilter: 'blur(18px)',
+            WebkitBackdropFilter: 'blur(18px)',
+            border: `1px solid ${goldAlpha(0.28)}`,
+            borderTop: `2px solid ${GOLD}`,
+            boxShadow: `0 10px 28px ${alpha('#000000', 0.55)}, inset 0 0 16px ${goldAlpha(0.04)}`,
+            clipPath: {
+              xs: 'none',
+              md: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+            },
+          }}
+        >
+          {[
+            {
+              label: t('referral.statReferrals'),
+              value: (
+                <UserAnimatedStat
+                  value={displayStats.totalReferrals}
+                  variant="h5"
+                  fontWeight={700}
+                />
+              ),
+            },
+            {
+              label: t('referral.statActive'),
+              value: (
+                <UserAnimatedStat
+                  value={displayStats.activeReferrals}
+                  variant="h5"
+                  fontWeight={700}
+                />
+              ),
+            },
+            {
+              label: t('referral.statEarnings'),
+              value: <CoinValue value={displayStats.totalEarnings} size={16} />,
+            },
+            {
+              label: t('referral.statRate'),
+              value: `${displayStats.commissionRate}%`,
+            },
+            {
+              label: t('referral.statDeposits'),
+              value: <CoinValue value={displayStats.totalDeposits} size={16} />,
+            },
+            {
+              label: t('referral.statEvents'),
+              value: (
+                <UserAnimatedStat
+                  value={displayStats.commissionEvents}
+                  variant="h5"
+                  fontWeight={700}
+                />
+              ),
+            },
+          ].map((stat, index, arr) => (
+            <Box
+              key={stat.label}
+              sx={{
+                minWidth: 0,
+                px: { xs: 1.25, md: 1.5 },
+                py: { xs: 1.25, md: 1.5 },
+                borderRight: {
+                  xs: index % 2 === 0 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                  sm: index % 3 !== 2 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                  lg: index < arr.length - 1 ? `1px solid ${alpha('#ffffff', 0.1)}` : 'none',
+                },
+                borderBottom: {
+                  xs: index < 4 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                  sm: index < 3 ? `1px solid ${alpha('#ffffff', 0.08)}` : 'none',
+                  lg: 'none',
+                },
+              }}
+            >
               <Typography
                 sx={{
-                  fontSize: { xs: 10, md: 11 },
+                  fontSize: 10,
                   fontWeight: 700,
-                  letterSpacing: 0.5,
+                  letterSpacing: 0.8,
                   textTransform: 'uppercase',
-                  color: alpha('#ffffff', 0.55),
+                  color: alpha('#ffffff', 0.45),
+                  mb: 0.75,
+                }}
+              >
+                {stat.label}
+              </Typography>
+              <Box
+                sx={{
+                  fontSize: { xs: 18, md: 20 },
+                  fontWeight: 800,
+                  color: USER_COLORS.textPrimary,
+                  lineHeight: 1.15,
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                 }}
               >
-                {stat.label}
-              </Typography>
-            </Stack>
-            <Box
-              sx={{
-                fontSize: { xs: 18, md: 20 },
-                fontWeight: 800,
-                color: USER_COLORS.textPrimary,
-                lineHeight: 1.15,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {loading ? '—' : stat.value}
+                {loading ? '—' : stat.value}
+              </Box>
             </Box>
-          </Box>
-        ))}
-      </Box>
+          ))}
+        </Box>
 
-      <Box sx={{ mb: 1.75 }}>
         <ReferralMilestonesPanel
           referral={referralMilestones}
           claimingKey={claimingTierKey}
           flashKey={flashKey}
           onClaim={handleClaimReferralTier}
         />
-      </Box>
 
-      {showInviteSection ? (
-        <>
-          <Stack direction={{ xs: 'column', lg: 'row' }} spacing={1.5} sx={{ mb: 1.75 }}>
-            <UserGlassCard sx={{ p: { xs: 1.5, md: 2 }, flex: 1 }}>
-              <Typography
-                className="font-tr"
-                sx={{
-                  mb: 1.25,
-                  fontSize: 16,
-                  fontWeight: 800,
-                  textTransform: 'uppercase',
-                  color: USER_COLORS.gold,
-                }}
-              >
-                {t('referral.inviteFriends')}
-              </Typography>
-
-              <Box
-                sx={{
-                  ...getGlassInnerSx(tokens, { p: 0 }),
-                  display: 'grid',
-                  gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
-                }}
-              >
-                <Box
+        {showInviteSection ? (
+          <>
+            <Stack direction={{ xs: 'column', lg: 'row' }} spacing={1.5}>
+              <Box sx={{ ...listPanelSx, flex: 1, p: { xs: 1.5, md: 2 } }}>
+                <Typography
+                  className="font-tr"
                   sx={{
-                    p: { xs: 1.25, md: 1.5 },
-                    borderRight: { md: `1px solid ${alpha('#ffffff', 0.08)}` },
-                    borderBottom: { xs: `1px solid ${alpha('#ffffff', 0.08)}`, md: 'none' },
+                    mb: 1.25,
+                    fontSize: 14,
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    color: GOLD,
+                    letterSpacing: 0.6,
                   }}
                 >
-                  <Typography sx={{ ...userMutedTextSx, fontSize: { xs: 13, md: 14 }, lineHeight: 1.55 }}>
+                  {t('referral.inviteFriends')}
+                </Typography>
+                <Stack spacing={1}>
+                  <Typography
+                    sx={{ ...userMutedTextSx, fontSize: { xs: 13, md: 14 }, lineHeight: 1.55 }}
+                  >
                     {t('referral.depositCommissionInfo')}{' '}
                     <HighlightText>{displayStats.commissionRate}%</HighlightText>{' '}
                     {t('referral.depositCommissionInfoSuffix')}
                   </Typography>
-                </Box>
-                <Box sx={{ p: { xs: 1.25, md: 1.5 } }}>
-                  <Typography sx={{ ...userMutedTextSx, fontSize: { xs: 13, md: 14 }, lineHeight: 1.55 }}>
+                  <Typography
+                    sx={{ ...userMutedTextSx, fontSize: { xs: 13, md: 14 }, lineHeight: 1.55 }}
+                  >
                     {t('referral.autoCommissionInfo')}
                   </Typography>
-                </Box>
+                </Stack>
               </Box>
-            </UserGlassCard>
 
-            <Box sx={{ width: { xs: 1, lg: 400 }, flexShrink: 0 }}>
-              <ReferralCodeCard referralCode={referralCode} referralUrl={referralUrl} />
+              <Box sx={{ width: { xs: 1, lg: 400 }, flexShrink: 0 }}>
+                <ReferralCodeCard referralCode={referralCode} referralUrl={referralUrl} />
+              </Box>
+            </Stack>
+
+            <Box sx={{ ...listPanelSx, p: { xs: 1.5, md: 2 } }}>
+              <ReferralStepsFlow title={t('referral.howItWorks')} steps={steps} />
             </Box>
-          </Stack>
+          </>
+        ) : null}
 
-          <UserGlassCard sx={{ p: { xs: 1.5, md: 2 }, mb: 1.75 }}>
-            <ReferralStepsFlow title={t('referral.howItWorks')} steps={steps} />
-          </UserGlassCard>
-        </>
-      ) : null}
-
-      <UserGlassCard sx={{ p: { xs: 1.25, md: 1.75 } }}>
-        <Tabs
-          value={tab}
-          onChange={(_, value) => setTab(value)}
-          sx={{
-            mb: 1.5,
-            minHeight: 36,
-            '& .MuiTab-root': {
-              minHeight: 36,
-              color: USER_COLORS.textMuted,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              fontSize: 12,
-            },
-            '& .Mui-selected': { color: USER_COLORS.gold },
-            '& .MuiTabs-indicator': { bgcolor: USER_COLORS.gold },
-          }}
-        >
-          <Tab value="network" label={t('referral.tabNetwork')} />
-          <Tab value="history" label={t('referral.tabCommissionHistory')} />
-        </Tabs>
+        <PlayTabs
+          tabs={[
+            { label: t('referral.tabNetwork'), value: 'network' },
+            { label: t('referral.tabCommissionHistory'), value: 'history' },
+          ]}
+          activeTab={tab}
+          onChange={(value) => setTab(value as 'network' | 'history')}
+        />
 
         {tab === 'network' ? (
           network.length === 0 ? (
@@ -377,18 +392,18 @@ export function ReferralDashboard({ showInviteSection = true, defaultTab = 'netw
               onAction={fetchData}
             />
           ) : (
-            <ReferralNetworkList
-              items={network}
-              labels={{
-                playerName: t('myReferrals.playerName'),
-                joined: t('referral.joinedAt'),
-                deposits: t('referral.deposits'),
-                earnings: t('myReferrals.earnings'),
-                status: t('myReferrals.status'),
-                active: t('myReferrals.active'),
-                inactive: t('myReferrals.inactive'),
-              }}
-            />
+            <Box sx={listPanelSx}>
+              <ReferralNetworkList
+                items={network}
+                labels={{
+                  joined: t('referral.joinedAt'),
+                  deposits: t('referral.deposits'),
+                  earnings: t('myReferrals.earnings'),
+                  active: t('myReferrals.active'),
+                  inactive: t('myReferrals.inactive'),
+                }}
+              />
+            </Box>
           )
         ) : commissions.length === 0 ? (
           <UserEmptyState
@@ -399,19 +414,20 @@ export function ReferralDashboard({ showInviteSection = true, defaultTab = 'netw
             onAction={fetchData}
           />
         ) : (
-          <ReferralCommissionList
-            items={commissions}
-            labels={{
-              date: t('myReferrals.date'),
-              playerName: t('myReferrals.playerName'),
-              deposit: t('referral.depositAmount'),
-              rate: t('referral.rate'),
-              commission: t('referral.commissionEarned'),
-              source: t('referral.source'),
-            }}
-          />
+          <Box sx={listPanelSx}>
+            <ReferralCommissionList
+              items={commissions}
+              labels={{
+                date: t('myReferrals.date'),
+                deposit: t('referral.depositAmount'),
+                rate: t('referral.rate'),
+                commission: t('referral.commissionEarned'),
+                source: t('referral.source'),
+              }}
+            />
+          </Box>
         )}
-      </UserGlassCard>
+      </Stack>
     </UserPageShell>
   );
 }

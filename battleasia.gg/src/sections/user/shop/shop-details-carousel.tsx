@@ -54,10 +54,10 @@ export function ShopDetailsCarousel({ images, name }: Props) {
           mb: 2,
           position: 'relative',
           overflow: 'hidden',
-          bgcolor: '#04070d',
-          border: `1px solid ${goldAlpha(0.25)}`,
-          clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
-          boxShadow: `0 12px 32px ${alpha('#000000', 0.8)}`,
+          bgcolor: '#161618',
+          borderRadius: '12px',
+          border: `1px solid ${alpha('#ffffff', 0.08)}`,
+          boxShadow: 'none',
         }}
       >
         <CarouselArrowNumberButtons
@@ -91,11 +91,11 @@ export function ShopDetailsCarousel({ images, name }: Props) {
               key={slide.src}
               alt={name || slide.src}
               src={slide.src}
-              ratio={isMobile ? '4/5' : '16/9'}
+              ratio={isMobile ? '16/10' : '16/9'}
               sx={{
                 cursor: 'pointer',
                 width: '100%',
-                maxHeight: isMobile ? 360 : 440,
+                maxHeight: { xs: 220, sm: 320, md: 380 },
                 objectFit: 'cover',
                 filter: 'contrast(1.05)',
               }}
@@ -170,11 +170,8 @@ export function ShopDetailsCarousel({ images, name }: Props) {
                   index === carousel.thumbs.selectedIndex
                     ? `2px solid ${GOLD}`
                     : `1px solid ${alpha('#ffffff', 0.15)}`,
-                clipPath: 'polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 0 100%)',
-                boxShadow:
-                  index === carousel.thumbs.selectedIndex
-                    ? `0 0 16px ${goldAlpha(0.35)}`
-                    : 'none',
+                borderRadius: '8px',
+                boxShadow: 'none',
                 transition: 'all 0.25s ease',
                 '&:hover': { opacity: 1, borderColor: GOLD },
               }}

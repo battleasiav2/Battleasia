@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/socket_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/notification_model.dart';
@@ -9,6 +10,7 @@ import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/common/refresh_overlay.dart';
 import 'package:battleasia_app/presentation/widgets/notifications/notification_item.dart';
+import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -26,11 +28,12 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   String _currentTab = 'all';
   int _unreadCount = 0;
   bool _isRefreshing = false;
-  double _overscrollAccumulator = 0.0;
   double _dragStartY = 0.0;
   bool _dragStartedAtTop = false;
   bool _dragStartedAtBottom = false;
   double _wheelAccumulator = 0.0;
+
+  static const Color _panelBg = Color(0xD906090E);
 
   @override
   void initState() {
@@ -46,12 +49,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     super.dispose();
   }
 
-  /// Called when the backend pushes a `new-notification` socket event.
-  /// Prepends the notification to the list so users see it immediately.
   void _onNewNotification(Map<String, dynamic> data) {
     if (!mounted) return;
     try {
-      // Ensure the isUnRead flag is set for freshly pushed notifications.
       final merged = Map<String, dynamic>.from(data);
       merged.putIfAbsent('isUnRead', () => true);
       final notification = NotificationModel.fromJson(merged);
@@ -59,9 +59,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         _notifications.insert(0, notification);
         _unreadCount++;
       });
-    } catch (_) {
-      // If parsing fails, silently ignore — user can pull-to-refresh manually.
-    }
+    } catch (_) {}
   }
 
   Future<void> _fetchNotifications({bool silent = false}) async {
@@ -76,14 +74,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       if (result['success'] == true && result['data'] != null) {
         final data = result['data'] as Map<String, dynamic>;
         final payload = data['results'] ?? data;
-        final items = payload is List ? payload : (payload['results'] as List? ?? []);
+        final items =
+            payload is List ? payload : (payload['results'] as List? ?? []);
 
         final notificationsList = items
-            .map((item) => NotificationModel.fromJson(
-                item as Map<String, dynamic>))
+            .map((item) =>
+                NotificationModel.fromJson(item as Map<String, dynamic>))
             .toList();
 
-        // Calculate unread count
         final unread = data['unread'] as int? ??
             notificationsList.where((n) => n.isUnRead).length;
 
@@ -122,7 +120,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Future<void> _handleMarkAllAsRead() async {
     if (_unreadCount == 0) return;
 
-    // Optimistically update UI
     setState(() {
       _notifications = _notifications.map((n) {
         return NotificationModel(
@@ -142,7 +139,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     try {
       await _userService.markAllNotificationsRead();
     } catch (e) {
-      // Revert on error
       _fetchNotifications();
     }
   }
@@ -155,7 +151,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     if (!notification.isUnRead) return;
 
-    // Optimistically update UI
     setState(() {
       _notifications = _notifications.map((n) {
         if (n.id == notificationId) {
@@ -178,7 +173,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     try {
       await _userService.markNotificationRead(notificationId);
     } catch (e) {
-      // Revert on error
       _fetchNotifications();
     }
   }
@@ -194,17 +188,24 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     }
   }
 
-  int get _archivedCount {
-    return _notifications.length - _unreadCount;
-  }
+  int get _archivedCount => _notifications.length - _unreadCount;
+
+  BoxDecoration get _panelDecoration => BoxDecoration(
+        color: _panelBg,
+        border: Border(
+          top: BorderSide(color: AppColors.gold, width: 2),
+          left: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+          right: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+          bottom: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
+        ),
+      );
 
   Future<void> _onRefresh() async {
     await _fetchNotifications(silent: true);
   }
 
   bool _atTop() =>
-      _scrollController.hasClients &&
-      _scrollController.position.pixels <= 0;
+      _scrollController.hasClients && _scrollController.position.pixels <= 0;
 
   bool _atBottom() =>
       _scrollController.hasClients &&
@@ -263,11 +264,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final spacing24 = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 24.0,
-    ).clamp(20.0, 32.0);
-    final loadingPadding = ResponsiveUtils.getResponsiveSpacing(
+    ).clamp(16.0, 24.0);
+    final titleFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
-      baseSize: 32.0,
-    ).clamp(24.0, 40.0);
+      baseSize: 22.0,
+      min: 20.0,
+      max: 26.0,
+    );
+    final tabFontSize = ResponsiveUtils.getResponsiveFontSize(
+      context,
+      baseSize: 14.0,
+      min: 12.0,
+      max: 16.0,
+    );
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
@@ -283,52 +292,92 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               physics: const ClampingScrollPhysics(),
               slivers: [
                 const SliverToBoxAdapter(child: SizedBox(height: 100)),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: spacing16),
-                      // Header
-                      _buildHeader(),
-                      SizedBox(height: spacing24),
-                      // Tabs
-                      _buildTabs(),
-                      SizedBox(height: spacing16),
-                    ],
-                  ),
-                ),
-              ),
-              // Notifications List
-              if (_loading)
                 SliverToBoxAdapter(
-                  child: Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(loadingPadding),
-                      child: const CircularProgressIndicator(),
+                  child: Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: horizontalPadding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: spacing16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'NOTIFICATIONS',
+                                style: AppTheme.heading2.copyWith(
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: titleFontSize,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                            ),
+                            if (_unreadCount > 0)
+                              TextButton(
+                                onPressed: _handleMarkAllAsRead,
+                                style: TextButton.styleFrom(
+                                  foregroundColor: AppColors.gold,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 6,
+                                  ),
+                                ),
+                                child: Text(
+                                  'Mark all read',
+                                  style: TextStyle(
+                                    color: AppColors.gold,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
+                        SizedBox(height: spacing24),
+                        if (_loading)
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(32),
+                              child: CircularProgressIndicator(
+                                color: AppColors.gold,
+                              ),
+                            ),
+                          )
+                        else ...[
+                          _buildStatsPanel(),
+                          SizedBox(height: spacing24),
+                          PlayTabs(
+                            tabs: [
+                              {
+                                'label': 'ALL (${_notifications.length})',
+                                'value': 'all',
+                              },
+                              {
+                                'label': 'UNREAD ($_unreadCount)',
+                                'value': 'unread',
+                              },
+                              {
+                                'label': 'ARCHIVED ($_archivedCount)',
+                                'value': 'archived',
+                              },
+                            ],
+                            activeTab: _currentTab,
+                            onTabChanged: (tab) {
+                              setState(() => _currentTab = tab);
+                            },
+                            fontSize: tabFontSize,
+                          ),
+                          SizedBox(height: spacing16),
+                          if (_filteredNotifications.isEmpty)
+                            _buildEmptyState()
+                          else
+                            _buildListPanel(),
+                        ],
+                      ],
                     ),
                   ),
-                )
-              else if (_filteredNotifications.isEmpty)
-                SliverToBoxAdapter(
-                  child: _buildEmptyState(),
-                )
-              else
-                SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final notification = _filteredNotifications[index];
-                      return NotificationItem(
-                        notification: notification,
-                        onMarkRead: () =>
-                            _handleMarkNotificationRead(notification.id),
-                      );
-                    },
-                    childCount: _filteredNotifications.length,
-                  ),
                 ),
-                // Bottom padding for floating nav
                 SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
               ],
             ),
@@ -338,8 +387,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               right: 0,
               child: AppHeader(scrollController: _scrollController),
             ),
-
-            // Bottom menu
             const FloatingBottomNav(),
             if (_isRefreshing) const RefreshOverlay(),
           ],
@@ -348,230 +395,94 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 
-  Widget _buildHeader() {
-    final titleFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 28.0,
-      min: 24.0,
-      max: 36.0,
-    );
-    final buttonFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 14.0,
-      min: 12.0,
-      max: 16.0,
-    );
-    final buttonIconSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 18.0,
-    ).clamp(16.0, 20.0);
-    final buttonPaddingH = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 12.0,
-    ).clamp(10.0, 16.0);
-    final buttonPaddingV = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 8.0,
-    ).clamp(6.0, 12.0);
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          'Notifications',
-          style: AppTheme.heading2.copyWith(
-            color: Colors.black,
-            fontWeight: FontWeight.w700,
-            fontSize: titleFontSize,
-            letterSpacing: 1,
-          ),
-        ),
-        if (_unreadCount > 0)
-          TextButton.icon(
-            onPressed: _handleMarkAllAsRead,
-            icon: Icon(
-              Icons.done_all,
-              size: buttonIconSize,
-              color: AppTheme.primaryColor,
-            ),
-            label: Text(
-              'Mark all as read',
-              style: AppTheme.bodyMedium.copyWith(
-                color: AppTheme.primaryColor,
-                fontSize: buttonFontSize,
-              ),
-            ),
-            style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(
-                horizontal: buttonPaddingH,
-                vertical: buttonPaddingV,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-                side: BorderSide(color: AppTheme.primaryColor),
-              ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildTabs() {
-    final tabs = [
-      {'value': 'all', 'label': 'All', 'count': _notifications.length},
-      {'value': 'unread', 'label': 'Unread', 'count': _unreadCount},
-      {'value': 'archived', 'label': 'Archived', 'count': _archivedCount},
+  Widget _buildStatsPanel() {
+    final cells = [
+      ('All', '${_notifications.length}'),
+      ('Unread', '$_unreadCount'),
+      ('Archived', '$_archivedCount'),
     ];
-    final tabFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 14.0,
-      min: 12.0,
-      max: 16.0,
-    );
-    final badgeFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 12.0,
-      min: 10.0,
-      max: 14.0,
-    );
-    final tabPaddingH = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 20.0,
-    ).clamp(16.0, 24.0);
-    final tabPaddingV = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(12.0, 20.0);
-    final spacing8 = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 8.0,
-    ).clamp(6.0, 12.0);
-    final badgePaddingH = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 8.0,
-    ).clamp(6.0, 12.0);
-    final badgePaddingV = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 2.0,
-    ).clamp(1.0, 4.0);
 
     return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: AppTheme.textSecondary.withOpacity(0.2),
-            width: 1,
-          ),
-        ),
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
+      decoration: _panelDecoration,
+      child: IntrinsicHeight(
         child: Row(
-          children: tabs.map((tab) {
-            final isActive = _currentTab == tab['value'];
-            return InkWell(
-              onTap: () {
-                setState(() {
-                  _currentTab = tab['value'] as String;
-                });
-              },
+          children: List.generate(cells.length, (i) {
+            final cell = cells[i];
+            return Expanded(
               child: Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: tabPaddingH,
-                  vertical: tabPaddingV,
-                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                 decoration: BoxDecoration(
-                  color: isActive ? AppTheme.surfaceColor : Colors.transparent,
-                  border: isActive
-                      ? const Border(
-                          bottom: BorderSide(
-                            color: AppTheme.primaryColor,
-                            width: 2,
-                          ),
-                        )
-                      : null,
+                  border: Border(
+                    right: BorderSide(
+                      color: Colors.white
+                          .withValues(alpha: i < cells.length - 1 ? 0.08 : 0),
+                    ),
+                  ),
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      tab['label'] as String,
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: isActive
-                            ? AppTheme.primaryColor
-                            : AppTheme.textSecondary,
-                        fontWeight:
-                            isActive ? FontWeight.w700 : FontWeight.normal,
-                        fontSize: tabFontSize,
+                      cell.$1.toUpperCase(),
+                      style: AppTheme.bodySmall.copyWith(
+                        color: Colors.white.withValues(alpha: 0.45),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.6,
                       ),
                     ),
-                    SizedBox(width: spacing8),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: badgePaddingH,
-                        vertical: badgePaddingV,
-                      ),
-                      decoration: BoxDecoration(
-                        color: isActive
-                            ? AppTheme.primaryColor
-                            : AppTheme.textSecondary.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        (tab['count'] as int).toString(),
-                        style: TextStyle(
-                          color: isActive ? Colors.white : AppTheme.textSecondary,
-                          fontSize: badgeFontSize,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    const SizedBox(height: 4),
+                    Text(
+                      cell.$2,
+                      style: AppTheme.heading3.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
                       ),
                     ),
                   ],
                 ),
               ),
             );
-          }).toList(),
+          }),
         ),
       ),
     );
   }
 
-  Widget _buildEmptyState() {
-    final emptyStatePadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 32.0,
-    ).clamp(24.0, 40.0);
-    final iconSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 64.0,
-    ).clamp(48.0, 80.0);
-    final spacing16 = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(12.0, 20.0);
-    final headingFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 20.0,
-      min: 18.0,
-      max: 24.0,
+  Widget _buildListPanel() {
+    final items = _filteredNotifications;
+    return Container(
+      decoration: _panelDecoration,
+      child: Column(
+        children: List.generate(items.length, (index) {
+          final notification = items[index];
+          return NotificationItem(
+            notification: notification,
+            isLast: index == items.length - 1,
+            onMarkRead: () => _handleMarkNotificationRead(notification.id),
+          );
+        }),
+      ),
     );
+  }
 
+  Widget _buildEmptyState() {
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(emptyStatePadding),
+        padding: const EdgeInsets.all(32),
         child: Column(
           children: [
             Icon(
               Icons.notifications_none,
-              size: iconSize,
-              color: Colors.grey[400],
+              size: 56,
+              color: AppColors.textMuted.withValues(alpha: 0.5),
             ),
-            SizedBox(height: spacing16),
+            const SizedBox(height: 16),
             Text(
               'No notifications found',
-              style: AppTheme.heading3.copyWith(
-                fontSize: headingFontSize,
-                color: Colors.grey,
-              ),
+              style: AppTheme.heading3.copyWith(color: AppColors.textMuted),
             ),
           ],
         ),
@@ -579,4 +490,3 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     );
   }
 }
-
