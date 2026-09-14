@@ -1,7 +1,7 @@
-/** Flat panels — home blur panel uses square corners. */
-export const GLASS_CARD_RADIUS = 0;
+/** BattleAsia 2.0 landing zip — shared card radii */
+export const GLASS_CARD_RADIUS = 18;
 
-export const GLASS_CARD_RADIUS_SM = 0;
+export const GLASS_CARD_RADIUS_SM = 12;
 
-/** Flat gold-bar stat tiles. */
-export const GLASS_STAT_TILE_RADIUS = 0;
+/** Stat tiles / inner chips */
+export const GLASS_STAT_TILE_RADIUS = 12;

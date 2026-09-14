@@ -10,6 +10,7 @@ import Stack from '@mui/material/Stack';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import Badge from '@mui/material/Badge';
 import CircularProgress from '@mui/material/CircularProgress';
 
 import { paths } from 'src/routes/paths';
@@ -25,7 +26,7 @@ import {
   UserActionButton,
   UserEmptyState,
   userGlassDialogPaperSx,
-  userMutedTextSx, goldAlpha } from 'src/layouts/user';
+  userMutedTextSx } from 'src/layouts/user';
 
 import { NotificationItem } from 'src/sections/user/notifications/components/notification-item';
 
@@ -166,52 +167,58 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
         sx={[
           {
             position: 'relative',
-            width: { xs: 34, sm: 38 },
-            height: { xs: 34, sm: 38 },
+            width: 44,
+            height: 44,
             p: 0,
             borderRadius: '10px',
-            bgcolor: open ? goldAlpha(0.16) : alpha('#161618', 0.55),
-            backgroundImage: open
-              ? `linear-gradient(145deg, ${goldAlpha(0.22)} 0%, ${alpha('#0a0a0c', 0.5)} 100%)`
-              : `linear-gradient(145deg, ${alpha('#ffffff', 0.07)} 0%, ${alpha('#050508', 0.55)} 100%)`,
-            border: `1px solid ${open ? goldAlpha(0.55) : alpha('#ffffff', 0.1)}`,
-            boxShadow: open
-              ? `0 0 0 1px ${goldAlpha(0.12)}, 0 6px 18px ${alpha('#000000', 0.45)}, inset 0 1px 0 ${alpha('#ffffff', 0.1)}`
-              : `0 4px 14px ${alpha('#000000', 0.35)}, inset 0 1px 0 ${alpha('#ffffff', 0.08)}`,
+            bgcolor: open ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)',
+            backgroundImage: 'none',
+            border: `1px solid ${open ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.09)'}`,
+            boxShadow: 'none',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
             flexShrink: 0,
-            transition:
-              'transform 0.18s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+            transition: 'background-color 0.25s ease, border-color 0.25s ease',
             '&:hover': {
-              bgcolor: goldAlpha(0.12),
-              borderColor: goldAlpha(0.5),
-              boxShadow: `0 0 0 1px ${goldAlpha(0.15)}, 0 8px 22px ${alpha('#000000', 0.5)}, 0 0 18px ${goldAlpha(0.18)}`,
-              transform: 'translateY(-1px)',
+              bgcolor: 'rgba(255,255,255,0.05)',
+              borderColor: 'rgba(255,255,255,0.14)',
               '& .notif-bell': {
                 color: USER_COLORS.gold,
-                filter: `drop-shadow(0 0 6px ${goldAlpha(0.55)})`,
               },
             },
-            '&:active': { transform: 'translateY(0) scale(0.97)' },
+            '&:active': { transform: 'none' },
           },
           ...(Array.isArray(sx) ? sx : [sx]),
         ]}
         {...other}
       >
-        <Iconify
-          className="notif-bell"
-          icon="solar:bell-bold"
-          width={18}
+        <Badge
+          badgeContent={unreadCount}
+          max={9}
+          overlap="circular"
           sx={{
-            color: open || unreadCount > 0 ? USER_COLORS.gold : alpha('#ffffff', 0.88),
-            filter:
-              open || unreadCount > 0
-                ? `drop-shadow(0 0 5px ${goldAlpha(0.45)})`
-                : 'none',
-            transition: 'color 0.2s ease, filter 0.2s ease',
+            '& .MuiBadge-badge': {
+              minWidth: 16,
+              height: 16,
+              px: 0.4,
+              fontSize: 10,
+              fontWeight: 800,
+              bgcolor: 'var(--ba-gold)',
+              color: 'var(--ba-gold-ink, #081401)',
+              border: '1px solid rgba(6,6,7,0.85)',
+            },
           }}
-        />
+        >
+          <Iconify
+            className="notif-bell"
+            icon="solar:bell-bold"
+            width={20}
+            sx={{
+              color: open || unreadCount > 0 ? 'var(--ba-gold)' : alpha('#ffffff', 0.92),
+              transition: 'color 0.2s ease',
+            }}
+          />
+        </Badge>
       </IconButton>
 
       <Drawer

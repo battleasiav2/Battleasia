@@ -332,7 +332,7 @@ export function ShopWalletView() {
                     p: 2,
                     bgcolor: alpha('#000000', 0.65),
                     border: `1px solid ${goldAlpha(0.35)}`,
-                    borderRadius: '8px',
+                    borderRadius: '12px',
                     boxShadow: `0 8px 24px ${alpha('#000000', 0.6)}, inset 0 0 14px ${goldAlpha(0.06)}`,
                   }}
                 >
@@ -376,7 +376,7 @@ export function ShopWalletView() {
                   fontSize: 14,
                   fontWeight: 900,
                   letterSpacing: 1,
-                  borderRadius: '8px',
+                  borderRadius: '12px',
                   boxShadow: `0 8px 24px ${goldAlpha(0.35)}`,
                 }}
               >

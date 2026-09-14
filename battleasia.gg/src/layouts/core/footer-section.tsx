@@ -81,7 +81,7 @@ export function FooterSection() {
     >
       <Box
         component="img"
-        src="/assets/images/black_bg.webp"
+        src="/landing-v2/footer-bg.webp"
         alt=""
         width={1920}
         height={1080}

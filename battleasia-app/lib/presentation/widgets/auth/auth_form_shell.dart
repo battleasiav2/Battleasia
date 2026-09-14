@@ -58,7 +58,7 @@ class _AuthFormShellState extends State<AuthFormShell> {
         body: Stack(
           fit: StackFit.expand,
           children: [
-            const ColoredBox(color: Color(0xFF070707)),
+            const ColoredBox(color: Color(0xFF060607)),
             RepaintBoundary(
               child: Image.asset(
                 'assets/images/auth_m.webp',
@@ -68,7 +68,7 @@ class _AuthFormShellState extends State<AuthFormShell> {
                 filterQuality: FilterQuality.medium,
                 cacheWidth: cacheW,
                 errorBuilder: (_, __, ___) =>
-                    const ColoredBox(color: Color(0xFF070707)),
+                    const ColoredBox(color: Color(0xFF060607)),
               ),
             ),
             const DecoratedBox(
@@ -155,15 +155,22 @@ class _AuthPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(AppColors.radius),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: const Color(0xFF161618).withValues(alpha: 0.38),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
+            color: AppColors.panelFill(),
+            borderRadius: BorderRadius.circular(AppColors.radius),
+            border: Border.all(color: AppColors.hair()),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x70000000),
+                blurRadius: 40,
+                offset: Offset(0, 24),
+              ),
+            ],
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -441,24 +448,26 @@ class AuthPrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 44,
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: loading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          foregroundColor: AppColors.goldInk,
-          disabledForegroundColor: Colors.white.withValues(alpha: 0.32),
-          backgroundColor: AppTheme.accentColor,
-          disabledBackgroundColor: Colors.white.withValues(alpha: 0.08),
-          side: BorderSide(color: AppTheme.accentColor.withValues(alpha: 0.28)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          textStyle: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 1.5,
-          ),
-        ),
+          height: 48,
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: loading ? null : onPressed,
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              foregroundColor: AppColors.goldInk,
+              disabledForegroundColor: Colors.white.withValues(alpha: 0.32),
+              backgroundColor: AppTheme.accentColor,
+              disabledBackgroundColor: Colors.white.withValues(alpha: 0.08),
+              side: BorderSide(color: AppTheme.accentColor),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppColors.radiusSm),
+              ),
+              textStyle: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.1,
+              ),
+            ),
         child: loading
             ? SizedBox(
                 width: 18,
@@ -501,7 +510,9 @@ class AuthSecondaryButton extends StatelessWidget {
         foregroundColor: Colors.white.withValues(alpha: 0.88),
         side: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
         backgroundColor: Colors.white.withValues(alpha: 0.05),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppColors.radiusSm),
+        ),
         textStyle: const TextStyle(
           fontSize: 12.5,
           fontWeight: FontWeight.w800,

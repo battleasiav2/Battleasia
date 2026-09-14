@@ -73,8 +73,8 @@ export function getGlassInnerSx(tokens: GlassCardTokens, extra?: SxProps<Theme>)
     backgroundColor: stat.bgcolor,
     border: stat.border,
     boxShadow: stat.boxShadow,
-    backdropFilter: shell.backdropFilter ?? 'blur(14px)',
-    WebkitBackdropFilter: shell.backdropFilter ?? 'blur(14px)',
+    backdropFilter: shell.backdropFilter ?? 'blur(20px)',
+    WebkitBackdropFilter: shell.backdropFilter ?? 'blur(20px)',
     ...(stat.shimmer ? { ...glassShimmerKeyframes, ...glassShimmerLayer } : {}),
     ...(stat.overlay
       ? {

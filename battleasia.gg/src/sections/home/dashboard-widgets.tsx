@@ -1,11 +1,9 @@
-﻿import { useMemo, useState, useEffect, useCallback, type ReactNode } from 'react';
+﻿import { useMemo, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import {
     Box,
     Stack,
-    Avatar,
     Button,
     Skeleton,
-    Container,
     Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
@@ -17,7 +15,6 @@ import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
 import { useSelector } from 'src/store';
 import { fNumber } from 'src/utils/format-number';
-import { getAvatarUrl } from 'src/utils/get-image-url';
 import { signInWithReturn } from 'src/utils/auth-return';
 import { useTranslate } from 'src/locales/use-locales';
 import CoinValue from 'src/components/coin-value';
@@ -31,12 +28,26 @@ import {
     sanitizePublicDashboardData,
 } from './pulse-dashboard-utils';
 import { HOME_TEXT_MUTED } from './home-blur-panel';
+import { LANDING_V2, landingPanelSx } from './landing-v2-theme';
 import { LivePulseDot } from './live-pulse-dot';
 import type {
     DashboardTopPlayer,
     PublicDashboardStats,
     DashboardMatchSummary,
 } from 'src/types';
+
+type PulseGameFilter = 'ALL' | 'PUBG' | 'FREE FIRE' | 'COD' | 'VALORANT' | 'MLBB';
+
+function matchPassesGameFilter(gameName: string | undefined, filter: PulseGameFilter): boolean {
+    if (filter === 'ALL') return true;
+    const g = (gameName || '').toLowerCase();
+    if (filter === 'PUBG') return g.includes('pubg');
+    if (filter === 'FREE FIRE') return g.includes('free fire') || g.includes('freefire') || g === 'ff';
+    if (filter === 'COD') return g.includes('cod') || g.includes('call of duty');
+    if (filter === 'VALORANT') return g.includes('valorant') || g.includes('val');
+    if (filter === 'MLBB') return g.includes('mobile legends') || g.includes('mlbb') || g.includes('legend');
+    return true;
+}
 
 type SectionState = {
     loading: boolean;
@@ -414,6 +425,9 @@ function PulseHeroTactical({
     stats,
     loading,
     lastUpdatedLabel,
+    gameFilter,
+    onGameFilterChange,
+    chipLabels,
 }: {
     title: string;
     description: string;
@@ -422,184 +436,99 @@ function PulseHeroTactical({
     stats: PulseCardStats;
     loading?: boolean;
     lastUpdatedLabel?: string;
+    gameFilter: PulseGameFilter;
+    onGameFilterChange: (filter: PulseGameFilter) => void;
+    chipLabels: { all: string; pubg: string; freeFire: string; cod: string; valorant: string; mlbb: string };
 }) {
     const theme = useTheme();
-    const accentColor = theme.palette.primary.main || '#f5c518';
+    const accentColor = theme.palette.primary.main || '#cbfb24';
+    const accentInk = theme.palette.primary.contrastText || LANDING_V2.goldInk;
 
-    const statRows = [
+    const chips: { id: PulseGameFilter; label: string }[] = [
+        { id: 'ALL', label: chipLabels.all },
+        { id: 'PUBG', label: chipLabels.pubg },
+        { id: 'FREE FIRE', label: chipLabels.freeFire },
+        { id: 'COD', label: chipLabels.cod },
+        { id: 'VALORANT', label: chipLabels.valorant },
+        { id: 'MLBB', label: chipLabels.mlbb },
+    ];
+
+    const metrics = [
         {
             key: 'winnings',
             label: labels.platformTotalWinnings,
             value: stats.totalWinnings,
-            suffix: undefined as string | undefined,
-            icon: 'solar:wallet-money-bold',
+            gold: true,
+            live: false,
         },
         {
             key: 'matches',
             label: labels.processedMatches,
             value: stats.processedMatches,
-            suffix: undefined as string | undefined,
-            icon: 'solar:medal-ribbon-star-bold',
+            gold: false,
+            live: false,
         },
         {
             key: 'live',
             label: labels.ongoingMatches,
             value: stats.ongoingMatches,
-            suffix: liveSuffix,
-            icon: 'solar:play-bold',
+            gold: false,
+            live: true,
         },
         {
             key: 'joined',
             label: labels.todayJoinedUsers,
             value: stats.todayJoinedUsers,
-            suffix: undefined as string | undefined,
-            icon: 'solar:user-plus-rounded-bold',
+            gold: false,
+            live: false,
         },
     ];
 
-    const renderStatRow = (row: (typeof statRows)[number]) => (
-        <Stack
-            key={row.key}
-            direction="row"
-            alignItems="center"
-            spacing={{ xs: 1.5, sm: 1.75 }}
-            sx={{ minWidth: 0 }}
-        >
-            <Box
-                sx={{
-                    width: { xs: 44, sm: 48 },
-                    height: { xs: 44, sm: 48 },
-                    flexShrink: 0,
-                    borderRadius: '10px',
-                    display: 'grid',
-                    placeItems: 'center',
-                    bgcolor: safeAlpha(accentColor, 0.08),
-                    border: `1px solid ${safeAlpha(accentColor, 0.28)}`,
-                    color: accentColor,
-                    boxShadow: 'none',
-                }}
-            >
-                <Iconify icon={row.icon} width={22} />
-            </Box>
-
-            <Box sx={{ minWidth: 0, flex: 1 }}>
-                <Typography
-                    sx={{
-                        color: alpha('#ffffff', 0.5),
-                        fontSize: { xs: 11, sm: 12 },
-                        fontWeight: 700,
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                        mb: 0.4,
-                    }}
-                >
-                    {row.label}
-                </Typography>
-
-                {loading ? (
-                    <Skeleton width="48%" height={30} sx={{ bgcolor: alpha('#ffffff', 0.06) }} />
-                ) : (
-                    <Typography
-                        sx={{
-                            display: 'flex',
-                            alignItems: 'baseline',
-                            gap: 0.65,
-                            color: '#ffffff',
-                            fontSize: { xs: '1.45rem', sm: '1.65rem', md: '1.75rem' },
-                            fontWeight: 800,
-                            lineHeight: 1.1,
-                            letterSpacing: '-0.02em',
-                            '& > *': { minWidth: 0 },
-                        }}
-                    >
-                        {row.value}
-                        {row.suffix ? (
-                            <Typography
-                                component="span"
-                                sx={{
-                                    color: accentColor,
-                                    fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                                    fontWeight: 700,
-                                    letterSpacing: 0.4,
-                                    textTransform: 'lowercase',
-                                }}
-                            >
-                                {row.suffix}
-                            </Typography>
-                        ) : null}
-                    </Typography>
-                )}
-            </Box>
-        </Stack>
-    );
+    void liveSuffix;
 
     return (
         <Box
             sx={{
-                position: 'relative',
-                overflow: 'hidden',
-                borderRadius: { xs: '12px', sm: '14px' },
-                boxSizing: 'border-box',
-                p: { xs: 2.25, sm: 3, md: 3.5 },
-                bgcolor: alpha('#161618', 0.38),
-                backdropFilter: 'blur(18px)',
-                WebkitBackdropFilter: 'blur(18px)',
-                border: `1px solid ${alpha('#ffffff', 0.14)}`,
-                boxShadow: 'none',
+                ...landingPanelSx,
+                p: { xs: 2.75, sm: 3.5, md: 'clamp(22px, 3.2vw, 40px)' },
             }}
         >
             <Box
                 sx={{
-                    display: 'grid',
-                    gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1.05fr) minmax(0, 1fr)' },
-                    gap: { xs: 0, md: 3.5 },
-                    alignItems: 'stretch',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    gap: { xs: 2.5, md: 3.5 },
+                    flexWrap: 'wrap',
+                    alignItems: 'flex-start',
                 }}
             >
-                {/* Left — copy / identity */}
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        minWidth: 0,
-                        pr: { md: 1 },
-                        pb: { xs: 2.25, md: 0 },
-                        borderBottom: {
-                            xs: `1px solid ${safeAlpha(accentColor, 0.18)}`,
-                            md: 'none',
-                        },
-                        borderRight: {
-                            xs: 'none',
-                            md: `1px solid ${safeAlpha(accentColor, 0.18)}`,
-                        },
-                    }}
-                >
-                    <Stack direction="row" alignItems="center" spacing={0.85} sx={{ mb: 1.5 }}>
-                        <LivePulseDot color="green" size={8} />
+                <Box sx={{ maxWidth: '50ch', minWidth: 0 }}>
+                    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
+                        <LivePulseDot size={8} />
                         <Typography
                             sx={{
-                                fontSize: { xs: 11, sm: 12 },
+                                fontSize: 11,
                                 fontWeight: 700,
-                                letterSpacing: '0.14em',
+                                letterSpacing: '0.16em',
                                 textTransform: 'uppercase',
-                                color: alpha('#ffffff', 0.55),
+                                color: LANDING_V2.faint,
                             }}
                         >
-                            Live Dashboard
+                            {tLiveKicker(title)}
                         </Typography>
                     </Stack>
 
                     <Typography
-                        className="font-tr"
+                        component="h2"
+                        className="landing-display"
                         sx={{
-                            fontSize: { xs: 26, sm: 34, md: 38 },
-                            fontWeight: 900,
-                            letterSpacing: { xs: '0.02em', sm: '0.04em' },
+                            fontFamily: LANDING_V2.display,
+                            fontWeight: 600,
+                            fontSize: { xs: '1.85rem', sm: 'clamp(1.85rem, 4vw, 3.2rem)' },
+                            lineHeight: 0.98,
+                            letterSpacing: '-0.03em',
                             textTransform: 'uppercase',
-                            color: '#ffffff',
-                            lineHeight: 1.05,
-                            mb: 1.25,
+                            color: LANDING_V2.text,
                         }}
                     >
                         {title}
@@ -607,11 +536,10 @@ function PulseHeroTactical({
 
                     <Typography
                         sx={{
-                            color: alpha('#ffffff', 0.62),
-                            fontSize: { xs: '0.875rem', sm: '0.9375rem' },
-                            lineHeight: 1.55,
-                            maxWidth: { xs: '100%', md: 420 },
-                            mb: 0.85,
+                            mt: 1.5,
+                            color: LANDING_V2.muted,
+                            fontSize: { xs: '0.95rem', md: '1.05rem' },
+                            lineHeight: 1.5,
                         }}
                     >
                         {description}
@@ -620,8 +548,9 @@ function PulseHeroTactical({
                     {lastUpdatedLabel ? (
                         <Typography
                             sx={{
-                                color: alpha('#ffffff', 0.38),
-                                fontSize: { xs: '0.75rem', sm: '0.8125rem' },
+                                mt: 1,
+                                color: LANDING_V2.faint,
+                                fontSize: '0.78rem',
                                 fontWeight: 500,
                             }}
                         >
@@ -630,23 +559,125 @@ function PulseHeroTactical({
                     ) : null}
                 </Box>
 
-                {/* Right — stats fill the split */}
-                <Box
-                    sx={{
-                        minWidth: 0,
-                        pl: { md: 0.5 },
-                        pt: { xs: 2.25, md: 0 },
-                        display: 'grid',
-                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr' },
-                        gap: { xs: 2, sm: 2.25, md: 2.35 },
-                        alignContent: 'center',
-                    }}
+                <Stack
+                    direction="row"
+                    flexWrap="wrap"
+                    gap={1}
+                    role="tablist"
+                    aria-label="Filter by game"
+                    sx={{ pt: { md: 0.5 } }}
                 >
-                    {statRows.map(renderStatRow)}
-                </Box>
+                    {chips.map((chip) => {
+                        const active = gameFilter === chip.id;
+                        return (
+                            <Box
+                                key={chip.id}
+                                component="button"
+                                type="button"
+                                role="tab"
+                                aria-selected={active}
+                                onClick={() => onGameFilterChange(chip.id)}
+                                sx={{
+                                    px: 1.75,
+                                    py: 1.15,
+                                    minHeight: 40,
+                                    cursor: 'pointer',
+                                    borderRadius: 999,
+                                    border: '1px solid',
+                                    borderColor: active ? accentColor : LANDING_V2.hair2,
+                                    bgcolor: active ? accentColor : 'transparent',
+                                    color: active ? accentInk : LANDING_V2.muted,
+                                    fontWeight: 700,
+                                    fontSize: 12,
+                                    letterSpacing: '0.1em',
+                                    textTransform: 'uppercase',
+                                    boxShadow: active
+                                        ? `0 6px 20px -8px ${alpha(accentColor, 0.4)}`
+                                        : 'none',
+                                    transition: `background-color 0.25s ${LANDING_V2.ease}, color 0.25s ${LANDING_V2.ease}`,
+                                    '&:hover': {
+                                        color: active ? accentInk : LANDING_V2.text,
+                                        borderColor: active ? accentColor : LANDING_V2.hairStrong,
+                                    },
+                                }}
+                            >
+                                {chip.label}
+                            </Box>
+                        );
+                    })}
+                </Stack>
+            </Box>
+
+            <Box
+                sx={{
+                    mt: { xs: 3, md: 3.5 },
+                    display: 'grid',
+                    gridTemplateColumns: {
+                        xs: '1fr',
+                        sm: '1fr 1fr',
+                        md: 'repeat(4, minmax(0, 1fr))',
+                    },
+                    gap: 1,
+                    borderRadius: LANDING_V2.radiusSm,
+                    overflow: 'hidden',
+                    border: `1px solid ${LANDING_V2.hair}`,
+                }}
+            >
+                {metrics.map((row) => (
+                    <Box
+                        key={row.key}
+                        sx={{
+                            bgcolor: 'rgba(10,10,12,0.62)',
+                            p: { xs: 2.25, md: '22px 20px' },
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 1.25,
+                            minWidth: 0,
+                        }}
+                    >
+                        <Typography
+                            sx={{
+                                fontSize: '0.64rem',
+                                letterSpacing: '0.16em',
+                                textTransform: 'uppercase',
+                                color: LANDING_V2.faint,
+                                fontWeight: 700,
+                            }}
+                        >
+                            {row.label}
+                        </Typography>
+                        {loading ? (
+                            <Skeleton width="55%" height={36} sx={{ bgcolor: alpha('#fff', 0.06) }} />
+                        ) : (
+                            <Typography
+                                className="landing-display"
+                                sx={{
+                                    fontFamily: LANDING_V2.display,
+                                    fontWeight: 600,
+                                    fontSize: { xs: '1.5rem', md: 'clamp(1.5rem, 2.6vw, 2.25rem)' },
+                                    lineHeight: 1,
+                                    color: row.gold ? accentColor : LANDING_V2.text,
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: 1,
+                                    minWidth: 0,
+                                    '& > *': { minWidth: 0 },
+                                }}
+                            >
+                                {row.live ? <LivePulseDot size={8} /> : null}
+                                {row.value}
+                            </Typography>
+                        )}
+                    </Box>
+                ))}
             </Box>
         </Box>
     );
+}
+
+/** Zip kicker: LIVE — {title} */
+function tLiveKicker(title: string) {
+    return `LIVE — ${title}`.toUpperCase();
 }
 
 const formatDateTime = (value?: string | null) => {
@@ -738,10 +769,9 @@ function PlayerListCardTactical({
     };
 }) {
     const theme = useTheme();
-    const accentColor = theme.palette.primary.main || '#f5c518';
-    const accentContrast = theme.palette.primary.contrastText || '#0a0a0a';
+    const accentColor = theme.palette.primary.main || '#cbfb24';
 
-    const metricLabel =
+    const metricMeta =
         metricKey === 'totalWinnings'
             ? translations.winnings
             : metricKey === 'winRate'
@@ -753,80 +783,56 @@ function PlayerListCardTactical({
     return (
         <Box
             sx={{
-                position: 'relative',
+                ...landingPanelSx,
+                p: { xs: 2.5, sm: '22px 24px' },
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column',
-                overflow: 'hidden',
-                borderRadius: { xs: '12px', sm: '14px' },
-                boxSizing: 'border-box',
-                p: { xs: 1.5, sm: 2 },
-                bgcolor: alpha('#161618', 0.38),
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
-                border: `1px solid ${alpha('#ffffff', 0.12)}`,
-                boxShadow: 'none',
             }}
         >
-            {/* Header — title + LIVE pill */}
             <Stack
                 direction="row"
                 alignItems="center"
                 justifyContent="space-between"
                 spacing={1.5}
-                sx={{ mb: 1.75 }}
+                sx={{ mb: 0.75 }}
             >
                 <Typography
+                    component="h3"
+                    className="landing-display"
                     sx={{
-                        fontSize: { xs: 13, sm: 14 },
-                        fontWeight: 900,
-                        letterSpacing: '0.08em',
+                        fontFamily: LANDING_V2.display,
+                        fontSize: '1.12rem',
+                        fontWeight: 600,
+                        color: LANDING_V2.text,
                         textTransform: 'uppercase',
-                        color: '#ffffff',
-                        lineHeight: 1.2,
                     }}
                 >
                     {title}
                 </Typography>
-
-                <Stack
-                    direction="row"
-                    alignItems="center"
-                    spacing={0.65}
+                <Box
                     sx={{
                         flexShrink: 0,
-                        px: 1,
-                        py: 0.45,
-                        borderRadius: '999px',
-                        bgcolor: alpha('#10b981', 0.12),
-                        border: `1px solid ${alpha('#10b981', 0.4)}`,
+                        px: 1.25,
+                        py: 0.5,
+                        borderRadius: 999,
+                        border: `1px solid ${LANDING_V2.hair}`,
+                        fontSize: '0.62rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.16em',
+                        textTransform: 'uppercase',
+                        color: LANDING_V2.faint,
                     }}
                 >
-                    <LivePulseDot color="green" size={7} />
-                    <Typography
-                        sx={{
-                            fontSize: 10,
-                            fontWeight: 800,
-                            letterSpacing: 1.1,
-                            textTransform: 'uppercase',
-                            color: '#34d399',
-                        }}
-                    >
-                        {liveLabel}
-                    </Typography>
-                </Stack>
+                    {liveLabel}
+                </Box>
             </Stack>
 
             <Box sx={{ flex: 1, minHeight: 0 }}>
                 {loading ? (
-                    <Stack spacing={1}>
+                    <Stack spacing={1.25} sx={{ pt: 1 }}>
                         {Array.from({ length: 5 }).map((_, idx) => (
-                            <Skeleton
-                                key={idx}
-                                variant="rounded"
-                                height={68}
-                                sx={{ borderRadius: '12px', bgcolor: alpha('#ffffff', 0.04) }}
-                            />
+                            <Skeleton key={idx} height={36} sx={{ bgcolor: alpha('#fff', 0.05) }} />
                         ))}
                     </Stack>
                 ) : players.length === 0 ? (
@@ -834,22 +840,22 @@ function PlayerListCardTactical({
                         {translations.noDataYet}
                     </Typography>
                 ) : (
-                    <Stack spacing={1}>
-                        {players.map((player, idx) => {
-                            const rank = idx + 1;
-                            const isTop1 = rank === 1;
-
+                    <Box component="ol" sx={{ listStyle: 'none', m: 0, p: 0 }}>
+                        {players.slice(0, 5).map((player, idx) => {
+                            const rank = String(idx + 1).padStart(2, '0');
+                            const isTop1 = idx === 0;
                             const metricValue = (() => {
                                 switch (metricKey) {
                                     case 'totalWinnings':
                                         return (
                                             <CoinValue
                                                 value={player.totalWinnings || 0}
-                                                size={16}
+                                                size={14}
                                                 textSx={{
-                                                    fontWeight: 800,
-                                                    fontSize: { xs: '0.95rem', sm: '1.05rem' },
-                                                    color: isTop1 ? accentColor : '#ffffff',
+                                                    fontFamily: LANDING_V2.display,
+                                                    fontWeight: 600,
+                                                    fontSize: '1rem',
+                                                    color: accentColor,
                                                 }}
                                             />
                                         );
@@ -857,147 +863,80 @@ function PlayerListCardTactical({
                                         return `${fNumber(player.winRate || 0)}%`;
                                     case 'totalKills':
                                         return fNumber(player.totalKills || 0);
-                                    case 'averageScore':
                                     default:
                                         return fNumber(player.averageScore || 0);
                                 }
                             })();
 
                             return (
-                                <Stack
+                                <Box
+                                    component="li"
                                     key={`${player.userId}-${idx}`}
-                                    direction="row"
-                                    spacing={1.25}
-                                    alignItems="center"
                                     sx={{
-                                        px: { xs: 1.15, sm: 1.35 },
-                                        py: { xs: 1.1, sm: 1.2 },
-                                        borderRadius: '12px',
-                                        bgcolor: alpha('#ffffff', isTop1 ? 0.05 : 0.03),
-                                        border: `1px solid ${
-                                            isTop1
-                                                ? safeAlpha(accentColor, 0.4)
-                                                : alpha('#ffffff', 0.08)
-                                        }`,
-                                        boxShadow: 'none',
-                                        transition: 'border-color 0.2s ease, background-color 0.2s ease',
-                                        '&:hover': {
-                                            bgcolor: alpha('#ffffff', 0.06),
-                                            borderColor: safeAlpha(accentColor, 0.35),
-                                        },
+                                        display: 'grid',
+                                        gridTemplateColumns: '36px minmax(0, 1fr) auto auto',
+                                        gap: 1.5,
+                                        alignItems: 'center',
+                                        py: 1.5,
+                                        borderTop: idx === 0 ? 'none' : `1px solid ${LANDING_V2.hair}`,
                                     }}
                                 >
-                                    {/* Rank badge */}
+                                    <Typography
+                                        sx={{
+                                            fontFamily: LANDING_V2.display,
+                                            fontWeight: 600,
+                                            fontSize: '0.95rem',
+                                            color: isTop1 ? accentColor : LANDING_V2.faint,
+                                        }}
+                                    >
+                                        {rank}
+                                    </Typography>
+                                    <Typography
+                                        noWrap
+                                        sx={{
+                                            fontWeight: 600,
+                                            fontSize: '0.95rem',
+                                            color: LANDING_V2.text,
+                                            minWidth: 0,
+                                        }}
+                                    >
+                                        {player.username || '—'}
+                                    </Typography>
+                                    <Typography
+                                        sx={{
+                                            fontSize: '0.72rem',
+                                            color: LANDING_V2.faint,
+                                            fontWeight: 600,
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.04em',
+                                            whiteSpace: 'nowrap',
+                                        }}
+                                    >
+                                        {metricMeta}
+                                    </Typography>
                                     <Box
                                         sx={{
-                                            width: 34,
-                                            height: 34,
-                                            flexShrink: 0,
-                                            borderRadius: '8px',
-                                            display: 'grid',
-                                            placeItems: 'center',
-                                            bgcolor: isTop1 ? accentColor : alpha('#ffffff', 0.04),
-                                            border: isTop1
-                                                ? 'none'
-                                                : `1px solid ${alpha('#ffffff', 0.14)}`,
-                                            color: isTop1 ? accentContrast : alpha('#ffffff', 0.7),
-                                            fontWeight: 900,
-                                            fontSize: 12,
-                                            letterSpacing: 0.2,
-                                            boxShadow: 'none',
+                                            fontFamily: LANDING_V2.display,
+                                            fontWeight: 600,
+                                            fontSize: '1rem',
+                                            color: metricKey === 'totalWinnings' ? accentColor : LANDING_V2.text,
+                                            textAlign: 'right',
+                                            justifySelf: 'end',
                                         }}
                                     >
-                                        #{rank}
+                                        {metricValue}
                                     </Box>
-
-                                    <Avatar
-                                        src={getAvatarUrl(player.avatar)}
-                                        alt={player.username}
-                                        sx={{
-                                            width: { xs: 40, sm: 44 },
-                                            height: { xs: 40, sm: 44 },
-                                            flexShrink: 0,
-                                            bgcolor: '#0a0a0a',
-                                            color: '#e2e8f0',
-                                            fontWeight: 700,
-                                            fontSize: 14,
-                                            border: `1.5px solid ${
-                                                isTop1
-                                                    ? safeAlpha(accentColor, 0.55)
-                                                    : alpha('#ffffff', 0.12)
-                                            }`,
-                                        }}
-                                    >
-                                        {player.username?.[0]?.toUpperCase() || '?'}
-                                    </Avatar>
-
-                                    <Stack sx={{ flex: 1, minWidth: 0, gap: 0.25 }}>
-                                        <Typography
-                                            noWrap
-                                            sx={{
-                                                color: '#ffffff',
-                                                fontSize: { xs: 13.5, sm: 15 },
-                                                fontWeight: 800,
-                                                lineHeight: 1.2,
-                                            }}
-                                        >
-                                            {player.username}
-                                        </Typography>
-                                        <Typography
-                                            noWrap
-                                            sx={{
-                                                color: alpha('#ffffff', 0.45),
-                                                fontSize: { xs: 11, sm: 12 },
-                                                lineHeight: 1.3,
-                                            }}
-                                        >
-                                            {translations.lastPlayed}: {formatDateTime(player.lastPlayed)}
-                                        </Typography>
-                                    </Stack>
-
-                                    <Stack
-                                        alignItems="flex-end"
-                                        spacing={0.2}
-                                        sx={{ flexShrink: 0, minWidth: 72 }}
-                                    >
-                                        {typeof metricValue === 'string' || typeof metricValue === 'number' ? (
-                                            <Typography
-                                                sx={{
-                                                    color: isTop1 ? accentColor : '#ffffff',
-                                                    fontSize: { xs: '0.95rem', sm: '1.05rem' },
-                                                    fontWeight: 800,
-                                                    fontVariantNumeric: 'tabular-nums',
-                                                    lineHeight: 1.2,
-                                                }}
-                                            >
-                                                {metricValue}
-                                            </Typography>
-                                        ) : (
-                                            metricValue
-                                        )}
-                                        <Typography
-                                            sx={{
-                                                color: alpha('#ffffff', 0.42),
-                                                fontSize: 10,
-                                                fontWeight: 700,
-                                                letterSpacing: 0.6,
-                                                textTransform: 'uppercase',
-                                            }}
-                                        >
-                                            {metricLabel}
-                                        </Typography>
-                                    </Stack>
-                                </Stack>
+                                </Box>
                             );
                         })}
-                    </Stack>
+                    </Box>
                 )}
             </Box>
         </Box>
     );
 }
 
-const TARGET_MATCH_TILES = 3;
+const TARGET_MATCH_TILES = 12;
 
 function isRealMatchId(id: string | undefined) {
     return Boolean(id) && !String(id).startsWith('demo-');
@@ -1009,11 +948,12 @@ function isMatchFull(match: DashboardMatchSummary) {
 }
 
 // ----------------------------------------------------------------------
-// Pulse-simple match tile — quiet glass card + brand Play button
+// Zip match tile
 // ----------------------------------------------------------------------
 
 function DashboardMatchTileTactical({
     match,
+    variant,
 }: {
     match: DashboardMatchSummary;
     index: number;
@@ -1026,6 +966,17 @@ function DashboardMatchTileTactical({
     const matchPath = isRealMatchId(match.id) ? paths.user.match(match.id) : '';
     const showJoin = Boolean(matchPath);
     const gameLabel = match.gameName || 'Match';
+    const isLive = variant === 'ongoing';
+    const spotsFilled = match.participantsCount || 0;
+    const spotsCap = match.totalPlayer || 0;
+    const spotsPct =
+        spotsCap > 0 ? Math.min(100, Math.round((spotsFilled / spotsCap) * 100)) : 0;
+
+    const statusLabel = full
+        ? t('home.dashboard.matchFull')
+        : isLive
+          ? t('home.dashboard.live').toUpperCase()
+          : t('home.dashboard.matchStatusOpen').toUpperCase();
 
     const handleJoin = () => {
         if (!matchPath) return;
@@ -1036,22 +987,6 @@ function DashboardMatchTileTactical({
         router.push(matchPath);
     };
 
-    const rows: Array<{ label: string; value: ReactNode; accent?: boolean }> = [
-        {
-            label: t('home.dashboard.spots'),
-            value: `${fNumber(match.participantsCount || 0)}${match.totalPlayer ? ` / ${fNumber(match.totalPlayer)}` : ''}`,
-        },
-        {
-            label: t('home.dashboard.entry'),
-            value: match.entryFee ? <CoinValue value={match.entryFee} size={12} /> : t('home.dashboard.free'),
-        },
-        {
-            label: t('home.dashboard.prizeEst'),
-            value: match.prizeEstimate ? <CoinValue value={match.prizeEstimate} size={12} /> : '—',
-            accent: true,
-        },
-    ];
-
     return (
         <Box
             sx={{
@@ -1060,110 +995,172 @@ function DashboardMatchTileTactical({
                 height: 1,
                 display: 'flex',
                 flexDirection: 'column',
-                p: { xs: 1.1, sm: 1.4, md: 1.6 },
-                borderRadius: '12px',
-                bgcolor: alpha('#ffffff', 0.06),
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-                border: `1px solid ${alpha('#ffffff', 0.14)}`,
-                boxShadow: 'none',
+                gap: 1.75,
+                p: 2.5,
+                borderRadius: '16px',
+                bgcolor: LANDING_V2.panel,
+                backdropFilter: `blur(${LANDING_V2.blur})`,
+                WebkitBackdropFilter: `blur(${LANDING_V2.blur})`,
+                border: `1px solid ${LANDING_V2.hair}`,
+                boxShadow: isLive
+                    ? 'inset 2px 0 0 var(--ba-gold), 0 30px 80px -44px #000'
+                    : '0 30px 80px -44px #000, inset 0 1px 0 rgba(255,255,255,0.05)',
+                position: 'relative',
+                overflow: 'hidden',
+                transition: `transform 0.35s ${LANDING_V2.ease}, border-color 0.35s ease, box-shadow 0.35s ease`,
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                    borderColor: LANDING_V2.hair2,
+                    boxShadow: isLive
+                        ? 'inset 2px 0 0 var(--ba-gold), 0 28px 60px -28px #000'
+                        : '0 28px 60px -28px #000',
+                },
             }}
         >
-            <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-                spacing={0.75}
-                sx={{ mb: 1 }}
-            >
+            <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
                 <Typography
                     sx={{
-                        fontSize: { xs: 9, sm: 10 },
+                        fontSize: '0.68rem',
                         fontWeight: 700,
-                        letterSpacing: '0.08em',
+                        letterSpacing: '0.14em',
                         textTransform: 'uppercase',
-                        color: alpha('#ffffff', 0.5),
+                        color: LANDING_V2.muted,
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
+                        minWidth: 0,
                     }}
                 >
                     {gameLabel}
                 </Typography>
-                <Typography
+                <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={0.75}
                     sx={{
-                        fontSize: { xs: 9, sm: 10 },
-                        fontWeight: 800,
-                        letterSpacing: '0.1em',
-                        textTransform: 'uppercase',
-                        color: '#22c55e',
                         flexShrink: 0,
+                        fontSize: '0.64rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                        color: 'var(--ba-gold)',
                     }}
                 >
-                    {t('home.dashboard.live').toUpperCase()}
-                </Typography>
+                    <LivePulseDot size={7} />
+                    {statusLabel}
+                </Stack>
             </Stack>
 
             <Typography
+                className="landing-display"
                 sx={{
-                    color: '#ffffff',
-                    fontSize: { xs: '0.78rem', sm: '0.92rem', md: '1rem' },
-                    fontWeight: 800,
-                    lineHeight: 1.3,
-                    mb: { xs: 1, sm: 1.15 },
+                    fontFamily: LANDING_V2.display,
+                    fontWeight: 600,
+                    fontSize: { xs: '1.05rem', sm: '1.18rem', md: '1.26rem' },
+                    lineHeight: 1.05,
+                    letterSpacing: '-0.01em',
+                    color: LANDING_V2.text,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
                     overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
                 }}
             >
                 {match.matchName}
             </Typography>
 
-            <Stack
-                spacing={{ xs: 0.55, sm: 0.7 }}
+            <Box
                 sx={{
-                    mb: { xs: 1.1, sm: 1.25 },
-                    pb: { xs: 1.1, sm: 1.25 },
-                    borderBottom: `1px solid ${alpha('#ffffff', 0.08)}`,
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '12px 16px',
+                    py: 1.75,
+                    borderTop: `1px solid ${LANDING_V2.hair}`,
+                    borderBottom: `1px solid ${LANDING_V2.hair}`,
                 }}
             >
-                {rows.map((row) => (
-                    <Stack
-                        key={row.label}
-                        direction="row"
-                        justifyContent="space-between"
-                        alignItems="center"
-                        spacing={0.75}
-                        sx={{ minWidth: 0 }}
+                <Box sx={{ gridColumn: '1 / -1', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography
+                        sx={{
+                            fontSize: '0.62rem',
+                            letterSpacing: '0.12em',
+                            textTransform: 'uppercase',
+                            color: LANDING_V2.faint,
+                            fontWeight: 700,
+                        }}
                     >
-                        <Typography
-                            sx={{
-                                fontSize: { xs: 9, sm: 11 },
-                                color: alpha('#ffffff', 0.55),
-                                fontWeight: 600,
-                                flexShrink: 0,
-                            }}
-                        >
-                            {row.label}
-                        </Typography>
+                        {t('home.dashboard.spots')} · {fNumber(spotsFilled)}
+                        {spotsCap ? `/${fNumber(spotsCap)}` : ''}
+                    </Typography>
+                    <Box
+                        sx={{
+                            height: 3,
+                            borderRadius: '4px',
+                            bgcolor: 'rgba(255,255,255,0.08)',
+                            overflow: 'hidden',
+                        }}
+                    >
                         <Box
                             sx={{
-                                fontSize: { xs: 11, sm: 13, md: 14 },
-                                fontWeight: 800,
-                                color: row.accent ? 'var(--ba-gold)' : '#ffffff',
-                                fontVariantNumeric: 'tabular-nums',
-                                textAlign: 'right',
-                                minWidth: 0,
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSpace: 'nowrap',
+                                width: `${spotsPct}%`,
+                                height: 1,
+                                bgcolor: 'var(--ba-gold)',
+                                borderRadius: '4px',
                             }}
-                        >
-                            {row.value}
-                        </Box>
-                    </Stack>
-                ))}
-            </Stack>
+                        />
+                    </Box>
+                </Box>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, minWidth: 0 }}>
+                    <Typography
+                        sx={{
+                            fontSize: '0.62rem',
+                            letterSpacing: '0.12em',
+                            textTransform: 'uppercase',
+                            color: LANDING_V2.faint,
+                            fontWeight: 700,
+                        }}
+                    >
+                        {t('home.dashboard.entry')}
+                    </Typography>
+                    <Box
+                        sx={{
+                            fontFamily: LANDING_V2.display,
+                            fontWeight: 600,
+                            fontSize: '1.05rem',
+                            color: LANDING_V2.text,
+                            lineHeight: 1.1,
+                        }}
+                    >
+                        {match.entryFee ? <CoinValue value={match.entryFee} size={14} /> : t('home.dashboard.free')}
+                    </Box>
+                </Box>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, minWidth: 0 }}>
+                    <Typography
+                        sx={{
+                            fontSize: '0.62rem',
+                            letterSpacing: '0.12em',
+                            textTransform: 'uppercase',
+                            color: LANDING_V2.faint,
+                            fontWeight: 700,
+                        }}
+                    >
+                        {t('home.dashboard.prizeEst')}
+                    </Typography>
+                    <Box
+                        sx={{
+                            fontFamily: LANDING_V2.display,
+                            fontWeight: 600,
+                            fontSize: '1.05rem',
+                            color: 'var(--ba-gold)',
+                            lineHeight: 1.1,
+                        }}
+                    >
+                        {match.prizeEstimate ? <CoinValue value={match.prizeEstimate} size={14} /> : '—'}
+                    </Box>
+                </Box>
+            </Box>
 
             {showJoin ? (
                 <Button
@@ -1172,6 +1169,7 @@ function DashboardMatchTileTactical({
                     disableElevation
                     disabled={full}
                     onClick={handleJoin}
+                    endIcon={!full ? <Iconify icon="solar:arrow-right-bold" width={15} /> : undefined}
                     aria-label={
                         full
                             ? t('home.dashboard.matchFull')
@@ -1181,46 +1179,47 @@ function DashboardMatchTileTactical({
                     }
                     sx={{
                         mt: 'auto',
-                        minHeight: { xs: 28, sm: 34 },
-                        py: 0.45,
-                        borderRadius: '4px',
-                        fontSize: { xs: 9, sm: 10.5 },
-                        fontWeight: 800,
-                        letterSpacing: 0.8,
+                        minHeight: 44,
+                        py: 1.5,
+                        borderRadius: '10px',
+                        fontSize: '0.78rem',
+                        fontWeight: 700,
+                        letterSpacing: '0.12em',
                         textTransform: 'uppercase',
-                        color: `${goldAlpha(0.92)} !important`,
+                        color: 'var(--ba-gold) !important',
                         bgcolor: `${goldAlpha(0.14)} !important`,
-                        border: `1px solid ${goldAlpha(0.28)} !important`,
+                        border: `1px solid ${goldAlpha(0.24)} !important`,
                         boxShadow: 'none',
+                        gap: 1,
+                        transition: 'background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease',
                         '&:hover': {
-                            bgcolor: `${goldAlpha(0.22)} !important`,
-                            borderColor: `${goldAlpha(0.42)} !important`,
-                            color: `var(--ba-gold) !important`,
+                            bgcolor: 'var(--ba-gold) !important',
+                            color: 'var(--ba-gold-ink, #081401) !important',
+                            borderColor: 'var(--ba-gold) !important',
                             boxShadow: 'none',
                         },
                         '&.Mui-disabled': {
-                            bgcolor: `${alpha('#ffffff', 0.03)} !important`,
-                            color: `${alpha('#ffffff', 0.32)} !important`,
-                            borderColor: `${alpha('#ffffff', 0.08)} !important`,
+                            bgcolor: 'rgba(255,255,255,0.03) !important',
+                            color: 'rgba(244,244,241,0.32) !important',
+                            borderColor: 'rgba(255,255,255,0.08) !important',
                         },
                     }}
                 >
                     {full ? t('home.dashboard.matchFull') : t('home.dashboard.joinNow')}
                 </Button>
             ) : (
-                <Box sx={{ mt: 'auto', minHeight: { xs: 28, sm: 34 } }} />
+                <Box sx={{ mt: 'auto', minHeight: 44 }} />
             )}
         </Box>
     );
 }
 
 // ----------------------------------------------------------------------
-// Match panel — Pulse shell + 3 simple cards in one line
+// Zip horizontal rail + arrows
 // ----------------------------------------------------------------------
 
 function DashboardMatchPanelTactical({
     title,
-    liveLabel = 'LIVE',
     matches,
     loading,
     variant,
@@ -1233,107 +1232,108 @@ function DashboardMatchPanelTactical({
     variant: 'prize' | 'ongoing';
     emptyLabel: string;
 }) {
+    const theme = useTheme();
+    const accentColor = theme.palette.primary.main || '#cbfb24';
+    const railRef = useRef<HTMLDivElement | null>(null);
     const count = matches.length;
     const tilesToRender = matches.slice(0, TARGET_MATCH_TILES);
 
-    /** Mobile rail: ~2 cards visible + slight peek of next */
-    const mobileCardFlex = {
-        flex: { xs: '0 0 calc((100% - 10px) / 2.12)', md: '1 1 0' },
-        minWidth: { xs: 'calc((100% - 10px) / 2.12)', md: 0 },
-        maxWidth: { md: 'none' },
-        scrollSnapAlign: 'start' as const,
-    };
-
-    const railSx = {
-        display: 'flex',
-        flexDirection: 'row' as const,
-        alignItems: 'stretch',
-        gap: { xs: 1.1, md: 1.35 },
-        overflowX: { xs: 'auto', md: 'visible' },
-        scrollSnapType: { xs: 'x mandatory', md: 'none' },
-        WebkitOverflowScrolling: 'touch',
-        pb: { xs: 0.75, md: 0 },
-        mx: { xs: -0.5, md: 0 },
-        px: { xs: 0.5, md: 0 },
-        scrollbarWidth: { xs: 'thin', md: 'auto' },
-        '&::-webkit-scrollbar': { height: 3 },
-        '&::-webkit-scrollbar-thumb': {
-            bgcolor: goldAlpha(0.35),
-            borderRadius: 999,
-        },
-        '@media (min-width: 900px)': {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-            overflowX: 'visible',
-        },
+    const scrollRail = (dir: -1 | 1) => {
+        const rail = railRef.current;
+        if (!rail) return;
+        const card = rail.querySelector('[data-match-card]') as HTMLElement | null;
+        const step = card ? card.getBoundingClientRect().width + 18 : 320;
+        rail.scrollBy({ left: step * dir, behavior: 'smooth' });
     };
 
     return (
-        <Box sx={{ position: 'relative', width: 1, minWidth: 0 }}>
+        <Box sx={{ position: 'relative', width: 1, minWidth: 0, mt: { xs: 4, md: 5.5 } }}>
             <Stack
                 direction="row"
                 alignItems="center"
                 justifyContent="space-between"
                 spacing={1}
-                sx={{ mb: { xs: 1.15, sm: 1.35 }, px: { xs: 0.25, md: 0 } }}
+                sx={{ mb: 2 }}
             >
-                <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0 }}>
-                    <Typography
-                        sx={{
-                            fontSize: { xs: 12, sm: 13, md: 14 },
-                            fontWeight: 800,
-                            letterSpacing: '0.06em',
-                            textTransform: 'uppercase',
-                            color: '#ffffff',
-                            lineHeight: 1.2,
-                            minWidth: 0,
-                        }}
-                    >
-                        {title}
-                    </Typography>
-                    {!loading && count > 0 && (
-                        <Box
-                            sx={{
-                                flexShrink: 0,
-                                px: 0.75,
-                                py: 0.2,
-                                borderRadius: '6px',
-                                bgcolor: alpha('#22c55e', 0.12),
-                                border: `1px solid ${alpha('#22c55e', 0.28)}`,
-                                fontSize: 9,
-                                fontWeight: 800,
-                                letterSpacing: '0.06em',
-                                color: '#22c55e',
-                                lineHeight: 1.3,
-                            }}
-                        >
-                            {count}
-                        </Box>
-                    )}
-                </Stack>
                 <Typography
+                    component="h3"
+                    className="landing-display"
                     sx={{
-                        flexShrink: 0,
-                        fontSize: 10,
-                        fontWeight: 800,
-                        letterSpacing: '0.1em',
+                        fontFamily: LANDING_V2.display,
+                        fontWeight: 600,
+                        fontSize: { xs: '1.3rem', sm: 'clamp(1.3rem, 2.4vw, 1.85rem)' },
+                        color: LANDING_V2.text,
                         textTransform: 'uppercase',
-                        color: '#22c55e',
+                        lineHeight: 1.15,
+                        minWidth: 0,
                     }}
                 >
-                    {liveLabel}
+                    {title}
                 </Typography>
+                <Stack direction="row" spacing={1} sx={{ flexShrink: 0 }}>
+                    <Box
+                        component="button"
+                        type="button"
+                        aria-label="Previous"
+                        onClick={() => scrollRail(-1)}
+                        sx={{
+                            width: 40,
+                            height: 40,
+                            display: 'grid',
+                            placeItems: 'center',
+                            borderRadius: '10px',
+                            border: `1px solid ${LANDING_V2.hair2}`,
+                            bgcolor: 'rgba(255,255,255,0.03)',
+                            color: LANDING_V2.text,
+                            cursor: 'pointer',
+                            fontSize: 22,
+                            lineHeight: 1,
+                            '&:hover': { borderColor: accentColor, color: accentColor },
+                        }}
+                    >
+                        ‹
+                    </Box>
+                    <Box
+                        component="button"
+                        type="button"
+                        aria-label="Next"
+                        onClick={() => scrollRail(1)}
+                        sx={{
+                            width: 40,
+                            height: 40,
+                            display: 'grid',
+                            placeItems: 'center',
+                            borderRadius: '10px',
+                            border: `1px solid ${LANDING_V2.hair2}`,
+                            bgcolor: 'rgba(255,255,255,0.03)',
+                            color: LANDING_V2.text,
+                            cursor: 'pointer',
+                            fontSize: 22,
+                            lineHeight: 1,
+                            '&:hover': { borderColor: accentColor, color: accentColor },
+                        }}
+                    >
+                        ›
+                    </Box>
+                </Stack>
             </Stack>
 
             {loading ? (
-                <Box sx={railSx}>
-                    {Array.from({ length: TARGET_MATCH_TILES }).map((_, idx) => (
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: '18px',
+                        overflow: 'hidden',
+                    }}
+                >
+                    {Array.from({ length: 3 }).map((_, idx) => (
                         <Box
                             key={idx}
                             sx={{
-                                ...mobileCardFlex,
-                                p: 1.25,
-                                borderRadius: '12px',
+                                flex: '0 0 calc((100% - 36px) / 3)',
+                                minWidth: { xs: 'calc((100% - 14px) / 2.18)', md: 'calc((100% - 36px) / 3)' },
+                                p: 2.5,
+                                borderRadius: '16px',
                                 bgcolor: alpha('#ffffff', 0.06),
                                 border: `1px solid ${alpha('#ffffff', 0.12)}`,
                             }}
@@ -1341,19 +1341,38 @@ function DashboardMatchPanelTactical({
                             <Skeleton width="40%" height={12} sx={{ mb: 1 }} />
                             <Skeleton width="88%" height={16} sx={{ mb: 1.25 }} />
                             <Skeleton width="100%" height={10} sx={{ mb: 0.5 }} />
-                            <Skeleton width="100%" height={10} sx={{ mb: 1 }} />
                             <Skeleton width="100%" height={32} sx={{ borderRadius: '8px' }} />
                         </Box>
                     ))}
                 </Box>
             ) : count ? (
-                <Box sx={railSx}>
+                <Box
+                    ref={railRef}
+                    sx={{
+                        display: 'flex',
+                        gap: '18px',
+                        overflowX: 'auto',
+                        scrollSnapType: 'x mandatory',
+                        pb: 1,
+                        scrollbarWidth: 'none',
+                        WebkitOverflowScrolling: 'touch',
+                        '&::-webkit-scrollbar': { display: 'none' },
+                    }}
+                >
                     {tilesToRender.map((match, index) => (
                         <Box
                             key={match.id || index}
+                            data-match-card
                             sx={{
-                                ...mobileCardFlex,
-                                height: 1,
+                                flex: {
+                                    xs: '0 0 calc((100% - 14px) / 2.18)',
+                                    md: '0 0 calc((100% - 36px) / 3)',
+                                },
+                                minWidth: {
+                                    xs: 'calc((100% - 14px) / 2.18)',
+                                    md: 'calc((100% - 36px) / 3)',
+                                },
+                                scrollSnapAlign: 'start',
                                 display: 'flex',
                             }}
                         >
@@ -1375,8 +1394,6 @@ function DashboardMatchPanelTactical({
 }
 
 // ----------------------------------------------------------------------
-// Main Exported Component: LandingDashboardSection
-// ----------------------------------------------------------------------
 
 export function LandingDashboardSection() {
     const { t } = useTranslate();
@@ -1384,6 +1401,7 @@ export function LandingDashboardSection() {
     const [state, setState] = useState<SectionState>({ loading: true, data: null });
     const [lastUpdatedAt, setLastUpdatedAt] = useState<number | null>(null);
     const [refreshTick, setRefreshTick] = useState(0);
+    const [gameFilter, setGameFilter] = useState<PulseGameFilter>('ALL');
 
     const applyPayload = useCallback((payload: PublicDashboardStats | undefined) => {
         if (!payload?.platform) return false;
@@ -1541,25 +1559,59 @@ export function LandingDashboardSection() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [lastUpdatedAt, t, refreshTick]);
 
+    const filteredHighPrize = useMemo(
+        () => (data?.highPrizeMatches || []).filter((m) => matchPassesGameFilter(m.gameName, gameFilter)),
+        [data?.highPrizeMatches, gameFilter]
+    );
+
+    const filteredOngoing = useMemo(
+        () => (data?.ongoingMatches || []).filter((m) => matchPassesGameFilter(m.gameName, gameFilter)),
+        [data?.ongoingMatches, gameFilter]
+    );
+
+    const chipLabels = useMemo(
+        () => ({
+            all: 'ALL',
+            pubg: t('home.dashboard.gamesCoveredShort.pubg'),
+            freeFire: t('home.dashboard.gamesCoveredShort.freeFire'),
+            cod: t('home.dashboard.gamesCoveredShort.cod'),
+            valorant: t('home.dashboard.gamesCoveredShort.valorant'),
+            mlbb: t('home.dashboard.gamesCoveredShort.mlbb'),
+        }),
+        [t]
+    );
+
+    const boardTranslations = useMemo(
+        () => ({
+            noDataYet: t('home.dashboard.noDataYet'),
+            lastPlayed: t('home.dashboard.lastPlayed'),
+            winnings: t('home.dashboard.winnings'),
+            kills: t('home.dashboard.kills'),
+            winRate: t('home.dashboard.winRate'),
+            avgScore: t('home.dashboard.avgScore'),
+        }),
+        [t]
+    );
+
     return (
         <Box
             id="public-dashboard"
+            component="section"
             sx={{
                 position: 'relative',
-                overflowX: 'clip',
-                overflowY: 'visible',
+                overflow: 'hidden',
+                isolation: 'isolate',
                 width: '100%',
                 maxWidth: '100%',
                 boxSizing: 'border-box',
-                bgcolor: '#07080b',
-                pt: { xs: 3.5, md: 5 },
-                pb: { xs: 2, md: 2.5 },
-                color: '#f5f5f5',
+                bgcolor: LANDING_V2.ink,
+                color: LANDING_V2.text,
+                py: { xs: 9, sm: 11, md: 'clamp(72px, 10vw, 148px)' },
             }}
         >
             <Box
                 component="img"
-                src="/assets/images/dashboard-pubg-black.webp"
+                src={LANDING_V2.assets.pulseBg}
                 alt=""
                 width={1600}
                 height={900}
@@ -1572,8 +1624,10 @@ export function LandingDashboardSection() {
                     height: 1,
                     objectFit: 'cover',
                     objectPosition: 'center 30%',
+                    opacity: 0.58,
+                    filter: 'saturate(1.05)',
                     pointerEvents: 'none',
-                    zIndex: 0,
+                    zIndex: -2,
                 }}
             />
             <Box
@@ -1581,133 +1635,80 @@ export function LandingDashboardSection() {
                 sx={{
                     position: 'absolute',
                     inset: 0,
-                    zIndex: 0,
+                    zIndex: -1,
                     pointerEvents: 'none',
                     background: `
-                        linear-gradient(180deg, rgba(7, 8, 11, 0.42) 0%, rgba(7, 8, 11, 0.55) 45%, rgba(7, 8, 11, 0.72) 100%),
-                        linear-gradient(90deg, rgba(7, 8, 11, 0.45) 0%, transparent 28%, transparent 72%, rgba(7, 8, 11, 0.45) 100%)
+                        radial-gradient(70% 55% at 50% 20%, transparent 0%, ${LANDING_V2.ink} 78%),
+                        linear-gradient(180deg, rgba(6,6,7,0.35) 0%, rgba(6,6,7,0.72) 100%)
                     `,
                 }}
             />
-            <Container
-                maxWidth="lg"
+            <Box
                 sx={{
                     position: 'relative',
                     zIndex: 1,
-                    width: '100%',
-                    maxWidth: '100%',
-                    px: { xs: 1.5, sm: 2, md: 3 },
+                    maxWidth: LANDING_V2.wrap,
+                    mx: 'auto',
+                    px: { xs: 2.5, sm: 4, md: 5 },
                     boxSizing: 'border-box',
                 }}
             >
-                <Stack spacing={{ xs: 3.5, sm: 4, md: 4.5 }}>
-                    {/* Hero Pulse Command Terminal */}
-                    <PulseHeroTactical
-                        title={t('home.dashboard.battleAsiaPulse')}
-                        description={t('home.dashboard.pulseDescription')}
-                        liveSuffix={t('home.dashboard.live')}
-                        labels={pulseLabels}
-                        stats={stats}
+                <PulseHeroTactical
+                    title={t('home.dashboard.battleAsiaPulse')}
+                    description={t('home.dashboard.pulseDescription')}
+                    liveSuffix={t('home.dashboard.live')}
+                    labels={pulseLabels}
+                    stats={stats}
+                    loading={loading}
+                    lastUpdatedLabel={lastUpdatedLabel}
+                    gameFilter={gameFilter}
+                    onGameFilterChange={setGameFilter}
+                    chipLabels={chipLabels}
+                />
+
+                <Box
+                    sx={{
+                        mt: 2.25,
+                        display: 'grid',
+                        gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' },
+                        gap: 2.25,
+                        alignItems: 'stretch',
+                    }}
+                >
+                    <PlayerListCardTactical
+                        title={t('home.dashboard.topProfitGenerators')}
+                        liveLabel={t('home.dashboard.live')}
+                        players={data?.topProfitPlayers || []}
                         loading={loading}
-                        lastUpdatedLabel={lastUpdatedLabel}
+                        metricKey="totalWinnings"
+                        translations={boardTranslations}
                     />
+                    <PlayerListCardTactical
+                        title={t('home.dashboard.topPlayers')}
+                        liveLabel={t('home.dashboard.live')}
+                        players={data?.topPlayers || []}
+                        loading={loading}
+                        metricKey="totalKills"
+                        translations={boardTranslations}
+                    />
+                </Box>
 
-                    {/* Leaderboards (Top Profit & Top Players) — mobile side-scroll pair */}
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'stretch',
-                            gap: { xs: 1.25, md: 0 },
-                            overflowX: { xs: 'auto', md: 'visible' },
-                            overflowY: 'hidden',
-                            scrollSnapType: { xs: 'x mandatory', md: 'none' },
-                            WebkitOverflowScrolling: 'touch',
-                            pt: { xs: 0.5, md: 0 },
-                            pb: { xs: 1.5, md: 0 },
-                            px: { xs: 0.5, md: 0 },
-                            '&::-webkit-scrollbar': { height: 4 },
-                            '&::-webkit-scrollbar-thumb': {
-                                bgcolor: goldAlpha(0.35),
-                                borderRadius: 0,
-                            },
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                flex: { xs: '0 0 100%', md: '1 1 0' },
-                                minWidth: { xs: '100%', md: 0 },
-                                maxWidth: { xs: '100%', md: 'none' },
-                                scrollSnapAlign: 'start',
-                            }}
-                        >
-                            <PlayerListCardTactical
-                                title={t('home.dashboard.topProfitGenerators')}
-                                liveLabel={t('home.dashboard.live')}
-                                players={data?.topProfitPlayers || []}
-                                loading={loading}
-                                metricKey="totalWinnings"
-                                translations={{
-                                    noDataYet: t('home.dashboard.noDataYet'),
-                                    lastPlayed: t('home.dashboard.lastPlayed'),
-                                    winnings: t('home.dashboard.winnings'),
-                                    kills: t('home.dashboard.kills'),
-                                    winRate: t('home.dashboard.winRate'),
-                                    avgScore: t('home.dashboard.avgScore'),
-                                }}
-                            />
-                        </Box>
+                <DashboardMatchPanelTactical
+                    title={t('home.dashboard.highPrizeBattles')}
+                    matches={filteredHighPrize}
+                    loading={loading}
+                    variant="prize"
+                    emptyLabel={t('home.dashboard.noHighPrizeMatches')}
+                />
 
-                        <DashboardSplitGoldRule orientation="vertical" />
-
-                        <Box
-                            sx={{
-                                flex: { xs: '0 0 100%', md: '1 1 0' },
-                                minWidth: { xs: '100%', md: 0 },
-                                maxWidth: { xs: '100%', md: 'none' },
-                                scrollSnapAlign: 'start',
-                            }}
-                        >
-                            <PlayerListCardTactical
-                                title={t('home.dashboard.topPlayers')}
-                                liveLabel={t('home.dashboard.live')}
-                                players={data?.topPlayers || []}
-                                loading={loading}
-                                metricKey="totalKills"
-                                translations={{
-                                    noDataYet: t('home.dashboard.noDataYet'),
-                                    lastPlayed: t('home.dashboard.lastPlayed'),
-                                    winnings: t('home.dashboard.winnings'),
-                                    kills: t('home.dashboard.kills'),
-                                    winRate: t('home.dashboard.winRate'),
-                                    avgScore: t('home.dashboard.avgScore'),
-                                }}
-                            />
-                        </Box>
-                    </Box>
-
-                    {/* Warzone Match Panels — Idea B: stacked rails (both visible; cards side-scroll) */}
-                    <Stack spacing={{ xs: 2.75, md: 3.5 }} sx={{ width: 1, minWidth: 0 }}>
-                        <DashboardMatchPanelTactical
-                            title={t('home.dashboard.highPrizeBattles')}
-                            liveLabel={t('home.dashboard.live')}
-                            matches={data?.highPrizeMatches || []}
-                            loading={loading}
-                            variant="prize"
-                            emptyLabel={t('home.dashboard.noHighPrizeMatches')}
-                        />
-
-                        <DashboardMatchPanelTactical
-                            title={t('home.dashboard.ongoingMatchesTitle')}
-                            liveLabel={t('home.dashboard.live')}
-                            matches={data?.ongoingMatches || []}
-                            loading={loading}
-                            variant="ongoing"
-                            emptyLabel={t('home.dashboard.noOngoingMatches')}
-                        />
-                    </Stack>
-                </Stack>
-            </Container>
+                <DashboardMatchPanelTactical
+                    title={t('home.dashboard.ongoingMatchesTitle')}
+                    matches={filteredOngoing}
+                    loading={loading}
+                    variant="ongoing"
+                    emptyLabel={t('home.dashboard.noOngoingMatches')}
+                />
+            </Box>
         </Box>
     );
 }

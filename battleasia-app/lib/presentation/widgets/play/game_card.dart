@@ -50,12 +50,15 @@ class GameCard extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
+      clipBehavior: Clip.antiAlias,
+      borderRadius: BorderRadius.circular(18),
       child: InkWell(
         onTap: isDisabled ? null : onTap,
         child: Ink(
           decoration: BoxDecoration(
             color: _cardBg,
-            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.5),

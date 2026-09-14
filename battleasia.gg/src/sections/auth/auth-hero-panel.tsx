@@ -68,7 +68,7 @@ export function AuthHeroPanel() {
             width: 'fit-content',
             px: 1.25,
             py: 0.4,
-            borderRadius: '4px',
+            borderRadius: '12px',
             bgcolor: alpha('#ffffff', 0.05),
             border: `1px solid ${alpha('#ffffff', 0.12)}`,
             fontSize: 10,

@@ -1,7 +1,7 @@
-import { useRef, useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 
-import { Box, Stack, Container, ButtonBase, Typography } from '@mui/material';
-import { alpha, useTheme, keyframes } from '@mui/material/styles';
+import { Box, Stack, ButtonBase, Typography } from '@mui/material';
+import { alpha, useTheme } from '@mui/material/styles';
 
 import { CONFIG } from 'src/global-config';
 import { paths } from 'src/routes/paths';
@@ -10,127 +10,27 @@ import { RouterLink } from 'src/routes/components';
 import { Iconify } from 'src/components/iconify/iconify';
 import { useTranslate } from 'src/locales/use-locales';
 
-import { HOME_GAME_ARTS, PLAY_YOUR_GAME_IMAGE_PATHS } from './home-game-arts';
+import { PLAY_YOUR_GAME_IMAGE_PATHS, HOME_GAME_ARTS } from './home-game-arts';
+import { LANDING_V2, landingPanelSx, landingPrimaryBtnSx } from './landing-v2-theme';
+import { LivePulseDot } from './live-pulse-dot';
 
 export { HOME_GAME_ARTS, PLAY_YOUR_GAME_IMAGE_PATHS };
 
 // ----------------------------------------------------------------------
 
-type GameTacticalSpec = {
+type GameSpec = {
   key: string;
   art: string;
-  genreKey: string;
-  liveCount: number;
   available: boolean;
-  platforms: readonly string[];
-  mobileOnly: boolean;
-  role: string;
-  weightOrClass: string;
-  stats: {
-    range: string;
-    mode: string;
-    accuracy: string;
-    fireRate: string;
-  };
-  briefing: string;
+  liveCount: number;
 };
 
-const BASE_GAMES: GameTacticalSpec[] = [
-  {
-    key: 'pubgMobile',
-    art: PLAY_YOUR_GAME_IMAGE_PATHS.pubgMobile,
-    genreKey: 'battleRoyale',
-    liveCount: 0,
-    available: true,
-    platforms: ['mdi:android', 'mdi:apple', 'mdi:cellphone'],
-    mobileOnly: true,
-    role: 'Airborne Infiltrator',
-    weightOrClass: 'Assault Class · 3.3KG',
-    stats: {
-      range: '800M (Ballistic)',
-      mode: 'Auto / Semi-auto',
-      accuracy: '78 / 100',
-      fireRate: '11.8 / s',
-    },
-    briefing:
-      'DROP INTO CONTESTED BATTLEGROUNDS. SECURE STRATEGIC AIRDROPS, HOLD TACTICAL CHOKEPOINTS, AND LEAD YOUR SQUAD TO CHICKEN DINNER GLORY WITH REAL BAC REWARDS ON EVERY FRAG.',
-  },
-  {
-    key: 'freeFire',
-    art: PLAY_YOUR_GAME_IMAGE_PATHS.freeFire,
-    genreKey: 'survival',
-    liveCount: 0,
-    available: true,
-    platforms: ['mdi:android', 'mdi:apple'],
-    mobileOnly: true,
-    role: 'Shadow Striker',
-    weightOrClass: 'Rush Protocol · 2.8KG',
-    stats: {
-      range: '450M (Rapid CQC)',
-      mode: 'Full-Auto / Burst',
-      accuracy: '82 / 100',
-      fireRate: '16.5 / s',
-    },
-    briefing:
-      'SURVIVE 50-PLAYER INTENSE FAST-PACED CLASHES. DEPLOY TACTICAL GLOO WALLS, EXECUTE LIGHTNING FLANK ATTACKS, AND OVERPOWER RIVAL SURVIVORS IN HIGH-STAKES ARENAS.',
-  },
-  {
-    key: 'codMobile',
-    art: PLAY_YOUR_GAME_IMAGE_PATHS.codMobile,
-    genreKey: 'fps',
-    liveCount: 0,
-    available: true,
-    platforms: ['mdi:android', 'mdi:apple'],
-    mobileOnly: true,
-    role: 'Black Ops Operative',
-    weightOrClass: 'Tactical Spec · 3.4KG',
-    stats: {
-      range: '600M (Precision ADS)',
-      mode: 'Auto / 3-Round Burst',
-      accuracy: '92 / 100',
-      fireRate: '13.2 / s',
-    },
-    briefing:
-      'HIGH-CALIBER MILITARY WARFARE. CHAIN DEADLY SCORESTREAKS, MASTER RECOIL PATTERNS, AND DOMINATE MULTIPLAYER ARENAS OR ISOLATED BATTLE ROYALE ZONES.',
-  },
-  {
-    key: 'mobileLegends',
-    art: PLAY_YOUR_GAME_IMAGE_PATHS.mobileLegends,
-    genreKey: 'moba',
-    liveCount: 0,
-    available: true,
-    platforms: ['mdi:android', 'mdi:apple'],
-    mobileOnly: true,
-    role: 'Mythic Vanguard',
-    weightOrClass: 'Royal Spear · 4.2KG',
-    stats: {
-      range: 'Melee / Spellstrike',
-      mode: 'Skill Combos / Ulti',
-      accuracy: 'Target Lock 95%',
-      fireRate: 'Burst CD 6.5s',
-    },
-    briefing:
-      'ASSEMBLE YOUR FIVE-HERO LINEUP. CONTEST CRUCIAL LORD AND TURTLE OBJECTIVES, EXECUTE CLEAN TEAMFIGHT INITIATIONS, AND CRUSH THE ENEMY BASE IN THRILLING ESPORTS SHOWDOWNS.',
-  },
-  {
-    key: 'valorant',
-    art: PLAY_YOUR_GAME_IMAGE_PATHS.valorant,
-    genreKey: 'tactical',
-    liveCount: 0,
-    available: false,
-    platforms: ['mdi:microsoft-windows', 'mdi:sony-playstation', 'mdi:monitor'],
-    mobileOnly: false,
-    role: 'Toxic Sentinel',
-    weightOrClass: 'Vandal Spec · 3.1KG',
-    stats: {
-      range: '1000M (Hitscan)',
-      mode: 'Semi / Single Tap',
-      accuracy: '98 / 100',
-      fireRate: '9.75 / s',
-    },
-    briefing:
-      'SURGICAL GUNPLAY MEETS TACTICAL AGENT ABILITIES. PRE-AIM ANGLES, DEPLOY BIOCHEMICAL SMOKES, AND CLUTCH HIGH-PRESSURE DEFUSES WITH CRISP ONE-TAP HEADSHOTS.',
-  },
+const BASE_GAMES: Omit<GameSpec, 'liveCount'>[] = [
+  { key: 'pubgMobile', art: PLAY_YOUR_GAME_IMAGE_PATHS.pubgMobile, available: true },
+  { key: 'freeFire', art: PLAY_YOUR_GAME_IMAGE_PATHS.freeFire, available: true },
+  { key: 'codMobile', art: PLAY_YOUR_GAME_IMAGE_PATHS.codMobile, available: true },
+  { key: 'mobileLegends', art: PLAY_YOUR_GAME_IMAGE_PATHS.mobileLegends, available: true },
+  { key: 'valorant', art: PLAY_YOUR_GAME_IMAGE_PATHS.valorant, available: false },
 ];
 
 const GAME_NAME_TO_KEY: Record<string, string> = {
@@ -144,55 +44,20 @@ const GAME_NAME_TO_KEY: Record<string, string> = {
 
 export function applyLiveCountsToGames(
   liveCountByGame: Record<string, number> | undefined
-): GameTacticalSpec[] {
-  if (!liveCountByGame) return BASE_GAMES;
+): GameSpec[] {
   return BASE_GAMES.map((game) => {
     const apiKey = Object.entries(GAME_NAME_TO_KEY).find(([, v]) => v === game.key)?.[0];
-    const count = apiKey ? liveCountByGame[apiKey] ?? 0 : 0;
+    const count = apiKey && liveCountByGame ? liveCountByGame[apiKey] ?? 0 : 0;
     return { ...game, liveCount: count };
   });
 }
 
 // ----------------------------------------------------------------------
 
-const slideInRight = keyframes`
-  0% {
-    opacity: 0;
-    transform: translate3d(24px, 0, 0);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-`;
-
-const slideInLeft = keyframes`
-  0% {
-    opacity: 0;
-    transform: translate3d(-24px, 0, 0);
-  }
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-`;
-
-const progressFill = keyframes`
-  from { width: 0%; }
-  to { width: 100%; }
-`;
-
-const AUTO_SLIDE_INTERVAL_MS = 4500;
-
-// ----------------------------------------------------------------------
-
 export function PlayYourGameSection() {
   const theme = useTheme();
   const { t } = useTranslate();
-  const [activeIndex, setActiveIndex] = useState<number>(0);
-  const [slideDirection, setSlideDirection] = useState<'forward' | 'backward'>('forward');
-  const [isPaused, setIsPaused] = useState<boolean>(false);
-  const [progressKey, setProgressKey] = useState<number>(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [liveCountByGame, setLiveCountByGame] = useState<Record<string, number> | undefined>();
 
   useEffect(() => {
@@ -206,551 +71,280 @@ export function PlayYourGameSection() {
         const counts = json?.data?.liveCountByGame || json?.liveCountByGame;
         if (counts) setLiveCountByGame(counts);
       })
-      .catch(() => { });
+      .catch(() => {});
   }, []);
 
   const games = useMemo(() => applyLiveCountsToGames(liveCountByGame), [liveCountByGame]);
-
-  const activeIndexRef = useRef(activeIndex);
-  activeIndexRef.current = activeIndex;
-
-  const slideDirectionRef = useRef(slideDirection);
-  slideDirectionRef.current = slideDirection;
-
-  const goToSlide = useCallback((index: number, forcedDirection?: 'forward' | 'backward') => {
-    const current = activeIndexRef.current;
-    if (index === current) return;
-    const dir = forcedDirection || (index > current ? 'forward' : 'backward');
-    setSlideDirection(dir);
-    setActiveIndex(index);
-    setProgressKey((k) => k + 1);
-  }, []);
-
-  const goNext = useCallback(() => {
-    const current = activeIndexRef.current;
-    const dir = slideDirectionRef.current;
-    if (dir === 'forward') {
-      if (current >= games.length - 1) {
-        goToSlide(current - 1, 'backward');
-      } else {
-        goToSlide(current + 1, 'forward');
-      }
-    } else if (current <= 0) {
-      goToSlide(current + 1, 'forward');
-    } else {
-      goToSlide(current - 1, 'backward');
-    }
-  }, [games.length, goToSlide]);
-
-  // Auto-slide effect cycling smoothly left to right and right to left within few seconds
-  useEffect(() => {
-    if (isPaused || games.length <= 1) return undefined;
-    const timer = setInterval(() => {
-      goNext();
-    }, AUTO_SLIDE_INTERVAL_MS);
-    return () => clearInterval(timer);
-  }, [isPaused, games.length, goNext]);
-
   const activeGame = games[activeIndex] || games[0];
-
-  // Dynamic accent color respecting user theme selection
   const accentColor = theme.palette.primary.main || '#cbfb24';
-  const accentContrast = theme.palette.primary.contrastText || '#081401';
 
-  // Title split logic: "PLAY YOUR" / "GAME"
   const titleRaw = t('home.playYourGame.title') || 'PLAY YOUR GAME';
   const titleWords = titleRaw.split(' ');
-  const titleLine1 = titleWords.length > 1 ? titleWords.slice(0, -1).join(' ') : 'PLAY YOUR';
-  const titleLine2 = titleWords.length > 1 ? titleWords[titleWords.length - 1] : titleRaw;
+  const titleLine1 = titleWords.length > 1 ? titleWords.slice(0, -1).join(' ') : titleRaw;
+  const titleLine2 = titleWords.length > 1 ? titleWords[titleWords.length - 1] : '';
+
+  const selectGame = useCallback((index: number) => {
+    setActiveIndex(index);
+  }, []);
 
   return (
     <Box
       id="play-your-game"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
+      component="section"
       sx={{
         scrollMarginTop: { xs: '80px', md: '100px' },
         position: 'relative',
         overflowX: 'clip',
         overflowY: 'visible',
-        bgcolor: '#06090e',
-        color: '#ffffff',
-        pt: { xs: 2.5, md: 3.5 },
-        pb: { xs: 4, md: 6 },
-        borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
-        borderBottom: `1px solid ${alpha('#ffffff', 0.08)}`,
+        bgcolor: LANDING_V2.ink,
+        color: LANDING_V2.text,
+        py: { xs: 9, sm: 11, md: 'clamp(72px, 10vw, 148px)' },
+        px: { xs: 2.5, sm: 4, md: 5 },
+        borderTop: `1px solid ${LANDING_V2.hair}`,
       }}
     >
-      <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2 }}>
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', lg: '1.18fr 1fr' },
-            gap: { xs: 4, md: 5, lg: 3 },
-            alignItems: 'center',
-            minHeight: { md: 660, lg: 740 },
-          }}
-        >
-          {/* LEFT SIDE: HERO OPERATIVE VISUAL + TACTICAL HUD STATS CALLOUT */}
-          <Box
+      <Box
+        sx={{
+          maxWidth: LANDING_V2.wrap,
+          mx: 'auto',
+          display: 'grid',
+          gridTemplateColumns: { xs: '1fr', md: '1.02fr 0.98fr' },
+          gap: { xs: 3.5, md: 5 },
+          alignItems: 'center',
+        }}
+      >
+        {/* Copy + switcher (zip play-copy) */}
+        <Box sx={{ order: { xs: 2, md: 1 } }}>
+          <Typography
+            component="h2"
+            className="landing-display"
             sx={{
-              position: 'relative',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minHeight: { xs: 500, sm: 600, md: 700, lg: 760 },
-              overflow: 'visible',
+              fontFamily: LANDING_V2.display,
+              fontWeight: 600,
+              fontSize: { xs: '2.5rem', sm: 'clamp(2.5rem, 11vw, 7.2rem)' },
+              lineHeight: 0.92,
+              letterSpacing: '-0.03em',
+              textTransform: 'uppercase',
+              color: LANDING_V2.text,
             }}
           >
-            {/* Main Character Image */}
-            <Box
-              key={`hero-${activeGame.key}`}
-              component="img"
-              src={activeGame.art}
-              alt={t(`home.playYourGame.games.${activeGame.key}`)}
-              loading="eager"
-              decoding="async"
-              sx={{
-                position: 'relative',
-                zIndex: 2,
-                maxHeight: { xs: 500, sm: 620, md: 740, lg: 820 },
-                maxWidth: { xs: '98%', sm: '94%', md: '90%', lg: '95%' },
-                width: 'auto',
-                height: 'auto',
-                objectFit: 'contain',
-                filter: 'drop-shadow(0 16px 28px rgba(0,0,0,0.55))',
-                animation: `${slideDirection === 'forward' ? slideInRight : slideInLeft} 0.45s ease-out both`,
-                maskImage: 'linear-gradient(to bottom, black 0%, black 88%, transparent 100%)',
-                WebkitMaskImage: 'linear-gradient(to bottom, black 0%, black 88%, transparent 100%)',
-                userSelect: 'none',
-                pointerEvents: 'none',
-              }}
-            />
+            {titleLine1}
+            {titleLine2 ? (
+              <>
+                <br />
+                {titleLine2}
+              </>
+            ) : null}
+          </Typography>
 
-            {/* Tactical Spec HUD Callout Floating Line & Specs (Directional Slide) */}
-            <Box
-              key={`hud-${activeGame.key}`}
-              sx={{
-                position: 'absolute',
-                right: { xs: 2, sm: 12, md: 0, lg: '-18px' },
-                top: { xs: '46%', sm: '43%', md: '44%' },
-                transform: 'translateY(-50%)',
-                zIndex: 3,
-                animation: `${slideDirection === 'forward' ? slideInRight : slideInLeft} 0.45s ease-out 0.04s both`,
-                pointerEvents: 'none',
-              }}
-            >
-              {/* Spec Header */}
-              <Box sx={{ textAlign: 'right', pr: 1.5, mb: 0.4 }}>
-                <Typography
-                  sx={{
-                    fontSize: { xs: 13, sm: 15 },
-                    fontWeight: 800,
-                    letterSpacing: 0.8,
-                    color: '#ffffff',
-                    lineHeight: 1.1,
-                    textTransform: 'capitalize',
-                  }}
-                >
-                  {activeGame.role}
-                </Typography>
-                <Typography
-                  sx={{
-                    fontSize: { xs: 9, sm: 10 },
-                    fontWeight: 700,
-                    letterSpacing: 1.4,
-                    color: alpha('#ffffff', 0.5),
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {activeGame.weightOrClass}
-                </Typography>
-              </Box>
-
-              {/* Connecting Line with Terminal Dot */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'flex-end',
-                  width: { xs: 150, sm: 190, md: 220 },
-                  my: 0.8,
-                }}
-              >
-                <Box
-                  sx={{
-                    flexGrow: 1,
-                    height: '1px',
-                    bgcolor: alpha('#ffffff', 0.2),
-                  }}
-                />
-                <Box
-                  sx={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: '50%',
-                    bgcolor: accentColor,
-                    flexShrink: 0,
-                  }}
-                />
-              </Box>
-
-              {/* 4-Row Tactical Specs Grid */}
-              <Stack
-                spacing={0.5}
-                sx={{
-                  width: { xs: 155, sm: 185, md: 210 },
-                  ml: 'auto',
-                  pr: 1.5,
-                  pt: 0.5,
-                }}
-              >
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography sx={{ fontSize: { xs: 10, sm: 11 }, fontWeight: 600, color: alpha('#ffffff', 0.55) }}>
-                    Range
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: { xs: 10, sm: 11 },
-                      fontWeight: 700,
-                      color: '#ffffff',
-                      fontFamily: 'monospace',
-                    }}
-                  >
-                    {activeGame.stats.range}
-                  </Typography>
-                </Box>
-
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography sx={{ fontSize: { xs: 10, sm: 11 }, fontWeight: 600, color: alpha('#ffffff', 0.55) }}>
-                    Mode
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: { xs: 10, sm: 11 },
-                      fontWeight: 700,
-                      color: '#ffffff',
-                      fontFamily: 'monospace',
-                    }}
-                  >
-                    {activeGame.stats.mode}
-                  </Typography>
-                </Box>
-
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography sx={{ fontSize: { xs: 10, sm: 11 }, fontWeight: 600, color: alpha('#ffffff', 0.55) }}>
-                    Accuracy
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: { xs: 10, sm: 11 },
-                      fontWeight: 700,
-                      color: '#ffffff',
-                      fontFamily: 'monospace',
-                    }}
-                  >
-                    {activeGame.stats.accuracy}
-                  </Typography>
-                </Box>
-
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography sx={{ fontSize: { xs: 10, sm: 11 }, fontWeight: 600, color: alpha('#ffffff', 0.55) }}>
-                    Fire Rate
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontSize: { xs: 10, sm: 11 },
-                      fontWeight: 700,
-                      color: '#ffffff',
-                      fontFamily: 'monospace',
-                    }}
-                  >
-                    {activeGame.stats.fireRate}
-                  </Typography>
-                </Box>
-              </Stack>
-            </Box>
-          </Box>
-
-          {/* RIGHT SIDE: Title, briefing & game chips */}
-          <Stack
-            spacing={{ xs: 2.5, md: 3.5 }}
+          <Typography
             sx={{
-              pl: { lg: 3 },
-              alignItems: { xs: 'center', lg: 'flex-start' },
-              textAlign: { xs: 'center', lg: 'left' },
+              mt: 2,
+              maxWidth: '42ch',
+              color: LANDING_V2.muted,
+              fontSize: { xs: '1rem', md: '1.12rem' },
+              lineHeight: 1.5,
             }}
           >
-            {/* Header Block: Military Stencil Line 1 + Slanted Giant Line 2 + Tactical Badge */}
-            <Box>
-              {/* Line 1: Distressed Military Stencil Typography */}
-              <Typography
-                component="div"
-                sx={{
-                  fontFamily: `'Barlow', 'Public Sans Variable', sans-serif`,
-                  fontSize: { xs: 26, sm: 34, md: 44, lg: 48 },
-                  fontWeight: 900,
-                  letterSpacing: { xs: 2.5, md: 4 },
-                  color: alpha('#ffffff', 0.9),
-                  textTransform: 'uppercase',
-                  lineHeight: 1,
-                }}
-              >
-                {titleLine1}
-              </Typography>
+            {t('home.playYourGame.subtitle')}
+          </Typography>
 
-              {/* Line 2 + Brand Badge */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: { xs: 'center', lg: 'flex-start' },
-                  flexWrap: 'wrap',
-                  gap: { xs: 1.5, sm: 2 },
-                  mt: 0.5,
-                }}
-              >
-                <Typography
-                  component="h2"
-                  sx={{
-                    fontFamily: `'Barlow', 'Public Sans Variable', sans-serif`,
-                    fontSize: { xs: 44, sm: 58, md: 70, lg: 76 },
-                    fontWeight: 900,
-                    fontStyle: 'italic',
-                    letterSpacing: '-0.01em',
-                    lineHeight: 0.92,
-                    color: '#ffffff',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {titleLine2}
-                </Typography>
+          <Stack spacing={1} sx={{ my: { xs: 3, md: 4 } }} role="listbox" aria-label="Select a game">
+            {games.map((game, idx) => {
+              const selected = idx === activeIndex;
+              const label = t(`home.playYourGame.games.${game.key}`);
 
-                <Box
-                  sx={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    borderRadius: '6px',
-                    border: `1px solid ${alpha('#ffffff', 0.08)}`,
-                    py: 0.55,
-                    px: 1.2,
-                    lineHeight: 1,
-                    bgcolor: '#161618',
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: { xs: 9, sm: 10, md: 11 },
-                      fontWeight: 900,
-                      letterSpacing: 2.5,
-                      color: '#ffffff',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    {t('home.playYourGame.brandLabel') || 'BATTLEASIA'}
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
-
-            {/* Dynamic Sliding Information Container (Lore, Briefing, Action Buttons, Stats) */}
-            <Stack
-              key={`info-${activeGame.key}`}
-              spacing={{ xs: 2.5, md: 3 }}
-              sx={{
-                width: 1,
-                alignItems: { xs: 'center', lg: 'flex-start' },
-                animation: `${slideDirection === 'forward' ? slideInRight : slideInLeft} 0.45s ease-out both`,
-              }}
-            >
-              {/* Lore & Subtitle Content (Preserving original translation keys) */}
-              <Stack spacing={1.5} sx={{ maxWidth: 580 }}>
-                <Typography
-                  sx={{
-                    fontSize: { xs: 13, sm: 14.5 },
-                    fontWeight: 600,
-                    letterSpacing: 0.6,
-                    color: alpha('#ffffff', 0.85),
-                    lineHeight: 1.6,
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {t('home.playYourGame.subtitle')}
-                </Typography>
-
-                {/* Dynamic Game Briefing in Tactical All-Caps */}
-                <Typography
-                  sx={{
-                    fontSize: { xs: 11.5, sm: 12.5 },
-                    fontWeight: 500,
-                    letterSpacing: 0.8,
-                    color: alpha('#ffffff', 0.52),
-                    lineHeight: 1.65,
-                  }}
-                >
-                  {activeGame.briefing}
-                </Typography>
-              </Stack>
-
-              {/* Action Bar: Enter Arena CTA + Live Indicator + Platforms */}
-              <Stack
-                direction={{ xs: 'column', sm: 'row' }}
-                alignItems="center"
-                spacing={2}
-                sx={{ width: { xs: 1, sm: 'auto' } }}
-              >
+              return (
                 <ButtonBase
-                  component={RouterLink}
-                  href={activeGame.available ? `${paths.user.play}?game=${activeGame.key}` : paths.user.play}
+                  key={game.key}
+                  role="option"
+                  aria-selected={selected}
+                  onClick={() => selectGame(idx)}
                   sx={{
-                    position: 'relative',
-                    px: 3.5,
-                    py: 1.35,
-                    borderRadius: '8px',
-                    bgcolor: activeGame.available ? alpha(accentColor, 0.16) : '#161618',
-                    color: activeGame.available ? accentColor : alpha('#ffffff', 0.5),
-                    fontWeight: 800,
-                    fontSize: 13,
-                    letterSpacing: 1.5,
-                    textTransform: 'uppercase',
-                    border: activeGame.available
-                      ? `1px solid ${alpha(accentColor, 0.32)}`
-                      : `1px solid ${alpha('#ffffff', 0.08)}`,
-                    transition: 'background-color 0.2s ease, border-color 0.2s ease',
+                    width: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    px: 2,
+                    py: 1.5,
+                    textAlign: 'left',
+                    borderRadius: LANDING_V2.radiusSm,
+                    border: '1px solid',
+                    borderColor: selected ? accentColor : LANDING_V2.hair,
+                    bgcolor: selected ? alpha(accentColor, 0.06) : 'transparent',
+                    boxShadow: selected ? `0 0 0 1px ${alpha(accentColor, 0.14)}` : 'none',
+                    transition: `border-color 0.25s ${LANDING_V2.ease}, background-color 0.25s ${LANDING_V2.ease}`,
                     '&:hover': {
-                      bgcolor: activeGame.available ? alpha(accentColor, 0.24) : alpha('#ffffff', 0.06),
-                      borderColor: activeGame.available
-                        ? alpha(accentColor, 0.5)
-                        : alpha('#ffffff', 0.14),
+                      borderColor: selected ? accentColor : LANDING_V2.hair2,
                     },
                   }}
                 >
-                  <Stack direction="row" alignItems="center" spacing={1}>
-                    <Iconify icon="solar:play-bold" width={14} />
-                    <span>{activeGame.available ? t('home.playYourGame.enterArena') : t('home.playYourGame.comingSoon')}</span>
-                  </Stack>
-                </ButtonBase>
-
-                {/* Live Match Count Badge */}
-                {activeGame.liveCount > 0 && (
-                  <Box
-                    sx={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 0.8,
-                      px: 1.5,
-                      py: 0.75,
-                      borderRadius: '8px',
-                      bgcolor: alpha('#22c55e', 0.1),
-                      border: `1px solid ${alpha('#22c55e', 0.28)}`,
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        width: 7,
-                        height: 7,
-                        borderRadius: '50%',
-                        bgcolor: '#22c55e',
-                      }}
-                    />
-                    <Typography sx={{ fontSize: 11, fontWeight: 800, color: '#22c55e', letterSpacing: 0.8 }}>
-                      {activeGame.liveCount} {t('home.playYourGame.live')}
-                    </Typography>
-                  </Box>
-                )}
-
-                {/* Platform Icons */}
-                <Stack direction="row" alignItems="center" spacing={1.2}>
-                  {activeGame.platforms.map((icon) => (
-                    <Iconify key={icon} icon={icon} width={18} sx={{ color: alpha('#ffffff', 0.45) }} />
-                  ))}
                   <Typography
                     sx={{
-                      fontSize: 10,
-                      fontWeight: 700,
-                      letterSpacing: 1,
-                      color: alpha('#ffffff', 0.4),
+                      fontFamily: LANDING_V2.display,
+                      fontWeight: 600,
+                      fontSize: { xs: '0.95rem', sm: '1.05rem' },
+                      letterSpacing: '0.02em',
                       textTransform: 'uppercase',
+                      color: LANDING_V2.text,
                     }}
                   >
-                    {t(`home.playYourGame.genres.${activeGame.genreKey}`)}
+                    {label}
                   </Typography>
-                </Stack>
-              </Stack>
-            </Stack>
 
-            {/* Game tabs — flat chips */}
-            <Box
-              sx={{
-                width: 1,
-                pt: { xs: 2, md: 3 },
-              }}
-            >
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: { xs: 0.8, sm: 1.25 },
-                  justifyContent: { xs: 'center', lg: 'flex-start' },
-                  flexWrap: 'wrap',
-                }}
-              >
-                {games.map((g, idx) => {
-                  const isActive = idx === activeIndex;
-                  const label = t(`home.playYourGame.games.${g.key}`);
-
-                  return (
-                    <ButtonBase
-                      key={g.key}
-                      onClick={() => goToSlide(idx)}
-                      sx={{
-                        position: 'relative',
-                        overflow: 'hidden',
-                        px: { xs: 1.75, sm: 2.4, md: 3 },
-                        py: { xs: 0.9, sm: 1.1 },
-                        borderRadius: '8px',
-                        bgcolor: isActive ? alpha(accentColor, 0.16) : '#161618',
-                        color: isActive ? accentColor : alpha('#ffffff', 0.68),
-                        fontWeight: 800,
-                        fontSize: { xs: 11, sm: 12.5 },
-                        letterSpacing: 1.2,
-                        textTransform: 'uppercase',
-                        border: isActive
-                          ? `1px solid ${alpha(accentColor, 0.32)}`
-                          : `1px solid ${alpha('#ffffff', 0.08)}`,
-                        transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease',
-                        '&:hover': {
-                          bgcolor: isActive ? alpha(accentColor, 0.24) : alpha('#ffffff', 0.06),
-                          color: isActive ? accentColor : '#ffffff',
-                          borderColor: isActive
-                            ? alpha(accentColor, 0.5)
-                            : alpha(accentColor, 0.28),
-                        },
-                      }}
-                    >
-                      {label}
-                      {isActive && !isPaused && (
-                        <Box
-                          key={`progress-${progressKey}-${activeIndex}`}
+                  <Stack direction="row" alignItems="center" spacing={0.75} sx={{ flexShrink: 0 }}>
+                    {game.available ? (
+                      <>
+                        <LivePulseDot size={7} />
+                        <Typography
                           sx={{
-                            position: 'absolute',
-                            bottom: 0,
-                            left: 0,
-                            height: '2px',
-                            bgcolor: accentColor,
-                            opacity: 0.45,
-                            animation: `${progressFill} ${AUTO_SLIDE_INTERVAL_MS}ms linear forwards`,
+                            fontSize: 11,
+                            fontWeight: 700,
+                            letterSpacing: '0.12em',
+                            color: accentColor,
+                            textTransform: 'uppercase',
                           }}
-                        />
-                      )}
-                    </ButtonBase>
-                  );
-                })}
-              </Box>
-            </Box>
+                        >
+                          {game.liveCount > 0
+                            ? `${game.liveCount} ${t('home.playYourGame.live')}`
+                            : t('home.playYourGame.live')}
+                        </Typography>
+                      </>
+                    ) : (
+                      <Typography
+                        sx={{
+                          fontSize: 11,
+                          fontWeight: 700,
+                          letterSpacing: '0.12em',
+                          color: LANDING_V2.faint,
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        {t('home.playYourGame.comingSoon')}
+                      </Typography>
+                    )}
+                  </Stack>
+                </ButtonBase>
+              );
+            })}
           </Stack>
+
+          <ButtonBase
+            component={RouterLink}
+            href={
+              activeGame.available
+                ? `${paths.user.play}?game=${activeGame.key}`
+                : paths.user.play
+            }
+            sx={{
+              ...landingPrimaryBtnSx,
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 1,
+              px: 3.5,
+              minHeight: 52,
+              fontSize: 13,
+              textDecoration: 'none',
+            }}
+          >
+            <span>
+              {activeGame.available
+                ? t('home.playYourGame.enterArena')
+                : t('home.playYourGame.comingSoon')}
+            </span>
+            <Iconify icon="solar:arrow-right-bold" width={18} />
+          </ButtonBase>
         </Box>
-      </Container>
+
+        {/* Stage (zip play-stage) */}
+        <Box
+          sx={{
+            order: { xs: 1, md: 2 },
+            position: 'relative',
+            minHeight: { xs: 360, sm: 420, md: 560 },
+            display: 'flex',
+            alignItems: 'flex-end',
+            justifyContent: 'center',
+            ...landingPanelSx,
+            overflow: 'hidden',
+            px: 2,
+            pt: 4,
+            pb: 0,
+          }}
+        >
+          <Box
+            aria-hidden
+            sx={{
+              position: 'absolute',
+              inset: '12% 10% 18%',
+              background: `radial-gradient(ellipse at 50% 60%, ${alpha(accentColor, 0.22)} 0%, transparent 70%)`,
+              pointerEvents: 'none',
+            }}
+          />
+
+          <Typography
+            sx={{
+              position: 'absolute',
+              top: 18,
+              left: { xs: '50%', md: 22 },
+              transform: { xs: 'translateX(-50%)', md: 'none' },
+              zIndex: 2,
+              fontFamily: LANDING_V2.display,
+              fontWeight: 600,
+              fontSize: 12,
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: LANDING_V2.muted,
+              px: 1.5,
+              py: 0.6,
+              borderRadius: 999,
+              border: `1px solid ${LANDING_V2.hair}`,
+              bgcolor: alpha('#000', 0.35),
+              backdropFilter: 'blur(8px)',
+            }}
+          >
+            {t(`home.playYourGame.games.${activeGame.key}`)}
+          </Typography>
+
+          <Box
+            component="img"
+            key={activeGame.key}
+            src={activeGame.art}
+            alt={t(`home.playYourGame.games.${activeGame.key}`)}
+            width={720}
+            height={900}
+            loading="lazy"
+            decoding="async"
+            sx={{
+              position: 'relative',
+              zIndex: 1,
+              maxHeight: { xs: 380, sm: 460, md: 560 },
+              width: 'auto',
+              maxWidth: '100%',
+              objectFit: 'contain',
+              objectPosition: 'bottom center',
+              filter: 'drop-shadow(0 24px 40px rgba(0,0,0,0.65))',
+              transition: `opacity 0.35s ${LANDING_V2.ease}, transform 0.35s ${LANDING_V2.ease}`,
+            }}
+          />
+
+          <Box
+            aria-hidden
+            sx={{
+              position: 'absolute',
+              bottom: 0,
+              left: '8%',
+              right: '8%',
+              height: 48,
+              background: 'linear-gradient(180deg, transparent, rgba(0,0,0,0.55))',
+              borderRadius: '50%',
+              filter: 'blur(12px)',
+              zIndex: 0,
+            }}
+          />
+        </Box>
+      </Box>
     </Box>
   );
 }

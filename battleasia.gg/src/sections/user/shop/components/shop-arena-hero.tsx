@@ -52,10 +52,12 @@ export function ShopArenaHero({
         position: 'relative',
         width: 1,
         mb: { xs: 2.5, md: 3.5 },
-        borderRadius: '12px',
+        borderRadius: '18px',
         overflow: 'hidden',
-        bgcolor: '#161618',
-        border: `1px solid ${alpha('#ffffff', 0.08)}`,
+        bgcolor: 'rgba(22,22,24,0.38)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        border: `1px solid ${alpha('#ffffff', 0.09)}`,
       }}
     >
       <Box
@@ -115,7 +117,7 @@ export function ShopArenaHero({
               sx={{
                 px: 1.25,
                 py: 0.45,
-                borderRadius: '8px',
+                borderRadius: '12px',
                 bgcolor: alpha('#000000', 0.45),
                 border: `1px solid ${alpha('#ffffff', 0.12)}`,
               }}
@@ -140,7 +142,7 @@ export function ShopArenaHero({
               sx={{
                 px: 1.1,
                 py: 0.45,
-                borderRadius: '8px',
+                borderRadius: '12px',
                 bgcolor: goldAlpha(0.12),
                 border: `1px solid ${goldAlpha(0.32)}`,
               }}

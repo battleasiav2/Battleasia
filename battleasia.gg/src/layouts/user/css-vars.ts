@@ -1,4 +1,3 @@
-import { alpha } from '@mui/material/styles';
 import type { SettingsState } from 'src/components/settings';
 import type { Theme, CSSObject } from '@mui/material/styles';
 
@@ -18,8 +17,8 @@ export function userLayoutVars(theme: Theme) {
     '--layout-nav-mini-width': '88px',
     '--layout-nav-vertical-width': '280px',
     '--layout-nav-horizontal-height': '72px',
-    '--layout-header-mobile-height': '54px',
-    '--layout-header-desktop-height': '58px',
+    '--layout-header-mobile-height': '64px',
+    '--layout-header-desktop-height': '72px',
     '--layout-user-content-pt': theme.spacing(1),
     '--layout-user-content-pb': theme.spacing(8),
     '--layout-user-content-px': theme.spacing(5),
@@ -48,8 +47,8 @@ export function userBattleNavColorVars(
 
   return {
     layout: {
-      '--layout-nav-bg': alpha('#000000', 0.82),
-      '--layout-nav-horizontal-bg': alpha('#000000', 0.88),
+      '--layout-nav-bg': 'rgba(6,6,7,0.82)',
+      '--layout-nav-horizontal-bg': 'rgba(6,6,7,0.88)',
       '--layout-nav-border-color': varAlpha(palette.common.whiteChannel, 0.1),
       '--layout-nav-text-primary-color': palette.common.white,
       '--layout-nav-text-secondary-color': varAlpha(palette.common.whiteChannel, 0.55),

@@ -26,7 +26,7 @@ class GoldButton extends StatefulWidget {
     this.uppercase = true,
     this.height = 44,
     this.fontSize = 13,
-    this.borderRadius = 8,
+    this.borderRadius = 12,
     this.glow = false,
   });
 

@@ -186,7 +186,7 @@ export function ShopDetailView() {
               border: `1px solid ${goldAlpha(0.28)}`,
               borderTop: `2px solid ${USER_COLORS.gold}`,
               boxShadow: `0 12px 36px ${alpha('#000000', 0.7)}`,
-              borderRadius: '12px',
+              borderRadius: '18px',
             }}
           >
             <Box
@@ -195,7 +195,7 @@ export function ShopDetailView() {
                 overflow: 'hidden',
                 bgcolor: alpha('#000000', 0.45),
                 border: `1px solid ${goldAlpha(0.2)}`,
-                borderRadius: '8px',
+                borderRadius: '12px',
               }}
             >
               <Image
@@ -299,7 +299,7 @@ export function ShopDetailView() {
                   WebkitBackdropFilter: 'blur(18px)',
                   border: `1px solid ${goldAlpha(0.28)}`,
                   borderTop: `2px solid ${USER_COLORS.gold}`,
-                  borderRadius: '8px',
+                  borderRadius: '18px',
                 }}
               >
                 <Typography

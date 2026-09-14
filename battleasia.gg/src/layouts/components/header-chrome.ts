@@ -1,20 +1,19 @@
 import type { Theme, SxProps } from '@mui/material/styles';
 import type { SystemStyleObject } from '@mui/system';
 
-import { alpha } from '@mui/material/styles';
+import { LANDING_V2 } from 'src/sections/home/landing-v2-theme';
 
 /**
- * Tactical military/sci-fi gaming header bar — matching Lost Light aesthetic.
- * Slightly taller bar for easier tap targets and clearer branding.
+ * Zip landing header bar — ink glass + gold hairline, matches home.
  */
 export function getHeaderBarSx(isScrolled = false): SystemStyleObject<Theme> {
   return {
-    bgcolor: isScrolled ? alpha('#050709', 0.98) : alpha('#07080b', 0.95),
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
-    borderBottom: '1px solid rgba(255, 255, 255, 0.07)',
-    boxShadow: isScrolled ? '0 8px 24px rgba(0, 0, 0, 0.65)' : 'none',
-    transition: 'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+    bgcolor: isScrolled ? 'rgba(6,6,7,0.94)' : 'rgba(6,6,7,0.72)',
+    backdropFilter: 'blur(18px)',
+    WebkitBackdropFilter: 'blur(18px)',
+    borderBottom: `1px solid ${isScrolled ? 'rgba(203,251,36,0.22)' : LANDING_V2.hair}`,
+    boxShadow: isScrolled ? '0 12px 40px -24px #000' : 'none',
+    transition: 'background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease',
   };
 }
 
@@ -22,8 +21,8 @@ export function getHeaderBarSx(isScrolled = false): SystemStyleObject<Theme> {
 export const headerBarSx = getHeaderBarSx(false);
 
 export const headerContainerSx: SystemStyleObject<Theme> = {
-  minHeight: { xs: 50, md: 58 },
-  height: { xs: 50, md: 58 },
+  minHeight: { xs: 64, md: 72 },
+  height: { xs: 64, md: 72 },
   px: { xs: 1.25, sm: 2, md: 3 },
   py: 0,
   alignItems: 'center',
@@ -60,7 +59,7 @@ export const headerRightAreaSx: SystemStyleObject<Theme> = {
 };
 
 /**
- * Simple active nav pill — Pulse-card style (no trapezoid / gaming badge).
+ * Active nav — gold underline like home zip header (no trapezoid / pill).
  */
 export const headerActiveTrapezoidSx: SxProps<Theme> = {
   position: 'relative',
@@ -71,33 +70,29 @@ export const headerActiveTrapezoidSx: SxProps<Theme> = {
   justifyContent: 'center',
   textDecoration: 'none',
   cursor: 'pointer',
-  px: { lg: 2, xl: 2.25 },
+  px: { lg: 1.75, xl: 2 },
   filter: 'none',
   boxShadow: 'none',
-  '&::before': {
+  '&::before': { display: 'none' },
+  '&::after': {
     content: '""',
     position: 'absolute',
-    top: '50%',
-    left: 6,
-    right: 6,
-    height: 30,
-    transform: 'translateY(-50%)',
-    zIndex: 0,
-    borderRadius: '4px',
-    bgcolor: 'rgba(255, 255, 255, 0.06)',
-    border: '1px solid rgba(255, 255, 255, 0.14)',
-    boxShadow: 'none',
-    filter: 'none',
+    left: 14,
+    right: 14,
+    bottom: 10,
+    height: '1.5px',
+    borderRadius: '2px',
+    bgcolor: 'var(--ba-gold)',
   },
   '& .nav-label': {
     position: 'relative',
     zIndex: 1,
-    fontFamily: "'Barlow', sans-serif",
-    fontWeight: 800,
-    fontSize: { lg: 14, xl: 14.5 },
-    letterSpacing: '1px',
+    fontFamily: LANDING_V2.display,
+    fontWeight: 700,
+    fontSize: { lg: 12, xl: 12.5 },
+    letterSpacing: '0.11em',
     textTransform: 'uppercase',
-    color: 'var(--ba-gold, #cbfb24)',
+    color: LANDING_V2.text,
     textShadow: 'none',
     lineHeight: 1,
     whiteSpace: 'nowrap',
@@ -105,7 +100,7 @@ export const headerActiveTrapezoidSx: SxProps<Theme> = {
 };
 
 /**
- * Inactive nav link matching reference.
+ * Inactive nav link matching home zip header.
  */
 export const headerInactiveNavLinkSx: SxProps<Theme> = {
   position: 'relative',
@@ -115,24 +110,24 @@ export const headerInactiveNavLinkSx: SxProps<Theme> = {
   justifyContent: 'center',
   textDecoration: 'none',
   cursor: 'pointer',
-  px: { lg: 2.5, xl: 3 },
-  transition: 'color 0.15s ease',
+  px: { lg: 1.75, xl: 2 },
+  transition: `color 0.25s ${LANDING_V2.ease}`,
   filter: 'none',
   boxShadow: 'none',
   '& .nav-label': {
-    fontFamily: "'Barlow', sans-serif",
-    fontWeight: 600,
-    fontSize: { lg: 14.5, xl: 15 },
-    letterSpacing: '1.2px',
+    fontFamily: LANDING_V2.display,
+    fontWeight: 700,
+    fontSize: { lg: 12, xl: 12.5 },
+    letterSpacing: '0.11em',
     textTransform: 'uppercase',
-    color: 'rgba(255, 255, 255, 0.68)',
+    color: LANDING_V2.muted,
     lineHeight: 1,
     whiteSpace: 'nowrap',
-    transition: 'color 0.15s ease',
+    transition: `color 0.25s ${LANDING_V2.ease}`,
   },
   '&:hover': {
     '& .nav-label': {
-      color: '#ffffff',
+      color: LANDING_V2.text,
     },
   },
 };
@@ -146,112 +141,116 @@ export function getHeaderNavLinkSx(isActive: boolean): SxProps<Theme> {
 export const headerNavDividerSx: SystemStyleObject<Theme> = {
   width: '1px',
   height: '16px',
-  bgcolor: 'rgba(255, 255, 255, 0.14)',
+  bgcolor: LANDING_V2.hair,
   alignSelf: 'center',
   flexShrink: 0,
 };
 
 /**
  * ----------------------------------------------------------------------
- * Header right controls — Pulse-simple chips
+ * Header right controls — zip 44×44 glass chips
  * ----------------------------------------------------------------------
  */
 
-/** Simple Pulse-style Sign-In / Login control */
+/** Outline LOGIN control — matches home zip header */
 export const headerSignInButtonSx: SystemStyleObject<Theme> = {
-  height: { xs: 32, sm: 34, md: 36 },
-  px: { xs: 1, sm: 1.35, md: 1.5 },
+  height: 44,
+  minHeight: 44,
+  px: { xs: 1.5, sm: 1.75 },
   position: 'relative',
   overflow: 'hidden',
   display: 'inline-flex',
   alignItems: 'center',
   gap: { xs: 0.5, sm: 0.75 },
   textDecoration: 'none',
-  fontFamily: "'Barlow', sans-serif",
+  fontFamily: LANDING_V2.display,
   fontWeight: 700,
-  fontSize: { xs: 11, sm: 12, md: 13 },
-  letterSpacing: { xs: '0.6px', md: '0.8px' },
+  fontSize: { xs: 11, sm: 12 },
+  letterSpacing: '0.10em',
   textTransform: 'uppercase',
-  color: 'rgba(255, 255, 255, 0.88)',
+  color: LANDING_V2.muted,
   flexShrink: 0,
-  bgcolor: 'rgba(255, 255, 255, 0.05)',
-  border: '1px solid rgba(255, 255, 255, 0.12)',
-  borderRadius: '4px',
+  bgcolor: 'rgba(255,255,255,0.03)',
+  border: `1px solid ${LANDING_V2.hair}`,
+  borderRadius: '10px',
   boxShadow: 'none',
-  transition: 'background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease',
+  transition: `background-color 0.25s ${LANDING_V2.ease}, border-color 0.25s ${LANDING_V2.ease}, color 0.25s ${LANDING_V2.ease}`,
   '&:hover': {
-    bgcolor: 'rgba(255, 255, 255, 0.08)',
-    borderColor: 'rgba(255, 255, 255, 0.22)',
-    color: '#ffffff',
+    bgcolor: 'rgba(255,255,255,0.05)',
+    borderColor: LANDING_V2.hair2,
+    color: LANDING_V2.text,
   },
   '&:active': {
-    bgcolor: 'rgba(255, 255, 255, 0.06)',
+    bgcolor: 'rgba(255,255,255,0.04)',
   },
 };
 
 export const headerSignInIconButtonSx: SystemStyleObject<Theme> = {
   ...headerSignInButtonSx,
   px: { xs: 0.85, sm: 1 },
-  width: { xs: 32, sm: 34, md: 36 },
+  width: 44,
+  minWidth: 44,
   justifyContent: 'center',
 };
 
-/** Simple language control — Pulse chip style */
+/** Language control — zip chip */
 export const headerLanguagePillSx = (open: boolean): SystemStyleObject<Theme> => ({
   display: 'inline-flex',
   alignItems: 'center',
   gap: { xs: 0.4, sm: 0.65 },
-  px: { xs: 0.7, sm: 1, md: 1.15 },
+  px: 0,
   py: 0,
-  minHeight: { xs: 32, sm: 34, md: 36 },
-  height: { xs: 32, sm: 34, md: 36 },
-  minWidth: 0,
+  minHeight: 44,
+  height: 44,
+  width: 44,
+  minWidth: 44,
+  justifyContent: 'center',
   flexShrink: 0,
   position: 'relative',
   overflow: 'hidden',
-  bgcolor: open ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.05)',
-  border: `1px solid ${open ? 'rgba(255, 255, 255, 0.22)' : 'rgba(255, 255, 255, 0.12)'}`,
-  borderRadius: '4px',
+  bgcolor: open ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)',
+  border: `1px solid ${open ? LANDING_V2.hair2 : LANDING_V2.hair}`,
+  borderRadius: '10px',
   boxShadow: 'none',
-  transition: 'background-color 0.15s ease, border-color 0.15s ease',
+  transition: `background-color 0.25s ${LANDING_V2.ease}, border-color 0.25s ${LANDING_V2.ease}`,
   '&:hover': {
-    bgcolor: 'rgba(255, 255, 255, 0.08)',
-    borderColor: 'rgba(255, 255, 255, 0.22)',
+    bgcolor: 'rgba(255,255,255,0.05)',
+    borderColor: LANDING_V2.hair2,
     '& .lang-chevron': {
-      color: 'rgba(255, 255, 255, 0.85)',
+      color: LANDING_V2.text,
     },
   },
 });
 
 export const headerLanguageCodeSx: SystemStyleObject<Theme> = {
-  fontFamily: "'Barlow', sans-serif",
-  fontSize: { xs: 11, sm: 12, md: 13 },
+  fontFamily: LANDING_V2.display,
+  fontSize: { xs: 11, sm: 12 },
   fontWeight: 700,
-  letterSpacing: { xs: '0.5px', md: '0.7px' },
-  color: 'rgba(255, 255, 255, 0.88)',
+  letterSpacing: '0.08em',
+  color: LANDING_V2.muted,
   lineHeight: 1,
   textTransform: 'uppercase',
   display: { xs: 'none', sm: 'inline' },
 };
 
-/** Simple accent / theme control */
+/** Accent / theme control */
 export const headerAccentButtonSx = (open: boolean): SystemStyleObject<Theme> => ({
-  width: { xs: 30, sm: 34, md: 36 },
-  minWidth: { xs: 30, sm: 34, md: 36 },
-  height: { xs: 30, sm: 34, md: 36 },
+  width: 44,
+  minWidth: 44,
+  height: 44,
   p: 0,
   flexShrink: 0,
   position: 'relative',
   display: 'grid',
   placeItems: 'center',
-  bgcolor: open ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.05)',
-  border: `1px solid ${open ? 'rgba(255, 255, 255, 0.22)' : 'rgba(255, 255, 255, 0.12)'}`,
-  borderRadius: '4px',
+  bgcolor: open ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)',
+  border: `1px solid ${open ? LANDING_V2.hair2 : LANDING_V2.hair}`,
+  borderRadius: '10px',
   boxShadow: 'none',
-  transition: 'background-color 0.15s ease, border-color 0.15s ease',
+  transition: `background-color 0.25s ${LANDING_V2.ease}, border-color 0.25s ${LANDING_V2.ease}`,
   '&:hover': {
-    bgcolor: 'rgba(255, 255, 255, 0.08)',
-    borderColor: 'rgba(255, 255, 255, 0.22)',
+    bgcolor: 'rgba(255,255,255,0.05)',
+    borderColor: LANDING_V2.hair2,
   },
 });
 
@@ -261,7 +260,7 @@ export const headerRightStackSx: SystemStyleObject<Theme> = {
   gap: { xs: 0.85, sm: 1.25 },
 };
 
-export const headerControlHeight = { xs: 34, sm: 36 } as const;
+export const headerControlHeight = { xs: 44, sm: 44 } as const;
 
 export const headerCompactSearchSx: SystemStyleObject<Theme> = {
   height: headerControlHeight,

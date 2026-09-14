@@ -25,16 +25,16 @@ export const USER_COLORS = {
   success: '#22c55e',
   error: '#ef4444',
   info: '#38bdf8',
-  surface: '#0a0a0a',
-  pageBg: '#000000',
-  textPrimary: '#ffffff',
-  textBody: '#f5f5f5',
+  surface: '#0b0b0d',
+  pageBg: '#060607',
+  textPrimary: '#f4f4f1',
+  textBody: '#f4f4f1',
   /** Secondary copy — keep high contrast on dark glass */
-  textMuted: '#c5ced9',
+  textMuted: 'rgba(244,244,241,0.62)',
   /** Supporting values / meta — brighter than muted */
-  textSubtle: '#e8eef5',
-  border: alpha('#ffffff', 0.12),
-  borderStrong: alpha('#ffffff', 0.18),
+  textSubtle: 'rgba(244,244,241,0.82)',
+  border: 'rgba(255,255,255,0.09)',
+  borderStrong: 'rgba(255,255,255,0.14)',
 } as const;
 
 export type UserChipTone = 'gold' | 'success' | 'error' | 'info' | 'neutral';
@@ -195,7 +195,7 @@ export const userMutedTextSx: SxProps<Theme> = {
 
 /** Shared glass-gold chrome — secondary / tone buttons (success, error, ghost) */
 const userGlassButtonBaseSx: SxProps<Theme> = {
-  borderRadius: '8px',
+  borderRadius: '12px',
   clipPath: 'none',
   fontWeight: 800,
   letterSpacing: '0.08em',
@@ -267,17 +267,17 @@ export const userGoldButtonSx: SxProps<Theme> = createUserGlassToneButtonSx(
 
 /** Solid filled gold CTA — tactical esports contained button (like ENTER ARENA in reference image) */
 export const userSolidGoldButtonSx: SxProps<Theme> = {
-  borderRadius: '8px',
+  borderRadius: '12px',
   clipPath: 'none',
   py: 0,
   px: { xs: 2.5, sm: 3 },
-  minHeight: 44,
-  height: 44,
-  fontSize: 14,
-  fontWeight: 800,
-  letterSpacing: '0.08em',
+  minHeight: 48,
+  height: 48,
+  fontSize: 13,
+  fontWeight: 700,
+  letterSpacing: '0.10em',
   textTransform: 'uppercase',
-  color: '#080a0e !important',
+  color: 'var(--ba-gold-ink, #081401) !important',
   position: 'relative',
   overflow: 'hidden',
   backdropFilter: 'none',
@@ -285,28 +285,28 @@ export const userSolidGoldButtonSx: SxProps<Theme> = {
   filter: 'none',
   textShadow: 'none',
   backgroundImage: 'none',
-  background: 'var(--ba-gold, #f5c518)',
-  border: `1px solid ${goldAlpha(0.28)}`,
-  boxShadow: 'none',
+  background: 'var(--ba-gold, #cbfb24)',
+  border: '1px solid var(--ba-gold, #cbfb24)',
+  boxShadow: '0 8px 28px -12px rgba(203,251,36,0.4), inset 0 1px 0 rgba(255,255,255,0.35)',
   transform: 'none',
-  transition: 'background-color 0.15s ease, border-color 0.15s ease',
+  transition: 'transform 0.25s cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 0.25s ease',
   '& .MuiButton-startIcon, & .MuiButton-endIcon, & .MuiLoadingButton-loadingIndicator': {
-    color: '#080a0e !important',
+    color: 'var(--ba-gold-ink, #081401) !important',
     position: 'relative',
     zIndex: 2,
   },
   '@media (hover: hover)': {
     '&:hover': {
-      background: 'var(--ba-gold-light, #fbbf24)',
-      borderColor: goldAlpha(0.45),
-      boxShadow: 'none',
-      transform: 'none',
+      background: 'var(--ba-gold, #cbfb24)',
+      borderColor: 'var(--ba-gold, #cbfb24)',
+      boxShadow: '0 16px 40px -12px rgba(203,251,36,0.4)',
+      transform: 'translateY(-2px)',
       filter: 'none',
     },
   },
   '&:active, &.Mui-focusVisible': {
-    background: 'var(--ba-gold-dark, #d97706)',
-    borderColor: goldAlpha(0.4),
+    background: 'var(--ba-gold, #cbfb24)',
+    borderColor: 'var(--ba-gold, #cbfb24)',
     boxShadow: 'none',
     transform: 'none',
   },
@@ -376,18 +376,18 @@ export const userHeaderPillSx: SxProps<Theme> = {
   gap: 0.75,
   px: 1.35,
   py: 0.45,
-  minHeight: { xs: 34, sm: 36 },
-  borderRadius: `${GLASS_CARD_RADIUS}px`,
-  bgcolor: alpha('#10141c', 0.82),
-  border: `1px solid ${goldAlpha(0.32)}`,
-  boxShadow: `0 4px 14px ${alpha('#000000', 0.55)}, inset 0 0 10px ${goldAlpha(0.08)}`,
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  transition: 'border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease',
+  minHeight: 44,
+  height: 44,
+  borderRadius: '10px',
+  bgcolor: 'rgba(255,255,255,0.03)',
+  border: '1px solid rgba(255,255,255,0.09)',
+  boxShadow: 'none',
+  backdropFilter: 'blur(12px)',
+  WebkitBackdropFilter: 'blur(12px)',
+  transition: 'border-color 0.25s ease, background-color 0.25s ease',
   '&:hover': {
-    borderColor: goldAlpha(0.65),
-    boxShadow: `0 6px 18px ${alpha('#000000', 0.65)}, 0 0 14px ${goldAlpha(0.22)}`,
-    transform: 'translateY(-1px)',
+    borderColor: 'rgba(255,255,255,0.14)',
+    bgcolor: 'rgba(255,255,255,0.05)',
   },
 };
 
@@ -464,7 +464,7 @@ export function getUserPageShellOverlays(): { before: SxProps<Theme>; after: SxP
       background: `
         radial-gradient(ellipse 90% 55% at 50% -5%, ${alpha('#f5a623', 0.09)} 0%, transparent 58%),
         radial-gradient(ellipse 50% 35% at 15% 95%, ${alpha(USER_COLORS.info, 0.06)} 0%, transparent 50%),
-        linear-gradient(180deg, ${alpha('#000000', 0.35)} 0%, ${alpha('#000000', 0.88)} 55%, #000000 100%)
+        linear-gradient(180deg, ${alpha('#060607', 0.35)} 0%, ${alpha('#060607', 0.88)} 55%, #060607 100%)
       `,
       pointerEvents: 'none',
     },

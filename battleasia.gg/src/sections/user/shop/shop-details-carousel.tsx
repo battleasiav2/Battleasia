@@ -54,9 +54,9 @@ export function ShopDetailsCarousel({ images, name }: Props) {
           mb: 2,
           position: 'relative',
           overflow: 'hidden',
-          bgcolor: '#161618',
-          borderRadius: '12px',
-          border: `1px solid ${alpha('#ffffff', 0.08)}`,
+          bgcolor: 'rgba(22,22,24,0.38)',
+          borderRadius: '18px',
+          border: `1px solid ${alpha('#ffffff', 0.09)}`,
           boxShadow: 'none',
         }}
       >

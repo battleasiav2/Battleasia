@@ -13,9 +13,11 @@ import { headerSignInButtonSx } from './header-chrome';
 
 // ----------------------------------------------------------------------
 
-export type SignInIconButtonProps = ButtonBaseProps;
+export type SignInIconButtonProps = ButtonBaseProps & {
+  hideIcon?: boolean;
+};
 
-export function SignInIconButton({ sx, ...other }: SignInIconButtonProps) {
+export function SignInIconButton({ sx, hideIcon = false, ...other }: SignInIconButtonProps) {
   const { t } = useTranslate();
 
   const rawLogin = t('navigation.login');
@@ -30,13 +32,14 @@ export function SignInIconButton({ sx, ...other }: SignInIconButtonProps) {
       sx={[headerSignInButtonSx, ...(Array.isArray(sx) ? sx : [sx])]}
       {...other}
     >
-      <Iconify icon="solar:user-circle-bold" width={19} sx={{ color: 'inherit' }} />
+      {!hideIcon && (
+        <Iconify icon="solar:user-circle-bold" width={19} sx={{ color: 'inherit' }} />
+      )}
 
-      {/* Label */}
       <Box
         component="span"
         sx={{
-          display: { xs: 'none', sm: 'inline-block' },
+          display: hideIcon ? 'inline-block' : { xs: 'none', sm: 'inline-block' },
           lineHeight: 1,
           fontWeight: 800,
           letterSpacing: '1.2px',

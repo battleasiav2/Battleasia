@@ -132,8 +132,8 @@ export function UserLayout({
             container: {
                 maxWidth: false,
                 sx: {
-                    minHeight: { xs: 54, md: 58 },
-                    height: { xs: 54, md: 58 },
+                    minHeight: { xs: 64, md: 72 },
+                    height: { xs: 64, md: 72 },
                     px: { xs: 2, sm: 2.5, [layoutQuery]: 3 },
                     py: 0,
                     display: 'flex',
@@ -207,9 +207,9 @@ export function UserLayout({
                                 width: 1,
                                 maxWidth: 420,
                                 justifyContent: 'flex-start',
-                                bgcolor: alpha('#000000', 0.45),
-                                border: `1px solid ${alpha('#ffffff', 0.1)}`,
-                                borderRadius: '6px',
+                                bgcolor: 'rgba(22,22,24,0.38)',
+                                border: `1px solid ${alpha('#ffffff', 0.09)}`,
+                                borderRadius: '12px',
                                 px: 0.5,
                                 py: 0,
                                 ...headerCompactSearchSx,
@@ -309,9 +309,7 @@ export function UserLayout({
                     )}
 
                     {/** @slot Language popover */}
-                    <LanguagePopover
-                        data={allLangs}
-                    />
+                    <LanguagePopover landing data={allLangs} />
                     <AccentPopover />
                 </Stack>
             ),
@@ -408,8 +406,9 @@ export function UserLayout({
                         ...getUserLayoutMainSx(),
                         [`& .MuiCard-root`]: {
                             backgroundImage: 'none',
-                            backgroundColor: alpha('#0a0a0a', 0.94),
+                            backgroundColor: 'rgba(22,22,24,0.38)',
                             color: USER_COLORS.textBody,
+                            borderRadius: '18px',
                         },
                         [`& .MuiPaper-root:not(.MuiDrawer-paper):not(.MuiPopover-paper):not(.MuiDialog-paper)`]: {
                             backgroundImage: 'none',

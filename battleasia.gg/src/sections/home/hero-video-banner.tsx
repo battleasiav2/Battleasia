@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 
 import { Box } from '@mui/material';
 
+import { LANDING_V2 } from './landing-v2-theme';
+
 // ----------------------------------------------------------------------
 
 export function HeroVideoBanner() {
@@ -11,7 +13,6 @@ export function HeroVideoBanner() {
     const video = videoRef.current;
     if (!video) return;
 
-    // Ensure muted state is recognized across all modern browsers for instant autoplay
     video.defaultMuted = true;
     video.muted = true;
 
@@ -37,69 +38,78 @@ export function HeroVideoBanner() {
         zIndex: 0,
         width: '100%',
         height: '100%',
-        minHeight: { xs: 520, sm: 0 },
         overflow: 'hidden',
-        bgcolor: '#000000',
+        bgcolor: LANDING_V2.ink,
         pointerEvents: 'none',
       }}
     >
-      {/* 16:9 Full HD Video Canvas */}
+      <Box
+        component="img"
+        src={LANDING_V2.assets.heroPoster}
+        alt=""
+        width={1920}
+        height={1080}
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          width: 1,
+          height: 1,
+          objectFit: 'cover',
+          objectPosition: '58% center',
+          filter: 'contrast(1.1) saturate(1.08) brightness(0.88)',
+        }}
+      />
+
       <Box
         component="video"
         ref={videoRef}
-        src="/hero.mp4"
-        poster="/hero-poster.webp"
+        src={LANDING_V2.assets.heroVideo}
+        poster={LANDING_V2.assets.heroPoster}
         autoPlay
         muted
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
         disablePictureInPicture
         disableRemotePlayback
         sx={{
           position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          minWidth: '100%',
-          minHeight: '100%',
+          inset: 0,
+          zIndex: 1,
           width: '100%',
           height: '100%',
-          aspectRatio: '16 / 9',
           objectFit: 'cover',
-          // Center stealth squad on mobile while keeping full tactical vista on desktop
-          objectPosition: { xs: '38% center', sm: '42% center', md: 'center center' },
+          objectPosition: '58% center',
           pointerEvents: 'none',
-          display: 'block',
-          filter: 'contrast(1.06) brightness(0.94) saturate(1.12)',
+          display: { xs: 'none', sm: 'block' },
+          filter: 'contrast(1.1) saturate(1.08) brightness(0.88)',
+          '@media (prefers-reduced-motion: reduce)': { display: 'none' },
         }}
       />
 
-      {/* Atmospheric depth vignette tuned for 16:9 gaming cinematic */}
       <Box
         sx={{
           position: 'absolute',
           inset: 0,
-          background: {
-            xs: 'radial-gradient(ellipse 95% 80% at 42% 38%, transparent 15%, rgba(0, 0, 0, 0.68) 85%)',
-            md: 'radial-gradient(ellipse 90% 75% at 38% 48%, transparent 25%, rgba(0, 0, 0, 0.65) 90%)',
-          },
-          pointerEvents: 'none',
-          zIndex: 1,
-        }}
-      />
-
-      {/* Vertical fade to seamlessly dissolve into the header and dark body */}
-      <Box
-        sx={{
-          position: 'absolute',
-          inset: 0,
+          zIndex: 2,
           background: `
-            linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 22%, transparent 68%, #000000 100%),
-            linear-gradient(90deg, rgba(0,0,0,0.25) 0%, transparent 35%, transparent 65%, rgba(0,0,0,0.4) 100%)
+            radial-gradient(80% 70% at 72% 48%, transparent 0%, rgba(6,6,7,0.28) 42%, rgba(6,6,7,0.78) 100%),
+            linear-gradient(90deg, rgba(6,6,7,0.82) 0%, rgba(6,6,7,0.35) 38%, rgba(6,6,7,0.2) 62%, rgba(6,6,7,0.55) 100%)
           `,
           pointerEvents: 'none',
-          zIndex: 1,
+        }}
+      />
+
+      <Box
+        sx={{
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: '36%',
+          zIndex: 2,
+          background: `linear-gradient(to top, ${LANDING_V2.ink} 4%, transparent)`,
+          pointerEvents: 'none',
         }}
       />
     </Box>

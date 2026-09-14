@@ -13,7 +13,8 @@ import { Iconify } from 'src/components/iconify/iconify';
 import { CustomPopover } from 'src/components/custom-popover';
 import { useTranslate } from 'src/locales/use-locales';
 import { USER_COLORS } from 'src/layouts/user/user-theme';
-import { headerLanguageCodeSx, headerLanguagePillSx } from './header-chrome';
+import { LANDING_V2 } from 'src/sections/home/landing-v2-theme';
+import { headerLanguagePillSx } from './header-chrome';
 import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
@@ -27,6 +28,7 @@ export type LanguagePopoverProps = IconButtonProps & {
     label: string;
     countryCode: string;
   }[];
+  landing?: boolean;
 };
 
 function getLangMeta(value: string) {
@@ -34,7 +36,7 @@ function getLangMeta(value: string) {
   return RTL_LANGS.has(value) ? `${code} • RTL` : code;
 }
 
-export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProps) {
+export function LanguagePopover({ data = [], landing: _landing = false, sx, ...other }: LanguagePopoverProps) {
   const { open, anchorEl, onClose, onOpen } = usePopover();
   const { currentLang, onChangeLang } = useTranslate();
 
@@ -54,7 +56,7 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
             p: 0,
             width: 196,
             overflow: 'hidden',
-            borderRadius: 0,
+            borderRadius: '12px',
             bgcolor: alpha('#000000', 0.94),
             border: `1px solid ${alpha('#ffffff', 0.08)}`,
             boxShadow: `0 12px 32px ${alpha('#000000', 0.45)}`,
@@ -185,61 +187,30 @@ export function LanguagePopover({ data = [], sx, ...other }: LanguagePopoverProp
         sx={[
           {
             p: 0,
-            minWidth: 0,
+            width: 44,
+            minWidth: 44,
+            justifyContent: 'center',
             ...headerLanguagePillSx(open),
           },
           ...(Array.isArray(sx) ? sx : [sx]),
         ]}
         {...other}
       >
-        {/* Tactical Flag Scope with Radar Ring */}
         <Box
+          component="svg"
+          viewBox="0 0 24 24"
+          aria-hidden
           sx={{
-            position: 'relative',
-            width: { xs: 15, sm: 19 },
-            height: { xs: 15, sm: 19 },
-            borderRadius: '50%',
-            overflow: 'hidden',
+            width: 20,
+            height: 20,
             flexShrink: 0,
-            display: 'grid',
-            placeItems: 'center',
-            boxShadow: `0 0 0 1px ${alpha('#ffffff', 0.22)}`,
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              inset: 0,
-              borderRadius: '50%',
-              border: '1px solid var(--ba-nav-badge-main, #cbfb24)',
-              opacity: open ? 0.9 : 0,
-              animation: 'radar-ping 2.4s ease-in-out infinite',
-              pointerEvents: 'none',
-            },
+            color: open ? LANDING_V2.text : LANDING_V2.muted,
           }}
         >
-          <FlagIcon
-            code={currentLang?.countryCode}
-            sx={{
-              width: { xs: 15, sm: 19 },
-              height: { xs: 15, sm: 19 },
-              borderRadius: '50%',
-            }}
-          />
+          <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="1.7" />
+          <ellipse cx="12" cy="12" rx="4" ry="9" fill="none" stroke="currentColor" strokeWidth="1.7" />
+          <path d="M3 12h18M5.2 7.5h13.6M5.2 16.5h13.6" fill="none" stroke="currentColor" strokeWidth="1.7" />
         </Box>
-        <Typography component="span" sx={headerLanguageCodeSx}>
-          {(currentLang?.value ?? 'en').toUpperCase()}
-        </Typography>
-        <Iconify
-          icon="solar:alt-arrow-down-bold"
-          className="lang-chevron"
-          width={10}
-          sx={{
-            color: open ? 'var(--ba-nav-badge-main, #cbfb24)' : 'rgba(255, 255, 255, 0.55)',
-            transform: open ? 'rotate(180deg)' : 'none',
-            transition: 'transform 0.2s ease, color 0.2s ease',
-            ml: { xs: 0, sm: -0.25 },
-            display: { xs: 'none', sm: 'block' },
-          }}
-        />
       </ButtonBase>
 
       {renderMenuList()}

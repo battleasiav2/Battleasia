@@ -86,7 +86,7 @@ export function AuthSplitLayout({
           ? (slotProps?.main?.sx ?? [])
           : [slotProps?.main?.sx]),
         {
-          bgcolor: '#06070a',
+          bgcolor: '#060607',
           backgroundImage: `url(${AUTH_BG})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center top',
@@ -95,15 +95,15 @@ export function AuthSplitLayout({
           overflowX: 'clip',
           overflowY: 'visible',
           minHeight: {
-            xs: 'calc(100dvh - var(--layout-header-mobile-height, 56px))',
-            md: 'calc(100dvh - var(--layout-header-desktop-height, 60px))',
+            xs: 'calc(100dvh - var(--layout-header-mobile-height, 72px))',
+            md: 'calc(100dvh - var(--layout-header-desktop-height, 72px))',
           },
           '&::before': {
             content: "''",
             position: 'absolute',
             inset: 0,
             background: `
-              linear-gradient(90deg, ${alpha('#06070a', 0.28)} 0%, ${alpha('#080a0f', 0.16)} 48%, ${alpha('#06070a', 0.28)} 100%),
+              linear-gradient(90deg, ${alpha('#060607', 0.28)} 0%, ${alpha('#0b0b0d', 0.16)} 48%, ${alpha('#060607', 0.28)} 100%),
               radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha(0.08)} 0%, transparent 55%)
             `,
             zIndex: 0,
@@ -112,7 +112,7 @@ export function AuthSplitLayout({
             content: "''",
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(180deg, ${alpha('#06070a', 0.18)} 0%, transparent 42%, ${alpha('#06070a', 0.42)} 100%)`,
+            background: `linear-gradient(180deg, ${alpha('#060607', 0.18)} 0%, transparent 42%, ${alpha('#060607', 0.42)} 100%)`,
             zIndex: 0,
           },
         },
@@ -124,7 +124,7 @@ export function AuthSplitLayout({
         sx={{
           position: 'relative',
           zIndex: 3,
-          minHeight: { xs: 'auto', md: 'calc(100dvh - var(--layout-header-desktop-height, 60px))' },
+          minHeight: { xs: 'auto', md: 'calc(100dvh - var(--layout-header-desktop-height, 72px))' },
           display: 'flex',
           justifyContent: 'center',
           alignItems: { xs: 'flex-start', md: 'center' },
@@ -148,8 +148,8 @@ export function AuthSplitLayout({
             zIndex: 0,
             pointerEvents: 'none',
             background: {
-              xs: `linear-gradient(180deg, ${alpha('#06070a', 0.22)} 0%, ${alpha('#06070a', 0.38)} 100%)`,
-              md: `linear-gradient(90deg, ${alpha('#06070a', 0.12)} 0%, ${alpha('#06070a', 0.28)} 55%, ${alpha('#06070a', 0.4)} 100%)`,
+              xs: `linear-gradient(180deg, ${alpha('#060607', 0.22)} 0%, ${alpha('#060607', 0.38)} 100%)`,
+              md: `linear-gradient(90deg, ${alpha('#060607', 0.12)} 0%, ${alpha('#060607', 0.28)} 55%, ${alpha('#060607', 0.4)} 100%)`,
             },
           },
         }}
@@ -172,8 +172,8 @@ export function AuthSplitLayout({
       footerSection={null}
       cssVars={{
         '--layout-auth-content-width': '620px',
-        '--layout-header-desktop-height': '60px',
-        '--layout-header-mobile-height': '56px',
+        '--layout-header-desktop-height': '72px',
+        '--layout-header-mobile-height': '72px',
         '--layout-main-margin-top': '0px',
         '--layout-main-mobile-margin-top': '0px',
         ...cssVars,

@@ -33,7 +33,7 @@ const corePulse = keyframes`
   50% { transform: scale(1.15); filter: drop-shadow(0 0 10px var(--ba-gold)); }
 `;
 
-export function AccentPopover() {
+export function AccentPopover({ landing = false }: { landing?: boolean }) {
   const { open, anchorEl, onClose, onOpen } = usePopover();
   const settings = useSettingsContext();
   const { t } = useTranslate();
@@ -54,9 +54,37 @@ export function AccentPopover() {
           disableRipple
           aria-label={t('navigation.siteColor')}
           onClick={onOpen}
-          sx={headerAccentButtonSx(open)}
+          sx={
+            landing
+              ? {
+                  width: 44,
+                  minWidth: 44,
+                  height: 44,
+                  p: 0,
+                  borderRadius: '10px',
+                  border: `1px solid ${alpha('#ffffff', 0.09)}`,
+                  bgcolor: 'rgba(255,255,255,0.03)',
+                  '&:hover': {
+                    borderColor: 'rgba(255,255,255,0.14)',
+                    bgcolor: 'rgba(255,255,255,0.05)',
+                  },
+                }
+              : headerAccentButtonSx(open)
+          }
         >
-          {/* Rotating Chromatic Reticle Ring (Clean solid micro-ticks, no dashes) */}
+          {landing ? (
+            <Box
+              sx={{
+                width: 16,
+                height: 16,
+                borderRadius: '50%',
+                bgcolor: 'var(--ba-gold)',
+                boxShadow: `0 0 0 3px ${goldAlpha(0.18)}`,
+                flexShrink: 0,
+              }}
+            />
+          ) : (
+            <>
           <Box
             className="prism-ring"
             sx={{
@@ -98,6 +126,8 @@ export function AccentPopover() {
               transition: 'transform 0.25s ease',
             }}
           />
+            </>
+          )}
         </ButtonBase>
       </Tooltip>
 

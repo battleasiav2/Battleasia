@@ -79,7 +79,7 @@ export function UserNavVertical({
             sx={{
               px: 0.65,
               py: 0.2,
-              borderRadius: '3px',
+              borderRadius: '8px',
               border: `1px solid ${goldAlpha(0.65)}`,
               bgcolor: goldAlpha(0.08),
               display: 'inline-flex',

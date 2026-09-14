@@ -15,7 +15,7 @@ type JoinArenaCardProps = {
   sx?: SxProps<Theme>;
 };
 
-/** Home / auth flat card — #161618, white border, gold top bar, square corners. */
+/** Zip glass card — #161618 panel, white hairline, 18px radius. */
 export function JoinArenaCard({ children, accent = 'gold', sx }: JoinArenaCardProps) {
   const accentColor =
     accent === 'success'
@@ -29,8 +29,8 @@ export function JoinArenaCard({ children, accent = 'gold', sx }: JoinArenaCardPr
       sx={{
         position: 'relative',
         bgcolor: JOIN_ARENA_CARD_BG,
-        border: `1px solid ${alpha('#ffffff', 0.08)}`,
-        borderRadius: 0,
+        border: `1px solid ${alpha('#ffffff', 0.09)}`,
+        borderRadius: '18px',
         overflow: 'hidden',
         boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.04)}`,
         '&::before': {

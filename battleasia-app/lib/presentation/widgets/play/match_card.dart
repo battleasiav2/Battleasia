@@ -75,16 +75,16 @@ class _MatchCardState extends State<MatchCard> {
       color: Colors.transparent,
       elevation: 0,
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: Stack(
         children: [
           Container(
             height: cardHeight,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(18),
               color: const Color(0xFF161618),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.08),
+                color: Colors.white.withValues(alpha: 0.09),
               ),
             ),
             child: Row(

@@ -1,6 +1,6 @@
 import type { MenuItem } from '../menu-items-config';
 
-import { useState, useEffect, useCallback, useRef, useLayoutEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -11,7 +11,7 @@ import { RouterLink } from 'src/routes/components';
 import { usePathname, useRouter } from 'src/routes/hooks';
 
 import { menuItems } from '../menu-items-config';
-import { headerNavDividerSx } from './header-chrome';
+import { LANDING_V2 } from 'src/sections/home/landing-v2-theme';
 
 // ----------------------------------------------------------------------
 
@@ -24,14 +24,8 @@ const DEFAULT_NAV_LABELS: Record<string, string> = {
   'navigation.rules': 'RULES',
 };
 
-type IndicatorPosition = {
-  left: number;
-  width: number;
-  ready: boolean;
-};
-
 export function HeaderNav() {
-  const { t, i18n, currentLang } = useTranslate();
+  const { t } = useTranslate();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -39,138 +33,19 @@ export function HeaderNav() {
     pathname === paths.dashboard.root || pathname === '/dashboard/' || pathname === '/';
 
   const [activeTarget, setActiveTarget] = useState<string>('home');
-  const [indicator, setIndicator] = useState<IndicatorPosition>({
-    left: 0,
-    width: 0,
-    ready: false,
-  });
-
-  const navContainerRef = useRef<HTMLDivElement | null>(null);
-  const itemRefs = useRef<(HTMLElement | null)[]>([]);
   const isClickScrolling = useRef(false);
   const clickTimeoutRef = useRef<number | null>(null);
-  const isMounted = useRef(false);
 
-  // Active item index
-  const activeIndex = menuItems.findIndex((item) =>
-    isHomeRoute ? activeTarget === (item.scrollTarget || 'home') : item.isActive(pathname)
-  );
-  const resolvedIndex = activeIndex >= 0 ? activeIndex : 0;
-
-  // Measure and position the sliding indicator
-  const updateIndicatorPosition = useCallback(() => {
-    const container = navContainerRef.current;
-    const targetItem = itemRefs.current[resolvedIndex];
-
-    if (!container || !targetItem) return;
-
-    const containerRect = container.getBoundingClientRect();
-    const itemRect = targetItem.getBoundingClientRect();
-
-    if (itemRect.width === 0 || containerRect.width === 0) return;
-
-    const left = itemRect.left - containerRect.left;
-    const width = itemRect.width;
-
-    setIndicator((prev) => {
-      if (
-        prev.ready &&
-        Math.abs(prev.left - left) < 0.5 &&
-        Math.abs(prev.width - width) < 0.5
-      ) {
-        return prev;
-      }
-      return {
-        left,
-        width,
-        ready: true,
-      };
-    });
-  }, [resolvedIndex]);
-
-  // Update indicator whenever active target or language changes
-  useLayoutEffect(() => {
-    updateIndicatorPosition();
-  }, [updateIndicatorPosition, currentLang?.value, t]);
-
-  // Handle resize, element size reflows, font loading, and i18n completion to keep indicator aligned
-  useEffect(() => {
-    updateIndicatorPosition();
-
-    // ResizeObserver: precisely watches any layout/font/text changes on container or items
-    let ro: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== 'undefined') {
-      ro = new ResizeObserver(() => {
-        updateIndicatorPosition();
-      });
-
-      if (navContainerRef.current) {
-        ro.observe(navContainerRef.current);
-      }
-      itemRefs.current.forEach((el) => {
-        if (el) ro?.observe(el);
-      });
-    }
-
-    // Font readiness and dynamic font loading events
-    const handleFontDone = () => {
-      updateIndicatorPosition();
-    };
-    if (document.fonts) {
-      document.fonts.ready.then(updateIndicatorPosition);
-      document.fonts.addEventListener?.('loadingdone', handleFontDone);
-    }
-
-    // i18n resource loading events (network fetch completion & language swap)
-    const handleI18nChange = () => {
-      updateIndicatorPosition();
-    };
-    i18n.on('loaded', handleI18nChange);
-    i18n.on('languageChanged', handleI18nChange);
-
-    // Window resize
-    const handleResize = () => {
-      updateIndicatorPosition();
-    };
-    window.addEventListener('resize', handleResize);
-
-    // Staggered frames for cold-load settling
-    const rafId = requestAnimationFrame(updateIndicatorPosition);
-    const t1 = setTimeout(updateIndicatorPosition, 50);
-    const t2 = setTimeout(updateIndicatorPosition, 150);
-    const t3 = setTimeout(() => {
-      isMounted.current = true;
-      updateIndicatorPosition();
-    }, 280);
-
-    return () => {
-      ro?.disconnect();
-      window.removeEventListener('resize', handleResize);
-      if (document.fonts?.removeEventListener) {
-        document.fonts.removeEventListener('loadingdone', handleFontDone);
-      }
-      i18n.off('loaded', handleI18nChange);
-      i18n.off('languageChanged', handleI18nChange);
-      cancelAnimationFrame(rafId);
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-    };
-  }, [updateIndicatorPosition, i18n]);
-
-  // Scrollspy: detect active section when scrolling
   const handleScroll = useCallback(() => {
     if (!isHomeRoute || isClickScrolling.current) return;
 
     const scrollY = window.scrollY || window.pageYOffset;
 
-    // Near the top of the page -> 'home'
     if (scrollY < 180) {
       setActiveTarget('home');
       return;
     }
 
-    // Near the bottom of the page -> last section ('rules')
     const scrollHeight = document.documentElement.scrollHeight;
     const clientHeight = window.innerHeight;
     if (scrollY + clientHeight >= scrollHeight - 80) {
@@ -178,7 +53,6 @@ export function HeaderNav() {
       return;
     }
 
-    // Check positions of all sections
     const headerOffsetThreshold = 180;
     let current = 'home';
 
@@ -220,12 +94,10 @@ export function HeaderNav() {
     };
   }, [handleScroll, isHomeRoute]);
 
-  // Click handler with smooth scroll
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, item: MenuItem) => {
     if (item.scrollTarget) {
       e.preventDefault();
 
-      // Immediately set active target so badge slides instantly
       setActiveTarget(item.scrollTarget);
       isClickScrolling.current = true;
 
@@ -239,7 +111,7 @@ export function HeaderNav() {
       const scrollToSection = (targetId: string) => {
         const targetElement = document.getElementById(targetId);
         if (targetElement) {
-          const headerOffset = 56;
+          const headerOffset = 72;
           const elementPosition = targetElement.getBoundingClientRect().top;
           const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
 
@@ -272,116 +144,67 @@ export function HeaderNav() {
   };
 
   return (
-    <Box
-      ref={navContainerRef}
+    <Stack
+      direction="row"
+      alignItems="center"
       sx={{
-        position: 'relative',
         display: { xs: 'none', lg: 'flex' },
-        alignItems: 'center',
-        justifyContent: 'center',
         height: '100%',
+        gap: 0.25,
+        ml: 1,
       }}
     >
-      {/* 
-        Single continuous sliding active indicator:
-        Physically glides left-to-right and right-to-left using GPU transform.
-      */}
-      <Box
-        aria-hidden="true"
-        sx={{
-          position: 'absolute',
-          top: '50%',
-          left: 0,
-          width: indicator.width > 0 ? `${indicator.width}px` : '96px',
-          height: 30,
-          marginTop: '-15px',
-          transform: `translate3d(${indicator.left}px, 0, 0)`,
-          transition: isMounted.current
-            ? 'transform 0.3s ease, width 0.3s ease'
-            : 'none',
-          zIndex: 1,
-          pointerEvents: 'none',
-          borderRadius: '4px',
-          bgcolor: 'rgba(255, 255, 255, 0.06)',
-          border: '1px solid rgba(255, 255, 255, 0.14)',
-          opacity: activeIndex >= 0 && indicator.ready ? 1 : 0,
-        }}
-      />
+      {menuItems.map((item) => {
+        const isActive = isHomeRoute
+          ? activeTarget === (item.scrollTarget || 'home')
+          : item.isActive(pathname);
 
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="center"
-        sx={{
-          height: '100%',
-          position: 'relative',
-          zIndex: 2,
-        }}
-      >
-        {menuItems.map((item, index) => {
-          const isActive = isHomeRoute
-            ? activeTarget === (item.scrollTarget || 'home')
-            : item.isActive(pathname);
+        const rawTranslated = t(item.labelKey);
+        const displayLabel =
+          !rawTranslated || rawTranslated === item.labelKey
+            ? (DEFAULT_NAV_LABELS[item.labelKey] ?? item.labelKey)
+            : rawTranslated;
 
-          const rawTranslated = t(item.labelKey);
-          const displayLabel =
-            !rawTranslated || rawTranslated === item.labelKey
-              ? (DEFAULT_NAV_LABELS[item.labelKey] ?? item.labelKey)
-              : rawTranslated;
-
-          return (
-            <Box
-              key={item.href}
-              sx={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                height: '100%',
-              }}
-            >
-              {index > 0 && <Box sx={headerNavDividerSx} />}
-              <Box
-                ref={(el: HTMLElement | null) => {
-                  itemRefs.current[index] = el;
-                }}
-                component={RouterLink}
-                href={item.href}
-                onClick={(e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, item)}
-                sx={{
-                  position: 'relative',
-                  height: '100%',
-                  minWidth: { xs: 88, lg: 96, xl: 104 },
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  textDecoration: 'none',
-                  cursor: 'pointer',
-                  px: { lg: 2, xl: 2.25 },
-                }}
-              >
-                <span
-                  className="nav-label"
-                  style={{
-                    position: 'relative',
-                    zIndex: 3,
-                    fontFamily: "'Barlow', sans-serif",
-                    fontWeight: isActive ? 800 : 600,
-                    fontSize: isActive ? '14px' : '13.5px',
-                    letterSpacing: '1px',
-                    textTransform: 'uppercase',
-                    color: isActive ? 'var(--ba-gold, #cbfb24)' : 'rgba(255, 255, 255, 0.68)',
-                    textShadow: 'none',
-                    transition: 'color 0.2s ease',
-                    whiteSpace: 'nowrap',
-                    lineHeight: 1,
-                  }}
-                >
-                  {displayLabel}
-                </span>
-              </Box>
-            </Box>
-          );
-        })}
-      </Stack>
-    </Box>
+        return (
+          <Box
+            key={item.href}
+            component={RouterLink}
+            href={item.href}
+            onClick={(e: React.MouseEvent<HTMLAnchorElement>) => handleNavClick(e, item)}
+            sx={{
+              position: 'relative',
+              display: 'inline-flex',
+              alignItems: 'center',
+              minHeight: 44,
+              px: 1.75,
+              py: 1.25,
+              borderRadius: '9px',
+              textDecoration: 'none',
+              cursor: 'pointer',
+              fontWeight: 700,
+              fontSize: '0.76rem',
+              letterSpacing: '0.11em',
+              textTransform: 'uppercase',
+              color: isActive ? LANDING_V2.text : LANDING_V2.muted,
+              transition: `color 0.25s ${LANDING_V2.ease}`,
+              whiteSpace: 'nowrap',
+              '&:hover': { color: LANDING_V2.text },
+              '&::after': {
+                content: '""',
+                position: 'absolute',
+                left: 14,
+                right: 14,
+                bottom: 7,
+                height: '1.5px',
+                borderRadius: '2px',
+                bgcolor: isActive ? 'var(--ba-gold)' : 'transparent',
+              },
+            }}
+          >
+            {displayLabel}
+          </Box>
+        );
+      })}
+    </Stack>
   );
 }

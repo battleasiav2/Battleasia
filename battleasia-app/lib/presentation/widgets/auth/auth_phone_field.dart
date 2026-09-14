@@ -19,7 +19,7 @@ class AuthPhoneField extends StatelessWidget {
   Widget build(BuildContext context) {
     final goldBorder = AppColors.gold.withValues(alpha: 0.28);
     final border = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(4),
+      borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide(color: goldBorder),
     );
 
@@ -75,7 +75,7 @@ class AuthPhoneField extends StatelessWidget {
               ),
               enabledBorder: border,
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(4),
+                borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(
                   color: AppColors.gold.withValues(alpha: 0.55),
                 ),

@@ -21,22 +21,22 @@ class GlassStatTile extends StatelessWidget {
     this.padding = const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
   });
 
-  static const double radius = 8;
+  static const double radius = AppColors.radiusSm;
 
   @override
   Widget build(BuildContext context) {
     return ClipRect(
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Stack(
           children: [
             Container(
               width: double.infinity,
               padding: padding,
               decoration: BoxDecoration(
-                color: const Color(0xFF161618),
+                color: AppColors.panelFill(),
                 borderRadius: BorderRadius.circular(radius),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                border: Border.all(color: AppColors.hair()),
               ),
               foregroundDecoration: BoxDecoration(
                 border: Border(
@@ -89,7 +89,7 @@ class GlassStatTile extends StatelessWidget {
           height: 36,
           decoration: BoxDecoration(
             color: AppColors.gold.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(2),
+            borderRadius: BorderRadius.circular(AppColors.radiusSm),
             border: Border.all(color: AppColors.gold.withValues(alpha: 0.22)),
           ),
           child: Icon(icon, color: AppColors.gold, size: 18),

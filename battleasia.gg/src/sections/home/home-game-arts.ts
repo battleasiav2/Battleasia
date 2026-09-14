@@ -1,10 +1,10 @@
-/** Shared game art paths — tiny module so home can import without pulling section JS */
+/** Shared game art paths — BattleAsia 2.0 landing zip assets */
 export const PLAY_YOUR_GAME_IMAGE_PATHS = {
-  pubgMobile: '/landing/PubgMobile.webp',
-  freeFire: '/landing/FreeFire.webp',
-  codMobile: '/landing/CODMobile.webp',
-  valorant: '/landing/Valorant.webp',
-  mobileLegends: '/landing/MobileLegends.webp',
+  pubgMobile: '/landing-v2/games/pubg.webp',
+  freeFire: '/landing-v2/games/freefire.webp',
+  codMobile: '/landing-v2/games/cod.webp',
+  valorant: '/landing-v2/games/valorant.webp',
+  mobileLegends: '/landing-v2/games/mlbb.webp',
 } as const;
 
 export const HOME_GAME_ARTS = [
