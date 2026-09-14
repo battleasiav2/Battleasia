@@ -22,6 +22,7 @@ type AuthFormShellProps = {
   taglineKey?: string;
 };
 
+/** Zip `.auth-card` / `.auth-brand` shell — API wiring stays in parent views. */
 export function AuthFormShell({
   title,
   description,
@@ -44,6 +45,12 @@ export function AuthFormShell({
         maxWidth: wide ? { xs: 1, sm: 440, md: 460 } : { xs: 1, sm: 410, md: 430 },
         display: 'flex',
         flexDirection: 'column',
+        '@keyframes authViewEnter': {
+          '0%': { opacity: 0, transform: 'translateY(16px)' },
+          '100%': { opacity: 1, transform: 'none' },
+        },
+        animation: 'authViewEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards',
+        '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
       }}
     >
       <Box
@@ -69,47 +76,61 @@ export function AuthFormShell({
 
         <Box
           sx={{
-            px: { xs: 2.5, sm: 3.25 },
-            py: compact ? { xs: 2.5, sm: 2.75 } : { xs: 2.75, sm: 3.25 },
+            // Zip `.auth-card-inner`
+            px: { xs: '22px', sm: '26px', md: '28px' },
+            pt: compact ? { xs: '20px', sm: '22px' } : { xs: '22px', sm: '26px' },
+            pb: { xs: '22px', sm: '26px', md: '28px' },
             position: 'relative',
             zIndex: 1,
           }}
         >
-          <Stack alignItems="center" textAlign="center" spacing={0.55} sx={{ mb: steps ? 1.75 : 2 }}>
+          <Stack
+            alignItems="center"
+            textAlign="center"
+            spacing={1}
+            sx={{ mb: steps ? 2.25 : 2.25 }}
+          >
             <Logo
               disabled
               sx={{
                 width: compact ? { xs: 96, sm: 104 } : { xs: 108, sm: 118 },
                 height: 'auto',
                 pointerEvents: 'none',
-                mb: 0.25,
-                filter: 'none',
+                mixBlendMode: 'lighten',
+                filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.55))',
                 '& img': { objectFit: 'contain', width: '100%', height: 'auto' },
               }}
             />
-            <Box sx={{ height: 2, width: 36, bgcolor: accentColor, borderRadius: 0 }} />
+            <Box
+              sx={{
+                height: 2,
+                width: 36,
+                bgcolor: accentColor,
+                borderRadius: '2px',
+              }}
+            />
             <Typography
               sx={{
-                fontSize: { xs: 10, sm: 11 },
+                fontSize: '0.68rem',
                 fontWeight: 700,
-                letterSpacing: 1.5,
+                letterSpacing: '0.16em',
                 textTransform: 'uppercase',
-                color: alpha('#ffffff', 0.55),
-                pt: 0.15,
+                color: alpha('#ffffff', 0.42),
               }}
             >
               {t(taglineKey)}
             </Typography>
 
             <Typography
-              className="font-tr"
+              className="landing-display"
               sx={{
-                fontWeight: 800,
+                fontFamily: '"Clash Display", "Satoshi", "Barlow", sans-serif',
+                fontWeight: 700,
                 color: '#ffffff',
-                fontSize: compact ? { xs: 18, sm: 20 } : { xs: 20, sm: 22 },
+                fontSize: 'clamp(1.05rem, 2.4vw, 1.28rem)',
                 lineHeight: 1.25,
-                letterSpacing: -0.2,
-                pt: 0.2,
+                letterSpacing: '-0.02em',
+                textWrap: 'balance',
               }}
             >
               {title}
@@ -119,10 +140,9 @@ export function AuthFormShell({
               <Typography
                 sx={{
                   color: AUTH_TEXT_MUTED,
-                  fontSize: { xs: 13, sm: 13.5 },
+                  fontSize: '0.86rem',
                   lineHeight: 1.45,
-                  maxWidth: 320,
-                  pt: 0.2,
+                  maxWidth: '32ch',
                 }}
               >
                 {description}

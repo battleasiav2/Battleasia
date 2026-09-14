@@ -38,12 +38,12 @@ class AuthTextField extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          label,
+          label.toUpperCase(),
           style: AppTheme.bodySmall.copyWith(
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0,
-            fontSize: 13,
+            color: AppColors.textMuted,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.8,
+            fontSize: 11.5,
           ),
         ),
         const SizedBox(height: 6),
@@ -57,17 +57,18 @@ class AuthTextField extends StatelessWidget {
             onEditingComplete: onEditingComplete,
             style: AppTheme.bodyMedium.copyWith(
               color: AppColors.textPrimary,
-              fontSize: 16,
+              fontSize: 15,
+              fontWeight: FontWeight.w500,
             ),
             cursorColor: AppColors.gold,
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: AppTheme.bodyMedium.copyWith(
-                color: const Color(0xFF9CA3AF),
-                fontSize: 16,
+                color: Colors.white.withValues(alpha: 0.42),
+                fontSize: 15,
               ),
               filled: true,
-              fillColor: const Color(0xFF0E0E0E),
+              fillColor: const Color(0x9E0A0A0C),
               isDense: true,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 14,
@@ -75,26 +76,24 @@ class AuthTextField extends StatelessWidget {
               ),
               prefixIcon: prefix ??
                   (prefixIcon != null
-                      ? Icon(prefixIcon, color: const Color(0xFF9CA3AF), size: 18)
+                      ? Icon(prefixIcon, color: Colors.white.withValues(alpha: 0.42), size: 18)
                       : null),
               suffixIcon: suffix,
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
-                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.09)),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
-                borderSide: BorderSide(
-                  color: AppColors.gold.withValues(alpha: 0.5),
-                ),
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppColors.gold),
               ),
-              errorBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
-                borderSide: BorderSide(color: AppColors.error),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppColors.error),
               ),
-              focusedErrorBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.zero,
-                borderSide: BorderSide(color: AppColors.error, width: 1.2),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: AppColors.error, width: 1.2),
               ),
             ),
           ),

@@ -27,8 +27,6 @@ const AuthHeroPanel = lazy(() =>
 
 // ----------------------------------------------------------------------
 
-const AUTH_BG = '/auth-background.jpeg';
-
 type LayoutBaseProps = Pick<LayoutSectionProps, 'sx' | 'children' | 'cssVars'>;
 
 export type AuthSplitLayoutProps = LayoutBaseProps & {
@@ -41,6 +39,7 @@ export type AuthSplitLayoutProps = LayoutBaseProps & {
   };
 };
 
+/** Zip `.auth-split` — ink + soft gold wash only (no photo BG). */
 export function AuthSplitLayout({
   sx,
   cssVars,
@@ -52,18 +51,6 @@ export function AuthSplitLayout({
   const router = useRouter();
 
   const { isLoggedIn } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
-    link.href = AUTH_BG;
-    link.type = 'image/jpeg';
-    document.head.appendChild(link);
-    return () => {
-      link.remove();
-    };
-  }, []);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -80,84 +67,83 @@ export function AuthSplitLayout({
       {...slotProps?.main}
       sx={[
         () => ({
-          [theme.breakpoints.up(layoutQuery)]: { flexDirection: 'row' },
+          [theme.breakpoints.up(layoutQuery)]: { flexDirection: 'row', alignItems: 'stretch' },
         }),
         ...(Array.isArray(slotProps?.main?.sx)
           ? (slotProps?.main?.sx ?? [])
           : [slotProps?.main?.sx]),
         {
           bgcolor: '#060607',
-          backgroundImage: `url(${AUTH_BG})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center top',
-          backgroundRepeat: 'no-repeat',
           position: 'relative',
           overflowX: 'clip',
           overflowY: 'visible',
           minHeight: {
-            xs: 'calc(100dvh - var(--layout-header-mobile-height, 72px))',
-            md: 'calc(100dvh - var(--layout-header-desktop-height, 72px))',
+            xs: 'calc(100svh - var(--layout-header-mobile-height, 72px))',
+            md: 'calc(100svh - var(--layout-header-desktop-height, 72px))',
           },
-          '&::before': {
-            content: "''",
-            position: 'absolute',
-            inset: 0,
-            background: `
-              linear-gradient(90deg, ${alpha('#060607', 0.28)} 0%, ${alpha('#0b0b0d', 0.16)} 48%, ${alpha('#060607', 0.28)} 100%),
-              radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha(0.08)} 0%, transparent 55%)
-            `,
-            zIndex: 0,
-          },
-          '&::after': {
-            content: "''",
-            position: 'absolute',
-            inset: 0,
-            background: `linear-gradient(180deg, ${alpha('#060607', 0.18)} 0%, transparent 42%, ${alpha('#060607', 0.42)} 100%)`,
-            zIndex: 0,
-          },
-        },
-      ]}
-    >
-      <AuthSplitSection
-        layoutQuery={layoutQuery}
-        {...slotProps?.section}
-        sx={{
-          position: 'relative',
-          zIndex: 3,
-          minHeight: { xs: 'auto', md: 'calc(100dvh - var(--layout-header-desktop-height, 72px))' },
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: { xs: 'flex-start', md: 'center' },
-          overflowX: 'clip',
-          overflowY: 'visible',
-          py: { xs: 2, md: 4 },
-        }}
-      >
-        {children}
-      </AuthSplitSection>
-      <AuthSplitContent
-        layoutQuery={layoutQuery}
-        {...slotProps?.content}
-        sx={{
-          position: 'relative',
-          zIndex: 3,
+          // Zip `.auth-split::before`
           '&::before': {
             content: "''",
             position: 'absolute',
             inset: 0,
             zIndex: 0,
             pointerEvents: 'none',
-            background: {
-              xs: `linear-gradient(180deg, ${alpha('#060607', 0.22)} 0%, ${alpha('#060607', 0.38)} 100%)`,
-              md: `linear-gradient(90deg, ${alpha('#060607', 0.12)} 0%, ${alpha('#060607', 0.28)} 55%, ${alpha('#060607', 0.4)} 100%)`,
-            },
+            background: `
+              radial-gradient(70% 45% at 50% 0%, ${goldAlpha(0.06)} 0%, transparent 55%),
+              linear-gradient(180deg, ${alpha('#060607', 0.18)} 0%, transparent 42%, ${alpha('#060607', 0.42)} 100%)
+            `,
           },
+        },
+      ]}
+    >
+      {/* Zip: hero LEFT on desktop, hidden on mobile */}
+      <AuthSplitContent
+        layoutQuery={layoutQuery}
+        {...slotProps?.content}
+        sx={{
+          position: 'relative',
+          zIndex: 3,
+          display: { xs: 'none', [layoutQuery]: 'flex' },
+          order: { [layoutQuery]: 0 },
+          flex: { [layoutQuery]: '1 1 52%' },
+          maxWidth: { [layoutQuery]: '52%' },
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: { md: '28px', lg: 5 },
+          py: { md: 7 },
+          '&::before': { display: 'none' },
         }}
       >
         <Suspense fallback={<BoxMinHeight />}>
           <AuthHeroPanel />
         </Suspense>
       </AuthSplitContent>
+
+      {/* Zip: form RIGHT on desktop, full-width first on mobile */}
+      <AuthSplitSection
+        layoutQuery={layoutQuery}
+        {...slotProps?.section}
+        sx={{
+          position: 'relative',
+          zIndex: 3,
+          order: { xs: 0, [layoutQuery]: 1 },
+          flex: { xs: '1 1 auto', [layoutQuery]: '1 1 48%' },
+          maxWidth: { [layoutQuery]: '48%' },
+          minHeight: {
+            xs: 'calc(100svh - var(--layout-header-mobile-height, 72px))',
+            md: 'calc(100svh - var(--layout-header-desktop-height, 72px))',
+          },
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          overflowX: 'clip',
+          overflowY: 'visible',
+          py: { xs: 3, md: 6 },
+          px: { xs: 2.5, sm: 4, md: '28px' },
+        }}
+      >
+        {children}
+      </AuthSplitSection>
     </MainSection>
   );
 
@@ -166,16 +152,32 @@ export function AuthSplitLayout({
       headerSection={
         <HomeHeader
           layoutQuery="lg"
-          slotProps={slotProps?.header ? { header: slotProps.header } : undefined}
+          slotProps={{
+            // Zip auth `.site-header.scrolled` — always ink glass (not transparent over white body)
+            header: {
+              ...slotProps?.header,
+              sx: {
+                bgcolor: 'rgba(6,6,7,0.94)',
+                backdropFilter: 'blur(18px)',
+                WebkitBackdropFilter: 'blur(18px)',
+                ...(slotProps?.header?.sx &&
+                typeof slotProps.header.sx === 'object' &&
+                !Array.isArray(slotProps.header.sx)
+                  ? slotProps.header.sx
+                  : null),
+              },
+            },
+          }}
         />
       }
       footerSection={null}
       cssVars={{
-        '--layout-auth-content-width': '620px',
+        '--layout-auth-content-width': '460px',
         '--layout-header-desktop-height': '72px',
         '--layout-header-mobile-height': '72px',
-        '--layout-main-margin-top': '0px',
-        '--layout-main-mobile-margin-top': '0px',
+        // Fixed HomeHeader — zip `.auth-split { margin-top: 72px }`
+        '--layout-main-margin-top': '72px',
+        '--layout-main-mobile-margin-top': '72px',
         ...cssVars,
       }}
       sx={sx}
@@ -186,5 +188,5 @@ export function AuthSplitLayout({
 }
 
 function BoxMinHeight() {
-  return <Box sx={{ minHeight: { xs: 180, md: 420 }, width: 1 }} aria-hidden />;
+  return <Box sx={{ minHeight: 420, width: 1 }} aria-hidden />;
 }

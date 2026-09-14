@@ -33,55 +33,44 @@ class AuthFormShell extends StatefulWidget {
 }
 
 class _AuthFormShellState extends State<AuthFormShell> {
-  static bool _assetsWarmed = false;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_assetsWarmed) return;
-    _assetsWarmed = true;
-    precacheImage(const AssetImage('assets/images/auth_m.webp'), context);
-  }
-
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-    final size = MediaQuery.sizeOf(context);
-    final dpr = MediaQuery.devicePixelRatioOf(context);
-    final cacheW = (size.width * dpr).round().clamp(480, 1440);
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: AppColors.pageBg,
+        backgroundColor: const Color(0xFF060607),
         resizeToAvoidBottomInset: true,
         body: Stack(
           fit: StackFit.expand,
           children: [
             const ColoredBox(color: Color(0xFF060607)),
-            RepaintBoundary(
-              child: Image.asset(
-                'assets/images/auth_m.webp',
-                fit: BoxFit.cover,
-                alignment: Alignment.center,
-                gaplessPlayback: true,
-                filterQuality: FilterQuality.medium,
-                cacheWidth: cacheW,
-                errorBuilder: (_, __, ___) =>
-                    const ColoredBox(color: Color(0xFF060607)),
+            // Zip soft gold wash — no photo BG
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: RadialGradient(
+                  center: const Alignment(0, -1.05),
+                  radius: 1.05,
+                  colors: [
+                    AppColors.gold.withValues(alpha: 0.06),
+                    Colors.transparent,
+                  ],
+                  stops: const [0.0, 0.55],
+                ),
               ),
             ),
-            const DecoratedBox(
+            DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0x66000000),
-                    Color(0x88000000),
-                    Color(0xB3000000),
+                    const Color(0xFF060607).withValues(alpha: 0.18),
+                    Colors.transparent,
+                    const Color(0xFF060607).withValues(alpha: 0.42),
                   ],
-                  stops: [0.0, 0.45, 1.0],
+                  stops: const [0.0, 0.42, 1.0],
                 ),
               ),
             ),
@@ -93,9 +82,9 @@ class _AuthFormShellState extends State<AuthFormShell> {
                     keyboardDismissBehavior:
                         ScrollViewKeyboardDismissBehavior.onDrag,
                     padding: EdgeInsets.fromLTRB(
-                      16,
-                      16,
-                      16,
+                      20,
+                      24,
+                      20,
                       20 + bottomInset,
                     ),
                     child: ConstrainedBox(
@@ -105,7 +94,7 @@ class _AuthFormShellState extends State<AuthFormShell> {
                       child: Center(
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
-                            maxWidth: widget.wide ? 440 : 420,
+                            maxWidth: widget.wide ? 460 : 430,
                           ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
@@ -216,9 +205,9 @@ class _AuthPanel extends StatelessWidget {
                       Text(
                       'common.brandTagline'.tr(),
                       style: AppTheme.labelUppercase.copyWith(
-                        color: Colors.white.withValues(alpha: 0.55),
+                        color: Colors.white.withValues(alpha: 0.42),
                         fontSize: 11,
-                        letterSpacing: 1.5,
+                        letterSpacing: 1.6,
                         fontWeight: FontWeight.w700,
                       ),
                       textAlign: TextAlign.center,
@@ -227,11 +216,11 @@ class _AuthPanel extends StatelessWidget {
                     Text(
                       title,
                       style: AppTheme.heading2.copyWith(
-                        fontSize: 19,
-                        height: 1.2,
-                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
+                        height: 1.25,
+                        fontWeight: FontWeight.w700,
                         color: Colors.white,
-                        letterSpacing: -0.2,
+                        letterSpacing: -0.3,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -242,7 +231,7 @@ class _AuthPanel extends StatelessWidget {
                         style: AppTheme.bodyMedium.copyWith(
                           color: AppColors.textMuted,
                           height: 1.45,
-                          fontSize: 14,
+                          fontSize: 13.5,
                         ),
                         textAlign: TextAlign.center,
                       ),

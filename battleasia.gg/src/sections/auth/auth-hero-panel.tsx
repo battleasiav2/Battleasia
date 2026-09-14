@@ -82,14 +82,16 @@ export function AuthHeroPanel() {
         </Typography>
 
         <Typography
-          className="font-tr"
+          className="landing-display"
           sx={{
-            fontSize: { xs: 28, sm: 36, md: 42 },
-            fontWeight: 800,
+            fontFamily: '"Clash Display", "Satoshi", "Barlow", sans-serif',
+            fontSize: 'clamp(1.7rem, 4vw, 2.6rem)',
+            fontWeight: 700,
             color: '#ffffff',
-            lineHeight: 1.15,
-            letterSpacing: -0.3,
+            lineHeight: 1.12,
+            letterSpacing: '-0.03em',
             textTransform: 'uppercase',
+            mt: 1.5,
           }}
         >
           {t('auth.heroHeadlineLine1')}
