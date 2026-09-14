@@ -15,6 +15,7 @@ import { HeroGamingHud } from './hero-gaming-hud';
 
 import { AboutBattleAsiaSection } from './about-battleasia-section';
 import { TournamentRulesSection } from './tournament-rules-section';
+import { homeGlassCardSx } from './home-blur-panel';
 import { useTranslate } from 'src/locales/use-locales';
 import { goldAlpha } from 'src/theme/accent-presets';
 
@@ -357,16 +358,18 @@ export function HomeView() {
                       cursor: 'pointer',
                       outline: 'none',
                       textAlign: 'left',
-                      bgcolor: isSelected ? goldAlpha(0.14) : alpha('#ffffff', 0.03),
+                      bgcolor: isSelected ? goldAlpha(0.14) : alpha('#161618', 0.38),
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
                       border: '1px solid',
                       borderColor: isSelected ? GOLD : alpha('#ffffff', 0.12),
-                      borderRadius: 0,
+                      borderRadius: '8px',
                       position: 'relative',
                       transition: 'border-color 0.2s ease, background-color 0.2s ease',
                       boxShadow: 'none',
                       '&:hover': {
                         borderColor: isSelected ? GOLD : goldAlpha(0.45),
-                        bgcolor: isSelected ? goldAlpha(0.16) : alpha('#ffffff', 0.06),
+                        bgcolor: isSelected ? goldAlpha(0.16) : alpha('#ffffff', 0.08),
                       },
                     }}
                   >
@@ -417,11 +420,10 @@ export function HomeView() {
             <Box
               sx={{
                 p: { xs: 2, sm: 2.75 },
-                bgcolor: alpha('#0d1117', 0.85),
-                border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                ...homeGlassCardSx,
                 borderLeft: `3px solid ${GOLD}`,
+                borderRadius: '12px',
                 position: 'relative',
-                backdropFilter: 'blur(10px)',
               }}
             >
               <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1.5 }}>
@@ -498,8 +500,11 @@ export function HomeView() {
                     alignItems="flex-start"
                     sx={{
                       p: 1.1,
-                      bgcolor: alpha('#000000', 0.45),
-                      border: `1px solid ${goldAlpha(0.12)}`,
+                      bgcolor: alpha('#ffffff', 0.06),
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      border: `1px solid ${alpha('#ffffff', 0.1)}`,
+                      borderRadius: '8px',
                     }}
                   >
                     <SvgIcon sx={{ fontSize: 16, color: GOLD, flexShrink: 0, mt: 0.2 }}>

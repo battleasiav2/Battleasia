@@ -22,6 +22,14 @@ export const homeBlurPanelSx: SxProps<Theme> = {
     boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.05)}`,
 };
 
+/** Pulse glass card fill — lower opacity so section/BG reads through */
+export const homeGlassCardSx = {
+    bgcolor: alpha('#161618', 0.38),
+    backdropFilter: 'blur(16px)',
+    WebkitBackdropFilter: 'blur(16px)',
+    border: `1px solid ${alpha('#ffffff', 0.12)}`,
+} as const;
+
 /** Shared flat blur container — dashboard + home sections */
 export function HomeBlurPanel({
     children,

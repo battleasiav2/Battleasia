@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 
 import { Box } from '@mui/material';
-import { alpha, useTheme, keyframes, type Breakpoint } from '@mui/material/styles';
+import { alpha, useTheme, type Breakpoint } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -27,16 +27,6 @@ const AuthHeroPanel = lazy(() =>
 
 // ----------------------------------------------------------------------
 
-const scanlineDown = keyframes`
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(1000%); }
-`;
-
-const gridPulse = keyframes`
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 0.58; }
-`;
-
 const AUTH_BG = '/auth-background.jpeg';
 
 type LayoutBaseProps = Pick<LayoutSectionProps, 'sx' | 'children' | 'cssVars'>;
@@ -60,8 +50,6 @@ export function AuthSplitLayout({
 }: AuthSplitLayoutProps) {
   const theme = useTheme();
   const router = useRouter();
-
-  const accentColor = theme.palette.primary.main || '#cbfb24';
 
   const { isLoggedIn } = useSelector((state) => state.auth);
 
@@ -115,8 +103,8 @@ export function AuthSplitLayout({
             position: 'absolute',
             inset: 0,
             background: `
-              linear-gradient(90deg, ${alpha('#06070a', 0.65)} 0%, ${alpha('#080a0f', 0.45)} 48%, ${alpha('#06070a', 0.65)} 100%),
-              radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha(0.12)} 0%, transparent 55%)
+              linear-gradient(90deg, ${alpha('#06070a', 0.28)} 0%, ${alpha('#080a0f', 0.16)} 48%, ${alpha('#06070a', 0.28)} 100%),
+              radial-gradient(ellipse 70% 45% at 50% 0%, ${goldAlpha(0.08)} 0%, transparent 55%)
             `,
             zIndex: 0,
           },
@@ -124,76 +112,12 @@ export function AuthSplitLayout({
             content: "''",
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(180deg, ${alpha('#06070a', 0.35)} 0%, transparent 40%, ${alpha('#06070a', 0.75)} 100%)`,
+            background: `linear-gradient(180deg, ${alpha('#06070a', 0.18)} 0%, transparent 42%, ${alpha('#06070a', 0.42)} 100%)`,
             zIndex: 0,
           },
         },
       ]}
     >
-      {/* Cyber Grid Overlay */}
-      <Box
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          backgroundImage: `
-            linear-gradient(to right, ${alpha('#ffffff', 0.03)} 1px, transparent 1px),
-            linear-gradient(to bottom, ${alpha('#ffffff', 0.03)} 1px, transparent 1px)
-          `,
-          backgroundSize: '48px 48px',
-          maskImage: 'radial-gradient(ellipse 80% 70% at 50% 50%, #000000 35%, transparent 100%)',
-          WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at 50% 50%, #000000 35%, transparent 100%)',
-          animation: `${gridPulse} 8s ease-in-out infinite`,
-          pointerEvents: 'none',
-          zIndex: 1,
-        }}
-      />
-
-      {/* Sweeping Laser Scanline */}
-      <Box
-        sx={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          top: 0,
-          height: '1px',
-          background: `linear-gradient(90deg, transparent 0%, ${alpha(accentColor, 0.75)} 50%, transparent 100%)`,
-          animation: `${scanlineDown} 9s linear infinite`,
-          pointerEvents: 'none',
-          zIndex: 2,
-          opacity: 0.4,
-        }}
-      />
-
-      {/* Ambient Neon Back-glow Aura */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: '20%',
-          left: '15%',
-          width: { xs: 260, md: 440 },
-          height: { xs: 260, md: 440 },
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha(accentColor, 0.12)} 0%, transparent 70%)`,
-          filter: 'blur(70px)',
-          pointerEvents: 'none',
-          zIndex: 1,
-        }}
-      />
-      <Box
-        sx={{
-          position: 'absolute',
-          bottom: '15%',
-          right: '10%',
-          width: { xs: 280, md: 460 },
-          height: { xs: 280, md: 460 },
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${alpha('#38bdf8', 0.08)} 0%, transparent 70%)`,
-          filter: 'blur(80px)',
-          pointerEvents: 'none',
-          zIndex: 1,
-        }}
-      />
-
       <AuthSplitSection
         layoutQuery={layoutQuery}
         {...slotProps?.section}
@@ -224,8 +148,8 @@ export function AuthSplitLayout({
             zIndex: 0,
             pointerEvents: 'none',
             background: {
-              xs: `linear-gradient(180deg, ${alpha('#06070a', 0.55)} 0%, ${alpha('#06070a', 0.72)} 100%)`,
-              md: `linear-gradient(90deg, ${alpha('#06070a', 0.28)} 0%, ${alpha('#06070a', 0.58)} 55%, ${alpha('#06070a', 0.7)} 100%)`,
+              xs: `linear-gradient(180deg, ${alpha('#06070a', 0.22)} 0%, ${alpha('#06070a', 0.38)} 100%)`,
+              md: `linear-gradient(90deg, ${alpha('#06070a', 0.12)} 0%, ${alpha('#06070a', 0.28)} 55%, ${alpha('#06070a', 0.4)} 100%)`,
             },
           },
         }}

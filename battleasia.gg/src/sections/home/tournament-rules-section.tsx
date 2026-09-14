@@ -16,6 +16,8 @@ import { Iconify } from 'src/components/iconify';
 import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { useTranslate } from 'src/locales/use-locales';
 
+import { homeGlassCardSx } from './home-blur-panel';
+
 // ----------------------------------------------------------------------
 
 type RuleCategory = 'all' | 'fair-play' | 'match-ops' | 'prizes';
@@ -161,7 +163,7 @@ export function TournamentRulesSection() {
               px: 2,
               py: 0.6,
               borderRadius: '8px',
-              bgcolor: '#161618',
+              ...homeGlassCardSx,
               border: `1px solid ${alpha(accentColor, 0.28)}`,
             }}
           >
@@ -239,7 +241,9 @@ export function TournamentRulesSection() {
                   px: { xs: 1.8, sm: 2.4 },
                   py: 0.9,
                   borderRadius: '8px',
-                  bgcolor: isActive ? accentColor : '#161618',
+                  bgcolor: isActive ? accentColor : alpha('#161618', 0.38),
+                  backdropFilter: isActive ? 'none' : 'blur(12px)',
+                  WebkitBackdropFilter: isActive ? 'none' : 'blur(12px)',
                   color: isActive ? accentContrast : alpha('#ffffff', 0.72),
                   fontWeight: 800,
                   fontSize: { xs: 10.5, sm: 11.5 },
@@ -248,10 +252,10 @@ export function TournamentRulesSection() {
                   textTransform: 'uppercase',
                   border: isActive
                     ? `1px solid ${alpha(accentColor, 0.28)}`
-                    : `1px solid ${alpha('#ffffff', 0.08)}`,
+                    : `1px solid ${alpha('#ffffff', 0.12)}`,
                   transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease',
                   '&:hover': {
-                    bgcolor: isActive ? accentColor : alpha('#ffffff', 0.06),
+                    bgcolor: isActive ? accentColor : alpha('#ffffff', 0.08),
                     color: isActive ? accentContrast : '#ffffff',
                     borderColor: isActive ? alpha(accentColor, 0.45) : alpha(accentColor, 0.28),
                   },
@@ -279,13 +283,13 @@ export function TournamentRulesSection() {
                   sx={{
                     position: 'relative',
                     borderRadius: '12px',
-                    bgcolor: '#161618',
+                    ...homeGlassCardSx,
                     border: `1px solid ${
                       isOpen
                         ? alpha(accentColor, 0.28)
                         : isHovered
-                          ? alpha('#ffffff', 0.14)
-                          : alpha('#ffffff', 0.08)
+                          ? alpha('#ffffff', 0.16)
+                          : alpha('#ffffff', 0.12)
                     }`,
                     transition: 'border-color 0.2s ease',
                     overflow: 'hidden',
@@ -417,8 +421,7 @@ export function TournamentRulesSection() {
             mt: { xs: 4, md: 5.5 },
             p: { xs: 2, sm: 2.5 },
             borderRadius: '12px',
-            bgcolor: '#161618',
-            border: `1px solid ${alpha('#ffffff', 0.08)}`,
+            ...homeGlassCardSx,
           }}
         >
           <Stack

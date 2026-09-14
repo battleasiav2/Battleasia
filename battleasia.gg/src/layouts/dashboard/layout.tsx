@@ -172,6 +172,7 @@ export function DashboardLayout({
         }}
         sx={[
           {
+            bgcolor: '#000000',
             [`& .${layoutClasses.sidebarContainer}`]: {
               [theme.breakpoints.up(layoutQuery)]: {
                 pl: isNavMini ? 'var(--layout-nav-mini-width)' : 'var(--layout-nav-vertical-width)',

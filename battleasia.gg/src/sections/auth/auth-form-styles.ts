@@ -103,12 +103,15 @@ export const authCardSx = {
   position: 'relative' as const,
   overflow: 'hidden' as const,
   borderRadius: '12px',
-  bgcolor: '#161618',
-  border: `1px solid ${alpha('#ffffff', 0.08)}`,
+  bgcolor: alpha('#161618', 0.38),
+  backdropFilter: 'blur(18px)',
+  WebkitBackdropFilter: 'blur(18px)',
+  border: `1px solid ${alpha('#ffffff', 0.14)}`,
   boxShadow: 'none',
-  transition: 'border-color 0.2s ease',
+  transition: 'border-color 0.2s ease, background-color 0.2s ease',
   '&:hover': {
-    borderColor: alpha('#ffffff', 0.12),
+    bgcolor: alpha('#161618', 0.48),
+    borderColor: alpha('#ffffff', 0.18),
   },
 };
 

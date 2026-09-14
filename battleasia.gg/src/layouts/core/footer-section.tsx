@@ -23,12 +23,12 @@ const FOOTER_PARTNERS = [
 ] as const;
 
 const SOCIAL_LINKS = [
-  { labelKey: 'footer.facebook', icon: 'solar:facebook-bold', href: 'https://www.facebook.com/share/14XUaoaUgUL/?mibextid=wwXIfr' },
-  { labelKey: 'footer.discord', icon: 'ic:baseline-discord', href: 'https://discord.gg/battleasia' },
-  { labelKey: 'footer.tiktok', icon: 'ic:baseline-tiktok', href: 'https://www.tiktok.com/@battleasia?_r=1&_t=ZN-93nBYQnjiGU' },
-  { labelKey: 'footer.instagram', icon: 'ri:instagram-fill', href: 'https://www.instagram.com/battleasia' },
-  { labelKey: 'footer.youtube', icon: 'ri:youtube-fill', href: 'https://www.youtube.com/@BattleAsia' },
-  { labelKey: 'footer.telegram', icon: 'ic:baseline-telegram', href: 'https://t.me/battleasiaofficial' },
+  { labelKey: 'footer.facebook', icon: 'mingcute:facebook-fill', href: 'https://www.facebook.com/share/14XUaoaUgUL/?mibextid=wwXIfr' },
+  { labelKey: 'footer.discord', icon: 'mingcute:discord-fill', href: 'https://discord.gg/battleasia' },
+  { labelKey: 'footer.tiktok', icon: 'mingcute:tiktok-fill', href: 'https://www.tiktok.com/@battleasia?_r=1&_t=ZN-93nBYQnjiGU' },
+  { labelKey: 'footer.instagram', icon: 'mingcute:instagram-fill', href: 'https://www.instagram.com/battleasia' },
+  { labelKey: 'footer.youtube', icon: 'mingcute:youtube-fill', href: 'https://www.youtube.com/@BattleAsia' },
+  { labelKey: 'footer.telegram', icon: 'mingcute:telegram-fill', href: 'https://t.me/battleasiaofficial' },
 ] as const;
 
 // ----------------------------------------------------------------------
@@ -74,12 +74,44 @@ export function FooterSection() {
         color: '#ffffff',
         pt: { xs: 5, sm: 6, md: 7.5 },
         pb: { xs: 4.5, sm: 5, md: 6 },
-        mt: { xs: 6, md: 9 },
+        mt: 0,
         overflow: 'hidden',
         borderTop: 'none',
-        backgroundImage: 'none',
       }}
     >
+      <Box
+        component="img"
+        src="/assets/images/black_bg.webp"
+        alt=""
+        width={1920}
+        height={1080}
+        loading="lazy"
+        decoding="async"
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          width: 1,
+          height: 1,
+          objectFit: 'cover',
+          objectPosition: 'center center',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+      <Box
+        aria-hidden
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: 'none',
+          background: `
+            linear-gradient(180deg, rgba(7, 8, 11, 0.55) 0%, rgba(7, 8, 11, 0.72) 45%, rgba(7, 8, 11, 0.88) 100%),
+            linear-gradient(90deg, rgba(7, 8, 11, 0.5) 0%, transparent 30%, transparent 70%, rgba(7, 8, 11, 0.5) 100%)
+          `,
+        }}
+      />
+
       <Box
         aria-hidden
         sx={{
@@ -101,7 +133,7 @@ export function FooterSection() {
             position: 'relative',
             zIndex: 1,
             px: 1,
-            bgcolor: '#07080b',
+            bgcolor: 'transparent',
             color: alpha('#ffffff', 0.28),
             display: 'flex',
             lineHeight: 0,

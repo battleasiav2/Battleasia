@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -75,9 +77,9 @@ class _AuthFormShellState extends State<AuthFormShell> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0x99000000),
-                    Color(0xCC000000),
-                    Color(0xF2000000),
+                    Color(0x66000000),
+                    Color(0x88000000),
+                    Color(0xB3000000),
                   ],
                   stops: [0.0, 0.45, 1.0],
                 ),
@@ -154,12 +156,14 @@ class _AuthPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
-      child: Container(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: const Color(0xFF161618),
+            color: const Color(0xFF161618).withValues(alpha: 0.38),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.14)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -260,6 +264,7 @@ class _AuthPanel extends StatelessWidget {
             ],
           ),
         ),
+      ),
     );
   }
 }

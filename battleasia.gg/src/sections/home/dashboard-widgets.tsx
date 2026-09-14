@@ -92,16 +92,19 @@ function CyberCardPanel({
                     maxWidth: '100%',
                     minWidth: 0,
                     boxSizing: 'border-box',
-                    bgcolor: '#161618',
-                    border: `1px solid ${accentBorder ? safeAlpha(accentColor, 0.35) : alpha('#ffffff', 0.08)}`,
+                    bgcolor: alpha('#161618', 0.42),
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                    border: `1px solid ${accentBorder ? safeAlpha(accentColor, 0.35) : alpha('#ffffff', 0.12)}`,
                     borderRadius: '8px',
                     boxShadow: 'none',
                     p: { xs: 1.5, sm: 2.25, md: 2.5 },
                     overflow: 'hidden',
-                    transition: 'border-color 0.2s ease',
+                    transition: 'border-color 0.2s ease, background-color 0.2s ease',
                     display: 'flex',
                     flexDirection: 'column',
                     '&:hover': {
+                        bgcolor: alpha('#161618', 0.52),
                         borderColor: safeAlpha(accentColor, 0.4),
                     },
                 },
@@ -334,7 +337,9 @@ function GlassSimpleTitle({
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 gap: 1.5,
-                bgcolor: '#161618',
+                bgcolor: alpha('#161618', 0.4),
+                backdropFilter: 'blur(14px)',
+                WebkitBackdropFilter: 'blur(14px)',
                 border: `1px solid ${safeAlpha(accentColor, 0.28)}`,
                 boxShadow: 'none',
                 '&::after': {
@@ -536,8 +541,10 @@ function PulseHeroTactical({
                 borderRadius: { xs: '12px', sm: '14px' },
                 boxSizing: 'border-box',
                 p: { xs: 2.25, sm: 3, md: 3.5 },
-                bgcolor: '#161618',
-                border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                bgcolor: alpha('#161618', 0.38),
+                backdropFilter: 'blur(18px)',
+                WebkitBackdropFilter: 'blur(18px)',
+                border: `1px solid ${alpha('#ffffff', 0.14)}`,
                 boxShadow: 'none',
             }}
         >
@@ -675,12 +682,15 @@ function GlassApkCardShell({
                 overflow: 'hidden',
                 borderRadius: '8px',
                 boxSizing: 'border-box',
-                bgcolor: '#161618',
-                border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                bgcolor: alpha('#161618', 0.42),
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                border: `1px solid ${alpha('#ffffff', 0.12)}`,
                 boxShadow: 'none',
                 p: { xs: 1.5, sm: 2.25, md: 2.5 },
-                transition: 'border-color 0.2s ease',
+                transition: 'border-color 0.2s ease, background-color 0.2s ease',
                 '&:hover': {
+                    bgcolor: alpha('#161618', 0.52),
                     borderColor: safeAlpha(accentColor, 0.35),
                 },
             }}
@@ -751,8 +761,10 @@ function PlayerListCardTactical({
                 borderRadius: { xs: '12px', sm: '14px' },
                 boxSizing: 'border-box',
                 p: { xs: 1.5, sm: 2 },
-                bgcolor: '#161618',
-                border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                bgcolor: alpha('#161618', 0.38),
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
+                border: `1px solid ${alpha('#ffffff', 0.12)}`,
                 boxShadow: 'none',
             }}
         >
@@ -1050,10 +1062,10 @@ function DashboardMatchTileTactical({
                 flexDirection: 'column',
                 p: { xs: 1.1, sm: 1.4, md: 1.6 },
                 borderRadius: '12px',
-                bgcolor: alpha('#06090e', 0.82),
-                backdropFilter: 'blur(14px)',
-                WebkitBackdropFilter: 'blur(14px)',
-                border: `1px solid ${goldAlpha(0.28)}`,
+                bgcolor: alpha('#ffffff', 0.06),
+                backdropFilter: 'blur(10px)',
+                WebkitBackdropFilter: 'blur(10px)',
+                border: `1px solid ${alpha('#ffffff', 0.14)}`,
                 boxShadow: 'none',
             }}
         >
@@ -1224,39 +1236,81 @@ function DashboardMatchPanelTactical({
     const count = matches.length;
     const tilesToRender = matches.slice(0, TARGET_MATCH_TILES);
 
+    /** Mobile rail: ~2 cards visible + slight peek of next */
+    const mobileCardFlex = {
+        flex: { xs: '0 0 calc((100% - 10px) / 2.12)', md: '1 1 0' },
+        minWidth: { xs: 'calc((100% - 10px) / 2.12)', md: 0 },
+        maxWidth: { md: 'none' },
+        scrollSnapAlign: 'start' as const,
+    };
+
+    const railSx = {
+        display: 'flex',
+        flexDirection: 'row' as const,
+        alignItems: 'stretch',
+        gap: { xs: 1.1, md: 1.35 },
+        overflowX: { xs: 'auto', md: 'visible' },
+        scrollSnapType: { xs: 'x mandatory', md: 'none' },
+        WebkitOverflowScrolling: 'touch',
+        pb: { xs: 0.75, md: 0 },
+        mx: { xs: -0.5, md: 0 },
+        px: { xs: 0.5, md: 0 },
+        scrollbarWidth: { xs: 'thin', md: 'auto' },
+        '&::-webkit-scrollbar': { height: 3 },
+        '&::-webkit-scrollbar-thumb': {
+            bgcolor: goldAlpha(0.35),
+            borderRadius: 999,
+        },
+        '@media (min-width: 900px)': {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+            overflowX: 'visible',
+        },
+    };
+
     return (
-        <Box
-            sx={{
-                position: 'relative',
-                p: { xs: 1.15, sm: 1.5, md: 1.85 },
-                borderRadius: '12px',
-                bgcolor: alpha('#06090e', 0.72),
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
-                border: `1px solid ${goldAlpha(0.28)}`,
-                boxShadow: 'none',
-            }}
-        >
+        <Box sx={{ position: 'relative', width: 1, minWidth: 0 }}>
             <Stack
                 direction="row"
                 alignItems="center"
                 justifyContent="space-between"
                 spacing={1}
-                sx={{ mb: { xs: 1.1, sm: 1.35 } }}
+                sx={{ mb: { xs: 1.15, sm: 1.35 }, px: { xs: 0.25, md: 0 } }}
             >
-                <Typography
-                    sx={{
-                        fontSize: { xs: 11, sm: 13, md: 14 },
-                        fontWeight: 800,
-                        letterSpacing: '0.06em',
-                        textTransform: 'uppercase',
-                        color: '#ffffff',
-                        lineHeight: 1.2,
-                        minWidth: 0,
-                    }}
-                >
-                    {title}
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0 }}>
+                    <Typography
+                        sx={{
+                            fontSize: { xs: 12, sm: 13, md: 14 },
+                            fontWeight: 800,
+                            letterSpacing: '0.06em',
+                            textTransform: 'uppercase',
+                            color: '#ffffff',
+                            lineHeight: 1.2,
+                            minWidth: 0,
+                        }}
+                    >
+                        {title}
+                    </Typography>
+                    {!loading && count > 0 && (
+                        <Box
+                            sx={{
+                                flexShrink: 0,
+                                px: 0.75,
+                                py: 0.2,
+                                borderRadius: '6px',
+                                bgcolor: alpha('#22c55e', 0.12),
+                                border: `1px solid ${alpha('#22c55e', 0.28)}`,
+                                fontSize: 9,
+                                fontWeight: 800,
+                                letterSpacing: '0.06em',
+                                color: '#22c55e',
+                                lineHeight: 1.3,
+                            }}
+                        >
+                            {count}
+                        </Box>
+                    )}
+                </Stack>
                 <Typography
                     sx={{
                         flexShrink: 0,
@@ -1272,42 +1326,16 @@ function DashboardMatchPanelTactical({
             </Stack>
 
             {loading ? (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'stretch',
-                        gap: { xs: 1, md: 1.35 },
-                        overflowX: { xs: 'auto', md: 'visible' },
-                        scrollSnapType: { xs: 'x mandatory', md: 'none' },
-                        WebkitOverflowScrolling: 'touch',
-                        pb: { xs: 0.5, md: 0 },
-                        mx: { xs: -0.25, md: 0 },
-                        px: { xs: 0.25, md: 0 },
-                        '&::-webkit-scrollbar': { height: 3 },
-                        '&::-webkit-scrollbar-thumb': {
-                            bgcolor: goldAlpha(0.35),
-                            borderRadius: 0,
-                        },
-                        // Desktop: 3 equal columns
-                        '@media (min-width: 900px)': {
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                            overflowX: 'visible',
-                        },
-                    }}
-                >
+                <Box sx={railSx}>
                     {Array.from({ length: TARGET_MATCH_TILES }).map((_, idx) => (
                         <Box
                             key={idx}
                             sx={{
-                                flex: { xs: '0 0 calc((100% - 8px) / 2)', md: '1 1 0' },
-                                minWidth: { xs: 'calc((100% - 8px) / 2)', md: 0 },
-                                scrollSnapAlign: 'start',
+                                ...mobileCardFlex,
                                 p: 1.25,
                                 borderRadius: '12px',
-                                border: `1px solid ${goldAlpha(0.2)}`,
-                                bgcolor: alpha('#06090e', 0.5),
+                                bgcolor: alpha('#ffffff', 0.06),
+                                border: `1px solid ${alpha('#ffffff', 0.12)}`,
                             }}
                         >
                             <Skeleton width="40%" height={12} sx={{ mb: 1 }} />
@@ -1319,38 +1347,12 @@ function DashboardMatchPanelTactical({
                     ))}
                 </Box>
             ) : count ? (
-                <Box
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'stretch',
-                        gap: { xs: 1, md: 1.35 },
-                        overflowX: { xs: 'auto', md: 'visible' },
-                        scrollSnapType: { xs: 'x mandatory', md: 'none' },
-                        WebkitOverflowScrolling: 'touch',
-                        pb: { xs: 0.5, md: 0 },
-                        mx: { xs: -0.25, md: 0 },
-                        px: { xs: 0.25, md: 0 },
-                        '&::-webkit-scrollbar': { height: 3 },
-                        '&::-webkit-scrollbar-thumb': {
-                            bgcolor: goldAlpha(0.35),
-                            borderRadius: 0,
-                        },
-                        '@media (min-width: 900px)': {
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                            overflowX: 'visible',
-                        },
-                    }}
-                >
+                <Box sx={railSx}>
                     {tilesToRender.map((match, index) => (
                         <Box
                             key={match.id || index}
                             sx={{
-                                flex: { xs: '0 0 calc((100% - 8px) / 2)', md: '1 1 0' },
-                                minWidth: { xs: 'calc((100% - 8px) / 2)', md: 0 },
-                                maxWidth: { md: 'none' },
-                                scrollSnapAlign: 'start',
+                                ...mobileCardFlex,
                                 height: 1,
                                 display: 'flex',
                             }}
@@ -1557,7 +1559,7 @@ export function LandingDashboardSection() {
         >
             <Box
                 component="img"
-                src="/assets/images/hero/hero-pubg-wide.webp"
+                src="/assets/images/dashboard-pubg-black.webp"
                 alt=""
                 width={1600}
                 height={900}
@@ -1569,7 +1571,7 @@ export function LandingDashboardSection() {
                     width: 1,
                     height: 1,
                     objectFit: 'cover',
-                    objectPosition: 'center 22%',
+                    objectPosition: 'center 30%',
                     pointerEvents: 'none',
                     zIndex: 0,
                 }}
@@ -1582,8 +1584,8 @@ export function LandingDashboardSection() {
                     zIndex: 0,
                     pointerEvents: 'none',
                     background: `
-                        linear-gradient(180deg, rgba(7, 8, 11, 0.42) 0%, rgba(7, 8, 11, 0.58) 42%, rgba(7, 8, 11, 0.82) 100%),
-                        linear-gradient(90deg, rgba(7, 8, 11, 0.55) 0%, transparent 22%, transparent 78%, rgba(7, 8, 11, 0.55) 100%)
+                        linear-gradient(180deg, rgba(7, 8, 11, 0.42) 0%, rgba(7, 8, 11, 0.55) 45%, rgba(7, 8, 11, 0.72) 100%),
+                        linear-gradient(90deg, rgba(7, 8, 11, 0.45) 0%, transparent 28%, transparent 72%, rgba(7, 8, 11, 0.45) 100%)
                     `,
                 }}
             />
@@ -1684,67 +1686,26 @@ export function LandingDashboardSection() {
                         </Box>
                     </Box>
 
-                    {/* Warzone Match Panels — mobile: side-scroll the 2 sections */}
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            alignItems: 'stretch',
-                            gap: { xs: 1.25, md: 2.5 },
-                            overflowX: { xs: 'auto', md: 'visible' },
-                            overflowY: 'hidden',
-                            scrollSnapType: { xs: 'x mandatory', md: 'none' },
-                            WebkitOverflowScrolling: 'touch',
-                            pb: { xs: 1.5, md: 0 },
-                            px: { xs: 0.5, md: 0 },
-                            '&::-webkit-scrollbar': { height: 4 },
-                            '&::-webkit-scrollbar-thumb': {
-                                bgcolor: goldAlpha(0.35),
-                                borderRadius: 0,
-                            },
-                            // Desktop: stack sections vertically
-                            '@media (min-width: 900px)': {
-                                flexDirection: 'column',
-                                overflowX: 'visible',
-                            },
-                        }}
-                    >
-                        <Box
-                            sx={{
-                                flex: { xs: '0 0 100%', md: '1 1 auto' },
-                                minWidth: { xs: '100%', md: 0 },
-                                maxWidth: { xs: '100%', md: 'none' },
-                                scrollSnapAlign: 'start',
-                            }}
-                        >
-                            <DashboardMatchPanelTactical
-                                title={t('home.dashboard.highPrizeBattles')}
-                                liveLabel={t('home.dashboard.live')}
-                                matches={data?.highPrizeMatches || []}
-                                loading={loading}
-                                variant="prize"
-                                emptyLabel={t('home.dashboard.noHighPrizeMatches')}
-                            />
-                        </Box>
+                    {/* Warzone Match Panels — Idea B: stacked rails (both visible; cards side-scroll) */}
+                    <Stack spacing={{ xs: 2.75, md: 3.5 }} sx={{ width: 1, minWidth: 0 }}>
+                        <DashboardMatchPanelTactical
+                            title={t('home.dashboard.highPrizeBattles')}
+                            liveLabel={t('home.dashboard.live')}
+                            matches={data?.highPrizeMatches || []}
+                            loading={loading}
+                            variant="prize"
+                            emptyLabel={t('home.dashboard.noHighPrizeMatches')}
+                        />
 
-                        <Box
-                            sx={{
-                                flex: { xs: '0 0 100%', md: '1 1 auto' },
-                                minWidth: { xs: '100%', md: 0 },
-                                maxWidth: { xs: '100%', md: 'none' },
-                                scrollSnapAlign: 'start',
-                            }}
-                        >
-                            <DashboardMatchPanelTactical
-                                title={t('home.dashboard.ongoingMatchesTitle')}
-                                liveLabel={t('home.dashboard.live')}
-                                matches={data?.ongoingMatches || []}
-                                loading={loading}
-                                variant="ongoing"
-                                emptyLabel={t('home.dashboard.noOngoingMatches')}
-                            />
-                        </Box>
-                    </Box>
+                        <DashboardMatchPanelTactical
+                            title={t('home.dashboard.ongoingMatchesTitle')}
+                            liveLabel={t('home.dashboard.live')}
+                            matches={data?.ongoingMatches || []}
+                            loading={loading}
+                            variant="ongoing"
+                            emptyLabel={t('home.dashboard.noOngoingMatches')}
+                        />
+                    </Stack>
                 </Stack>
             </Container>
         </Box>

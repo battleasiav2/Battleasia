@@ -9,6 +9,7 @@ import { BattleGoldDivider } from 'src/components/battle-gold-divider';
 import { useTranslate } from 'src/locales/use-locales';
 
 import { PLAY_YOUR_GAME_IMAGE_PATHS } from './home-game-arts';
+import { homeGlassCardSx } from './home-blur-panel';
 
 // ----------------------------------------------------------------------
 
@@ -96,7 +97,7 @@ export function AboutBattleAsiaSection() {
               px: 2,
               py: 0.6,
               borderRadius: '8px',
-              bgcolor: '#161618',
+              ...homeGlassCardSx,
               border: `1px solid ${alpha(accentColor, 0.28)}`,
             }}
           >
@@ -159,8 +160,8 @@ export function AboutBattleAsiaSection() {
                       p: { xs: 2.2, sm: 2.6, md: 3 },
                       pl: { xs: 2.6, sm: 3, md: 3.4 },
                       borderRadius: '12px',
-                      bgcolor: '#161618',
-                      border: `1px solid ${isHovered ? alpha(accentColor, 0.28) : alpha('#ffffff', 0.08)}`,
+                      ...homeGlassCardSx,
+                      border: `1px solid ${isHovered ? alpha(accentColor, 0.28) : alpha('#ffffff', 0.12)}`,
                       transition: 'border-color 0.2s ease',
                       overflow: 'hidden',
                       '&::before': {
@@ -234,8 +235,7 @@ export function AboutBattleAsiaSection() {
                 minHeight: { xs: 380, md: 440 },
                 borderRadius: '12px',
                 p: { xs: 2.5, sm: 3 },
-                bgcolor: '#161618',
-                border: `1px solid ${alpha('#ffffff', 0.08)}`,
+                ...homeGlassCardSx,
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
@@ -283,8 +283,10 @@ export function AboutBattleAsiaSection() {
                         position: 'relative',
                         p: { xs: 2, sm: 2.4 },
                         borderRadius: '10px',
-                        bgcolor: '#06090e',
-                        border: `1px solid ${isHovered ? alpha(stat.tint, 0.28) : alpha('#ffffff', 0.08)}`,
+                        bgcolor: alpha('#ffffff', 0.06),
+                        backdropFilter: 'blur(10px)',
+                        WebkitBackdropFilter: 'blur(10px)',
+                        border: `1px solid ${isHovered ? alpha(stat.tint, 0.28) : alpha('#ffffff', 0.12)}`,
                         borderTop: `2px solid ${isHovered ? stat.tint : alpha(stat.tint, 0.4)}`,
                         transition: 'border-color 0.2s ease',
                         display: 'flex',

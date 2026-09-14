@@ -126,8 +126,10 @@ export function AuthHeroPanel() {
             sx={{
               p: { xs: 1.35, sm: 1.6 },
               borderRadius: '12px',
-              bgcolor: '#161618',
-              border: `1px solid ${alpha('#ffffff', 0.08)}`,
+              bgcolor: alpha('#161618', 0.38),
+              backdropFilter: 'blur(14px)',
+              WebkitBackdropFilter: 'blur(14px)',
+              border: `1px solid ${alpha('#ffffff', 0.12)}`,
               boxShadow: 'none',
             }}
           >

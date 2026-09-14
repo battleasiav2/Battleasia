@@ -51,10 +51,6 @@ export function AuthFormShell({
           ...authCardSx,
           width: 1,
           position: 'relative',
-          borderRadius: '12px',
-          bgcolor: '#161618',
-          border: `1px solid ${alpha('#ffffff', 0.08)}`,
-          boxShadow: 'none',
           overflow: 'hidden',
         }}
       >
