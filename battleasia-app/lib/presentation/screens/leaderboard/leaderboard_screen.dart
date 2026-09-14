@@ -10,7 +10,6 @@ import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/common/refresh_overlay.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
-import 'package:intl/intl.dart';
 
 class LeaderboardScreen extends StatefulWidget {
   const LeaderboardScreen({super.key});
@@ -32,7 +31,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
   bool _dragStartedAtBottom = false;
   double _wheelAccumulator = 0.0;
 
-  static const Color _panelBg = Color(0xD906090E);
 
   @override
   void initState() {
@@ -96,59 +94,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       }
     }
   }
-
-  List<LeaderboardEntryModel> get _topThree => _leaderboard.take(3).toList();
-
-  String _formatScore(int score) => NumberFormat('#,###').format(score);
-
-  Color _podiumRankColor(int rank) {
-    switch (rank) {
-      case 1:
-        return AppColors.gold;
-      case 2:
-        return const Color(0xFFC0C0C0);
-      case 3:
-        return const Color(0xFFCD7F32);
-      default:
-        return AppColors.textMuted;
-    }
-  }
-
-  double _pedestalHeight(int rank) {
-    switch (rank) {
-      case 1:
-        return 88;
-      case 2:
-        return 58;
-      case 3:
-        return 44;
-      default:
-        return 40;
-    }
-  }
-
-  double _podiumAvatarRadius(int rank) {
-    switch (rank) {
-      case 1:
-        return 34;
-      case 2:
-        return 24;
-      case 3:
-        return 22;
-      default:
-        return 20;
-    }
-  }
-
-  BoxDecoration get _panelDecoration => BoxDecoration(
-        color: _panelBg,
-        border: Border(
-          top: BorderSide(color: AppColors.gold, width: 2),
-          left: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
-          right: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
-          bottom: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
-        ),
-      );
 
   Widget _buildPlayerAvatar({
     required String? avatar,
@@ -296,6 +241,36 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: spacing16),
+                        Text(
+                          'HALL OF CHAMPIONS',
+                          style: TextStyle(
+                            color: AppColors.gold,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.6,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Leaderboard',
+                          style: TextStyle(
+                            color: AppColors.textPrimary,
+                            fontSize: isMobile ? 28 : 34,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.4,
+                            height: 1.1,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Rankings are based on verified match results, win rate and tournament performance.',
+                          style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.55),
+                            fontSize: 13,
+                            height: 1.45,
+                          ),
+                        ),
+                        SizedBox(height: spacing16),
                         if (_loading && _leaderboard.isEmpty)
                           Center(
                             child: Padding(
@@ -309,8 +284,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                           PlayTabs(
                             tabs: const [
                               {'label': 'ALL TIME', 'value': 'all'},
-                              {'label': 'THIS WEEK', 'value': 'weekly'},
-                              {'label': 'THIS MONTH', 'value': 'monthly'},
+                              {'label': 'WEEKLY', 'value': 'weekly'},
+                              {'label': 'MONTHLY', 'value': 'monthly'},
                             ],
                             activeTab: _selectedPeriod,
                             onTabChanged: (period) {
@@ -331,13 +306,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                             )
                           else if (_leaderboard.isEmpty)
                             _buildEmptyState()
-                          else ...[
-                            if (_topThree.isNotEmpty) ...[
-                              _buildPodium(),
-                              SizedBox(height: spacing24),
-                            ],
+                          else
                             _buildLeaderboardTable(),
-                          ],
                         ],
                         SizedBox(height: spacing24),
                       ],
@@ -361,321 +331,183 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     );
   }
 
-  Widget _buildPodium() {
-    final byRank = {for (final p in _topThree) p.rank: p};
-    // Stadium order: 2nd · 1st · 3rd
-    final order = [2, 1, 3];
-
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: AppColors.gold, width: 2),
-          left: BorderSide(color: AppColors.gold.withValues(alpha: 0.32)),
-          right: BorderSide(color: AppColors.gold.withValues(alpha: 0.32)),
-          bottom: BorderSide(color: AppColors.gold.withValues(alpha: 0.32)),
-        ),
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.gold.withValues(alpha: 0.1),
-            const Color(0xE004070C),
-          ],
-        ),
-      ),
-      padding: const EdgeInsets.fromLTRB(8, 20, 8, 0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: order.map((rank) {
-          final player = byRank[rank];
-          final color = _podiumRankColor(rank);
-          final isChamp = rank == 1;
-          final flex = isChamp ? 12 : 10;
-
-          return Expanded(
-            flex: flex,
-            child: player == null
-                ? SizedBox(height: _pedestalHeight(rank) + 120)
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (isChamp)
-                        Icon(
-                          Icons.workspace_premium,
-                          color: AppColors.gold,
-                          size: 22,
-                          shadows: [
-                            Shadow(
-                              color: AppColors.gold.withValues(alpha: 0.55),
-                              blurRadius: 10,
-                            ),
-                          ],
-                        )
-                      else
-                        const SizedBox(height: 22),
-                      const SizedBox(height: 6),
-                      Stack(
-                        clipBehavior: Clip.none,
-                        alignment: Alignment.center,
-                        children: [
-                          Container(
-                            decoration: isChamp
-                                ? BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppColors.gold
-                                            .withValues(alpha: 0.35),
-                                        blurRadius: 18,
-                                        spreadRadius: 2,
-                                      ),
-                                    ],
-                                  )
-                                : null,
-                            child: _buildPlayerAvatar(
-                              avatar: player.avatar,
-                              username: player.username,
-                              radius: _podiumAvatarRadius(rank),
-                              borderColor: color,
-                            ),
-                          ),
-                          Positioned(
-                            bottom: -6,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 1,
-                              ),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF06090E),
-                                border: Border.all(
-                                  color: color.withValues(alpha: 0.7),
-                                ),
-                              ),
-                              child: Text(
-                                '#$rank',
-                                style: TextStyle(
-                                  color: color,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        player.username.toUpperCase(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w900,
-                          fontSize: isChamp ? 13 : 11,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        _formatScore(player.totalScore),
-                        style: TextStyle(
-                          color: isChamp ? AppColors.gold : AppColors.textPrimary,
-                          fontWeight: FontWeight.w800,
-                          fontSize: isChamp ? 15 : 12,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      // Pedestal
-                      Container(
-                        height: _pedestalHeight(rank),
-                        width: double.infinity,
-                        alignment: Alignment.topCenter,
-                        padding: const EdgeInsets.only(top: 8),
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              color.withValues(alpha: 0.28),
-                              color.withValues(alpha: 0.06),
-                            ],
-                          ),
-                          border: Border(
-                            top: BorderSide(color: color, width: 2),
-                            left: BorderSide(
-                              color: color.withValues(alpha: 0.35),
-                            ),
-                            right: BorderSide(
-                              color: color.withValues(alpha: 0.35),
-                            ),
-                          ),
-                        ),
-                        child: Text(
-                          '$rank',
-                          style: TextStyle(
-                            color: color.withValues(alpha: 0.55),
-                            fontSize: isChamp ? 26 : 18,
-                            fontWeight: FontWeight.w900,
-                            height: 1,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
   Widget _buildLeaderboardTable() {
-    final rest = _leaderboard.where((p) => p.rank > 3).toList();
-    if (rest.isEmpty) return const SizedBox.shrink();
+    if (_leaderboard.isEmpty) return const SizedBox.shrink();
 
-    final peak = _leaderboard.isNotEmpty
-        ? _leaderboard.first.totalScore.clamp(1, 1 << 30)
-        : 1;
+    Widget rankMark(int rank) {
+      if (rank == 1) {
+        return Icon(Icons.workspace_premium, size: 22, color: AppColors.gold);
+      }
+      if (rank == 2) {
+        return const Icon(Icons.military_tech, size: 22, color: Color(0xFFC0C0C0));
+      }
+      if (rank == 3) {
+        return const Icon(Icons.military_tech, size: 22, color: Color(0xFFCD7F32));
+      }
+      return Text(
+        rank.toString().padLeft(2, '0'),
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w800,
+          color: Colors.white.withValues(alpha: 0.45),
+        ),
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.only(left: 2, bottom: 10),
-          child: Row(
+          padding: const EdgeInsets.fromLTRB(8, 0, 8, 10),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.08),
+                ),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Row(
             children: [
-              Icon(Icons.leaderboard, size: 16, color: AppColors.gold),
-              const SizedBox(width: 6),
-              Text(
-                'FULL RANKINGS',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.55),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.8,
+              SizedBox(
+                width: 44,
+                child: Text(
+                  'RANK',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                    color: Colors.white.withValues(alpha: 0.42),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  'PLAYER',
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                    color: Colors.white.withValues(alpha: 0.42),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 52,
+                child: Text(
+                  'WINS',
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                    color: Colors.white.withValues(alpha: 0.42),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 64,
+                child: Text(
+                  'MATCHES',
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2,
+                    color: Colors.white.withValues(alpha: 0.42),
+                  ),
                 ),
               ),
             ],
           ),
+            ),
+          ),
         ),
-        Container(
-          decoration: _panelDecoration,
-          child: Column(
-            children: List.generate(rest.length, (index) {
-              final player = rest[index];
-              final isLast = index == rest.length - 1;
-              final strength =
-                  ((player.totalScore / peak) * 100).clamp(0, 100).round();
-              final meta = [
-                'Lvl ${player.level}',
-                '${_formatScore(player.gamesPlayed)} Games',
-                'Avg ${player.averageScore.toStringAsFixed(1)}%',
-                player.badge,
-                if (player.lastPlayed != null && player.lastPlayed!.isNotEmpty)
-                  player.lastPlayed!,
-              ].join(' · ');
-
-              return Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color:
-                          Colors.white.withValues(alpha: isLast ? 0 : 0.08),
+        ..._leaderboard.map((player) {
+          final meta = 'Lvl ${player.level} · ${player.badge}';
+          return Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.08),
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                SizedBox(width: 44, child: Center(child: rankMark(player.rank))),
+                Expanded(
+                  child: Row(
+                    children: [
+                      _buildPlayerAvatar(
+                        avatar: player.avatar,
+                        username: player.username,
+                        radius: 20,
+                        borderColor: Colors.white.withValues(alpha: 0.12),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              player.username,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTheme.bodyMedium.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            Text(
+                              meta,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTheme.bodySmall.copyWith(
+                                color: Colors.white.withValues(alpha: 0.48),
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: 52,
+                  child: Text(
+                    '${player.wins}',
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
                     ),
                   ),
                 ),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 36,
-                      child: Text(
-                        '${player.rank}',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white.withValues(alpha: 0.45),
-                        ),
-                      ),
+                SizedBox(
+                  width: 64,
+                  child: Text(
+                    '${player.gamesPlayed}',
+                    textAlign: TextAlign.right,
+                    style: const TextStyle(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
                     ),
-                    const SizedBox(width: 8),
-                    _buildPlayerAvatar(
-                      avatar: player.avatar,
-                      username: player.username,
-                      radius: 20,
-                      borderColor: Colors.white.withValues(alpha: 0.12),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            player.username.toUpperCase(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTheme.bodyMedium.copyWith(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 13,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            meta,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTheme.bodySmall.copyWith(
-                              color: Colors.white.withValues(alpha: 0.5),
-                              fontSize: 11,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          ClipRRect(
-                            child: LinearProgressIndicator(
-                              value: strength / 100,
-                              minHeight: 3,
-                              backgroundColor:
-                                  Colors.white.withValues(alpha: 0.06),
-                              color: AppColors.gold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          _formatScore(player.totalScore),
-                          style: const TextStyle(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 13,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '$strength% PWR',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.35),
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.4,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  ),
                 ),
-              );
-            }),
-          ),
-        ),
+              ],
+            ),
+          );
+        }),
       ],
     );
   }

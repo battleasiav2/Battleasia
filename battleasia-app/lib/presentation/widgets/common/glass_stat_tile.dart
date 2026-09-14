@@ -140,7 +140,7 @@ class GlassStatTile extends StatelessWidget {
           Text(
             suffix!,
             style: AppTheme.bodySmall.copyWith(
-              color: AppColors.gold.withValues(alpha: 0.85),
+              color: AppColors.textMuted,
               fontSize: 11,
               fontWeight: FontWeight.w600,
             ),

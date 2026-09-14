@@ -73,10 +73,10 @@ class AppHeader extends StatelessWidget {
               return IconButton(
                 tooltip: 'nav.login'.tr(),
                 visualDensity: isMobile ? VisualDensity.compact : VisualDensity.standard,
-                padding: EdgeInsets.all(isMobile ? 6 : 8),
+                padding: EdgeInsets.all(isMobile ? 8 : 10),
                 constraints: BoxConstraints(
-                  minWidth: isMobile ? 36 : 48,
-                  minHeight: isMobile ? 36 : 48,
+                  minWidth: isMobile ? 42 : 48,
+                  minHeight: isMobile ? 42 : 48,
                 ),
                 onPressed: () {
                   Navigator.push(
@@ -87,12 +87,12 @@ class AppHeader extends StatelessWidget {
                   );
                 },
                 icon: Icon(
-                  Icons.person_outline_rounded,
-                  color: Colors.white.withValues(alpha: 0.82),
-                  size: 24,
+                  Icons.login_rounded,
+                  color: Colors.white.withValues(alpha: 0.88),
+                  size: 26,
                 ),
                 style: IconButton.styleFrom(
-                  minimumSize: const Size(36, 36),
+                  minimumSize: const Size(42, 42),
                   padding: EdgeInsets.zero,
                 ),
               );

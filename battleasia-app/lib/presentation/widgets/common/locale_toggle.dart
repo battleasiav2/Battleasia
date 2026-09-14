@@ -66,8 +66,8 @@ class LocaleToggle extends StatelessWidget {
           .toList(),
       child: Container(
         padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 7 : 10,
-          vertical: isMobile ? 5 : 6,
+          horizontal: isMobile ? 9 : 12,
+          vertical: isMobile ? 7 : 8,
         ),
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.06),
@@ -77,7 +77,7 @@ class LocaleToggle extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(flag, style: TextStyle(fontSize: isMobile ? 12 : 14, height: 1)),
+            Text(flag, style: TextStyle(fontSize: isMobile ? 16 : 18, height: 1)),
             if (!isMobile) ...[
               const SizedBox(width: 6),
               Text(
@@ -85,7 +85,7 @@ class LocaleToggle extends StatelessWidget {
                 style: AppTheme.bodySmall.copyWith(
                   color: Colors.white.withValues(alpha: 0.88),
                   fontWeight: FontWeight.w600,
-                  fontSize: 13,
+                  fontSize: 14,
                   letterSpacing: 0.2,
                 ),
               ),

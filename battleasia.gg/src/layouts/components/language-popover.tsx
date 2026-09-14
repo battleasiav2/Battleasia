@@ -187,8 +187,8 @@ export function LanguagePopover({ data = [], landing: _landing = false, sx, ...o
         sx={[
           {
             p: 0,
-            width: 44,
-            minWidth: 44,
+            width: 48,
+            minWidth: 48,
             justifyContent: 'center',
             ...headerLanguagePillSx(open),
           },
@@ -201,8 +201,8 @@ export function LanguagePopover({ data = [], landing: _landing = false, sx, ...o
           viewBox="0 0 24 24"
           aria-hidden
           sx={{
-            width: 20,
-            height: 20,
+            width: 26,
+            height: 26,
             flexShrink: 0,
             color: open ? LANDING_V2.text : LANDING_V2.muted,
           }}

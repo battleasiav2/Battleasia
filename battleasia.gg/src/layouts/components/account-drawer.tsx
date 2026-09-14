@@ -709,7 +709,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                     alt="BAC"
                     sx={{ width: 18, height: 18, objectFit: 'contain' }}
                   />
-                  <Typography sx={{ fontSize: 16, fontWeight: 900, color: GOLD, lineHeight: 1 }}>
+                  <Typography sx={{ fontSize: 16, fontWeight: 900, color: '#ffffff', lineHeight: 1 }}>
                     {user.balance.toLocaleString()} BAC
                   </Typography>
                 </Stack>

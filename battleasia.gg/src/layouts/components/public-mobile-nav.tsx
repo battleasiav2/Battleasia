@@ -1,13 +1,14 @@
-import { Box, alpha } from '@mui/material';
+import { Box } from '@mui/material';
 
 import { usePathname, useRouter } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
 
 import { useTranslate } from 'src/locales';
 import { Iconify } from 'src/components/iconify';
+import { LANDING_V2 } from 'src/sections/home/landing-v2-theme';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 import { menuItems, createMenuClickHandler, type MenuItem } from '../menu-items-config';
-import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -61,11 +62,21 @@ export function PublicMobileNav() {
         px: 0.75,
         pt: 1.1,
         pb: 'max(10px, env(safe-area-inset-bottom))',
-        bgcolor: alpha('#141414', 0.96),
-        borderTop: `1px solid ${goldAlpha(0.28)}`,
-        boxShadow: `0 -8px 24px ${alpha('#000000', 0.45)}`,
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
+        bgcolor: 'rgba(6,6,7,0.94)',
+        backdropFilter: 'blur(18px)',
+        WebkitBackdropFilter: 'blur(18px)',
+        border: 'none',
+        boxShadow: 'none',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 0,
+          height: '1px',
+          pointerEvents: 'none',
+          background: `linear-gradient(90deg, transparent, ${goldAlpha(0.24)} 18%, ${goldAlpha(0.24)} 82%, transparent)`,
+        },
       }}
     >
       {menuItems.map((item) => {
@@ -88,9 +99,9 @@ export function PublicMobileNav() {
               py: 0.65,
               px: 0.25,
               textDecoration: 'none',
-              transition: 'color 0.2s ease',
-              color: isActive ? GOLD : '#9CA3AF',
-              '&:hover': { color: GOLD },
+              transition: `color 0.25s ${LANDING_V2.ease}`,
+              color: isActive ? LANDING_V2.text : LANDING_V2.muted,
+              '&:hover': { color: LANDING_V2.text },
               WebkitTapHighlightColor: 'transparent',
             }}
           >
@@ -98,9 +109,10 @@ export function PublicMobileNav() {
             <Box
               component="span"
               sx={{
+                fontFamily: LANDING_V2.display,
                 fontSize: 9,
-                fontWeight: isActive ? 800 : 600,
-                letterSpacing: 0.2,
+                fontWeight: 700,
+                letterSpacing: '0.11em',
                 textTransform: 'uppercase',
                 lineHeight: 1.1,
                 textAlign: 'center',
@@ -116,12 +128,12 @@ export function PublicMobileNav() {
             <Box
               sx={{
                 mt: 0.15,
-                height: 2,
+                height: '1.5px',
                 width: isActive ? 24 : 0,
                 bgcolor: GOLD,
-                borderRadius: 1,
-                transition: 'width 0.2s ease',
-                boxShadow: isActive ? `0 0 6px ${goldAlpha(0.55)}` : 'none',
+                borderRadius: '2px',
+                transition: `width 0.25s ${LANDING_V2.ease}`,
+                boxShadow: 'none',
               }}
             />
           </Box>

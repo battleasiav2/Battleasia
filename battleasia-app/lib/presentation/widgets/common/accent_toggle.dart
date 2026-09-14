@@ -53,8 +53,8 @@ class AccentToggle extends StatelessWidget {
           )
           .toList(),
       child: Container(
-        width: 34,
-        height: 34,
+        width: 42,
+        height: 42,
         decoration: BoxDecoration(
           color: Colors.white.withValues(alpha: 0.06),
           shape: BoxShape.circle,
@@ -62,8 +62,8 @@ class AccentToggle extends StatelessWidget {
         ),
         child: Center(
           child: Container(
-            width: 14,
-            height: 14,
+            width: 18,
+            height: 18,
             decoration: BoxDecoration(
               color: AppColors.gold,
               shape: BoxShape.circle,

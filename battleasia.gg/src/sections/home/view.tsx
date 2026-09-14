@@ -32,7 +32,7 @@ const HOME_IMAGE_PATHS = {
 
 const imagePaths = [
   '/landing-v2/hero-poster.webp',
-  '/landing-v2/logo.png',
+  '/logo/logo.webp',
   '/landing-v2/games/pubg.webp',
 ];
 
@@ -66,12 +66,13 @@ export function HomeView() {
           width: '100%',
           maxWidth: '100%',
           boxSizing: 'border-box',
-          minHeight: { xs: '100svh', md: '100svh' },
+          minHeight: '100svh',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
+          // Zip `.hero` padding
           pt: { xs: '92px', md: '88px' },
-          pb: { xs: 5, md: 'clamp(48px, 8vh, 88px)' },
+          pb: { xs: '40px', md: 'clamp(48px, 8vh, 88px)' },
         }}
       >
         <HeroVideoBanner />
@@ -83,7 +84,8 @@ export function HomeView() {
             width: '100%',
             maxWidth: LANDING_V2.wrap,
             mx: 'auto',
-            px: { xs: 2.5, sm: 4, md: 5 },
+            // Zip `--gutter`
+            px: 'clamp(20px, 5vw, 64px)',
             display: 'flex',
             justifyContent: 'flex-start',
             alignItems: 'center',

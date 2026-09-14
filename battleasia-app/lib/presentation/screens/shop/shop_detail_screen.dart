@@ -1183,7 +1183,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       '\$${item.price.toStringAsFixed(0)}',
                       style: AppTheme.heading3.copyWith(
                         fontSize: 24,
-                        color: AppTheme.primaryColor,
+                        color: Colors.white,
                         fontWeight: FontWeight.w700,
                       ),
                     ),

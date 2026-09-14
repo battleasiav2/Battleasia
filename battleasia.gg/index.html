@@ -53,15 +53,6 @@
       href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=satoshi@400,500,700,900&display=swap"
     />
 
-    <!-- Lost Light loader background preload -->
-    <link
-      id="boot-loader-preload"
-      rel="preload"
-      as="image"
-      href="/loader.webp"
-      type="image/webp"
-      fetchpriority="high"
-    />
     <!-- Brand logo preload -->
     <link
       id="boot-logo-preload"
@@ -76,136 +67,160 @@
       html,
       body {
         margin: 0;
-        background: #000;
+        background: #060607;
       }
       #boot-shell {
         position: fixed;
         inset: 0;
         z-index: 2147483000;
-        background: #000;
-        overflow: hidden;
+        background: #060607;
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
+        font-family: "Satoshi", "Helvetica Neue", sans-serif;
       }
       #boot-shell[hidden] {
         display: none !important;
       }
-      #boot-loader-bg {
+      .boot-glow {
         position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center 48%;
-        pointer-events: none;
-        user-select: none;
-      }
-      .boot-vignette {
-        position: absolute;
-        inset: 0;
-        background: radial-gradient(ellipse 70% 60% at 50% 50%, transparent 15%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.92) 85%, #000000 100%);
+        width: min(520px, 90vw);
+        height: min(520px, 90vw);
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(var(--ba-gold-rgb, 203,251,36), 0.22) 0%, rgba(var(--ba-gold-rgb, 203,251,36), 0.06) 42%, transparent 70%);
+        animation: boot-glow 2.8s ease-in-out infinite;
         pointer-events: none;
       }
-      .boot-vignette-linear {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(180deg, rgba(0,0,0,0.9) 0%, transparent 18%, transparent 80%, rgba(0,0,0,0.95) 100%);
-        pointer-events: none;
+      @keyframes boot-glow {
+        0%, 100% { opacity: 0.7; transform: scale(0.96); }
+        50% { opacity: 1; transform: scale(1.04); }
       }
       #boot-loader-center {
         position: relative;
-        z-index: 10;
-        width: min(400px, 84vw);
-        margin-top: 4vh;
+        z-index: 1;
+        width: min(340px, 86vw);
         display: flex;
         flex-direction: column;
-        align-items: stretch;
-      }
-      .boot-bar-track {
-        position: relative;
-        width: 100%;
-        height: 2px;
-        background: rgba(255, 255, 255, 0.18);
-      }
-      .boot-bar-track::before,
-      .boot-bar-track::after {
-        content: "";
-        position: absolute;
-        top: -2px;
-        width: 1px;
-        height: 6px;
-        background: rgba(255, 255, 255, 0.35);
-      }
-      .boot-bar-track::before { left: 0; }
-      .boot-bar-track::after { right: 0; }
-      #boot-loader-bar {
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 0%;
-        background: linear-gradient(90deg, rgba(var(--ba-gold-rgb), 0.25) 0%, rgba(var(--ba-gold-light-rgb, var(--ba-gold-rgb)), 0.92) 70%, var(--ba-gold) 100%);
-        box-shadow: 0 0 10px rgba(var(--ba-gold-rgb), 0.9), 0 0 20px rgba(var(--ba-gold-rgb), 0.45);
-      }
-      #boot-loader-spark {
-        position: absolute;
-        right: -1px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 4px;
-        height: 5px;
-        border-radius: 1px;
-        background: #ffffff;
-        box-shadow: 0 0 8px #ffffff, 0 0 16px var(--ba-gold);
-      }
-      #boot-loader-moth {
-        position: absolute;
-        left: 0%;
-        top: -8px;
-        transform: translate(-50%, -100%);
-        pointer-events: none;
-        display: flex;
         align-items: center;
-        justify-content: center;
+        gap: 22px;
       }
-      .boot-moth-aura {
+      .boot-crest {
+        position: relative;
+        width: 128px;
+        height: 128px;
+        display: grid;
+        place-items: center;
+        animation: boot-float 2.6s ease-in-out infinite;
+      }
+      @keyframes boot-float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+      }
+      .boot-crest-ring {
         position: absolute;
-        width: 90px;
-        height: 90px;
+        inset: -10px;
         border-radius: 50%;
-        background: radial-gradient(circle at center, rgba(var(--ba-gold-rgb), 0.75) 0%, rgba(var(--ba-gold-light-rgb, var(--ba-gold-rgb)), 0.35) 35%, rgba(var(--ba-gold-rgb), 0.12) 60%, transparent 75%);
-        filter: drop-shadow(0 0 16px rgba(var(--ba-gold-rgb), 0.9));
-        animation: boot-pulse 2.2s ease-in-out infinite alternate;
-      }
-      @keyframes boot-pulse {
-        0% { transform: scale(0.88); opacity: 0.8; }
-        100% { transform: scale(1.14); opacity: 1; }
+        border: 1px solid rgba(var(--ba-gold-rgb, 203,251,36), 0.28);
+        box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 0 40px rgba(var(--ba-gold-rgb, 203,251,36), 0.18);
       }
       .boot-logo-icon {
-        position: relative;
-        z-index: 2;
-        width: 32px;
-        height: 32px;
+        width: 112px;
+        height: 112px;
         object-fit: contain;
-        filter: drop-shadow(0 0 8px rgba(var(--ba-gold-rgb), 0.85)) drop-shadow(0 0 16px rgba(var(--ba-gold-rgb), 0.45)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
-        animation: boot-hover 2.4s ease-in-out infinite;
+        filter: drop-shadow(0 12px 28px rgba(0,0,0,0.55)) drop-shadow(0 0 18px rgba(var(--ba-gold-rgb, 203,251,36), 0.35));
       }
-      @keyframes boot-hover {
-        0%, 100% { transform: translateY(0) scale(1); }
-        35% { transform: translateY(-4px) scale(1.06); }
-        70% { transform: translateY(-1.5px) scale(0.98); }
+      .boot-wordmark {
+        text-align: center;
+        user-select: none;
+      }
+      .boot-word-battle {
+        margin: 0;
+        font-family: "Clash Display", "Satoshi", "Barlow", sans-serif;
+        font-weight: 700;
+        font-size: clamp(1.85rem, 6vw, 2.15rem);
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        color: #f4f4f1;
+      }
+      .boot-word-row {
+        display: inline-flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-top: 4px;
+      }
+      .boot-word-asia {
+        font-family: "Clash Display", "Satoshi", "Barlow", sans-serif;
+        font-weight: 700;
+        font-size: clamp(1.85rem, 6vw, 2.15rem);
+        line-height: 0.9;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        color: var(--ba-gold, #cbfb24);
+      }
+      .boot-ver {
+        margin-top: 4px;
+        padding: 0.32em 0.58em;
+        border-radius: 8px;
+        font-family: "Clash Display", "Satoshi", sans-serif;
+        font-weight: 700;
+        font-size: 0.68rem;
+        letter-spacing: 0.14em;
+        color: var(--ba-gold-ink, #081401);
+        background: linear-gradient(180deg, var(--ba-gold-light, #e2ff58) 0%, var(--ba-gold, #cbfb24) 55%, var(--ba-gold-dark, #9de006) 100%);
+        border: 1px solid rgba(255,255,255,0.28);
+        box-shadow: 0 3px 0 rgba(0,0,0,0.35), 0 8px 18px -10px rgba(var(--ba-gold-rgb, 203,251,36), 0.55);
+      }
+      .boot-panel {
+        width: 100%;
+        margin-top: 4px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: rgba(22,22,24,0.55);
+        border: 1px solid rgba(255,255,255,0.09);
+        box-shadow: 0 20px 50px -30px #000, inset 0 1px 0 rgba(255,255,255,0.05);
+      }
+      .boot-panel-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .boot-panel-label {
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: rgba(244,244,241,0.45);
       }
       #boot-loader-percent {
-        margin-top: 14px;
-        text-align: right;
-        font-family: 'Barlow', sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto;
-        font-weight: 700;
-        font-size: 13.5px;
-        letter-spacing: 1.2px;
-        color: rgba(255, 255, 255, 0.88);
-        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95);
-        user-select: none;
+        font-family: "Clash Display", "Satoshi", sans-serif;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: #fff;
+        font-variant-numeric: tabular-nums;
+      }
+      .boot-bar-track {
+        width: 100%;
+        height: 3px;
+        border-radius: 2px;
+        background: rgba(255,255,255,0.1);
+        overflow: hidden;
+      }
+      #boot-loader-bar {
+        height: 100%;
+        width: 0%;
+        border-radius: 2px;
+        background: linear-gradient(90deg, rgba(var(--ba-gold-rgb, 203,251,36), 0.35), var(--ba-gold, #cbfb24));
+        box-shadow: 0 0 12px rgba(var(--ba-gold-rgb, 203,251,36), 0.55);
+      }
+      @media (max-width: 480px) {
+        .boot-crest { width: 112px; height: 112px; }
+        .boot-logo-icon { width: 96px; height: 96px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .boot-glow, .boot-crest { animation: none !important; }
       }
     </style>
 
@@ -213,42 +228,48 @@
   </head>
 
   <body>
-    <!-- Instant paint Lost Light tactical loader on first open -->
+    <!-- Instant first-paint loader — home-matched brand lockup -->
     <div id="boot-shell" hidden>
-      <img
-        id="boot-loader-bg"
-        src="/loader.webp"
-        onerror="this.src='/loader.jpeg'"
-        alt="BattleAsia Loading"
-        fetchpriority="high"
-        decoding="sync"
-      />
-      <div class="boot-vignette"></div>
-      <div class="boot-vignette-linear"></div>
-
+      <div class="boot-glow" aria-hidden="true"></div>
       <div id="boot-loader-center">
-        <div class="boot-bar-track">
-          <div id="boot-loader-bar">
-            <div id="boot-loader-spark"></div>
-          </div>
-          <div id="boot-loader-moth">
-            <div class="boot-moth-aura"></div>
-            <img
-              class="boot-logo-icon"
-              src="/logo/logo.webp"
-              alt="BattleAsia"
-              width="32"
-              height="32"
-            />
+        <div class="boot-crest">
+          <div class="boot-crest-ring" aria-hidden="true"></div>
+          <img
+            class="boot-logo-icon"
+            src="/logo/logo.webp"
+            alt="BattleAsia"
+            width="112"
+            height="112"
+            fetchpriority="high"
+            decoding="sync"
+          />
+        </div>
+        <div class="boot-wordmark">
+          <p class="boot-word-battle">Battle</p>
+          <div class="boot-word-row">
+            <span class="boot-word-asia">Asia</span>
+            <span class="boot-ver">2.0</span>
           </div>
         </div>
-        <div id="boot-loader-percent">0%</div>
+        <div class="boot-panel">
+          <div class="boot-panel-head">
+            <span class="boot-panel-label">Entering arena</span>
+            <span id="boot-loader-percent">0%</span>
+          </div>
+          <div class="boot-bar-track">
+            <div id="boot-loader-bar"></div>
+          </div>
+        </div>
       </div>
     </div>
     <script>
       (function () {
         var path = window.location.pathname || '';
-        var isHome = path === '/' || path === '/index.html' || path === '';
+        var isHome =
+          path === '/' ||
+          path === '/index.html' ||
+          path === '' ||
+          path === '/dashboard';
         var hasShown = false;
         try {
           hasShown = !!sessionStorage.getItem('ba_home_loader_shown');
@@ -263,17 +284,14 @@
         if (el) el.hidden = false;
         var start = Date.now();
         var bar = document.getElementById('boot-loader-bar');
-        var moth = document.getElementById('boot-loader-moth');
         var pct = document.getElementById('boot-loader-percent');
         function tick() {
           if (!el || el.hasAttribute('hidden') || !document.body.contains(el)) return;
           var elapsed = Date.now() - start;
-          var p = Math.min(65, (elapsed / 650) * 65);
-          var rounded = Math.round(p);
+          var p = Math.min(60, (elapsed / 500) * 60);
           if (bar) bar.style.width = p + '%';
-          if (moth) moth.style.left = p + '%';
-          if (pct) pct.textContent = rounded + '%';
-          if (p < 65) requestAnimationFrame(tick);
+          if (pct) pct.textContent = Math.round(p) + '%';
+          if (p < 60) requestAnimationFrame(tick);
         }
         requestAnimationFrame(tick);
       })();

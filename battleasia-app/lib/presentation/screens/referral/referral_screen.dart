@@ -612,7 +612,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                     Text(
                       (item.earnings ?? 0).toStringAsFixed(0),
                       style: TextStyle(
-                        color: AppColors.gold,
+                        color: Colors.white,
                         fontWeight: FontWeight.w700,
                         fontSize: 13,
                       ),
@@ -702,7 +702,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                 Text(
                   '+${item.commissionAmount.toStringAsFixed(0)}',
                   style: TextStyle(
-                    color: AppColors.gold,
+                    color: Colors.white,
                     fontWeight: FontWeight.w800,
                     fontSize: 13,
                   ),

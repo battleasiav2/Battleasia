@@ -3,14 +3,17 @@
  * Keep API / i18n copy wired in sections; only visuals use these tokens.
  */
 
+import { keyframes } from '@mui/material/styles';
+
 export const LANDING_V2 = {
   assets: {
     heroPoster: '/landing-v2/hero-poster.webp',
     heroVideo: '/landing-v2/hero.mp4',
+    playerCutout: '/landing-v2/player-cutout.png',
     pulseBg: '/landing-v2/pulse-bg.webp',
     aboutBg: '/landing-v2/about-bg.webp',
     footerBg: '/landing-v2/footer-bg.webp',
-    logo: '/landing-v2/logo.png',
+    logo: '/logo/logo.webp',
     games: {
       pubg: '/landing-v2/games/pubg.webp',
       freefire: '/landing-v2/games/freefire.webp',
@@ -96,4 +99,53 @@ export const landingGhostBtnSx = {
     borderColor: LANDING_V2.hairStrong,
     transform: 'translateY(-2px)',
   },
+} as const;
+
+/** Soft gold aura behind character art — CSS only, no canvas/filters on the PNG. */
+export const landingGlowPulse = keyframes`
+  0%, 100% { opacity: 0.68; }
+  50% { opacity: 1; }
+`;
+
+export const landingCharAuraSx = {
+  position: 'absolute' as const,
+  bottom: '6%',
+  left: '50%',
+  width: '82%',
+  height: '74%',
+  transform: 'translateX(-50%)',
+  pointerEvents: 'none' as const,
+  zIndex: 0,
+  background:
+    'radial-gradient(48% 46% at 50% 58%, rgba(var(--ba-gold-rgb, 203,251,36), 0.42) 0%, rgba(var(--ba-gold-rgb, 203,251,36), 0.12) 42%, transparent 72%)',
+  animation: `${landingGlowPulse} 4.8s ease-in-out infinite`,
+  '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
+};
+
+export const landingCharPlinthSx = {
+  position: 'absolute' as const,
+  bottom: '6%',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  width: '70%',
+  height: 22,
+  zIndex: 1,
+  pointerEvents: 'none' as const,
+  background:
+    'radial-gradient(50% 100% at 50% 0, rgba(var(--ba-gold-rgb, 203,251,36), 0.38), transparent 72%)',
+  borderTop: '1px solid rgba(var(--ba-gold-rgb, 203,251,36), 0.28)',
+};
+
+export const landingCharImgFilter =
+  'drop-shadow(0 36px 48px rgba(0,0,0,0.78)) drop-shadow(0 0 26px rgba(var(--ba-gold-rgb, 203,251,36), 0.35))';
+
+/** Zip `.section-title` — not the huge 7.2rem poster size */
+export const landingSectionTitleSx = {
+  fontFamily: LANDING_V2.display,
+  fontWeight: 600,
+  fontSize: { xs: '2.2rem', sm: 'clamp(2.2rem, 5.4vw, 4.4rem)' },
+  lineHeight: 0.95,
+  letterSpacing: '-0.03em',
+  textTransform: 'uppercase' as const,
+  color: LANDING_V2.text,
 } as const;

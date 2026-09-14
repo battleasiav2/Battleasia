@@ -482,7 +482,7 @@ export function WalletView() {
               <Typography variant="caption" sx={userMutedTextSx} display="block">
                 {t('wallet.availableBalance')}
               </Typography>
-              <Typography variant="h5" component="div" sx={{ color: USER_COLORS.gold, fontWeight: 800 }}>
+              <Typography variant="h5" component="div" sx={{ color: '#ffffff', fontWeight: 800 }}>
                 <CoinValue value={user?.balance} size={24} />
               </Typography>
             </Box>
@@ -490,7 +490,7 @@ export function WalletView() {
               <Typography variant="caption" sx={userMutedTextSx} display="block">
                 {t('wallet.withdrawableAmount')}
               </Typography>
-              <Typography variant="h6" component="div" sx={{ color: hasPendingWithdrawal ? USER_COLORS.textMuted : USER_COLORS.gold, fontWeight: 700 }}>
+              <Typography variant="h6" component="div" sx={{ color: hasPendingWithdrawal ? USER_COLORS.textMuted : '#ffffff', fontWeight: 700 }}>
                 {hasPendingWithdrawal ? '0.00' : withdrawableAmount.toFixed(2)} BAC
               </Typography>
             </Box>
@@ -587,7 +587,7 @@ export function WalletView() {
                              selectedChannel.currency === 'PKR' ? '#006600' : '#1d4ed8',
                   }}
                 />
-                <Typography variant="h5" fontWeight={700} sx={{ color: USER_COLORS.gold }}>
+                <Typography variant="h5" fontWeight={700} sx={{ color: '#ffffff' }}>
                   {withdrawalCurrencyAmount.toFixed(2)} {selectedChannel.currency}
                 </Typography>
               </Stack>

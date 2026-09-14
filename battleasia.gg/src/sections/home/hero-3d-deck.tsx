@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 import { Box, Stack, ButtonBase, Typography } from '@mui/material';
 import { keyframes } from '@mui/material/styles';
 
 import { Iconify } from 'src/components/iconify/iconify';
+import CoinValue from 'src/components/coin-value';
 import { CONFIG } from 'src/global-config';
 import { useTranslate } from 'src/locales/use-locales';
 import { startAppDownload } from 'src/utils/app-download-url';
@@ -36,6 +37,28 @@ type HeroHudStats = {
   prizePool: number | null;
   online: number | null;
 };
+
+/** Zip `.hero-word` emboss shadows */
+const WHITE_WORD_SHADOW = `
+  0 1px 0 #fff,
+  0 2px 0 #d8d8d3,
+  1px 3px 0 #2a2a2e,
+  2px 5px 0 #1c1c20,
+  3px 7px 0 #121216,
+  5px 10px 0 #0a0a0c,
+  10px 20px 26px rgba(0,0,0,.5)
+`;
+
+const LIME_WORD_SHADOW = `
+  0 1px 0 #f6ffb0,
+  0 2px 0 #a8dc14,
+  1px 3px 0 #4a5c0a,
+  2px 5px 0 #323e08,
+  3px 7px 0 #1e2604,
+  5px 10px 0 #101402,
+  0 0 32px rgba(var(--ba-gold-rgb, 203,251,36), .4),
+  10px 20px 26px rgba(0,0,0,.45)
+`;
 
 export function Hero3dDeck({
   logoSrc,
@@ -77,6 +100,7 @@ export function Hero3dDeck({
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  // Zip `.hero-word`
   const wordSx = {
     position: 'relative' as const,
     display: 'block',
@@ -88,6 +112,9 @@ export function Hero3dDeck({
     textTransform: 'uppercase' as const,
     transform: { xs: 'rotateX(8deg)', md: 'rotateX(10deg)' },
     transformOrigin: 'left bottom',
+    '@media (prefers-reduced-motion: reduce)': {
+      transform: 'none',
+    },
   };
 
   return (
@@ -96,17 +123,16 @@ export function Hero3dDeck({
       sx={{
         position: 'relative',
         zIndex: 2,
-        width: { xs: '100%', md: 'auto' },
-        maxWidth: { xs: '100%', md: 720 },
+        // Zip `.hero-inner`
+        width: '100%',
+        maxWidth: 720,
         minWidth: 0,
         boxSizing: 'border-box',
         alignItems: 'flex-start',
         textAlign: 'left',
-        perspective: 1100,
         animation: `${deckEnter} 0.85s ${LANDING_V2.ease} both`,
         '@media (prefers-reduced-motion: reduce)': {
           animation: 'none',
-          '& .hero-word': { transform: 'none' },
         },
       }}
     >
@@ -116,37 +142,25 @@ export function Hero3dDeck({
         className="landing-display"
         sx={{
           m: 0,
+          maxWidth: '100%',
+          // Zip `.hero-stack`
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
+          perspective: '1100px',
           transformStyle: 'preserve-3d',
           userSelect: 'none',
         }}
       >
-        <Box
-          className="hero-word"
-          component="span"
-          sx={{
-            ...wordSx,
-            color: '#f7f7f4',
-            textShadow: `
-              0 1px 0 #fff,
-              0 2px 0 #d8d8d3,
-              1px 3px 0 #2a2a2e,
-              2px 5px 0 #1c1c20,
-              3px 7px 0 #121216,
-              5px 10px 0 #0a0a0c,
-              10px 20px 26px rgba(0,0,0,0.5)
-            `,
-          }}
-        >
+        <Box className="hero-word" component="span" sx={{ ...wordSx, color: '#f7f7f4', textShadow: WHITE_WORD_SHADOW }}>
           BATTLE
         </Box>
+
         <Box
           sx={{
-            display: 'inline-flex',
+            display: 'flex',
             alignItems: 'flex-start',
-            gap: { xs: 1, md: 'clamp(8px, 1.2vw, 14px)' },
+            gap: 'clamp(8px, 1.2vw, 14px)',
           }}
         >
           <Box
@@ -154,36 +168,28 @@ export function Hero3dDeck({
             component="span"
             sx={{
               ...wordSx,
-              color: 'var(--ba-gold)',
-              textShadow: `
-                0 1px 0 #f6ffb0,
-                0 2px 0 #a8dc14,
-                1px 3px 0 #4a5c0a,
-                2px 5px 0 #323e08,
-                3px 7px 0 #1e2604,
-                5px 10px 0 #101402,
-                0 0 32px rgba(var(--ba-gold-rgb, 203,251,36), 0.4),
-                10px 20px 26px rgba(0,0,0,0.45)
-              `,
+              color: 'var(--ba-gold, #cbfb24)',
+              textShadow: LIME_WORD_SHADOW,
             }}
           >
             ASIA
           </Box>
+
+          {/* Zip `.hero-ver` */}
           <Box
             component="span"
             sx={{
-              mt: { xs: '0.28em', md: '0.22em' },
-              px: '0.58em',
-              py: '0.32em',
-              borderRadius: '8px',
-              border: '1px solid rgba(255,255,255,0.28)',
               fontFamily: LANDING_V2.display,
               fontWeight: 700,
               fontSize: { xs: '0.7rem', md: 'clamp(0.7rem, 1.25vw, 1.02rem)' },
               letterSpacing: '0.16em',
-              color: LANDING_V2.goldInk,
+              color: 'var(--ba-gold-ink, #081401)',
+              background: 'linear-gradient(180deg, #f3ff8c 0%, var(--ba-gold, #cbfb24) 48%, #8fb410 100%)',
+              border: '1px solid rgba(255,255,255,0.28)',
+              padding: '0.32em 0.58em',
+              borderRadius: '8px',
+              marginTop: { xs: '0.28em', md: '0.22em' },
               lineHeight: 1,
-              background: `linear-gradient(180deg, #f3ff8c 0%, var(--ba-gold) 48%, #8fb410 100%)`,
               boxShadow: `
                 inset 0 1px 0 rgba(255,255,255,0.4),
                 0 3px 0 #4a5c0a,
@@ -204,7 +210,7 @@ export function Hero3dDeck({
           fontWeight: 500,
           fontSize: { xs: '1.05rem', md: 'clamp(1.05rem, 1.7vw, 1.32rem)' },
           color: 'rgba(244,244,241,0.86)',
-          lineHeight: 1.45,
+          lineHeight: 1.5,
         }}
       >
         {t('home.subtitle')}
@@ -215,7 +221,7 @@ export function Hero3dDeck({
         spacing={1.5}
         useFlexGap
         sx={{
-          mt: 4,
+          mt: '32px',
           width: 1,
           justifyContent: 'flex-start',
           flexWrap: 'wrap',
@@ -259,6 +265,7 @@ export function Hero3dDeck({
         </ButtonBase>
       </Stack>
 
+      {/* Zip `.hero-hud` — hidden below ~1100px */}
       <Box
         component="aside"
         aria-label="Live arena stats"
@@ -266,10 +273,12 @@ export function Hero3dDeck({
           ...landingPanelSx,
           display: { xs: 'none', lg: 'flex' },
           alignItems: 'stretch',
-          mt: 4.5,
+          mt: '36px',
           width: 'min(100%, 520px)',
           overflow: 'hidden',
           borderRadius: '14px',
+          gap: 0,
+          p: 0,
         }}
       >
         <HudCell
@@ -281,9 +290,40 @@ export function Hero3dDeck({
         <HudCell
           label={t('match.prizePool')}
           value={
-            hud.prizePool != null ? `$${fNumber(hud.prizePool)}` : CONFIG.homeStats.prizeMoney
+            hud.prizePool != null ? (
+              <CoinValue
+                value={hud.prizePool}
+                size={15}
+                textSx={{
+                  fontFamily: LANDING_V2.display,
+                  fontWeight: 600,
+                  fontSize: '1.12rem',
+                  color: '#ffffff',
+                }}
+              />
+            ) : (
+              <Box
+                component="span"
+                sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 0.5,
+                  fontFamily: LANDING_V2.display,
+                  fontWeight: 600,
+                  fontSize: '1.12rem',
+                  color: '#ffffff',
+                }}
+              >
+                <Box
+                  component="img"
+                  src={CONFIG.currencyIcon}
+                  alt=""
+                  sx={{ width: 15, height: 15, flexShrink: 0 }}
+                />
+                {String(CONFIG.homeStats.prizeMoney).replace(/^\$/, '')}
+              </Box>
+            )
           }
-          gold
         />
         <Box sx={{ width: '1px', bgcolor: LANDING_V2.hair, my: 1.25, flex: '0 0 1px' }} />
         <HudCell
@@ -309,12 +349,10 @@ function HudCell({
   label,
   value,
   live,
-  gold,
 }: {
   label: string;
-  value: string;
+  value: ReactNode;
   live?: boolean;
-  gold?: boolean;
 }) {
   return (
     <Box
@@ -348,7 +386,7 @@ function HudCell({
           display: 'inline-flex',
           alignItems: 'center',
           gap: 0.9,
-          color: gold ? 'var(--ba-gold)' : LANDING_V2.text,
+          color: '#ffffff',
           minWidth: 0,
         }}
       >

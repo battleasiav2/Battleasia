@@ -1,6 +1,8 @@
 {
   "leaderboard": {
     "title": "排行榜",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "allTime": "全部时间",
     "thisWeek": "本周",
     "thisMonth": "本月",
@@ -28,7 +30,10 @@
     "emptyDescription": "Leaderboard rankings will appear once players start competing.",
     "failedToLoad": "Failed to load leaderboard",
     "badgeTopPlayers": "Top Players",
-    "badgeRanked": "RANKED"
+    "badgeRanked": "RANKED",
+    "viewFull": "View full leaderboard",
+    "wins": "Wins",
+    "matches": "Matches"
   },
   "auth": {
     "signIn": "登录",
@@ -126,6 +131,8 @@
   },
   "home": {
     "title": "游戏就是BattleAsia",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "subtitle": "Worldwide mobile tournament arena win BAC coins and cash out anytime.",
     "downloadApk": "APK下载",
     "downloadApkButton": "BattleAsia Apk",
@@ -141,6 +148,8 @@
     "battleAsiaPulse": "BattleAsia脉搏",
     "playYourGame": {
       "title": "玩你的游戏",
+      "hallEyebrow": "Hall of Champions",
+      "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
       "subtitle": "五个竞技场。一个平台。每个记分牌上的真实现金。",
       "brandLabel": "BATTLE ASIA",
       "enterArena": "进入竞技场",
@@ -185,6 +194,8 @@
       "solo": {
         "playersLabel": "1 名玩家",
         "title": "单人模式",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "独自游戏，测试你对其他玩家的技能",
         "feature1": "地图: Karakin, Nusa, Erangel, Miramar, Sanhok, Vikendi, Rondo",
         "feature2": "模式: 经典比赛, TDM, 枪战游戏",
@@ -194,6 +205,8 @@
       "duo": {
         "playersLabel": "2 名玩家",
         "title": "双人模式",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "与伙伴组队，双倍行动",
         "feature1": "邀请朋友或与随机队友配对",
         "feature2": "为吃鸡晚餐+现金奖励而战",
@@ -203,6 +216,8 @@
       "squad": {
         "playersLabel": "4 名玩家",
         "title": "小队模式",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "组建四人小队，主宰战场",
         "feature1": "与3名随机队友一起玩",
         "feature2": "一起创造难忘的历史",
@@ -212,6 +227,8 @@
       "tdm": {
         "playersLabel": "6–8 名玩家",
         "title": "TDM模式",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "快节奏的团队死斗",
         "feature1": "快节奏的4v4团队死斗",
         "feature2": "与随机队友一起玩",
@@ -286,7 +303,8 @@
       "signInToJoin": "登录后加入比赛",
       "playersLabel": "玩家",
       "matchStatusOpen": "开放",
-      "matchBlurb": "{{game}} 房间：实时报名、击杀奖励与奖池。"
+      "matchBlurb": "{{game}} 房间：实时报名、击杀奖励与奖池。",
+      "viewAllMatches": "View all matches"
     }
   },
   "navigation": {
@@ -402,6 +420,8 @@
   },
   "wallet": {
     "title": "钱包",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "balance": "余额",
     "deposit": "充值",
     "withdraw": "提现",
@@ -465,6 +485,8 @@
   },
   "shop": {
     "title": "商店",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "buyNow": "立即购买",
     "addToCart": "加入购物车",
     "price": "价格",
@@ -495,18 +517,26 @@
     "features": {
       "inGamePurchases": {
         "title": "In-Game Purchases",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Buy items, skins, and upgrades across the Battle Asia ecosystem."
       },
       "rewardsPrizes": {
         "title": "Rewards & Prizes",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Collect tournament winnings and event rewards instantly in BAC."
       },
       "joinEvents": {
         "title": "Join Events",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Pay entry fees and unlock premium tournaments with one currency."
       },
       "secureSettlement": {
         "title": "Secure Settlement",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Shop securely with verified transactions and instant settlement."
       }
     },
@@ -556,6 +586,8 @@
   },
   "profile": {
     "title": "个人资料",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "editProfile": "编辑个人资料",
     "publicProfile": "公开资料",
     "fullName": "全名",
@@ -637,6 +669,8 @@
   },
   "match": {
     "title": "比赛",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "matchDetails": "比赛详情",
     "startTime": "开始时间",
     "endTime": "结束时间",
@@ -714,6 +748,8 @@
   },
   "referral": {
     "title": "推荐",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "yourCode": "您的推荐码",
     "copyCode": "复制代码",
     "codeCopied": "代码已复制！",
@@ -762,6 +798,8 @@
   },
   "myMatches": {
     "title": "我的比赛",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "totalMatches": "总比赛数",
     "wins": "胜利",
     "losses": "失败",
@@ -783,6 +821,8 @@
   },
   "play": {
     "title": "玩",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "battleasia": "战斗亚洲",
     "bannerDescription": "参加 PUBG Mobile、Free Fire、COD 等实时移动电竞锦标赛，赢取真实 BAC 奖励。",
     "tournament": "锦标赛",
@@ -816,6 +856,8 @@
   },
   "customerSupport": {
     "title": "客户支持",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "failedToLoadConversation": "加载对话失败",
     "filesUploadedSuccess": "{{count}}个文件上传成功",
     "failedToUploadFiles": "文件上传失败",
@@ -838,6 +880,8 @@
   },
   "notifications": {
     "title": "通知",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "all": "全部",
     "unread": "未读",
     "archived": "已归档",
@@ -851,6 +895,8 @@
   },
   "support": {
     "title": "客户支持",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "subject": "主题",
     "message": "消息",
     "sendMessage": "发送消息",
@@ -863,6 +909,8 @@
   },
   "feed": {
     "title": "动态",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "allBlogs": "所有博客",
     "publishedAt": "发布于",
     "whatsNew": "What's New",
@@ -902,6 +950,8 @@
   },
   "myStatistics": {
     "title": "我的统计",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "totalPaid": "总支付",
     "totalWon": "总赢得",
     "netProfit": "净利润",
@@ -917,6 +967,8 @@
   },
   "myReferrals": {
     "title": "我的推荐",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "summary": "我的推荐摘要",
     "list": "我的推荐列表",
     "referrals": "推荐",
@@ -933,6 +985,8 @@
   },
   "myOrders": {
     "title": "我的订单",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "orderItem": "商店订单",
     "all": "全部",
     "pending": "待处理",
@@ -984,6 +1038,8 @@
   },
   "statistics": {
     "title": "My Statistics",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "totalMatches": "Total Matches",
     "wins": "Wins",
     "losses": "Losses",
@@ -995,6 +1051,8 @@
   },
   "orders": {
     "title": "My Orders",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "orderHistory": "Order History",
     "orderNumber": "Order Number",
     "orderDate": "Order Date",

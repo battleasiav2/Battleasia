@@ -143,6 +143,8 @@
     "mostPlayed": "Le plus joué",
     "lastPlayed": "Dernière partie",
     "title": "Profile",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "editProfile": "Edit Profile",
     "publicProfile": "Public Profile",
     "fullName": "Full Name",
@@ -222,6 +224,8 @@
   },
   "referral": {
     "title": "Parrainage",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "yourCode": "Votre code de parrainage",
     "copyCode": "Copier le code",
     "codeCopied": "Code copié!",
@@ -288,6 +292,8 @@
   },
   "leaderboard": {
     "title": "Leader Board",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "allTime": "All Time",
     "thisWeek": "This Week",
     "thisMonth": "This Month",
@@ -309,16 +315,21 @@
     "failedToLoad": "Failed to load leaderboard",
     "badgeTopPlayers": "Top Players",
     "badgeRanked": "RANKED",
+    "viewFull": "View full leaderboard",
     "badges": {
       "champion": "Champion",
       "elite": "Elite",
       "master": "Master",
       "expert": "Expert",
       "advanced": "Advanced"
-    }
+    },
+    "wins": "Wins",
+    "matches": "Matches"
   },
   "home": {
     "title": "It's all about Gaming means BattleAsia",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "subtitle": "Win real cash via playing MOBILE tournaments for free. Get it now!",
     "downloadApk": "APK Download",
     "downloadApkButton": "BattleAsia Apk",
@@ -334,6 +345,8 @@
     "battleAsiaPulse": "BattleAsia Pulse",
     "playYourGame": {
       "title": "PLAY YOUR GAME",
+      "hallEyebrow": "Hall of Champions",
+      "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
       "subtitle": "Five arenas. One platform. Real cash on every scoreboard.",
       "brandLabel": "BATTLE ASIA",
       "enterArena": "ENTER ARENA",
@@ -366,6 +379,8 @@
     "gameModes": {
       "solo": {
         "title": "Solo Mode",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Play alone and test your skills against other players",
         "feature1": "Maps: Karakin, Nusa, Erangel, Miramar, Sanhok, Vikendi, Rondo",
         "feature2": "Modes: Classic Matches, TDM, Gun Game",
@@ -374,6 +389,8 @@
       },
       "duo": {
         "title": "Duo Mode",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Team up with a partner for double the action",
         "feature1": "Invite a friend or get paired with a random teammate",
         "feature2": "Fight for the Chicken Dinner + Cash Rewards",
@@ -382,6 +399,8 @@
       },
       "squad": {
         "title": "Squad Mode",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Form a team of four and dominate the battlefield",
         "feature1": "Play with 3 random teammates",
         "feature2": "Create unforgettable history together",
@@ -390,6 +409,8 @@
       },
       "tdm": {
         "title": "TDM Mode",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Fast-paced Team Deathmatch action",
         "feature1": "Fast-paced 4v4 Team Deathmatch",
         "feature2": "Play with random teammates",
@@ -456,7 +477,8 @@
       "signInToJoin": "Sign in to join this match",
       "playersLabel": "players",
       "matchStatusOpen": "Open",
-      "matchBlurb": "{{game}} room with live entry, kill rewards, and a growing prize pool."
+      "matchBlurb": "{{game}} room with live entry, kill rewards, and a growing prize pool.",
+      "viewAllMatches": "View all matches"
     }
   },
   "navigation": {
@@ -524,6 +546,8 @@
   },
   "wallet": {
     "title": "Wallet",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "totalBalance": "Total Balance",
     "balance": "Balance",
     "deposit": "Deposit",
@@ -587,6 +611,8 @@
   },
   "shop": {
     "title": "Shop",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "buyNow": "Buy Now",
     "addToCart": "Add to Cart",
     "price": "Price",
@@ -614,18 +640,26 @@
     "features": {
       "inGamePurchases": {
         "title": "In-Game Purchases",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Buy items, skins, and upgrades across the Battle Asia ecosystem."
       },
       "rewardsPrizes": {
         "title": "Rewards & Prizes",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Collect tournament winnings and event rewards instantly in BAC."
       },
       "joinEvents": {
         "title": "Join Events",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Pay entry fees and unlock premium tournaments with one currency."
       },
       "secureSettlement": {
         "title": "Secure Settlement",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Shop securely with verified transactions and instant settlement."
       }
     },
@@ -646,6 +680,8 @@
   },
   "match": {
     "title": "Match",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "matchDetails": "Match Details",
     "startTime": "Start Time",
     "endTime": "End Time",
@@ -719,6 +755,8 @@
   },
   "play": {
     "title": "Play",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "selectGame": "Select Game",
     "availableMatches": "Available Matches",
     "noGames": "No games available",
@@ -750,6 +788,8 @@
   },
   "notifications": {
     "title": "Notifications",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "all": "All",
     "unread": "Unread",
     "archived": "Archived",
@@ -763,6 +803,8 @@
   },
   "customerSupport": {
     "title": "Customer Support",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "failedToLoadConversation": "Failed to load conversation",
     "filesUploadedSuccess": "{{count}} file(s) uploaded successfully",
     "failedToUploadFiles": "Failed to upload files",
@@ -781,6 +823,8 @@
   },
   "support": {
     "title": "Customer Support",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "subject": "Subject",
     "message": "Message",
     "sendMessage": "Send Message",
@@ -793,6 +837,8 @@
   },
   "myMatches": {
     "title": "My Matches",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "totalMatches": "Total Matches",
     "wins": "Wins",
     "losses": "Losses",
@@ -814,6 +860,8 @@
   },
   "statistics": {
     "title": "My Statistics",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "totalMatches": "Total Matches",
     "wins": "Wins",
     "losses": "Losses",
@@ -825,6 +873,8 @@
   },
   "orders": {
     "title": "My Orders",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "orderHistory": "Order History",
     "orderNumber": "Order Number",
     "orderDate": "Order Date",
@@ -834,6 +884,8 @@
   },
   "feed": {
     "title": "Feed",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "whatsNew": "What's New",
     "trending": "Trending",
     "latest": "Latest",
@@ -870,6 +922,8 @@
   },
   "myStatistics": {
     "title": "MY STATISTICS",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "totalPaid": "Total Paid",
     "totalWon": "Total Won",
     "netProfit": "Net Profit",
@@ -885,6 +939,8 @@
   },
   "myReferrals": {
     "title": "MY REFERRALS",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "summary": "MY REFERRALS SUMMARY",
     "list": "MY REFERRAL LIST",
     "referrals": "Referrals",
@@ -901,6 +957,8 @@
   },
   "myOrders": {
     "title": "My Orders",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "all": "All",
     "pending": "Pending",
     "paid": "Paid",

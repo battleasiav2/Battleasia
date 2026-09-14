@@ -148,14 +148,14 @@ export const headerNavDividerSx: SystemStyleObject<Theme> = {
 
 /**
  * ----------------------------------------------------------------------
- * Header right controls — zip 44×44 glass chips
+ * Header right controls — direct icons (no glass chip cards)
  * ----------------------------------------------------------------------
  */
 
 /** Outline LOGIN control — matches home zip header */
 export const headerSignInButtonSx: SystemStyleObject<Theme> = {
-  height: 44,
-  minHeight: 44,
+  height: 48,
+  minHeight: 48,
   px: { xs: 1.5, sm: 1.75 },
   position: 'relative',
   overflow: 'hidden',
@@ -188,38 +188,42 @@ export const headerSignInButtonSx: SystemStyleObject<Theme> = {
 export const headerSignInIconButtonSx: SystemStyleObject<Theme> = {
   ...headerSignInButtonSx,
   px: { xs: 0.85, sm: 1 },
-  width: 44,
-  minWidth: 44,
+  width: 48,
+  minWidth: 48,
   justifyContent: 'center',
 };
 
-/** Language control — zip chip */
+/** Language control — icon only */
 export const headerLanguagePillSx = (open: boolean): SystemStyleObject<Theme> => ({
   display: 'inline-flex',
   alignItems: 'center',
   gap: { xs: 0.4, sm: 0.65 },
   px: 0,
   py: 0,
-  minHeight: 44,
-  height: 44,
-  width: 44,
-  minWidth: 44,
+  minHeight: 48,
+  height: 48,
+  width: 48,
+  minWidth: 48,
   justifyContent: 'center',
   flexShrink: 0,
   position: 'relative',
-  overflow: 'hidden',
-  bgcolor: open ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)',
-  border: `1px solid ${open ? LANDING_V2.hair2 : LANDING_V2.hair}`,
-  borderRadius: '10px',
+  overflow: 'visible',
+  bgcolor: 'transparent',
+  border: 'none',
+  borderRadius: 0,
   boxShadow: 'none',
-  transition: `background-color 0.25s ${LANDING_V2.ease}, border-color 0.25s ${LANDING_V2.ease}`,
+  transition: `color 0.25s ${LANDING_V2.ease}`,
   '&:hover': {
-    bgcolor: 'rgba(255,255,255,0.05)',
-    borderColor: LANDING_V2.hair2,
+    bgcolor: 'transparent',
     '& .lang-chevron': {
       color: LANDING_V2.text,
     },
   },
+  ...(open
+    ? {
+        color: LANDING_V2.text,
+      }
+    : {}),
 });
 
 export const headerLanguageCodeSx: SystemStyleObject<Theme> = {
@@ -233,25 +237,26 @@ export const headerLanguageCodeSx: SystemStyleObject<Theme> = {
   display: { xs: 'none', sm: 'inline' },
 };
 
-/** Accent / theme control */
+/** Accent / theme control — icon only */
 export const headerAccentButtonSx = (open: boolean): SystemStyleObject<Theme> => ({
-  width: 44,
-  minWidth: 44,
-  height: 44,
+  width: 48,
+  minWidth: 48,
+  height: 48,
   p: 0,
   flexShrink: 0,
   position: 'relative',
   display: 'grid',
   placeItems: 'center',
-  bgcolor: open ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)',
-  border: `1px solid ${open ? LANDING_V2.hair2 : LANDING_V2.hair}`,
-  borderRadius: '10px',
+  bgcolor: 'transparent',
+  border: 'none',
+  borderRadius: 0,
   boxShadow: 'none',
-  transition: `background-color 0.25s ${LANDING_V2.ease}, border-color 0.25s ${LANDING_V2.ease}`,
+  transition: `opacity 0.25s ${LANDING_V2.ease}`,
   '&:hover': {
-    bgcolor: 'rgba(255,255,255,0.05)',
-    borderColor: LANDING_V2.hair2,
+    bgcolor: 'transparent',
+    opacity: 0.92,
   },
+  ...(open ? { opacity: 1 } : {}),
 });
 
 export const headerRightStackSx: SystemStyleObject<Theme> = {
@@ -260,7 +265,7 @@ export const headerRightStackSx: SystemStyleObject<Theme> = {
   gap: { xs: 0.85, sm: 1.25 },
 };
 
-export const headerControlHeight = { xs: 44, sm: 44 } as const;
+export const headerControlHeight = { xs: 48, sm: 48 } as const;
 
 export const headerCompactSearchSx: SystemStyleObject<Theme> = {
   height: headerControlHeight,

@@ -40,13 +40,13 @@ class AccountDrawer extends StatelessWidget {
         // Responsive avatar size for header icon
         final avatarSize = ResponsiveUtils.getResponsiveSpacing(
           context,
-          baseSize: 18.0,
-        ).clamp(16.0, 22.0);
+          baseSize: 22.0,
+        ).clamp(20.0, 26.0);
         final avatarFontSize = ResponsiveUtils.getResponsiveFontSize(
           context,
-          baseSize: 16.0,
-          min: 14.0,
-          max: 18.0,
+          baseSize: 18.0,
+          min: 16.0,
+          max: 20.0,
         );
 
         // If user just picked a new image, show it immediately via FileImage

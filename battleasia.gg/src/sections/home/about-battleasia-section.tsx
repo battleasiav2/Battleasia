@@ -1,5 +1,6 @@
 import { Box, Stack, Container, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
+import type { ReactNode } from 'react';
 
 import { CONFIG } from 'src/global-config';
 import { Iconify } from 'src/components/iconify';
@@ -37,26 +38,45 @@ export function AboutBattleAsiaSection() {
     },
   ];
 
-  const stats = [
+  const prizeLabel = String(CONFIG.homeStats.prizeMoney).replace(/^\$/, '');
+
+  const stats: { value: ReactNode; label: string }[] = [
     {
       value: CONFIG.homeStats.activePlayers,
       label: t('home.stats.activePlayers'),
-      gold: false,
     },
     {
-      value: CONFIG.homeStats.prizeMoney,
+      value: (
+        <Box
+          component="span"
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: { xs: 0.75, md: 1 },
+          }}
+        >
+          <Box
+            component="img"
+            src={CONFIG.currencyIcon}
+            alt=""
+            sx={{
+              width: { xs: 28, md: 36 },
+              height: { xs: 28, md: 36 },
+              flexShrink: 0,
+            }}
+          />
+          {prizeLabel}
+        </Box>
+      ),
       label: t('home.stats.prizeMoney'),
-      gold: true,
     },
     {
       value: CONFIG.homeStats.gamesSupported,
       label: t('home.stats.gamesSupported'),
-      gold: false,
     },
     {
       value: CONFIG.homeStats.tournaments,
       label: t('home.stats.tournaments'),
-      gold: false,
     },
   ];
 
@@ -100,7 +120,7 @@ export function AboutBattleAsiaSection() {
           position: 'absolute',
           inset: 0,
           zIndex: 0,
-          background: `radial-gradient(70% 60% at 50% 40%, transparent, ${LANDING_V2.ink} 80%)`,
+          background: `radial-gradient(70% 60% at 50% 40%, rgba(var(--ba-gold-rgb, 203,251,36), 0.1), ${LANDING_V2.ink} 80%)`,
           pointerEvents: 'none',
         }}
       />
@@ -288,7 +308,7 @@ export function AboutBattleAsiaSection() {
                   fontWeight: 600,
                   fontSize: { xs: '2rem', md: 'clamp(2rem, 3.4vw, 2.85rem)' },
                   lineHeight: 1,
-                  color: stat.gold ? accentColor : LANDING_V2.text,
+                  color: LANDING_V2.text,
                 }}
               >
                 {stat.value}

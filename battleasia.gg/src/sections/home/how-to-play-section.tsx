@@ -6,7 +6,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { Iconify } from 'src/components/iconify/iconify';
 import { useTranslate } from 'src/locales/use-locales';
 
-import { LANDING_V2, landingPanelSx, landingPrimaryBtnSx } from './landing-v2-theme';
+import { LANDING_V2, landingCharAuraSx, landingCharImgFilter, landingCharPlinthSx, landingPanelSx, landingPrimaryBtnSx, landingSectionTitleSx } from './landing-v2-theme';
 
 // ----------------------------------------------------------------------
 
@@ -106,14 +106,9 @@ export function HowToPlaySection() {
             component="h2"
             className="landing-display"
             sx={{
-              fontFamily: LANDING_V2.display,
-              fontWeight: 600,
+              ...landingSectionTitleSx,
               fontStyle: 'italic',
-              fontSize: { xs: '2.5rem', sm: 'clamp(2.5rem, 11vw, 7.2rem)' },
-              lineHeight: 0.92,
-              letterSpacing: '-0.03em',
-              textTransform: 'uppercase',
-              color: LANDING_V2.text,
+              letterSpacing: '-0.04em',
             }}
           >
             {t('home.howToPlay')}
@@ -251,6 +246,8 @@ export function HowToPlaySection() {
                 overflow: 'hidden',
               }}
             >
+              <Box aria-hidden sx={landingCharAuraSx} />
+              <Box aria-hidden sx={landingCharPlinthSx} />
               {gameModes.map((mode, idx) => (
                 <Box
                   key={mode.key}
@@ -272,6 +269,8 @@ export function HowToPlaySection() {
                     opacity: idx === activeIndex ? 1 : 0,
                     transition: `opacity 0.35s ${LANDING_V2.ease}`,
                     pointerEvents: 'none',
+                    zIndex: 2,
+                    filter: landingCharImgFilter,
                   }}
                 />
               ))}

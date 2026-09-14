@@ -251,7 +251,7 @@ export function ShopDetailView() {
               <Stack spacing={1.5}>
                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                   <Typography sx={{ ...userMutedTextSx, fontSize: 13 }}>{t('shop.price')}</Typography>
-                  <Typography sx={{ fontSize: 22, fontWeight: 900, color: USER_COLORS.gold, textShadow: `0 0 12px ${goldAlpha(0.4)}` }}>
+                  <Typography sx={{ fontSize: 22, fontWeight: 900, color: '#ffffff' }}>
                     ${Number(item.price).toFixed(2)}
                   </Typography>
                 </Stack>

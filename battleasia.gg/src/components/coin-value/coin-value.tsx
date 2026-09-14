@@ -49,6 +49,8 @@ export function CoinValue({
         sx={{
           whiteSpace: 'nowrap',
           lineHeight: 1.2,
+          // Balance / amount text stays white — never follows accent theme
+          color: '#ffffff',
           ...textSx,
         }}
       >

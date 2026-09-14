@@ -12,15 +12,9 @@ import { goldAlpha } from 'src/theme/accent-presets';
 
 import { toast } from 'react-hot-toast';
 import { useTranslate } from 'src/locales/use-locales';
-import { Iconify } from 'src/components/iconify';
 
 import type { LeaderboardPeriod } from './leader-board-constants';
-import {
-  LeaderboardPodium,
-  LeaderboardTable,
-  LeaderboardPageSkeleton,
-  LeaderboardGlassShell,
-} from './components';
+import { LeaderboardTable, LeaderboardPageSkeleton, LeaderboardGlassShell } from './components';
 
 // ----------------------------------------------------------------------
 
@@ -37,8 +31,6 @@ export function LeaderBoardView() {
     { value: 'weekly' as const, label: t('leaderboard.thisWeek') },
     { value: 'monthly' as const, label: t('leaderboard.thisMonth') },
   ];
-
-  const formatScore = (score: number) => score.toLocaleString();
 
   const fetchLeaderboard = useCallback(
     async (period: LeaderboardPeriod) => {
@@ -71,121 +63,121 @@ export function LeaderBoardView() {
     LIVE_SYNC_TOPICS.dashboard
   );
 
-  const topThree = useMemo(() => rows.slice(0, 3), [rows]);
-  const tableRows = useMemo(() => rows.slice(3), [rows]);
-  const maxScore = useMemo(() => rows[0]?.totalScore ?? 0, [rows]);
-
-  const tableLabels = {
-    games: t('leaderboard.games'),
-    average: t('leaderboard.average'),
-    level: t('leaderboard.level'),
-  };
+  const tableLabels = useMemo(
+    () => ({
+      rank: t('leaderboard.rank'),
+      player: t('leaderboard.player'),
+      wins: t('leaderboard.wins'),
+      matches: t('leaderboard.matches'),
+      games: t('leaderboard.games'),
+      average: t('leaderboard.average'),
+      level: t('leaderboard.level'),
+    }),
+    [t]
+  );
 
   const showInitialSkeleton = loading && rows.length === 0;
 
   return (
     <UserPageShell>
-      {showInitialSkeleton ? (
-        <LeaderboardPageSkeleton />
-      ) : (
-        <Stack spacing={2.5}>
-          <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1}>
-            {periods.map((period) => {
-              const active = selectedPeriod === period.value;
-              return (
-                <ButtonBase
-                  key={period.value}
-                  onClick={() => setSelectedPeriod(period.value)}
-                  sx={{
-                    px: 1.5,
-                    py: 0.75,
-                    borderRadius: '8px',
-                    bgcolor: active ? goldAlpha(0.16) : alpha('#ffffff', 0.04),
-                    border: `1px solid ${active ? goldAlpha(0.45) : alpha('#ffffff', 0.1)}`,
-                    color: active ? USER_COLORS.gold : alpha('#ffffff', 0.72),
-                    fontSize: 12,
-                    fontWeight: 800,
-                    letterSpacing: 0.6,
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  {period.label}
-                </ButtonBase>
-              );
-            })}
-          </Stack>
+      <Stack spacing={2.5}>
+        <Box>
+          <Typography
+            sx={{
+              fontSize: 11,
+              fontWeight: 800,
+              letterSpacing: 1.6,
+              textTransform: 'uppercase',
+              color: USER_COLORS.gold,
+              mb: 0.75,
+            }}
+          >
+            {t('leaderboard.hallEyebrow')}
+          </Typography>
+          <Typography
+            component="h1"
+            sx={{
+              fontSize: { xs: 28, sm: 34 },
+              fontWeight: 800,
+              color: USER_COLORS.textPrimary,
+              letterSpacing: '-0.02em',
+              lineHeight: 1.1,
+            }}
+          >
+            {t('leaderboard.title')}
+          </Typography>
+          <Typography
+            sx={{
+              mt: 1,
+              maxWidth: 52 * 8,
+              fontSize: { xs: 13, sm: 14 },
+              color: alpha('#ffffff', 0.55),
+              lineHeight: 1.5,
+            }}
+          >
+            {t('leaderboard.hallDescription')}
+          </Typography>
+        </Box>
 
-          {loading ? (
-            <LeaderboardPageSkeleton />
-          ) : rows.length === 0 ? (
-            <UserEmptyState
-              icon="solar:trophy-bold-duotone"
-              title={t('leaderboard.noData')}
-              description={t('leaderboard.emptyDescription')}
-              actionLabel={t('common.refresh')}
-              onAction={() => fetchLeaderboard(selectedPeriod)}
-            />
-          ) : (
-            <Stack spacing={2.5}>
-              <LeaderboardGlassShell>
-                <Box sx={{ px: { xs: 1.25, sm: 2 }, pt: { xs: 1.5, sm: 2 }, pb: 0 }}>
-                  <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
-                    <Iconify icon="solar:crown-bold" width={16} sx={{ color: USER_COLORS.gold }} />
-                    <Typography
-                      sx={{
-                        fontSize: 11,
-                        fontWeight: 800,
-                        letterSpacing: 0.8,
-                        textTransform: 'uppercase',
-                        color: alpha('#ffffff', 0.55),
-                        fontFamily: 'monospace',
-                      }}
-                    >
-                      Champions podium
-                    </Typography>
-                  </Stack>
-                </Box>
-                <LeaderboardPodium
-                  players={topThree}
-                  pointsLabel={t('leaderboard.points')}
-                  formatScore={formatScore}
-                />
-              </LeaderboardGlassShell>
+        <Box
+          sx={{
+            display: 'inline-flex',
+            alignSelf: 'flex-start',
+            p: 0.5,
+            borderRadius: 999,
+            bgcolor: alpha('#ffffff', 0.04),
+            border: `1px solid ${alpha('#ffffff', 0.1)}`,
+            gap: 0.35,
+            flexWrap: 'wrap',
+          }}
+        >
+          {periods.map((period) => {
+            const active = selectedPeriod === period.value;
+            return (
+              <ButtonBase
+                key={period.value}
+                onClick={() => setSelectedPeriod(period.value)}
+                sx={{
+                  px: 1.75,
+                  py: 0.9,
+                  borderRadius: 999,
+                  bgcolor: active ? USER_COLORS.gold : 'transparent',
+                  color: active ? '#111111' : alpha('#ffffff', 0.62),
+                  fontSize: 12,
+                  fontWeight: 800,
+                  letterSpacing: 0.7,
+                  textTransform: 'uppercase',
+                  minHeight: 36,
+                  transition: 'background-color 0.2s ease, color 0.2s ease',
+                  '&:hover': {
+                    bgcolor: active ? USER_COLORS.gold : goldAlpha(0.1),
+                  },
+                }}
+              >
+                {period.label}
+              </ButtonBase>
+            );
+          })}
+        </Box>
 
-              {tableRows.length > 0 ? (
-                <LeaderboardGlassShell>
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    spacing={1}
-                    sx={{ px: { xs: 1.5, sm: 2 }, pt: { xs: 1.5, sm: 1.75 }, pb: 1 }}
-                  >
-                    <Iconify icon="solar:ranking-bold" width={16} sx={{ color: USER_COLORS.gold }} />
-                    <Typography
-                      sx={{
-                        fontSize: 11,
-                        fontWeight: 800,
-                        letterSpacing: 0.8,
-                        textTransform: 'uppercase',
-                        color: alpha('#ffffff', 0.55),
-                        fontFamily: 'monospace',
-                      }}
-                    >
-                      Full rankings
-                    </Typography>
-                  </Stack>
-                  <LeaderboardTable
-                    rows={tableRows}
-                    labels={tableLabels}
-                    formatScore={formatScore}
-                    maxScore={maxScore}
-                  />
-                </LeaderboardGlassShell>
-              ) : null}
-            </Stack>
-          )}
-        </Stack>
-      )}
+        {showInitialSkeleton || loading ? (
+          <LeaderboardPageSkeleton />
+        ) : rows.length === 0 ? (
+          <UserEmptyState
+            icon="solar:trophy-bold-duotone"
+            title={t('leaderboard.noData')}
+            description={t('leaderboard.emptyDescription')}
+            actionLabel={t('common.refresh')}
+            onAction={() => fetchLeaderboard(selectedPeriod)}
+          />
+        ) : (
+          <LeaderboardGlassShell>
+            <Box sx={{ pt: { xs: 1.5, sm: 1.75 } }}>
+              <LeaderboardTable rows={rows} labels={tableLabels} />
+            </Box>
+          </LeaderboardGlassShell>
+        )}
+      </Stack>
     </UserPageShell>
   );
 }

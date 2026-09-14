@@ -167,21 +167,20 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
         sx={[
           {
             position: 'relative',
-            width: 44,
-            height: 44,
+            width: 48,
+            height: 48,
             p: 0,
-            borderRadius: '10px',
-            bgcolor: open ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.03)',
+            borderRadius: 0,
+            bgcolor: 'transparent',
             backgroundImage: 'none',
-            border: `1px solid ${open ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.09)'}`,
+            border: 'none',
             boxShadow: 'none',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
+            backdropFilter: 'none',
+            WebkitBackdropFilter: 'none',
             flexShrink: 0,
-            transition: 'background-color 0.25s ease, border-color 0.25s ease',
+            transition: 'color 0.25s ease',
             '&:hover': {
-              bgcolor: 'rgba(255,255,255,0.05)',
-              borderColor: 'rgba(255,255,255,0.14)',
+              bgcolor: 'transparent',
               '& .notif-bell': {
                 color: USER_COLORS.gold,
               },
@@ -198,10 +197,10 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
           overlap="circular"
           sx={{
             '& .MuiBadge-badge': {
-              minWidth: 16,
-              height: 16,
-              px: 0.4,
-              fontSize: 10,
+              minWidth: 18,
+              height: 18,
+              px: 0.45,
+              fontSize: 11,
               fontWeight: 800,
               bgcolor: 'var(--ba-gold)',
               color: 'var(--ba-gold-ink, #081401)',
@@ -212,7 +211,7 @@ export function NotificationsDrawer({ sx, ...other }: NotificationsDrawerProps) 
           <Iconify
             className="notif-bell"
             icon="solar:bell-bold"
-            width={20}
+            width={26}
             sx={{
               color: open || unreadCount > 0 ? 'var(--ba-gold)' : alpha('#ffffff', 0.92),
               transition: 'color 0.2s ease',

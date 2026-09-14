@@ -144,7 +144,7 @@ export const GLASS_CARD_VARIANTS: Record<GlassCardVariant, GlassCardTokens> = {
       boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
       labelColor: 'rgba(244,244,241,0.62)',
       valueColor: '#f4f4f1',
-      suffixColor: goldAlpha(0.85),
+      suffixColor: 'rgba(244,244,241,0.62)',
     },
   },
 };

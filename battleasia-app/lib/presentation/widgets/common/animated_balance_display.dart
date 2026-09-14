@@ -117,7 +117,7 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
                   Text(
                     balance.toStringAsFixed(2),
                     style: AppTheme.bodyMedium.copyWith(
-                      color: AppColors.gold,
+                      color: Colors.white,
                       fontWeight: FontWeight.w700,
                       fontSize: balanceFontSize,
                     ),

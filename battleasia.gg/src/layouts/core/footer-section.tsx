@@ -1,25 +1,24 @@
-import { Box, Stack, Container, Typography } from '@mui/material';
-import { alpha } from '@mui/material/styles';
+import { Box, Container, Typography } from '@mui/material';
 
 import { RouterLink } from 'src/routes/components';
-import { Logo } from 'src/components/logo';
 import { Iconify } from 'src/components/iconify';
 import { useRouter, usePathname } from 'src/routes/hooks';
 import { useTranslate } from 'src/locales/use-locales';
+import { LANDING_V2 } from 'src/sections/home/landing-v2-theme';
 
 import { createMenuClickHandler } from '../menu-items-config';
 
 // ----------------------------------------------------------------------
-// CONSTANTS & EXISTING DATA
-// ----------------------------------------------------------------------
+
+const GOLD_24 = 'rgba(var(--ba-gold-rgb, 203, 251, 36), 0.24)';
 
 const FOOTER_PARTNERS = [
-  { label: 'battleasia.com', href: 'https://battleasia.com', icon: '/logo/logo.webp' },
-  { label: 'baccoin.shop', href: 'https://baccoin.shop', icon: '/assets/images/currency.webp' },
-  { label: 'battleasia.net', href: 'https://battleasia.net', icon: '/logo/logo.webp' },
-  { label: 'pubg.com', href: 'https://www.pubg.com', icon: '/assets/images/games/pubg-mobile.png' },
-  { label: 'www.bkash.com', href: 'https://www.bkash.com', icon: '/assets/images/bkash.webp' },
-  { label: 'nagadwallet.net', href: 'https://nagadwallet.net', icon: '/assets/images/nagad.webp' },
+  { label: 'battleasia.com', href: 'https://battleasia.com' },
+  { label: 'baccoin.shop', href: 'https://baccoin.shop' },
+  { label: 'battleasia.net', href: 'https://battleasia.net' },
+  { label: 'pubg.com', href: 'https://www.pubg.com' },
+  { label: 'bkash', href: 'https://www.bkash.com' },
+  { label: 'nagad', href: 'https://nagadwallet.net' },
 ] as const;
 
 const SOCIAL_LINKS = [
@@ -31,9 +30,50 @@ const SOCIAL_LINKS = [
   { labelKey: 'footer.telegram', icon: 'mingcute:telegram-fill', href: 'https://t.me/battleasiaofficial' },
 ] as const;
 
-// ----------------------------------------------------------------------
-// MAIN FOOTER SECTION COMPONENT
-// ----------------------------------------------------------------------
+const PAY_CHIPS = [
+  { labelKey: 'footer.bkash', src: LANDING_V2.assets.pay.bkash },
+  { labelKey: 'footer.nagad', src: LANDING_V2.assets.pay.nagad },
+  { labelKey: 'footer.crypto', src: LANDING_V2.assets.pay.crypto },
+] as const;
+
+const footerLabelSx = {
+  display: 'block',
+  fontFamily: LANDING_V2.sans,
+  fontSize: '0.64rem',
+  letterSpacing: '0.2em',
+  textTransform: 'uppercase' as const,
+  color: LANDING_V2.faint,
+  fontWeight: 700,
+  mb: '14px',
+  lineHeight: 1.3,
+};
+
+const footerLinkSx = {
+  fontFamily: LANDING_V2.sans,
+  fontSize: '0.84rem',
+  fontWeight: 500,
+  color: LANDING_V2.muted,
+  textDecoration: 'none',
+  cursor: 'pointer',
+  minHeight: 44,
+  display: 'inline-flex',
+  alignItems: 'center',
+  transition: `color 0.3s ${LANDING_V2.ease}`,
+  '&:hover': { color: LANDING_V2.gold },
+};
+
+function BrandWord({ name }: { name: string }) {
+  const match = name.match(/^(.*?)(\s*2\.0\s*)$/i);
+  if (!match) return <>{name}</>;
+  return (
+    <>
+      {match[1].trim()}{' '}
+      <Box component="span" sx={{ color: LANDING_V2.gold }}>
+        2.0
+      </Box>
+    </>
+  );
+}
 
 export function FooterSection() {
   const { t } = useTranslate();
@@ -41,201 +81,227 @@ export function FooterSection() {
   const router = useRouter();
   const handleMenuClick = createMenuClickHandler(pathname, router);
 
-  const linkStyle = {
-    color: alpha('#ffffff', 0.7),
-    fontSize: { xs: 12.5, md: 13.5 },
-    fontWeight: 500,
-    textDecoration: 'none',
-    cursor: 'pointer',
-    transition: 'color 0.2s ease',
-    lineHeight: 1.5,
-    '&:hover': {
-      color: alpha('#ffffff', 0.92),
-      textDecoration: 'underline',
-    },
-  };
-
-  const sectionLabelSx = {
-    fontFamily: 'monospace',
-    fontSize: { xs: 10, md: 11 },
-    fontWeight: 700,
-    letterSpacing: 1.4,
-    color: alpha('#ffffff', 0.42),
-    textTransform: 'uppercase' as const,
-    lineHeight: 1.3,
-  };
-
   return (
     <Box
       component="footer"
       sx={{
         position: 'relative',
-        bgcolor: '#07080b',
-        color: '#ffffff',
-        pt: { xs: 5, sm: 6, md: 7.5 },
-        pb: { xs: 4.5, sm: 5, md: 6 },
-        mt: 0,
         overflow: 'hidden',
-        borderTop: 'none',
+        isolation: 'isolate',
+        mt: 5,
+        bgcolor: LANDING_V2.ink,
+        color: LANDING_V2.text,
+        '@keyframes footerLiveDot': {
+          '0%': { boxShadow: `0 0 0 0 ${GOLD_24}` },
+          '70%': { boxShadow: '0 0 0 8px rgba(0,0,0,0)' },
+          '100%': { boxShadow: '0 0 0 0 rgba(0,0,0,0)' },
+        },
       }}
     >
-      <Box
-        component="img"
-        src="/landing-v2/footer-bg.webp"
-        alt=""
-        width={1920}
-        height={1080}
-        loading="lazy"
-        decoding="async"
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          width: 1,
-          height: 1,
-          objectFit: 'cover',
-          objectPosition: 'center center',
-          pointerEvents: 'none',
-          zIndex: 0,
-        }}
-      />
       <Box
         aria-hidden
         sx={{
           position: 'absolute',
           inset: 0,
-          zIndex: 0,
-          pointerEvents: 'none',
-          background: `
-            linear-gradient(180deg, rgba(7, 8, 11, 0.55) 0%, rgba(7, 8, 11, 0.72) 45%, rgba(7, 8, 11, 0.88) 100%),
-            linear-gradient(90deg, rgba(7, 8, 11, 0.5) 0%, transparent 30%, transparent 70%, rgba(7, 8, 11, 0.5) 100%)
-          `,
+          zIndex: -2,
         }}
-      />
+      >
+        <Box
+          component="img"
+          src={LANDING_V2.assets.footerBg}
+          alt=""
+          width={1920}
+          height={1080}
+          loading="lazy"
+          decoding="async"
+          sx={{
+            width: 1,
+            height: 1,
+            objectFit: 'cover',
+            opacity: 0.85,
+            pointerEvents: 'none',
+          }}
+        />
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            background: `linear-gradient(to bottom, ${LANDING_V2.ink} 0%, rgba(6,6,7,0.72) 28%, rgba(6,6,7,0.86) 100%)`,
+          }}
+        />
+      </Box>
 
       <Box
         aria-hidden
         sx={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 22,
-          pointerEvents: 'none',
-          zIndex: 4,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          height: '1px',
+          background: `linear-gradient(90deg, transparent, ${GOLD_24}, transparent)`,
+          position: 'relative',
         }}
       >
-        <Box sx={{ position: 'absolute', left: 0, right: 0, top: '50%', borderTop: `1px solid ${alpha('#ffffff', 0.08)}` }} />
         <Box
           sx={{
-            position: 'relative',
-            zIndex: 1,
-            px: 1,
-            bgcolor: 'transparent',
-            color: alpha('#ffffff', 0.28),
-            display: 'flex',
-            lineHeight: 0,
+            position: 'absolute',
+            left: '50%',
+            top: 0,
+            transform: 'translate(-50%, -50%)',
+            bgcolor: LANDING_V2.ink,
+            color: LANDING_V2.gold,
+            width: 28,
+            height: 28,
+            borderRadius: '50%',
+            border: `1px solid ${GOLD_24}`,
+            display: 'grid',
+            placeItems: 'center',
+            fontSize: '0.85rem',
+            lineHeight: 1,
           }}
         >
-          <Iconify icon="solar:alt-arrow-down-bold" width={16} />
+          ⌄
         </Box>
       </Box>
 
       <Container
-        maxWidth="xl"
+        maxWidth={false}
         sx={{
           position: 'relative',
-          zIndex: 2,
-          px: { xs: 2.25, sm: 3.5, md: 5 },
+          zIndex: 1,
+          maxWidth: LANDING_V2.wrap,
+          px: { xs: 2.25, sm: 3 },
         }}
       >
-        {/* Primary block: brand → links → support → social */}
-        <Stack
-          direction={{ xs: 'column', md: 'row' }}
-          alignItems={{ xs: 'center', md: 'flex-start' }}
-          justifyContent="space-between"
-          spacing={{ xs: 3.5, md: 4 }}
+        <Box
           sx={{
-            pt: { xs: 1, md: 1.5 },
-            pb: { xs: 0.5, md: 1 },
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', md: '1fr auto 1fr' },
+            gap: { xs: 4.5, md: 4.5 },
+            alignItems: 'start',
+            py: { xs: 6.5, md: 'clamp(52px, 7vw, 92px)' },
+            textAlign: { xs: 'center', md: 'initial' },
           }}
         >
-          {/* Brand — strongest signal */}
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={1.75}
-            sx={{
-              flexShrink: 0,
-              order: { xs: 1, md: 2 },
-            }}
-          >
-            <Logo
-              sx={{
-                width: { xs: 60, md: 72 },
-                height: { xs: 60, md: 72 },
-              }}
-            />
-            <Box>
-              <Typography
-                className="font-brand-gaming"
-                sx={{
-                  fontSize: { xs: 24, md: 28 },
-                  fontWeight: 900,
-                  fontStyle: 'italic',
-                  lineHeight: 1.05,
-                  letterSpacing: 0.5,
-                  color: '#ffffff',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {t('common.brandName')}
-              </Typography>
-              <Typography
-                sx={{
-                  ...sectionLabelSx,
-                  mt: 0.6,
-                  color: alpha('#ffffff', 0.5),
-                }}
-              >
-                {t('common.brandTagline')}
-              </Typography>
-            </Box>
-          </Stack>
-
-          {/* Legal + nav + copyright */}
           <Box
             sx={{
-              textAlign: { xs: 'center', md: 'left' },
-              order: { xs: 2, md: 3 },
-              flexGrow: 1,
-              px: { md: 2.5 },
-              maxWidth: { md: 560 },
+              order: { xs: 3, md: 1 },
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: { xs: 'center', md: 'flex-start' },
               minWidth: 0,
             }}
           >
-            <Stack
-              direction="row"
-              alignItems="center"
-              justifyContent={{ xs: 'center', md: 'flex-start' }}
-              flexWrap="wrap"
-              useFlexGap
-              spacing={{ xs: 1.25, md: 1.75 }}
-              sx={{ rowGap: { xs: 1, md: 1.1 }, mb: { xs: 1.5, md: 1.75 } }}
+            <Typography component="span" sx={footerLabelSx}>
+              Follow the arena
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                flexWrap: { xs: 'wrap', md: 'nowrap' },
+                gap: 1.25,
+                justifyContent: { xs: 'center', md: 'flex-start' },
+              }}
             >
-              <Typography component={RouterLink} href="/privacy-policy" sx={linkStyle}>
+              {SOCIAL_LINKS.map((item) => (
+                <Box
+                  key={item.labelKey}
+                  component="a"
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={t(item.labelKey)}
+                  sx={{
+                    width: 46,
+                    height: 46,
+                    borderRadius: '50%',
+                    display: 'grid',
+                    placeItems: 'center',
+                    color: LANDING_V2.text,
+                    bgcolor: 'rgba(255,255,255,0.10)',
+                    border: '1px solid transparent',
+                    textDecoration: 'none',
+                    transition: `background-color 0.3s ${LANDING_V2.ease}, color 0.3s ${LANDING_V2.ease}, transform 0.3s ${LANDING_V2.ease}`,
+                    '&:hover': {
+                      bgcolor: LANDING_V2.gold,
+                      color: LANDING_V2.goldInk,
+                      transform: 'translateY(-3px)',
+                    },
+                  }}
+                >
+                  <Iconify icon={item.icon} width={18} />
+                </Box>
+              ))}
+            </Box>
+          </Box>
+
+          <Box
+            sx={{
+              order: { xs: 1, md: 2 },
+              textAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 0.75,
+              maxWidth: { md: 520 },
+              px: { md: 1 },
+            }}
+          >
+            <Box
+              component="img"
+              src={LANDING_V2.assets.logo}
+              alt={t('common.brandName')}
+              width={72}
+              height={72}
+              loading="lazy"
+              decoding="async"
+              sx={{
+                width: 72,
+                height: 72,
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 8px 20px rgba(0,0,0,0.6))',
+              }}
+            />
+            <Typography
+              sx={{
+                fontFamily: LANDING_V2.display,
+                fontWeight: 700,
+                fontSize: '1.55rem',
+                letterSpacing: '0.03em',
+                mt: 0.5,
+                lineHeight: 1.1,
+                textTransform: 'uppercase',
+                color: LANDING_V2.text,
+              }}
+            >
+              <BrandWord name={t('common.brandName')} />
+            </Typography>
+            <Typography
+              sx={{
+                fontFamily: LANDING_V2.sans,
+                fontSize: '0.64rem',
+                letterSpacing: '0.24em',
+                color: LANDING_V2.muted,
+                fontWeight: 700,
+                textTransform: 'uppercase',
+              }}
+            >
+              {t('common.brandTagline')}
+            </Typography>
+            <Box
+              component="nav"
+              aria-label="Footer"
+              sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'center',
+                columnGap: 2.25,
+                rowGap: 0.75,
+                mt: 2,
+              }}
+            >
+              <Typography component={RouterLink} href="/privacy-policy" sx={footerLinkSx}>
                 {t('footer.privacyPolicy')}
               </Typography>
-              <Typography sx={{ color: alpha('#ffffff', 0.22), fontSize: 12, lineHeight: 1 }} aria-hidden>
-                ·
-              </Typography>
-              <Typography component={RouterLink} href="/terms-and-conditions" sx={linkStyle}>
+              <Typography component={RouterLink} href="/terms-and-conditions" sx={footerLinkSx}>
                 {t('footer.termsAndConditions')}
-              </Typography>
-              <Typography sx={{ color: alpha('#ffffff', 0.22), fontSize: 12, lineHeight: 1 }} aria-hidden>
-                ·
               </Typography>
               <Typography
                 component="span"
@@ -247,12 +313,9 @@ export function FooterSection() {
                     isActive: () => false,
                   })
                 }
-                sx={linkStyle}
+                sx={footerLinkSx}
               >
                 {t('footer.rules')}
-              </Typography>
-              <Typography sx={{ color: alpha('#ffffff', 0.22), fontSize: 12, lineHeight: 1 }} aria-hidden>
-                ·
               </Typography>
               <Typography
                 component="span"
@@ -264,12 +327,9 @@ export function FooterSection() {
                     isActive: () => false,
                   })
                 }
-                sx={linkStyle}
+                sx={footerLinkSx}
               >
                 {t('footer.howToPlay')}
-              </Typography>
-              <Typography sx={{ color: alpha('#ffffff', 0.22), fontSize: 12, lineHeight: 1 }} aria-hidden>
-                ·
               </Typography>
               <Typography
                 component="span"
@@ -281,164 +341,180 @@ export function FooterSection() {
                     isActive: () => false,
                   })
                 }
-                sx={linkStyle}
+                sx={footerLinkSx}
               >
                 {t('footer.aboutUs')}
               </Typography>
-            </Stack>
-
+            </Box>
             <Typography
               sx={{
-                fontSize: { xs: 12, md: 13 },
-                color: alpha('#ffffff', 0.48),
-                lineHeight: 1.55,
-                letterSpacing: 0.15,
+                fontFamily: LANDING_V2.sans,
+                fontSize: '0.74rem',
+                color: LANDING_V2.faint,
+                mt: 1.25,
               }}
             >
               {t('footer.copyright', { year: new Date().getFullYear() })}
             </Typography>
           </Box>
 
-          {/* Support — secondary column */}
           <Box
             sx={{
+              order: { xs: 2, md: 3 },
               textAlign: { xs: 'center', md: 'right' },
-              flexShrink: 0,
-              order: { xs: 3, md: 4 },
-              pt: { md: 0.25 },
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: { xs: 'center', md: 'flex-end' },
+              gap: 1.5,
             }}
           >
-            <Typography sx={{ ...sectionLabelSx, mb: 0.85, color: alpha('#ffffff', 0.45) }}>
-              User Support
+            <Typography component="span" sx={{ ...footerLabelSx, mb: 0 }}>
+              User support
             </Typography>
             <Typography
               component="a"
               href="mailto:support@battleasia.gg"
               sx={{
-                display: 'block',
-                fontSize: { xs: 13, md: 14 },
-                fontWeight: 600,
-                color: alpha('#ffffff', 0.88),
+                fontFamily: LANDING_V2.display,
+                fontWeight: 500,
+                fontSize: '1.12rem',
+                color: LANDING_V2.text,
                 textDecoration: 'none',
-                lineHeight: 1.35,
-                transition: 'color 0.2s ease',
-                '&:hover': {
-                  color: alpha('#ffffff', 0.95),
-                  textDecoration: 'underline',
-                },
+                lineHeight: 1.3,
+                transition: `color 0.3s ${LANDING_V2.ease}`,
+                '&:hover': { color: LANDING_V2.gold },
               }}
             >
               support@battleasia.gg
             </Typography>
-            <Typography
+            <Box
               component={RouterLink}
               href="/support"
               sx={{
-                display: 'inline-block',
-                fontSize: 11.5,
-                fontFamily: 'monospace',
+                bgcolor: 'rgba(255,255,255,0.05)',
+                border: `1px solid ${GOLD_24}`,
+                color: LANDING_V2.gold,
+                px: 2.25,
+                py: 1.75,
+                borderRadius: LANDING_V2.radiusSm,
+                fontFamily: LANDING_V2.sans,
                 fontWeight: 700,
-                color: alpha('#ffffff', 0.45),
+                fontSize: '0.74rem',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
                 textDecoration: 'none',
-                mt: 1,
-                letterSpacing: 0.6,
-                '&:hover': { textDecoration: 'underline', color: alpha('#ffffff', 0.7) },
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 1.125,
+                minHeight: 44,
+                transition: `background-color 0.3s ${LANDING_V2.ease}, color 0.3s ${LANDING_V2.ease}`,
+                '&:hover': {
+                  bgcolor: LANDING_V2.gold,
+                  color: LANDING_V2.goldInk,
+                },
               }}
             >
-              [ LIVE SUPPORT RELAY ]
-            </Typography>
-          </Box>
-
-          {/* Social — quiet utility row on mobile */}
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={1.35}
-            sx={{
-              flexShrink: 0,
-              order: { xs: 4, md: 1 },
-              pt: { xs: 0.5, md: 0.75 },
-            }}
-          >
-            {SOCIAL_LINKS.map((item) => (
               <Box
-                key={item.labelKey}
-                component="a"
-                href={item.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={t(item.labelKey)}
+                aria-hidden
                 sx={{
-                  width: { xs: 34, md: 36 },
-                  height: { xs: 34, md: 36 },
+                  width: 7,
+                  height: 7,
                   borderRadius: '50%',
-                  bgcolor: alpha('#ffffff', 0.04),
-                  border: `1px solid ${alpha('#ffffff', 0.1)}`,
-                  color: alpha('#ffffff', 0.55),
-                  display: 'grid',
-                  placeItems: 'center',
-                  textDecoration: 'none',
-                  transition: 'border-color 0.2s ease, background-color 0.2s ease, color 0.2s ease',
-                  '&:hover': {
-                    bgcolor: alpha('#ffffff', 0.08),
-                    borderColor: alpha('#ffffff', 0.18),
-                    boxShadow: 'none',
-                    color: '#ffffff',
-                  },
+                  bgcolor: 'currentColor',
+                  flexShrink: 0,
+                  boxShadow: `0 0 0 0 ${GOLD_24}`,
+                  animation: 'footerLiveDot 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) infinite',
                 }}
-              >
-                <Iconify icon={item.icon} width={17} />
-              </Box>
-            ))}
-          </Stack>
-        </Stack>
+              />
+              Live support relay
+            </Box>
+          </Box>
+        </Box>
+      </Container>
 
-        {/* Secondary strip: payments + partners */}
-        <Box
+      <Box
+        sx={{
+          borderTop: `1px solid ${LANDING_V2.hair}`,
+          bgcolor: 'rgba(6,6,7,0.55)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+        }}
+      >
+        <Container
+          maxWidth={false}
           sx={{
-            mt: { xs: 3.5, md: 4.5 },
-            pt: { xs: 2.75, md: 3.25 },
-            borderTop: `1px solid ${alpha('#ffffff', 0.1)}`,
+            maxWidth: LANDING_V2.wrap,
+            px: { xs: 2.25, sm: 3 },
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: 3.5,
+            flexWrap: 'wrap',
+            py: 2.75,
+            textAlign: { xs: 'center', md: 'initial' },
+            flexDirection: { xs: 'column', md: 'row' },
+            alignItems: { xs: 'center', md: 'flex-start' },
           }}
         >
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            alignItems={{ xs: 'center', sm: 'flex-start' }}
-            justifyContent="space-between"
-            spacing={{ xs: 2.75, sm: 3 }}
-            flexWrap="wrap"
-          >
-            <Stack
-              direction={{ xs: 'column', sm: 'row' }}
-              alignItems="center"
-              spacing={{ xs: 0.85, sm: 1.5 }}
-              flexWrap="wrap"
-              useFlexGap
+          <Box sx={{ textAlign: { xs: 'center', md: 'left' } }}>
+            <Typography component="span" sx={{ ...footerLabelSx, mb: '10px' }}>
+              {t('footer.payments')}
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 1,
+                flexWrap: 'wrap',
+                justifyContent: { xs: 'center', md: 'flex-start' },
+              }}
             >
-              <Typography sx={sectionLabelSx}>{t('footer.payments')}</Typography>
-              <Typography
-                sx={{
-                  fontSize: { xs: 12, md: 12.5 },
-                  color: alpha('#ffffff', 0.62),
-                  lineHeight: 1.45,
-                }}
-              >
-                {t('footer.bkash')} · {t('footer.nagad')} · {t('footer.crypto')}
-              </Typography>
-            </Stack>
+              {PAY_CHIPS.map((chip) => (
+                <Box
+                  key={chip.labelKey}
+                  component="span"
+                  sx={{
+                    fontFamily: LANDING_V2.sans,
+                    fontWeight: 700,
+                    fontSize: '0.78rem',
+                    color: LANDING_V2.text,
+                    border: `1px solid ${LANDING_V2.hair2}`,
+                    borderRadius: '8px',
+                    px: 1.5,
+                    py: 1,
+                    bgcolor: 'rgba(255,255,255,0.04)',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    minHeight: 40,
+                  }}
+                >
+                  <Box
+                    component="img"
+                    src={chip.src}
+                    alt=""
+                    width={18}
+                    height={18}
+                    loading="lazy"
+                    decoding="async"
+                    sx={{ width: 18, height: 18, objectFit: 'contain' }}
+                  />
+                  {t(chip.labelKey)}
+                </Box>
+              ))}
+            </Box>
+          </Box>
 
-            <Stack
-              direction="row"
-              alignItems="center"
-              spacing={1.1}
-              flexWrap="wrap"
-              useFlexGap
-              justifyContent={{ xs: 'center', sm: 'flex-end' }}
-              sx={{ rowGap: 1 }}
+          <Box sx={{ textAlign: { xs: 'center', md: 'right' } }}>
+            <Typography component="span" sx={{ ...footerLabelSx, mb: '10px' }}>
+              Trusted partners
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 1,
+                flexWrap: 'wrap',
+                justifyContent: { xs: 'center', md: 'flex-end' },
+              }}
             >
-              <Typography sx={{ ...sectionLabelSx, mr: { sm: 0.25 } }}>
-                {t('footer.trustedPartners')}
-              </Typography>
               {FOOTER_PARTNERS.map((partner) => (
                 <Box
                   key={partner.label}
@@ -447,39 +523,32 @@ export function FooterSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   sx={{
+                    fontFamily: LANDING_V2.sans,
+                    fontSize: '0.72rem',
+                    fontWeight: 600,
+                    color: LANDING_V2.muted,
+                    border: `1px solid ${LANDING_V2.hair}`,
+                    borderRadius: 999,
+                    px: 1.625,
+                    py: 1,
+                    minHeight: 36,
                     display: 'inline-flex',
                     alignItems: 'center',
-                    gap: 0.65,
-                    px: 1.15,
-                    py: 0.5,
-                    borderRadius: '6px',
-                    border: `1px solid ${alpha('#ffffff', 0.1)}`,
-                    bgcolor: alpha('#ffffff', 0.03),
-                    color: alpha('#ffffff', 0.7),
-                    fontSize: 11.5,
-                    fontWeight: 600,
                     textDecoration: 'none',
-                    transition: 'all 0.2s ease',
+                    transition: `color 0.3s ${LANDING_V2.ease}, border-color 0.3s ${LANDING_V2.ease}`,
                     '&:hover': {
-                      borderColor: alpha('#ffffff', 0.18),
-                      bgcolor: alpha('#ffffff', 0.06),
-                      color: '#ffffff',
+                      color: LANDING_V2.text,
+                      borderColor: LANDING_V2.hair2,
                     },
                   }}
                 >
-                  <Box
-                    component="img"
-                    src={partner.icon}
-                    alt=""
-                    sx={{ width: 14, height: 14, objectFit: 'contain', borderRadius: '2px' }}
-                  />
-                  <span>{partner.label}</span>
+                  {partner.label}
                 </Box>
               ))}
-            </Stack>
-          </Stack>
-        </Box>
-      </Container>
+            </Box>
+          </Box>
+        </Container>
+      </Box>
     </Box>
   );
 }

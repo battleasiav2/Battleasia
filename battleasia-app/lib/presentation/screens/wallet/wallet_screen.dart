@@ -590,7 +590,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   child: Text(
                     walletData['totalBalance'].toStringAsFixed(2),
                     style: AppTheme.heading2.copyWith(
-                      color: AppColors.gold,
+                      color: Colors.white,
                       fontWeight: FontWeight.w800,
                       fontSize: balanceFontSize,
                     ),
@@ -641,7 +641,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         : _withdrawableAmount.toStringAsFixed(2),
                     valueColor: _hasPendingWithdrawal
                         ? AppColors.textMuted
-                        : AppColors.gold,
+                        : Colors.white,
                   ),
                 ),
               ],

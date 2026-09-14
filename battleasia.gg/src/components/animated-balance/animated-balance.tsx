@@ -14,7 +14,7 @@ export function AnimatedBalance({
     value,
     fontSize = { xs: '0.85rem', sm: '1.25rem' },
     fontWeight = 600,
-    color = 'text.primary',
+    color = '#ffffff',
     duration = 800,
 }: AnimatedBalanceProps) {
     const [displayValue, setDisplayValue] = useState(value);
@@ -77,7 +77,7 @@ export function AnimatedBalance({
                     transition: 'all 0.3s ease',
                     transform: isAnimating ? 'scale(1.15)' : 'scale(1)',
                     textShadow: isAnimating
-                        ? '0 0 20px rgba(255, 215, 0, 0.8), 0 0 30px rgba(255, 215, 0, 0.6)'
+                        ? '0 0 18px rgba(255, 255, 255, 0.55), 0 0 28px rgba(255, 255, 255, 0.28)'
                         : 'none',
                     animation: isAnimating ? 'pulse 0.6s ease-in-out' : 'none',
                     '@keyframes pulse': {
@@ -103,7 +103,7 @@ export function AnimatedBalance({
                         height: '120%',
                         borderRadius: '50%',
                         background:
-                            'radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%)',
+                            'radial-gradient(circle, rgba(255, 255, 255, 0.22) 0%, transparent 70%)',
                         animation: 'ripple 0.8s ease-out',
                         pointerEvents: 'none',
                         '@keyframes ripple': {

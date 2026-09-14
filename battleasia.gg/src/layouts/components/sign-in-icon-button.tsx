@@ -14,6 +14,7 @@ import { headerSignInButtonSx } from './header-chrome';
 // ----------------------------------------------------------------------
 
 export type SignInIconButtonProps = ButtonBaseProps & {
+  /** Hide the glyph and show label only */
   hideIcon?: boolean;
 };
 

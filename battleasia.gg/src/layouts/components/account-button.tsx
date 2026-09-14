@@ -33,8 +33,8 @@ export function AccountButton({ photoURL, displayName, sx, ...other }: AccountBu
         src={photoURL}
         alt={displayName}
         sx={{
-          width: { xs: 28, sm: 34 },
-          height: { xs: 28, sm: 34 },
+          width: { xs: 36, sm: 40 },
+          height: { xs: 36, sm: 40 },
           border: `1.5px solid ${goldAlpha(0.65)}`,
           boxShadow: `0 0 0 1px ${goldAlpha(0.2)}`,
         }}

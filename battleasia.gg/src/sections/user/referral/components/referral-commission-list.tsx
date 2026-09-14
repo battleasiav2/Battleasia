@@ -136,7 +136,7 @@ export function ReferralCommissionList({ items, labels }: ReferralCommissionList
               <CoinValue
                 value={item.commissionAmount}
                 size={14}
-                textSx={{ fontWeight: 700, color: GOLD }}
+                textSx={{ fontWeight: 700, color: '#ffffff' }}
               />
             </Stack>
           </Box>

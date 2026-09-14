@@ -103,7 +103,7 @@ class ShopItemCard extends StatelessWidget {
                   _displayPrice(),
                   style: AppTheme.heading3.copyWith(
                     fontSize: 20,
-                    color: AppColors.gold,
+                    color: Colors.white,
                     fontWeight: FontWeight.w800,
                     height: 1.15,
                   ),

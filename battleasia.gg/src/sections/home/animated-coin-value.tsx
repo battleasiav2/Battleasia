@@ -38,6 +38,7 @@ export function AnimatedCoinValue({ value, size = 24 }: AnimatedCoinValueProps) 
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
           fontVariantNumeric: 'tabular-nums',
+          color: '#ffffff',
         }}
       >
         <PulseCountUp value={value} decimals={decimals} />

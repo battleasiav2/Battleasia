@@ -119,7 +119,7 @@ export function ReferralsList({ referrals, labels }: ReferralsListProps) {
             </Stack>
 
             <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-end', md: 'flex-end' }, gridColumn: { xs: '1 / -1', md: 'auto' } }}>
-              <CoinValue value={referral.earnings || 0} size={14} textSx={{ fontWeight: 700, color: USER_COLORS.gold }} />
+              <CoinValue value={referral.earnings || 0} size={14} textSx={{ fontWeight: 700, color: '#ffffff' }} />
             </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>

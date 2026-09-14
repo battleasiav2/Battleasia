@@ -43,6 +43,7 @@ export type ILeaderboardEntry = {
     level: number;
     lastPlayed?: string | null;
     totalKills?: number;
+    wins?: number;
 };
 
 export type IUserRole = {

@@ -11,7 +11,15 @@ import { Iconify } from 'src/components/iconify/iconify';
 import { useTranslate } from 'src/locales/use-locales';
 
 import { PLAY_YOUR_GAME_IMAGE_PATHS, HOME_GAME_ARTS } from './home-game-arts';
-import { LANDING_V2, landingPanelSx, landingPrimaryBtnSx } from './landing-v2-theme';
+import {
+  LANDING_V2,
+  landingCharAuraSx,
+  landingCharImgFilter,
+  landingCharPlinthSx,
+  landingPanelSx,
+  landingPrimaryBtnSx,
+  landingSectionTitleSx,
+} from './landing-v2-theme';
 import { LivePulseDot } from './live-pulse-dot';
 
 export { HOME_GAME_ARTS, PLAY_YOUR_GAME_IMAGE_PATHS };
@@ -79,9 +87,9 @@ export function PlayYourGameSection() {
   const accentColor = theme.palette.primary.main || '#cbfb24';
 
   const titleRaw = t('home.playYourGame.title') || 'PLAY YOUR GAME';
-  const titleWords = titleRaw.split(' ');
-  const titleLine1 = titleWords.length > 1 ? titleWords.slice(0, -1).join(' ') : titleRaw;
-  const titleLine2 = titleWords.length > 1 ? titleWords[titleWords.length - 1] : '';
+  const titleWords = titleRaw.trim().split(/\s+/);
+  const titleLine1 = titleWords[0] || titleRaw;
+  const titleLine2 = titleWords.slice(1).join(' ');
 
   const selectGame = useCallback((index: number) => {
     setActiveIndex(index);
@@ -119,13 +127,7 @@ export function PlayYourGameSection() {
             component="h2"
             className="landing-display"
             sx={{
-              fontFamily: LANDING_V2.display,
-              fontWeight: 600,
-              fontSize: { xs: '2.5rem', sm: 'clamp(2.5rem, 11vw, 7.2rem)' },
-              lineHeight: 0.92,
-              letterSpacing: '-0.03em',
-              textTransform: 'uppercase',
-              color: LANDING_V2.text,
+              ...landingSectionTitleSx,
             }}
           >
             {titleLine1}
@@ -273,15 +275,8 @@ export function PlayYourGameSection() {
             pb: 0,
           }}
         >
-          <Box
-            aria-hidden
-            sx={{
-              position: 'absolute',
-              inset: '12% 10% 18%',
-              background: `radial-gradient(ellipse at 50% 60%, ${alpha(accentColor, 0.22)} 0%, transparent 70%)`,
-              pointerEvents: 'none',
-            }}
-          />
+          <Box aria-hidden sx={landingCharAuraSx} />
+          <Box aria-hidden sx={landingCharPlinthSx} />
 
           <Typography
             sx={{
@@ -324,25 +319,11 @@ export function PlayYourGameSection() {
               maxWidth: '100%',
               objectFit: 'contain',
               objectPosition: 'bottom center',
-              filter: 'drop-shadow(0 24px 40px rgba(0,0,0,0.65))',
+              filter: landingCharImgFilter,
               transition: `opacity 0.35s ${LANDING_V2.ease}, transform 0.35s ${LANDING_V2.ease}`,
             }}
           />
 
-          <Box
-            aria-hidden
-            sx={{
-              position: 'absolute',
-              bottom: 0,
-              left: '8%',
-              right: '8%',
-              height: 48,
-              background: 'linear-gradient(180deg, transparent, rgba(0,0,0,0.55))',
-              borderRadius: '50%',
-              filter: 'blur(12px)',
-              zIndex: 0,
-            }}
-          />
         </Box>
       </Box>
     </Box>

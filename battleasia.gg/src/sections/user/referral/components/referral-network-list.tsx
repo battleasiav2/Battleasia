@@ -132,7 +132,7 @@ export function ReferralNetworkList({ items, labels }: ReferralNetworkListProps)
               <CoinValue
                 value={item.totalEarnings}
                 size={14}
-                textSx={{ fontWeight: 700, color: GOLD }}
+                textSx={{ fontWeight: 700, color: '#ffffff' }}
               />
             </Stack>
           </Box>

@@ -62,12 +62,12 @@ export const joinArenaLabelSx = {
 export const joinArenaValueSx = {
   fontSize: 14,
   fontWeight: 800,
-  color: USER_COLORS.gold,
+  color: '#ffffff',
 };
 
 export const joinArenaCoinTextSx = {
   fontWeight: 800,
-  color: USER_COLORS.gold,
+  color: '#ffffff',
   fontSize: 14,
 };
 

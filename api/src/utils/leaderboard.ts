@@ -123,6 +123,7 @@ export async function getLeaderboardEntries(period: Period = 'all', limit = 50) 
       level: Math.min(99, Math.floor(row.totalMatches / 3) + 1),
       lastPlayed: row.lastPlayed,
       totalKills: row.totalKills,
+      wins: row.wins || 0,
     };
   });
 }

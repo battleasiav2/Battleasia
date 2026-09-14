@@ -352,7 +352,7 @@ export function ShopWalletView() {
                       <Typography sx={{ fontSize: 13.5, fontWeight: 900, color: USER_COLORS.textPrimary, letterSpacing: 0.5 }}>
                         {t('shop.transferTotalDebit')}
                       </Typography>
-                      <CoinValue value={feePreview.totalDebited} sx={{ fontWeight: 900, color: USER_COLORS.gold, fontSize: 17 }} />
+                      <CoinValue value={feePreview.totalDebited} sx={{ fontWeight: 900, fontSize: 17 }} textSx={{ fontWeight: 900, color: '#ffffff', fontSize: 17 }} />
                     </Stack>
                   </Stack>
                 </Box>
@@ -463,7 +463,7 @@ export function ShopWalletView() {
                             sx={{
                               fontWeight: 900,
                               fontSize: 15,
-                              color: isSent ? '#f87171' : USER_COLORS.gold,
+                              color: isSent ? '#f87171' : '#ffffff',
                             }}
                           >
                             {isSent ? 'âˆ’' : '+'}
@@ -473,7 +473,7 @@ export function ShopWalletView() {
                             textSx={{
                               fontWeight: 900,
                               fontSize: 15,
-                              color: isSent ? '#f87171' : USER_COLORS.gold,
+                              color: isSent ? '#f87171' : '#ffffff',
                             }}
                           />
                         </Stack>

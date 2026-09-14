@@ -305,7 +305,7 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
                       '${isSent ? '-' : '+'}${(isSent ? totalDebited : amount).toStringAsFixed(2)} BAC',
                       style: AppTheme.bodySmall.copyWith(
                         fontWeight: FontWeight.w800,
-                        color: isSent ? Colors.redAccent : AppColors.gold,
+                        color: isSent ? Colors.redAccent : Colors.white,
                       ),
                     ),
                   ],
@@ -363,7 +363,7 @@ class _PreviewRow extends StatelessWidget {
             value,
             style: AppTheme.bodySmall.copyWith(
               fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
-              color: bold ? AppColors.gold : AppColors.textPrimary,
+              color: Colors.white,
             ),
           ),
         ],

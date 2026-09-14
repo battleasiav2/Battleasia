@@ -296,7 +296,7 @@ export function UserLayout({
                                     value={balance ?? 0}
                                     fontSize={{ xs: '0.85rem', sm: '1rem' }}
                                     fontWeight={700}
-                                    color={USER_COLORS.gold}
+                                    color="#ffffff"
                                 />
                             </Stack>
                             <Suspense fallback={null}>

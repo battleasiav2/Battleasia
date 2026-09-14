@@ -42,19 +42,19 @@ export type HomeHeaderProps = {
 };
 
 const zipControlSx = {
-  minHeight: 44,
-  height: 44,
-  minWidth: 44,
-  px: 1.5,
-  borderRadius: '10px',
-  border: `1px solid ${LANDING_V2.hair}`,
-  bgcolor: 'rgba(255,255,255,0.03)',
+  minHeight: 48,
+  height: 48,
+  minWidth: 48,
+  px: 0,
+  borderRadius: 0,
+  border: 'none',
+  bgcolor: 'transparent',
   color: LANDING_V2.muted,
   boxShadow: 'none',
   '&:hover': {
-    borderColor: LANDING_V2.hair2,
+    border: 'none',
     color: LANDING_V2.text,
-    bgcolor: 'rgba(255,255,255,0.05)',
+    bgcolor: 'transparent',
   },
 } as const;
 
@@ -125,7 +125,6 @@ export function HomeHeader({
               height: { xs: 28, sm: 36 },
               objectFit: 'contain',
               filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.6))',
-              mixBlendMode: 'lighten',
               flexShrink: 0,
             }}
           />
@@ -179,8 +178,8 @@ export function HomeHeader({
           data={allLangs}
           sx={{
             ...zipControlSx,
-            width: 44,
-            minWidth: 44,
+            width: 48,
+            minWidth: 48,
             px: 0,
           }}
         />
@@ -191,15 +190,15 @@ export function HomeHeader({
             <NotificationsDrawer
               sx={{
                 ...zipControlSx,
-                width: 44,
-                minWidth: 44,
-                height: 44,
+                width: 48,
+                minWidth: 48,
+                height: 48,
                 p: 0,
                 backgroundImage: 'none',
                 boxShadow: 'none',
                 '&:hover': {
-                  borderColor: LANDING_V2.hair2,
-                  bgcolor: 'rgba(255,255,255,0.05)',
+                  border: 'none',
+                  bgcolor: 'transparent',
                   boxShadow: 'none',
                   transform: 'none',
                   '& .notif-bell': {
@@ -215,16 +214,19 @@ export function HomeHeader({
           <SignInIconButton
             hideIcon
             sx={{
-              ...zipControlSx,
-              px: { xs: 1.5, sm: 2.5 },
-              minWidth: { xs: 44, sm: 'auto' },
+              height: 44,
+              minHeight: 44,
+              minWidth: { xs: 72, sm: 'auto' },
+              px: { xs: 1.5, sm: 2.25 },
               fontSize: '0.76rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               color: LANDING_V2.text,
-              borderColor: LANDING_V2.hair2,
-              bgcolor: 'transparent',
+              border: `1px solid ${LANDING_V2.hair2}`,
+              borderRadius: '10px',
+              bgcolor: 'rgba(255,255,255,0.03)',
+              boxShadow: 'none',
               '&:hover': {
                 borderColor: 'var(--ba-gold)',
                 color: 'var(--ba-gold)',

@@ -1,6 +1,8 @@
 {
   "leaderboard": {
     "title": "لیڈر بورڈ",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "allTime": "تمام وقت",
     "thisWeek": "اس ہفتے",
     "thisMonth": "اس مہینے",
@@ -28,7 +30,10 @@
     "emptyDescription": "Leaderboard rankings will appear once players start competing.",
     "failedToLoad": "Failed to load leaderboard",
     "badgeTopPlayers": "Top Players",
-    "badgeRanked": "RANKED"
+    "badgeRanked": "RANKED",
+    "viewFull": "View full leaderboard",
+    "wins": "Wins",
+    "matches": "Matches"
   },
   "auth": {
     "signIn": "سائن ان کریں",
@@ -126,6 +131,8 @@
   },
   "home": {
     "title": "گیمنگ کا مطلب ہے BattleAsia",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "subtitle": "Worldwide mobile tournament arena win BAC coins and cash out anytime.",
     "downloadApk": "APK ڈاؤن لوڈ کریں",
     "downloadApkButton": "BattleAsia Apk",
@@ -141,6 +148,8 @@
     "battleAsiaPulse": "BattleAsia پلس",
     "playYourGame": {
       "title": "اپنا گیم کھیلیں",
+      "hallEyebrow": "Hall of Champions",
+      "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
       "subtitle": "پانچ ارینا۔ ایک پلیٹ فارم۔ ہر اسکور بورڈ پر اصل نقد۔",
       "brandLabel": "BATTLE ASIA",
       "enterArena": "ارینا میں داخل ہوں",
@@ -185,6 +194,8 @@
       "solo": {
         "playersLabel": "1 کھلاڑی",
         "title": "سولو موڈ",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "اکیلے کھیلیں اور دوسرے کھلاڑیوں کے خلاف اپنی صلاحیتوں کا تجربہ کریں",
         "feature1": "نقشے: Karakin, Nusa, Erangel, Miramar, Sanhok, Vikendi, Rondo",
         "feature2": "موڈز: کلاسک میچز، TDM، گن گیم",
@@ -194,6 +205,8 @@
       "duo": {
         "playersLabel": "2 کھلاڑی",
         "title": "ڈوو موڈ",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "دوگنی ایکشن کے لیے ایک پارٹنر کے ساتھ ٹیم بنائیں",
         "feature1": "کسی دوست کو مدعو کریں یا رینڈم ٹیم میٹ کے ساتھ جوڑی بنائیں",
         "feature2": "چکن ڈنر + کیش انعامات کے لیے لڑیں",
@@ -203,6 +216,8 @@
       "squad": {
         "playersLabel": "4 کھلاڑی",
         "title": "اسکواڈ موڈ",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "چار کی ٹیم بنائیں اور میدان جنگ پر غلبہ حاصل کریں",
         "feature1": "3 رینڈم ٹیم میٹس کے ساتھ کھیلیں",
         "feature2": "مل کر ناقابل فراموش تاریخ بنائیں",
@@ -212,6 +227,8 @@
       "tdm": {
         "playersLabel": "6–8 کھلاڑی",
         "title": "TDM موڈ",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "تیز رفتار ٹیم ڈیتھ میچ ایکشن",
         "feature1": "تیز رفتار 4v4 ٹیم ڈیتھ میچ",
         "feature2": "رینڈم ٹیم میٹس کے ساتھ کھیلیں",
@@ -286,7 +303,8 @@
       "signInToJoin": "جوائن کرنے کے لیے سائن ان کریں",
       "playersLabel": "پلیئرز",
       "matchStatusOpen": "اوپن",
-      "matchBlurb": "{{game}} روم — لائیو انٹری، کل ریوارڈز اور پرائز پول۔"
+      "matchBlurb": "{{game}} روم — لائیو انٹری، کل ریوارڈز اور پرائز پول۔",
+      "viewAllMatches": "View all matches"
     }
   },
   "navigation": {
@@ -402,6 +420,8 @@
   },
   "wallet": {
     "title": "والیٹ",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "balance": "بیلنس",
     "deposit": "جمع کرائیں",
     "withdraw": "نکالیں",
@@ -465,6 +485,8 @@
   },
   "shop": {
     "title": "دکان",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "buyNow": "ابھی خریدیں",
     "addToCart": "کارٹ میں شامل کریں",
     "price": "قیمت",
@@ -495,18 +517,26 @@
     "features": {
       "inGamePurchases": {
         "title": "In-Game Purchases",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Buy items, skins, and upgrades across the Battle Asia ecosystem."
       },
       "rewardsPrizes": {
         "title": "Rewards & Prizes",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Collect tournament winnings and event rewards instantly in BAC."
       },
       "joinEvents": {
         "title": "Join Events",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Pay entry fees and unlock premium tournaments with one currency."
       },
       "secureSettlement": {
         "title": "Secure Settlement",
+        "hallEyebrow": "Hall of Champions",
+        "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
         "description": "Shop securely with verified transactions and instant settlement."
       }
     },
@@ -556,6 +586,8 @@
   },
   "profile": {
     "title": "پروفائل",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "editProfile": "پروفائل میں ترمیم کریں",
     "publicProfile": "عوامی پروفائل",
     "fullName": "پورا نام",
@@ -637,6 +669,8 @@
   },
   "match": {
     "title": "میچ",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "matchDetails": "میچ کی تفصیلات",
     "startTime": "شروع ہونے کا وقت",
     "endTime": "ختم ہونے کا وقت",
@@ -714,6 +748,8 @@
   },
   "referral": {
     "title": "ریفرل",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "yourCode": "آپ کا ریفرل کوڈ",
     "copyCode": "کوڈ کاپی کریں",
     "codeCopied": "کوڈ کاپی ہو گیا!",
@@ -762,6 +798,8 @@
   },
   "myMatches": {
     "title": "میرے میچز",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "totalMatches": "کل میچز",
     "wins": "جیت",
     "losses": "ہار",
@@ -783,6 +821,8 @@
   },
   "play": {
     "title": "کھیلیں",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "battleasia": "بیٹل ایشیا",
     "bannerDescription": "PUBG Mobile، Free Fire، COD اور مزید میں لائیو موبائل ای-اسپورٹس ٹورنامنٹس میں شامل ہوں — اصلی BAC انعامات جیتیں۔",
     "tournament": "ٹورنامنٹ",
@@ -816,6 +856,8 @@
   },
   "customerSupport": {
     "title": "کسٹمر سپورٹ",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "failedToLoadConversation": "گفتگو لوڈ کرنے میں ناکام",
     "filesUploadedSuccess": "{{count}} فائلیں کامیابی سے اپ لوڈ ہو گئیں",
     "failedToUploadFiles": "فائلیں اپ لوڈ کرنے میں ناکام",
@@ -838,6 +880,8 @@
   },
   "notifications": {
     "title": "اطلاعات",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "all": "سب",
     "unread": "نہ پڑھے ہوئے",
     "archived": "محفوظ شدہ",
@@ -851,6 +895,8 @@
   },
   "support": {
     "title": "کسٹمر سپورٹ",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "subject": "موضوع",
     "message": "پیغام",
     "sendMessage": "پیغام بھیجیں",
@@ -863,6 +909,8 @@
   },
   "feed": {
     "title": "فیڈ",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "allBlogs": "تمام بلاگز",
     "publishedAt": "شائع شدہ",
     "whatsNew": "What's New",
@@ -902,6 +950,8 @@
   },
   "myStatistics": {
     "title": "میرے اعدادوشمار",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "totalPaid": "کل ادا شدہ",
     "totalWon": "کل جیتا",
     "netProfit": "خالص منافع",
@@ -917,6 +967,8 @@
   },
   "myReferrals": {
     "title": "میرے ریفرلز",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "summary": "میرے ریفرلز کا خلاصہ",
     "list": "میری ریفرل فہرست",
     "referrals": "ریفرلز",
@@ -933,6 +985,8 @@
   },
   "myOrders": {
     "title": "میرے آرڈرز",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "orderItem": "شاپ آرڈر",
     "all": "سب",
     "pending": "زیر التواء",
@@ -984,6 +1038,8 @@
   },
   "statistics": {
     "title": "My Statistics",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "totalMatches": "Total Matches",
     "wins": "Wins",
     "losses": "Losses",
@@ -995,6 +1051,8 @@
   },
   "orders": {
     "title": "My Orders",
+    "hallEyebrow": "Hall of Champions",
+    "hallDescription": "Rankings are based on verified match results, win rate and tournament performance.",
     "orderHistory": "Order History",
     "orderNumber": "Order Number",
     "orderDate": "Order Date",

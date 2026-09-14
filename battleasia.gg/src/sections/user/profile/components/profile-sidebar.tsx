@@ -155,7 +155,7 @@ export function ProfileSidebar({
               alt=""
               sx={{ width: { xs: 22, sm: 24 }, height: { xs: 22, sm: 24 }, flexShrink: 0 }}
             />
-            <AnimatedBalance value={balance ?? 0} fontSize={{ xs: '1.25rem', sm: '1.5rem' }} fontWeight={800} color={USER_COLORS.gold} />
+            <AnimatedBalance value={balance ?? 0} fontSize={{ xs: '1.25rem', sm: '1.5rem' }} fontWeight={800} color="#ffffff" />
           </Stack>
         </Box>
       ) : null}

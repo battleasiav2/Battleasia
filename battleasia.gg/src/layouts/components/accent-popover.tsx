@@ -57,16 +57,16 @@ export function AccentPopover({ landing = false }: { landing?: boolean }) {
           sx={
             landing
               ? {
-                  width: 44,
-                  minWidth: 44,
-                  height: 44,
+                  width: 48,
+                  minWidth: 48,
+                  height: 48,
                   p: 0,
-                  borderRadius: '10px',
-                  border: `1px solid ${alpha('#ffffff', 0.09)}`,
-                  bgcolor: 'rgba(255,255,255,0.03)',
+                  borderRadius: 0,
+                  border: 'none',
+                  bgcolor: 'transparent',
                   '&:hover': {
-                    borderColor: 'rgba(255,255,255,0.14)',
-                    bgcolor: 'rgba(255,255,255,0.05)',
+                    bgcolor: 'transparent',
+                    opacity: 0.92,
                   },
                 }
               : headerAccentButtonSx(open)
@@ -75,8 +75,8 @@ export function AccentPopover({ landing = false }: { landing?: boolean }) {
           {landing ? (
             <Box
               sx={{
-                width: 16,
-                height: 16,
+                width: 22,
+                height: 22,
                 borderRadius: '50%',
                 bgcolor: 'var(--ba-gold)',
                 boxShadow: `0 0 0 3px ${goldAlpha(0.18)}`,
@@ -89,8 +89,8 @@ export function AccentPopover({ landing = false }: { landing?: boolean }) {
             className="prism-ring"
             sx={{
               position: 'absolute',
-              width: { xs: 16, sm: 22 },
-              height: { xs: 16, sm: 22 },
+              width: { xs: 22, sm: 28 },
+              height: { xs: 22, sm: 28 },
               borderRadius: '50%',
               border: `1px solid ${goldAlpha(0.4)}`,
               animation: `${prismRotate} 10s linear infinite`,
@@ -102,8 +102,8 @@ export function AccentPopover({ landing = false }: { landing?: boolean }) {
                 top: -2,
                 left: '50%',
                 transform: 'translateX(-50%)',
-                width: 4,
-                height: 4,
+                width: 5,
+                height: 5,
                 borderRadius: '50%',
                 bgcolor: 'var(--ba-gold)',
                 boxShadow: '0 0 6px var(--ba-gold)',
@@ -115,8 +115,8 @@ export function AccentPopover({ landing = false }: { landing?: boolean }) {
           <Box
             className="prism-gem"
             sx={{
-              width: 11,
-              height: 11,
+              width: 14,
+              height: 14,
               bgcolor: 'var(--ba-gold)',
               transform: 'rotate(45deg)',
               borderRadius: '1px',
