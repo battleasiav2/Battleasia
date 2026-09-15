@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { merge } from 'es-toolkit';
 
-import { Alert, Button } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import { alpha, useTheme, type Breakpoint } from '@mui/material/styles';
 
 import axios from 'src/lib/axios';
@@ -11,8 +11,10 @@ import { useRouter, useSearchParams } from 'src/routes/hooks';
 
 import { useSelector, useDispatch } from 'src/store';
 import { logoutAction } from 'src/store/reducers/auth';
+import { Logo } from 'src/components/logo';
 import { Iconify } from 'src/components/iconify';
 import { useTranslate } from 'src/locales/use-locales';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 import {
   clearShopPersistStorage,
@@ -21,10 +23,12 @@ import {
 } from 'src/utils/shop-session';
 
 import { AuthSplitSection } from './section';
-import { AUTH_BG_IMAGE } from 'src/sections/auth/auth-form-styles';
+import { AuthSplitContent } from './content';
 import { MainSection } from '../core/main-section';
 import { LayoutSection } from '../core/layout-section';
 import { HeaderSection } from '../core/header-section';
+import { AUTH_BG_IMAGE } from 'src/sections/auth/auth-form-styles';
+import { AccentPopover } from '../components/accent-popover';
 
 import type { AuthSplitSectionProps } from './section';
 import type { AuthSplitContentProps } from './content';
@@ -34,7 +38,9 @@ import type { LayoutSectionProps } from '../core/layout-section';
 
 // ----------------------------------------------------------------------
 
-const GOLD = '#f5c518';
+const AuthHeroPanel = lazy(() =>
+  import('src/sections/auth/auth-hero-panel').then((m) => ({ default: m.AuthHeroPanel }))
+);
 
 type LayoutBaseProps = Pick<LayoutSectionProps, 'sx' | 'children' | 'cssVars'>;
 
@@ -48,6 +54,7 @@ export type AuthSplitLayoutProps = LayoutBaseProps & {
   };
 };
 
+/** Match main-site zip auth — ink wash split + glass form (shop keeps reauth gate). */
 export function AuthSplitLayout({
   sx,
   cssVars,
@@ -63,7 +70,9 @@ export function AuthSplitLayout({
   const { isLoggedIn } = useSelector((state) => state.auth);
   const [reauthReady, setReauthReady] = useState(() => searchParams.get('reauth') !== '1');
 
-  // `?reauth=1` clears shop cookie/session so every entry requires sign-in.
+  const mainAppUrl =
+    (import.meta.env.VITE_MAIN_APP_URL as string | undefined) || 'https://battleasia.gg';
+
   useEffect(() => {
     if (searchParams.get('reauth') !== '1') {
       setReauthReady(true);
@@ -113,46 +122,57 @@ export function AuthSplitLayout({
 
   const renderHeader = () => {
     const headerSlotProps: HeaderSectionProps['slotProps'] = {
-      container: { maxWidth: false, sx: { px: { xs: 2, md: 3 } } },
+      container: {
+        maxWidth: false,
+        sx: {
+          px: { xs: 2, md: 3 },
+          minHeight: 72,
+          height: 72,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        },
+      },
     };
 
-    const mainAppUrl = (import.meta.env.VITE_MAIN_APP_URL as string | undefined) || 'https://battleasia.gg';
-
     const headerSlots: HeaderSectionProps['slots'] = {
-      topArea: (
-        <Alert severity="info" sx={{ display: 'none', borderRadius: 0 }}>
-          This is an info Alert.
-        </Alert>
-      ),
       leftArea: (
-        <Button
-          href={`${mainAppUrl.replace(/\/$/, '')}/dashboard`}
-          startIcon={<Iconify icon="solar:arrow-left-linear" width={16} />}
+        <Logo
           sx={{
-            mt: { xs: 2, md: 2.5 },
-            minHeight: 36,
-            height: 36,
-            px: 1.5,
-            py: 0.75,
-            borderRadius: '8px',
-            fontSize: 14,
-            fontWeight: 600,
-            letterSpacing: 0,
-            textTransform: 'none',
-            lineHeight: 1,
-            color: GOLD,
-            bgcolor: alpha('#000000', 0.35),
-            border: `1px solid ${alpha(GOLD, 0.4)}`,
-            boxShadow: 'none',
-            '& .MuiButton-startIcon': { mr: 0.75, ml: 0 },
-            '&:hover': {
-              bgcolor: alpha(GOLD, 0.1),
-              borderColor: GOLD,
-            },
+            width: { xs: 72, sm: 80 },
+            height: 'auto',
+            '& img': { objectFit: 'contain', width: '100%', height: 'auto' },
           }}
-        >
-          {t('auth.backHome')}
-        </Button>
+        />
+      ),
+      rightArea: (
+        <Stack direction="row" alignItems="center" spacing={1}>
+          <AccentPopover />
+          <Button
+            href={`${mainAppUrl.replace(/\/$/, '')}/`}
+            startIcon={<Iconify icon="solar:arrow-left-linear" width={16} />}
+            sx={{
+              minHeight: 36,
+              height: 36,
+              px: 1.5,
+              borderRadius: '10px',
+              fontSize: 13,
+              fontWeight: 600,
+              textTransform: 'none',
+              color: 'var(--ba-gold)',
+              bgcolor: alpha('#000000', 0.35),
+              border: `1px solid ${goldAlpha(0.35)}`,
+              boxShadow: 'none',
+              '& .MuiButton-startIcon': { mr: 0.75, ml: 0 },
+              '&:hover': {
+                bgcolor: goldAlpha(0.1),
+                borderColor: 'var(--ba-gold)',
+              },
+            }}
+          >
+            {t('auth.backHome')}
+          </Button>
+        </Stack>
       ),
     };
 
@@ -166,14 +186,15 @@ export function AuthSplitLayout({
         slotProps={merge(headerSlotProps, slotProps?.header?.slotProps ?? {})}
         sx={[
           {
-            position: 'absolute',
+            position: 'fixed',
             top: 0,
             left: 0,
             right: 0,
             zIndex: 10,
-            bgcolor: 'transparent',
-            backgroundColor: 'transparent !important',
-            backgroundImage: 'none !important',
+            bgcolor: 'rgba(6,6,7,0.94)',
+            backdropFilter: 'blur(18px)',
+            WebkitBackdropFilter: 'blur(18px)',
+            borderBottom: `1px solid ${alpha('#ffffff', 0.08)}`,
             boxShadow: 'none',
           },
           ...(Array.isArray(slotProps?.header?.sx)
@@ -189,61 +210,80 @@ export function AuthSplitLayout({
       {...slotProps?.main}
       sx={[
         () => ({
-          [theme.breakpoints.up(layoutQuery)]: {
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-          },
+          [theme.breakpoints.up(layoutQuery)]: { flexDirection: 'row', alignItems: 'stretch' },
         }),
         ...(Array.isArray(slotProps?.main?.sx)
           ? (slotProps?.main?.sx ?? [])
           : [slotProps?.main?.sx]),
         {
-          bgcolor: '#070708',
-          backgroundColor: '#070708 !important',
+          bgcolor: '#060607',
+          position: 'relative',
+          overflowX: 'clip',
+          overflowY: 'visible',
+          minHeight: {
+            xs: 'calc(100svh - var(--layout-header-mobile-height, 72px))',
+            md: 'calc(100svh - var(--layout-header-desktop-height, 72px))',
+          },
           backgroundImage: `url(${AUTH_BG_IMAGE})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center top',
           backgroundRepeat: 'no-repeat',
-          position: 'relative',
-          overflowX: 'clip',
-          overflowY: 'auto',
-          minHeight: '100vh',
-          width: '100%',
           '&::before': {
             content: "''",
             position: 'absolute',
             inset: 0,
+            zIndex: 0,
+            pointerEvents: 'none',
             background: `
-              radial-gradient(ellipse 60% 55% at 50% 45%, ${alpha(GOLD, 0.1)} 0%, transparent 65%),
-              linear-gradient(180deg, ${alpha('#070708', 0.4)} 0%, ${alpha('#070708', 0.65)} 100%)
+              linear-gradient(180deg, ${alpha('#060607', 0.55)} 0%, ${alpha('#060607', 0.72)} 45%, ${alpha('#060607', 0.88)} 100%),
+              radial-gradient(70% 45% at 50% 0%, ${goldAlpha(0.1)} 0%, transparent 55%)
             `,
-            zIndex: 0,
-          },
-          '&::after': {
-            content: "''",
-            position: 'absolute',
-            inset: 0,
-            background: `radial-gradient(ellipse 120% 80% at 50% 50%, transparent 35%, ${alpha('#050506', 0.6)} 100%)`,
-            zIndex: 0,
           },
         },
       ]}
     >
+      <AuthSplitContent
+        layoutQuery={layoutQuery}
+        {...slotProps?.content}
+        sx={{
+          position: 'relative',
+          zIndex: 3,
+          display: { xs: 'none', [layoutQuery]: 'flex' },
+          order: { [layoutQuery]: 0 },
+          flex: { [layoutQuery]: '1 1 52%' },
+          maxWidth: { [layoutQuery]: '52%' },
+          alignItems: 'center',
+          justifyContent: 'center',
+          px: { md: '28px', lg: 5 },
+          py: { md: 7 },
+          '&::before': { display: 'none' },
+        }}
+      >
+        <Suspense fallback={<Box sx={{ minHeight: 420, width: 1 }} aria-hidden />}>
+          <AuthHeroPanel />
+        </Suspense>
+      </AuthSplitContent>
+
       <AuthSplitSection
         layoutQuery={layoutQuery}
         {...slotProps?.section}
         sx={{
           position: 'relative',
-          zIndex: 1,
-          minHeight: '100vh',
-          width: '100%',
+          zIndex: 3,
+          order: { xs: 0, [layoutQuery]: 1 },
+          flex: { xs: '1 1 auto', [layoutQuery]: '1 1 48%' },
+          maxWidth: { [layoutQuery]: '48%' },
+          minHeight: {
+            xs: 'calc(100svh - var(--layout-header-mobile-height, 72px))',
+            md: 'calc(100svh - var(--layout-header-desktop-height, 72px))',
+          },
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           overflowX: 'clip',
           overflowY: 'visible',
-          py: { xs: 4, md: 5 },
+          py: { xs: 3, md: 6 },
+          px: { xs: 2.5, sm: 4, md: '28px' },
         }}
       >
         {children}
@@ -256,17 +296,15 @@ export function AuthSplitLayout({
       headerSection={renderHeader()}
       footerSection={null}
       cssVars={{
-        '--layout-auth-content-width': '620px',
-        '--layout-header-desktop-height': '56px',
-        '--layout-header-mobile-height': '52px',
-        '--layout-main-margin-top': '0px',
-        '--layout-main-mobile-margin-top': '0px',
+        '--layout-auth-content-width': '460px',
+        '--layout-header-desktop-height': '72px',
+        '--layout-header-mobile-height': '72px',
+        '--layout-main-margin-top': '72px',
+        '--layout-main-mobile-margin-top': '72px',
         ...cssVars,
       }}
       sx={{
-        bgcolor: '#070708',
-        backgroundColor: '#070708 !important',
-        minHeight: '100vh',
+        bgcolor: '#060607',
         ...sx,
       }}
     >

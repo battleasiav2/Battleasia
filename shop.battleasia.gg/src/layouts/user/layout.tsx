@@ -28,8 +28,10 @@ import { AccountDrawer } from '../components/account-drawer';
 import { USER_COLORS, userGoldButtonSx, userHeaderPillSx, getUserLayoutMainSx } from './user-theme';
 import { userLayoutVars, userNavColorVars } from './css-vars';
 import { LanguagePopover } from '../components/language-popover';
+import { AccentPopover } from '../components/accent-popover';
 import { FloatingFooterNav } from '../components/floating-footer-nav';
 import { menuItems, accountMenuItems, createMenuClickHandler } from '../menu-items-config';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 import type { MainSectionProps } from '../core/main-section';
 import type { HeaderSectionProps } from '../core/header-section';
@@ -126,6 +128,11 @@ export function UserLayout({
       container: {
         maxWidth: false,
         sx: {
+          px: { xs: 1.25, sm: 2, md: 3 },
+          gap: { xs: 0.75, sm: 1.5 },
+          minWidth: 0,
+          maxWidth: '100%',
+          overflow: 'hidden',
           ...(isNavVertical && { px: { [layoutQuery]: 5 } }),
         },
       },
@@ -143,14 +150,14 @@ export function UserLayout({
         <Stack
           direction="row"
           alignItems="center"
-          spacing={{ xs: 1, sm: 1.5 }}
-          sx={{ flexShrink: 0, minWidth: 0 }}
+          spacing={{ xs: 0.75, sm: 1.25 }}
+          sx={{ flex: '1 1 auto', minWidth: 0, overflow: 'hidden', pr: 1 }}
         >
           <Logo
             href={paths.user.shop}
             sx={{
-              width: { xs: 60, sm: 68, md: 76 },
-              height: { xs: 60, sm: 68, md: 76 },
+              width: { xs: 44, sm: 60, md: 72 },
+              height: { xs: 44, sm: 60, md: 72 },
               flexShrink: 0,
               '& img': {
                 borderRadius: 0.5,
@@ -159,58 +166,72 @@ export function UserLayout({
             }}
           />
 
-          {/* Badges next to logo on Shop Page matching reference design */}
-          <Stack direction="row" alignItems="center" spacing={1.25}>
-            {/* OFFICIAL STORE */}
+          {/* Shop-only trust badges — compact on mobile to avoid side-scroll */}
+          {isShopPage ? (
             <Stack
               direction="row"
               alignItems="center"
-              spacing={0.85}
-              sx={{
-                px: 1.5,
-                py: 0.5,
-                bgcolor: alpha('#070c18', 0.85),
-                border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}`,
+              spacing={{ xs: 0.65, sm: 1 }}
+              sx={{ minWidth: 0, overflow: 'hidden' }}
+            >
+              <Stack
+                direction="row"
+                alignItems="center"
+                spacing={0.65}
+                sx={{
+                  px: { xs: 0.9, sm: 1.35 },
+                  py: { xs: 0.4, sm: 0.5 },
+                  bgcolor: alpha('#070c18', 0.85),
+                border: `1px solid ${goldAlpha(0.45)}`,
                 borderRadius: '6px',
                 boxShadow: `0 4px 14px ${alpha('#000000', 0.5)}`,
+                flexShrink: 1,
+                minWidth: 0,
               }}
             >
               <Box
                 sx={{
-                  width: 7,
-                  height: 7,
+                  width: 6,
+                  height: 6,
                   borderRadius: '50%',
                   bgcolor: '#22c55e',
                   boxShadow: '0 0 8px #22c55e',
+                  flexShrink: 0,
                 }}
               />
               <Typography
                 sx={{
-                  fontSize: 11,
+                  fontSize: { xs: 9, sm: 11 },
                   fontWeight: 800,
-                  letterSpacing: 1.2,
+                  letterSpacing: { xs: 0.6, sm: 1.2 },
                   textTransform: 'uppercase',
                   color: '#dcdcdc',
                   lineHeight: 1,
                   whiteSpace: 'nowrap',
                 }}
               >
-                OFFICIAL STORE
+                <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                  OFFICIAL STORE
+                </Box>
+                <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
+                  OFFICIAL
+                </Box>
               </Typography>
             </Stack>
 
-            {/* VERIFIED STORE */}
             <Stack
               direction="row"
               alignItems="center"
-              spacing={0.75}
+              spacing={0.55}
               sx={{
-                px: 1.5,
+                display: { xs: 'none', sm: 'flex' },
+                px: 1.35,
                 py: 0.5,
                 bgcolor: alpha('#070c18', 0.85),
-                border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}`,
+                border: `1px solid ${goldAlpha(0.45)}`,
                 borderRadius: '6px',
                 boxShadow: `0 4px 14px ${alpha('#000000', 0.5)}`,
+                flexShrink: 0,
               }}
             >
               <Box
@@ -218,30 +239,32 @@ export function UserLayout({
                   width: 14,
                   height: 14,
                   borderRadius: '50%',
-                  bgcolor: alpha(USER_COLORS.gold, 0.18),
+                  bgcolor: goldAlpha(0.18),
                   border: `1px solid ${USER_COLORS.gold}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  flexShrink: 0,
                 }}
               >
-                <Iconify icon="eva:checkmark-fill" width={10} sx={{ color: USER_COLORS.gold }} />
-              </Box>
-              <Typography
-                sx={{
-                  fontSize: 11,
-                  fontWeight: 800,
-                  letterSpacing: 1.2,
-                  textTransform: 'uppercase',
-                  color: USER_COLORS.gold,
-                  lineHeight: 1,
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                VERIFIED STORE
-              </Typography>
+                  <Iconify icon="eva:checkmark-fill" width={10} sx={{ color: USER_COLORS.gold }} />
+                </Box>
+                <Typography
+                  sx={{
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: 1.2,
+                    textTransform: 'uppercase',
+                    color: USER_COLORS.gold,
+                    lineHeight: 1,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  VERIFIED STORE
+                </Typography>
+              </Stack>
             </Stack>
-          </Stack>
+          ) : null}
         </Stack>
       ),
       centerArea: isShopPage ? null : (
@@ -286,42 +309,61 @@ export function UserLayout({
         </Stack>
       ),
       rightArea: (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 1.75 } }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: { xs: 0.5, sm: 1.25 },
+            flexShrink: 0,
+            maxWidth: { xs: '52%', sm: 'none' },
+          }}
+        >
           {isLoggedIn ? (
             <>
-              {/* Balance Display */}
-              <Stack direction="row" alignItems="center" spacing={{ xs: 0.75, sm: 1 }} sx={userHeaderPillSx}>
+              <Stack
+                direction="row"
+                alignItems="center"
+                spacing={{ xs: 0.5, sm: 1 }}
+                sx={{
+                  ...userHeaderPillSx,
+                  minWidth: 0,
+                  maxWidth: { xs: 108, sm: 'none' },
+                  px: { xs: 0.75, sm: undefined },
+                }}
+              >
                 {isCurrencyIconLoaded ? (
                   <Box
                     component="img"
                     src={CONFIG.headerCurrencyIcon}
                     alt="BAC"
                     sx={{
-                      width: { xs: 26, sm: 28 },
-                      height: { xs: 26, sm: 28 },
+                      width: { xs: 22, sm: 28 },
+                      height: { xs: 22, sm: 28 },
                       flexShrink: 0,
                       objectFit: 'contain',
                       display: 'block',
-                      filter: `drop-shadow(0 0 6px ${alpha(USER_COLORS.gold, 0.35)})`,
+                      filter: `drop-shadow(0 0 6px ${goldAlpha(0.35)})`,
                     }}
                   />
                 ) : (
                   <Box
                     sx={{
-                      width: { xs: 26, sm: 28 },
-                      height: { xs: 26, sm: 28 },
+                      width: { xs: 22, sm: 28 },
+                      height: { xs: 22, sm: 28 },
                       bgcolor: alpha('#ffffff', 0.08),
                       borderRadius: '50%',
                       flexShrink: 0,
                     }}
                   />
                 )}
-                <AnimatedBalance
-                  value={balance ?? 0}
-                  fontSize={{ xs: '0.85rem', sm: '1rem' }}
-                  fontWeight={700}
-                  color={USER_COLORS.gold}
-                />
+                <Box sx={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  <AnimatedBalance
+                    value={balance ?? 0}
+                    fontSize={{ xs: '0.78rem', sm: '1rem' }}
+                    fontWeight={700}
+                    color={USER_COLORS.gold}
+                  />
+                </Box>
               </Stack>
               <AccountDrawer data={accountMenuItems} />
             </>
@@ -331,9 +373,9 @@ export function UserLayout({
               href={paths.auth.signIn}
               sx={{
                 ...userGoldButtonSx,
-                height: { xs: 36, sm: 45, md: 53 },
-                px: { xs: 2, sm: 3, md: 6.7 },
-                fontSize: { xs: 14, sm: 16, md: 18 },
+                height: { xs: 34, sm: 45, md: 53 },
+                px: { xs: 1.5, sm: 3, md: 6.7 },
+                fontSize: { xs: 13, sm: 16, md: 18 },
                 minWidth: { xs: 'auto', sm: undefined },
                 fontWeight: 600,
               }}
@@ -342,15 +384,18 @@ export function UserLayout({
             </Button>
           )}
 
-          {/** @slot Language popover */}
-          <LanguagePopover data={allLangs} />
+          <AccentPopover />
 
-          {/* Search Icon button matching reference header */}
+          <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center' }}>
+            <LanguagePopover data={allLangs} />
+          </Box>
+
           <IconButton
             sx={{
+              display: { xs: 'none', md: 'inline-flex' },
               color: alpha('#ffffff', 0.8),
               p: 1,
-              '&:hover': { color: USER_COLORS.gold, bgcolor: alpha(USER_COLORS.gold, 0.1) },
+              '&:hover': { color: USER_COLORS.gold, bgcolor: goldAlpha(0.1) },
             }}
           >
             <Iconify icon="eva:search-fill" width={20} />
@@ -372,8 +417,10 @@ export function UserLayout({
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'repeat-x',
-          pb: 2.5,
-          ...slotProps?.header?.sx
+          pb: { xs: 1.5, sm: 2.5 },
+          overflowX: 'clip',
+          maxWidth: '100%',
+          ...slotProps?.header?.sx,
         }}
       />
     );
@@ -396,13 +443,19 @@ export function UserLayout({
       sx={[
         {
           minHeight: '100vh',
+          maxWidth: '100%',
+          overflowX: 'clip',
           bgcolor: USER_COLORS.pageBg,
           [`& .${layoutClasses.root}`]: {
             minHeight: '100vh',
+            maxWidth: '100%',
+            overflowX: 'clip',
             bgcolor: USER_COLORS.pageBg,
           },
           [`& .${layoutClasses.sidebarContainer}`]: {
             minHeight: '100vh',
+            maxWidth: '100%',
+            overflowX: 'clip',
             bgcolor: USER_COLORS.pageBg,
             [theme.breakpoints.up(layoutQuery)]: {
               pl: isNavMini ? 'var(--layout-nav-mini-width)' : 'var(--layout-nav-vertical-width)',
@@ -416,6 +469,9 @@ export function UserLayout({
             display: 'flex',
             flex: '1 1 auto',
             flexDirection: 'column',
+            minWidth: 0,
+            maxWidth: '100%',
+            overflowX: 'clip',
             bgcolor: USER_COLORS.pageBg,
             ...getUserLayoutMainSx(),
             [`& .MuiCard-root`]: {

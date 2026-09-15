@@ -11,12 +11,18 @@ import { goldAlpha, USER_COLORS } from 'src/layouts/user';
 
 const GOLD = USER_COLORS.gold;
 
+const GRID_COLS = {
+  xs: '40px minmax(0, 1fr) 44px 48px 52px',
+  sm: '52px minmax(0, 1fr) 64px 64px 80px',
+} as const;
+
 type LeaderboardTableProps = {
   rows: ILeaderboardEntry[];
   labels: {
     rank: string;
     player: string;
     wins: string;
+    kills: string;
     matches: string;
     games: string;
     average: string;
@@ -49,15 +55,14 @@ function RankMark({ rank }: { rank: number }) {
 }
 
 export function LeaderboardTable({ rows, labels }: LeaderboardTableProps) {
+  const headerLabels = [labels.rank, labels.player, labels.wins, labels.kills, labels.matches];
+
   return (
     <Box sx={{ px: { xs: 1.25, sm: 1.75 }, pb: { xs: 1.5, sm: 2 } }}>
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: {
-            xs: '44px minmax(0, 1fr) 52px 64px',
-            sm: '52px minmax(0, 1fr) 72px 88px',
-          },
+          gridTemplateColumns: GRID_COLS,
           gap: 1.25,
           px: 0.5,
           mb: 0,
@@ -65,7 +70,7 @@ export function LeaderboardTable({ rows, labels }: LeaderboardTableProps) {
           borderBottom: `1px solid ${alpha('#ffffff', 0.08)}`,
         }}
       >
-        {[labels.rank, labels.player, labels.wins, labels.matches].map((label, i) => (
+        {headerLabels.map((label, i) => (
           <Typography
             key={label}
             sx={{
@@ -87,16 +92,14 @@ export function LeaderboardTable({ rows, labels }: LeaderboardTableProps) {
           const avatarSrc = getAvatarUrl(player.avatar);
           const meta = [`${labels.level} ${player.level}`, player.badge].filter(Boolean).join(' · ');
           const wins = player.wins ?? 0;
+          const kills = player.totalKills ?? 0;
 
           return (
             <Box
               key={player.id}
               sx={{
                 display: 'grid',
-                gridTemplateColumns: {
-                  xs: '44px minmax(0, 1fr) 52px 64px',
-                  sm: '52px minmax(0, 1fr) 72px 88px',
-                },
+                gridTemplateColumns: GRID_COLS,
                 gap: 1.25,
                 alignItems: 'center',
                 px: 0.5,
@@ -165,6 +168,17 @@ export function LeaderboardTable({ rows, labels }: LeaderboardTableProps) {
                 }}
               >
                 {wins}
+              </Typography>
+              <Typography
+                sx={{
+                  textAlign: 'right',
+                  fontSize: { xs: 13, sm: 15 },
+                  fontWeight: 700,
+                  color: USER_COLORS.textPrimary,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {kills}
               </Typography>
               <Typography
                 sx={{

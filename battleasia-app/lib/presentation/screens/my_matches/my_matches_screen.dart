@@ -1,14 +1,14 @@
-﻿import 'package:flutter/gestures.dart';
+﻿import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
+import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/match_history_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
-import 'package:battleasia_app/presentation/widgets/common/refresh_overlay.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 import 'package:battleasia_app/presentation/screens/play/match_detail_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/match_result_screen.dart';
@@ -28,12 +28,6 @@ class _MyMatchesScreenState extends State<MyMatchesScreen> {
   String _activeTab = 'all';
   List<MatchHistoryModel> _matches = [];
   bool _loading = true;
-  bool _isRefreshing = false;
-  double _overscrollAccumulator = 0.0;
-  double _dragStartY = 0.0;
-  bool _dragStartedAtTop = false;
-  bool _dragStartedAtBottom = false;
-  double _wheelAccumulator = 0.0;
 
   @override
   void initState() {
@@ -140,55 +134,6 @@ class _MyMatchesScreenState extends State<MyMatchesScreen> {
     await _fetchMatches(silent: true);
   }
 
-  bool _atTop() =>
-      _scrollController.hasClients &&
-      _scrollController.position.pixels <= 0;
-
-  bool _atBottom() =>
-      _scrollController.hasClients &&
-      _scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent;
-
-  void _onPointerDown(PointerDownEvent e) {
-    _dragStartY = e.position.dy;
-    _dragStartedAtTop = _atTop();
-    _dragStartedAtBottom = _atBottom();
-  }
-
-  void _onPointerMove(PointerMoveEvent e) {
-    if (_isRefreshing) return;
-    final dy = e.position.dy - _dragStartY;
-    if ((dy > 0 && _dragStartedAtTop) || (dy < 0 && _dragStartedAtBottom)) {
-      if (dy.abs() >= 70) _triggerRefresh();
-    }
-  }
-
-  void _onPointerSignal(PointerSignalEvent e) {
-    if (_isRefreshing) return;
-    if (e is PointerScrollEvent) {
-      final scrollingUp = e.scrollDelta.dy < 0;
-      final scrollingDown = e.scrollDelta.dy > 0;
-      if (scrollingDown && _atTop()) {
-        _wheelAccumulator += e.scrollDelta.dy.abs();
-      } else if (scrollingUp && _atBottom()) {
-        _wheelAccumulator += e.scrollDelta.dy.abs();
-      } else {
-        _wheelAccumulator = 0;
-      }
-      if (_wheelAccumulator >= 60) {
-        _wheelAccumulator = 0;
-        _triggerRefresh();
-      }
-    }
-  }
-
-  Future<void> _triggerRefresh() async {
-    if (_isRefreshing || !mounted) return;
-    setState(() => _isRefreshing = true);
-    await _onRefresh();
-    if (mounted) setState(() => _isRefreshing = false);
-  }
-
   @override
   Widget build(BuildContext context) {
     // Responsive sizes
@@ -226,78 +171,73 @@ class _MyMatchesScreenState extends State<MyMatchesScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      body: Listener(
-        onPointerDown: _onPointerDown,
-        onPointerMove: _onPointerMove,
-        onPointerSignal: _onPointerSignal,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            CustomScrollView(
-              controller: _scrollController,
-              physics: const ClampingScrollPhysics(),
-              slivers: [
-                SliverToBoxAdapter(child: SizedBox(height: headerHeight)),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: spacing16),
-                        // Statistics Summary
-                      _buildStatisticsSummary(context),
-                      SizedBox(height: spacing24),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          CustomScrollView(
+            controller: _scrollController,
+            physics: appScrollPhysics,
+            slivers: [
+              CupertinoSliverRefreshControl(onRefresh: _onRefresh),
+              SliverToBoxAdapter(child: SizedBox(height: headerHeight)),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: spacing16),
+                      // Statistics Summary
+                    _buildStatisticsSummary(context),
+                    SizedBox(height: spacing24),
 
-                      // Tabs
-                      PlayTabs(
-                        tabs: const [
-                          {'label': 'ALL', 'value': 'all'},
-                          {'label': 'WINS', 'value': 'win'},
-                          {'label': 'LOSSES', 'value': 'loss'},
-                          {'label': 'PENDING', 'value': 'pending'},
-                        ],
-                        activeTab: _activeTab,
-                        onTabChanged: (tab) {
-                          setState(() {
-                            _activeTab = tab;
-                          });
-                        },
-                        fontSize: tabFontSize,
-                      ),
+                    // Tabs
+                    PlayTabs(
+                      tabs: const [
+                        {'label': 'ALL', 'value': 'all'},
+                        {'label': 'WINS', 'value': 'win'},
+                        {'label': 'LOSSES', 'value': 'loss'},
+                        {'label': 'PENDING', 'value': 'pending'},
+                      ],
+                      activeTab: _activeTab,
+                      onTabChanged: (tab) {
+                        setState(() {
+                          _activeTab = tab;
+                        });
+                      },
+                      fontSize: tabFontSize,
+                    ),
 
-                      // Match Cards
-                      if (_loading)
-                        Center(
-                          child: Padding(
-                            padding: EdgeInsets.all(spacing24 * 1.33),
-                            child: const CircularProgressIndicator(),
-                          ),
-                        )
-                      else if (_filteredMatches.isEmpty)
-                        _buildEmptyState(context)
-                      else
-                        _buildMatchGrid(context),
-                    ],
-                  ),
+                    // Match Cards
+                    if (_loading)
+                      Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(spacing24 * 1.33),
+                          child: const CircularProgressIndicator(),
+                        ),
+                      )
+                    else if (_filteredMatches.isEmpty)
+                      _buildEmptyState(context)
+                    else
+                      _buildMatchGrid(context),
+                  ],
                 ),
               ),
-                // Bottom padding for floating nav
-                SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
-              ],
             ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: AppHeader(scrollController: _scrollController),
-            ),
+              // Bottom padding for floating nav
+              SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
+            ],
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AppHeader(scrollController: _scrollController),
+          ),
 
-            // Bottom menu
-            const FloatingBottomNav(),
-            if (_isRefreshing) const RefreshOverlay(),
-          ],
-        ),
+          // Bottom menu
+          const FloatingBottomNav(),
+        ],
       ),
     );
   }

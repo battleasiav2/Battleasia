@@ -12,9 +12,15 @@ import { goldAlpha } from 'src/theme/accent-presets';
 
 import { toast } from 'react-hot-toast';
 import { useTranslate } from 'src/locales/use-locales';
+import { Iconify } from 'src/components/iconify';
 
 import type { LeaderboardPeriod } from './leader-board-constants';
-import { LeaderboardTable, LeaderboardPageSkeleton, LeaderboardGlassShell } from './components';
+import {
+  LeaderboardPodium,
+  LeaderboardTable,
+  LeaderboardPageSkeleton,
+  LeaderboardGlassShell,
+} from './components';
 
 // ----------------------------------------------------------------------
 
@@ -31,6 +37,8 @@ export function LeaderBoardView() {
     { value: 'weekly' as const, label: t('leaderboard.thisWeek') },
     { value: 'monthly' as const, label: t('leaderboard.thisMonth') },
   ];
+
+  const formatScore = useCallback((score: number) => score.toLocaleString(), []);
 
   const fetchLeaderboard = useCallback(
     async (period: LeaderboardPeriod) => {
@@ -63,11 +71,15 @@ export function LeaderBoardView() {
     LIVE_SYNC_TOPICS.dashboard
   );
 
+  const topThree = useMemo(() => rows.slice(0, 3), [rows]);
+  const tableRows = useMemo(() => rows.slice(3), [rows]);
+
   const tableLabels = useMemo(
     () => ({
       rank: t('leaderboard.rank'),
       player: t('leaderboard.player'),
       wins: t('leaderboard.wins'),
+      kills: t('leaderboard.kills'),
       matches: t('leaderboard.matches'),
       games: t('leaderboard.games'),
       average: t('leaderboard.average'),
@@ -171,11 +183,58 @@ export function LeaderBoardView() {
             onAction={() => fetchLeaderboard(selectedPeriod)}
           />
         ) : (
-          <LeaderboardGlassShell>
-            <Box sx={{ pt: { xs: 1.5, sm: 1.75 } }}>
-              <LeaderboardTable rows={rows} labels={tableLabels} />
-            </Box>
-          </LeaderboardGlassShell>
+          <Stack spacing={2.5}>
+            <LeaderboardGlassShell>
+              <Box sx={{ px: { xs: 1.25, sm: 2 }, pt: { xs: 1.5, sm: 2 }, pb: 0 }}>
+                <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
+                  <Iconify icon="solar:crown-bold" width={16} sx={{ color: USER_COLORS.gold }} />
+                  <Typography
+                    sx={{
+                      fontSize: 11,
+                      fontWeight: 800,
+                      letterSpacing: 0.8,
+                      textTransform: 'uppercase',
+                      color: alpha('#ffffff', 0.55),
+                    }}
+                  >
+                    Champions podium
+                  </Typography>
+                </Stack>
+              </Box>
+              <LeaderboardPodium
+                players={topThree}
+                pointsLabel={t('leaderboard.points')}
+                formatScore={formatScore}
+              />
+            </LeaderboardGlassShell>
+
+            {tableRows.length > 0 ? (
+              <LeaderboardGlassShell>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                  sx={{ px: { xs: 1.5, sm: 2 }, pt: { xs: 1.5, sm: 1.75 }, pb: 1 }}
+                >
+                  <Iconify icon="solar:ranking-bold" width={16} sx={{ color: USER_COLORS.gold }} />
+                  <Typography
+                    sx={{
+                      fontSize: 11,
+                      fontWeight: 800,
+                      letterSpacing: 0.8,
+                      textTransform: 'uppercase',
+                      color: alpha('#ffffff', 0.55),
+                    }}
+                  >
+                    Full rankings
+                  </Typography>
+                </Stack>
+                <Box sx={{ pt: { xs: 0.5, sm: 0.75 } }}>
+                  <LeaderboardTable rows={tableRows} labels={tableLabels} />
+                </Box>
+              </LeaderboardGlassShell>
+            ) : null}
+          </Stack>
         )}
       </Stack>
     </UserPageShell>

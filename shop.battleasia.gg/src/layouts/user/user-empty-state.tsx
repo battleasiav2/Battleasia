@@ -1,3 +1,4 @@
+import { goldAlpha } from 'src/theme/accent-presets';
 import type { SxProps, Theme } from '@mui/material/styles';
 
 import Box from '@mui/material/Box';
@@ -53,8 +54,8 @@ export function UserEmptyState({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            bgcolor: alpha(USER_COLORS.gold, 0.1),
-            border: `1px solid ${alpha(USER_COLORS.gold, 0.22)}`,
+            bgcolor: goldAlpha(0.1),
+            border: `1px solid ${goldAlpha(0.22)}`,
             color: USER_COLORS.gold,
           }}
         >

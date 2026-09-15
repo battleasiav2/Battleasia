@@ -41,15 +41,40 @@ import type {
 
 type PulseGameFilter = 'ALL' | 'PUBG' | 'FREE FIRE' | 'COD' | 'VALORANT' | 'MLBB';
 
+const PULSE_GAME_FILTERS: Exclude<PulseGameFilter, 'ALL'>[] = [
+    'PUBG',
+    'FREE FIRE',
+    'COD',
+    'VALORANT',
+    'MLBB',
+];
+
+function detectPulseGameFilter(gameName: string | undefined): Exclude<PulseGameFilter, 'ALL'> | null {
+    const g = (gameName || '').toLowerCase();
+    if (!g) return null;
+    if (g.includes('pubg')) return 'PUBG';
+    if (g.includes('free fire') || g.includes('freefire') || g === 'ff') return 'FREE FIRE';
+    if (g.includes('cod') || g.includes('call of duty')) return 'COD';
+    if (g.includes('valorant') || /\bval\b/.test(g)) return 'VALORANT';
+    if (g.includes('mobile legends') || g.includes('mlbb') || g.includes('legend')) return 'MLBB';
+    return null;
+}
+
 function matchPassesGameFilter(gameName: string | undefined, filter: PulseGameFilter): boolean {
     if (filter === 'ALL') return true;
-    const g = (gameName || '').toLowerCase();
-    if (filter === 'PUBG') return g.includes('pubg');
-    if (filter === 'FREE FIRE') return g.includes('free fire') || g.includes('freefire') || g === 'ff';
-    if (filter === 'COD') return g.includes('cod') || g.includes('call of duty');
-    if (filter === 'VALORANT') return g.includes('valorant') || g.includes('val');
-    if (filter === 'MLBB') return g.includes('mobile legends') || g.includes('mlbb') || g.includes('legend');
-    return true;
+    return detectPulseGameFilter(gameName) === filter;
+}
+
+/** Only chips for games that appear in live Pulse match rails (+ ALL). */
+function presentPulseGameFilters(
+    matches: { gameName?: string }[]
+): Exclude<PulseGameFilter, 'ALL'>[] {
+    const present = new Set<Exclude<PulseGameFilter, 'ALL'>>();
+    matches.forEach((m) => {
+        const id = detectPulseGameFilter(m.gameName);
+        if (id) present.add(id);
+    });
+    return PULSE_GAME_FILTERS.filter((id) => present.has(id));
 }
 
 type SectionState = {
@@ -431,6 +456,7 @@ function PulseHeroTactical({
     gameFilter,
     onGameFilterChange,
     chipLabels,
+    availableGames,
 }: {
     title: string;
     description: string;
@@ -442,18 +468,23 @@ function PulseHeroTactical({
     gameFilter: PulseGameFilter;
     onGameFilterChange: (filter: PulseGameFilter) => void;
     chipLabels: { all: string; pubg: string; freeFire: string; cod: string; valorant: string; mlbb: string };
+    availableGames: Exclude<PulseGameFilter, 'ALL'>[];
 }) {
     const theme = useTheme();
     const accentColor = theme.palette.primary.main || '#cbfb24';
     const accentInk = theme.palette.primary.contrastText || LANDING_V2.goldInk;
 
+    const labelById: Record<Exclude<PulseGameFilter, 'ALL'>, string> = {
+        PUBG: chipLabels.pubg,
+        'FREE FIRE': chipLabels.freeFire,
+        COD: chipLabels.cod,
+        VALORANT: chipLabels.valorant,
+        MLBB: chipLabels.mlbb,
+    };
+
     const chips: { id: PulseGameFilter; label: string }[] = [
         { id: 'ALL', label: chipLabels.all },
-        { id: 'PUBG', label: chipLabels.pubg },
-        { id: 'FREE FIRE', label: chipLabels.freeFire },
-        { id: 'COD', label: chipLabels.cod },
-        { id: 'VALORANT', label: chipLabels.valorant },
-        { id: 'MLBB', label: chipLabels.mlbb },
+        ...availableGames.map((id) => ({ id, label: labelById[id] })),
     ];
 
     const metrics = [
@@ -1699,6 +1730,22 @@ export function LandingDashboardSection() {
         [data?.ongoingMatches, gameFilter]
     );
 
+    const availableGames = useMemo(
+        () =>
+            presentPulseGameFilters([
+                ...(data?.highPrizeMatches || []),
+                ...(data?.ongoingMatches || []),
+            ]),
+        [data?.highPrizeMatches, data?.ongoingMatches]
+    );
+
+    useEffect(() => {
+        if (gameFilter === 'ALL') return;
+        if (!availableGames.includes(gameFilter)) {
+            setGameFilter('ALL');
+        }
+    }, [availableGames, gameFilter]);
+
     const chipLabels = useMemo(
         () => ({
             all: 'ALL',
@@ -1796,6 +1843,7 @@ export function LandingDashboardSection() {
                     gameFilter={gameFilter}
                     onGameFilterChange={setGameFilter}
                     chipLabels={chipLabels}
+                    availableGames={availableGames}
                 />
 
                 <Box

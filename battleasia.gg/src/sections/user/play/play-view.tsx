@@ -1,7 +1,6 @@
 ﻿import { useState, useEffect, useMemo } from 'react';
 
 import { Box, Stack, Typography, Grid2 as Grid } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
@@ -13,7 +12,6 @@ import { useImagePreloader } from 'src/hooks';
 import { useTranslate } from 'src/locales/use-locales';
 import { UserPageShell, UserEmptyState } from 'src/layouts/user';
 import { USER_COLORS } from 'src/layouts/user/user-theme';
-import { goldAlpha } from 'src/theme/accent-presets';
 
 import { ScrollReveal } from 'src/components/animate';
 
@@ -153,47 +151,27 @@ export function PlayView() {
               sx={{
                 scrollMarginTop: { xs: 90, md: 110 },
                 position: 'relative',
-                px: { xs: 1.25, sm: 1.75, md: 2.25 },
-                py: { xs: 2, md: 2.75 },
-                borderRadius: '12px',
-                overflow: 'hidden',
-                bgcolor: alpha('#05070c', 0.72),
-                border: `1px solid ${goldAlpha(0.16)}`,
-                boxShadow: `inset 0 0 60px ${goldAlpha(0.04)}, 0 20px 48px ${alpha('#000000', 0.45)}`,
-                '&::before': {
-                  content: '""',
-                  position: 'absolute',
-                  inset: 0,
-                  pointerEvents: 'none',
-                  background: `
-                    radial-gradient(ellipse 50% 40% at 15% 0%, ${goldAlpha(0.12)} 0%, transparent 60%),
-                    radial-gradient(ellipse 40% 35% at 90% 100%, ${alpha('#22c55e', 0.06)} 0%, transparent 55%)
-                  `,
-                },
               }}
             >
               <Stack
                 direction={{ xs: 'column', sm: 'row' }}
-                alignItems={{ xs: 'flex-start', sm: 'center' }}
+                alignItems={{ xs: 'flex-start', sm: 'baseline' }}
                 justifyContent="space-between"
                 spacing={1}
-                sx={{ mb: 2.5, position: 'relative', zIndex: 1 }}
+                sx={{ mb: 2.25 }}
               >
-                <Box>
-                  <Typography
-                    className="font-tr"
-                    sx={{
-                      fontSize: { xs: 22, md: 28 },
-                      fontWeight: 800,
-                      textTransform: 'uppercase',
-                      color: USER_COLORS.textPrimary,
-                      letterSpacing: 0.5,
-                      textShadow: `0 0 24px ${goldAlpha(0.25)}`,
-                    }}
-                  >
-                    {t('play.tournament')}
-                  </Typography>
-                </Box>
+                <Typography
+                  className="font-tr"
+                  sx={{
+                    fontSize: { xs: 22, md: 28 },
+                    fontWeight: 800,
+                    textTransform: 'uppercase',
+                    color: USER_COLORS.textPrimary,
+                    letterSpacing: 0.4,
+                  }}
+                >
+                  {t('play.tournament')}
+                </Typography>
                 <Typography sx={{ fontSize: 13, color: USER_COLORS.textMuted }}>
                   {t('play.selectTitleHint')}
                 </Typography>
@@ -210,8 +188,8 @@ export function PlayView() {
               ) : (
                 <Grid
                   container
-                  spacing={{ xs: 1.5, sm: 1.75, md: 2.25 }}
-                  sx={{ alignItems: 'stretch', position: 'relative', zIndex: 1 }}
+                  spacing={{ xs: 1.5, sm: 1.75, md: 2 }}
+                  sx={{ alignItems: 'stretch' }}
                 >
                   {games.map((game, index) => (
                     <Grid key={game.id} size={{ xs: 6, sm: 4, md: 2.4, lg: 2.4 }} sx={{ display: 'flex' }}>

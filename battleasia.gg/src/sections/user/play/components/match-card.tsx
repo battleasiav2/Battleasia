@@ -12,11 +12,7 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
 import CoinValue from 'src/components/coin-value';
-import {
-  getGlassBadgeChipSx,
-  getDefaultGlassTokens,
-  getGoldTopLineShellSx,
-} from 'src/components/battle-glass-card';
+import { getGlassBadgeChipSx, getDefaultGlassTokens } from 'src/components/battle-glass-card';
 
 import { USER_COLORS, userGoldButtonSx, goldAlpha } from 'src/layouts/user';
 
@@ -39,7 +35,7 @@ function StatInline({
   children: React.ReactNode;
 }) {
   return (
-    <Box sx={{ minWidth: 0 }}>
+    <Box sx={{ minWidth: 0, flex: 1 }}>
       <Typography
         sx={{
           fontSize: 9,
@@ -55,7 +51,7 @@ function StatInline({
       </Typography>
       <Box
         sx={{
-          fontSize: 13,
+          fontSize: { xs: 12, sm: 13 },
           fontWeight: 700,
           color: USER_COLORS.textPrimary,
           display: 'flex',
@@ -93,6 +89,7 @@ export function MatchCard({
   const buttonDisabled =
     joining || isJoined || !canJoin || isMatchFull || (isPremiumMatch && !isPremiumUser);
   const winningPool = estimateMatchWinningPool(match);
+  const spotsPct = max > 0 ? Math.min(100, Math.round((joined / max) * 100)) : 0;
 
   const goToDetail = (e?: React.MouseEvent) => {
     e?.stopPropagation();
@@ -110,24 +107,38 @@ export function MatchCard({
   return (
     <Box
       onClick={isResult ? handleCardClick : undefined}
-      sx={getGoldTopLineShellSx({
-        p: 0,
+      sx={{
+        position: 'relative',
         width: 1,
-        height: 1,
+        height: { xs: 200, sm: 220 },
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         overflow: 'hidden',
+        borderRadius: '18px',
+        bgcolor: 'rgba(22,22,24,0.72)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        border: `1px solid ${alpha('#ffffff', 0.09)}`,
+        boxShadow: 'inset 2px 0 0 rgba(212,168,75,0.55), 0 24px 60px -40px #000',
         cursor: isResult ? 'pointer' : 'default',
-        bgcolor: '#161618',
-        borderColor: alpha('#ffffff', 0.08),
-        boxShadow: 'none',
-        transition: 'border-color 0.2s ease',
+        transition: 'border-color 0.2s ease, box-shadow 0.2s ease, transform 0.25s ease',
         '&:hover': {
-          borderColor: goldAlpha(0.4),
+          borderColor: goldAlpha(0.35),
+          boxShadow: 'inset 2px 0 0 rgba(212,168,75,0.75), 0 28px 60px -32px #000',
+          transform: 'translateY(-2px)',
         },
-      })}
+      }}
     >
-      <Box sx={{ position: 'relative', height: 120, flexShrink: 0, overflow: 'hidden' }}>
+      {/* Banner — left half (APK parity) */}
+      <Box
+        sx={{
+          position: 'relative',
+          width: { xs: '38%', sm: '42%' },
+          flexShrink: 0,
+          overflow: 'hidden',
+          bgcolor: '#0a0a0a',
+        }}
+      >
         <Box
           component="img"
           src={bannerSrc}
@@ -143,21 +154,20 @@ export function MatchCard({
             objectFit: 'cover',
             objectPosition: 'center',
             display: 'block',
-            bgcolor: '#0a0a0a',
           }}
         />
         <Box
           sx={{
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(180deg, transparent 30%, ${alpha('#000000', 0.8)} 100%)`,
+            background: `linear-gradient(90deg, transparent 40%, ${alpha('#161618', 0.92)} 100%)`,
           }}
         />
 
         <Stack
           direction="row"
-          spacing={0.75}
-          sx={{ position: 'absolute', top: 10, left: 10, right: 10, flexWrap: 'wrap' }}
+          spacing={0.5}
+          sx={{ position: 'absolute', top: 8, left: 8, right: 8, flexWrap: 'wrap' }}
         >
           {isPremiumMatch ? (
             <Box
@@ -168,15 +178,15 @@ export function MatchCard({
                 border: `1px solid ${goldAlpha(0.35)}`,
               }}
             >
-              <Stack direction="row" alignItems="center" spacing={0.5} sx={{ px: 0.5 }}>
-                <Iconify icon="solar:crown-bold" width={12} />
-                <Typography sx={{ fontSize: 10, fontWeight: 800 }}>PREMIUM</Typography>
+              <Stack direction="row" alignItems="center" spacing={0.35} sx={{ px: 0.35 }}>
+                <Iconify icon="solar:crown-bold" width={11} />
+                <Typography sx={{ fontSize: 9, fontWeight: 800 }}>PREMIUM</Typography>
               </Stack>
             </Box>
           ) : null}
           {!isResult && isJoined ? (
             <Box sx={getGlassBadgeChipSx(tokens)}>
-              <Typography sx={{ fontSize: 10, fontWeight: 800, px: 0.5 }}>JOINED</Typography>
+              <Typography sx={{ fontSize: 9, fontWeight: 800, px: 0.35 }}>JOINED</Typography>
             </Box>
           ) : null}
           {isResult ? (
@@ -187,7 +197,7 @@ export function MatchCard({
                 border: `1px solid ${alpha(USER_COLORS.info, 0.35)}`,
               }}
             >
-              <Typography sx={{ fontSize: 10, fontWeight: 800, px: 0.5, color: USER_COLORS.info }}>
+              <Typography sx={{ fontSize: 9, fontWeight: 800, px: 0.35, color: USER_COLORS.info }}>
                 RESULT
               </Typography>
             </Box>
@@ -195,13 +205,23 @@ export function MatchCard({
         </Stack>
       </Box>
 
-      <Stack spacing={1.25} sx={{ p: 1.75, flex: 1, minHeight: 0, display: 'flex' }}>
-        <Box>
+      {/* Info — right half */}
+      <Stack
+        spacing={0.85}
+        sx={{
+          flex: 1,
+          minWidth: 0,
+          p: { xs: 1.25, sm: 1.5 },
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Box sx={{ minWidth: 0 }}>
           <Typography
             className="font-tr"
             onClick={goToDetail}
             sx={{
-              fontSize: 15,
+              fontSize: { xs: 13, sm: 15 },
               fontWeight: 800,
               color: USER_COLORS.textPrimary,
               textTransform: 'uppercase',
@@ -217,35 +237,67 @@ export function MatchCard({
             {match.matchName}
           </Typography>
 
-          <Typography sx={{ mt: 0.5, fontSize: 12, color: USER_COLORS.textMuted }}>
-            <Box component="span" sx={{ color: USER_COLORS.gold, fontWeight: 600 }}>
-              {fDateTime(match.matchSchedule, 'DD/MM/YYYY hh:mm a')}
-            </Box>
+          <Typography
+            sx={{
+              mt: 0.4,
+              fontSize: { xs: 11, sm: 12 },
+              color: USER_COLORS.gold,
+              fontWeight: 600,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {fDateTime(match.matchSchedule, 'DD/MM/YYYY hh:mm a')}
             {match.map ? ` · ${match.map}` : ''}
-            {!isResult ? ` · ${joined}/${max}` : ''}
           </Typography>
+
+          {!isResult ? (
+            <Box sx={{ mt: 0.75 }}>
+              <Typography
+                sx={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  letterSpacing: 0.5,
+                  color: alpha('#ffffff', 0.42),
+                  textTransform: 'uppercase',
+                  mb: 0.35,
+                }}
+              >
+                {joined}/{max} spots
+              </Typography>
+              <Box
+                sx={{
+                  height: 3,
+                  borderRadius: 4,
+                  bgcolor: alpha('#ffffff', 0.08),
+                  overflow: 'hidden',
+                }}
+              >
+                <Box
+                  sx={{
+                    width: `${spotsPct}%`,
+                    height: 1,
+                    bgcolor: USER_COLORS.gold,
+                    borderRadius: 4,
+                  }}
+                />
+              </Box>
+            </Box>
+          ) : null}
         </Box>
 
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-            gap: 1.25,
-            py: 1,
-            borderTop: `1px solid ${alpha('#ffffff', 0.06)}`,
-            borderBottom: `1px solid ${alpha('#ffffff', 0.06)}`,
-          }}
-        >
+        <Stack direction="row" spacing={1} sx={{ py: 0.5 }}>
           <StatInline label={t('match.entryFee')}>
-            <CoinValue value={match.entryFee ?? 0} size={13} />
+            <CoinValue value={match.entryFee ?? 0} size={12} />
           </StatInline>
           <StatInline label={t('match.prizePool')}>
-            <CoinValue value={winningPool} size={13} />
+            <CoinValue value={winningPool} size={12} />
           </StatInline>
           <StatInline label={t('match.perKill')}>
-            <CoinValue value={match.perKill ?? 0} size={13} />
+            <CoinValue value={match.perKill ?? 0} size={12} />
           </StatInline>
-        </Box>
+        </Stack>
 
         {!isResult && isJoined ? (
           <MatchRoomDialog
@@ -254,9 +306,9 @@ export function MatchCard({
               <Typography
                 component="span"
                 sx={{
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: 700,
-                  letterSpacing: 0.6,
+                  letterSpacing: 0.5,
                   textTransform: 'uppercase',
                   color: USER_COLORS.gold,
                   textDecoration: 'underline',
@@ -281,9 +333,9 @@ export function MatchCard({
             }}
             sx={{
               ...userGoldButtonSx,
-              mt: 'auto',
-              py: 0.9,
-              fontSize: 13,
+              py: 0.75,
+              minHeight: 40,
+              fontSize: 12,
             }}
           >
             View Results
@@ -300,25 +352,25 @@ export function MatchCard({
             }}
             sx={{
               ...userGoldButtonSx,
-              mt: 'auto',
-              py: 0.9,
-              fontSize: 13,
+              py: 0.75,
+              minHeight: 40,
+              fontSize: 12,
             }}
           >
             {isJoined ? (
               <Stack direction="row" alignItems="center" spacing={0.5}>
-                <CoinValue value={match.entryFee} size={14} />
-                <Typography sx={{ fontSize: 13, fontWeight: 800, color: 'inherit' }}>SPECTATE</Typography>
+                <CoinValue value={match.entryFee} size={13} />
+                <Typography sx={{ fontSize: 12, fontWeight: 800, color: 'inherit' }}>SPECTATE</Typography>
               </Stack>
             ) : isPremiumMatch && !isPremiumUser ? (
               <Stack direction="row" alignItems="center" spacing={0.5}>
-                <Iconify icon="solar:crown-bold" width={16} />
-                <Typography sx={{ fontSize: 13, fontWeight: 800, color: 'inherit' }}>
+                <Iconify icon="solar:crown-bold" width={14} />
+                <Typography sx={{ fontSize: 12, fontWeight: 800, color: 'inherit' }}>
                   PREMIUM ONLY
                 </Typography>
               </Stack>
             ) : isMatchFull ? (
-              <Typography sx={{ fontSize: 13, fontWeight: 800, letterSpacing: 0.6, color: 'inherit' }}>
+              <Typography sx={{ fontSize: 12, fontWeight: 800, letterSpacing: 0.6, color: 'inherit' }}>
                 {t('match.matchFull')}
               </Typography>
             ) : joining ? (

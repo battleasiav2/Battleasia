@@ -7,6 +7,8 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
 
+import { goldAlpha } from 'src/theme/accent-presets';
+
 import { paths } from 'src/routes/paths';
 import { RouterLink } from 'src/routes/components';
 
@@ -37,7 +39,7 @@ export function NotFoundView() {
           alignItems: 'center',
           bgcolor: '#050505',
           backgroundImage: `
-            radial-gradient(ellipse 60% 40% at 50% 0%, ${alpha(GOLD, 0.12)} 0%, transparent 55%),
+            radial-gradient(ellipse 60% 40% at 50% 0%, ${goldAlpha(0.12)} 0%, transparent 55%),
             linear-gradient(180deg, #0a0a0a 0%, #000000 100%)
           `,
         }}

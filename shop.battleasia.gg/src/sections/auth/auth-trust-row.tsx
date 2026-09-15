@@ -1,11 +1,12 @@
 import { Stack, Typography } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 
 import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
 
-const GOLD = '#f5c518';
+import { AUTH_TEXT_MUTED } from './auth-form-styles';
+
+const GOLD = 'var(--ba-gold)';
 
 type AuthTrustRowProps = {
   insideCard?: boolean;
@@ -38,9 +39,9 @@ export function AuthTrustRow({ insideCard }: AuthTrustRowProps) {
           <Iconify icon={item.icon} width={14} sx={{ color: GOLD }} />
           <Typography
             sx={{
-              fontSize: 12,
+              fontSize: 13,
               fontWeight: 500,
-              color: alpha('#fff', 0.5),
+              color: AUTH_TEXT_MUTED,
               whiteSpace: 'nowrap',
             }}
           >

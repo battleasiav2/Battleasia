@@ -167,3 +167,13 @@ input[type='number']::-webkit-inner-spin-button {
   transform: translateY(1px) scale(0.97);
 }
 
+/** Shop / brand UI — match hosted Barlow (Clash/Satoshi fall back here) */
+.landing-display,
+.shop-display {
+  font-family: 'Barlow', 'Public Sans Variable', sans-serif !important;
+}
+
+.shop-ui {
+  font-family: 'Barlow', 'Public Sans Variable', sans-serif;
+}
+

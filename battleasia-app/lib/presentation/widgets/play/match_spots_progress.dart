@@ -154,12 +154,7 @@ class MatchSpotsProgress extends StatelessWidget {
                                   const Color(0xFFFDE68A),
                                 ],
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: (state.isFull ? _fullRed : AppColors.gold).withValues(alpha: 0.42),
-                        blurRadius: 14,
-                      ),
-                    ],
+                    boxShadow: const [],
                   ),
                 ),
               ),

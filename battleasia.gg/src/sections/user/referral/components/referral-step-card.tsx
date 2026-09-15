@@ -37,9 +37,10 @@ export function ReferralStepsFlow({ title, steps }: ReferralStepsFlowProps) {
           display: 'grid',
           gridTemplateColumns: { xs: '1fr', sm: `repeat(${steps.length}, minmax(0, 1fr))` },
           width: 1,
-          bgcolor: alpha('#06090e', 0.55),
-          border: `1px solid ${goldAlpha(0.22)}`,
-          borderTop: `2px solid ${GOLD}`,
+          bgcolor: 'rgba(10,10,12,0.55)',
+          border: '1px solid rgba(255,255,255,0.09)',
+          borderRadius: '12px',
+          overflow: 'hidden',
         }}
       >
         {steps.map((step, index) => (
@@ -67,6 +68,7 @@ export function ReferralStepsFlow({ title, steps }: ReferralStepsFlowProps) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  borderRadius: '8px',
                   bgcolor: goldAlpha(0.12),
                   border: `1px solid ${goldAlpha(0.35)}`,
                   color: GOLD,

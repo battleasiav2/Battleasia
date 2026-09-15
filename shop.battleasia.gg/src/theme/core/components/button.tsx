@@ -104,32 +104,10 @@ const MuiButton: Components<Theme>['MuiButton'] = {
         fontWeight: 800,
         letterSpacing: '0.08em',
         textTransform: 'uppercase',
-        transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
+        transition: 'background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease',
         ...(!isText && {
-          borderRadius: 0,
-          clipPath: 'polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%)',
-          '&:hover': {
-            transform: 'translateY(-2px)',
-          },
-          '&:active': {
-            transform: 'translateY(0) scale(0.98)',
-          },
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: '-140%',
-            width: '60%',
-            height: '100%',
-            background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent)',
-            transform: 'skewX(-20deg)',
-            transition: 'left 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
-            pointerEvents: 'none',
-            zIndex: 1,
-          },
-          '&:hover::before': {
-            left: '160%',
-          },
+          borderRadius: 8,
+          clipPath: 'none',
         }),
         '& .MuiButton-startIcon, & .MuiButton-endIcon, & .MuiLoadingButton-loadingIndicator': {
           position: 'relative',
@@ -229,7 +207,7 @@ const MuiButton: Components<Theme>['MuiButton'] = {
       height: 32,
       fontSize: '0.8rem',
       ...(ownerState.variant !== 'text' && {
-        clipPath: 'polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)',
+        clipPath: 'none',
       }),
       ...(ownerState.variant === 'text'
         ? { paddingLeft: '6px', paddingRight: '6px' }
@@ -239,7 +217,7 @@ const MuiButton: Components<Theme>['MuiButton'] = {
       height: 40,
       fontSize: '0.875rem',
       ...(ownerState.variant !== 'text' && {
-        clipPath: 'polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%)',
+        clipPath: 'none',
       }),
       ...(ownerState.variant === 'text'
         ? { paddingLeft: '10px', paddingRight: '10px' }
@@ -249,7 +227,7 @@ const MuiButton: Components<Theme>['MuiButton'] = {
       height: 48,
       fontSize: '0.95rem',
       ...(ownerState.variant !== 'text' && {
-        clipPath: 'polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%)',
+        clipPath: 'none',
       }),
       ...(ownerState.variant === 'text'
         ? { paddingLeft: '14px', paddingRight: '14px' }

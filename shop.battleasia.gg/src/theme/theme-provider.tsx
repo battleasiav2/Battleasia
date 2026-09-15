@@ -1,6 +1,8 @@
 import type { Theme } from '@mui/material/styles';
 import type { ThemeProviderProps as MuiThemeProviderProps } from '@mui/material/styles/ThemeProvider';
 
+import { useLayoutEffect } from 'react';
+
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider as ThemeVarsProvider } from '@mui/material/styles';
 
@@ -8,6 +10,7 @@ import { useSettingsContext } from 'src/components/settings';
 
 import { createTheme } from './create-theme';
 import { Rtl } from './with-settings/right-to-left';
+import { applyAccentToDocument, persistAccentId, resolveAccentId } from './accent-presets';
 
 import type {} from './extend-theme-types';
 import type { ThemeOptions } from './types';
@@ -21,9 +24,18 @@ export type ThemeProviderProps = Omit<MuiThemeProviderProps, 'theme'> & {
 
 export function ThemeProvider({ themeOverrides, children, ...other }: ThemeProviderProps) {
   const settings = useSettingsContext();
+  const accentId = resolveAccentId(settings.state.primaryColor);
+
+  useLayoutEffect(() => {
+    applyAccentToDocument(accentId);
+    persistAccentId(accentId);
+  }, [accentId]);
 
   const theme = createTheme({
-    settingsState: settings.state,
+    settingsState: {
+      ...settings.state,
+      primaryColor: accentId as SettingsPrimary,
+    },
     themeOverrides,
   });
 
@@ -34,3 +46,19 @@ export function ThemeProvider({ themeOverrides, children, ...other }: ThemeProvi
     </ThemeVarsProvider>
   );
 }
+
+type SettingsPrimary =
+  | 'default'
+  | 'gold'
+  | 'lime'
+  | 'ember'
+  | 'jade'
+  | 'cyan'
+  | 'violet'
+  | 'rose'
+  | 'sky'
+  | 'preset1'
+  | 'preset2'
+  | 'preset3'
+  | 'preset4'
+  | 'preset5';

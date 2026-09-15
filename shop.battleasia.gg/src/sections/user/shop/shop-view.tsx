@@ -747,15 +747,15 @@ export function ShopView() {
                                     <Box
                                         sx={{
                                             position: 'relative',
-                                            p: { xs: 0.75, sm: 1.25, md: 1.75 },
-                                            pt: showBadge ? { xs: 1.75, sm: 2.25, md: 3 } : { xs: 1.25, sm: 1.75, md: 2.25 },
-                                            minHeight: { xs: 168, sm: 210, md: 260 },
+                                            p: { xs: 0.65, sm: 1, md: 1.25 },
+                                            pt: { xs: 2, sm: 2.25, md: 2.5 },
+                                            minHeight: { xs: 152, sm: 178, md: 210 },
                                             height: '100%',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
                                             textAlign: 'center',
-                                            gap: { xs: 0.4, sm: 0.75, md: 1 },
+                                            gap: { xs: 0.35, sm: 0.5, md: 0.65 },
                                             overflow: 'hidden',
                                             width: 1,
                                             maxWidth: '100%',
@@ -764,9 +764,9 @@ export function ShopView() {
                                             '@media (hover: hover)': {
                                                 '&:hover': {
                                                     borderColor: goldAlpha(0.4),
-                                                    transform: 'translateY(-3px)',
+                                                    transform: 'translateY(-2px)',
                                                     '& .coin-img-box': {
-                                                        transform: 'scale(1.06)',
+                                                        transform: 'scale(1.05)',
                                                     },
                                                 },
                                             },
@@ -776,7 +776,6 @@ export function ShopView() {
                                             },
                                         }}
                                     >
-                                        {/* Soft top hairline */}
                                         <Box
                                             sx={{
                                                 position: 'absolute',
@@ -789,30 +788,29 @@ export function ShopView() {
                                             }}
                                         />
 
-                                        {/* Tier Ribbon Badge */}
                                         {showBadge && (
                                             <Box
                                                 sx={{
                                                     position: 'absolute',
-                                                    top: { xs: 6, md: 10 },
-                                                    left: { xs: 6, md: 10 },
-                                                    px: { xs: 0.6, md: 1.25 },
-                                                    py: { xs: 0.2, md: 0.35 },
-                                                    bgcolor: alpha('#000000', 0.8),
-                                                    color: `${tierColor} !important`,
-                                                    border: `1px solid ${alpha(tierColor, 0.6)}`,
+                                                    top: { xs: 5, md: 8 },
+                                                    left: { xs: 5, md: 8 },
+                                                    px: { xs: 0.5, md: 0.85 },
+                                                    py: { xs: 0.15, md: 0.25 },
+                                                    bgcolor: alpha('#000000', 0.82),
+                                                    border: `1px solid ${alpha(tierColor, 0.55)}`,
                                                     borderRadius: '4px',
-                                                    boxShadow: `0 0 10px ${alpha(tierColor, 0.4)}`,
+                                                    boxShadow: `0 0 8px ${alpha(tierColor, 0.35)}`,
+                                                    zIndex: 1,
                                                 }}
                                             >
                                                 <Typography
                                                     sx={{
-                                                        fontSize: { xs: 7, sm: 9, md: 10 },
+                                                        fontSize: { xs: 6.5, sm: 8, md: 9 },
                                                         fontWeight: 900,
-                                                        letterSpacing: { xs: 0.4, md: 1.2 },
+                                                        letterSpacing: { xs: 0.3, md: 0.8 },
                                                         textTransform: 'uppercase',
                                                         color: tierColor,
-                                                        lineHeight: 1.2,
+                                                        lineHeight: 1.15,
                                                     }}
                                                 >
                                                     {badgeLabel}
@@ -820,18 +818,47 @@ export function ShopView() {
                                             </Box>
                                         )}
 
-                                        {/* Coin Image Container */}
+                                        {hasDiscount && (
+                                            <Box
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: { xs: 5, md: 8 },
+                                                    right: { xs: 5, md: 8 },
+                                                    px: { xs: 0.45, md: 0.7 },
+                                                    py: { xs: 0.15, md: 0.25 },
+                                                    bgcolor: alpha('#EF4444', 0.95),
+                                                    borderRadius: '4px',
+                                                    boxShadow: `0 0 10px ${alpha('#EF4444', 0.45)}`,
+                                                    zIndex: 1,
+                                                }}
+                                            >
+                                                <Typography
+                                                    sx={{
+                                                        fontSize: { xs: 7, sm: 9, md: 10 },
+                                                        fontWeight: 900,
+                                                        letterSpacing: 0.2,
+                                                        color: '#fff',
+                                                        lineHeight: 1.15,
+                                                        fontFamily: '"Barlow", "Public Sans Variable", sans-serif',
+                                                    }}
+                                                >
+                                                    -{Math.round(Number(shopItem.discountPercent))}%
+                                                </Typography>
+                                            </Box>
+                                        )}
+
                                         <Box
                                             className="coin-img-box"
                                             sx={{
-                                                width: { xs: 48, sm: 72, md: 100 },
-                                                height: { xs: 48, sm: 72, md: 100 },
-                                                mt: showBadge ? { xs: 0.5, md: 1 } : 0.25,
+                                                width: { xs: 36, sm: 48, md: 58 },
+                                                height: { xs: 36, sm: 48, md: 58 },
+                                                mt: { xs: 0.35, md: 0.5 },
                                                 display: 'grid',
                                                 placeItems: 'center',
                                                 borderRadius: '50%',
-                                                background: `radial-gradient(circle, ${goldAlpha(0.2)} 0%, transparent 72%)`,
-                                                transition: 'all 0.35s ease',
+                                                background: `radial-gradient(circle, ${goldAlpha(0.18)} 0%, transparent 72%)`,
+                                                transition: 'transform 0.3s ease',
+                                                flexShrink: 0,
                                             }}
                                         >
                                             <Image
@@ -840,81 +867,86 @@ export function ShopView() {
                                                 alt={`${shopItem.amount} ${shopItem.symbol}`}
                                                 ratio="1/1"
                                                 sx={{
-                                                    width: { xs: 40, sm: 64, md: 88 },
-                                                    height: { xs: 40, sm: 64, md: 88 },
+                                                    width: { xs: 30, sm: 42, md: 52 },
+                                                    height: { xs: 30, sm: 42, md: 52 },
                                                     objectFit: 'contain',
-                                                    filter: `drop-shadow(0 6px 16px ${alpha('#000000', 0.8)})`,
+                                                    filter: `drop-shadow(0 4px 10px ${alpha('#000000', 0.75)})`,
                                                 }}
                                             />
                                         </Box>
 
-                                        {/* Coin Amount Title */}
-                                        <Typography
-                                            className="font-tr"
-                                            sx={{
-                                                mt: 0.25,
-                                                fontSize: { xs: 10, sm: 14, md: 18 },
-                                                fontWeight: 900,
-                                                letterSpacing: 0.3,
-                                                color: '#ffffff',
-                                                lineHeight: 1.15,
-                                                px: 0.15,
-                                                maxWidth: '100%',
-                                                overflowWrap: 'anywhere',
-                                                fontFamily: '"Barlow", "Public Sans Variable", sans-serif',
-                                            }}
-                                        >
-                                            {fNumber(shopItem.amount)} {shopItem.symbol}
-                                        </Typography>
-
-                                        {/* Pricing Box */}
+                                        {/* 2-line amount + price */}
                                         <Stack
-                                            direction="row"
-                                            alignItems="baseline"
-                                            justifyContent="center"
-                                            spacing={0.5}
-                                            sx={{ width: 1, minWidth: 0, px: 0.25 }}
+                                            spacing={0.15}
+                                            alignItems="center"
+                                            sx={{ width: 1, minWidth: 0, px: 0.15, mt: 0.15 }}
                                         >
                                             <Typography
+                                                className="font-tr"
                                                 sx={{
-                                                    fontSize: { xs: 9, sm: 13, md: 16 },
+                                                    fontSize: { xs: 9, sm: 12, md: 14 },
                                                     fontWeight: 900,
+                                                    letterSpacing: 0.2,
+                                                    color: '#ffffff',
+                                                    lineHeight: 1.2,
+                                                    maxWidth: '100%',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap',
+                                                    fontFamily: '"Barlow", "Public Sans Variable", sans-serif',
+                                                }}
+                                            >
+                                                {fNumber(shopItem.amount)} {shopItem.symbol}
+                                            </Typography>
+                                            <Typography
+                                                sx={{
+                                                    fontSize: { xs: 8, sm: 11, md: 12.5 },
+                                                    fontWeight: 800,
                                                     color: USER_COLORS.gold,
                                                     lineHeight: 1.2,
-                                                    textAlign: 'center',
-                                                    overflowWrap: 'anywhere',
+                                                    maxWidth: '100%',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    whiteSpace: 'nowrap',
                                                     fontFamily: '"Barlow", "Public Sans Variable", sans-serif',
                                                 }}
                                             >
                                                 ৳ {fNumber(shopItem.price * (currencyRates.find(r => r.currency?.toLowerCase() === 'bdt')?.rate || 1))} BDT
                                             </Typography>
+                                            {hasDiscount && Number(shopItem.originalPrice) > Number(shopItem.price) && (
+                                                <Typography
+                                                    sx={{
+                                                        fontSize: { xs: 7, sm: 9, md: 10 },
+                                                        fontWeight: 600,
+                                                        color: alpha('#ffffff', 0.45),
+                                                        textDecoration: 'line-through',
+                                                        lineHeight: 1.15,
+                                                        fontFamily: '"Barlow", "Public Sans Variable", sans-serif',
+                                                    }}
+                                                >
+                                                    ৳ {fNumber(shopItem.originalPrice * (currencyRates.find(r => r.currency?.toLowerCase() === 'bdt')?.rate || 1))}
+                                                </Typography>
+                                            )}
                                         </Stack>
 
                                         <Box sx={{ flexGrow: 1 }} />
 
-                                        {/* Purchase CTA Button */}
                                         <UserActionButton
                                             onClick={() => handleOpenModal(shopItem)}
                                             actionVariant="gold"
                                             size="medium"
                                             fullWidth
-                                            startIcon={<Iconify icon="solar:cart-large-bold" width={16} />}
                                             sx={{
-                                                mt: 0.5,
-                                                py: { xs: 0.55, sm: 0.75, md: 1 },
+                                                mt: 0.35,
+                                                py: { xs: 0.45, sm: 0.6, md: 0.75 },
                                                 minWidth: 0,
-                                                minHeight: { xs: 28, md: 36 },
-                                                fontSize: { xs: 8, sm: 10, md: 12 },
+                                                minHeight: { xs: 26, md: 32 },
+                                                fontSize: { xs: 7.5, sm: 9, md: 11 },
                                                 fontWeight: 900,
-                                                letterSpacing: { xs: 0.2, md: 1 },
-                                                borderRadius: { xs: '8px', md: '12px' },
+                                                letterSpacing: { xs: 0.15, md: 0.6 },
+                                                borderRadius: { xs: '8px', md: '10px' },
                                                 clipPath: 'none !important',
-                                                px: { xs: 0.5, md: 1.5 },
-                                                '& .MuiButton-startIcon': {
-                                                    display: { xs: 'none', sm: 'inherit' },
-                                                    mr: { sm: 0.5, md: 1 },
-                                                    ml: 0,
-                                                },
+                                                px: { xs: 0.35, md: 1 },
                                             }}
                                         >
                                             {t('shop.buyNow')}

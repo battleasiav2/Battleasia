@@ -110,9 +110,14 @@ class AppTheme {
         filled: true,
         fillColor: Colors.black.withValues(alpha: 0.5),
         labelStyle: bodySmall.copyWith(
-          color: AppColors.textPrimary.withValues(alpha: 0.82),
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.4,
+          color: Colors.white.withValues(alpha: 0.72),
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.5,
+        ),
+        floatingLabelStyle: bodySmall.copyWith(
+          color: Colors.white.withValues(alpha: 0.72),
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.5,
         ),
         hintStyle: bodyMedium.copyWith(
           color: Colors.white.withValues(alpha: 0.55),

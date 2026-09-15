@@ -7,8 +7,8 @@ import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/widgets/common/battleasia_logo.dart';
 
-/// Minimal auth card — matches web zip-style signup shell.
-class AuthFormShell extends StatefulWidget {
+/// Clean auth card — logo, title, form. No trust chrome clutter.
+class AuthFormShell extends StatelessWidget {
   final String title;
   final String? description;
   final Widget child;
@@ -16,6 +16,7 @@ class AuthFormShell extends StatefulWidget {
   final double? progress;
   final Widget? steps;
   final Widget? belowCard;
+  final bool showTrustRow;
 
   const AuthFormShell({
     super.key,
@@ -26,13 +27,9 @@ class AuthFormShell extends StatefulWidget {
     this.progress,
     this.steps,
     this.belowCard,
+    this.showTrustRow = false,
   });
 
-  @override
-  State<AuthFormShell> createState() => _AuthFormShellState();
-}
-
-class _AuthFormShellState extends State<AuthFormShell> {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
@@ -46,31 +43,16 @@ class _AuthFormShellState extends State<AuthFormShell> {
           fit: StackFit.expand,
           children: [
             const ColoredBox(color: Color(0xFF060607)),
-            // Zip soft gold wash — no photo BG
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: RadialGradient(
                   center: const Alignment(0, -1.05),
                   radius: 1.05,
                   colors: [
-                    AppColors.gold.withValues(alpha: 0.06),
+                    AppColors.gold.withValues(alpha: 0.05),
                     Colors.transparent,
                   ],
                   stops: const [0.0, 0.55],
-                ),
-              ),
-            ),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    const Color(0xFF060607).withValues(alpha: 0.18),
-                    Colors.transparent,
-                    const Color(0xFF060607).withValues(alpha: 0.42),
-                  ],
-                  stops: const [0.0, 0.42, 1.0],
                 ),
               ),
             ),
@@ -83,32 +65,33 @@ class _AuthFormShellState extends State<AuthFormShell> {
                         ScrollViewKeyboardDismissBehavior.onDrag,
                     padding: EdgeInsets.fromLTRB(
                       20,
-                      24,
                       20,
-                      20 + bottomInset,
+                      20,
+                      16 + bottomInset,
                     ),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight - 16,
+                        minHeight: constraints.maxHeight - 12,
                       ),
                       child: Center(
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
-                            maxWidth: widget.wide ? 460 : 430,
+                            maxWidth: wide ? 440 : 400,
                           ),
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               _AuthPanel(
-                                title: widget.title,
-                                description: widget.description,
-                                progress: widget.progress,
-                                steps: widget.steps,
-                                child: widget.child,
+                                title: title,
+                                description: description,
+                                progress: progress,
+                                steps: steps,
+                                showTrustRow: showTrustRow,
+                                child: child,
                               ),
-                              if (widget.belowCard != null) ...[
-                                const SizedBox(height: 14),
-                                widget.belowCard!,
+                              if (belowCard != null) ...[
+                                const SizedBox(height: 12),
+                                belowCard!,
                               ],
                             ],
                           ),
@@ -132,6 +115,7 @@ class _AuthPanel extends StatelessWidget {
   final Widget child;
   final double? progress;
   final Widget? steps;
+  final bool showTrustRow;
 
   const _AuthPanel({
     required this.title,
@@ -139,6 +123,7 @@ class _AuthPanel extends StatelessWidget {
     required this.child,
     this.progress,
     this.steps,
+    this.showTrustRow = false,
   });
 
   @override
@@ -167,56 +152,43 @@ class _AuthPanel extends StatelessWidget {
             children: [
               if (progress != null)
                 SizedBox(
-                  height: 3,
+                  height: 2,
                   child: ColoredBox(
                     color: Colors.white.withValues(alpha: 0.08),
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: FractionallySizedBox(
                         widthFactor: (progress! / 100).clamp(0.0, 1.0),
-                        child: Container(
-                          color: AppColors.gold,
-                        ),
+                        child: ColoredBox(color: AppColors.gold),
                       ),
                     ),
                   ),
                 ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(22, 22, 22, 20),
+                padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const Center(
                       child: BattleAsiaLogo(
-                        logoSize: 104,
+                        logoSize: 64,
                         showText: false,
                         alignment: MainAxisAlignment.center,
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 8),
                     Center(
                       child: Container(
-                        width: 40,
+                        width: 28,
                         height: 2,
                         color: AppColors.gold,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                      Text(
-                      'common.brandTagline'.tr(),
-                      style: AppTheme.labelUppercase.copyWith(
-                        color: Colors.white.withValues(alpha: 0.42),
-                        fontSize: 11,
-                        letterSpacing: 1.6,
-                        fontWeight: FontWeight.w700,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 10),
                     Text(
                       title,
                       style: AppTheme.heading2.copyWith(
-                        fontSize: 18,
+                        fontSize: 17,
                         height: 1.25,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -230,30 +202,28 @@ class _AuthPanel extends StatelessWidget {
                         description!,
                         style: AppTheme.bodyMedium.copyWith(
                           color: AppColors.textMuted,
-                          height: 1.45,
-                          fontSize: 13.5,
+                          height: 1.4,
+                          fontSize: 13,
                         ),
                         textAlign: TextAlign.center,
                       ),
                     ],
                     if (steps != null) ...[
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 16),
                       steps!,
+                      const SizedBox(height: 14),
                     ] else
-                      const SizedBox(height: 18),
+                      const SizedBox(height: 16),
                     child,
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.only(top: 16),
-                      decoration: BoxDecoration(
-                        border: Border(
-                          top: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.08),
-                          ),
-                        ),
+                    if (showTrustRow) ...[
+                      const SizedBox(height: 16),
+                      Divider(
+                        height: 1,
+                        color: Colors.white.withValues(alpha: 0.08),
                       ),
-                      child: const _AuthTrustRow(),
-                    ),
+                      const SizedBox(height: 12),
+                      const _AuthTrustRow(),
+                    ],
                   ],
                 ),
               ),
@@ -265,6 +235,7 @@ class _AuthPanel extends StatelessWidget {
   }
 }
 
+/// Slim step indicator — number + short title only.
 class AuthStepProgress extends StatelessWidget {
   final int currentStep;
   final List<({String title, String hint})> steps;
@@ -284,18 +255,15 @@ class AuthStepProgress extends StatelessWidget {
             Expanded(
               child: Container(
                 height: 1,
-                margin: const EdgeInsets.only(left: 8, right: 4),
+                margin: const EdgeInsets.symmetric(horizontal: 8),
                 color: Colors.white.withValues(alpha: 0.1),
               ),
             ),
-          Expanded(
-            child: _StepItem(
-              index: i + 1,
-              title: steps[i].title,
-              hint: steps[i].hint,
-              active: currentStep == i + 1,
-              done: currentStep > i + 1,
-            ),
+          _StepDot(
+            index: i + 1,
+            title: steps[i].title,
+            active: currentStep == i + 1,
+            done: currentStep > i + 1,
           ),
         ],
       ],
@@ -303,32 +271,30 @@ class AuthStepProgress extends StatelessWidget {
   }
 }
 
-class _StepItem extends StatelessWidget {
+class _StepDot extends StatelessWidget {
   final int index;
   final String title;
-  final String hint;
   final bool active;
   final bool done;
 
-  const _StepItem({
+  const _StepDot({
     required this.index,
     required this.title,
-    required this.hint,
     required this.active,
     required this.done,
   });
 
   @override
   Widget build(BuildContext context) {
-    final borderColor = done || active
-        ? AppColors.gold
-        : Colors.white.withValues(alpha: 0.14);
+    final borderColor =
+        done || active ? AppColors.gold : Colors.white.withValues(alpha: 0.14);
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 28,
-          height: 28,
+          width: 26,
+          height: 26,
           alignment: Alignment.center,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
@@ -336,43 +302,27 @@ class _StepItem extends StatelessWidget {
             border: Border.all(color: borderColor),
           ),
           child: done
-              ? const Icon(Icons.check, size: 14, color: Color(0xFF111111))
+              ? const Icon(Icons.check, size: 13, color: Color(0xFF111111))
               : Text(
                   '$index',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 11,
                     fontWeight: FontWeight.w700,
                     color: active ? AppColors.gold : AppColors.textMuted,
                   ),
                 ),
         ),
         const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: active || done
-                      ? Colors.white
-                      : AppColors.textMuted,
-                ),
-              ),
-              Text(
-                hint,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textMuted,
-                ),
-              ),
-            ],
+        Flexible(
+          child: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: active || done ? Colors.white : AppColors.textMuted,
+            ),
           ),
         ),
       ],
@@ -393,21 +343,21 @@ class _AuthTrustRow extends StatelessWidget {
 
     return Wrap(
       alignment: WrapAlignment.center,
-      spacing: 16,
-      runSpacing: 8,
+      spacing: 14,
+      runSpacing: 6,
       children: items
           .map(
             (item) => Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(item.$2, size: 14, color: AppColors.gold),
-                const SizedBox(width: 6),
+                Icon(item.$2, size: 13, color: AppColors.gold),
+                const SizedBox(width: 5),
                 Text(
                   item.$1,
                   style: TextStyle(
                     color: AppColors.textMuted,
                     fontWeight: FontWeight.w500,
-                    fontSize: 13,
+                    fontSize: 12,
                   ),
                 ),
               ],
@@ -437,26 +387,26 @@ class AuthPrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-          height: 48,
-          width: double.infinity,
-          child: ElevatedButton(
-            onPressed: loading ? null : onPressed,
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              foregroundColor: AppColors.goldInk,
-              disabledForegroundColor: Colors.white.withValues(alpha: 0.32),
-              backgroundColor: AppTheme.accentColor,
-              disabledBackgroundColor: Colors.white.withValues(alpha: 0.08),
-              side: BorderSide(color: AppTheme.accentColor),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(AppColors.radiusSm),
-              ),
-              textStyle: const TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.1,
-              ),
-            ),
+      height: 48,
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: loading ? null : onPressed,
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          foregroundColor: AppColors.goldInk,
+          disabledForegroundColor: Colors.white.withValues(alpha: 0.32),
+          backgroundColor: AppTheme.accentColor,
+          disabledBackgroundColor: Colors.white.withValues(alpha: 0.08),
+          side: BorderSide(color: AppTheme.accentColor),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppColors.radiusSm),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.1,
+          ),
+        ),
         child: loading
             ? SizedBox(
                 width: 18,
@@ -489,10 +439,8 @@ class AuthSecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton.icon(
+    return OutlinedButton(
       onPressed: onPressed,
-      icon: Icon(icon ?? Icons.arrow_back, size: 16),
-      label: Text(label.toUpperCase()),
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(0, 42),
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -508,6 +456,7 @@ class AuthSecondaryButton extends StatelessWidget {
           letterSpacing: 0.8,
         ),
       ),
+      child: Text(label.toUpperCase()),
     );
   }
 }

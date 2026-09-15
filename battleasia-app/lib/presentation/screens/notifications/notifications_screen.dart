@@ -1,14 +1,14 @@
-import 'package:flutter/gestures.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/socket_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
+import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/notification_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
-import 'package:battleasia_app/presentation/widgets/common/refresh_overlay.dart';
 import 'package:battleasia_app/presentation/widgets/notifications/notification_item.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 
@@ -27,11 +27,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   bool _loading = true;
   String _currentTab = 'all';
   int _unreadCount = 0;
-  bool _isRefreshing = false;
-  double _dragStartY = 0.0;
-  bool _dragStartedAtTop = false;
-  bool _dragStartedAtBottom = false;
-  double _wheelAccumulator = 0.0;
 
   static const Color _panelBg = Color(0xD906090E);
 
@@ -204,54 +199,6 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     await _fetchNotifications(silent: true);
   }
 
-  bool _atTop() =>
-      _scrollController.hasClients && _scrollController.position.pixels <= 0;
-
-  bool _atBottom() =>
-      _scrollController.hasClients &&
-      _scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent;
-
-  void _onPointerDown(PointerDownEvent e) {
-    _dragStartY = e.position.dy;
-    _dragStartedAtTop = _atTop();
-    _dragStartedAtBottom = _atBottom();
-  }
-
-  void _onPointerMove(PointerMoveEvent e) {
-    if (_isRefreshing) return;
-    final dy = e.position.dy - _dragStartY;
-    if ((dy > 0 && _dragStartedAtTop) || (dy < 0 && _dragStartedAtBottom)) {
-      if (dy.abs() >= 70) _triggerRefresh();
-    }
-  }
-
-  void _onPointerSignal(PointerSignalEvent e) {
-    if (_isRefreshing) return;
-    if (e is PointerScrollEvent) {
-      final scrollingUp = e.scrollDelta.dy < 0;
-      final scrollingDown = e.scrollDelta.dy > 0;
-      if (scrollingDown && _atTop()) {
-        _wheelAccumulator += e.scrollDelta.dy.abs();
-      } else if (scrollingUp && _atBottom()) {
-        _wheelAccumulator += e.scrollDelta.dy.abs();
-      } else {
-        _wheelAccumulator = 0;
-      }
-      if (_wheelAccumulator >= 60) {
-        _wheelAccumulator = 0;
-        _triggerRefresh();
-      }
-    }
-  }
-
-  Future<void> _triggerRefresh() async {
-    if (_isRefreshing || !mounted) return;
-    setState(() => _isRefreshing = true);
-    await _onRefresh();
-    if (mounted) setState(() => _isRefreshing = false);
-  }
-
   @override
   Widget build(BuildContext context) {
     final isMobile = ResponsiveUtils.isMobile(context);
@@ -280,117 +227,112 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      body: Listener(
-        onPointerDown: _onPointerDown,
-        onPointerMove: _onPointerMove,
-        onPointerSignal: _onPointerSignal,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            CustomScrollView(
-              controller: _scrollController,
-              physics: const ClampingScrollPhysics(),
-              slivers: [
-                const SliverToBoxAdapter(child: SizedBox(height: 100)),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: horizontalPadding),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(height: spacing16),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                'NOTIFICATIONS',
-                                style: AppTheme.heading2.copyWith(
-                                  color: AppColors.textPrimary,
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: titleFontSize,
-                                  letterSpacing: 1,
-                                ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          CustomScrollView(
+            controller: _scrollController,
+            physics: appScrollPhysics,
+            slivers: [
+              CupertinoSliverRefreshControl(onRefresh: _onRefresh),
+              const SliverToBoxAdapter(child: SizedBox(height: 100)),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: spacing16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'NOTIFICATIONS',
+                              style: AppTheme.heading2.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w800,
+                                fontSize: titleFontSize,
+                                letterSpacing: 1,
                               ),
                             ),
-                            if (_unreadCount > 0)
-                              TextButton(
-                                onPressed: _handleMarkAllAsRead,
-                                style: TextButton.styleFrom(
-                                  foregroundColor: AppColors.gold,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 6,
-                                  ),
-                                ),
-                                child: Text(
-                                  'Mark all read',
-                                  style: TextStyle(
-                                    color: AppColors.gold,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                        SizedBox(height: spacing24),
-                        if (_loading)
-                          Center(
-                            child: Padding(
-                              padding: const EdgeInsets.all(32),
-                              child: CircularProgressIndicator(
-                                color: AppColors.gold,
-                              ),
-                            ),
-                          )
-                        else ...[
-                          _buildStatsPanel(),
-                          SizedBox(height: spacing24),
-                          PlayTabs(
-                            tabs: [
-                              {
-                                'label': 'ALL (${_notifications.length})',
-                                'value': 'all',
-                              },
-                              {
-                                'label': 'UNREAD ($_unreadCount)',
-                                'value': 'unread',
-                              },
-                              {
-                                'label': 'ARCHIVED ($_archivedCount)',
-                                'value': 'archived',
-                              },
-                            ],
-                            activeTab: _currentTab,
-                            onTabChanged: (tab) {
-                              setState(() => _currentTab = tab);
-                            },
-                            fontSize: tabFontSize,
                           ),
-                          SizedBox(height: spacing16),
-                          if (_filteredNotifications.isEmpty)
-                            _buildEmptyState()
-                          else
-                            _buildListPanel(),
+                          if (_unreadCount > 0)
+                            TextButton(
+                              onPressed: _handleMarkAllAsRead,
+                              style: TextButton.styleFrom(
+                                foregroundColor: AppColors.gold,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 6,
+                                ),
+                              ),
+                              child: Text(
+                                'Mark all read',
+                                style: TextStyle(
+                                  color: AppColors.gold,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
                         ],
+                      ),
+                      SizedBox(height: spacing24),
+                      if (_loading)
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(32),
+                            child: CircularProgressIndicator(
+                              color: AppColors.gold,
+                            ),
+                          ),
+                        )
+                      else ...[
+                        _buildStatsPanel(),
+                        SizedBox(height: spacing24),
+                        PlayTabs(
+                          tabs: [
+                            {
+                              'label': 'ALL (${_notifications.length})',
+                              'value': 'all',
+                            },
+                            {
+                              'label': 'UNREAD ($_unreadCount)',
+                              'value': 'unread',
+                            },
+                            {
+                              'label': 'ARCHIVED ($_archivedCount)',
+                              'value': 'archived',
+                            },
+                          ],
+                          activeTab: _currentTab,
+                          onTabChanged: (tab) {
+                            setState(() => _currentTab = tab);
+                          },
+                          fontSize: tabFontSize,
+                        ),
+                        SizedBox(height: spacing16),
+                        if (_filteredNotifications.isEmpty)
+                          _buildEmptyState()
+                        else
+                          _buildListPanel(),
                       ],
-                    ),
+                    ],
                   ),
                 ),
-                SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
-              ],
-            ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: AppHeader(scrollController: _scrollController),
-            ),
-            const FloatingBottomNav(),
-            if (_isRefreshing) const RefreshOverlay(),
-          ],
-        ),
+              ),
+              SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
+            ],
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AppHeader(scrollController: _scrollController),
+          ),
+          const FloatingBottomNav(),
+        ],
       ),
     );
   }

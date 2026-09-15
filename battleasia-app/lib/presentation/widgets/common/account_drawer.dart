@@ -167,14 +167,10 @@ class AccountDrawer extends StatelessWidget {
             ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF0C0C0E), Colors.black],
-                ),
+                color: const Color(0xFF060607),
                 border: Border(
                   left: BorderSide(
-                    color: AppColors.gold.withValues(alpha: 0.12),
+                    color: Colors.white.withValues(alpha: 0.09),
                   ),
                 ),
                 boxShadow: [
@@ -231,18 +227,22 @@ class _AccountDrawerContent extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (displayName.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: Text(
-                      displayName,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.42),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
+                _HomeProfileCard(
+                  displayName: displayName,
+                  pubgId: authProvider.user?.pubgId ?? '',
+                  balance: authProvider.user?.balance ?? 0,
+                  avatarUrl: ImageUtils.getImageUrl(authProvider.user?.avatar),
+                  onWalletTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ShopWalletScreen(),
                       ),
-                    ),
-                  ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
                 _buildExpandableAccountMenu(context),
                 AccountMenuTile(
                   label: 'nav.play'.tr(),
@@ -514,6 +514,219 @@ class _AccountDrawerContent extends StatelessWidget {
             ),
           ),
         ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Home Pulse-style profile card — matches web Command Matrix card.
+class _HomeProfileCard extends StatelessWidget {
+  final String displayName;
+  final String pubgId;
+  final double balance;
+  final String? avatarUrl;
+  final VoidCallback onWalletTap;
+
+  const _HomeProfileCard({
+    required this.displayName,
+    required this.pubgId,
+    required this.balance,
+    required this.avatarUrl,
+    required this.onWalletTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bal = balance.round().toString();
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: const Color(0x6B161618),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(
+              width: 2,
+              color: AppColors.gold.withValues(alpha: 0.45),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: avatarUrl != null && avatarUrl!.isNotEmpty
+                              ? Image.network(
+                                  avatarUrl!,
+                                  width: 48,
+                                  height: 48,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => _avatarFallback(displayName),
+                                )
+                              : _avatarFallback(displayName),
+                        ),
+                        Positioned(
+                          right: -2,
+                          bottom: -2,
+                          child: Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF22C55E),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: const Color(0xFF161618), width: 2),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            displayName.toUpperCase(),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.4,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.gold.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(
+                                    color: AppColors.gold.withValues(alpha: 0.35),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.verified, size: 11, color: AppColors.gold),
+                                    const SizedBox(width: 3),
+                                    Text(
+                                      'VERIFIED',
+                                      style: TextStyle(
+                                        color: AppColors.gold,
+                                        fontSize: 9.5,
+                                        fontWeight: FontWeight.w800,
+                                        letterSpacing: 0.6,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (pubgId.isNotEmpty) ...[
+                                const SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    'ID: $pubgId',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: 0.48),
+                                      fontSize: 10.5,
+                                      fontFamily: 'monospace',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                Container(
+                  padding: const EdgeInsets.only(top: 12),
+                  decoration: BoxDecoration(
+                    border: Border(
+                      top: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.monetization_on, size: 18, color: AppColors.gold),
+                      const SizedBox(width: 6),
+                      Text(
+                        '$bal BAC',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const Spacer(),
+                      OutlinedButton(
+                        onPressed: onWalletTap,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.gold,
+                          side: BorderSide(color: AppColors.gold.withValues(alpha: 0.45)),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        child: const Text(
+                          'WALLET HUB >',
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.6,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _avatarFallback(String name) {
+    return Container(
+      width: 48,
+      height: 48,
+      alignment: Alignment.center,
+      color: const Color(0xFF0A0A0A),
+      child: Text(
+        name.isNotEmpty ? name[0].toUpperCase() : '?',
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w800,
+          fontSize: 18,
         ),
       ),
     );

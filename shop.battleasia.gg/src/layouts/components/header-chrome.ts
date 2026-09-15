@@ -3,6 +3,7 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import { alpha } from '@mui/material/styles';
 
 import { USER_COLORS } from 'src/layouts/user/user-theme';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 const GOLD = USER_COLORS.gold;
 
@@ -15,7 +16,7 @@ export const headerLanguagePillSx = (open: boolean): SxProps<Theme> => ({
   minHeight: 40,
   borderRadius: '999px',
   bgcolor: open ? alpha('#ffffff', 0.1) : alpha('#ffffff', 0.06),
-  border: `1px solid ${open ? alpha(GOLD, 0.28) : alpha('#ffffff', 0.1)}`,
+  border: `1px solid ${open ? goldAlpha(0.28) : alpha('#ffffff', 0.1)}`,
   transition: 'background-color 0.15s ease, border-color 0.15s ease',
   '&:hover': {
     bgcolor: alpha('#ffffff', 0.1),

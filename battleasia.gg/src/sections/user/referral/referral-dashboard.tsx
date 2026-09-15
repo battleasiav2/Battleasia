@@ -14,7 +14,6 @@ import {
   UserEmptyState,
   USER_COLORS,
   userMutedTextSx,
-  goldAlpha,
   UserAnimatedStat,
 } from 'src/layouts/user';
 
@@ -183,18 +182,21 @@ export function ReferralDashboard({
     { icon: 'solar:wallet-money-bold', label: t('referral.stepEarnOnDeposit') },
   ];
 
-  const listPanelSx = {
-    bgcolor: alpha('#06090e', 0.72),
-    backdropFilter: 'blur(18px)',
-    WebkitBackdropFilter: 'blur(18px)',
-    border: `1px solid ${goldAlpha(0.28)}`,
-    borderTop: `2px solid ${GOLD}`,
-    boxShadow: `0 10px 28px ${alpha('#000000', 0.55)}, inset 0 0 16px ${goldAlpha(0.04)}`,
-    clipPath: {
-      xs: 'none',
-      md: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
-    },
+  /** Home Pulse / landing panel — same surface as home cards */
+  const homePanelSx = {
+    position: 'relative' as const,
+    bgcolor: 'rgba(22,22,24,0.38)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(255,255,255,0.09)',
+    borderRadius: '18px',
+    boxShadow: '0 30px 80px -44px #000, inset 0 1px 0 rgba(255,255,255,0.05)',
     overflow: 'hidden',
+    transition: 'border-color 0.25s cubic-bezier(0.22, 0.61, 0.36, 1), background-color 0.25s ease',
+    '&:hover': {
+      bgcolor: 'rgba(30,30,33,0.55)',
+      borderColor: 'rgba(255,255,255,0.14)',
+    },
   } as const;
 
   if (loading && !stats && network.length === 0) {
@@ -219,16 +221,7 @@ export function ReferralDashboard({
               lg: 'repeat(6, minmax(0, 1fr))',
             },
             width: 1,
-            bgcolor: alpha('#06090e', 0.72),
-            backdropFilter: 'blur(18px)',
-            WebkitBackdropFilter: 'blur(18px)',
-            border: `1px solid ${goldAlpha(0.28)}`,
-            borderTop: `2px solid ${GOLD}`,
-            boxShadow: `0 10px 28px ${alpha('#000000', 0.55)}, inset 0 0 16px ${goldAlpha(0.04)}`,
-            clipPath: {
-              xs: 'none',
-              md: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
-            },
+            ...homePanelSx,
           }}
         >
           {[
@@ -332,7 +325,7 @@ export function ReferralDashboard({
         {showInviteSection ? (
           <>
             <Stack direction={{ xs: 'column', lg: 'row' }} spacing={1.5}>
-              <Box sx={{ ...listPanelSx, flex: 1, p: { xs: 1.5, md: 2 } }}>
+              <Box sx={{ ...homePanelSx, flex: 1, p: { xs: 1.5, md: 2 } }}>
                 <Typography
                   className="font-tr"
                   sx={{
@@ -367,7 +360,7 @@ export function ReferralDashboard({
               </Box>
             </Stack>
 
-            <Box sx={{ ...listPanelSx, p: { xs: 1.5, md: 2 } }}>
+            <Box sx={{ ...homePanelSx, p: { xs: 1.5, md: 2 } }}>
               <ReferralStepsFlow title={t('referral.howItWorks')} steps={steps} />
             </Box>
           </>
@@ -392,7 +385,7 @@ export function ReferralDashboard({
               onAction={fetchData}
             />
           ) : (
-            <Box sx={listPanelSx}>
+            <Box sx={homePanelSx}>
               <ReferralNetworkList
                 items={network}
                 labels={{
@@ -414,7 +407,7 @@ export function ReferralDashboard({
             onAction={fetchData}
           />
         ) : (
-          <Box sx={listPanelSx}>
+          <Box sx={homePanelSx}>
             <ReferralCommissionList
               items={commissions}
               labels={{

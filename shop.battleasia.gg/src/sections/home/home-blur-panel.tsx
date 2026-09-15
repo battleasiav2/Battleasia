@@ -1,7 +1,6 @@
 import type { SxProps, Theme } from '@mui/material/styles';
 
 import { Box } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 
 export const HOME_GOLD = '#f5c518';
 
@@ -15,11 +14,12 @@ export const HOME_ROW_LINE = '1px solid rgba(255, 255, 255, 0.08)';
 /** Flat blur surface — shared by home sections + auth card */
 export const homeBlurPanelSx: SxProps<Theme> = {
   position: 'relative',
-  bgcolor: alpha('#161618', 0.4),
-  backdropFilter: 'blur(14px)',
-  WebkitBackdropFilter: 'blur(14px)',
-  border: `1px solid ${alpha('#ffffff', 0.07)}`,
-  boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.05)}`,
+  bgcolor: 'rgba(22,22,24,0.38)',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+  border: '1px solid rgba(255,255,255,0.09)',
+  borderRadius: '18px',
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
 };
 
 export function HomeBlurPanel({

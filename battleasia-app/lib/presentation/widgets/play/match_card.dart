@@ -82,16 +82,32 @@ class _MatchCardState extends State<MatchCard> {
             height: cardHeight,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(18),
-              color: const Color(0xFF161618),
+              color: const Color(0xB8161618),
               border: Border.all(
                 color: Colors.white.withValues(alpha: 0.09),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.45),
+                  blurRadius: 24,
+                  offset: const Offset(0, 12),
+                ),
+              ],
+            ),
+            foregroundDecoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              border: Border(
+                left: BorderSide(
+                  color: AppColors.gold.withValues(alpha: 0.55),
+                  width: 2,
+                ),
               ),
             ),
             child: Row(
               children: [
-                Expanded(flex: 1, child: _buildBannerSection(bannerUrl)),
+                Expanded(flex: 10, child: _buildBannerSection(bannerUrl)),
                 Expanded(
-                  flex: 1,
+                  flex: 14,
                   child: _buildMatchInfoSection(buttonDisabled),
                 ),
               ],
@@ -152,10 +168,28 @@ class _MatchCardState extends State<MatchCard> {
   Widget _buildBannerSection(String bannerUrl) {
     return ClipRRect(
       borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(8),
-        bottomLeft: Radius.circular(8),
+        topLeft: Radius.circular(17),
+        bottomLeft: Radius.circular(17),
       ),
-      child: _buildMaskedBanner(bannerUrl),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          _buildMaskedBanner(bannerUrl),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Colors.transparent,
+                  const Color(0xFF161618).withValues(alpha: 0.85),
+                ],
+                stops: const [0.4, 1],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

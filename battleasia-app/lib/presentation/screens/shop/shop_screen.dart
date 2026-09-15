@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
@@ -16,9 +15,9 @@ import 'package:battleasia_app/presentation/widgets/common/glass_stat_tile.dart'
 import 'package:battleasia_app/presentation/widgets/shop/shop_item_card.dart';
 import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
-import 'package:battleasia_app/presentation/screens/shop/shop_detail_screen.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_buy_flow.dart';
 
-/// Native BAC store — list + filters + buy, matching web shop.battleasia.gg /store.
+/// Native BAC store — list + filters + buy, matching web shop.battleasia.gg.
 class ShopScreen extends StatefulWidget {
   const ShopScreen({super.key});
 
@@ -35,14 +34,11 @@ class _ShopScreenState extends State<ShopScreen> {
   List<ShopItemModel> _items = [];
   List<ShopItemModel> _allItems = [];
   List<Map<String, dynamic>> _channels = [];
+  List<Map<String, dynamic>> _rates = [];
+  double _bdtRate = 1;
   bool _loading = true;
   String _selectedCategory = 'all';
   String _selectedChannelId = '';
-  bool _isRefreshing = false;
-  double _dragStartY = 0.0;
-  bool _dragStartedAtTop = false;
-  bool _dragStartedAtBottom = false;
-  double _wheelAccumulator = 0.0;
 
   final List<Map<String, String>> _categories = [
     {'value': 'all', 'key': 'shop.categoryAll'},
@@ -53,8 +49,7 @@ class _ShopScreenState extends State<ShopScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchItems();
-    _fetchChannels();
+    _fetchAll();
   }
 
   @override
@@ -63,6 +58,42 @@ class _ShopScreenState extends State<ShopScreen> {
     _minPriceController.dispose();
     _maxPriceController.dispose();
     super.dispose();
+  }
+
+  Future<void> _fetchAll({bool silent = false}) async {
+    await Future.wait([
+      _fetchItems(silent: silent),
+      _fetchChannels(),
+      _fetchRates(),
+    ]);
+  }
+
+  Future<void> _fetchRates() async {
+    try {
+      final result = await _shopService.getCurrencyRates();
+      if (result['success'] == true && result['data'] is List) {
+        final list = (result['data'] as List)
+            .whereType<Map>()
+            .map((e) => Map<String, dynamic>.from(e))
+            .toList();
+        double bdt = 1;
+        for (final r in list) {
+          final cur = r['currency']?.toString().toLowerCase() ?? '';
+          final region = r['region']?.toString().toLowerCase() ?? '';
+          if (cur == 'bdt' || region == 'bdt') {
+            final rate = r['rate'];
+            if (rate is num && rate > 0) bdt = rate.toDouble();
+            break;
+          }
+        }
+        if (mounted) {
+          setState(() {
+            _rates = list;
+            _bdtRate = bdt;
+          });
+        }
+      }
+    } catch (_) {}
   }
 
   Future<void> _fetchChannels() async {
@@ -80,9 +111,7 @@ class _ShopScreenState extends State<ShopScreen> {
             .toList();
         if (mounted) setState(() => _channels = enabled);
       }
-    } catch (_) {
-      // Filters stay empty — shop list still works.
-    }
+    } catch (_) {}
   }
 
   Future<void> _fetchItems({bool silent = false}) async {
@@ -154,8 +183,6 @@ class _ShopScreenState extends State<ShopScreen> {
       list = list.where((i) => i.price <= max).toList();
     }
 
-    // Channel filter preselects buy flow; packs themselves are not channel-bound
-    // on the API, so we only store the preference for detail navigation.
     list.sort((a, b) => a.amount.compareTo(b.amount));
     return list;
   }
@@ -168,73 +195,23 @@ class _ShopScreenState extends State<ShopScreen> {
     _minPriceController.clear();
     _maxPriceController.clear();
     _selectedChannelId = '';
+    _selectedCategory = 'all';
     _refilter();
   }
 
   void _handleBuy(ShopItemModel item) {
-    Navigator.push(
+    showShopBuyFlow(
       context,
-      MaterialPageRoute(
-        builder: (context) => ShopDetailScreen(
-          itemId: item.id,
-          preferredChannelId: _selectedChannelId.isEmpty
-              ? null
-              : _selectedChannelId,
-        ),
-      ),
+      item: item,
+      preferredChannelId:
+          _selectedChannelId.isEmpty ? null : _selectedChannelId,
+      preloadedChannels: _channels,
+      preloadedRates: _rates,
     );
   }
 
   Future<void> _onRefresh() async {
-    await Future.wait([_fetchItems(silent: true), _fetchChannels()]);
-  }
-
-  bool _atTop() =>
-      _scrollController.hasClients && _scrollController.position.pixels <= 0;
-
-  bool _atBottom() =>
-      _scrollController.hasClients &&
-      _scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent;
-
-  void _onPointerDown(PointerDownEvent e) {
-    _dragStartY = e.position.dy;
-    _dragStartedAtTop = _atTop();
-    _dragStartedAtBottom = _atBottom();
-  }
-
-  void _onPointerMove(PointerMoveEvent e) {
-    if (_isRefreshing) return;
-    final dy = e.position.dy - _dragStartY;
-    if ((dy > 0 && _dragStartedAtTop) || (dy < 0 && _dragStartedAtBottom)) {
-      if (dy.abs() >= 70) _triggerRefresh();
-    }
-  }
-
-  void _onPointerSignal(PointerSignalEvent e) {
-    if (_isRefreshing) return;
-    if (e is PointerScrollEvent) {
-      final scrollingUp = e.scrollDelta.dy < 0;
-      final scrollingDown = e.scrollDelta.dy > 0;
-      if (scrollingDown && _atTop()) {
-        _wheelAccumulator += e.scrollDelta.dy.abs();
-      } else if (scrollingUp && _atBottom()) {
-        _wheelAccumulator += e.scrollDelta.dy.abs();
-      } else {
-        _wheelAccumulator = 0;
-      }
-      if (_wheelAccumulator >= 60) {
-        _wheelAccumulator = 0;
-        _triggerRefresh();
-      }
-    }
-  }
-
-  Future<void> _triggerRefresh() async {
-    if (_isRefreshing || !mounted) return;
-    setState(() => _isRefreshing = true);
-    await _onRefresh();
-    if (mounted) setState(() => _isRefreshing = false);
+    await _fetchAll(silent: true);
   }
 
   @override
@@ -260,156 +237,163 @@ class _ShopScreenState extends State<ShopScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.pageBg,
-      body: Listener(
-        onPointerDown: _onPointerDown,
-        onPointerMove: _onPointerMove,
-        onPointerSignal: _onPointerSignal,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            CustomScrollView(
-              controller: _scrollController,
-              physics: appScrollPhysics,
-              slivers: [
-                CupertinoSliverRefreshControl(onRefresh: _onRefresh),
-                SliverToBoxAdapter(child: SizedBox(height: headerHeight)),
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 12),
-                        _buildHero(),
-                        const SizedBox(height: 14),
-                        _buildStats(balance),
-                        const SizedBox(height: 14),
-                        _buildFilters(),
-                        const SizedBox(height: 12),
-                        _buildCategories(),
-                        const SizedBox(height: 16),
-                      ],
-                    ),
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          CustomScrollView(
+            controller: _scrollController,
+            physics: appScrollPhysics,
+            slivers: [
+              CupertinoSliverRefreshControl(onRefresh: _onRefresh),
+              SliverToBoxAdapter(child: SizedBox(height: headerHeight)),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 12),
+                      _buildHero(),
+                      const SizedBox(height: 14),
+                      _buildStats(balance),
+                      const SizedBox(height: 14),
+                      _buildFilters(),
+                      const SizedBox(height: 12),
+                      _buildCategories(),
+                      const SizedBox(height: 16),
+                    ],
                   ),
                 ),
-                if (_loading)
-                  const SliverToBoxAdapter(
-                    child: Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(24),
-                        child: CircularProgressIndicator(),
-                      ),
+              ),
+              if (_loading)
+                SliverPadding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  sliver: SliverGrid(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: screenWidth < 600 ? 4 : 6,
+                      crossAxisSpacing: screenWidth < 600 ? 6 : 12,
+                      mainAxisSpacing: screenWidth < 600 ? 6 : 12,
+                      mainAxisExtent: screenWidth < 600 ? 168 : 200,
                     ),
-                  )
-                else if (_items.isEmpty)
-                  SliverToBoxAdapter(child: _buildEmptyState())
-                else
-                  SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                    sliver: Builder(
-                      builder: (context) {
-                        final w = MediaQuery.of(context).size.width;
-                        final crossAxisCount =
-                            w < 600 ? 4 : 6;
-
-                        return SliverGrid(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: crossAxisCount,
-                            crossAxisSpacing: w < 600 ? 6 : 12,
-                            mainAxisSpacing: w < 600 ? 6 : 12,
-                            mainAxisExtent: w < 600 ? 200 : 300,
-                          ),
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              final item = _items[index];
-                              return ShopItemCard(
-                                item: item,
-                                onTap: () => _handleBuy(item),
-                                onBuy: () => _handleBuy(item),
-                              );
-                            },
-                            childCount: _items.length,
-                          ),
-                        );
-                      },
+                    delegate: SliverChildBuilderDelegate(
+                      (_, __) => Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.panelFill(0.4),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: AppColors.hair()),
+                        ),
+                      ),
+                      childCount: 12,
                     ),
                   ),
-                const SliverToBoxAdapter(child: SizedBox(height: 100)),
-              ],
-            ),
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: AppHeader(scrollController: _scrollController),
-            ),
-            const FloatingBottomNav(),
-          ],
-        ),
+                )
+              else if (_items.isEmpty)
+                SliverToBoxAdapter(child: _buildEmptyState())
+              else
+                SliverPadding(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  sliver: Builder(
+                    builder: (context) {
+                      final w = MediaQuery.of(context).size.width;
+                      final crossAxisCount = w < 600 ? 4 : 6;
+
+                      return SliverGrid(
+                        gridDelegate:
+                            SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          crossAxisSpacing: w < 600 ? 6 : 12,
+                          mainAxisSpacing: w < 600 ? 6 : 12,
+                          mainAxisExtent: w < 600 ? 168 : 200,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
+                            final item = _items[index];
+                            return ShopItemCard(
+                              item: item,
+                              bdtRate: _bdtRate,
+                              onTap: () => _handleBuy(item),
+                              onBuy: () => _handleBuy(item),
+                            );
+                          },
+                          childCount: _items.length,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              const SliverToBoxAdapter(child: SizedBox(height: 100)),
+            ],
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: AppHeader(scrollController: _scrollController),
+          ),
+          const FloatingBottomNav(),
+        ],
       ),
     );
   }
 
   Widget _buildHero() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(12),
-      child: AspectRatio(
-        aspectRatio: 16 / 7,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Image.asset(
-              'assets/images/shop/bac-store-hero.webp',
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                color: AppColors.surface,
-                alignment: Alignment.center,
-                child: Icon(Icons.storefront, color: AppColors.gold, size: 48),
+    return Container(
+      width: double.infinity,
+      constraints: const BoxConstraints(minHeight: 148),
+      decoration: BoxDecoration(
+        color: AppColors.panelFill(0.45),
+        borderRadius: BorderRadius.circular(AppColors.radius),
+        border: Border.all(color: AppColors.hair()),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Opacity(
+              opacity: 0.55,
+              child: Image.asset(
+                'assets/images/shop/bac-store-hero.webp',
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
               ),
             ),
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.75),
-                    Colors.black.withValues(alpha: 0.2),
-                  ],
+          ),
+          Positioned(
+            left: 0,
+            top: 0,
+            bottom: 0,
+            child: Container(width: 2, color: AppColors.gold),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 20, 18, 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'shop.heroTitle'.tr(),
+                  style: AppTheme.heading2.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.2,
+                    fontSize: 22,
+                  ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'shop.heroTitle'.tr(),
-                      style: AppTheme.heading2.copyWith(
-                        color: AppColors.gold,
-                        fontWeight: FontWeight.w900,
-                        letterSpacing: 1.2,
-                        fontSize: 22,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'shop.heroSubtitle'.tr(),
-                      style: AppTheme.bodySmall.copyWith(
-                        color: Colors.white.withValues(alpha: 0.85),
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 6),
+                Text(
+                  'shop.heroSubtitle'.tr(),
+                  style: AppTheme.bodySmall.copyWith(
+                    color: Colors.white.withValues(alpha: 0.72),
+                    height: 1.35,
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -422,13 +406,16 @@ class _ShopScreenState extends State<ShopScreen> {
             label: 'shop.statBalance'.tr(),
             value: balance.toStringAsFixed(0),
             suffix: 'BAC',
+            icon: Icons.account_balance_wallet_outlined,
           ),
         ),
         const SizedBox(width: 8),
         Expanded(
           child: GlassStatTile(
             label: 'shop.statPacks'.tr(),
-            value: '${_allItems.length}',
+            value: '${_items.length}',
+            suffix: 'shop.statAvailable'.tr(),
+            icon: Icons.shopping_bag_outlined,
           ),
         ),
         const SizedBox(width: 8),
@@ -436,6 +423,8 @@ class _ShopScreenState extends State<ShopScreen> {
           child: GlassStatTile(
             label: 'shop.statChannels'.tr(),
             value: '${_channels.length}',
+            suffix: 'shop.statActive'.tr(),
+            icon: Icons.credit_card_outlined,
           ),
         ),
       ],
@@ -453,26 +442,49 @@ class _ShopScreenState extends State<ShopScreen> {
     ];
 
     return GlassCard(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(14),
       showGoldBar: true,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            children: [
+              Text(
+                'shop.filters'.tr(),
+                style: AppTheme.bodySmall.copyWith(
+                  color: AppColors.textMuted,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                  fontSize: 10,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                width: 7,
+                height: 7,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF22C55E),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
           Text(
-            'shop.filters'.tr(),
+            'shop.filterPayment'.tr(),
             style: AppTheme.bodySmall.copyWith(
-              color: AppColors.textMuted,
+              color: AppColors.gold,
               fontWeight: FontWeight.w800,
-              letterSpacing: 0.8,
               fontSize: 10,
+              letterSpacing: 0.6,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 6),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10),
             decoration: BoxDecoration(
               color: Colors.black.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(8),
               border: Border.all(color: AppColors.border(0.2)),
             ),
             child: DropdownButtonHideUnderline(
@@ -489,7 +501,17 @@ class _ShopScreenState extends State<ShopScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
+          Text(
+            'shop.filterPriceRange'.tr(),
+            style: AppTheme.bodySmall.copyWith(
+              color: AppColors.gold,
+              fontWeight: FontWeight.w800,
+              fontSize: 10,
+              letterSpacing: 0.6,
+            ),
+          ),
+          const SizedBox(height: 6),
           Row(
             children: [
               Expanded(
@@ -521,15 +543,30 @@ class _ShopScreenState extends State<ShopScreen> {
                   decoration: _priceDecoration('shop.maxPrice'.tr()),
                 ),
               ),
-              const SizedBox(width: 8),
-              TextButton(
-                onPressed: _clearPriceFilters,
-                child: Text(
-                  'shop.clear'.tr(),
-                  style: TextStyle(color: AppColors.gold, fontSize: 12),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            height: 40,
+            child: OutlinedButton(
+              onPressed: _clearPriceFilters,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.gold,
+                side: BorderSide(color: AppColors.gold.withValues(alpha: 0.7)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
               ),
-            ],
+              child: Text(
+                'shop.clearAllFilters'.tr(),
+                style: const TextStyle(
+                  fontWeight: FontWeight.w900,
+                  fontSize: 11,
+                  letterSpacing: 0.6,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -544,13 +581,14 @@ class _ShopScreenState extends State<ShopScreen> {
         filled: true,
         fillColor: Colors.black.withValues(alpha: 0.4),
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(2),
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: AppColors.border(0.2)),
         ),
-        focusedBorder: const OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(2)),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(color: AppColors.gold),
         ),
       );
@@ -570,7 +608,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   _items = _applyFilters(_allItems);
                 });
               },
-              borderRadius: BorderRadius.circular(2),
+              borderRadius: BorderRadius.circular(8),
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -583,7 +621,7 @@ class _ShopScreenState extends State<ShopScreen> {
                   border: Border.all(
                     color: isSelected ? AppColors.gold : AppColors.border(0.2),
                   ),
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   category['key']!.tr(),
@@ -616,7 +654,23 @@ class _ShopScreenState extends State<ShopScreen> {
             const SizedBox(height: 12),
             Text(
               'shop.emptyFilters'.tr(),
-              style: AppTheme.heading3.copyWith(color: AppColors.textMuted),
+              style: AppTheme.heading3.copyWith(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'shop.emptyFiltersHint'.tr(),
+              style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            OutlinedButton(
+              onPressed: _clearPriceFilters,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.gold,
+                side: BorderSide(color: AppColors.gold.withValues(alpha: 0.7)),
+              ),
+              child: Text('shop.clearAllFilters'.tr()),
             ),
           ],
         ),

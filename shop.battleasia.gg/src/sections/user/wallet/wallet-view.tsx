@@ -1,5 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { alpha } from '@mui/material/styles';
+
+import { goldAlpha } from 'src/theme/accent-presets';
 import {
     Box,
     Card,
@@ -39,7 +41,7 @@ import {
     userPolishedDialogHeadingSx,
     userPolishedDialogContentSx,
 } from 'src/layouts/user';
-import { SHOP_FIELD_SX, SHOP_FIELD_LABEL_PROPS, SHOP_SELECT_MENU_PROPS } from '../shop/shop-styles';
+import { SHOP_PANEL_SX, SHOP_FIELD_SX, SHOP_FIELD_LABEL_PROPS, SHOP_SELECT_MENU_PROPS } from '../shop/shop-styles';
 import { WalletHero } from './wallet-hero';
 import { PAYMENT_META, PAYMENT_OPTIONS } from 'src/global-config';
 import { paths } from 'src/routes/paths';
@@ -55,10 +57,10 @@ import CoinValue from 'src/components/coin-value';
 
 const arenaChipSx = (tone: 'gold' | 'success' | 'error' | 'warning' | 'info' | 'muted') => {
     const map = {
-        gold: { color: USER_COLORS.gold, border: alpha(USER_COLORS.gold, 0.4), bg: alpha(USER_COLORS.gold, 0.12) },
+        gold: { color: USER_COLORS.gold, border: goldAlpha(0.4), bg: goldAlpha(0.12) },
         success: { color: USER_COLORS.success, border: alpha(USER_COLORS.success, 0.4), bg: alpha(USER_COLORS.success, 0.1) },
         error: { color: USER_COLORS.error, border: alpha(USER_COLORS.error, 0.4), bg: alpha(USER_COLORS.error, 0.1) },
-        warning: { color: USER_COLORS.goldLight, border: alpha(USER_COLORS.goldLight, 0.45), bg: alpha(USER_COLORS.goldLight, 0.1) },
+        warning: { color: USER_COLORS.goldLight, border: 'rgba(var(--ba-gold-light-rgb), 0.45)', bg: 'rgba(var(--ba-gold-light-rgb), 0.1)' },
         info: { color: USER_COLORS.info, border: alpha(USER_COLORS.info, 0.4), bg: alpha(USER_COLORS.info, 0.1) },
         muted: { color: alpha('#ffffff', 0.7), border: alpha('#ffffff', 0.18), bg: alpha('#ffffff', 0.06) },
     } as const;
@@ -435,15 +437,11 @@ export function WalletView() {
             <Grid size={{ xs: 12, md: 6 }}>
                 <UserGlassCard
                     sx={{
+                        ...SHOP_PANEL_SX,
                         p: { xs: 2.5, md: 3.5 },
                         height: '100%',
                         position: 'relative',
                         overflow: 'hidden',
-                        bgcolor: alpha('#060912', 0.8),
-                        border: `1px solid ${alpha(USER_COLORS.gold, 0.35)}`,
-                        borderTop: `2px solid ${USER_COLORS.gold}`,
-                        boxShadow: `0 16px 40px ${alpha('#000000', 0.85)}, inset 0 1px 0 ${alpha(USER_COLORS.gold, 0.2)}`,
-                        clipPath: 'polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%)',
                     }}
                 >
                     {/* Background glow */}
@@ -455,7 +453,7 @@ export function WalletView() {
                             width: 160,
                             height: 160,
                             borderRadius: '50%',
-                            background: `radial-gradient(circle, ${alpha(USER_COLORS.gold, 0.18)} 0%, transparent 70%)`,
+                            background: `radial-gradient(circle, ${goldAlpha(0.18)} 0%, transparent 70%)`,
                             pointerEvents: 'none',
                         }}
                     />
@@ -485,9 +483,9 @@ export function WalletView() {
                                     fontWeight: 800,
                                     letterSpacing: 1,
                                     color: USER_COLORS.gold,
-                                    bgcolor: alpha(USER_COLORS.gold, 0.1),
-                                    border: `1px solid ${alpha(USER_COLORS.gold, 0.3)}`,
-                                    borderRadius: 0,
+                                    bgcolor: goldAlpha(0.1),
+                                    border: `1px solid ${goldAlpha(0.28)}`,
+                                    borderRadius: '6px',
                                 }}
                             />
                         </Box>
@@ -502,7 +500,7 @@ export function WalletView() {
                                     alignItems: 'center',
                                     gap: 1.5,
                                     letterSpacing: 0.5,
-                                    filter: `drop-shadow(0 2px 10px ${alpha(USER_COLORS.gold, 0.3)})`,
+                                    filter: `drop-shadow(0 2px 10px ${goldAlpha(0.3)})`,
                                 }}
                             >
                                 <Box
@@ -512,7 +510,7 @@ export function WalletView() {
                                     sx={{
                                         width: { xs: 36, md: 44 },
                                         height: { xs: 36, md: 44 },
-                                        filter: `drop-shadow(0 0 12px ${alpha(USER_COLORS.gold, 0.6)})`,
+                                        filter: `drop-shadow(0 0 12px ${goldAlpha(0.6)})`,
                                     }}
                                 />
                                 {fNumber(user?.balance, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -571,15 +569,16 @@ export function WalletView() {
             <Grid size={{ xs: 12, md: 6 }}>
                 <UserGlassCard
                     sx={{
+                        ...SHOP_PANEL_SX,
                         p: { xs: 2.5, md: 3.5 },
                         height: '100%',
                         position: 'relative',
                         overflow: 'hidden',
-                        bgcolor: alpha('#060912', 0.8),
-                        border: `1px solid ${hasPendingWithdrawal ? alpha(USER_COLORS.error, 0.4) : alpha(USER_COLORS.gold, 0.35)}`,
-                        borderTop: `2px solid ${hasPendingWithdrawal ? USER_COLORS.error : USER_COLORS.gold}`,
-                        boxShadow: `0 16px 40px ${alpha('#000000', 0.85)}, inset 0 1px 0 ${alpha('#ffffff', 0.1)}`,
-                        clipPath: 'polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%)',
+                        ...(hasPendingWithdrawal
+                          ? {
+                              borderColor: alpha(USER_COLORS.error, 0.35),
+                            }
+                          : null),
                     }}
                 >
                     {/* Background glow */}
@@ -591,7 +590,7 @@ export function WalletView() {
                             width: 160,
                             height: 160,
                             borderRadius: '50%',
-                            background: `radial-gradient(circle, ${hasPendingWithdrawal ? alpha(USER_COLORS.error, 0.15) : alpha(USER_COLORS.gold, 0.15)} 0%, transparent 70%)`,
+                            background: `radial-gradient(circle, ${hasPendingWithdrawal ? alpha(USER_COLORS.error, 0.15) : goldAlpha(0.15)} 0%, transparent 70%)`,
                             pointerEvents: 'none',
                         }}
                     />
@@ -642,7 +641,7 @@ export function WalletView() {
                                     alignItems: 'center',
                                     gap: 1.5,
                                     letterSpacing: 0.5,
-                                    filter: hasPendingWithdrawal ? 'none' : `drop-shadow(0 2px 10px ${alpha(USER_COLORS.gold, 0.3)})`,
+                                    filter: hasPendingWithdrawal ? 'none' : `drop-shadow(0 2px 10px ${goldAlpha(0.3)})`,
                                 }}
                             >
                                 <Box
@@ -691,8 +690,9 @@ export function WalletView() {
                                 fontWeight: 800,
                                 letterSpacing: 1,
                                 textTransform: 'uppercase',
-                                boxShadow: `0 8px 24px ${alpha(USER_COLORS.gold, 0.3)}`,
-                                clipPath: 'polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%)',
+                                borderRadius: '12px',
+                                clipPath: 'none !important',
+                                boxShadow: `0 8px 24px ${goldAlpha(0.3)}`,
                             }}
                         >
                             Request Withdrawal
@@ -708,10 +708,9 @@ export function WalletView() {
             <Grid size={{ xs: 12, sm: 4 }}>
                 <UserGlassCard
                     sx={{
+                        ...SHOP_PANEL_SX,
                         p: 2.25,
-                        bgcolor: alpha('#060912', 0.7),
-                        border: `1px solid ${alpha('#22c55e', 0.3)}`,
-                        borderLeft: '4px solid #22c55e',
+                        borderLeft: '3px solid #22c55e',
                     }}
                 >
                     <Stack direction="row" alignItems="center" spacing={2}>
@@ -719,11 +718,12 @@ export function WalletView() {
                             sx={{
                                 width: 44,
                                 height: 44,
+                                borderRadius: '10px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                bgcolor: alpha('#22c55e', 0.15),
-                                border: `1px solid ${alpha('#22c55e', 0.4)}`,
+                                bgcolor: alpha('#22c55e', 0.12),
+                                border: `1px solid ${alpha('#22c55e', 0.28)}`,
                                 color: '#22c55e',
                             }}
                         >
@@ -744,10 +744,9 @@ export function WalletView() {
             <Grid size={{ xs: 12, sm: 4 }}>
                 <UserGlassCard
                     sx={{
+                        ...SHOP_PANEL_SX,
                         p: 2.25,
-                        bgcolor: alpha('#060912', 0.7),
-                        border: `1px solid ${alpha('#0284c7', 0.3)}`,
-                        borderLeft: '4px solid #0284c7',
+                        borderLeft: '3px solid #0284c7',
                     }}
                 >
                     <Stack direction="row" alignItems="center" spacing={2}>
@@ -755,11 +754,12 @@ export function WalletView() {
                             sx={{
                                 width: 44,
                                 height: 44,
+                                borderRadius: '10px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                bgcolor: alpha('#0284c7', 0.15),
-                                border: `1px solid ${alpha('#0284c7', 0.4)}`,
+                                bgcolor: alpha('#0284c7', 0.12),
+                                border: `1px solid ${alpha('#0284c7', 0.28)}`,
                                 color: '#0284c7',
                             }}
                         >
@@ -780,10 +780,9 @@ export function WalletView() {
             <Grid size={{ xs: 12, sm: 4 }}>
                 <UserGlassCard
                     sx={{
+                        ...SHOP_PANEL_SX,
                         p: 2.25,
-                        bgcolor: alpha('#060912', 0.7),
-                        border: `1px solid ${alpha(USER_COLORS.gold, 0.3)}`,
-                        borderLeft: `4px solid ${USER_COLORS.gold}`,
+                        borderLeft: `3px solid ${USER_COLORS.gold}`,
                     }}
                 >
                     <Stack direction="row" alignItems="center" spacing={2}>
@@ -791,11 +790,12 @@ export function WalletView() {
                             sx={{
                                 width: 44,
                                 height: 44,
+                                borderRadius: '10px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                bgcolor: alpha(USER_COLORS.gold, 0.15),
-                                border: `1px solid ${alpha(USER_COLORS.gold, 0.4)}`,
+                                bgcolor: goldAlpha(0.12),
+                                border: `1px solid ${goldAlpha(0.28)}`,
                                 color: USER_COLORS.gold,
                             }}
                         >
@@ -1048,12 +1048,11 @@ export function WalletView() {
 
                 <UserGlassCard
                     sx={{
+                        ...SHOP_PANEL_SX,
                         height: 600,
                         width: '100%',
                         p: 0,
                         overflow: 'hidden',
-                        border: `1px solid ${alpha(USER_COLORS.gold, 0.25)}`,
-                        boxShadow: `0 16px 40px ${alpha('#000000', 0.85)}`,
                     }}
                 >
                     <DataGrid
@@ -1080,10 +1079,11 @@ export function WalletView() {
                         sx={{
                             border: 'none',
                             color: USER_COLORS.textPrimary,
+                            bgcolor: 'transparent',
                             '& .MuiDataGrid-columnHeaders': {
-                                bgcolor: alpha('#030509', 0.85),
+                                bgcolor: 'rgba(22,22,24,0.72)',
                                 color: USER_COLORS.gold,
-                                borderBottom: `1px solid ${alpha(USER_COLORS.gold, 0.25)}`,
+                                borderBottom: '1px solid rgba(255,255,255,0.09)',
                                 fontSize: 12,
                                 fontWeight: 800,
                                 textTransform: 'uppercase',
@@ -1095,10 +1095,10 @@ export function WalletView() {
                                 borderColor: alpha('#ffffff', 0.06),
                             },
                             '& .MuiDataGrid-cell:focus': { outline: 'none' },
-                            '& .MuiDataGrid-row:hover': { bgcolor: alpha(USER_COLORS.gold, 0.05) },
+                            '& .MuiDataGrid-row:hover': { bgcolor: alpha('#ffffff', 0.04) },
                             '& .MuiDataGrid-footerContainer': {
-                                borderTop: `1px solid ${alpha(USER_COLORS.gold, 0.2)}`,
-                                bgcolor: alpha('#030509', 0.85),
+                                borderTop: '1px solid rgba(255,255,255,0.09)',
+                                bgcolor: 'rgba(22,22,24,0.72)',
                                 color: alpha('#ffffff', 0.8),
                             },
                             '& .MuiTablePagination-root': {
@@ -1106,12 +1106,12 @@ export function WalletView() {
                             },
                             '& .MuiDataGrid-toolbarContainer': {
                                 p: 1.5,
-                                bgcolor: alpha('#000000', 0.4),
-                                borderBottom: `1px solid ${alpha('#ffffff', 0.08)}`,
+                                bgcolor: 'rgba(10,10,12,0.45)',
+                                borderBottom: '1px solid rgba(255,255,255,0.09)',
                                 '& .MuiTextField-root': {
                                     bgcolor: alpha('#ffffff', 0.04),
-                                    borderRadius: 0,
-                                    '& fieldset': { borderColor: alpha('#ffffff', 0.15) },
+                                    borderRadius: '10px',
+                                    '& fieldset': { borderColor: alpha('#ffffff', 0.12) },
                                 },
                             },
                         }}
@@ -1256,7 +1256,7 @@ export function WalletView() {
 
                         {/* Calculated Currency Amount Display */}
                         {coinAmount && parseFloat(coinAmount) > 0 && (
-                            <UserGlassCard sx={{ p: 2, bgcolor: alpha(USER_COLORS.gold, 0.08), borderColor: alpha(USER_COLORS.gold, 0.35) }}>
+                            <UserGlassCard sx={{ p: 2, bgcolor: goldAlpha(0.08), borderColor: goldAlpha(0.35) }}>
                                 <Stack spacing={1}>
                                     <Typography sx={userMutedTextSx}>
                                         You will receive (approx.)

@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
@@ -10,7 +9,6 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/feed_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
-import 'package:battleasia_app/presentation/widgets/common/refresh_overlay.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_hub_panels.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_hub_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_item.dart';
@@ -46,12 +44,6 @@ class _FeedScreenState extends State<FeedScreen> {
   String? _selectedCategoryId;
   String? _searchQuery;
   String _feedMode = 'all';
-  bool _isRefreshing = false;
-  double _overscrollAccumulator = 0.0;
-  double _dragStartY = 0.0;
-  bool _dragStartedAtTop = false;
-  bool _dragStartedAtBottom = false;
-  double _wheelAccumulator = 0.0;
   FeedHubSection _hubSection = FeedHubSection.feed;
 
   @override
@@ -256,61 +248,6 @@ class _FeedScreenState extends State<FeedScreen> {
     ]);
   }
 
-  bool _atTop() =>
-      _scrollController.hasClients &&
-      _scrollController.position.pixels <= 0;
-
-  bool _atBottom() =>
-      _scrollController.hasClients &&
-      _scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent;
-
-  void _onPointerDown(PointerDownEvent e) {
-    _dragStartY = e.position.dy;
-    _dragStartedAtTop = _atTop();
-    _dragStartedAtBottom = _atBottom();
-  }
-
-  void _onPointerMove(PointerMoveEvent e) {
-    if (_isRefreshing) return;
-    final dy = e.position.dy - _dragStartY;
-    // 드래그 시작 시점에 이미 경계에 있었을 때만 새로고침
-    // dy > 0 = 아래로 끌기 → 최상단에서만
-    // dy < 0 = 위로 끌기   → 최하단에서만
-    if ((dy > 0 && _dragStartedAtTop) || (dy < 0 && _dragStartedAtBottom)) {
-      if (dy.abs() >= 70) _triggerRefresh();
-    }
-  }
-
-  void _onPointerSignal(PointerSignalEvent e) {
-    if (_isRefreshing) return;
-    if (e is PointerScrollEvent) {
-      final scrollingUp = e.scrollDelta.dy < 0;
-      final scrollingDown = e.scrollDelta.dy > 0;
-      if (scrollingDown && _atTop()) {
-        _wheelAccumulator += e.scrollDelta.dy.abs();
-      } else if (scrollingUp && _atBottom()) {
-        _wheelAccumulator += e.scrollDelta.dy.abs();
-      } else {
-        _wheelAccumulator = 0;
-      }
-      if (_wheelAccumulator >= 60) {
-        _wheelAccumulator = 0;
-        _triggerRefresh();
-      }
-    }
-  }
-
-  Future<void> _triggerRefresh() async {
-    if (_isRefreshing || !mounted) return;
-    setState(() {
-      _isRefreshing = true;
-      _loadingMore = false;
-    });
-    await _onRefresh();
-    if (mounted) setState(() => _isRefreshing = false);
-  }
-
   @override
   Widget build(BuildContext context) {
     final headerHeight = ResponsiveUtils.getResponsiveSpacing(
@@ -400,10 +337,10 @@ class _FeedScreenState extends State<FeedScreen> {
                   delegate: SliverChildBuilderDelegate((context, index) {
                     if (index == _feeds.length) {
                       // Load more indicator
-                      if (_hasMore && !_loadingMore && !_isRefreshing) {
+                      if (_hasMore && !_loadingMore) {
                         _fetchFeeds(loadMore: true);
                       }
-                      if (_loadingMore && !_isRefreshing) {
+                      if (_loadingMore) {
                         return Center(
                           child: Padding(
                             padding: EdgeInsets.all(spacing24),

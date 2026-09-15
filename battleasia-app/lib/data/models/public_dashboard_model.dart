@@ -81,6 +81,7 @@ class PublicDashboardStats {
   final double totalWinnings;
   final int processedMatches;
   final int ongoingMatches;
+  final int todayJoinedUsers;
   final Map<String, int> liveCountByGame;
   final Map<String, int> participantsByGame;
   final List<DashboardTopPlayer> topProfitPlayers;
@@ -92,6 +93,7 @@ class PublicDashboardStats {
     required this.totalWinnings,
     required this.processedMatches,
     required this.ongoingMatches,
+    this.todayJoinedUsers = 0,
     this.liveCountByGame = const {},
     this.participantsByGame = const {},
     required this.topProfitPlayers,
@@ -127,6 +129,7 @@ class PublicDashboardStats {
       totalWinnings: (platform['totalWinnings'] as num?)?.toDouble() ?? 0,
       processedMatches: (platform['processedMatches'] as num?)?.toInt() ?? 0,
       ongoingMatches: (platform['ongoingMatches'] as num?)?.toInt() ?? 0,
+      todayJoinedUsers: (platform['todayJoinedUsers'] as num?)?.toInt() ?? 0,
       liveCountByGame: _parseCountMap(json['liveCountByGame']),
       participantsByGame: _parseCountMap(json['participantsByGame']),
       topProfitPlayers: parseList(

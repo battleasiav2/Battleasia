@@ -114,19 +114,9 @@ class HowToPlaySection extends StatelessWidget {
           Text(
             'HOW TO PLAY',
             style: AppTheme.heading2.copyWith(
-              fontSize: isMobile ? 36 : 56,
-              shadows: [
-                Shadow(
-                  offset: const Offset(0, 0),
-                  blurRadius: 20,
-                  color: Colors.white.withOpacity(0.5),
-                ),
-                Shadow(
-                  offset: const Offset(0, 0),
-                  blurRadius: 40,
-                  color: Colors.white.withOpacity(0.3),
-                ),
-              ],
+              fontSize: isMobile ? 28 : 44,
+              color: Colors.white,
+              fontWeight: FontWeight.w900,
             ),
             textAlign: TextAlign.center,
           ),

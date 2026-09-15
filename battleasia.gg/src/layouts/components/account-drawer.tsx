@@ -39,7 +39,6 @@ import { goldAlpha } from 'src/theme/accent-presets';
 // ----------------------------------------------------------------------
 
 const GOLD = 'var(--ba-gold, #f5c518)';
-const GOLD_LIGHT = 'var(--ba-gold-light, #fbbf24)';
 
 const liveBeaconPulse = keyframes`
   0%, 100% {
@@ -52,23 +51,27 @@ const liveBeaconPulse = keyframes`
   }
 `;
 
-const laserSweep = keyframes`
-  0% {
-    background-position: 0% 0%;
-  }
-  100% {
-    background-position: 200% 0%;
-  }
-`;
-
 const DRAWER_PAPER_SX = {
   width: { xs: 'min(380px, 92vw)', sm: 420 },
   display: 'flex',
   flexDirection: 'column',
-  background: 'linear-gradient(180deg, #090d14 0%, #04060a 100%)',
-  borderLeft: `1px solid ${goldAlpha(0.25)}`,
-  boxShadow: `-16px 0 60px ${alpha('#000000', 0.85)}, inset 1px 0 0 ${goldAlpha(0.12)}`,
+  bgcolor: '#060607',
+  backgroundImage: 'none',
+  borderLeft: `1px solid ${alpha('#ffffff', 0.09)}`,
+  boxShadow: `-16px 0 60px ${alpha('#000000', 0.85)}`,
   overflow: 'hidden',
+} as const;
+
+/** Home Pulse / GlassApk card surface */
+const HOME_CARD_SX = {
+  position: 'relative' as const,
+  overflow: 'hidden' as const,
+  borderRadius: '8px',
+  bgcolor: alpha('#161618', 0.42),
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
+  border: `1px solid ${alpha('#ffffff', 0.12)}`,
+  boxShadow: 'none',
 } as const;
 
 export type AccountDrawerProps = IconButtonProps & {
@@ -165,14 +168,12 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
             <Box
               key={option.labelKey}
               sx={{
-                borderRadius: '8px',
-                border: isExpanded ? `1px solid ${goldAlpha(0.4)}` : `1px solid rgba(255, 255, 255, 0.1)`,
-                bgcolor: isExpanded ? 'rgba(15, 20, 31, 0.85)' : 'rgba(10, 14, 22, 0.65)',
-                boxShadow: isExpanded
-                  ? `0 8px 24px rgba(0, 0, 0, 0.5), inset 0 0 16px ${goldAlpha(0.06)}`
-                  : '0 4px 14px rgba(0, 0, 0, 0.35)',
-                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                overflow: 'hidden',
+                ...HOME_CARD_SX,
+                border: isExpanded
+                  ? `1px solid ${goldAlpha(0.35)}`
+                  : `1px solid ${alpha('#ffffff', 0.12)}`,
+                bgcolor: isExpanded ? alpha('#161618', 0.52) : alpha('#161618', 0.42),
+                transition: 'border-color 0.2s ease, background-color 0.2s ease',
               }}
             >
               {/* Parent Expandable Command Header */}
@@ -190,21 +191,21 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                   overflow: 'hidden',
                   cursor: 'pointer',
                   '&:hover': {
-                    bgcolor: 'rgba(255, 255, 255, 0.04)',
+                    bgcolor: alpha('#ffffff', 0.03),
                   },
                 }}
               >
-                {/* Active Indicator Left Glow Strip */}
-                {isActive && (
+                {/* Home-style left gold bar when active/expanded */}
+                {(isActive || isExpanded) && (
                   <Box
                     sx={{
                       position: 'absolute',
                       left: 0,
                       top: 0,
                       bottom: 0,
-                      width: 3.5,
-                      bgcolor: GOLD,
-                      boxShadow: `0 0 12px ${GOLD}`,
+                      width: 2,
+                      bgcolor: goldAlpha(0.45),
+                      zIndex: 1,
                     }}
                   />
                 )}
@@ -362,24 +363,24 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
               py: 1.4,
               borderRadius: '8px',
               clipPath: 'none',
-              bgcolor: isActive
-                ? goldAlpha(0.16)
-                : 'rgba(12, 17, 26, 0.75)',
-              border: `1px solid ${isActive ? goldAlpha(0.45) : 'rgba(255, 255, 255, 0.12)'}`,
+              bgcolor: isActive ? goldAlpha(0.1) : alpha('#161618', 0.42),
+              border: `1px solid ${isActive ? goldAlpha(0.35) : alpha('#ffffff', 0.12)}`,
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)',
               boxShadow: 'none',
               position: 'relative',
               overflow: 'hidden',
               transition: 'background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease',
               '&:hover': {
-                bgcolor: goldAlpha(0.12),
-                borderColor: goldAlpha(0.45),
+                bgcolor: alpha('#161618', 0.52),
+                borderColor: goldAlpha(0.35),
                 transform: 'none',
                 boxShadow: 'none',
                 '& .nav-icon': {
                   color: GOLD,
                 },
                 '& .nav-label': {
-                  color: GOLD_LIGHT,
+                  color: '#ffffff',
                 },
               },
             }}
@@ -392,9 +393,8 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                   left: 0,
                   top: 0,
                   bottom: 0,
-                  width: 3.5,
-                  bgcolor: GOLD,
-                  boxShadow: `0 0 12px ${GOLD}`,
+                  width: 2,
+                  bgcolor: goldAlpha(0.45),
                 }}
               />
             )}
@@ -528,8 +528,8 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
             px: { xs: 2.5, sm: 3 },
             pt: 2.5,
             pb: 1.5,
-            borderBottom: `1px solid ${goldAlpha(0.16)}`,
-            background: `linear-gradient(90deg, ${goldAlpha(0.08)} 0%, transparent 100%)`,
+            borderBottom: `1px solid ${alpha('#ffffff', 0.09)}`,
+            bgcolor: alpha('#161618', 0.35),
           }}
         >
           {/* Tactical Header Badge */}
@@ -581,35 +581,29 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
         </Box>
 
         <Scrollbar sx={{ flex: '1 1 auto' }}>
-          {/* Holographic Player Profile Pod */}
+          {/* Home-style player profile card */}
           <Box sx={{ px: { xs: 2.25, sm: 3 }, pt: 2, pb: 1 }}>
             <Box
               sx={{
+                ...HOME_CARD_SX,
                 p: 2,
-                borderRadius: '8px',
-                clipPath: 'polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%)',
-                bgcolor: 'rgba(15, 21, 33, 0.9)',
-                border: `1px solid ${goldAlpha(0.35)}`,
-                boxShadow: `0 8px 28px rgba(0, 0, 0, 0.5), inset 0 0 20px ${goldAlpha(0.08)}`,
-                position: 'relative',
-                overflow: 'hidden',
               }}
             >
-              {/* Corner Bracket */}
+              {/* Left gold accent bar — same as home Pulse cards */}
               <Box
+                aria-hidden
                 sx={{
                   position: 'absolute',
+                  left: 0,
                   top: 0,
-                  right: 0,
-                  width: 14,
-                  height: 14,
-                  borderTop: `2px solid ${GOLD}`,
-                  borderRight: `2px solid ${GOLD}`,
+                  bottom: 0,
+                  width: 2,
+                  bgcolor: goldAlpha(0.45),
+                  zIndex: 1,
                 }}
               />
 
-              <Stack direction="row" alignItems="center" spacing={1.75}>
-                {/* Avatar with Glowing Status Ring */}
+              <Stack direction="row" alignItems="center" spacing={1.75} sx={{ position: 'relative', zIndex: 2 }}>
                 <Box sx={{ position: 'relative', flexShrink: 0 }}>
                   <Box
                     component="img"
@@ -620,10 +614,9 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                       height: 48,
                       borderRadius: '8px',
                       objectFit: 'cover',
-                      border: `2px solid ${goldAlpha(0.6)}`,
+                      border: `1px solid ${alpha('#ffffff', 0.12)}`,
                     }}
                   />
-                  {/* Online Dot */}
                   <Box
                     sx={{
                       position: 'absolute',
@@ -633,19 +626,17 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                       height: 12,
                       borderRadius: '50%',
                       bgcolor: '#22c55e',
-                      border: '2px solid #090d14',
-                      boxShadow: '0 0 8px #22c55e',
+                      border: '2px solid #161618',
                     }}
                   />
                 </Box>
 
-                {/* Player Name & Verified Badge */}
                 <Box sx={{ minWidth: 0, flex: 1 }}>
                   <Typography
                     noWrap
                     sx={{
                       fontSize: 16,
-                      fontWeight: 900,
+                      fontWeight: 800,
                       letterSpacing: '0.04em',
                       color: '#ffffff',
                       textTransform: 'uppercase',
@@ -663,8 +654,8 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                         gap: 0.5,
                         px: 0.8,
                         py: 0.2,
-                        borderRadius: '3px',
-                        bgcolor: goldAlpha(0.15),
+                        borderRadius: '999px',
+                        bgcolor: goldAlpha(0.12),
                         border: `1px solid ${goldAlpha(0.35)}`,
                         fontSize: 9.5,
                         fontWeight: 800,
@@ -681,7 +672,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                         sx={{
                           fontSize: 10.5,
                           fontFamily: 'monospace',
-                          color: alpha('#ffffff', 0.5),
+                          color: alpha('#ffffff', 0.48),
                         }}
                       >
                         ID: {user.pubgId}
@@ -691,15 +682,16 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                 </Box>
               </Stack>
 
-              {/* BAC Balance Strip inside HUD */}
               <Box
                 sx={{
                   mt: 1.75,
                   pt: 1.25,
-                  borderTop: `1px solid ${goldAlpha(0.15)}`,
+                  borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  position: 'relative',
+                  zIndex: 2,
                 }}
               >
                 <Stack direction="row" alignItems="center" spacing={0.8}>
@@ -709,7 +701,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                     alt="BAC"
                     sx={{ width: 18, height: 18, objectFit: 'contain' }}
                   />
-                  <Typography sx={{ fontSize: 16, fontWeight: 900, color: '#ffffff', lineHeight: 1 }}>
+                  <Typography sx={{ fontSize: 16, fontWeight: 800, color: '#ffffff', lineHeight: 1 }}>
                     {user.balance.toLocaleString()} BAC
                   </Typography>
                 </Stack>
@@ -720,18 +712,18 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                   onClick={onClose}
                   sx={{
                     px: 1.25,
-                    py: 0.45,
-                    borderRadius: '4px',
-                    bgcolor: goldAlpha(0.12),
-                    border: `1px solid ${goldAlpha(0.35)}`,
+                    py: 0.55,
+                    borderRadius: '8px',
+                    bgcolor: 'transparent',
+                    border: `1px solid ${goldAlpha(0.45)}`,
                     fontSize: 10.5,
                     fontWeight: 800,
                     letterSpacing: '0.06em',
-                    color: GOLD_LIGHT,
+                    color: GOLD,
                     textTransform: 'uppercase',
-                    transition: 'all 0.2s ease',
+                    transition: 'background-color 0.2s ease, border-color 0.2s ease',
                     '&:hover': {
-                      bgcolor: goldAlpha(0.24),
+                      bgcolor: goldAlpha(0.12),
                       borderColor: GOLD,
                       color: '#ffffff',
                     },
@@ -758,8 +750,8 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
               sm: 2.5,
             },
             mt: 'auto',
-            borderTop: `1px solid ${goldAlpha(0.16)}`,
-            background: 'rgba(5, 8, 14, 0.98)',
+            borderTop: `1px solid ${alpha('#ffffff', 0.09)}`,
+            background: 'rgba(6, 6, 7, 0.98)',
             position: 'relative',
             zIndex: 2,
           }}

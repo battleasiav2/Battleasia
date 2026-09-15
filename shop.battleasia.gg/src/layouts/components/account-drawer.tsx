@@ -13,7 +13,7 @@ import {
   IconButton,
   ButtonBase,
 } from '@mui/material';
-import { alpha, keyframes } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 
 import { paths } from 'src/routes/paths';
 import { usePathname } from 'src/routes/hooks';
@@ -27,7 +27,7 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
-import { USER_COLORS } from 'src/layouts/user/user-theme';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 import { AccountButton } from './account-button';
 import { SignOutButton } from './sign-out-button';
@@ -36,29 +36,29 @@ import type { AccountMenuItem } from '../menu-items-config';
 
 // ----------------------------------------------------------------------
 
-const GOLD = USER_COLORS.gold;
-const GOLD_LIGHT = USER_COLORS.goldLight;
-const goldAlpha = (opacity: number) => alpha(USER_COLORS.gold, opacity);
-
-const subMenuEntrance = keyframes`
-  0% {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-`;
+const GOLD = 'var(--ba-gold, #f5c518)';
 
 const DRAWER_PAPER_SX = {
   width: { xs: 'min(380px, 92vw)', sm: 420 },
   display: 'flex',
   flexDirection: 'column',
-  background: 'linear-gradient(180deg, #090d14 0%, #04060a 100%)',
-  borderLeft: `1px solid ${goldAlpha(0.25)}`,
-  boxShadow: `-16px 0 60px ${alpha('#000000', 0.85)}, inset 1px 0 0 ${goldAlpha(0.12)}`,
+  bgcolor: '#060607',
+  backgroundImage: 'none',
+  borderLeft: `1px solid ${alpha('#ffffff', 0.09)}`,
+  boxShadow: `-16px 0 60px ${alpha('#000000', 0.85)}`,
   overflow: 'hidden',
+} as const;
+
+/** Home / shop glass menu card surface — all items share this */
+const MENU_CARD_SX = {
+  position: 'relative' as const,
+  overflow: 'hidden' as const,
+  borderRadius: '8px',
+  bgcolor: alpha('#161618', 0.42),
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
+  border: `1px solid ${alpha('#ffffff', 0.12)}`,
+  boxShadow: 'none',
 } as const;
 
 const MAIN_APP_URL =
@@ -133,21 +133,18 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
         const hasChildren = option.children && option.children.length > 0;
         const isExpanded = expandedItems.has(itemKey);
         const isActive = isMenuItemActive(pathname, option);
-        const subCount = option.children?.length ?? 0;
 
         if (hasChildren) {
           return (
             <Box
               key={itemKey}
               sx={{
-                borderRadius: '8px',
-                border: isExpanded ? `1px solid ${goldAlpha(0.4)}` : `1px solid rgba(255, 255, 255, 0.1)`,
-                bgcolor: isExpanded ? 'rgba(15, 20, 31, 0.85)' : 'rgba(10, 14, 22, 0.65)',
-                boxShadow: isExpanded
-                  ? `0 8px 24px rgba(0, 0, 0, 0.5), inset 0 0 16px ${goldAlpha(0.06)}`
-                  : '0 4px 14px rgba(0, 0, 0, 0.35)',
-                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                overflow: 'hidden',
+                ...MENU_CARD_SX,
+                border: isExpanded
+                  ? `1px solid ${goldAlpha(0.35)}`
+                  : `1px solid ${alpha('#ffffff', 0.12)}`,
+                bgcolor: isExpanded ? alpha('#161618', 0.52) : alpha('#161618', 0.42),
+                transition: 'border-color 0.2s ease, background-color 0.2s ease',
               }}
             >
               <ButtonBase
@@ -164,20 +161,20 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                   overflow: 'hidden',
                   cursor: 'pointer',
                   '&:hover': {
-                    bgcolor: 'rgba(255, 255, 255, 0.04)',
+                    bgcolor: alpha('#ffffff', 0.03),
                   },
                 }}
               >
-                {isActive && (
+                {(isActive || isExpanded) && (
                   <Box
                     sx={{
                       position: 'absolute',
                       left: 0,
                       top: 0,
                       bottom: 0,
-                      width: 3.5,
-                      bgcolor: GOLD,
-                      boxShadow: `0 0 12px ${GOLD}`,
+                      width: 2,
+                      bgcolor: goldAlpha(0.45),
+                      zIndex: 1,
                     }}
                   />
                 )}
@@ -185,17 +182,10 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                 <Stack direction="row" alignItems="center" spacing={1.5} sx={{ minWidth: 0 }}>
                   <Box
                     sx={{
-                      width: 38,
-                      height: 38,
-                      borderRadius: '6px',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                      bgcolor: isExpanded || isActive ? goldAlpha(0.16) : 'rgba(255, 255, 255, 0.06)',
-                      border: `1px solid ${isExpanded || isActive ? goldAlpha(0.45) : 'rgba(255, 255, 255, 0.12)'}`,
-                      color: isExpanded || isActive ? GOLD : '#ffffff',
-                      boxShadow: isExpanded || isActive ? `0 0 14px ${goldAlpha(0.25)}` : 'none',
-                      transition: 'all 0.22s ease',
+                      color: isExpanded || isActive ? GOLD : alpha('#ffffff', 0.75),
+                      transition: 'color 0.22s ease',
                       flexShrink: 0,
                     }}
                   >
@@ -218,60 +208,50 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                   </Box>
                 </Stack>
 
-                <Box
+                <Iconify
+                  icon="eva:arrow-ios-downward-fill"
+                  width={20}
                   sx={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: '6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                      bgcolor: isExpanded ? goldAlpha(0.24) : 'rgba(255, 255, 255, 0.12)',
-                      border: `1px solid ${isExpanded ? goldAlpha(0.65) : 'rgba(255, 255, 255, 0.25)'}`,
-                      color: isExpanded ? GOLD : '#ffffff',
-                      boxShadow: isExpanded ? `0 0 14px ${goldAlpha(0.45)}` : '0 2px 8px rgba(0,0,0,0.4)',
-                      transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                      transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Iconify
-                      icon="eva:arrow-ios-downward-fill"
-                      width={20}
-                      sx={{ color: isExpanded ? GOLD : '#ffffff' }}
-                    />
-                  </Box>
+                    color: isExpanded ? GOLD : alpha('#ffffff', 0.55),
+                    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                    flexShrink: 0,
+                  }}
+                />
               </ButtonBase>
 
               <Collapse in={isExpanded} timeout="auto" unmountOnExit>
                 <Box
                   sx={{
                     position: 'relative',
-                    px: 1.75,
-                    pt: 0.75,
-                    pb: 1.5,
-                    bgcolor: 'rgba(5, 8, 14, 0.7)',
-                    borderTop: `1px solid ${goldAlpha(0.14)}`,
+                    pl: 2.25,
+                    pr: 1.5,
+                    pb: 0.5,
+                    borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
                   }}
                 >
                   <Box
                     sx={{
                       position: 'absolute',
-                      left: 27,
-                      top: 14,
-                      bottom: 20,
+                      left: 14,
+                      top: 8,
+                      bottom: 8,
                       width: 2,
-                      background: `linear-gradient(180deg, ${GOLD} 0%, ${goldAlpha(0.3)} 100%)`,
-                      boxShadow: `0 0 8px ${goldAlpha(0.5)}`,
+                      bgcolor: GOLD,
+                      opacity: 0.85,
                       zIndex: 1,
                     }}
                   />
 
-                  <Stack spacing={0.75} sx={{ position: 'relative', zIndex: 2 }}>
+                  <Stack spacing={0} sx={{ position: 'relative', zIndex: 2 }}>
                     {option.children?.map((child, idx) => {
                       const childKey = child.labelKey || child.label || '';
-                      const childActive = !!(child.href && (pathname === child.href || pathname.startsWith(`${child.href}/`)));
+                      const childActive = !!(
+                        child.href &&
+                        (pathname === child.href || pathname.startsWith(`${child.href}/`))
+                      );
                       const childLabel = t(childKey) || child.label;
+                      const isLast = idx === (option.children?.length ?? 0) - 1;
 
                       return (
                         <ButtonBase
@@ -283,78 +263,47 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                             width: 1,
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'space-between',
-                            py: 1.15,
-                            px: 1.5,
-                            pl: 3.5,
-                            borderRadius: '6px',
-                            clipPath: 'polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%)',
-                            bgcolor: childActive
-                              ? `linear-gradient(90deg, ${goldAlpha(0.22)} 0%, ${goldAlpha(0.06)} 100%)`
-                              : 'rgba(255, 255, 255, 0.02)',
-                            border: `1px solid ${childActive ? goldAlpha(0.48) : 'rgba(255, 255, 255, 0.07)'}`,
-                            boxShadow: childActive ? `0 0 16px ${goldAlpha(0.25)}` : 'none',
-                            animation: `${subMenuEntrance} 0.3s ease-out ${idx * 0.04}s both`,
-                            position: 'relative',
-                            overflow: 'hidden',
-                            transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+                            gap: 1.5,
+                            py: 1.35,
+                            pl: 2,
+                            pr: 0.5,
+                            borderBottom: isLast ? 'none' : `1px solid ${alpha('#ffffff', 0.08)}`,
+                            bgcolor: 'transparent',
+                            transition: 'background-color 0.2s ease',
                             '&:hover': {
-                              bgcolor: goldAlpha(0.12),
-                              borderColor: goldAlpha(0.45),
-                              transform: 'translateX(4px)',
-                              '& .child-icon-pod': {
-                                color: GOLD,
-                                bgcolor: goldAlpha(0.2),
-                              },
-                              '& .child-label': {
-                                color: GOLD_LIGHT,
-                              },
+                              bgcolor: goldAlpha(0.05),
+                              '& .child-icon, & .child-label': { color: GOLD },
                             },
                           }}
                         >
-                          <Stack direction="row" alignItems="center" spacing={1.25} sx={{ minWidth: 0 }}>
-                            <Box
-                              className="child-icon-pod"
-                              sx={{
-                                width: 28,
-                                height: 28,
-                                borderRadius: '4px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                bgcolor: childActive ? goldAlpha(0.25) : 'rgba(255, 255, 255, 0.06)',
-                                color: childActive ? GOLD : alpha('#ffffff', 0.7),
-                                transition: 'all 0.2s ease',
-                                flexShrink: 0,
-                              }}
-                            >
-                              {renderItemIcon(child, childActive)}
-                            </Box>
-
-                            <Typography
-                              className="child-label"
-                              sx={{
-                                fontSize: 13.5,
-                                fontWeight: childActive ? 800 : 600,
-                                letterSpacing: '0.04em',
-                                textTransform: 'uppercase',
-                                color: childActive ? '#ffffff' : alpha('#ffffff', 0.8),
-                                textShadow: childActive ? `0 0 12px ${goldAlpha(0.5)}` : 'none',
-                                transition: 'color 0.2s ease',
-                                lineHeight: 1.2,
-                              }}
-                            >
-                              {childLabel}
-                            </Typography>
-                          </Stack>
-
-                          <Iconify
-                            icon="solar:arrow-right-bold"
-                            width={14}
+                          <Box
+                            className="child-icon"
                             sx={{
-                              color: childActive ? GOLD : alpha('#ffffff', 0.3),
+                              display: 'flex',
+                              alignItems: 'center',
+                              color: childActive ? GOLD : alpha('#ffffff', 0.55),
+                              transition: 'color 0.2s ease',
+                              flexShrink: 0,
                             }}
-                          />
+                          >
+                            {renderItemIcon(child, childActive)}
+                          </Box>
+
+                          <Typography
+                            className="child-label"
+                            sx={{
+                              fontSize: 13,
+                              fontWeight: childActive ? 800 : 600,
+                              letterSpacing: '0.06em',
+                              textTransform: 'uppercase',
+                              color: childActive ? '#ffffff' : alpha('#ffffff', 0.72),
+                              transition: 'color 0.2s ease',
+                              lineHeight: 1.2,
+                              textAlign: 'left',
+                            }}
+                          >
+                            {childLabel}
+                          </Typography>
                         </ButtonBase>
                       );
                     })}
@@ -378,43 +327,15 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
               justifyContent: 'space-between',
               px: 2,
               py: 1.4,
-              borderRadius: '8px',
-              clipPath: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
-              bgcolor: isActive
-                ? `linear-gradient(90deg, ${goldAlpha(0.2)} 0%, rgba(10, 14, 22, 0.85) 100%)`
-                : 'rgba(12, 17, 26, 0.75)',
-              border: `1px solid ${isActive ? goldAlpha(0.55) : 'rgba(255, 255, 255, 0.12)'}`,
-              boxShadow: isActive ? `0 0 20px ${goldAlpha(0.3)}` : '0 4px 12px rgba(0, 0, 0, 0.35)',
-              position: 'relative',
-              overflow: 'hidden',
-              transition: 'all 0.22s cubic-bezier(0.16, 1, 0.3, 1)',
-              '&::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: '-140%',
-                width: '60%',
-                height: '100%',
-                background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent)',
-                transform: 'skewX(-20deg)',
-                transition: 'left 0.6s ease',
-                pointerEvents: 'none',
-              },
+              ...MENU_CARD_SX,
+              bgcolor: isActive ? goldAlpha(0.1) : alpha('#161618', 0.42),
+              border: `1px solid ${isActive ? goldAlpha(0.35) : alpha('#ffffff', 0.12)}`,
+              transition: 'background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease',
               '&:hover': {
-                bgcolor: goldAlpha(0.15),
-                borderColor: goldAlpha(0.6),
-                transform: 'translateY(-2px)',
-                boxShadow: `0 8px 24px rgba(0, 0, 0, 0.5), 0 0 18px ${goldAlpha(0.3)}`,
-                '&::before': {
-                  left: '160%',
-                },
-                '& .nav-icon-pod': {
-                  color: GOLD,
-                  bgcolor: goldAlpha(0.22),
-                },
-                '& .nav-label': {
-                  color: GOLD_LIGHT,
-                },
+                bgcolor: alpha('#161618', 0.52),
+                borderColor: goldAlpha(0.35),
+                '& .nav-icon': { color: GOLD },
+                '& .nav-label': { color: '#ffffff' },
               },
             }}
           >
@@ -425,28 +346,20 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                   left: 0,
                   top: 0,
                   bottom: 0,
-                  width: 3.5,
-                  bgcolor: GOLD,
-                  boxShadow: `0 0 12px ${GOLD}`,
+                  width: 2,
+                  bgcolor: goldAlpha(0.45),
                 }}
               />
             )}
 
             <Stack direction="row" alignItems="center" spacing={1.5} sx={{ minWidth: 0 }}>
               <Box
-                className="nav-icon-pod"
+                className="nav-icon"
                 sx={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: '6px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  bgcolor: isActive ? goldAlpha(0.2) : 'rgba(255, 255, 255, 0.06)',
-                  border: `1px solid ${isActive ? goldAlpha(0.45) : 'rgba(255, 255, 255, 0.12)'}`,
-                  color: isActive ? GOLD : '#ffffff',
-                  boxShadow: isActive ? `0 0 14px ${goldAlpha(0.25)}` : 'none',
-                  transition: 'all 0.22s ease',
+                  color: isActive ? GOLD : alpha('#ffffff', 0.75),
+                  transition: 'color 0.22s ease',
                   flexShrink: 0,
                 }}
               >
@@ -461,7 +374,6 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                   letterSpacing: '0.07em',
                   textTransform: 'uppercase',
                   color: isActive ? '#ffffff' : alpha('#ffffff', 0.9),
-                  textShadow: isActive ? `0 0 12px ${goldAlpha(0.5)}` : 'none',
                   transition: 'color 0.2s ease',
                   lineHeight: 1.2,
                 }}
@@ -493,16 +405,14 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
             justifyContent: 'space-between',
             px: 2,
             py: 1.35,
-            borderRadius: '8px',
-            bgcolor: 'rgba(255, 255, 255, 0.04)',
-            border: `1px solid ${goldAlpha(0.2)}`,
-            color: alpha('#ffffff', 0.8),
-            transition: 'all 0.2s ease',
+            ...MENU_CARD_SX,
+            border: `1px solid ${goldAlpha(0.28)}`,
+            color: alpha('#ffffff', 0.85),
+            transition: 'background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease',
             '&:hover': {
-              bgcolor: goldAlpha(0.12),
-              borderColor: GOLD,
+              bgcolor: alpha('#161618', 0.52),
+              borderColor: goldAlpha(0.45),
               color: '#ffffff',
-              transform: 'translateY(-2px)',
             },
           }}
         >
@@ -532,6 +442,9 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
         open={open}
         onClose={onClose}
         anchor="right"
+        sx={{
+          zIndex: (theme) => theme.zIndex.modal + 4,
+        }}
         slotProps={{
           backdrop: {
             sx: {
@@ -554,8 +467,8 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
             px: { xs: 2.5, sm: 3 },
             pt: 2.5,
             pb: 1.5,
-            borderBottom: `1px solid ${goldAlpha(0.16)}`,
-            background: `linear-gradient(90deg, ${goldAlpha(0.08)} 0%, transparent 100%)`,
+            borderBottom: `1px solid ${alpha('#ffffff', 0.09)}`,
+            bgcolor: alpha('#161618', 0.35),
           }}
         >
           <Stack direction="row" alignItems="center" spacing={1}>
@@ -605,33 +518,28 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
         </Box>
 
         <Scrollbar sx={{ flex: '1 1 auto' }}>
-          {/* Holographic Player Profile Pod */}
+          {/* Profile card — same glass as menu items */}
           <Box sx={{ px: { xs: 2.25, sm: 3 }, pt: 2, pb: 1 }}>
             <Box
               sx={{
+                ...MENU_CARD_SX,
                 p: 2,
-                borderRadius: '8px',
-                clipPath: 'polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%)',
-                bgcolor: 'rgba(15, 21, 33, 0.9)',
-                border: `1px solid ${goldAlpha(0.35)}`,
-                boxShadow: `0 8px 28px rgba(0, 0, 0, 0.5), inset 0 0 20px ${goldAlpha(0.08)}`,
-                position: 'relative',
-                overflow: 'hidden',
               }}
             >
               <Box
+                aria-hidden
                 sx={{
                   position: 'absolute',
+                  left: 0,
                   top: 0,
-                  right: 0,
-                  width: 14,
-                  height: 14,
-                  borderTop: `2px solid ${GOLD}`,
-                  borderRight: `2px solid ${GOLD}`,
+                  bottom: 0,
+                  width: 2,
+                  bgcolor: goldAlpha(0.45),
+                  zIndex: 1,
                 }}
               />
 
-              <Stack direction="row" alignItems="center" spacing={1.75}>
+              <Stack direction="row" alignItems="center" spacing={1.75} sx={{ position: 'relative', zIndex: 2 }}>
                 <Box sx={{ position: 'relative', flexShrink: 0 }}>
                   <Box
                     component="img"
@@ -642,7 +550,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                       height: 48,
                       borderRadius: '8px',
                       objectFit: 'cover',
-                      border: `2px solid ${goldAlpha(0.6)}`,
+                      border: `1px solid ${alpha('#ffffff', 0.12)}`,
                     }}
                   />
                   <Box
@@ -654,8 +562,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                       height: 12,
                       borderRadius: '50%',
                       bgcolor: '#22c55e',
-                      border: '2px solid #090d14',
-                      boxShadow: '0 0 8px #22c55e',
+                      border: '2px solid #161618',
                     }}
                   />
                 </Box>
@@ -665,7 +572,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                     noWrap
                     sx={{
                       fontSize: 16,
-                      fontWeight: 900,
+                      fontWeight: 800,
                       letterSpacing: '0.04em',
                       color: '#ffffff',
                       textTransform: 'uppercase',
@@ -683,8 +590,8 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                         gap: 0.5,
                         px: 0.8,
                         py: 0.2,
-                        borderRadius: '3px',
-                        bgcolor: goldAlpha(0.15),
+                        borderRadius: '999px',
+                        bgcolor: goldAlpha(0.12),
                         border: `1px solid ${goldAlpha(0.35)}`,
                         fontSize: 9.5,
                         fontWeight: 800,
@@ -701,7 +608,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                         sx={{
                           fontSize: 10.5,
                           fontFamily: 'monospace',
-                          color: alpha('#ffffff', 0.5),
+                          color: alpha('#ffffff', 0.48),
                         }}
                       >
                         ID: {user.pubgId}
@@ -711,15 +618,16 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                 </Box>
               </Stack>
 
-              {/* BAC Balance Strip */}
               <Box
                 sx={{
                   mt: 1.75,
                   pt: 1.25,
-                  borderTop: `1px solid ${goldAlpha(0.15)}`,
+                  borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'space-between',
+                  position: 'relative',
+                  zIndex: 2,
                 }}
               >
                 <Stack direction="row" alignItems="center" spacing={0.8}>
@@ -747,7 +655,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                     fontSize: 10.5,
                     fontWeight: 800,
                     letterSpacing: '0.06em',
-                    color: GOLD_LIGHT,
+                    color: GOLD,
                     textTransform: 'uppercase',
                     transition: 'all 0.2s ease',
                     '&:hover': {
@@ -772,8 +680,8 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
             px: { xs: 2.25, sm: 3 },
             py: 2,
             mt: 'auto',
-            borderTop: `1px solid ${goldAlpha(0.16)}`,
-            background: 'rgba(5, 8, 14, 0.95)',
+            borderTop: `1px solid ${alpha('#ffffff', 0.09)}`,
+            bgcolor: alpha('#161618', 0.55),
           }}
         >
           <SignOutButton
@@ -782,8 +690,7 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
             sx={{
               width: 1,
               py: 1.15,
-              borderRadius: 0,
-              clipPath: 'polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%)',
+              borderRadius: '8px',
               fontWeight: 800,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
@@ -796,8 +703,6 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                 bgcolor: alpha('#ef4444', 0.2),
                 borderColor: '#ef4444',
                 color: '#ffffff',
-                boxShadow: '0 0 18px rgba(239, 68, 68, 0.4)',
-                transform: 'translateY(-2px)',
               },
             }}
           />

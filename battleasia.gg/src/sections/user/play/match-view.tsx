@@ -276,7 +276,7 @@ export function MatchView() {
           ) : (
             <Grid container spacing={2} alignItems="stretch">
               {activeList.map((match) => (
-                <Grid key={match.id} size={{ xs: 12, sm: 6, lg: 4 }} sx={{ display: 'flex' }}>
+                <Grid key={match.id} size={{ xs: 12, lg: 6 }} sx={{ display: 'flex' }}>
                   <MatchCard
                     match={match}
                     onJoin={handleRequestJoin}

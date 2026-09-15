@@ -19,7 +19,7 @@ const _heroSlides = [
   'assets/images/hero/hero-mobile-legends.webp',
 ];
 
-const _rotateEvery = Duration(seconds: 90);
+const _rotateEvery = Duration(seconds: 8);
 
 class HeroBannerSection extends StatefulWidget {
   const HeroBannerSection({super.key});
@@ -62,15 +62,15 @@ class _HeroBannerSectionState extends State<HeroBannerSection> {
     final isMobile = AppUtils.isMobile(context);
 
     return SizedBox(
-      height: isMobile ? 520 : 720,
+      height: isMobile ? 380 : 560,
       width: double.infinity,
       child: Stack(
         fit: StackFit.expand,
         children: [
           AnimatedSwitcher(
-            duration: const Duration(milliseconds: 1800),
-            switchInCurve: Curves.easeInOut,
-            switchOutCurve: Curves.easeInOut,
+            duration: const Duration(milliseconds: 400),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
             child: Image.asset(
               _heroSlides[_activeIndex],
               key: ValueKey(_heroSlides[_activeIndex]),
@@ -78,7 +78,7 @@ class _HeroBannerSectionState extends State<HeroBannerSection> {
               alignment: Alignment.center,
               width: double.infinity,
               height: double.infinity,
-              filterQuality: FilterQuality.high,
+              filterQuality: FilterQuality.medium,
             ),
           ),
           Container(
@@ -165,10 +165,10 @@ class _HeroBannerSectionState extends State<HeroBannerSection> {
                 return GestureDetector(
                   onTap: () => setState(() => _activeIndex = index),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 350),
+                    duration: const Duration(milliseconds: 200),
                     margin: const EdgeInsets.symmetric(horizontal: 4),
-                    width: active ? 22 : 8,
-                    height: 8,
+                    width: active ? 18 : 7,
+                    height: 7,
                     decoration: BoxDecoration(
                       color: active
                           ? AppColors.gold

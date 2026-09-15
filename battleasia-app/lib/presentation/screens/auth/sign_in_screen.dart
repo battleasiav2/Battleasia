@@ -117,24 +117,13 @@ class _SignInScreenState extends State<SignInScreen> {
     setState(() => _errorMessage = result['message'] ?? 'Sign in failed');
   }
 
-  void _comingSoon() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('auth.socialComingSoon'.tr()),
-        backgroundColor: const Color(0xFF181614),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
 
     return AuthFormShell(
-      progress: 100,
       title: widget.titleKey.tr(),
       description: 'auth.signInDescription'.tr(),
-      belowCard: _SignInSocialSection(onTap: _comingSoon),
       child: Form(
         key: _formKey,
         child: Column(
@@ -142,7 +131,7 @@ class _SignInScreenState extends State<SignInScreen> {
           children: [
             if (_errorMessage != null) ...[
               AuthAlert(message: _errorMessage!),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
             ],
             AuthTextField(
               controller: _emailController,
@@ -159,7 +148,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 12),
             AuthTextField(
               controller: _passwordController,
               label: 'auth.password'.tr(),
@@ -187,7 +176,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 return null;
               },
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             SizedBox(
               height: 22,
               child: Row(
@@ -240,7 +229,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             AuthPrimaryButton(
               label: 'auth.signIn'.tr(),
               loading: authProvider.isLoading,
@@ -263,7 +252,6 @@ class _SignInScreenState extends State<SignInScreen> {
                       fontSize: 12.5,
                       decoration: TextDecoration.underline,
                       decorationColor: AppColors.gold,
-                      decorationThickness: 1.5,
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
@@ -283,160 +271,4 @@ class _SignInScreenState extends State<SignInScreen> {
       ),
     );
   }
-}
-
-class _SignInSocialSection extends StatelessWidget {
-  final VoidCallback onTap;
-
-  const _SignInSocialSection({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: Container(
-                height: 1,
-                color: Colors.white.withValues(alpha: 0.1),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Text(
-                'auth.orContinueWith'.tr().toUpperCase(),
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.42),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 10,
-                  letterSpacing: 0.8,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                height: 1,
-                color: Colors.white.withValues(alpha: 0.1),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 108,
-              child: _SocialBtn(
-                semanticsLabel: 'auth.continueWithGoogle'.tr(),
-                onTap: onTap,
-                child: const _GoogleLogoIcon(size: 18),
-              ),
-            ),
-            const SizedBox(width: 8),
-            SizedBox(
-              width: 108,
-              child: _SocialBtn(
-                semanticsLabel: 'auth.continueWithDiscord'.tr(),
-                onTap: onTap,
-                child: const Icon(
-                  Icons.discord,
-                  color: Color(0xFF7289DA),
-                  size: 18,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class _SocialBtn extends StatelessWidget {
-  final String semanticsLabel;
-  final VoidCallback onTap;
-  final Widget child;
-
-  const _SocialBtn({
-    required this.semanticsLabel,
-    required this.onTap,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: semanticsLabel,
-      child: Material(
-        color: const Color(0xFF0E0E0E).withValues(alpha: 0.72),
-        borderRadius: BorderRadius.zero,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Container(
-            height: 40,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
-            ),
-            child: child,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _GoogleLogoIcon extends StatelessWidget {
-  final double size;
-
-  const _GoogleLogoIcon({this.size = 22});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: size,
-      height: size,
-      child: CustomPaint(
-        painter: _GoogleLogoPainter(),
-        size: Size(size, size),
-      ),
-    );
-  }
-}
-
-class _GoogleLogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final rect = Offset.zero & size;
-    final paint = Paint()..style = PaintingStyle.fill;
-
-    paint.color = const Color(0xFF4285F4);
-    canvas.drawArc(rect, -1.5708, 1.5708, true, paint);
-
-    paint.color = const Color(0xFF34A853);
-    canvas.drawArc(rect, 0, 1.5708, true, paint);
-
-    paint.color = const Color(0xFFFBBC05);
-    canvas.drawArc(rect, 1.5708, 1.5708, true, paint);
-
-    paint.color = const Color(0xFFEA4335);
-    canvas.drawArc(rect, 3.1416, 1.5708, true, paint);
-
-    paint.color = Colors.white;
-    canvas.drawCircle(Offset(size.width / 2, size.height / 2), size.width * 0.32, paint);
-
-    paint.color = const Color(0xFF4285F4);
-    canvas.drawRect(
-      Rect.fromLTWH(size.width * 0.45, size.height * 0.42, size.width * 0.5, size.height * 0.16),
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

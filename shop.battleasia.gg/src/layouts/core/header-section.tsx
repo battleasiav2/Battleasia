@@ -147,7 +147,8 @@ const HeaderCenterArea = styled('div')(() => ({
   display: 'flex',
   flex: '1 1 auto',
   justifyContent: 'center',
-  overflow: "auto",
-  width: "auto",
-  height: "100%",
+  overflow: 'hidden',
+  minWidth: 0,
+  width: 'auto',
+  height: '100%',
 }));

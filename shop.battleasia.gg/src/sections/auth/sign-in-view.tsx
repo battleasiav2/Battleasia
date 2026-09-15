@@ -1,5 +1,4 @@
 import { Box, Link, Alert, Stack, Checkbox, IconButton, InputAdornment, FormControlLabel } from '@mui/material';
-import { alpha } from '@mui/material/styles';
 import { z as zod } from 'zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -25,7 +24,14 @@ import { AuthTrustRow } from './auth-trust-row';
 import { AuthFooterLinks } from './auth-footer-links';
 import { AuthSubmitButton } from './auth-submit-button';
 import { AuthSocialButtons } from './auth-social-buttons';
-import { authAlertSx, authCardFooterSx, authFieldSlotPropsCompact, authLinkSx } from './auth-form-styles';
+import {
+  authLinkSx,
+  authAlertSx,
+  authCardFooterSx,
+  AUTH_TEXT_SECONDARY,
+  authFieldSlotPropsCompact,
+} from './auth-form-styles';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 const MAIN_APP_URL = (import.meta.env.VITE_MAIN_APP_URL as string | undefined) || 'https://battleasia.gg';
 const REMEMBER_EMAIL_KEY = 'ba_remember_email';
@@ -53,7 +59,11 @@ export function SignInView() {
     defaultValues: { email: '', password: '' },
   });
 
-  const { handleSubmit, setValue, formState: { isSubmitting } } = methods;
+  const {
+    handleSubmit,
+    setValue,
+    formState: { isSubmitting },
+  } = methods;
 
   useEffect(() => {
     try {
@@ -102,7 +112,14 @@ export function SignInView() {
   });
 
   return (
-    <Box sx={{ width: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Box
+      sx={{
+        width: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
       <AuthFormShell
         compact
         progress={100}
@@ -127,7 +144,7 @@ export function SignInView() {
                   ...authFieldSlotPropsCompact.input,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Iconify icon="solar:letter-bold-duotone" width={16} sx={{ color: '#9CA3AF' }} />
+                      <Iconify icon="solar:letter-bold-duotone" width={18} sx={{ color: '#9CA3AF' }} />
                     </InputAdornment>
                   ),
                 },
@@ -145,13 +162,25 @@ export function SignInView() {
                   ...authFieldSlotPropsCompact.input,
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Iconify icon="solar:lock-password-bold-duotone" width={16} sx={{ color: '#9CA3AF' }} />
+                      <Iconify
+                        icon="solar:lock-password-bold-duotone"
+                        width={18}
+                        sx={{ color: '#9CA3AF' }}
+                      />
                     </InputAdornment>
                   ),
                   endAdornment: (
                     <InputAdornment position="end">
-                      <IconButton onClick={showPassword.onToggle} edge="end" size="small" sx={{ color: '#9CA3AF' }}>
-                        <Iconify icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'} width={16} />
+                      <IconButton
+                        onClick={showPassword.onToggle}
+                        edge="end"
+                        size="small"
+                        sx={{ color: '#9CA3AF' }}
+                      >
+                        <Iconify
+                          icon={showPassword.value ? 'solar:eye-bold' : 'solar:eye-closed-bold'}
+                          width={18}
+                        />
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -159,24 +188,40 @@ export function SignInView() {
               }}
             />
 
-            <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ minHeight: 24 }}>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ minHeight: 24 }}
+            >
               <FormControlLabel
-                sx={{ mr: 0, ml: -0.5, my: 0 }}
+                sx={{
+                  mr: 0,
+                  ml: -0.5,
+                  my: 0,
+                  '& .MuiFormControlLabel-label': { lineHeight: 1.4 },
+                }}
                 control={
                   <Checkbox
                     size="small"
                     checked={rememberMe}
                     onChange={(event) => setRememberMe(event.target.checked)}
                     sx={{
-                      color: alpha('#f5c518', 0.45),
+                      color: goldAlpha(0.45),
                       p: 0.25,
                       mr: 0.75,
-                      '&.Mui-checked': { color: '#f5c518' },
+                      transition: 'all 0.2s ease',
+                      '&.Mui-checked': {
+                        color: 'var(--ba-gold)',
+                      },
+                      '&:hover': {
+                        bgcolor: goldAlpha(0.08),
+                      },
                     }}
                   />
                 }
                 label={
-                  <Box sx={{ fontSize: 13, fontWeight: 500, color: alpha('#fff', 0.62) }}>
+                  <Box sx={{ fontSize: 13, fontWeight: 500, color: AUTH_TEXT_SECONDARY }}>
                     {t('auth.rememberMe')}
                   </Box>
                 }
@@ -185,13 +230,18 @@ export function SignInView() {
                 href={`${MAIN_APP_URL.replace(/\/$/, '')}/auth/forgot-password`}
                 target="_blank"
                 rel="noopener noreferrer"
-                sx={{ ...authLinkSx, fontSize: 13, fontWeight: 600 }}
+                sx={authLinkSx}
               >
                 {t('auth.forgotPassword')}
               </Link>
             </Stack>
 
-            <AuthSubmitButton loading={isSubmitting} startIcon={false}>
+            <AuthSubmitButton
+              loading={isSubmitting}
+              loadingIndicator={`${t('auth.signIn')}...`}
+              startIcon={false}
+              endIcon={<Iconify icon="solar:login-3-bold" width={18} />}
+            >
               {t('auth.signIn')}
             </AuthSubmitButton>
 
@@ -207,19 +257,7 @@ export function SignInView() {
         </Box>
       </AuthFormShell>
 
-      <Box
-        sx={{
-          width: 1,
-          maxWidth: { xs: 1, sm: 400, md: 420 },
-          mt: 1.5,
-          animation: 'authViewEnter 0.75s cubic-bezier(0.16, 1, 0.3, 1) 0.06s both',
-          '@keyframes authViewEnter': {
-            '0%': { opacity: 0, transform: 'scale(1.1) translateY(-4px)', filter: 'blur(8px)' },
-            '100%': { opacity: 1, transform: 'scale(1) translateY(0)', filter: 'blur(0px)' },
-          },
-          '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
-        }}
-      >
+      <Box sx={{ width: 1, maxWidth: { xs: 1, sm: 410, md: 430 }, mt: 1.75 }}>
         <AuthSocialButtons />
       </Box>
     </Box>

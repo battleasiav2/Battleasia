@@ -136,8 +136,9 @@ export function LeaderboardPodium({ players, pointsLabel, formatScore }: Leaderb
                         bottom: -4,
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        px: 0.75,
-                        py: 0.15,
+                        px: 0.85,
+                        py: 0.2,
+                        borderRadius: '999px',
                         bgcolor: '#06090e',
                         border: `1px solid ${alpha(rankColor, 0.7)}`,
                         fontSize: 10,
@@ -145,6 +146,7 @@ export function LeaderboardPodium({ players, pointsLabel, formatScore }: Leaderb
                         letterSpacing: 0.6,
                         color: rankColor,
                         lineHeight: 1.4,
+                        boxShadow: `0 0 12px ${alpha(rankColor, 0.25)}`,
                       }}
                     >
                       #{rank}
@@ -212,11 +214,14 @@ export function LeaderboardPodium({ players, pointsLabel, formatScore }: Leaderb
                   width: 1,
                   height: pedestalH,
                   position: 'relative',
-                  background: `linear-gradient(180deg, ${alpha(rankColor, 0.28)} 0%, ${alpha(rankColor, 0.06)} 100%)`,
+                  borderRadius: '14px 14px 0 0',
+                  background: `linear-gradient(180deg, ${alpha(rankColor, 0.34)} 0%, ${alpha(rankColor, 0.08)} 55%, ${alpha('#000', 0.35)} 100%)`,
                   borderTop: `2px solid ${rankColor}`,
                   borderLeft: `1px solid ${alpha(rankColor, 0.35)}`,
                   borderRight: `1px solid ${alpha(rankColor, 0.35)}`,
-                  clipPath: 'polygon(8% 0, 92% 0, 100% 100%, 0 100%)',
+                  boxShadow: isChamp
+                    ? `0 -8px 28px ${alpha(rankColor, 0.22)}, inset 0 1px 0 ${alpha('#fff', 0.12)}`
+                    : `inset 0 1px 0 ${alpha('#fff', 0.06)}`,
                   display: 'flex',
                   alignItems: 'flex-start',
                   justifyContent: 'center',
@@ -226,7 +231,8 @@ export function LeaderboardPodium({ players, pointsLabel, formatScore }: Leaderb
                         content: '""',
                         position: 'absolute',
                         inset: 0,
-                        background: `linear-gradient(180deg, ${goldAlpha(0.12)} 0%, transparent 60%)`,
+                        borderRadius: 'inherit',
+                        background: `linear-gradient(180deg, ${goldAlpha(0.14)} 0%, transparent 60%)`,
                         pointerEvents: 'none',
                       }
                     : undefined,

@@ -1,10 +1,7 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-/// Native-feel scrolling:
-/// - Android → clamping (Material / APK feel, no rubber-band “web bounce”)
-/// - iOS → bouncing
+/// Native APK scrolling — clamping only (no rubber-band bounce).
 class AppScrollBehavior extends MaterialScrollBehavior {
   const AppScrollBehavior();
 
@@ -20,17 +17,6 @@ class AppScrollBehavior extends MaterialScrollBehavior {
   ScrollPhysics getScrollPhysics(BuildContext context) => appScrollPhysics;
 }
 
-/// Prefer Android clamping so the APK does not feel like a browser overscroll.
-ScrollPhysics get appScrollPhysics {
-  switch (defaultTargetPlatform) {
-    case TargetPlatform.iOS:
-    case TargetPlatform.macOS:
-      return const AlwaysScrollableScrollPhysics(
-        parent: BouncingScrollPhysics(),
-      );
-    default:
-      return const AlwaysScrollableScrollPhysics(
-        parent: ClampingScrollPhysics(),
-      );
-  }
-}
+ScrollPhysics get appScrollPhysics => const AlwaysScrollableScrollPhysics(
+      parent: ClampingScrollPhysics(),
+    );

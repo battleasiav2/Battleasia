@@ -145,11 +145,12 @@ export function UserLayout({
             centerArea: {
                 sx: {
                     display: 'flex',
-                    flex: 1,
+                    flex: { xs: '0 0 auto', sm: 1 },
                     alignItems: 'center',
                     justifyContent: 'flex-start',
                     minWidth: 0,
-                    mx: { xs: 1, lg: 2 },
+                    mx: { xs: 0.75, lg: 2 },
+                    overflow: 'hidden',
                 },
             },
         };
@@ -196,7 +197,7 @@ export function UserLayout({
                     alignItems="center"
                     spacing={1}
                     sx={{
-                        width: '100%',
+                        width: { xs: 'auto', sm: '100%' },
                         maxWidth: { lg: 420, xl: 460 },
                     }}
                 >
@@ -204,21 +205,27 @@ export function UserLayout({
                         <Searchbar
                             data={navData}
                             sx={{
-                                width: 1,
-                                maxWidth: 420,
-                                justifyContent: 'flex-start',
-                                bgcolor: 'rgba(22,22,24,0.38)',
+                                width: { xs: 44, sm: 1 },
+                                minWidth: { xs: 44, sm: 0 },
+                                maxWidth: { xs: 44, sm: 420 },
+                                justifyContent: { xs: 'center', sm: 'flex-start' },
+                                bgcolor: 'rgba(22,22,24,0.55)',
                                 border: `1px solid ${alpha('#ffffff', 0.09)}`,
-                                borderRadius: '12px',
-                                px: 0.5,
+                                borderRadius: { xs: '10px', sm: '12px' },
+                                px: { xs: 0, sm: 0.5 },
                                 py: 0,
+                                flexShrink: 0,
                                 ...headerCompactSearchSx,
                                 transition: 'border-color 0.2s ease, background-color 0.2s ease',
                                 '&:hover': {
                                     bgcolor: alpha('#000000', 0.55),
                                     borderColor: goldAlpha(0.35),
                                 },
-                                '& .MuiIconButton-root': { color: alpha('#ffffff', 0.7) },
+                                '& .MuiIconButton-root': {
+                                    color: alpha('#ffffff', 0.7),
+                                    width: { xs: 44, sm: 36 },
+                                    height: { xs: 44, sm: 36 },
+                                },
                                 '& .MuiLabel-root, & .label': {
                                     bgcolor: goldAlpha(0.15),
                                     color: USER_COLORS.gold,
@@ -259,7 +266,7 @@ export function UserLayout({
                     direction="row"
                     alignItems="center"
                     justifyContent="flex-end"
-                    spacing={{ xs: 0.5, sm: 1.25 }}
+                    spacing={{ xs: 0.65, sm: 1.25 }}
                     sx={{
                         ...headerRightAreaSx,
                         display: 'flex',
@@ -268,36 +275,61 @@ export function UserLayout({
                         justifySelf: 'flex-end',
                         flexShrink: 0,
                         minWidth: 0,
-                        maxWidth: { xs: '58%', sm: 'none' },
+                        maxWidth: 'none',
+                        gap: { xs: 0.65, sm: 1.25 },
                     }}
                 >
                     {isLoggedIn ? (
                         <>
                             {/* Balance Display */}
-                            <Stack direction="row" alignItems="center" spacing={{ xs: 0.5, sm: 1 }} sx={userHeaderPillSx}>
+                            <Stack
+                                direction="row"
+                                alignItems="center"
+                                spacing={{ xs: 0.45, sm: 1 }}
+                                sx={{
+                                    ...userHeaderPillSx,
+                                    flexShrink: 0,
+                                    px: { xs: 0.9, sm: 1.35 },
+                                    py: { xs: 0.35, sm: 0.45 },
+                                    minHeight: { xs: 40, sm: 44 },
+                                    height: { xs: 40, sm: 44 },
+                                    maxWidth: { xs: 108, sm: 'none' },
+                                    borderRadius: '10px',
+                                }}
+                            >
                                 {isCurrencyIconLoaded ? (
                                     <img
                                         src={CONFIG.currencyIcon}
-                                        alt="Currency Icon"
-                                        style={{ width: 'auto', height: 'auto', maxWidth: 20, maxHeight: 20 }}
+                                        alt=""
+                                        style={{ width: 16, height: 16, flexShrink: 0 }}
                                     />
                                 ) : (
                                     <Box
                                         sx={{
-                                            width: { xs: 18, sm: 20 },
-                                            height: { xs: 18, sm: 20 },
+                                            width: { xs: 16, sm: 20 },
+                                            height: { xs: 16, sm: 20 },
                                             bgcolor: alpha('#ffffff', 0.08),
                                             borderRadius: '50%',
                                             flexShrink: 0,
                                         }}
                                     />
                                 )}
-                                <AnimatedBalance
-                                    value={balance ?? 0}
-                                    fontSize={{ xs: '0.85rem', sm: '1rem' }}
-                                    fontWeight={700}
-                                    color="#ffffff"
-                                />
+                                <Box
+                                    sx={{
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        whiteSpace: 'nowrap',
+                                        maxWidth: { xs: 64, sm: 'none' },
+                                        lineHeight: 1,
+                                    }}
+                                >
+                                    <AnimatedBalance
+                                        value={balance ?? 0}
+                                        fontSize={{ xs: '0.78rem', sm: '1rem' }}
+                                        fontWeight={700}
+                                        color="#ffffff"
+                                    />
+                                </Box>
                             </Stack>
                             <Suspense fallback={null}>
                                <NotificationsDrawer />

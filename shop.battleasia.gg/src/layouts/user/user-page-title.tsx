@@ -1,3 +1,4 @@
+import { goldAlpha } from 'src/theme/accent-presets';
 import type { SxProps, Theme } from '@mui/material/styles';
 
 import Box from '@mui/material/Box';
@@ -34,7 +35,7 @@ export function UserPageTitle({ title, subtitle, badge, action, sx }: UserPageTi
               fontWeight: 700,
               letterSpacing: 1.8,
               textTransform: 'uppercase',
-              color: alpha(USER_COLORS.gold, 0.9),
+              color: goldAlpha(0.9),
               mb: 0.75,
             }}
           >

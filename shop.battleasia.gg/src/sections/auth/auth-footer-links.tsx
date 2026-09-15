@@ -2,7 +2,7 @@ import { Box, Link } from '@mui/material';
 
 import { RouterLink } from 'src/routes/components';
 
-import { authFooterTextSx, authLinkSx } from './auth-form-styles';
+import { authLinkSx, authFooterTextSx } from './auth-form-styles';
 
 // ----------------------------------------------------------------------
 

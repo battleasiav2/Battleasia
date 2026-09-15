@@ -1,30 +1,14 @@
 import type { ReactNode } from 'react';
 
 import { Box, Stack, Typography } from '@mui/material';
-import { alpha, keyframes } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 
 import { Logo } from 'src/components/logo';
 import { useTranslate } from 'src/locales/use-locales';
 
-import { authCardSx } from './auth-form-styles';
+import { authCardSx, AUTH_TEXT_MUTED } from './auth-form-styles';
 
-const zoomOutEnter = keyframes`
-  0% {
-    opacity: 0;
-    transform: scale(1.14) translateY(-8px);
-    filter: blur(12px);
-  }
-  65% {
-    filter: blur(0px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-    filter: blur(0px);
-  }
-`;
-
-const GOLD = '#f5c518';
+// ----------------------------------------------------------------------
 
 type AuthFormShellProps = {
   title: ReactNode;
@@ -34,9 +18,11 @@ type AuthFormShellProps = {
   steps?: ReactNode;
   wide?: boolean;
   compact?: boolean;
+  /** i18n key for line under logo */
   taglineKey?: string;
 };
 
+/** Zip `.auth-card` / `.auth-brand` shell — API wiring stays in parent views. */
 export function AuthFormShell({
   title,
   description,
@@ -45,81 +31,118 @@ export function AuthFormShell({
   steps,
   wide,
   compact,
-  taglineKey = 'shop.bacShopName',
+  taglineKey = 'auth.brandTagline',
 }: AuthFormShellProps) {
+  const theme = useTheme();
   const { t } = useTranslate();
+
+  const accentColor = theme.palette.primary.main || '#cbfb24';
 
   return (
     <Box
       sx={{
         width: 1,
-        maxWidth: wide ? { xs: 1, sm: 420, md: 440 } : { xs: 1, sm: 400, md: 420 },
+        maxWidth: wide ? { xs: 1, sm: 440, md: 460 } : { xs: 1, sm: 410, md: 430 },
         display: 'flex',
         flexDirection: 'column',
-        animation: `${zoomOutEnter} 0.75s cubic-bezier(0.16, 1, 0.3, 1) both`,
+        '@keyframes authViewEnter': {
+          '0%': { opacity: 0, transform: 'translateY(16px)' },
+          '100%': { opacity: 1, transform: 'none' },
+        },
+        animation: 'authViewEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards',
         '@media (prefers-reduced-motion: reduce)': { animation: 'none' },
       }}
     >
-      <Box sx={{ ...authCardSx, width: 1 }}>
+      <Box
+        sx={{
+          ...authCardSx,
+          width: 1,
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
         {progress !== undefined && (
-          <Box sx={{ height: 3, bgcolor: alpha('#fff', 0.08) }}>
+          <Box sx={{ position: 'relative', height: 2, bgcolor: alpha('#ffffff', 0.08) }}>
             <Box
               sx={{
                 height: 1,
                 width: `${progress}%`,
-                background: `linear-gradient(90deg, ${GOLD}, ${alpha(GOLD, 0.55)})`,
-                transition: 'width 0.5s ease',
+                bgcolor: accentColor,
+                transition: 'width 0.35s ease',
               }}
             />
           </Box>
         )}
 
-        <Box sx={{ px: { xs: 2.75, sm: 3.5 }, py: compact ? { xs: 2.75, sm: 3 } : { xs: 3, sm: 3.5 } }}>
-          <Stack alignItems="center" textAlign="center" spacing={0.5} sx={{ mb: steps ? 2 : 2.25 }}>
+        <Box
+          sx={{
+            // Zip `.auth-card-inner`
+            px: { xs: '22px', sm: '26px', md: '28px' },
+            pt: compact ? { xs: '20px', sm: '22px' } : { xs: '22px', sm: '26px' },
+            pb: { xs: '22px', sm: '26px', md: '28px' },
+            position: 'relative',
+            zIndex: 1,
+          }}
+        >
+          <Stack
+            alignItems="center"
+            textAlign="center"
+            spacing={1}
+            sx={{ mb: steps ? 2.25 : 2.25 }}
+          >
             <Logo
               disabled
               sx={{
-                width: compact ? { xs: 96, sm: 104 } : { xs: 108, sm: 118 },
+                width: compact ? { xs: 56, sm: 64 } : { xs: 64, sm: 72 },
                 height: 'auto',
                 pointerEvents: 'none',
-                mb: 0.25,
+                mixBlendMode: 'lighten',
+                filter: 'drop-shadow(0 6px 14px rgba(0,0,0,0.5))',
                 '& img': { objectFit: 'contain', width: '100%', height: 'auto' },
               }}
             />
-            <Box sx={{ height: 2, width: 40, bgcolor: GOLD }} />
+            <Box
+              sx={{
+                height: 2,
+                width: 28,
+                bgcolor: accentColor,
+                borderRadius: '2px',
+              }}
+            />
             <Typography
               sx={{
-                fontSize: { xs: 10, sm: 11 },
+                fontSize: '0.68rem',
                 fontWeight: 700,
-                letterSpacing: 2.5,
+                letterSpacing: '0.16em',
                 textTransform: 'uppercase',
-                color: alpha(GOLD, 0.88),
-                pt: 0.25,
+                color: alpha('#ffffff', 0.42),
               }}
             >
               {t(taglineKey)}
             </Typography>
+
             <Typography
-              className="font-tr"
+              className="landing-display"
               sx={{
-                fontWeight: 800,
+                fontFamily: '"Clash Display", "Satoshi", "Barlow", sans-serif',
+                fontWeight: 700,
                 color: '#ffffff',
-                fontSize: compact ? { xs: 17, sm: 19 } : { xs: 19, sm: 21 },
-                lineHeight: 1.2,
-                letterSpacing: -0.2,
-                pt: 0.25,
+                fontSize: 'clamp(1.05rem, 2.4vw, 1.28rem)',
+                lineHeight: 1.25,
+                letterSpacing: '-0.02em',
+                textWrap: 'balance',
               }}
             >
               {title}
             </Typography>
+
             {description && (
               <Typography
                 sx={{
-                  color: alpha('#ffffff', 0.52),
-                  fontSize: 13,
+                  color: AUTH_TEXT_MUTED,
+                  fontSize: '0.86rem',
                   lineHeight: 1.45,
-                  maxWidth: 320,
-                  pt: 0.25,
+                  maxWidth: '32ch',
                 }}
               >
                 {description}
@@ -128,6 +151,7 @@ export function AuthFormShell({
           </Stack>
 
           {steps}
+
           {children}
         </Box>
       </Box>

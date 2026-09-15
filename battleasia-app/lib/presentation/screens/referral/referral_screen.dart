@@ -43,7 +43,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
   List<ReferralItemModel> _network = [];
   List<_CommissionItem> _commissions = [];
 
-  static const Color _panelBg = Color(0xD906090E);
+  static const Color _panelBg = Color(0x61161618); // ~rgba(22,22,24,0.38)
 
   @override
   void initState() {
@@ -159,12 +159,15 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
   BoxDecoration get _panelDecoration => BoxDecoration(
         color: _panelBg,
-        border: Border(
-          top: BorderSide(color: AppColors.gold, width: 2),
-          left: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
-          right: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
-          bottom: BorderSide(color: AppColors.gold.withValues(alpha: 0.28)),
-        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x70000000),
+            blurRadius: 40,
+            offset: Offset(0, 24),
+          ),
+        ],
       );
 
   @override

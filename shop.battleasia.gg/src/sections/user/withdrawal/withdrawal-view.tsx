@@ -1,6 +1,8 @@
 import { useMemo, useState, useEffect } from 'react';
 
 import { alpha } from '@mui/material/styles';
+
+import { goldAlpha } from 'src/theme/accent-presets';
 import {
   Box,
   Stack,
@@ -39,6 +41,7 @@ import {
 import { Iconify } from 'src/components/iconify';
 import { WalletHero } from '../wallet/wallet-hero';
 import {
+  SHOP_PANEL_SX,
   SHOP_FIELD_SX,
   SHOP_FIELD_LABEL_PROPS,
   SHOP_SELECT_MENU_PROPS,
@@ -214,14 +217,10 @@ export function WithdrawalView() {
       <UserGlassCard
         noPadding
         sx={{
+          ...SHOP_PANEL_SX,
           width: 1,
           maxWidth: { xs: 1, md: 980 },
           mx: 'auto',
-          bgcolor: alpha('#060912', 0.85),
-          border: `1px solid ${alpha(GOLD, 0.35)}`,
-          borderTop: `3px solid ${GOLD}`,
-          boxShadow: `0 24px 60px ${alpha('#000000', 0.95)}, inset 0 1px 0 ${alpha(GOLD, 0.2)}`,
-          clipPath: 'polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%)',
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -232,10 +231,10 @@ export function WithdrawalView() {
             px: { xs: 2.5, sm: 3, md: 4 },
             pt: { xs: 2.5, md: 3.5 },
             pb: { xs: 2, md: 2.5 },
-            borderBottom: `1px solid ${alpha('#ffffff', 0.08)}`,
+            borderBottom: `1px solid ${alpha('#ffffff', 0.09)}`,
             background: `
-              linear-gradient(135deg, ${alpha(GOLD, 0.08)} 0%, transparent 55%),
-              ${alpha('#000000', 0.3)}
+              linear-gradient(135deg, ${goldAlpha(0.06)} 0%, transparent 55%),
+              rgba(22,22,24,0.25)
             `,
           }}
         >
@@ -374,13 +373,13 @@ export function WithdrawalView() {
                           fontSize: 10,
                           fontWeight: 800,
                           color: GOLD,
-                          bgcolor: alpha(GOLD, 0.1),
-                          border: `1px solid ${alpha(GOLD, 0.3)}`,
+                          bgcolor: goldAlpha(0.1),
+                          border: `1px solid ${goldAlpha(0.3)}`,
                           cursor: 'pointer',
                           userSelect: 'none',
                           transition: 'all 0.2s',
                           '&:hover': {
-                            bgcolor: alpha(GOLD, 0.25),
+                            bgcolor: goldAlpha(0.25),
                             borderColor: GOLD,
                           },
                         }}
@@ -404,9 +403,9 @@ export function WithdrawalView() {
                     alignItems: { sm: 'center' },
                     justifyContent: 'space-between',
                     gap: 1.5,
-                    bgcolor: alpha(GOLD, 0.08),
-                    border: `1px solid ${alpha(GOLD, 0.35)}`,
-                    boxShadow: `0 8px 24px ${alpha('#000000', 0.4)}, inset 0 0 16px ${alpha(GOLD, 0.05)}`,
+                    bgcolor: goldAlpha(0.08),
+                    border: `1px solid ${goldAlpha(0.35)}`,
+                    boxShadow: `0 8px 24px ${alpha('#000000', 0.4)}, inset 0 0 16px ${goldAlpha(0.05)}`,
                   }}
                 >
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
@@ -469,13 +468,14 @@ export function WithdrawalView() {
                           justifyContent: 'center',
                           gap: 1,
                           cursor: 'pointer',
-                          bgcolor: isSelected ? alpha(GOLD, 0.15) : alpha('#000000', 0.4),
-                          border: `1px solid ${isSelected ? GOLD : alpha('#ffffff', 0.12)}`,
-                          boxShadow: isSelected ? `0 0 16px ${alpha(GOLD, 0.3)}` : 'none',
-                          transition: 'all 0.2s',
+                          bgcolor: isSelected ? goldAlpha(0.12) : 'rgba(22,22,24,0.45)',
+                          border: `1px solid ${isSelected ? goldAlpha(0.45) : 'rgba(255,255,255,0.09)'}`,
+                          borderRadius: '12px',
+                          boxShadow: 'none',
+                          transition: 'border-color 0.2s, background-color 0.2s',
                           '&:hover': {
-                            borderColor: alpha(GOLD, 0.6),
-                            bgcolor: alpha(GOLD, 0.08),
+                            borderColor: 'rgba(255,255,255,0.16)',
+                            bgcolor: 'rgba(30,30,33,0.55)',
                           },
                         }}
                       >
@@ -570,8 +570,9 @@ export function WithdrawalView() {
                   fontWeight: 900,
                   letterSpacing: 1.5,
                   textTransform: 'uppercase',
-                  boxShadow: `0 12px 32px ${alpha(GOLD, 0.35)}`,
-                  clipPath: 'polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)',
+                  borderRadius: '12px',
+                  clipPath: 'none !important',
+                  boxShadow: `0 12px 32px ${goldAlpha(0.35)}`,
                 }}
               >
                 {t('withdrawal.requestWithdrawal') || 'INITIATE PAYOUT DISPATCH'}
@@ -598,7 +599,12 @@ export function WithdrawalView() {
         </DialogTitle>
         <DialogContent dividers sx={userPolishedDialogContentSx}>
           <Stack spacing={2.5}>
-            <Box sx={{ p: 2.25, bgcolor: alpha('#000000', 0.45), border: `1px solid ${alpha(GOLD, 0.3)}` }}>
+            <Box
+              sx={{
+                ...SHOP_PANEL_SX,
+                p: 2.25,
+              }}
+            >
               <Stack spacing={1.5}>
                 <Typography sx={{ ...userMutedTextSx, fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>
                   Withdrawal Amount

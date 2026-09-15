@@ -1,4 +1,4 @@
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Stack, Button, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { toast } from 'react-hot-toast';
 
@@ -6,9 +6,10 @@ import { useTranslate } from 'src/locales/use-locales';
 
 import { Iconify } from 'src/components/iconify';
 
-import { authSocialIconButtonSx } from './auth-form-styles';
+import { AUTH_TEXT_MUTED, authSocialIconButtonSx } from './auth-form-styles';
+import { goldAlpha } from 'src/theme/accent-presets';
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 
 function GoogleMark({ size = 18 }: { size?: number }) {
   return (
@@ -53,7 +54,7 @@ function SoonBadge() {
         px: 0.6,
         py: 0.25,
         borderRadius: '3px',
-        bgcolor: alpha(GOLD, 0.16),
+        bgcolor: goldAlpha(0.16),
         color: GOLD,
         textTransform: 'uppercase',
       }}
@@ -73,11 +74,11 @@ export function AuthSocialButtons() {
   return (
     <Stack spacing={1} sx={{ width: 1 }}>
       <Stack direction="row" alignItems="center" spacing={1} sx={{ py: 0.25 }}>
-        <Box sx={{ flex: 1, height: '1px', bgcolor: alpha('#fff', 0.1) }} />
-        <Typography sx={{ fontSize: 10, fontWeight: 700, letterSpacing: 0.8, color: alpha('#fff', 0.42), textTransform: 'uppercase' }}>
+        <Box sx={{ flex: 1, height: '1px', bgcolor: alpha('#fff', 0.08) }} />
+        <Typography sx={{ fontSize: 11, fontWeight: 700, letterSpacing: 0.8, color: AUTH_TEXT_MUTED, textTransform: 'uppercase' }}>
           {t('auth.orContinueWith')}
         </Typography>
-        <Box sx={{ flex: 1, height: '1px', bgcolor: alpha('#fff', 0.1) }} />
+        <Box sx={{ flex: 1, height: '1px', bgcolor: alpha('#fff', 0.08) }} />
       </Stack>
 
       <Box

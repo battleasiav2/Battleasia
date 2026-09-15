@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { alpha, keyframes } from '@mui/material/styles';
 
+import { goldAlpha } from 'src/theme/accent-presets';
+
 import { USER_COLORS, userPageDividerSx } from './user-theme';
 
 // ----------------------------------------------------------------------
@@ -52,8 +54,8 @@ export function UserArenaStrip({
         alignItems: 'flex-end',
         overflow: 'hidden',
         bgcolor: '#000000',
-        borderTop: `1px solid ${alpha(GOLD, 0.14)}`,
-        borderBottom: `1px solid ${alpha(GOLD, 0.14)}`,
+        borderTop: `1px solid ${goldAlpha(0.14)}`,
+        borderBottom: `1px solid ${goldAlpha(0.14)}`,
       }}
     >
       <Box
@@ -79,7 +81,7 @@ export function UserArenaStrip({
           background: `
             linear-gradient(90deg, ${alpha('#000000', 0.88)} 0%, ${alpha('#000000', 0.55)} 50%, ${alpha('#000000', 0.4)} 100%),
             linear-gradient(180deg, ${alpha('#000000', 0.45)} 0%, transparent 40%, ${alpha('#000000', 0.88)} 100%),
-            radial-gradient(ellipse 50% 40% at 15% 30%, ${alpha(GOLD, 0.1)} 0%, transparent 60%)
+            radial-gradient(ellipse 50% 40% at 15% 30%, ${goldAlpha(0.1)} 0%, transparent 60%)
           `,
         }}
       />
@@ -104,7 +106,7 @@ export function UserArenaStrip({
               fontWeight: 800,
               letterSpacing: 1.8,
               textTransform: 'uppercase',
-              color: alpha(GOLD, 0.9),
+              color: goldAlpha(0.9),
               mb: 0.75,
             }}
           >
@@ -171,7 +173,7 @@ export function UserArenaChip({
       sx={{
         px: 1,
         py: 0.4,
-        border: `1px solid ${alpha(GOLD, 0.35)}`,
+        border: `1px solid ${goldAlpha(0.35)}`,
         bgcolor: alpha('#000000', 0.5),
         backdropFilter: 'blur(6px)',
       }}

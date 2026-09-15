@@ -15,7 +15,19 @@
     "home": "Home",
     "battleArena": "Battle Arena",
     "backToMain": "Back to main site",
-    "bacBalance": "BAC Balance"
+    "bacBalance": "BAC Balance",
+    "siteColor": "Site color",
+    "siteColorHint": "Accent updates buttons, borders, and highlights.",
+    "accent": {
+      "lime": "Lime",
+      "gold": "Gold",
+      "ember": "Ember",
+      "jade": "Jade",
+      "cyan": "Cyan",
+      "violet": "Violet",
+      "rose": "Rose",
+      "sky": "Sky"
+    }
   },
   "auth": {
     "signIn": "Sign In",

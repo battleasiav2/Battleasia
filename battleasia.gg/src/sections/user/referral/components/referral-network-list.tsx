@@ -63,6 +63,7 @@ export function ReferralNetworkList({ items, labels }: ReferralNetworkListProps)
                 placeItems: 'center',
                 bgcolor: '#0a0a0a',
                 border: `1px solid ${alpha('#ffffff', 0.1)}`,
+                borderRadius: '8px',
                 color: GOLD,
               }}
             >

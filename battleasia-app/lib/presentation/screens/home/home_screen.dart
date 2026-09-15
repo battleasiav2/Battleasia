@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
+import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_footer.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
@@ -11,7 +12,7 @@ import 'package:battleasia_app/presentation/widgets/home/about_section.dart';
 import 'package:battleasia_app/presentation/widgets/home/how_to_play_section.dart';
 import 'package:battleasia_app/presentation/widgets/home/rules_section.dart';
 
-/// Marketing + live pulse home — mirrors web `/dashboard`.
+/// Logged-in: Pulse-first (native app). Guests: marketing + pulse.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -39,14 +40,18 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           CustomScrollView(
             controller: _scrollController,
+            physics: appScrollPhysics,
             slivers: [
-              const SliverToBoxAdapter(child: HeroBannerSection()),
+              if (!authed)
+                const SliverToBoxAdapter(child: HeroBannerSection()),
               const SliverToBoxAdapter(child: HomeDashboardSection()),
-              const SliverToBoxAdapter(child: AboutSection()),
-              const SliverToBoxAdapter(child: HowToPlaySection()),
-              const SliverToBoxAdapter(child: RulesSection()),
-              const SliverToBoxAdapter(child: AppFooter()),
-              SliverToBoxAdapter(child: SizedBox(height: authed ? 90 : 24)),
+              if (!authed) ...[
+                const SliverToBoxAdapter(child: AboutSection()),
+                const SliverToBoxAdapter(child: HowToPlaySection()),
+                const SliverToBoxAdapter(child: RulesSection()),
+                const SliverToBoxAdapter(child: AppFooter()),
+              ],
+              SliverToBoxAdapter(child: SizedBox(height: authed ? 100 : 24)),
             ],
           ),
           Positioned(

@@ -11,6 +11,7 @@ import 'package:battleasia_app/data/models/shop_item_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_buy_flow.dart';
 
 // Badge colour map — mirrors BADGE_COLOR_MAP in the web shop frontend.
 const Map<String, Color> _kBadgeBgColor = {
@@ -406,6 +407,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   // ---------------------------------------------------------------------------
 
   void _handleBuy() {
+    if (_item == null) return;
     if (_loadingSupport) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text('Loading payment options...'),
@@ -419,9 +421,12 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
       ));
       return;
     }
-    showDialog(
-      context: context,
-      builder: (_) => _buildPurchaseDialog(),
+    showShopBuyFlow(
+      context,
+      item: _item!,
+      preferredChannelId: _selectedChannelId.isEmpty
+          ? widget.preferredChannelId
+          : _selectedChannelId,
     );
   }
 

@@ -205,10 +205,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
               AuthPrimaryButton(
                 label: 'auth.continue'.tr(),
-                trailingIcon: Icons.arrow_forward_rounded,
                 onPressed: _goNext,
               ),
             ] else ...[
@@ -224,7 +223,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               AuthTextField(
                 controller: _pubgIdController,
                 label: 'auth.pubgId'.tr(),
@@ -237,18 +236,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   return null;
                 },
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               AuthPhoneField(
                 controller: _phoneController,
                 onNumberChanged: (n) => _phoneNumber = n,
                 onCountryChanged: (c) => _countryCode = c,
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               _GameServerDropdown(
                 value: _selectedGameServer,
                 onChanged: (v) => setState(() => _selectedGameServer = v),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -280,41 +279,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 16),
               GestureDetector(
                 onTap: () => setState(() {
                   _step = 1;
                   _errorMessage = null;
                 }),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.arrow_back,
-                      size: 14,
-                      color: AppColors.gold.withValues(alpha: 0.95),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      'auth.back'.tr(),
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: AppColors.gold,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  '← ${'auth.back'.tr()}',
+                  style: AppTheme.bodyMedium.copyWith(
+                    color: AppColors.gold,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
               AuthPrimaryButton(
                 label: 'auth.createAccount'.tr(),
-                icon: Icons.sports_martial_arts_rounded,
                 loading: authProvider.isLoading,
                 onPressed: authProvider.isLoading ? null : _handleSignUp,
               ),
             ],
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             Text.rich(
               TextSpan(
                 text: '${'auth.alreadyHaveAccount'.tr()} ',

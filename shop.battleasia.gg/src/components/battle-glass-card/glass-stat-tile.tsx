@@ -1,6 +1,8 @@
 import { Box, Card, Skeleton, Stack, Typography } from '@mui/material';
 import { alpha, type SxProps, type Theme } from '@mui/material/styles';
 
+import { goldAlpha } from 'src/theme/accent-presets';
+
 import { Iconify } from 'src/components/iconify';
 
 import { GLASS_CARD_RADIUS_SM, GLASS_STAT_TILE_RADIUS } from './glass-card-tokens';
@@ -58,8 +60,8 @@ export function GlassStatTile({ label, value, suffix, icon, loading, tokens }: G
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: `${GLASS_CARD_RADIUS_SM}px`,
-    bgcolor: alpha(GOLD, 0.08),
-    border: `1px solid ${alpha(GOLD, 0.22)}`,
+    bgcolor: goldAlpha(0.08),
+    border: `1px solid ${goldAlpha(0.22)}`,
     color: GOLD,
   };
 

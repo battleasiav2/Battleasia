@@ -86,6 +86,7 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
           min: 12.0,
           max: 16.0,
         );
+        final isMobile = MediaQuery.sizeOf(context).width < 600;
         final isGain = _delta >= 0;
         final deltaColor = isGain ? AppColors.success : AppColors.error;
 
@@ -94,32 +95,40 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
           alignment: Alignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: EdgeInsets.symmetric(
+                horizontal: isMobile ? 8 : 12,
+                vertical: isMobile ? 6 : 8,
+              ),
+              constraints: BoxConstraints(maxWidth: isMobile ? 108 : double.infinity),
               decoration: BoxDecoration(
-                color: AppColors.surface.withValues(alpha: 0.92),
-                borderRadius: BorderRadius.circular(999),
-                border: Border.all(color: AppColors.gold.withValues(alpha: 0.45)),
+                color: const Color(0xB8161618),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image.asset(
                     'assets/images/currency.webp',
-                    width: 20,
-                    height: 20,
+                    width: isMobile ? 16 : 20,
+                    height: isMobile ? 16 : 20,
                     errorBuilder: (_, __, ___) => Icon(
                       Icons.monetization_on,
-                      size: 20,
+                      size: isMobile ? 16 : 20,
                       color: AppColors.gold,
                     ),
                   ),
-                  const SizedBox(width: 6),
+                  SizedBox(width: isMobile ? 4 : 6),
                   Text(
-                    balance.toStringAsFixed(2),
+                    balance >= 1000
+                        ? balance.toStringAsFixed(0)
+                        : balance.toStringAsFixed(balance.truncateToDouble() == balance ? 0 : 2),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: AppTheme.bodyMedium.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w700,
-                      fontSize: balanceFontSize,
+                      fontSize: isMobile ? 12.5 : balanceFontSize,
                     ),
                   ),
                 ],

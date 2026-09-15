@@ -3,18 +3,14 @@ import type { SettingsState } from 'src/components/settings';
 
 import { setFont, hexToRgbChannel, createPaletteChannel } from 'minimal-shared/utils';
 
+import { themeConfig } from '../theme-config';
 import { primaryColorPresets } from './color-presets';
 import { createShadowColor } from '../core/custom-shadows';
+import { resolveAccentId } from '../accent-presets';
 
 import type { ThemeOptions, ThemeColorScheme } from '../types';
 
 // ----------------------------------------------------------------------
-
-/**
- * Update the core theme with the settings state.
- * @contrast
- * @primaryColor
- */
 
 export function updateCoreWithSettings(
   theme: ThemeOptions,
@@ -24,43 +20,44 @@ export function updateCoreWithSettings(
     direction,
     fontFamily,
     contrast = 'default',
-    primaryColor = 'default',
+    primaryColor = 'gold',
   } = settingsState ?? {};
 
   const isDefaultContrast = contrast === 'default';
-  const isDefaultPrimaryColor = primaryColor === 'default';
+  const accentId = resolveAccentId(primaryColor);
+  const primaryPreset =
+    primaryColorPresets[accentId] || primaryColorPresets.default || primaryColorPresets.gold;
 
-  const lightPalette = theme.colorSchemes?.light.palette as ColorSystem['palette'];
+  const lightPalette = theme.colorSchemes?.light?.palette as ColorSystem['palette'] | undefined;
 
-  const updatedPrimaryColor = createPaletteChannel(primaryColorPresets[primaryColor]);
-  // const updatedSecondaryColor = createPaletteChannel(SECONDARY_COLORS[primaryColor!]);
+  const updatedPrimaryColor = createPaletteChannel(primaryPreset);
 
   const updateColorScheme = (scheme: ThemeColorScheme) => {
     const colorSchemes = theme.colorSchemes?.[scheme];
 
     const updatedPalette = {
       ...colorSchemes?.palette,
-      ...(!isDefaultPrimaryColor && {
-        primary: updatedPrimaryColor,
-        // secondary: updatedSecondaryColor,
-      }),
-      ...(scheme === 'light' && {
-        background: {
-          ...lightPalette?.background,
-          ...(!isDefaultContrast && {
-            default: lightPalette.grey[200],
-            defaultChannel: hexToRgbChannel(lightPalette.grey[200]),
-          }),
-        },
-      }),
+      primary: updatedPrimaryColor,
+      ...(scheme === 'light' && lightPalette
+        ? {
+            background: {
+              ...lightPalette.background,
+              ...(!isDefaultContrast && lightPalette.grey?.[200]
+                ? {
+                    default: lightPalette.grey[200],
+                    defaultChannel: hexToRgbChannel(lightPalette.grey[200]),
+                  }
+                : null),
+            },
+          }
+        : null),
     };
 
     const updatedCustomShadows = {
       ...colorSchemes?.customShadows,
-      ...(!isDefaultPrimaryColor && {
-        primary: createShadowColor(updatedPrimaryColor.mainChannel),
-        // secondary: createShadowColor(updatedSecondaryColor.mainChannel),
-      }),
+      ...(updatedPrimaryColor.mainChannel
+        ? { primary: createShadowColor(updatedPrimaryColor.mainChannel) }
+        : null),
     };
 
     return {
@@ -79,7 +76,7 @@ export function updateCoreWithSettings(
     },
     typography: {
       ...theme.typography,
-      fontFamily: setFont(fontFamily),
+      fontFamily: setFont(fontFamily || themeConfig.fontFamily.primary),
     },
   };
 }

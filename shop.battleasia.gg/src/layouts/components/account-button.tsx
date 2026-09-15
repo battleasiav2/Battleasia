@@ -5,6 +5,7 @@ import IconButton from '@mui/material/IconButton';
 import { alpha } from '@mui/material/styles';
 
 import { USER_COLORS } from 'src/layouts/user/user-theme';
+import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -35,8 +36,8 @@ export function AccountButton({ photoURL, displayName, sx, ...other }: AccountBu
         sx={{
           width: { xs: 32, sm: 34 },
           height: { xs: 32, sm: 34 },
-          border: `1.5px solid ${alpha(USER_COLORS.gold, 0.65)}`,
-          boxShadow: `0 0 0 1px ${alpha(USER_COLORS.gold, 0.2)}`,
+          border: `1.5px solid ${goldAlpha(0.65)}`,
+          boxShadow: `0 0 0 1px ${goldAlpha(0.2)}`,
         }}
       >
         {displayName?.charAt(0).toUpperCase()}

@@ -14,6 +14,8 @@ import ListItemText from '@mui/material/ListItemText';
 import InputAdornment from '@mui/material/InputAdornment';
 import { alpha } from '@mui/material/styles';
 
+import { goldAlpha } from 'src/theme/accent-presets';
+
 import { Iconify } from 'src/components/iconify';
 import { FlagIcon } from 'src/components/flag-icon';
 import { SearchNotFound } from 'src/components/search-not-found';
@@ -118,10 +120,10 @@ export function CountryListPopover({
             borderRadius: 0,
             gap: 1,
             color: alpha('#ffffff', 0.9),
-            '&:hover': { bgcolor: alpha(GOLD, 0.12) },
+            '&:hover': { bgcolor: goldAlpha(0.12) },
             '&.Mui-selected': {
-              bgcolor: alpha(GOLD, 0.18),
-              '&:hover': { bgcolor: alpha(GOLD, 0.24) },
+              bgcolor: goldAlpha(0.18),
+              '&:hover': { bgcolor: goldAlpha(0.24) },
             },
           }}
         >

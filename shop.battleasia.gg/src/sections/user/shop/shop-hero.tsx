@@ -1,14 +1,14 @@
-import type { ReactNode } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
-import { USER_COLORS } from 'src/layouts/user';
+import type { ReactNode } from 'react';
+
+import { goldAlpha } from 'src/theme/accent-presets';
+
 import { SHOP_HERO_IMAGE } from './shop-constants';
+import { SHOP_PANEL_SX } from './shop-styles';
 
 // ----------------------------------------------------------------------
-
-const GOLD = USER_COLORS.gold;
-const goldAlpha = (opacity: number) => alpha(USER_COLORS.gold, opacity);
 
 type ShopHeroProps = {
   title?: string;
@@ -16,7 +16,7 @@ type ShopHeroProps = {
   action?: ReactNode;
 };
 
-/** 100% Exact Match Storefront Hero Banner matching reference image */
+/** Glass arena hero — matches main-site shop surfaces. */
 export function ShopHero({ title, subtitle, action }: ShopHeroProps) {
   const displayTitle = title || 'BAC COIN SHOP';
   const displaySubtitle = subtitle || 'Secure payments • Instant BAC delivery after approval';
@@ -24,67 +24,68 @@ export function ShopHero({ title, subtitle, action }: ShopHeroProps) {
   return (
     <Box
       sx={{
+        ...SHOP_PANEL_SX,
         position: 'relative',
         width: '100%',
-        mb: 3.5,
-        minHeight: { xs: 220, sm: 280, md: 320 },
+        mb: { xs: 2.5, md: 3.5 },
+        minHeight: { xs: 148, sm: 220, md: 260 },
         display: 'flex',
         alignItems: 'center',
-        borderRadius: '12px',
         overflow: 'hidden',
-        bgcolor: '#0a101d',
-        border: `1px solid ${goldAlpha(0.5)}`,
-        boxShadow: `0 20px 50px ${alpha('#000000', 0.95)}, inset 0 0 40px ${goldAlpha(0.08)}`,
-        p: { xs: 2.5, sm: 4, md: 5 },
+        maxWidth: '100%',
+        boxSizing: 'border-box',
+        p: { xs: 1.75, sm: 3.5, md: 4.5 },
       }}
     >
-      {/* Crowned horse medallion hero background */}
       <Box
         component="img"
         src={SHOP_HERO_IMAGE}
-        alt="BAC Store Hero"
+        alt=""
+        loading="lazy"
+        decoding="async"
         sx={{
           position: 'absolute',
           inset: 0,
           width: 1,
           height: 1,
           objectFit: 'cover',
-          objectPosition: { xs: '70% center', sm: 'center right' },
+          objectPosition: { xs: 'center right', sm: 'center right' },
           pointerEvents: 'none',
+          opacity: 0.55,
         }}
       />
 
-      {/* Left-weighted scrim so title stays readable while horse stays visible on the right */}
       <Box
         sx={{
           position: 'absolute',
           inset: 0,
-          background: `linear-gradient(90deg, ${alpha('#0a101d', 0.92)} 0%, ${alpha('#0a101d', 0.62)} 42%, ${alpha('#0a101d', 0.18)} 68%, transparent 82%)`,
+          background: `
+            linear-gradient(90deg, rgba(6,6,7,0.92) 0%, rgba(6,6,7,0.55) 48%, rgba(6,6,7,0.2) 100%),
+            radial-gradient(60% 80% at 80% 50%, ${goldAlpha(0.12)} 0%, transparent 70%)
+          `,
           pointerEvents: 'none',
         }}
       />
 
-      {/* Hero Content Stack */}
       <Stack
-        spacing={1.5}
+        spacing={1.15}
         sx={{
           position: 'relative',
-          zIndex: 3,
-          maxWidth: { xs: '100%', md: 540 },
+          zIndex: 2,
+          maxWidth: { xs: '100%', md: 520 },
         }}
       >
         <Typography
-          className="font-tr"
+          className="landing-display"
           sx={{
-            fontSize: { xs: 30, sm: 44, md: 50 },
-            fontWeight: 900,
-            lineHeight: 1.1,
-            letterSpacing: 1,
+            fontFamily: '"Barlow", "Public Sans Variable", sans-serif',
+            fontSize: { xs: 20, sm: 30, md: 36 },
+            fontWeight: 800,
+            lineHeight: 1.12,
+            letterSpacing: '-0.02em',
             textTransform: 'uppercase',
-            background: `linear-gradient(180deg, #FFF4A3 0%, #E5B842 50%, #A67C1E 100%)`,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            filter: `drop-shadow(0 4px 12px ${alpha('#000000', 0.85)})`,
+            color: '#ffffff',
+            overflowWrap: 'anywhere',
           }}
         >
           {displayTitle}
@@ -92,21 +93,32 @@ export function ShopHero({ title, subtitle, action }: ShopHeroProps) {
 
         <Typography
           sx={{
-            fontSize: { xs: 13, sm: 15 },
+            fontSize: { xs: 13, sm: 14 },
             fontWeight: 500,
-            color: alpha('#ffffff', 0.75),
+            color: alpha('#ffffff', 0.62),
             lineHeight: 1.5,
-            textShadow: `0 2px 8px ${alpha('#000000', 0.9)}`,
+            maxWidth: '40ch',
+            fontFamily: '"Barlow", "Public Sans Variable", sans-serif',
           }}
         >
           {displaySubtitle}
         </Typography>
 
-        {action && <Box sx={{ pt: 1 }}>{action}</Box>}
+        {action ? <Box sx={{ pt: 0.5 }}>{action}</Box> : null}
       </Stack>
+
+      <Box
+        aria-hidden
+        sx={{
+          position: 'absolute',
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: 2,
+          bgcolor: goldAlpha(0.55),
+          zIndex: 3,
+        }}
+      />
     </Box>
   );
 }
-
-
-
