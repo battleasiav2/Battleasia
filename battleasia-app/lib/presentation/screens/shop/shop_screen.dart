@@ -310,15 +310,15 @@ class _ShopScreenState extends State<ShopScreen> {
                       builder: (context) {
                         final w = MediaQuery.of(context).size.width;
                         final crossAxisCount =
-                            w < 340 ? 1 : (w < 900 ? 2 : 4);
+                            w < 600 ? 4 : 6;
 
                         return SliverGrid(
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: crossAxisCount,
-                            crossAxisSpacing: 12,
-                            mainAxisSpacing: 12,
-                            mainAxisExtent: 320,
+                            crossAxisSpacing: w < 600 ? 6 : 12,
+                            mainAxisSpacing: w < 600 ? 6 : 12,
+                            mainAxisExtent: w < 600 ? 200 : 300,
                           ),
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {

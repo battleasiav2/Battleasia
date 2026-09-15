@@ -31,8 +31,7 @@ import {
   userPolishedDialogEyebrowSx,
 } from 'src/layouts/user';
 import { getDefaultGlassTokens, getGlassInnerSx } from 'src/components/battle-glass-card';
-
-const goldAlpha = (opacity: number) => alpha(USER_COLORS.gold, opacity);
+import { goldAlpha } from 'src/theme/accent-presets';
 
 import { Image } from 'src/components/image';
 import useApi from 'src/hooks/use-api';
@@ -58,6 +57,8 @@ import {
   SHOP_SELECT_MENU_PROPS,
   SHOP_BODY_TEXT_SX,
   SHOP_LABEL_TEXT_SX,
+  SHOP_PANEL_SX,
+  SHOP_ICON_TILE_SX,
 } from './shop-styles';
 
 // Badge color mapping (legacy — chips now use gold glass styling)
@@ -444,40 +445,21 @@ export function ShopView() {
 
 
     return (
-        <UserPageShell>
+        <UserPageShell contentSx={{ fontFamily: '"Barlow", "Public Sans Variable", sans-serif' }}>
             <ShopHero />
 
             {/* Stat Tiles Grid matching reference image */}
-            <Grid container spacing={2.5} sx={{ mb: 3.5 }}>
+            <Grid container spacing={{ xs: 1.5, sm: 2.5 }} sx={{ mb: { xs: 2.5, md: 3.5 }, width: 1, maxWidth: '100%' }}>
                 <Grid size={{ xs: 12, sm: 4 }}>
                     <Box
                         sx={{
                             p: 2,
-                            bgcolor: alpha('#0d1526', 0.9),
-                            borderRadius: '10px',
-                            border: `1px solid ${goldAlpha(0.45)}`,
-                            boxShadow: `0 8px 24px ${alpha('#000000', 0.65)}`,
-                            transition: 'all 0.25s ease',
-                            '&:hover': {
-                                borderColor: USER_COLORS.gold,
-                                boxShadow: `0 12px 30px ${alpha('#000000', 0.85)}, 0 0 16px ${goldAlpha(0.25)}`,
-                            },
+                            ...SHOP_PANEL_SX,
                         }}
                     >
                         <Stack direction="row" alignItems="center" spacing={2}>
                             <Box
-                                sx={{
-                                    width: 40,
-                                    height: 40,
-                                    borderRadius: '8px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    bgcolor: goldAlpha(0.15),
-                                    border: `1px solid ${goldAlpha(0.45)}`,
-                                    color: USER_COLORS.gold,
-                                    flexShrink: 0,
-                                }}
+                                sx={SHOP_ICON_TILE_SX}
                             >
                                 <Iconify icon="solar:wallet-money-bold" width={22} />
                             </Box>
@@ -514,31 +496,12 @@ export function ShopView() {
                     <Box
                         sx={{
                             p: 2,
-                            bgcolor: alpha('#0d1526', 0.9),
-                            borderRadius: '10px',
-                            border: `1px solid ${goldAlpha(0.45)}`,
-                            boxShadow: `0 8px 24px ${alpha('#000000', 0.65)}`,
-                            transition: 'all 0.25s ease',
-                            '&:hover': {
-                                borderColor: USER_COLORS.gold,
-                                boxShadow: `0 12px 30px ${alpha('#000000', 0.85)}, 0 0 16px ${goldAlpha(0.25)}`,
-                            },
+                            ...SHOP_PANEL_SX,
                         }}
                     >
                         <Stack direction="row" alignItems="center" spacing={2}>
                             <Box
-                                sx={{
-                                    width: 40,
-                                    height: 40,
-                                    borderRadius: '8px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    bgcolor: goldAlpha(0.15),
-                                    border: `1px solid ${goldAlpha(0.45)}`,
-                                    color: USER_COLORS.gold,
-                                    flexShrink: 0,
-                                }}
+                                sx={SHOP_ICON_TILE_SX}
                             >
                                 <Iconify icon="solar:bag-check-bold" width={22} />
                             </Box>
@@ -575,31 +538,12 @@ export function ShopView() {
                     <Box
                         sx={{
                             p: 2,
-                            bgcolor: alpha('#0d1526', 0.9),
-                            borderRadius: '10px',
-                            border: `1px solid ${goldAlpha(0.45)}`,
-                            boxShadow: `0 8px 24px ${alpha('#000000', 0.65)}`,
-                            transition: 'all 0.25s ease',
-                            '&:hover': {
-                                borderColor: USER_COLORS.gold,
-                                boxShadow: `0 12px 30px ${alpha('#000000', 0.85)}, 0 0 16px ${goldAlpha(0.25)}`,
-                            },
+                            ...SHOP_PANEL_SX,
                         }}
                     >
                         <Stack direction="row" alignItems="center" spacing={2}>
                             <Box
-                                sx={{
-                                    width: 40,
-                                    height: 40,
-                                    borderRadius: '8px',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    bgcolor: goldAlpha(0.15),
-                                    border: `1px solid ${goldAlpha(0.45)}`,
-                                    color: USER_COLORS.gold,
-                                    flexShrink: 0,
-                                }}
+                                sx={SHOP_ICON_TILE_SX}
                             >
                                 <Iconify icon="solar:card-transfer-bold" width={22} />
                             </Box>
@@ -633,16 +577,13 @@ export function ShopView() {
                 </Grid>
             </Grid>
 
-            <Grid container spacing={2.5}>
+            <Grid container spacing={{ xs: 1.5, sm: 2.5 }} sx={{ width: 1, maxWidth: '100%' }}>
                 {/* Vault Filters Sidebar matching reference image */}
-                <Grid size={{ xs: 12, md: 3 }}>
+                <Grid size={{ xs: 12, md: 3 }} sx={{ minWidth: 0 }}>
                     <Box
                         sx={{
                             p: { xs: 2.25, md: 2.5 },
-                            bgcolor: alpha('#0d1526', 0.9),
-                            borderRadius: '12px',
-                            border: `1px solid ${goldAlpha(0.45)}`,
-                            boxShadow: `0 12px 32px ${alpha('#000000', 0.7)}`,
+                            ...SHOP_PANEL_SX,
                             position: { md: 'sticky' },
                             top: { md: 100 },
                         }}
@@ -657,12 +598,12 @@ export function ShopView() {
                                     boxShadow: '0 0 8px #22c55e',
                                 }}
                             />
-                            <Typography sx={{ fontSize: 13, fontWeight: 900, letterSpacing: 1.2, textTransform: 'uppercase', color: '#dcdcdc' }}>
+                            <Typography sx={{ fontSize: 13, fontWeight: 900, letterSpacing: 1.2, textTransform: 'uppercase', color: '#dcdcdc', fontFamily: '"Barlow", "Public Sans Variable", sans-serif' }}>
                                 VAULT FILTERS
                             </Typography>
                         </Stack>
 
-                        <Typography sx={{ fontSize: 11, fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: alpha('#ffffff', 0.6), mb: 1 }}>
+                        <Typography sx={{ fontSize: 11, fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: alpha('#ffffff', 0.72), mb: 1, fontFamily: '"Barlow", "Public Sans Variable", sans-serif' }}>
                             PAYMENT
                         </Typography>
 
@@ -699,7 +640,7 @@ export function ShopView() {
                                                 objectFit: 'contain',
                                             }}
                                         />
-                                        <Typography variant="body2" sx={{ color: USER_COLORS.textPrimary, fontWeight: 700 }}>
+                                        <Typography variant="body2" sx={{ color: '#ffffff', fontWeight: 700, fontFamily: '"Barlow", "Public Sans Variable", sans-serif' }}>
                                             {channel.channel_name}
                                         </Typography>
                                     </Stack>
@@ -708,7 +649,7 @@ export function ShopView() {
                             )}
                         </TextField>
 
-                        <Typography sx={{ fontSize: 11, fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: alpha('#ffffff', 0.6), mb: 1 }}>
+                        <Typography sx={{ fontSize: 11, fontWeight: 800, letterSpacing: 0.8, textTransform: 'uppercase', color: alpha('#ffffff', 0.72), mb: 1, fontFamily: '"Barlow", "Public Sans Variable", sans-serif' }}>
                             PRICE RANGE
                         </Typography>
 
@@ -738,7 +679,7 @@ export function ShopView() {
                                 fontSize: 11,
                                 fontWeight: 800,
                                 letterSpacing: 1,
-                                borderRadius: '6px',
+                                borderRadius: '10px',
                             }}
                             onClick={() => {
                                 setPaymentFilter('');
@@ -752,13 +693,13 @@ export function ShopView() {
                 </Grid>
 
                 {/* Coin Pack Offers Grid matching reference image */}
-                <Grid size={{ xs: 12, md: 9 }}>
+                <Grid size={{ xs: 12, md: 9 }} sx={{ minWidth: 0 }}>
                     {loading ? (
-                        <Grid container spacing={2.5}>
-                            {Array.from({ length: 4 }).map((_, idx) => (
-                                <Grid key={idx} size={{ xs: 12, sm: 6, md: 3 }}>
-                                    <Box sx={{ p: 2, bgcolor: alpha('#0d1526', 0.7), border: `1px solid ${goldAlpha(0.3)}`, borderRadius: '12px' }}>
-                                        <Skeleton variant="rectangular" height={160} sx={{ borderRadius: 1, mb: 2, bgcolor: alpha('#ffffff', 0.06) }} />
+                        <Grid container spacing={{ xs: 1, sm: 1.5, md: 2 }}>
+                            {Array.from({ length: 12 }).map((_, idx) => (
+                                <Grid key={idx} size={{ xs: 3, sm: 3, md: 2, lg: 2 }} sx={{ minWidth: 0 }}>
+                                    <Box sx={{ p: 2, ...SHOP_PANEL_SX }}>
+                                        <Skeleton variant="rectangular" height={140} sx={{ borderRadius: '12px', mb: 2, bgcolor: alpha('#ffffff', 0.06) }} />
                                         <Skeleton variant="text" sx={{ bgcolor: alpha('#ffffff', 0.06) }} />
                                         <Skeleton variant="text" width="60%" sx={{ bgcolor: alpha('#ffffff', 0.04) }} />
                                     </Box>
@@ -778,7 +719,7 @@ export function ShopView() {
                             }}
                         />
                     ) : (
-                        <Grid container spacing={{ xs: 2, md: 2.5 }}>
+                        <Grid container spacing={{ xs: 1, sm: 1.5, md: 2 }}>
                             {filteredShopItems.map((shopItem) => {
                                 const badgeLabel = shopItem.badge?.trim() || '';
                                 const showBadge = Boolean(badgeLabel) && badgeLabel.toLowerCase() !== 'none';
@@ -802,46 +743,48 @@ export function ShopView() {
                                     : USER_COLORS.gold;
 
                                 return (
-                                <Grid key={`${shopItem.amount}-${shopItem.symbol}`} size={{ xs: 12, sm: 6, md: 3 }}>
+                                <Grid key={`${shopItem.amount}-${shopItem.symbol}`} size={{ xs: 3, sm: 3, md: 2, lg: 2 }} sx={{ minWidth: 0 }}>
                                     <Box
                                         sx={{
                                             position: 'relative',
-                                            p: { xs: 2, md: 2.25 },
-                                            pt: showBadge ? 3.5 : 2.5,
-                                            minHeight: 290,
+                                            p: { xs: 0.75, sm: 1.25, md: 1.75 },
+                                            pt: showBadge ? { xs: 1.75, sm: 2.25, md: 3 } : { xs: 1.25, sm: 1.75, md: 2.25 },
+                                            minHeight: { xs: 168, sm: 210, md: 260 },
                                             height: '100%',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
                                             textAlign: 'center',
-                                            gap: 1.25,
+                                            gap: { xs: 0.4, sm: 0.75, md: 1 },
                                             overflow: 'hidden',
-                                            borderRadius: '12px',
-                                            bgcolor: alpha('#0d1526', 0.9),
-                                            border: `1px solid ${goldAlpha(0.45)}`,
-                                            boxShadow: `0 10px 28px ${alpha('#000000', 0.7)}`,
-                                            transition: 'all 0.3s ease',
-                                            '&:hover': {
-                                                borderColor: USER_COLORS.gold,
-                                                transform: 'translateY(-4px)',
-                                                boxShadow: `0 16px 36px ${alpha('#000000', 0.85)}, 0 0 20px ${goldAlpha(0.2)}`,
-                                                '& .coin-img-box': {
-                                                    transform: 'scale(1.08)',
+                                            width: 1,
+                                            maxWidth: '100%',
+                                            boxSizing: 'border-box',
+                                            ...SHOP_PANEL_SX,
+                                            '@media (hover: hover)': {
+                                                '&:hover': {
+                                                    borderColor: goldAlpha(0.4),
+                                                    transform: 'translateY(-3px)',
+                                                    '& .coin-img-box': {
+                                                        transform: 'scale(1.06)',
+                                                    },
                                                 },
+                                            },
+                                            '@media (prefers-reduced-motion: reduce)': {
+                                                transition: 'border-color 0.2s ease',
+                                                '&:hover': { transform: 'none' },
                                             },
                                         }}
                                     >
-                                        {/* Ornate Arch Filigree Line Overlay inside top of card */}
+                                        {/* Soft top hairline */}
                                         <Box
                                             sx={{
                                                 position: 'absolute',
                                                 top: 0,
-                                                left: '50%',
-                                                transform: 'translateX(-50%)',
-                                                width: '80%',
-                                                height: 30,
-                                                borderTop: `1px solid ${goldAlpha(0.35)}`,
-                                                borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
+                                                left: 0,
+                                                right: 0,
+                                                height: 1,
+                                                bgcolor: 'rgba(255,255,255,0.08)',
                                                 pointerEvents: 'none',
                                             }}
                                         />
@@ -851,10 +794,10 @@ export function ShopView() {
                                             <Box
                                                 sx={{
                                                     position: 'absolute',
-                                                    top: 10,
-                                                    left: 10,
-                                                    px: 1.25,
-                                                    py: 0.35,
+                                                    top: { xs: 6, md: 10 },
+                                                    left: { xs: 6, md: 10 },
+                                                    px: { xs: 0.6, md: 1.25 },
+                                                    py: { xs: 0.2, md: 0.35 },
                                                     bgcolor: alpha('#000000', 0.8),
                                                     color: `${tierColor} !important`,
                                                     border: `1px solid ${alpha(tierColor, 0.6)}`,
@@ -864,9 +807,9 @@ export function ShopView() {
                                             >
                                                 <Typography
                                                     sx={{
-                                                        fontSize: 10,
+                                                        fontSize: { xs: 7, sm: 9, md: 10 },
                                                         fontWeight: 900,
-                                                        letterSpacing: 1.2,
+                                                        letterSpacing: { xs: 0.4, md: 1.2 },
                                                         textTransform: 'uppercase',
                                                         color: tierColor,
                                                         lineHeight: 1.2,
@@ -881,9 +824,9 @@ export function ShopView() {
                                         <Box
                                             className="coin-img-box"
                                             sx={{
-                                                width: { xs: 96, md: 110 },
-                                                height: { xs: 96, md: 110 },
-                                                mt: showBadge ? 1 : 0.5,
+                                                width: { xs: 48, sm: 72, md: 100 },
+                                                height: { xs: 48, sm: 72, md: 100 },
+                                                mt: showBadge ? { xs: 0.5, md: 1 } : 0.25,
                                                 display: 'grid',
                                                 placeItems: 'center',
                                                 borderRadius: '50%',
@@ -897,8 +840,8 @@ export function ShopView() {
                                                 alt={`${shopItem.amount} ${shopItem.symbol}`}
                                                 ratio="1/1"
                                                 sx={{
-                                                    width: { xs: 84, md: 96 },
-                                                    height: { xs: 84, md: 96 },
+                                                    width: { xs: 40, sm: 64, md: 88 },
+                                                    height: { xs: 40, sm: 64, md: 88 },
                                                     objectFit: 'contain',
                                                     filter: `drop-shadow(0 6px 16px ${alpha('#000000', 0.8)})`,
                                                 }}
@@ -909,24 +852,38 @@ export function ShopView() {
                                         <Typography
                                             className="font-tr"
                                             sx={{
-                                                mt: 0.5,
-                                                fontSize: { xs: 18, md: 21 },
+                                                mt: 0.25,
+                                                fontSize: { xs: 10, sm: 14, md: 18 },
                                                 fontWeight: 900,
-                                                letterSpacing: 0.5,
+                                                letterSpacing: 0.3,
                                                 color: '#ffffff',
-                                                lineHeight: 1.1,
+                                                lineHeight: 1.15,
+                                                px: 0.15,
+                                                maxWidth: '100%',
+                                                overflowWrap: 'anywhere',
+                                                fontFamily: '"Barlow", "Public Sans Variable", sans-serif',
                                             }}
                                         >
                                             {fNumber(shopItem.amount)} {shopItem.symbol}
                                         </Typography>
 
                                         {/* Pricing Box */}
-                                        <Stack direction="row" alignItems="baseline" justifyContent="center" spacing={0.85}>
+                                        <Stack
+                                            direction="row"
+                                            alignItems="baseline"
+                                            justifyContent="center"
+                                            spacing={0.5}
+                                            sx={{ width: 1, minWidth: 0, px: 0.25 }}
+                                        >
                                             <Typography
                                                 sx={{
-                                                    fontSize: { xs: 18, md: 20 },
+                                                    fontSize: { xs: 9, sm: 13, md: 16 },
                                                     fontWeight: 900,
                                                     color: USER_COLORS.gold,
+                                                    lineHeight: 1.2,
+                                                    textAlign: 'center',
+                                                    overflowWrap: 'anywhere',
+                                                    fontFamily: '"Barlow", "Public Sans Variable", sans-serif',
                                                 }}
                                             >
                                                 ৳ {fNumber(shopItem.price * (currencyRates.find(r => r.currency?.toLowerCase() === 'bdt')?.rate || 1))} BDT
@@ -941,14 +898,23 @@ export function ShopView() {
                                             actionVariant="gold"
                                             size="medium"
                                             fullWidth
-                                            startIcon={<Iconify icon="solar:cart-large-bold" width={18} />}
+                                            startIcon={<Iconify icon="solar:cart-large-bold" width={16} />}
                                             sx={{
-                                                mt: 1,
-                                                py: 1,
-                                                fontSize: 12,
+                                                mt: 0.5,
+                                                py: { xs: 0.55, sm: 0.75, md: 1 },
+                                                minWidth: 0,
+                                                minHeight: { xs: 28, md: 36 },
+                                                fontSize: { xs: 8, sm: 10, md: 12 },
                                                 fontWeight: 900,
-                                                letterSpacing: 1,
-                                                borderRadius: '6px',
+                                                letterSpacing: { xs: 0.2, md: 1 },
+                                                borderRadius: { xs: '8px', md: '12px' },
+                                                clipPath: 'none !important',
+                                                px: { xs: 0.5, md: 1.5 },
+                                                '& .MuiButton-startIcon': {
+                                                    display: { xs: 'none', sm: 'inherit' },
+                                                    mr: { sm: 0.5, md: 1 },
+                                                    ml: 0,
+                                                },
                                             }}
                                         >
                                             {t('shop.buyNow')}
@@ -1007,8 +973,8 @@ export function ShopView() {
                                                         sx={{
                                                             p: 1.5,
                                                             cursor: 'pointer',
-                                                            borderColor: isSelected ? alpha(USER_COLORS.gold, 0.55) : alpha('#ffffff', 0.12),
-                                                            bgcolor: isSelected ? alpha(USER_COLORS.gold, 0.08) : alpha('#000000', 0.35),
+                                                            borderColor: isSelected ? goldAlpha(0.55) : alpha('#ffffff', 0.12),
+                                                            bgcolor: isSelected ? goldAlpha(0.08) : alpha('#000000', 0.35),
                                                             transition: 'border-color 0.2s ease, background-color 0.2s ease',
                                                         }}
                                                     >
@@ -1146,9 +1112,9 @@ export function ShopView() {
                                                                               height: 22,
                                                                               fontSize: '0.7rem',
                                                                               fontWeight: 700,
-                                                                              bgcolor: alpha(USER_COLORS.gold, 0.16),
+                                                                              bgcolor: goldAlpha(0.16),
                                                                               color: `${USER_COLORS.gold} !important`,
-                                                                              border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}`,
+                                                                              border: `1px solid ${goldAlpha(0.45)}`,
                                                                               '& .MuiChip-label': {
                                                                                 color: `${USER_COLORS.gold} !important`,
                                                                                 fontWeight: 700,
@@ -1237,9 +1203,9 @@ export function ShopView() {
                                                                               height: 22,
                                                                               fontSize: '0.7rem',
                                                                               fontWeight: 700,
-                                                                              bgcolor: alpha(USER_COLORS.gold, 0.16),
+                                                                              bgcolor: goldAlpha(0.16),
                                                                               color: `${USER_COLORS.gold} !important`,
-                                                                              border: `1px solid ${alpha(USER_COLORS.gold, 0.45)}`,
+                                                                              border: `1px solid ${goldAlpha(0.45)}`,
                                                                               '& .MuiChip-label': {
                                                                                 color: `${USER_COLORS.gold} !important`,
                                                                                 fontWeight: 700,
@@ -1341,7 +1307,7 @@ export function ShopView() {
                                         <img
                                             src={selectedWallet.qr_code}
                                             alt={`QR Code for ${selectedWallet.wallet_address}`}
-                                            style={{ width: 240, height: 240, display: 'block' }}
+                                            style={{ width: 'min(240px, 70vw)', height: 'auto', aspectRatio: '1', display: 'block', maxWidth: '100%' }}
                                         />
                                     </Box>
                                 </Box>
