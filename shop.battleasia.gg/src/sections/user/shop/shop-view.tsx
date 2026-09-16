@@ -733,7 +733,7 @@ export function ShopView() {
                                 const isFeatured = isPopular || isNew || isHot || isBest;
 
                                 const tierColor = isPopular
-                                    ? '#F5C518'
+                                    ? USER_COLORS.gold
                                     : isNew
                                     ? '#38BDF8'
                                     : isHot
@@ -741,6 +741,12 @@ export function ShopView() {
                                     : isBest
                                     ? '#22C55E'
                                     : USER_COLORS.gold;
+                                const tierBorder = isNew || isHot || isBest
+                                    ? alpha(tierColor, 0.55)
+                                    : goldAlpha(0.55);
+                                const tierGlow = isNew || isHot || isBest
+                                    ? alpha(tierColor, 0.35)
+                                    : goldAlpha(0.35);
 
                                 return (
                                 <Grid key={`${shopItem.amount}-${shopItem.symbol}`} size={{ xs: 3, sm: 3, md: 2, lg: 2 }} sx={{ minWidth: 0 }}>
@@ -797,9 +803,9 @@ export function ShopView() {
                                                     px: { xs: 0.5, md: 0.85 },
                                                     py: { xs: 0.15, md: 0.25 },
                                                     bgcolor: alpha('#000000', 0.82),
-                                                    border: `1px solid ${alpha(tierColor, 0.55)}`,
+                                                    border: `1px solid ${tierBorder}`,
                                                     borderRadius: '4px',
-                                                    boxShadow: `0 0 8px ${alpha(tierColor, 0.35)}`,
+                                                    boxShadow: `0 0 8px ${tierGlow}`,
                                                     zIndex: 1,
                                                 }}
                                             >

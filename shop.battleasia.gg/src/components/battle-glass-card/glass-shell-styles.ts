@@ -134,7 +134,7 @@ export function getGlassIconButtonSx(): SxProps<Theme> {
   };
 }
 
-const GOLD_TOP_LINE = '#f5c518';
+const GOLD_TOP_LINE = 'var(--ba-gold)';
 
 const goldTopLineAccentSx: SxProps<Theme> = {
   '&::before': {

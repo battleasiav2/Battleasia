@@ -8,7 +8,7 @@ import { Iconify } from 'src/components/iconify';
 import { GLASS_CARD_RADIUS_SM, GLASS_STAT_TILE_RADIUS } from './glass-card-tokens';
 import type { GlassCardTokens } from './types';
 
-const GOLD = '#f5c518';
+const GOLD = 'var(--ba-gold)';
 
 type GlassStatTileProps = {
   label: string;

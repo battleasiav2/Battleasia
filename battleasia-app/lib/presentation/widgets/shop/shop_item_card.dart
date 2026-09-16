@@ -5,7 +5,6 @@ import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/data/models/shop_item_model.dart';
 
 const Map<String, Color> _kBadgeColor = {
-  'popular': Color(0xFFF5C518),
   'new': Color(0xFF38BDF8),
   'hot': Color(0xFFEF4444),
   'best': Color(0xFF22C55E),
