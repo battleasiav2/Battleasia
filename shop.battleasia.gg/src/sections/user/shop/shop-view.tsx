@@ -695,10 +695,10 @@ export function ShopView() {
                 {/* Coin Pack Offers Grid matching reference image */}
                 <Grid size={{ xs: 12, md: 9 }} sx={{ minWidth: 0 }}>
                     {loading ? (
-                        <Grid container spacing={{ xs: 1, sm: 1.5, md: 2 }}>
-                            {Array.from({ length: 12 }).map((_, idx) => (
-                                <Grid key={idx} size={{ xs: 3, sm: 3, md: 2, lg: 2 }} sx={{ minWidth: 0 }}>
-                                    <Box sx={{ p: 2, ...SHOP_PANEL_SX }}>
+                        <Grid container spacing={{ xs: 1.25, sm: 1.75, md: 2 }}>
+                            {Array.from({ length: 8 }).map((_, idx) => (
+                                <Grid key={idx} size={{ xs: 6, sm: 6, md: 3, lg: 3 }} sx={{ minWidth: 0 }}>
+                                    <Box sx={{ p: 2, ...SHOP_PANEL_SX, minHeight: { xs: 200, md: 248 } }}>
                                         <Skeleton variant="rectangular" height={140} sx={{ borderRadius: '12px', mb: 2, bgcolor: alpha('#ffffff', 0.06) }} />
                                         <Skeleton variant="text" sx={{ bgcolor: alpha('#ffffff', 0.06) }} />
                                         <Skeleton variant="text" width="60%" sx={{ bgcolor: alpha('#ffffff', 0.04) }} />
@@ -719,7 +719,7 @@ export function ShopView() {
                             }}
                         />
                     ) : (
-                        <Grid container spacing={{ xs: 1, sm: 1.5, md: 2 }}>
+                        <Grid container spacing={{ xs: 1.25, sm: 1.75, md: 2 }}>
                             {filteredShopItems.map((shopItem) => {
                                 const badgeLabel = shopItem.badge?.trim() || '';
                                 const showBadge = Boolean(badgeLabel) && badgeLabel.toLowerCase() !== 'none';
@@ -749,19 +749,19 @@ export function ShopView() {
                                     : goldAlpha(0.35);
 
                                 return (
-                                <Grid key={`${shopItem.amount}-${shopItem.symbol}`} size={{ xs: 3, sm: 3, md: 2, lg: 2 }} sx={{ minWidth: 0 }}>
+                                <Grid key={`${shopItem.amount}-${shopItem.symbol}`} size={{ xs: 6, sm: 6, md: 3, lg: 3 }} sx={{ minWidth: 0 }}>
                                     <Box
                                         sx={{
                                             position: 'relative',
-                                            p: { xs: 0.65, sm: 1, md: 1.25 },
-                                            pt: { xs: 2, sm: 2.25, md: 2.5 },
-                                            minHeight: { xs: 152, sm: 178, md: 210 },
+                                            p: { xs: 1.25, sm: 1.5, md: 1.75 },
+                                            pt: { xs: 2.35, sm: 2.5, md: 2.75 },
+                                            minHeight: { xs: 200, sm: 220, md: 248 },
                                             height: '100%',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
                                             textAlign: 'center',
-                                            gap: { xs: 0.35, sm: 0.5, md: 0.65 },
+                                            gap: { xs: 0.5, sm: 0.6, md: 0.75 },
                                             overflow: 'hidden',
                                             width: 1,
                                             maxWidth: '100%',
@@ -798,10 +798,10 @@ export function ShopView() {
                                             <Box
                                                 sx={{
                                                     position: 'absolute',
-                                                    top: { xs: 5, md: 8 },
-                                                    left: { xs: 5, md: 8 },
-                                                    px: { xs: 0.5, md: 0.85 },
-                                                    py: { xs: 0.15, md: 0.25 },
+                                                    top: { xs: 8, md: 10 },
+                                                    left: { xs: 8, md: 10 },
+                                                    px: { xs: 0.65, md: 0.9 },
+                                                    py: { xs: 0.2, md: 0.3 },
                                                     bgcolor: alpha('#000000', 0.82),
                                                     border: `1px solid ${tierBorder}`,
                                                     borderRadius: '4px',
@@ -811,9 +811,9 @@ export function ShopView() {
                                             >
                                                 <Typography
                                                     sx={{
-                                                        fontSize: { xs: 6.5, sm: 8, md: 9 },
+                                                        fontSize: { xs: 8, sm: 9, md: 10 },
                                                         fontWeight: 900,
-                                                        letterSpacing: { xs: 0.3, md: 0.8 },
+                                                        letterSpacing: { xs: 0.4, md: 0.8 },
                                                         textTransform: 'uppercase',
                                                         color: tierColor,
                                                         lineHeight: 1.15,
@@ -828,10 +828,10 @@ export function ShopView() {
                                             <Box
                                                 sx={{
                                                     position: 'absolute',
-                                                    top: { xs: 5, md: 8 },
-                                                    right: { xs: 5, md: 8 },
-                                                    px: { xs: 0.45, md: 0.7 },
-                                                    py: { xs: 0.15, md: 0.25 },
+                                                    top: { xs: 8, md: 10 },
+                                                    right: { xs: 8, md: 10 },
+                                                    px: { xs: 0.55, md: 0.75 },
+                                                    py: { xs: 0.2, md: 0.3 },
                                                     bgcolor: alpha('#EF4444', 0.95),
                                                     borderRadius: '4px',
                                                     boxShadow: `0 0 10px ${alpha('#EF4444', 0.45)}`,
@@ -840,7 +840,7 @@ export function ShopView() {
                                             >
                                                 <Typography
                                                     sx={{
-                                                        fontSize: { xs: 7, sm: 9, md: 10 },
+                                                        fontSize: { xs: 9, sm: 10, md: 11 },
                                                         fontWeight: 900,
                                                         letterSpacing: 0.2,
                                                         color: '#fff',
@@ -856,9 +856,9 @@ export function ShopView() {
                                         <Box
                                             className="coin-img-box"
                                             sx={{
-                                                width: { xs: 36, sm: 48, md: 58 },
-                                                height: { xs: 36, sm: 48, md: 58 },
-                                                mt: { xs: 0.35, md: 0.5 },
+                                                width: { xs: 56, sm: 62, md: 72 },
+                                                height: { xs: 56, sm: 62, md: 72 },
+                                                mt: { xs: 0.5, md: 0.65 },
                                                 display: 'grid',
                                                 placeItems: 'center',
                                                 borderRadius: '50%',
@@ -873,8 +873,8 @@ export function ShopView() {
                                                 alt={`${shopItem.amount} ${shopItem.symbol}`}
                                                 ratio="1/1"
                                                 sx={{
-                                                    width: { xs: 30, sm: 42, md: 52 },
-                                                    height: { xs: 30, sm: 42, md: 52 },
+                                                    width: { xs: 48, sm: 54, md: 64 },
+                                                    height: { xs: 48, sm: 54, md: 64 },
                                                     objectFit: 'contain',
                                                     filter: `drop-shadow(0 4px 10px ${alpha('#000000', 0.75)})`,
                                                 }}
@@ -883,14 +883,14 @@ export function ShopView() {
 
                                         {/* 2-line amount + price */}
                                         <Stack
-                                            spacing={0.15}
+                                            spacing={0.2}
                                             alignItems="center"
-                                            sx={{ width: 1, minWidth: 0, px: 0.15, mt: 0.15 }}
+                                            sx={{ width: 1, minWidth: 0, px: 0.25, mt: 0.25 }}
                                         >
                                             <Typography
                                                 className="font-tr"
                                                 sx={{
-                                                    fontSize: { xs: 9, sm: 12, md: 14 },
+                                                    fontSize: { xs: 14, sm: 15, md: 16 },
                                                     fontWeight: 900,
                                                     letterSpacing: 0.2,
                                                     color: '#ffffff',
@@ -906,7 +906,7 @@ export function ShopView() {
                                             </Typography>
                                             <Typography
                                                 sx={{
-                                                    fontSize: { xs: 8, sm: 11, md: 12.5 },
+                                                    fontSize: { xs: 12, sm: 12.5, md: 13.5 },
                                                     fontWeight: 800,
                                                     color: USER_COLORS.gold,
                                                     lineHeight: 1.2,
@@ -922,7 +922,7 @@ export function ShopView() {
                                             {hasDiscount && Number(shopItem.originalPrice) > Number(shopItem.price) && (
                                                 <Typography
                                                     sx={{
-                                                        fontSize: { xs: 7, sm: 9, md: 10 },
+                                                        fontSize: { xs: 10, sm: 10.5, md: 11 },
                                                         fontWeight: 600,
                                                         color: alpha('#ffffff', 0.45),
                                                         textDecoration: 'line-through',
@@ -943,16 +943,16 @@ export function ShopView() {
                                             size="medium"
                                             fullWidth
                                             sx={{
-                                                mt: 0.35,
-                                                py: { xs: 0.45, sm: 0.6, md: 0.75 },
+                                                mt: 0.5,
+                                                py: { xs: 0.7, sm: 0.8, md: 0.9 },
                                                 minWidth: 0,
-                                                minHeight: { xs: 26, md: 32 },
-                                                fontSize: { xs: 7.5, sm: 9, md: 11 },
+                                                minHeight: { xs: 36, md: 40 },
+                                                fontSize: { xs: 11, sm: 11.5, md: 12 },
                                                 fontWeight: 900,
-                                                letterSpacing: { xs: 0.15, md: 0.6 },
-                                                borderRadius: { xs: '8px', md: '10px' },
+                                                letterSpacing: { xs: 0.4, md: 0.7 },
+                                                borderRadius: { xs: '10px', md: '12px' },
                                                 clipPath: 'none !important',
-                                                px: { xs: 0.35, md: 1 },
+                                                px: { xs: 1, md: 1.25 },
                                             }}
                                         >
                                             {t('shop.buyNow')}

@@ -38,12 +38,12 @@ class ShopItemCard extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final compact = constraints.maxWidth < 120;
-        final pad = compact ? 6.0 : 10.0;
-        final coinSize = compact ? 36.0 : 54.0;
-        final amountSize = compact ? 10.0 : 13.0;
-        final priceSize = compact ? 9.0 : 11.5;
-        final badgeSize = compact ? 7.0 : 8.5;
+        final compact = constraints.maxWidth < 160;
+        final pad = compact ? 10.0 : 14.0;
+        final coinSize = compact ? 52.0 : 64.0;
+        final amountSize = compact ? 14.0 : 16.0;
+        final priceSize = compact ? 12.0 : 13.5;
+        final badgeSize = compact ? 8.0 : 10.0;
 
         return Material(
           color: Colors.transparent,
@@ -61,9 +61,9 @@ class ShopItemCard extends StatelessWidget {
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(
                       pad,
-                      compact ? 22 : 26,
+                      compact ? 26 : 30,
                       pad,
-                      compact ? 8 : 10,
+                      compact ? 10 : 12,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -141,7 +141,7 @@ class ShopItemCard extends StatelessWidget {
                         const Spacer(),
                         SizedBox(
                           width: double.infinity,
-                          height: compact ? 26 : 32,
+                          height: compact ? 36 : 40,
                           child: OutlinedButton(
                             onPressed: onBuy,
                             style: OutlinedButton.styleFrom(
@@ -154,15 +154,15 @@ class ShopItemCard extends StatelessWidget {
                               padding: EdgeInsets.zero,
                               shape: RoundedRectangleBorder(
                                 borderRadius:
-                                    BorderRadius.circular(compact ? 8 : 10),
+                                    BorderRadius.circular(compact ? 10 : 12),
                               ),
                             ),
                             child: Text(
                               'shop.buyNow'.tr(),
                               style: TextStyle(
-                                fontSize: compact ? 8 : 10,
+                                fontSize: compact ? 11 : 12,
                                 fontWeight: FontWeight.w900,
-                                letterSpacing: compact ? 0.2 : 0.5,
+                                letterSpacing: compact ? 0.4 : 0.6,
                               ),
                             ),
                           ),

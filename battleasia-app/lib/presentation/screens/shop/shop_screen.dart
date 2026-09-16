@@ -272,10 +272,10 @@ class _ShopScreenState extends State<ShopScreen> {
                       EdgeInsets.symmetric(horizontal: horizontalPadding),
                   sliver: SliverGrid(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: screenWidth < 600 ? 4 : 6,
-                      crossAxisSpacing: screenWidth < 600 ? 6 : 12,
-                      mainAxisSpacing: screenWidth < 600 ? 6 : 12,
-                      mainAxisExtent: screenWidth < 600 ? 168 : 200,
+                      crossAxisCount: screenWidth < 600 ? 2 : 4,
+                      crossAxisSpacing: screenWidth < 600 ? 10 : 14,
+                      mainAxisSpacing: screenWidth < 600 ? 10 : 14,
+                      mainAxisExtent: screenWidth < 600 ? 220 : 248,
                     ),
                     delegate: SliverChildBuilderDelegate(
                       (_, __) => Container(
@@ -298,15 +298,15 @@ class _ShopScreenState extends State<ShopScreen> {
                   sliver: Builder(
                     builder: (context) {
                       final w = MediaQuery.of(context).size.width;
-                      final crossAxisCount = w < 600 ? 4 : 6;
+                      final crossAxisCount = w < 600 ? 2 : 4;
 
                       return SliverGrid(
                         gridDelegate:
                             SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: crossAxisCount,
-                          crossAxisSpacing: w < 600 ? 6 : 12,
-                          mainAxisSpacing: w < 600 ? 6 : 12,
-                          mainAxisExtent: w < 600 ? 168 : 200,
+                          crossAxisSpacing: w < 600 ? 10 : 14,
+                          mainAxisSpacing: w < 600 ? 10 : 14,
+                          mainAxisExtent: w < 600 ? 220 : 248,
                         ),
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
