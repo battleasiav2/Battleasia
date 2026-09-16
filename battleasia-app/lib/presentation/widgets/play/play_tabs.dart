@@ -45,6 +45,8 @@ class PlayTabs extends StatelessWidget {
                     Text(
                       tab['label'] ?? '',
                       textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: AppTheme.bodyLarge.copyWith(
                         color: isActive ? AppColors.gold : AppColors.textMuted,
                         fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,

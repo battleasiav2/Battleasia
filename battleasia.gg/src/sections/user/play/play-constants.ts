@@ -64,15 +64,25 @@ export function getGamePlatforms(idPrefix?: string) {
   return (idPrefix && GAME_PLATFORMS_BY_PREFIX[idPrefix]) || DEFAULT_PLATFORMS;
 }
 
+function arenaRank(game: { idPrefix?: string; name?: string }): number {
+  const prefix = (game.idPrefix || '').toUpperCase();
+  if (prefix && GAME_ORDER_BY_PREFIX[prefix] !== undefined) {
+    return GAME_ORDER_BY_PREFIX[prefix];
+  }
+  const n = (game.name || '').toLowerCase();
+  if (n.includes('pubg')) return 0;
+  if (n.includes('free fire') || n.includes('freefire')) return 1;
+  if (n.includes('cod') || n.includes('call of duty')) return 2;
+  if (n.includes('valorant')) return 3;
+  if (n.includes('legend') || n.includes('mlbb')) return 4;
+  return 99;
+}
+
 /** PUBG first, then known arenas, then anything else alphabetically. */
 export function sortGamesForArena<T extends { idPrefix?: string; name?: string }>(games: T[]): T[] {
   return [...games].sort((a, b) => {
-    const rankA = a.idPrefix && GAME_ORDER_BY_PREFIX[a.idPrefix] !== undefined
-      ? GAME_ORDER_BY_PREFIX[a.idPrefix]
-      : 99;
-    const rankB = b.idPrefix && GAME_ORDER_BY_PREFIX[b.idPrefix] !== undefined
-      ? GAME_ORDER_BY_PREFIX[b.idPrefix]
-      : 99;
+    const rankA = arenaRank(a);
+    const rankB = arenaRank(b);
     if (rankA !== rankB) return rankA - rankB;
     return (a.name || '').localeCompare(b.name || '');
   });
@@ -85,17 +95,24 @@ type GameArtSource = {
   idPrefix?: string;
 };
 
-/** Resolve card art when API image path is empty — matches home section assets. */
+/** Unique card art per game — never reuse one photo for all five arenas. */
 export function resolvePlayGameArt(game: GameArtSource, field: 'image' | 'logo' = 'image') {
-  const raw = field === 'logo' ? game.logo : game.image;
-  const url = getImageUrl(raw);
-  if (url && url.length > 0) return url;
   if (game.packageName && GAME_ART_BY_PACKAGE[game.packageName]) {
     return GAME_ART_BY_PACKAGE[game.packageName];
   }
   if (game.idPrefix && GAME_ART_BY_PREFIX[game.idPrefix]) {
     return GAME_ART_BY_PREFIX[game.idPrefix];
   }
+  const n = `${game.packageName || ''}`.toLowerCase();
+  if (n.includes('pubg') || n.includes('tencent.ig')) return PLAY_IMAGE_PATHS.pubgCard;
+  if (n.includes('freefire') || n.includes('dts.freefire')) return PLAY_IMAGE_PATHS.freeFireCard;
+  if (n.includes('callofduty') || n.includes('activision')) return PLAY_IMAGE_PATHS.codMobileCard;
+  if (n.includes('valorant') || n.includes('riot')) return PLAY_IMAGE_PATHS.valorantCard;
+  if (n.includes('mobilelegends')) return PLAY_IMAGE_PATHS.mobileLegendsCard;
+
+  const raw = field === 'logo' ? game.logo : game.image;
+  const url = getImageUrl(raw);
+  if (url && url.length > 0) return url;
   return PLAY_IMAGE_PATHS.pubgCard;
 }
 

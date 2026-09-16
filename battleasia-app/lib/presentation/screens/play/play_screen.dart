@@ -4,7 +4,6 @@ import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
-import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/game_model.dart';
 import 'package:battleasia_app/core/services/public_dashboard_service.dart';
@@ -15,6 +14,7 @@ import 'package:battleasia_app/presentation/widgets/common/network_status_banner
 import 'package:battleasia_app/presentation/widgets/play/play_hero_banner.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/play/game_card.dart';
+import 'package:battleasia_app/presentation/widgets/play/game_cover_art.dart';
 import 'package:battleasia_app/core/utils/link_utils.dart';
 import 'package:battleasia_app/presentation/screens/play/match_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
@@ -76,7 +76,9 @@ class _PlayScreenState extends State<PlayScreen> {
       setState(() {
         _isLoading = false;
         if (result['success'] == true) {
-          _games = result['data'] as List<GameModel>? ?? [];
+          _games = GameCoverArt.sortForArena(
+            result['data'] as List<GameModel>? ?? [],
+          );
         } else {
           _errorMessage =
               result['message'] as String? ?? 'play.failedLoadGames'.tr();
@@ -305,14 +307,14 @@ class _PlayScreenState extends State<PlayScreen> {
                       crossAxisCount: 2,
                       crossAxisSpacing: gridSpacing,
                       mainAxisSpacing: gridSpacing,
-                      childAspectRatio: 1.0,
+                      childAspectRatio: 0.62,
                     ),
                     delegate: SliverChildBuilderDelegate((context, index) {
                       final game = _games[index];
                       return GameCard(
                         title: game.name,
                         subTitle: game.genreLabel,
-                        imageUrl: ImageUtils.getImageUrl(game.image),
+                        imageAsset: GameCoverArt.assetFor(game),
                         comingSoon: game.comingSoon,
                         liveCount: _liveCountByGame[game.name] ?? 0,
                         playerCount: _participantsByGame[game.name] ?? 0,

@@ -52,7 +52,7 @@ class _GoldButtonState extends State<GoldButton> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           height: widget.height,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 14),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(widget.borderRadius),
             color: enabled
@@ -82,7 +82,9 @@ class _GoldButtonState extends State<GoldButton> {
                       color: Color(0xFF111111),
                     ),
                   )
-                : Row(
+                : FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
                     mainAxisSize: MainAxisSize.min,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -98,6 +100,8 @@ class _GoldButtonState extends State<GoldButton> {
                       ],
                       Text(
                         text,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           color: enabled
                               ? const Color(0xFF111111)
@@ -119,6 +123,7 @@ class _GoldButtonState extends State<GoldButton> {
                         ),
                       ],
                     ],
+                  ),
                   ),
           ),
         ),
