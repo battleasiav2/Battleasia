@@ -77,6 +77,11 @@ export const accountMenuItems: AccountMenuItem[] = [
         icon: <Iconify icon="solar:user-bold" />,
       },
       {
+        labelKey: 'navigation.settings',
+        href: paths.user.account.profile,
+        icon: <Iconify icon="solar:settings-bold-duotone" />,
+      },
+      {
         labelKey: 'navigation.wallet',
         href: getBacShopWalletUrl(),
         external: true,
