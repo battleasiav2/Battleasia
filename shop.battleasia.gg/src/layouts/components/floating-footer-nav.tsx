@@ -55,12 +55,12 @@ export function FloatingFooterNav() {
         px: 0.5,
         pt: 1,
         pb: 'max(8px, env(safe-area-inset-bottom))',
-        bgcolor: 'transparent',
-        backgroundImage: `linear-gradient(180deg, ${alpha('#161618', 0.58)} 0%, ${alpha('#050508', 0.7)} 100%)`,
-        borderTop: `1px solid ${alpha('#ffffff', 0.08)}`,
-        boxShadow: `0 -10px 28px ${alpha('#000000', 0.35)}, inset 0 1px 0 ${alpha('#ffffff', 0.06)}`,
-        backdropFilter: 'blur(18px) saturate(1.2)',
-        WebkitBackdropFilter: 'blur(18px) saturate(1.2)',
+        bgcolor: '#060607',
+        backgroundImage: 'none',
+        borderTop: `1px solid ${alpha('#ffffff', 0.09)}`,
+        boxShadow: `0 -12px 32px ${alpha('#000000', 0.55)}, inset 0 1px 0 ${alpha('#ffffff', 0.05)}`,
+        backdropFilter: 'none',
+        WebkitBackdropFilter: 'none',
       }}
     >
       {navItems.map((item) => {

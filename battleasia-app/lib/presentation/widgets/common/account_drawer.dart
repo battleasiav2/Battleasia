@@ -347,6 +347,10 @@ class _AccountDrawerContent extends StatelessWidget {
         child: ExpansionTile(
           tilePadding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
           childrenPadding: EdgeInsets.zero,
+          backgroundColor: Colors.transparent,
+          collapsedBackgroundColor: Colors.transparent,
+          shape: const Border(),
+          collapsedShape: const Border(),
           title: Row(
             children: [
               Container(
@@ -695,7 +699,7 @@ class _HomeProfileCard extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'WALLET HUB >',
                           style: TextStyle(
                             fontSize: 10.5,

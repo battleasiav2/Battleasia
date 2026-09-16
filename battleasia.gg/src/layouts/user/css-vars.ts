@@ -47,8 +47,8 @@ export function userBattleNavColorVars(
 
   return {
     layout: {
-      '--layout-nav-bg': 'rgba(6,6,7,0.82)',
-      '--layout-nav-horizontal-bg': 'rgba(6,6,7,0.88)',
+      '--layout-nav-bg': '#060607',
+      '--layout-nav-horizontal-bg': '#060607',
       '--layout-nav-border-color': varAlpha(palette.common.whiteChannel, 0.1),
       '--layout-nav-text-primary-color': palette.common.white,
       '--layout-nav-text-secondary-color': varAlpha(palette.common.whiteChannel, 0.55),

@@ -386,8 +386,6 @@ export function UserLayout({
                 )
             }
             sx={{
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
                 borderRight: `1px solid ${alpha('#ffffff', 0.08)}`,
             }}
         />

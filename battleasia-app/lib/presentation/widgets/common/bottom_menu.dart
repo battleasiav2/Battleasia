@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -193,26 +191,17 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
       right: 0,
       bottom: 0,
       child: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-          child: DecoratedBox(
+        child: DecoratedBox(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  const Color(0xFF161618).withValues(alpha: 0.55),
-                  const Color(0xFF050508).withValues(alpha: 0.72),
-                ],
-              ),
+              color: const Color(0xFF060607),
               border: Border(
-                top: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                top: BorderSide(color: Colors.white.withValues(alpha: 0.09)),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.35),
-                  blurRadius: 20,
-                  offset: const Offset(0, -6),
+                  color: Colors.black.withValues(alpha: 0.55),
+                  blurRadius: 24,
+                  offset: const Offset(0, -8),
                 ),
               ],
             ),
@@ -226,7 +215,6 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
               ),
             ),
           ),
-        ),
       ),
     );
   }

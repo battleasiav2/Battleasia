@@ -54,11 +54,11 @@ const MENU_CARD_SX = {
   position: 'relative' as const,
   overflow: 'hidden' as const,
   borderRadius: '8px',
-  bgcolor: alpha('#161618', 0.42),
-  backdropFilter: 'blur(16px)',
-  WebkitBackdropFilter: 'blur(16px)',
-  border: `1px solid ${alpha('#ffffff', 0.12)}`,
-  boxShadow: 'none',
+  bgcolor: '#161618',
+  backdropFilter: 'none',
+  WebkitBackdropFilter: 'none',
+  border: `1px solid ${alpha('#ffffff', 0.09)}`,
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.05)',
 } as const;
 
 const MAIN_APP_URL =
@@ -82,6 +82,7 @@ function isMenuItemActive(pathname: string, option: AccountMenuItem): boolean {
 const FALLBACK_ICONS: Record<string, string> = {
   'nav.shop': 'solar:shop-bold',
   'nav.wallet': 'solar:wallet-bold',
+  'nav.transfer': 'solar:transfer-horizontal-bold',
   'nav.withdrawal': 'solar:card-send-bold',
   'nav.account': 'solar:user-id-bold',
   'nav.profile': 'solar:user-bold',
