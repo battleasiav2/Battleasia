@@ -1,8 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material';
 
 import { useTranslate } from 'src/locales/use-locales';
-import { paths } from 'src/routes/paths';
-import { useRouter } from 'src/routes/hooks';
 import {
   UserGlassCard,
   UserActionButton,
@@ -11,6 +9,7 @@ import {
   getUserChipSx,
 } from 'src/layouts/user';
 import { Iconify } from 'src/components/iconify';
+import { getBacShopEntryUrl } from 'src/sections/user/shop/shop-constants';
 
 import { EARN_HUB_GOLD } from './wallet-earn-hub-styles';
 
@@ -32,7 +31,6 @@ type Props = {
 
 export function WalletDepositBonusPanel({ depositBonusDays }: Props) {
   const { t } = useTranslate();
-  const router = useRouter();
 
   if (!depositBonusDays?.enabled || !depositBonusDays.active) return null;
 
@@ -89,7 +87,9 @@ export function WalletDepositBonusPanel({ depositBonusDays }: Props) {
         </Stack>
 
         <UserActionButton
-          onClick={() => router.push(paths.user.shopWallet)}
+          onClick={() => {
+            window.location.assign(getBacShopEntryUrl());
+          }}
           sx={{ alignSelf: 'flex-start' }}
         >
           <Iconify icon="solar:wallet-bold" width={16} />
