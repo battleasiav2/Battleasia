@@ -804,12 +804,12 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                     height: 28,
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) =>
-                        const Icon(Icons.payment, size: 28,
+                        Icon(Icons.payment, size: 28,
                             color: AppTheme.primaryColor),
                   ),
                 const SizedBox(width: 8),
                 Text('Deposit via ${channel.name}',
-                    style: const TextStyle(
+                    style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: AppTheme.primaryColor)),

@@ -86,7 +86,7 @@ class _ShopAuthGateState extends State<ShopAuthGate> with WidgetsBindingObserver
   @override
   Widget build(BuildContext context) {
     if (_checking) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppColors.pageBg,
         body: Center(
           child: CircularProgressIndicator(color: AppColors.gold),

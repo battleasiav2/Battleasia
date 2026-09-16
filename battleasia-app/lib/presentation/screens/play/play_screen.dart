@@ -156,7 +156,7 @@ class _PlayScreenState extends State<PlayScreen> {
                 ),
               ),
             ),
-            const Center(
+            Center(
               child: CircularProgressIndicator(
                 color: AppColors.gold,
                 strokeWidth: 2.5,

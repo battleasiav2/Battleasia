@@ -201,7 +201,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
                   padding: const EdgeInsets.fromLTRB(20, 14, 8, 8),
                   child: Row(
                     children: [
-                      const Icon(Icons.account_balance_wallet_outlined,
+                      Icon(Icons.account_balance_wallet_outlined,
                           color: AppColors.gold, size: 22),
                       const SizedBox(width: 8),
                       Expanded(

@@ -194,7 +194,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
     );
     
     if (_isLoading || _matchDetail == null) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppTheme.backgroundColor,
         body: Center(
           child: CircularProgressIndicator(color: AppTheme.accentColor),

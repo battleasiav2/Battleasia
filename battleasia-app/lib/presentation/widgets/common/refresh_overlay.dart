@@ -26,7 +26,7 @@ class RefreshOverlay extends StatelessWidget {
               ),
             ],
           ),
-          child: const Center(
+          child: Center(
             child: CircularProgressIndicator(
               color: AppTheme.primaryColor,
               strokeWidth: 3.0,

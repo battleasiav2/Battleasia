@@ -64,8 +64,8 @@ class _FeedExplorePanelState extends State<FeedExplorePanel> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Padding(
-        padding: EdgeInsets.all(32),
+      return Padding(
+        padding: const EdgeInsets.all(32),
         child: Center(
           child: CircularProgressIndicator(color: AppColors.gold),
         ),
@@ -263,8 +263,8 @@ class _FeedReelsPanelState extends State<FeedReelsPanel> {
           ),
         ),
         if (_loading)
-          const Padding(
-            padding: EdgeInsets.all(32),
+          Padding(
+            padding: const EdgeInsets.all(32),
             child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
           )
         else if (_error != null)
@@ -376,8 +376,8 @@ class _FeedSavedPanelState extends State<FeedSavedPanel> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Padding(
-        padding: EdgeInsets.all(32),
+      return Padding(
+        padding: const EdgeInsets.all(32),
         child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
       );
     }
@@ -611,8 +611,8 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
   @override
   Widget build(BuildContext context) {
     if (_settingsLoading) {
-      return const Padding(
-        padding: EdgeInsets.all(32),
+      return Padding(
+        padding: const EdgeInsets.all(32),
         child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
       );
     }
@@ -622,8 +622,8 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
     }
 
     if (_loading) {
-      return const Padding(
-        padding: EdgeInsets.all(32),
+      return Padding(
+        padding: const EdgeInsets.all(32),
         child: Center(child: CircularProgressIndicator(color: AppColors.gold)),
       );
     }

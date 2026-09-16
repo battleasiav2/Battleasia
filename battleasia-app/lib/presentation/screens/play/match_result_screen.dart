@@ -102,7 +102,7 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
     final bottomPadding = 80.0 + MediaQuery.of(context).padding.bottom;
 
     if (_isLoading) {
-      return const Scaffold(
+      return Scaffold(
         backgroundColor: AppTheme.backgroundColor,
         body: Center(
           child: CircularProgressIndicator(color: AppTheme.accentColor),
