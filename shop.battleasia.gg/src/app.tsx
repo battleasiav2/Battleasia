@@ -14,6 +14,7 @@ import { DeferredSettingsDrawer } from 'src/components/settings/deferred-setting
 import { Toaster } from 'react-hot-toast';
 
 import { AuthConsumer } from './utils/authcheck';
+import { ProgressBar } from 'src/components/progress-bar';
 
 // ----------------------------------------------------------------------
 
@@ -41,6 +42,7 @@ export default function App({ children }: AppProps) {
                   duration: 4000,
                 }}
               />
+              <ProgressBar />
               <DeferredSettingsDrawer defaultSettings={defaultSettings} />
               <AuthConsumer>{children}</AuthConsumer>
             </MotionLazy>

@@ -1,3 +1,4 @@
+export * from './simple-loading-bar';
 export * from './loading-screen';
 export * from './lost-light-loader';
 

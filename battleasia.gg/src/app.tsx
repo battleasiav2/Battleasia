@@ -22,6 +22,7 @@ import { AuthConsumer } from './utils/authcheck';
 import { LiveSyncProvider } from 'src/providers/live-sync-provider';
 import { Toaster } from 'react-hot-toast';
 import { LostLightLoader } from 'src/components/loading-screen';
+import { ProgressBar } from 'src/components/progress-bar';
 import { TacticalCursor } from 'src/components/gaming-cursor';
 
 // ----------------------------------------------------------------------
@@ -52,6 +53,7 @@ export default function App({ children }: AppProps) {
               modeStorageKey={themeConfig.modeStorageKey}
             >
               <TacticalCursor />
+              <ProgressBar />
               <LostLightLoader />
               <DeferredSettingsDrawer defaultSettings={defaultSettings} />
               <AuthConsumer>

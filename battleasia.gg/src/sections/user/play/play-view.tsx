@@ -17,7 +17,8 @@ import { ScrollReveal } from 'src/components/animate';
 
 import type { PublicDashboardStats } from 'src/types';
 
-import { GameCard, PlayArenaHero, PlayPageSkeleton } from './components';
+import { GameCard, PlayArenaHero } from './components';
+import { SimpleLoadingBar } from 'src/components/loading-screen';
 import { PLAY_IMAGE_PATHS, resolvePlayGameArt, sortGamesForArena, getGameGenre } from './play-constants';
 
 // Re-export for backward compatibility
@@ -142,7 +143,16 @@ export function PlayView() {
       />
 
       {isPageLoading ? (
-        <PlayPageSkeleton />
+        <Box
+          sx={{
+            minHeight: 280,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <SimpleLoadingBar />
+        </Box>
       ) : (
         <ScrollReveal preset="cinematic">
           <Stack spacing={{ xs: 3, md: 4 }}>

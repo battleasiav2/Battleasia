@@ -1,13 +1,11 @@
 // components
 import { useState, useEffect } from 'react';
 
-import Box from '@mui/material/Box';
-import CircularProgress from '@mui/material/CircularProgress';
-
 import useApi from 'src/hooks/use-api';
 
 import { useSelector, useDispatch } from 'src/store';
 import { userAction, balanceAction } from 'src/store/reducers/auth';
+import { LoadingScreen } from 'src/components/loading-screen';
 
 // ----------------------------------------------------------------------
 
@@ -62,19 +60,15 @@ export function AuthConsumer({ children }: Props) {
     <>
       {children}
       {loading ? (
-        <Box
+        <LoadingScreen
+          portal
           sx={{
             position: 'fixed',
             inset: 0,
             zIndex: 20000,
-            bgcolor: '#000000',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            minHeight: '100dvh',
           }}
-        >
-          <CircularProgress size={40} sx={{ color: 'var(--ba-gold)' }} />
-        </Box>
+        />
       ) : null}
     </>
   );

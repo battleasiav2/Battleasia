@@ -5,7 +5,7 @@ import { Fragment } from 'react';
 import Portal from '@mui/material/Portal';
 import { styled } from '@mui/material/styles';
 
-import { AnimateLogoZoom } from 'src/components/animate/animate-logo';
+import { SimpleLoadingBar } from './simple-loading-bar';
 
 // ----------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ export function SplashScreen({ portal = true, slotProps, sx, ...other }: SplashS
     <PortalWrapper>
       <LoadingWrapper {...slotProps?.wrapper}>
         <LoadingContent sx={sx} {...other}>
-          <AnimateLogoZoom />
+          <SimpleLoadingBar />
         </LoadingContent>
       </LoadingWrapper>
     </PortalWrapper>
@@ -39,7 +39,7 @@ const LoadingWrapper = styled('div')({
   flexDirection: 'column',
 });
 
-const LoadingContent = styled('div')(({ theme }) => ({
+const LoadingContent = styled('div')(() => ({
   right: 0,
   bottom: 0,
   zIndex: 9998,
@@ -50,5 +50,5 @@ const LoadingContent = styled('div')(({ theme }) => ({
   position: 'fixed',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundColor: theme.vars.palette.background.default,
+  backgroundColor: '#060607',
 }));

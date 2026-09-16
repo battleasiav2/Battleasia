@@ -77,150 +77,41 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        overflow: hidden;
-        font-family: "Satoshi", "Helvetica Neue", sans-serif;
       }
       #boot-shell[hidden] {
         display: none !important;
       }
-      .boot-glow {
-        position: absolute;
-        width: min(520px, 90vw);
-        height: min(520px, 90vw);
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(var(--ba-gold-rgb, 203,251,36), 0.22) 0%, rgba(var(--ba-gold-rgb, 203,251,36), 0.06) 42%, transparent 70%);
-        animation: boot-glow 2.8s ease-in-out infinite;
-        pointer-events: none;
-      }
-      @keyframes boot-glow {
-        0%, 100% { opacity: 0.7; transform: scale(0.96); }
-        50% { opacity: 1; transform: scale(1.04); }
-      }
       #boot-loader-center {
-        position: relative;
-        z-index: 1;
-        width: min(340px, 86vw);
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 22px;
-      }
-      .boot-crest {
-        position: relative;
-        width: 128px;
-        height: 128px;
-        display: grid;
-        place-items: center;
-        animation: boot-float 2.6s ease-in-out infinite;
-      }
-      @keyframes boot-float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-6px); }
-      }
-      .boot-crest-ring {
-        position: absolute;
-        inset: -10px;
-        border-radius: 50%;
-        border: 1px solid rgba(var(--ba-gold-rgb, 203,251,36), 0.28);
-        box-shadow: 0 0 0 1px rgba(255,255,255,0.04), 0 0 40px rgba(var(--ba-gold-rgb, 203,251,36), 0.18);
+        gap: 20px;
       }
       .boot-logo-icon {
-        width: 112px;
-        height: 112px;
+        width: 56px;
+        height: 56px;
         object-fit: contain;
-        filter: drop-shadow(0 12px 28px rgba(0,0,0,0.55)) drop-shadow(0 0 18px rgba(var(--ba-gold-rgb, 203,251,36), 0.35));
-      }
-      .boot-wordmark {
-        text-align: center;
-        user-select: none;
-      }
-      .boot-word-battle {
-        margin: 0;
-        font-family: "Clash Display", "Satoshi", "Barlow", sans-serif;
-        font-weight: 700;
-        font-size: clamp(1.85rem, 6vw, 2.15rem);
-        line-height: 0.9;
-        letter-spacing: -0.04em;
-        text-transform: uppercase;
-        color: #f4f4f1;
-      }
-      .boot-word-row {
-        display: inline-flex;
-        align-items: flex-start;
-        gap: 8px;
-        margin-top: 4px;
-      }
-      .boot-word-asia {
-        font-family: "Clash Display", "Satoshi", "Barlow", sans-serif;
-        font-weight: 700;
-        font-size: clamp(1.85rem, 6vw, 2.15rem);
-        line-height: 0.9;
-        letter-spacing: -0.04em;
-        text-transform: uppercase;
-        color: var(--ba-gold, #cbfb24);
-      }
-      .boot-ver {
-        margin-top: 4px;
-        padding: 0.32em 0.58em;
-        border-radius: 8px;
-        font-family: "Clash Display", "Satoshi", sans-serif;
-        font-weight: 700;
-        font-size: 0.68rem;
-        letter-spacing: 0.14em;
-        color: var(--ba-gold-ink, #081401);
-        background: linear-gradient(180deg, var(--ba-gold-light, #e2ff58) 0%, var(--ba-gold, #cbfb24) 55%, var(--ba-gold-dark, #9de006) 100%);
-        border: 1px solid rgba(255,255,255,0.28);
-        box-shadow: 0 3px 0 rgba(0,0,0,0.35), 0 8px 18px -10px rgba(var(--ba-gold-rgb, 203,251,36), 0.55);
-      }
-      .boot-panel {
-        width: 100%;
-        margin-top: 4px;
-        padding: 14px 16px;
-        border-radius: 14px;
-        background: rgba(22,22,24,0.55);
-        border: 1px solid rgba(255,255,255,0.09);
-        box-shadow: 0 20px 50px -30px #000, inset 0 1px 0 rgba(255,255,255,0.05);
-      }
-      .boot-panel-head {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-      }
-      .boot-panel-label {
-        font-size: 0.62rem;
-        font-weight: 700;
-        letter-spacing: 0.16em;
-        text-transform: uppercase;
-        color: rgba(244,244,241,0.45);
-      }
-      #boot-loader-percent {
-        font-family: "Clash Display", "Satoshi", sans-serif;
-        font-weight: 600;
-        font-size: 0.85rem;
-        color: #fff;
-        font-variant-numeric: tabular-nums;
       }
       .boot-bar-track {
-        width: 100%;
+        width: 220px;
         height: 3px;
-        border-radius: 2px;
-        background: rgba(255,255,255,0.1);
+        border-radius: 99px;
+        background: rgba(255,255,255,0.12);
         overflow: hidden;
       }
       #boot-loader-bar {
         height: 100%;
-        width: 0%;
-        border-radius: 2px;
-        background: linear-gradient(90deg, rgba(var(--ba-gold-rgb, 203,251,36), 0.35), var(--ba-gold, #cbfb24));
-        box-shadow: 0 0 12px rgba(var(--ba-gold-rgb, 203,251,36), 0.55);
+        width: 42%;
+        border-radius: 99px;
+        background: var(--ba-gold, #cbfb24);
+        animation: boot-simple-load 1.05s ease-in-out infinite;
       }
-      @media (max-width: 480px) {
-        .boot-crest { width: 112px; height: 112px; }
-        .boot-logo-icon { width: 96px; height: 96px; }
+      @keyframes boot-simple-load {
+        0% { transform: translateX(-130%); }
+        100% { transform: translateX(280%); }
       }
       @media (prefers-reduced-motion: reduce) {
-        .boot-glow, .boot-crest { animation: none !important; }
+        #boot-loader-bar { animation: none; width: 100%; opacity: 0.7; }
       }
     </style>
 
@@ -228,72 +119,36 @@
   </head>
 
   <body>
-    <!-- Instant first-paint loader — home-matched brand lockup -->
+    <!-- Instant first-paint loader — same simple bar as every page -->
     <div id="boot-shell" hidden>
-      <div class="boot-glow" aria-hidden="true"></div>
       <div id="boot-loader-center">
-        <div class="boot-crest">
-          <div class="boot-crest-ring" aria-hidden="true"></div>
-          <img
-            class="boot-logo-icon"
-            src="/logo/logo.webp"
-            alt="BattleAsia"
-            width="112"
-            height="112"
-            fetchpriority="high"
-            decoding="sync"
-          />
-        </div>
-        <div class="boot-wordmark">
-          <p class="boot-word-battle">Battle</p>
-          <div class="boot-word-row">
-            <span class="boot-word-asia">Asia</span>
-            <span class="boot-ver">2.0</span>
-          </div>
-        </div>
-        <div class="boot-panel">
-          <div class="boot-panel-head">
-            <span class="boot-panel-label">Entering arena</span>
-            <span id="boot-loader-percent">0%</span>
-          </div>
-          <div class="boot-bar-track">
-            <div id="boot-loader-bar"></div>
-          </div>
+        <img
+          class="boot-logo-icon"
+          src="/logo/logo.webp"
+          alt=""
+          width="56"
+          height="56"
+          fetchpriority="high"
+          decoding="sync"
+        />
+        <div class="boot-bar-track">
+          <div id="boot-loader-bar"></div>
         </div>
       </div>
     </div>
     <script>
       (function () {
-        var path = window.location.pathname || '';
-        var isHome =
-          path === '/' ||
-          path === '/index.html' ||
-          path === '' ||
-          path === '/dashboard';
         var hasShown = false;
         try {
           hasShown = !!sessionStorage.getItem('ba_home_loader_shown');
         } catch (e) {}
 
         var el = document.getElementById('boot-shell');
-        if (!isHome || hasShown) {
+        if (hasShown) {
           if (el) el.remove();
           return;
         }
-
         if (el) el.hidden = false;
-        var start = Date.now();
-        var bar = document.getElementById('boot-loader-bar');
-        var pct = document.getElementById('boot-loader-percent');
-        function tick() {
-          if (!el || el.hasAttribute('hidden') || !document.body.contains(el)) return;
-          var elapsed = Date.now() - start;
-          var p = Math.min(60, (elapsed / 500) * 60);
-          if (bar) bar.style.width = p + '%';
-          if (pct) pct.textContent = Math.round(p) + '%';
-          if (p < 60) requestAnimationFrame(tick);
-        }
-        requestAnimationFrame(tick);
       })();
     </script>
     <div id="root"></div>
