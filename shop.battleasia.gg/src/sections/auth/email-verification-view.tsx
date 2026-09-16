@@ -157,8 +157,8 @@ export function EmailVerificationView() {
           // Wait for Redux Persist to complete localStorage save
           await new Promise((resolve) => setTimeout(resolve, 100));
 
-          // Redirect to user play page
-          router.push(paths.user.play);
+          // Stay in shop after verification
+          router.push(paths.user.shop);
         } else {
           throw new Error('Session or user data is missing from response');
         }
