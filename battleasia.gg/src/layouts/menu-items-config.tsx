@@ -3,7 +3,6 @@ import { paths } from 'src/routes/paths';
 import { Iconify } from 'src/components/iconify';
 import {
   getBacShopTransferUrl,
-  getBacShopWalletUrl,
   getBacShopWithdrawalUrl,
 } from 'src/sections/user/shop/shop-constants';
 
@@ -83,8 +82,7 @@ export const accountMenuItems: AccountMenuItem[] = [
       },
       {
         labelKey: 'navigation.wallet',
-        href: getBacShopWalletUrl(),
-        external: true,
+        href: paths.user.account.wallet,
         icon: <Iconify icon="solar:wallet-bold" />,
       },
       {

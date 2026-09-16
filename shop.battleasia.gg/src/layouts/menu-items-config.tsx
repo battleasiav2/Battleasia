@@ -61,6 +61,13 @@ export const accountMenuItems: AccountMenuItem[] = [
     mobileMenu: true,
   },
   {
+    label: 'nav.transfer',
+    labelKey: 'nav.transfer',
+    href: paths.user.account.transfer,
+    icon: <Iconify icon="solar:transfer-horizontal-bold" />,
+    mobileMenu: true,
+  },
+  {
     label: 'nav.withdrawal',
     labelKey: 'nav.withdrawal',
     href: paths.user.account.withdrawal,

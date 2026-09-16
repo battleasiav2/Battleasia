@@ -28,7 +28,6 @@ import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { USER_COLORS } from 'src/layouts/user/user-theme';
 import { CONFIG } from 'src/global-config';
-import { getBacShopWalletUrl } from 'src/sections/user/shop/shop-constants';
 
 import { AccountButton } from './account-button';
 import { SignOutButton } from './sign-out-button';
@@ -727,10 +726,8 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                 </Stack>
 
                 <ButtonBase
-                  component="a"
-                  href={getBacShopWalletUrl()}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  component={RouterLink}
+                  href={paths.user.account.wallet}
                   onClick={onClose}
                   sx={{
                     px: 1.25,
