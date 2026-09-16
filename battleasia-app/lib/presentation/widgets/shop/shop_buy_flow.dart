@@ -420,7 +420,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                                     ),
                                     minimumSize: const Size(0, 44),
                                   ),
-                                  child: const Text('Back'),
+                                  child: Text('Back'),
                                 ),
                               ),
                               const SizedBox(width: 10),

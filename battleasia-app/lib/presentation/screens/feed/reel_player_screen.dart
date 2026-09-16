@@ -129,7 +129,7 @@ class _ReelPlayerScreenState extends State<ReelPlayerScreen> {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          const Icon(Icons.music_note,
+                          Icon(Icons.music_note,
                               size: 14, color: AppColors.gold),
                           const SizedBox(width: 4),
                           Expanded(
@@ -216,7 +216,7 @@ class _StoryMediaPlayerState extends State<StoryMediaPlayer> {
     final url = ImageUtils.getImageUrl(widget.mediaUrl) ?? widget.mediaUrl;
     if (widget.mediaType == 'video') {
       if (_controller == null || !_controller!.value.isInitialized) {
-        return const Center(
+        return Center(
           child: CircularProgressIndicator(color: AppColors.gold),
         );
       }

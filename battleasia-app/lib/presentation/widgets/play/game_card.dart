@@ -110,7 +110,7 @@ class GameCard extends StatelessWidget {
                                 color: AppColors.gold.withValues(alpha: 0.35),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'SOON',
                               style: TextStyle(
                                 color: AppColors.gold,

@@ -125,3 +125,14 @@ export const getWithdrawalByIdApi = (id: string) => axios.get(`/api/v4/payments/
 
 // Get deposit details by ID
 export const getDepositByIdApi = (id: string) => axios.get(`/api/v4/payments/deposit-history/${id}`);
+/** User -> user BAC transfer */
+export const getTransferSettingsApi = () => axios.get('/api/v2/users/transfer/settings');
+
+export const submitCoinTransferApi = (data: {
+  recipientUsername: string;
+  amount: number;
+  note?: string;
+}) => axios.post('/api/v2/users/transfer', data);
+
+export const getTransferHistoryApi = (params?: { page?: number; limit?: number }) =>
+  axios.get('/api/v2/users/transfer/history', { params });

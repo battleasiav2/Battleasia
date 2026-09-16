@@ -51,6 +51,8 @@ export const LANDING_V2 = {
   wrap: 1180,
   ease: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
   display: '"Clash Display", "Satoshi", "Barlow", sans-serif',
+  /** Hero wordmark only — geometric modern display */
+  heroDisplay: '"Syne", "Satoshi", "Barlow", sans-serif',
   sans: '"Satoshi", "Helvetica Neue", "Public Sans Variable", sans-serif',
 } as const;
 

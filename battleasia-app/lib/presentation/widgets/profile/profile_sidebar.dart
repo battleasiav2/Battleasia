@@ -450,7 +450,7 @@ class ProfileSidebar extends StatelessWidget {
 
     if (userId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('Unable to generate profile link'),
           backgroundColor: Colors.red,
         ),
@@ -462,7 +462,7 @@ class ProfileSidebar extends StatelessWidget {
     final profileUrl = '$site/profile/$userId';
     Clipboard.setData(ClipboardData(text: profileUrl));
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text('Profile link copied to clipboard!'),
         backgroundColor: AppTheme.accentColor,
         duration: Duration(seconds: 2),

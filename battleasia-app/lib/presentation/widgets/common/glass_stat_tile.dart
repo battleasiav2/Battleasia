@@ -45,7 +45,7 @@ class GlassStatTile extends StatelessWidget {
               ),
               child: icon != null ? _buildWithIcon() : _buildSimple(),
             ),
-            const Positioned(
+            Positioned(
               top: 0,
               left: 0,
               right: 0,

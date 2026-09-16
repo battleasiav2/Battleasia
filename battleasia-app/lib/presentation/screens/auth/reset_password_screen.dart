@@ -62,7 +62,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
         (_) => false,
       );
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password updated. Please sign in.')),
+        SnackBar(content: Text('Password updated. Please sign in.')),
       );
       return;
     }

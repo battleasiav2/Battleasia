@@ -146,7 +146,7 @@ class _WalletEarnPanelState extends State<WalletEarnPanel> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Center(
+      return Center(
         child: Padding(
           padding: EdgeInsets.all(32),
           child: CircularProgressIndicator(color: AppColors.gold),

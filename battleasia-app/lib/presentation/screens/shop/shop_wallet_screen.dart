@@ -7,7 +7,7 @@ import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_coin_transfer_panel.dart';
 
-/// Shop wallet tab — user-to-user BAC transfer (web `/user/shop/wallet` parity).
+/// Shop wallet tab — user-to-user BAC transfer (web shop `/user/transfer` parity).
 class ShopWalletScreen extends StatefulWidget {
   const ShopWalletScreen({super.key});
 

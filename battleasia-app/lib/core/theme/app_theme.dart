@@ -37,6 +37,13 @@ class AppTheme {
     fontFamily: 'Poppins',
   );
 
+  static const TextStyle headingSmall = TextStyle(
+    fontSize: 16,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimary,
+    fontFamily: 'Poppins',
+  );
+
   static const TextStyle bodyLarge = TextStyle(
     fontSize: 16,
     fontWeight: FontWeight.w500,

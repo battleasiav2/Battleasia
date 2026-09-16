@@ -3,6 +3,8 @@ import '@fontsource/barlow/latin-600.css';
 import '@fontsource/barlow/latin-700.css';
 import '@fontsource/barlow/latin-800.css';
 import '@fontsource/barlow/latin-900.css';
+import '@fontsource/syne/700.css';
+import '@fontsource/syne/800.css';
 
 import { useEffect } from 'react';
 

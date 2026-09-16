@@ -81,7 +81,7 @@ class _ProfileContentState extends State<ProfileContent> {
         if (mounted) {
           setState(() => _premiumDialogOpen = false);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('Premium membership activated!'),
               backgroundColor: Colors.green,
             ),
@@ -166,7 +166,7 @@ class _ProfileContentState extends State<ProfileContent> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text(
+            child: Text(
               'Cancel',
               style: TextStyle(color: Colors.black54),
             ),
@@ -182,7 +182,7 @@ class _ProfileContentState extends State<ProfileContent> {
                 borderRadius: BorderRadius.circular(24),
               ),
             ),
-            child: const Text(
+            child: Text(
               'Confirm',
               style: TextStyle(color: Colors.white),
             ),
@@ -239,7 +239,7 @@ class _ProfileContentState extends State<ProfileContent> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text('OK'),
+                child: Text('OK'),
               ),
             ],
           ),
@@ -690,7 +690,7 @@ class _ProfileContentState extends State<ProfileContent> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
+                      borderSide: BorderSide(
                         color: AppTheme.accentColor,
                         width: 1,
                       ),
@@ -844,8 +844,8 @@ class _ProfileContentState extends State<ProfileContent> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(
-                              color: AppTheme.accentColor,
+                            borderSide: BorderSide(
+                        color: AppTheme.accentColor,
                               width: 1,
                             ),
                           ),
@@ -922,7 +922,7 @@ class _ProfileContentState extends State<ProfileContent> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
+                      borderSide: BorderSide(
                         color: AppTheme.accentColor,
                         width: 1,
                       ),
@@ -984,7 +984,7 @@ class _ProfileContentState extends State<ProfileContent> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
+                      borderSide: BorderSide(
                         color: AppTheme.accentColor,
                         width: 1,
                       ),
@@ -1055,7 +1055,7 @@ class _ProfileContentState extends State<ProfileContent> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
+                      borderSide: BorderSide(
                         color: AppTheme.accentColor,
                         width: 1,
                       ),
@@ -1117,7 +1117,7 @@ class _ProfileContentState extends State<ProfileContent> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
+                      borderSide: BorderSide(
                         color: AppTheme.accentColor,
                         width: 1,
                       ),
@@ -1174,7 +1174,7 @@ class _ProfileContentState extends State<ProfileContent> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
+                      borderSide: BorderSide(
                         color: AppTheme.accentColor,
                         width: 1,
                       ),
@@ -1238,7 +1238,7 @@ class _ProfileContentState extends State<ProfileContent> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
+                      borderSide: BorderSide(
                         color: AppTheme.accentColor,
                         width: 1,
                       ),
@@ -1302,7 +1302,7 @@ class _ProfileContentState extends State<ProfileContent> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
+                      borderSide: BorderSide(
                         color: AppTheme.accentColor,
                         width: 1,
                       ),

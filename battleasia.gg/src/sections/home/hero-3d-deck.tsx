@@ -38,26 +38,11 @@ type HeroHudStats = {
   online: number | null;
 };
 
-/** Zip `.hero-word` emboss shadows */
+/** Clean modern depth — no chunky emboss stack */
 const WHITE_WORD_SHADOW = `
-  0 1px 0 #fff,
-  0 2px 0 #d8d8d3,
-  1px 3px 0 #2a2a2e,
-  2px 5px 0 #1c1c20,
-  3px 7px 0 #121216,
-  5px 10px 0 #0a0a0c,
-  10px 20px 26px rgba(0,0,0,.5)
-`;
-
-const LIME_WORD_SHADOW = `
-  0 1px 0 #f6ffb0,
-  0 2px 0 #a8dc14,
-  1px 3px 0 #4a5c0a,
-  2px 5px 0 #323e08,
-  3px 7px 0 #1e2604,
-  5px 10px 0 #101402,
-  0 0 32px rgba(var(--ba-gold-rgb, 203,251,36), .4),
-  10px 20px 26px rgba(0,0,0,.45)
+  0 1px 0 rgba(255,255,255,0.18),
+  0 10px 28px rgba(0,0,0,0.45),
+  0 2px 0 rgba(0,0,0,0.35)
 `;
 
 export function Hero3dDeck({
@@ -100,21 +85,18 @@ export function Hero3dDeck({
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  // Zip `.hero-word`
+  // Modern geometric hero lockup
   const wordSx = {
     position: 'relative' as const,
     display: 'block',
-    fontFamily: LANDING_V2.display,
-    fontWeight: 700,
-    fontSize: { xs: 'clamp(2.45rem, 14vw, 4.2rem)', md: 'clamp(2.5rem, 7vw, 6.2rem)' },
-    lineHeight: 0.86,
-    letterSpacing: '-0.05em',
+    fontFamily: LANDING_V2.heroDisplay,
+    fontWeight: 800,
+    fontSize: { xs: 'clamp(2.55rem, 13.5vw, 4rem)', md: 'clamp(3rem, 6.4vw, 5.6rem)' },
+    lineHeight: 0.92,
+    letterSpacing: '-0.045em',
     textTransform: 'uppercase' as const,
-    transform: { xs: 'rotateX(8deg)', md: 'rotateX(10deg)' },
+    transform: 'none',
     transformOrigin: 'left bottom',
-    '@media (prefers-reduced-motion: reduce)': {
-      transform: 'none',
-    },
   };
 
   return (
@@ -139,16 +121,13 @@ export function Hero3dDeck({
       <Box
         component="h1"
         aria-label="Battle Asia 2.0"
-        className="landing-display"
+        className="hero-wordmark"
         sx={{
           m: 0,
           maxWidth: '100%',
-          // Zip `.hero-stack`
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',
-          perspective: '1100px',
-          transformStyle: 'preserve-3d',
           userSelect: 'none',
         }}
       >
@@ -168,8 +147,13 @@ export function Hero3dDeck({
             component="span"
             sx={{
               ...wordSx,
-              color: 'var(--ba-gold, #cbfb24)',
-              textShadow: LIME_WORD_SHADOW,
+              background:
+                'linear-gradient(180deg, #f3ff9a 0%, var(--ba-gold, #cbfb24) 42%, #9cc410 100%)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
+              textShadow: 'none',
+              filter: 'drop-shadow(0 10px 24px rgba(0,0,0,0.45)) drop-shadow(0 0 22px rgba(var(--ba-gold-rgb, 203,251,36), 0.28))',
             }}
           >
             ASIA
@@ -179,21 +163,20 @@ export function Hero3dDeck({
           <Box
             component="span"
             sx={{
-              fontFamily: LANDING_V2.display,
-              fontWeight: 700,
-              fontSize: { xs: '0.7rem', md: 'clamp(0.7rem, 1.25vw, 1.02rem)' },
-              letterSpacing: '0.16em',
+              fontFamily: LANDING_V2.heroDisplay,
+              fontWeight: 800,
+              fontSize: { xs: '0.68rem', md: 'clamp(0.68rem, 1.1vw, 0.92rem)' },
+              letterSpacing: '0.14em',
               color: 'var(--ba-gold-ink, #081401)',
               background: 'linear-gradient(180deg, #f3ff8c 0%, var(--ba-gold, #cbfb24) 48%, #8fb410 100%)',
               border: '1px solid rgba(255,255,255,0.28)',
-              padding: '0.32em 0.58em',
-              borderRadius: '8px',
-              marginTop: { xs: '0.28em', md: '0.22em' },
+              padding: '0.38em 0.62em',
+              borderRadius: '999px',
+              marginTop: { xs: '0.42em', md: '0.5em' },
               lineHeight: 1,
               boxShadow: `
-                inset 0 1px 0 rgba(255,255,255,0.4),
-                0 3px 0 #4a5c0a,
-                0 10px 20px -10px rgba(var(--ba-gold-rgb, 203,251,36), 0.55)
+                inset 0 1px 0 rgba(255,255,255,0.35),
+                0 8px 18px -10px rgba(var(--ba-gold-rgb, 203,251,36), 0.55)
               `,
             }}
           >

@@ -52,7 +52,7 @@ class PlayTabs extends StatelessWidget {
                       ? AppColors.surfaceElevated.withValues(alpha: 0.6)
                       : Colors.transparent,
                   border: isActive
-                      ? const Border(
+                      ? Border(
                           bottom: BorderSide(color: AppColors.gold, width: 2),
                         )
                       : null,

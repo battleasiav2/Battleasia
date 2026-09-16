@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
@@ -135,9 +135,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     }).toList();
   }
 
-  // ─────────────────────────────────────────────────────────
+  // ---------------------------------------------------------
   // Helpers
-  // ─────────────────────────────────────────────────────────
+  // ---------------------------------------------------------
 
   Color _statusColor(String status) {
     switch (status) {
@@ -164,12 +164,12 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
 
   String _shortAddress(String address) {
     if (address.length <= 16) return address;
-    return '${address.substring(0, 8)}…${address.substring(address.length - 8)}';
+    return '${address.substring(0, 8)}�${address.substring(address.length - 8)}';
   }
 
-  // ─────────────────────────────────────────────────────────
+  // ---------------------------------------------------------
   // View Details bottom sheet
-  // ─────────────────────────────────────────────────────────
+  // ---------------------------------------------------------
 
   void _showDetails(_TxEntry entry) {
     showModalBottomSheet(
@@ -334,9 +334,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     );
   }
 
-  // ─────────────────────────────────────────────────────────
+  // ---------------------------------------------------------
   // Build
-  // ─────────────────────────────────────────────────────────
+  // ---------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -375,7 +375,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                     children: [
                       SizedBox(height: spacing16),
 
-                      // ── Page title + refresh ─────────────────────────────
+                      // -- Page title + refresh -----------------------------
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -404,15 +404,15 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                       ),
                       SizedBox(height: spacing16),
 
-                      // ── Type filter tabs ─────────────────────────────────
+                      // -- Type filter tabs ---------------------------------
                       _buildTypeTabs(),
                       SizedBox(height: spacing16),
 
-                      // ── Status filter tabs ───────────────────────────────
+                      // -- Status filter tabs -------------------------------
                       _buildStatusTabs(),
                       SizedBox(height: spacing24),
 
-                      // ── Content ───────────────────────────────────────────────────
+                      // -- Content ---------------------------------------------------
                       if (_loading)
                         const Center(
                           child: Padding(
@@ -449,7 +449,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     );
   }
 
-  // ── Type filter tabs ──────────────────────────────────────────────────────────────
+  // -- Type filter tabs --------------------------------------------------------------
 
   Widget _buildTypeTabs() {
     final tabs = [
@@ -540,7 +540,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     );
   }
 
-  // ── Status filter scrollable ────────────────────────────────────────────────────
+  // -- Status filter scrollable ----------------------------------------------------
 
   Widget _buildStatusTabs() {
     final List<Map<String, String>> statusTabs = [
@@ -581,7 +581,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                       ? AppTheme.surfaceColor
                       : Colors.transparent,
                   border: isActive
-                      ? const Border(
+                      ? Border(
                           bottom: BorderSide(
                             color: AppTheme.accentColor,
                             width: 2,
@@ -635,7 +635,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     );
   }
 
-  // ── Transaction card ──────────────────────────────────────────────────────────────
+  // -- Transaction card --------------------------------------------------------------
 
   Widget _buildTxCard(_TxEntry entry) {
     final bool isDeposit = entry.isDeposit;
@@ -792,7 +792,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     );
   }
 
-  // ── Empty / error states ──────────────────────────────────────────────────────
+  // -- Empty / error states ------------------------------------------------------
 
   Widget _buildEmptyState() {
     final String message;
