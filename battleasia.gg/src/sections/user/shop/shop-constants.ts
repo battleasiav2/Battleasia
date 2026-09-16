@@ -36,3 +36,51 @@ export function getBacShopEntryUrl() {
     return `${SHOP_EXTERNAL_URL.replace(/\/user\/shop\/?$/, '/auth/sign-in')}?reauth=1`;
   }
 }
+
+/** BAC P2P transfer lives only on the shop app. */
+export function getBacShopTransferUrl() {
+  try {
+    const storeUrl = new URL(
+      SHOP_EXTERNAL_URL,
+      typeof window !== 'undefined' ? window.location.origin : 'http://localhost'
+    );
+    storeUrl.pathname = storeUrl.pathname.replace(/\/user\/shop\/?$/, '/user/transfer');
+    storeUrl.search = '';
+    storeUrl.hash = '';
+    return storeUrl.toString();
+  } catch {
+    return SHOP_EXTERNAL_URL.replace(/\/user\/shop\/?$/, '/user/transfer');
+  }
+}
+
+/** BAC wallet hub lives only on the shop app. */
+export function getBacShopWalletUrl() {
+  try {
+    const storeUrl = new URL(
+      SHOP_EXTERNAL_URL,
+      typeof window !== 'undefined' ? window.location.origin : 'http://localhost'
+    );
+    storeUrl.pathname = storeUrl.pathname.replace(/\/user\/shop\/?$/, '/user/wallet');
+    storeUrl.search = '';
+    storeUrl.hash = '';
+    return storeUrl.toString();
+  } catch {
+    return SHOP_EXTERNAL_URL.replace(/\/user\/shop\/?$/, '/user/wallet');
+  }
+}
+
+/** BAC withdrawal lives only on the shop app. */
+export function getBacShopWithdrawalUrl() {
+  try {
+    const storeUrl = new URL(
+      SHOP_EXTERNAL_URL,
+      typeof window !== 'undefined' ? window.location.origin : 'http://localhost'
+    );
+    storeUrl.pathname = storeUrl.pathname.replace(/\/user\/shop\/?$/, '/user/withdrawal');
+    storeUrl.search = '';
+    storeUrl.hash = '';
+    return storeUrl.toString();
+  } catch {
+    return SHOP_EXTERNAL_URL.replace(/\/user\/shop\/?$/, '/user/withdrawal');
+  }
+}

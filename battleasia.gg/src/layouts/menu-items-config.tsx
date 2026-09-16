@@ -1,6 +1,11 @@
 import { paths } from 'src/routes/paths';
 
 import { Iconify } from 'src/components/iconify';
+import {
+  getBacShopTransferUrl,
+  getBacShopWalletUrl,
+  getBacShopWithdrawalUrl,
+} from 'src/sections/user/shop/shop-constants';
 
 // ----------------------------------------------------------------------
 
@@ -53,6 +58,8 @@ export const menuItems: MenuItem[] = [
 export type AccountMenuItem = {
   labelKey: string; // Translation key for i18n
   href?: string;
+  /** Open in a new tab (shop.battleasia.gg money links, etc.) */
+  external?: boolean;
   icon: React.ReactNode;
   mobileMenu?: boolean;
   children?: AccountMenuItem[];
@@ -68,6 +75,24 @@ export const accountMenuItems: AccountMenuItem[] = [
         labelKey: 'navigation.profile',
         href: paths.user.account.profile,
         icon: <Iconify icon="solar:user-bold" />,
+      },
+      {
+        labelKey: 'navigation.wallet',
+        href: getBacShopWalletUrl(),
+        external: true,
+        icon: <Iconify icon="solar:wallet-bold" />,
+      },
+      {
+        labelKey: 'navigation.transfer',
+        href: getBacShopTransferUrl(),
+        external: true,
+        icon: <Iconify icon="solar:transfer-horizontal-bold" />,
+      },
+      {
+        labelKey: 'navigation.withdrawal',
+        href: getBacShopWithdrawalUrl(),
+        external: true,
+        icon: <Iconify icon="solar:card-send-bold" />,
       },
       {
         labelKey: 'navigation.myMatches',

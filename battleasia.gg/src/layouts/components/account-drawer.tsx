@@ -28,6 +28,7 @@ import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 import { USER_COLORS } from 'src/layouts/user/user-theme';
 import { CONFIG } from 'src/global-config';
+import { getBacShopWalletUrl } from 'src/sections/user/shop/shop-constants';
 
 import { AccountButton } from './account-button';
 import { SignOutButton } from './sign-out-button';
@@ -78,13 +79,26 @@ export type AccountDrawerProps = IconButtonProps & {
   data?: AccountMenuItem[];
 };
 
+function isExternalMenuHref(option: AccountMenuItem): boolean {
+  if (option.external) return true;
+  const href = option.href || '';
+  return href.startsWith('http://') || href.startsWith('https://');
+}
+
 function isMenuItemActive(pathname: string, option: AccountMenuItem): boolean {
-  if (option.href && (pathname === option.href || pathname.startsWith(`${option.href}/`))) {
+  if (
+    option.href &&
+    !isExternalMenuHref(option) &&
+    (pathname === option.href || pathname.startsWith(`${option.href}/`))
+  ) {
     return true;
   }
 
   return !!option.children?.some(
-    (child) => child.href && (pathname === child.href || pathname.startsWith(`${child.href}/`))
+    (child) =>
+      child.href &&
+      !isExternalMenuHref(child) &&
+      (pathname === child.href || pathname.startsWith(`${child.href}/`))
   );
 }
 
@@ -105,6 +119,7 @@ const FALLBACK_ICONS: Record<string, string> = {
   'navigation.feed': 'solar:clapperboard-play-bold',
   'navigation.home': 'solar:home-2-bold',
   'navigation.wallet': 'solar:wallet-bold',
+  'navigation.transfer': 'solar:transfer-horizontal-bold',
   'navigation.withdrawal': 'solar:card-send-bold',
 };
 
@@ -277,7 +292,9 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
 
                   <Stack spacing={0} sx={{ position: 'relative', zIndex: 2 }}>
                     {option.children?.map((child, idx) => {
+                      const childExternal = isExternalMenuHref(child);
                       const childActive = !!(
+                        !childExternal &&
                         child.href &&
                         (pathname === child.href || pathname.startsWith(`${child.href}/`))
                       );
@@ -287,8 +304,11 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                       return (
                         <ButtonBase
                           key={child.labelKey}
-                          component={RouterLink}
+                          component={childExternal ? 'a' : RouterLink}
                           href={child.href || '#'}
+                          {...(childExternal
+                            ? { target: '_blank', rel: 'noopener noreferrer' }
+                            : {})}
                           onClick={onClose}
                           sx={{
                             width: 1,
@@ -707,8 +727,10 @@ export function AccountDrawer({ data = [], sx, ...other }: AccountDrawerProps) {
                 </Stack>
 
                 <ButtonBase
-                  component={RouterLink}
-                  href={paths.user.account.wallet}
+                  component="a"
+                  href={getBacShopWalletUrl()}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={onClose}
                   sx={{
                     px: 1.25,
