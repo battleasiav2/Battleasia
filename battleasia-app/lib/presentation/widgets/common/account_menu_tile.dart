@@ -43,15 +43,8 @@ class AccountMenuTile extends StatelessWidget {
     if (nested) {
       return InkWell(
         onTap: onTap,
-        child: Container(
+        child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(
-                color: Colors.white.withValues(alpha: 0.08),
-              ),
-            ),
-          ),
           child: Row(
             children: [
               if (icon != null) ...[
@@ -75,6 +68,7 @@ class AccountMenuTile extends StatelessWidget {
                     fontSize: 13,
                     letterSpacing: 0.6,
                     height: 1.2,
+                    decoration: TextDecoration.none,
                   ),
                 ),
               ),
@@ -86,15 +80,8 @@ class AccountMenuTile extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      child: Container(
+      child: Padding(
         padding: const EdgeInsets.fromLTRB(0, 10, 8, 10),
-        decoration: BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: AppColors.gold.withValues(alpha: 0.1),
-            ),
-          ),
-        ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -113,10 +100,11 @@ class AccountMenuTile extends StatelessWidget {
                 style: TextStyle(
                   color: active
                       ? Colors.white
-                      : Colors.white.withValues(alpha: 0.55),
-                  fontWeight: active ? FontWeight.w600 : FontWeight.w500,
+                      : Colors.white.withValues(alpha: 0.72),
+                  fontWeight: active ? FontWeight.w700 : FontWeight.w600,
                   fontSize: 20,
                   height: 1.25,
+                  decoration: TextDecoration.none,
                 ),
               ),
             ),

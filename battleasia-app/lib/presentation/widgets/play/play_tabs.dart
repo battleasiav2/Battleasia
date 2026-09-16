@@ -32,45 +32,37 @@ class PlayTabs extends StatelessWidget {
       baseSize: 16.0,
     ).clamp(12.0, 20.0);
 
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: AppColors.border(0.12)),
-        ),
-      ),
-      child: Row(
-        children: tabs.map((tab) {
+    return Row(
+      children: tabs.map((tab) {
           final isActive = activeTab == tab['value'];
           return Expanded(
             child: InkWell(
               onTap: () => onTabChanged(tab['value']!),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
+              child: Padding(
                 padding: EdgeInsets.symmetric(vertical: verticalPadding),
-                decoration: BoxDecoration(
-                  color: isActive
-                      ? AppColors.surfaceElevated.withValues(alpha: 0.6)
-                      : Colors.transparent,
-                  border: isActive
-                      ? Border(
-                          bottom: BorderSide(color: AppColors.gold, width: 2),
-                        )
-                      : null,
-                ),
-                child: Text(
-                  tab['label'] ?? '',
-                  textAlign: TextAlign.center,
-                  style: AppTheme.bodyLarge.copyWith(
-                    color: isActive ? AppColors.gold : AppColors.textMuted,
-                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                    fontSize: tabFontSize,
-                  ),
+                child: Column(
+                  children: [
+                    Text(
+                      tab['label'] ?? '',
+                      textAlign: TextAlign.center,
+                      style: AppTheme.bodyLarge.copyWith(
+                        color: isActive ? AppColors.gold : AppColors.textMuted,
+                        fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                        fontSize: tabFontSize,
+                        decoration: TextDecoration.none,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      height: 2,
+                      color: isActive ? AppColors.gold : Colors.transparent,
+                    ),
+                  ],
                 ),
               ),
             ),
           );
         }).toList(),
-      ),
     );
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -32,13 +30,11 @@ class AuthFormShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
-
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
         backgroundColor: const Color(0xFF060607),
-        resizeToAvoidBottomInset: true,
+        resizeToAvoidBottomInset: false,
         body: Stack(
           fit: StackFit.expand,
           children: [
@@ -57,49 +53,32 @@ class AuthFormShell extends StatelessWidget {
               ),
             ),
             SafeArea(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    physics: const ClampingScrollPhysics(),
-                    keyboardDismissBehavior:
-                        ScrollViewKeyboardDismissBehavior.onDrag,
-                    padding: EdgeInsets.fromLTRB(
-                      20,
-                      20,
-                      20,
-                      16 + bottomInset,
-                    ),
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: constraints.maxHeight - 12,
+              child: SingleChildScrollView(
+                physics: const ClampingScrollPhysics(),
+                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: wide ? 440 : 400,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _AuthPanel(
+                        title: title,
+                        description: description,
+                        progress: progress,
+                        steps: steps,
+                        showTrustRow: showTrustRow,
+                        child: child,
                       ),
-                      child: Center(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: wide ? 440 : 400,
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _AuthPanel(
-                                title: title,
-                                description: description,
-                                progress: progress,
-                                steps: steps,
-                                showTrustRow: showTrustRow,
-                                child: child,
-                              ),
-                              if (belowCard != null) ...[
-                                const SizedBox(height: 12),
-                                belowCard!,
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
+                      if (belowCard != null) ...[
+                        const SizedBox(height: 12),
+                        belowCard!,
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
@@ -130,9 +109,7 @@ class _AuthPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppColors.radius),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
+      child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
             color: AppColors.panelFill(),
@@ -230,7 +207,6 @@ class _AuthPanel extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }

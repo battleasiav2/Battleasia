@@ -11,6 +11,7 @@ import 'package:battleasia_app/core/services/public_dashboard_service.dart';
 import 'package:battleasia_app/data/models/public_dashboard_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/widgets/common/network_status_banner.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_hero_banner.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/play/game_card.dart';
@@ -99,8 +100,8 @@ class _PlayScreenState extends State<PlayScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Icon(
-              Icons.error_outline,
-              size: 64,
+              Icons.signal_wifi_statusbar_connected_no_internet_4,
+              size: 48,
               color: AppColors.textMuted,
             ),
             const SizedBox(height: 16),
@@ -208,6 +209,7 @@ class _PlayScreenState extends State<PlayScreen> {
             slivers: [
               // Add top padding for header
               SliverToBoxAdapter(child: SizedBox(height: topPadding)),
+              const SliverToBoxAdapter(child: NetworkStatusBanner()),
 
               // Hero Banner
               SliverToBoxAdapter(

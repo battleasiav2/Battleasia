@@ -4,11 +4,12 @@ import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/match_capacity_utils.dart';
+import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/utils/date_utils.dart' as date_utils;
 import 'package:battleasia_app/data/models/match_model.dart';
+import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
-/// Compact vertical match tile — 2-up grid after Play → game.
-class MatchCard extends StatelessWidget {
+class MatchCard extends StatefulWidget {
   final MatchModel match;
   final VoidCallback? onWatchLive;
   final VoidCallback onJoin;
@@ -35,307 +36,470 @@ class MatchCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    final capacity = getMatchCapacityState(
-      participantsCount: match.participantsCount,
-      totalPlayer: match.totalPlayer,
-    );
-    final isMatchFull = capacity.isFull;
-    final buttonDisabled = joining || isJoined || !canJoin;
-    final bannerUrl =
-        ImageUtils.getImageUrl(match.banner) ?? 'assets/images/game.webp';
+  State<MatchCard> createState() => _MatchCardState();
+}
 
-    return RepaintBoundary(
-      child: Material(
-        color: Colors.transparent,
-        clipBehavior: Clip.antiAlias,
-        borderRadius: BorderRadius.circular(14),
-        child: Ink(
-          decoration: BoxDecoration(
-            color: const Color(0xFF161618),
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.4),
-                blurRadius: 18,
-                offset: const Offset(0, 10),
+class _MatchCardState extends State<MatchCard> {
+  Widget _buildMaskedBanner(String bannerUrl) {
+    return ImageUtils.networkImage(
+      bannerUrl,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      memCacheWidth: 900,
+      errorWidget: Image.asset(
+        'assets/images/game.webp',
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return RepaintBoundary(child: _buildCard());
+  }
+
+  Widget _buildCard() {
+    final bannerUrl =
+        ImageUtils.getImageUrl(widget.match.banner) ?? 'assets/images/game.webp';
+    final buttonDisabled = widget.joining || widget.isJoined || !widget.canJoin;
+
+    final cardHeight = ResponsiveUtils.getResponsiveSpacing(
+      context,
+      baseSize: 220.0,
+    ).clamp(200.0, 230.0);
+
+    return Card(
+      color: Colors.transparent,
+      elevation: 0,
+      clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: Stack(
+        children: [
+          Container(
+            height: cardHeight,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              color: const Color(0xB8161618),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.09),
               ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(height: 2, color: AppColors.gold),
-              Expanded(
-                flex: 11,
-                child: Stack(
-                  fit: StackFit.expand,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.45),
+                  blurRadius: 24,
+                  offset: const Offset(0, 12),
+                ),
+              ],
+            ),
+            child: Stack(
+              children: [
+                Row(
                   children: [
-                    ImageUtils.networkImage(
-                      bannerUrl,
-                      fit: BoxFit.cover,
-                      memCacheWidth: 420,
-                      errorWidget: Image.asset(
-                        'assets/images/game.webp',
-                        fit: BoxFit.cover,
+                    Expanded(flex: 10, child: _buildBannerSection(bannerUrl)),
+                    Expanded(
+                      flex: 14,
+                      child: _buildMatchInfoSection(buttonDisabled),
+                    ),
+                  ],
+                ),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(height: 2, color: AppColors.gold),
+                ),
+              ],
+            ),
+          ),
+
+          if (widget.showLive)
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: 2,
+                color: AppColors.gold.withValues(alpha: 0.85),
+              ),
+            ),
+
+          if (widget.match.premiumOnly)
+            Positioned(
+              top: 8,
+              right: 8,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
+                  vertical: 3,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.amber.shade700,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.workspace_premium,
+                      color: Colors.white,
+                      size: 12,
+                    ),
+                    SizedBox(width: 3),
+                    Text(
+                      'PREMIUM',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
                       ),
                     ),
-                    const DecoratedBox(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Color(0x33000000),
-                            Color(0x00000000),
-                            Color(0xE0161618),
-                          ],
-                          stops: [0, 0.45, 1],
-                        ),
-                      ),
-                    ),
-                    if (showLive)
-                      Positioned(
-                        top: 8,
-                        left: 8,
-                        child: _Pill(
-                          color: const Color(0xFF22C55E),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                width: 5,
-                                height: 5,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              const Text(
-                                'LIVE',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    if (match.premiumOnly)
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: _Pill(
-                          color: Colors.amber.shade700,
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.workspace_premium, size: 10, color: Colors.white),
-                              SizedBox(width: 3),
-                              Text(
-                                'PRO',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
                   ],
                 ),
               ),
-              Expanded(
-                flex: 12,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      GestureDetector(
-                        onTap: onMatchNameTap,
-                        child: Text(
-                          match.matchName,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: AppTheme.heading3.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 13,
-                            height: 1.2,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '${date_utils.DateUtils.formatDateTime(match.matchSchedule)} · ${capacity.joined}/${capacity.max}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: AppColors.gold.withValues(alpha: 0.95),
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _Stat(
-                              label: 'ENTRY',
-                              value: match.entryFee.toStringAsFixed(0),
-                              accent: AppColors.gold,
-                            ),
-                          ),
-                          Expanded(
-                            child: _Stat(
-                              label: 'KILL',
-                              value: match.perKill.toStringAsFixed(0),
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (match.prizeDescription != null &&
-                          match.prizeDescription!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          match.prizeDescription!,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color(0xFF22C55E),
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                      const Spacer(),
-                      if (isJoined && (match.roomId?.isNotEmpty ?? false))
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: GestureDetector(
-                            onTap: onShowRoomDetails,
-                            child: Text(
-                              'ID & PASS',
-                              style: TextStyle(
-                                color: AppColors.gold,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                decoration: TextDecoration.underline,
-                                decorationColor: AppColors.gold,
-                              ),
-                            ),
-                          ),
-                        )
-                      else if (isJoined)
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 6),
-                          child: GestureDetector(
-                            onTap: onShowRoomDetails,
-                            child: Text(
-                              'ID & PASSWORD',
-                              style: TextStyle(
-                                color: AppColors.gold,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                decoration: TextDecoration.underline,
-                                decorationColor: AppColors.gold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      SizedBox(
-                        height: 34,
-                        child: isJoined
-                            ? OutlinedButton(
-                                onPressed: buttonDisabled ? null : onJoin,
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: AppColors.gold,
-                                  side: BorderSide(
-                                    color: AppColors.gold.withValues(alpha: 0.55),
-                                  ),
-                                  backgroundColor: Colors.black.withValues(alpha: 0.35),
-                                  padding: EdgeInsets.zero,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: const Text(
-                                  'SPECTATE',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w800,
-                                    fontSize: 11,
-                                    letterSpacing: 0.6,
-                                  ),
-                                ),
-                              )
-                            : isMatchFull
-                                ? OutlinedButton(
-                                    onPressed: null,
-                                    style: OutlinedButton.styleFrom(
-                                      foregroundColor: const Color(0xFFEF4444),
-                                      side: BorderSide(
-                                        color: const Color(0xFFEF4444)
-                                            .withValues(alpha: 0.45),
-                                      ),
-                                      backgroundColor:
-                                          Colors.black.withValues(alpha: 0.3),
-                                      padding: EdgeInsets.zero,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                    child: Text(
-                                      'match.matchFull'.tr(),
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w800,
-                                        fontSize: 11,
-                                        letterSpacing: 0.5,
-                                      ),
-                                    ),
-                                  )
-                                : FilledButton(
-                                    onPressed: buttonDisabled ? null : onJoin,
-                                    style: FilledButton.styleFrom(
-                                      backgroundColor: AppColors.gold,
-                                      foregroundColor: const Color(0xFF111111),
-                                      disabledBackgroundColor:
-                                          AppColors.gold.withValues(alpha: 0.35),
-                                      padding: EdgeInsets.zero,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                    child: joining
-                                        ? const SizedBox(
-                                            width: 16,
-                                            height: 16,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: Color(0xFF111111),
-                                            ),
-                                          )
-                                        : const Text(
-                                            'JOIN',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w900,
-                                              fontSize: 12,
-                                              letterSpacing: 0.8,
-                                            ),
-                                          ),
-                                  ),
-                      ),
-                    ],
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBannerSection(String bannerUrl) {
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(17),
+        bottomLeft: Radius.circular(17),
+      ),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          _buildMaskedBanner(bannerUrl),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                colors: [
+                  Colors.transparent,
+                  const Color(0xFF161618).withValues(alpha: 0.85),
+                ],
+                stops: const [0.4, 1],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMatchInfoSection(bool buttonDisabled) {
+    final capacity = getMatchCapacityState(
+      participantsCount: widget.match.participantsCount,
+      totalPlayer: widget.match.totalPlayer,
+    );
+    final isMatchFull = capacity.isFull;
+    // Responsive sizes
+    final contentPadding = ResponsiveUtils.getResponsiveSpacing(
+      context,
+      baseSize: 12.0,
+    ).clamp(8.0, 12.0);
+
+    final contentPaddingTop = ResponsiveUtils.getResponsiveSpacing(
+      context,
+      baseSize: 12.0,
+    ).clamp(10.0, 14.0);
+
+    final contentPaddingRight = ResponsiveUtils.getResponsiveSpacing(
+      context,
+      baseSize: 14.0,
+    ).clamp(10.0, 14.0);
+
+    final contentPaddingBottom = ResponsiveUtils.getResponsiveSpacing(
+      context,
+      baseSize: 12.0,
+    ).clamp(10.0, 14.0);
+
+    final titleFontSize = ResponsiveUtils.getResponsiveFontSize(
+      context,
+      baseSize: 15.0,
+      min: 13.0,
+      max: 17.0,
+    );
+
+    final linkFontSize = ResponsiveUtils.getResponsiveFontSize(
+      context,
+      baseSize: 12.0,
+      min: 11.0,
+      max: 13.0,
+    );
+
+    final dateFontSize = ResponsiveUtils.getResponsiveFontSize(
+      context,
+      baseSize: 12.0,
+      min: 11.0,
+      max: 13.0,
+    );
+
+    final labelFontSize = ResponsiveUtils.getResponsiveFontSize(
+      context,
+      baseSize: 9.0,
+      min: 8.0,
+      max: 11.0,
+    );
+
+    final valueFontSize = ResponsiveUtils.getResponsiveFontSize(
+      context,
+      baseSize: 12.0,
+      min: 11.0,
+      max: 13.0,
+    );
+
+    final spacing8 = ResponsiveUtils.getResponsiveSpacing(
+      context,
+      baseSize: 8.0,
+    ).clamp(4.0, 8.0);
+
+    final spacing4 = ResponsiveUtils.getResponsiveSpacing(
+      context,
+      baseSize: 4.0,
+    ).clamp(2.0, 4.0);
+
+    final spacing12 = ResponsiveUtils.getResponsiveSpacing(
+      context,
+      baseSize: 10.0,
+    ).clamp(8.0, 12.0);
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(
+        contentPadding,
+        contentPaddingTop,
+        contentPaddingRight,
+        contentPaddingBottom,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: widget.onMatchNameTap,
+                child: Text(
+                  widget.match.matchName,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppTheme.heading3.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: titleFontSize,
                   ),
                 ),
               ),
+              SizedBox(height: spacing4),
+
+              Text(
+                '${date_utils.DateUtils.formatDateTime(widget.match.matchSchedule)} · ${capacity.joined}/${capacity.max}',
+                style: AppTheme.bodySmall.copyWith(
+                  color: AppTheme.accentColor,
+                  fontSize: dateFontSize,
+                ),
+              ),
+              SizedBox(height: spacing8),
+
+              if (widget.isJoined &&
+                  (widget.match.roomId?.isNotEmpty ?? false))
+                _RoomTicketStub(
+                  roomId: widget.match.roomId!,
+                  password: widget.match.password,
+                  onTap: widget.onShowRoomDetails,
+                )
+              else if (widget.isJoined)
+                GestureDetector(
+                  onTap: widget.onShowRoomDetails,
+                  child: Text(
+                    'ID & PASSWORD',
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppColors.gold,
+                      decoration: TextDecoration.underline,
+                      fontSize: linkFontSize,
+                    ),
+                  ),
+                ),
+              SizedBox(height: spacing12),
+
+              // Statistics row
+              Row(
+                children: [
+                  // Prize Pool
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'PRIZE POOL',
+                          style: AppTheme.bodySmall.copyWith(
+                            color: Colors.green,
+                            fontWeight: FontWeight.w600,
+                            fontSize: labelFontSize,
+                          ),
+                        ),
+                        SizedBox(height: spacing4),
+                        Text(
+                          widget.match.prizeDescription ?? 'N/A',
+                          style: AppTheme.bodySmall.copyWith(
+                            color: Colors.green,
+                            fontSize: valueFontSize,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: ResponsiveUtils.getResponsiveSpacing(
+                      context,
+                      baseSize: 12.0,
+                    ).clamp(8.0, 12.0),
+                  ),
+                  // Per Kill
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'PER KILL',
+                          style: AppTheme.bodySmall.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: labelFontSize,
+                          ),
+                        ),
+                        SizedBox(height: spacing4),
+                        Text(
+                          '${widget.match.perKill.toStringAsFixed(0)}',
+                          style: AppTheme.bodyMedium.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: valueFontSize,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+
+          widget.isJoined
+              ? OutlinedButton(
+                  onPressed: buttonDisabled ? null : widget.onJoin,
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 40),
+                    foregroundColor: AppColors.gold,
+                    side: BorderSide(
+                      color: AppColors.gold.withValues(alpha: 0.55),
+                    ),
+                    backgroundColor: Colors.black.withValues(alpha: 0.4),
+                  ),
+                  child: Text(
+                    '${widget.match.entryFee.toStringAsFixed(0)} SPECTATE',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 12,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                )
+              : isMatchFull
+                  ? OutlinedButton(
+                      onPressed: null,
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 40),
+                        foregroundColor: const Color(0xFFEF4444),
+                        side: BorderSide(
+                          color: const Color(0xFFEF4444).withValues(alpha: 0.45),
+                        ),
+                        backgroundColor: Colors.black.withValues(alpha: 0.35),
+                      ),
+                      child: Text(
+                        'match.matchFull'.tr(),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 12,
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    )
+                  : GoldButton(
+                      label: 'JOIN MATCH',
+                      loading: widget.joining,
+                      onPressed: buttonDisabled ? null : widget.onJoin,
+                    ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RoomTicketStub extends StatelessWidget {
+  final String roomId;
+  final String? password;
+  final VoidCallback? onTap;
+
+  const _RoomTicketStub({
+    required this.roomId,
+    this.password,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: CustomPaint(
+        painter: _DashedBorderPainter(
+          color: AppColors.gold.withValues(alpha: 0.45),
+        ),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          color: Colors.black.withValues(alpha: 0.35),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'ROOM ID',
+                style: AppTheme.bodySmall.copyWith(
+                  color: AppColors.gold,
+                  fontSize: 8,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              Text(
+                roomId,
+                style: AppTheme.bodySmall.copyWith(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+              if (password != null && password!.isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(
+                  'PASS  $password',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: Colors.white.withValues(alpha: 0.85),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ],
           ),
         ),
@@ -344,56 +508,30 @@ class MatchCard extends StatelessWidget {
   }
 }
 
-class _Pill extends StatelessWidget {
+class _DashedBorderPainter extends CustomPainter {
   final Color color;
-  final Widget child;
-
-  const _Pill({required this.color, required this.child});
+  const _DashedBorderPainter({required this.color});
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: child,
-    );
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+    const dash = 4.0;
+    const gap = 3.0;
+    final path = Path()..addRect(Rect.fromLTWH(0.5, 0.5, size.width - 1, size.height - 1));
+    for (final metric in path.computeMetrics()) {
+      var distance = 0.0;
+      while (distance < metric.length) {
+        final next = (distance + dash).clamp(0, metric.length).toDouble();
+        canvas.drawPath(metric.extractPath(distance, next), paint);
+        distance += dash + gap;
+      }
+    }
   }
-}
-
-class _Stat extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color? accent;
-
-  const _Stat({required this.label, required this.value, this.accent});
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.45),
-            fontSize: 8,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.6,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: TextStyle(
-            color: accent ?? Colors.white,
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ],
-    );
-  }
+  bool shouldRepaint(covariant _DashedBorderPainter oldDelegate) =>
+      oldDelegate.color != color;
 }

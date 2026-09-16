@@ -11,6 +11,7 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/match_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/widgets/common/network_status_banner.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/play/match_card.dart';
 import 'package:battleasia_app/presentation/widgets/play/join_arena_card.dart';
@@ -350,24 +351,25 @@ class _MatchScreenState extends State<MatchScreen> {
       context,
       baseSize: 16.0,
     ).clamp(10.0, 16.0);
-    final gridGap = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 10.0,
-    ).clamp(8.0, 12.0);
 
     if (_isLoading) {
-      return SliverPadding(
-        padding: EdgeInsets.fromLTRB(horizontalPadding, 12, horizontalPadding, 0),
-        sliver: SliverGrid(
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: gridGap,
-            mainAxisSpacing: gridGap,
-            childAspectRatio: 0.62,
-          ),
-          delegate: SliverChildBuilderDelegate(
-            (context, index) => const _MatchCardSkeleton(),
-            childCount: 4,
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(horizontalPadding, 24, horizontalPadding, 0),
+          child: Column(
+            children: [
+              Icon(Icons.signal_cellular_alt, color: AppColors.gold, size: 28),
+              const SizedBox(height: 12),
+              CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2.4),
+              const SizedBox(height: 12),
+              Text(
+                'Loading matches…',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.6),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
           ),
         ),
       );
@@ -399,19 +401,16 @@ class _MatchScreenState extends State<MatchScreen> {
     }
 
     return SliverPadding(
-      padding: EdgeInsets.fromLTRB(horizontalPadding, 12, horizontalPadding, 0),
-      sliver: SliverGrid(
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: gridGap,
-          mainAxisSpacing: gridGap,
-          childAspectRatio: 0.62,
-        ),
+      padding: EdgeInsets.fromLTRB(horizontalPadding, 8, horizontalPadding, 0),
+      sliver: SliverList(
         delegate: SliverChildBuilderDelegate(
-          (context, index) => _buildMatchCard(
-            matches[index],
-            showLive,
-            isResult: isResult,
+          (context, index) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _buildMatchCard(
+              matches[index],
+              showLive,
+              isResult: isResult,
+            ),
           ),
           childCount: matches.length,
         ),
@@ -467,6 +466,7 @@ class _MatchScreenState extends State<MatchScreen> {
             slivers: [
               // Add top padding for header
               SliverToBoxAdapter(child: SizedBox(height: topPadding)),
+              const SliverToBoxAdapter(child: NetworkStatusBanner()),
 
               // Back button
               SliverToBoxAdapter(
@@ -1264,60 +1264,6 @@ class _MatchScreenState extends State<MatchScreen> {
                 ),
               ),
             ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MatchCardSkeleton extends StatelessWidget {
-  const _MatchCardSkeleton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF161618),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Column(
-        children: [
-          Container(height: 2, color: AppColors.gold.withValues(alpha: 0.35)),
-          Expanded(
-            flex: 11,
-            child: Container(color: Colors.white.withValues(alpha: 0.04)),
-          ),
-          Expanded(
-            flex: 12,
-            child: Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    height: 12,
-                    width: double.infinity,
-                    color: Colors.white.withValues(alpha: 0.08),
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    height: 10,
-                    width: 96,
-                    color: Colors.white.withValues(alpha: 0.06),
-                  ),
-                  const Spacer(),
-                  Container(
-                    height: 34,
-                    decoration: BoxDecoration(
-                      color: AppColors.gold.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           ),
         ],
       ),
