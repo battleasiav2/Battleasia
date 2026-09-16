@@ -98,7 +98,6 @@ class _MatchScreenState extends State<MatchScreen> {
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final user = authProvider.user;
-    final balance = user?.balance ?? 0.0;
     final isPremiumUser = user?.isPremiumActive ?? false;
 
     // Block non-premium users from joining premium-only matches
@@ -304,11 +303,6 @@ class _MatchScreenState extends State<MatchScreen> {
   Widget _buildMatchCard(MatchModel match, bool showLive, {bool isResult = false}) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final isPremiumUser = authProvider.user?.isPremiumActive ?? false;
-    
-    final horizontalPadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(8.0, 16.0);
 
     void goToResult() {
       Navigator.push(
@@ -319,61 +313,61 @@ class _MatchScreenState extends State<MatchScreen> {
       );
     }
 
-    final card = Padding(
-      padding: EdgeInsets.fromLTRB(
-        horizontalPadding,
-        8,
-        horizontalPadding,
-        0,
-      ),
-      child: MatchCard(
-        match: match,
-        onWatchLive: isResult ? null : _handleWatchLive,
-        onJoin: isResult ? () {} : () => _handleJoinMatch(match),
-        onShowRoomDetails: isResult ? null : () => _handleShowRoomDetails(match),
-        onMatchNameTap: isResult
-            ? goToResult
-            : () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MatchDetailScreen(matchId: match.id),
-                  ),
-                );
-              },
-        joining: _joiningMatchId == match.id,
-        canJoin: isMatchJoinableByCapacity(
-              participantsCount: match.participantsCount,
-              totalPlayer: match.totalPlayer,
-            ) &&
-            (!match.premiumOnly || isPremiumUser),
-        isJoined: match.isJoined,
-        showLive: isResult ? false : showLive,
-        isPremiumUser: isPremiumUser,
-      ),
+    final card = MatchCard(
+      match: match,
+      onWatchLive: isResult ? null : _handleWatchLive,
+      onJoin: isResult ? () {} : () => _handleJoinMatch(match),
+      onShowRoomDetails: isResult ? null : () => _handleShowRoomDetails(match),
+      onMatchNameTap: isResult
+          ? goToResult
+          : () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MatchDetailScreen(matchId: match.id),
+                ),
+              );
+            },
+      joining: _joiningMatchId == match.id,
+      canJoin: isMatchJoinableByCapacity(
+            participantsCount: match.participantsCount,
+            totalPlayer: match.totalPlayer,
+          ) &&
+          (!match.premiumOnly || isPremiumUser),
+      isJoined: match.isJoined,
+      showLive: isResult ? false : showLive,
+      isPremiumUser: isPremiumUser,
     );
 
     if (isResult) {
-      return GestureDetector(
-        onTap: goToResult,
-        child: card,
-      );
+      return GestureDetector(onTap: goToResult, child: card);
     }
     return card;
   }
 
   Widget _buildMatchGrid(List<MatchModel> matches, {bool showLive = false, bool isResult = false}) {
+    final horizontalPadding = ResponsiveUtils.getResponsiveSpacing(
+      context,
+      baseSize: 16.0,
+    ).clamp(10.0, 16.0);
+    final gridGap = ResponsiveUtils.getResponsiveSpacing(
+      context,
+      baseSize: 10.0,
+    ).clamp(8.0, 12.0);
+
     if (_isLoading) {
-      return SliverToBoxAdapter(
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(
-              ResponsiveUtils.getResponsiveSpacing(
-                context,
-                baseSize: 32.0,
-              ).clamp(24.0, 32.0),
-            ),
-            child: const CircularProgressIndicator(color: AppTheme.accentColor),
+      return SliverPadding(
+        padding: EdgeInsets.fromLTRB(horizontalPadding, 12, horizontalPadding, 0),
+        sliver: SliverGrid(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: gridGap,
+            mainAxisSpacing: gridGap,
+            childAspectRatio: 0.62,
+          ),
+          delegate: SliverChildBuilderDelegate(
+            (context, index) => const _MatchCardSkeleton(),
+            childCount: 4,
           ),
         ),
       );
@@ -404,17 +398,24 @@ class _MatchScreenState extends State<MatchScreen> {
       );
     }
 
-    final cardHeight = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 280.0,
-    ).clamp(250.0, 280.0);
-    
-    return SliverFixedExtentList(
-      itemExtent: cardHeight,
-      delegate: SliverChildBuilderDelegate((context, index) {
-        final match = matches[index];
-        return _buildMatchCard(match, showLive, isResult: isResult);
-      }, childCount: matches.length),
+    return SliverPadding(
+      padding: EdgeInsets.fromLTRB(horizontalPadding, 12, horizontalPadding, 0),
+      sliver: SliverGrid(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: gridGap,
+          mainAxisSpacing: gridGap,
+          childAspectRatio: 0.62,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) => _buildMatchCard(
+            matches[index],
+            showLive,
+            isResult: isResult,
+          ),
+          childCount: matches.length,
+        ),
+      ),
     );
   }
 
@@ -1263,6 +1264,60 @@ class _MatchScreenState extends State<MatchScreen> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MatchCardSkeleton extends StatelessWidget {
+  const _MatchCardSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF161618),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      ),
+      child: Column(
+        children: [
+          Container(height: 2, color: AppColors.gold.withValues(alpha: 0.35)),
+          Expanded(
+            flex: 11,
+            child: Container(color: Colors.white.withValues(alpha: 0.04)),
+          ),
+          Expanded(
+            flex: 12,
+            child: Padding(
+              padding: const EdgeInsets.all(10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    height: 12,
+                    width: double.infinity,
+                    color: Colors.white.withValues(alpha: 0.08),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    height: 10,
+                    width: 96,
+                    color: Colors.white.withValues(alpha: 0.06),
+                  ),
+                  const Spacer(),
+                  Container(
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: AppColors.gold.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),

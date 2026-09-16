@@ -7,7 +7,7 @@ import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/providers/accent_provider.dart';
-import 'package:battleasia_app/presentation/screens/auth/auth_wrapper.dart';
+import 'package:battleasia_app/presentation/screens/splash/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -74,7 +74,7 @@ class BattleAsiaApp extends StatelessWidget {
             locale: context.locale,
             supportedLocales: context.supportedLocales,
             localizationsDelegates: context.localizationDelegates,
-            home: const AuthWrapper(),
+            home: const SplashScreen(),
           );
         },
       ),
