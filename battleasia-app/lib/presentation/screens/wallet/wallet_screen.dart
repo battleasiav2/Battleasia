@@ -10,6 +10,7 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/balance_history_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
 import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/withdraw_sheet.dart';
@@ -473,7 +474,10 @@ class _WalletScreenState extends State<WalletScreen> {
           ),
 
           // Bottom menu
-          const FloatingBottomNav(),
+          if (widget.fromShop)
+            const ShopSectionNav(active: ShopNavTab.wallet)
+          else
+            const FloatingBottomNav(),
         ],
       ),
     );

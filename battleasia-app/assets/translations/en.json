@@ -252,9 +252,10 @@
   "shop": {
     "tabShop": "Shop",
     "tabWallet": "Wallet",
+    "tabTransfer": "Transfer",
     "tabWithdraw": "Withdraw",
     "signInTitle": "Sign in to BAC Store",
-    "signInDesc": "Shop needs your BattleAsia account. Stay signed in while online — if the network drops, sign in again to open Shop.",
+    "signInDesc": "Shop uses your BattleAsia login. Email and password stay saved so you don't type them every visit.",
     "heroTitle": "BAC COIN SHOP",
     "heroSubtitle": "Secure payments • Instant BAC delivery after approval",
     "goToBacShop": "Go to BAC Shop",

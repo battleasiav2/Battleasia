@@ -15,6 +15,7 @@ class AuthTextField extends StatelessWidget {
   final int maxLines;
   final TextInputAction? textInputAction;
   final VoidCallback? onEditingComplete;
+  final Iterable<String>? autofillHints;
 
   const AuthTextField({
     super.key,
@@ -30,6 +31,7 @@ class AuthTextField extends StatelessWidget {
     this.maxLines = 1,
     this.textInputAction,
     this.onEditingComplete,
+    this.autofillHints,
   });
 
   @override
@@ -55,6 +57,7 @@ class AuthTextField extends StatelessWidget {
             validator: validator,
             textInputAction: textInputAction,
             onEditingComplete: onEditingComplete,
+            autofillHints: autofillHints,
             style: AppTheme.bodyMedium.copyWith(
               color: AppColors.textPrimary,
               fontSize: 15,

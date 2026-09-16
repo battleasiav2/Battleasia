@@ -1,10 +1,9 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
-import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_coin_transfer_panel.dart';
 
 /// Shop wallet tab — user-to-user BAC transfer (web shop `/user/transfer` parity).
@@ -64,7 +63,7 @@ class _ShopWalletScreenState extends State<ShopWalletScreen> {
               right: 0,
               child: AppHeader(scrollController: _scrollController),
             ),
-            const FloatingBottomNav(),
+            const ShopSectionNav(active: ShopNavTab.transfer),
           ],
         ),
       ),

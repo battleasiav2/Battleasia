@@ -244,9 +244,10 @@
   "shop": {
     "tabShop": "শপ",
     "tabWallet": "ওয়ালেট",
+    "tabTransfer": "ট্রান্সফার",
     "tabWithdraw": "উইথড্র",
     "signInTitle": "BAC স্টোরে সাইন ইন",
-    "signInDesc": "শপের জন্য BattleAsia অ্যাকাউন্ট লাগবে। অনলাইনে থাকলে একবার লগইনই যথেষ্ট — নেট বন্ধ হলে শপ খুলতে আবার সাইন ইন করুন।",
+    "signInDesc": "শপে আপনার BattleAsia লগইন লাগে। ইমেইল ও পাসওয়ার্ড সেভ থাকবে যাতে বারবার লিখতে না হয়।",
     "heroTitle": "BAC COIN SHOP",
     "heroSubtitle": "Secure payments • Instant BAC delivery after approval",
     "goToBacShop": "BAC শপে যান",

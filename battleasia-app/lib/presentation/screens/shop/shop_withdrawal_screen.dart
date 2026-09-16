@@ -8,7 +8,7 @@ import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
-import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
 import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
 import 'package:battleasia_app/presentation/widgets/common/glass_stat_tile.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
@@ -362,7 +362,7 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
             right: 0,
             child: AppHeader(scrollController: _scrollController),
           ),
-          const FloatingBottomNav(),
+          const ShopSectionNav(active: ShopNavTab.withdraw),
         ],
       ),
     );

@@ -20,6 +20,7 @@ class AppTheme {
     fontFamily: 'Poppins',
     height: 1.15,
     letterSpacing: 0.3,
+    decoration: TextDecoration.none,
   );
 
   static const TextStyle heading2 = TextStyle(
@@ -28,6 +29,7 @@ class AppTheme {
     color: AppColors.textPrimary,
     fontFamily: 'Poppins',
     height: 1.25,
+    decoration: TextDecoration.none,
   );
 
   static const TextStyle heading3 = TextStyle(
@@ -35,6 +37,7 @@ class AppTheme {
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
     fontFamily: 'Poppins',
+    decoration: TextDecoration.none,
   );
 
   static const TextStyle headingSmall = TextStyle(
@@ -42,6 +45,7 @@ class AppTheme {
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
     fontFamily: 'Poppins',
+    decoration: TextDecoration.none,
   );
 
   static const TextStyle bodyLarge = TextStyle(
@@ -49,6 +53,7 @@ class AppTheme {
     fontWeight: FontWeight.w500,
     color: AppColors.textBody,
     fontFamily: 'Poppins',
+    decoration: TextDecoration.none,
   );
 
   static const TextStyle bodyMedium = TextStyle(
@@ -56,6 +61,7 @@ class AppTheme {
     fontWeight: FontWeight.w500,
     color: AppColors.textBody,
     fontFamily: 'Poppins',
+    decoration: TextDecoration.none,
   );
 
   static const TextStyle bodySmall = TextStyle(
@@ -63,6 +69,7 @@ class AppTheme {
     fontWeight: FontWeight.w500,
     color: AppColors.textMuted,
     fontFamily: 'Poppins',
+    decoration: TextDecoration.none,
   );
 
   static TextStyle get labelUppercase => TextStyle(
@@ -78,7 +85,7 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       primaryColor: AppColors.gold,
-      scaffoldBackgroundColor: AppColors.pageBg,
+      scaffoldBackgroundColor: Colors.transparent,
       colorScheme: ColorScheme.dark(
         primary: AppColors.gold,
         secondary: AppColors.goldAccent,

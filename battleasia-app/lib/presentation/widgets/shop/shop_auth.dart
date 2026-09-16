@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 
-/// Navigate to a shop screen — fresh login required each visit (web shop AuthGuard parity).
+/// Open a shop screen. Already signed-in users skip the login prompt.
 Future<void> openShopRoute(
   BuildContext context,
   Widget screen, {
   String? routeName,
 }) async {
-  ShopAuthGate.clearShopSession();
-
   final allowed = await ShopAuthGate.ensureShopAccess(context);
   if (!context.mounted) return;
 
@@ -28,6 +26,7 @@ Future<void> openShopRoute(
     return;
   }
 
+  ShopAuthGate.markShopSessionActive();
   await Navigator.of(context).pushReplacement(
     MaterialPageRoute(
       builder: (_) => screen,

@@ -11,7 +11,7 @@ class AppColors {
   static Color goldAccent = const Color(0xFFF59E0B);
   static Color goldInk = const Color(0xFF111111);
 
-  static const Color pageBg = Color(0xFF060607);
+  static const Color pageBg = Color(0xC2060607);
   static const Color surface = Color(0xFF0B0B0D);
   static const Color surfaceElevated = Color(0xFF161618);
   static const Color panel = Color(0xFF161618);

@@ -16,6 +16,8 @@ import 'package:battleasia_app/presentation/widgets/auth/auth_text_field.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 
 const _rememberEmailKey = 'ba_remember_email';
+const _rememberPasswordKey = 'ba_remember_password';
+const _rememberFlagKey = 'ba_remember_me';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({
@@ -38,23 +40,26 @@ class _SignInScreenState extends State<SignInScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
-  bool _rememberMe = false;
+  bool _rememberMe = true;
   String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _loadRememberedEmail();
+    _loadRememberedCredentials();
   }
 
-  Future<void> _loadRememberedEmail() async {
+  Future<void> _loadRememberedCredentials() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      final saved = prefs.getString(_rememberEmailKey);
-      if (!mounted || saved == null || saved.isEmpty) return;
+      final remember = prefs.getBool(_rememberFlagKey) ?? true;
+      final email = prefs.getString(_rememberEmailKey) ?? '';
+      final password = prefs.getString(_rememberPasswordKey) ?? '';
+      if (!mounted) return;
       setState(() {
-        _emailController.text = saved;
-        _rememberMe = true;
+        _rememberMe = remember;
+        if (email.isNotEmpty) _emailController.text = email;
+        if (password.isNotEmpty) _passwordController.text = password;
       });
     } catch (_) {}
   }
@@ -66,13 +71,16 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
-  Future<void> _persistRememberedEmail(String email) async {
+  Future<void> _persistRememberedCredentials(String email, String password) async {
     try {
       final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_rememberFlagKey, _rememberMe);
       if (_rememberMe) {
         await prefs.setString(_rememberEmailKey, email);
+        await prefs.setString(_rememberPasswordKey, password);
       } else {
         await prefs.remove(_rememberEmailKey);
+        await prefs.remove(_rememberPasswordKey);
       }
     } catch (_) {}
   }
@@ -83,16 +91,17 @@ class _SignInScreenState extends State<SignInScreen> {
     setState(() => _errorMessage = null);
 
     final email = _emailController.text.trim();
+    final password = _passwordController.text;
     final authProvider = context.read<AuthProvider>();
     final result = await authProvider.signIn(
       email: email,
-      password: _passwordController.text,
+      password: password,
     );
 
     if (!mounted) return;
 
     if (result['success'] == true) {
-      await _persistRememberedEmail(email);
+      await _persistRememberedCredentials(email, password);
       if (!mounted) return;
       if (result['emailVerificationRequired'] == true) {
         final verifyEmail = result['email'] as String? ?? email;
@@ -124,7 +133,8 @@ class _SignInScreenState extends State<SignInScreen> {
     return AuthFormShell(
       title: widget.titleKey.tr(),
       description: 'auth.signInDescription'.tr(),
-      child: Form(
+      child: AutofillGroup(
+        child: Form(
         key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -140,6 +150,7 @@ class _SignInScreenState extends State<SignInScreen> {
               keyboardType: TextInputType.emailAddress,
               prefixIcon: Icons.mail_outline,
               textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.email, AutofillHints.username],
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return 'auth.emailRequired'.tr();
@@ -155,6 +166,7 @@ class _SignInScreenState extends State<SignInScreen> {
               hint: 'auth.passwordPlaceholder'.tr(),
               obscureText: _obscurePassword,
               prefixIcon: Icons.lock_outline,
+              autofillHints: const [AutofillHints.password],
               suffix: IconButton(
                 icon: Icon(
                   _obscurePassword
@@ -267,6 +279,7 @@ class _SignInScreenState extends State<SignInScreen> {
               textAlign: TextAlign.center,
             ),
           ],
+        ),
         ),
       ),
     );

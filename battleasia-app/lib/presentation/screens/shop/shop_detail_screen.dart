@@ -9,7 +9,7 @@ import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/shop_item_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
-import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_buy_flow.dart';
 
@@ -1081,7 +1081,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
             right: 0,
             child: AppHeader(scrollController: _scrollController),
           ),
-          const FloatingBottomNav(),
+          const ShopSectionNav(active: ShopNavTab.shop),
         ],
       ),
     );

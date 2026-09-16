@@ -38,11 +38,6 @@ class GlassStatTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(radius),
                 border: Border.all(color: AppColors.hair()),
               ),
-              foregroundDecoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
-                ),
-              ),
               child: icon != null ? _buildWithIcon() : _buildSimple(),
             ),
             Positioned(

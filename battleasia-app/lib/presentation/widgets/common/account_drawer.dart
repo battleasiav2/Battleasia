@@ -168,7 +168,7 @@ class AccountDrawer extends StatelessWidget {
             ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: const Color(0xFF060607),
+                color: const Color(0xE8060607),
                 border: Border(
                   left: BorderSide(
                     color: Colors.white.withValues(alpha: 0.09),
@@ -334,13 +334,7 @@ class _AccountDrawerContent extends StatelessWidget {
   }
 
   Widget _buildExpandableAccountMenu(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: AppColors.gold.withValues(alpha: 0.1)),
-        ),
-      ),
-      child: Theme(
+    return Theme(
         data: Theme.of(context).copyWith(
           dividerColor: Colors.transparent,
           splashColor: Colors.transparent,
@@ -372,6 +366,7 @@ class _AccountDrawerContent extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     fontSize: 20,
                     height: 1.25,
+                    decoration: TextDecoration.none,
                   ),
                 ),
               ),
@@ -440,7 +435,7 @@ class _AccountDrawerContent extends StatelessWidget {
                     openShopRoute(
                       context,
                       const ShopWalletScreen(),
-                      routeName: '/shop/wallet',
+                      routeName: '/shop/transfer',
                     );
                   },
                 ),
@@ -547,7 +542,6 @@ class _AccountDrawerContent extends StatelessWidget {
             ),
           ),
         ],
-        ),
       ),
     );
   }
@@ -580,170 +574,170 @@ class _HomeProfileCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
       ),
-      child: Stack(
-        children: [
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            child: Container(
-              width: 2,
-              color: AppColors.gold.withValues(alpha: 0.45),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Row(
+                Stack(
+                  clipBehavior: Clip.none,
                   children: [
-                    Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: avatarUrl != null && avatarUrl!.isNotEmpty
-                              ? Image.network(
-                                  avatarUrl!,
-                                  width: 48,
-                                  height: 48,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => _avatarFallback(displayName),
-                                )
-                              : _avatarFallback(displayName),
-                        ),
-                        Positioned(
-                          right: -2,
-                          bottom: -2,
-                          child: Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF22C55E),
-                              shape: BoxShape.circle,
-                              border: Border.all(color: const Color(0xFF161618), width: 2),
-                            ),
-                          ),
-                        ),
-                      ],
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: avatarUrl != null && avatarUrl!.isNotEmpty
+                          ? Image.network(
+                              avatarUrl!,
+                              width: 48,
+                              height: 48,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) =>
+                                  _avatarFallback(displayName),
+                            )
+                          : _avatarFallback(displayName),
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            displayName.toUpperCase(),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.4,
-                            ),
+                    Positioned(
+                      right: -2,
+                      bottom: -2,
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF22C55E),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFF161618),
+                            width: 2,
                           ),
-                          const SizedBox(height: 4),
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: AppColors.gold.withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(999),
-                                  border: Border.all(
-                                    color: AppColors.gold.withValues(alpha: 0.35),
-                                  ),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.verified, size: 11, color: AppColors.gold),
-                                    const SizedBox(width: 3),
-                                    Text(
-                                      'VERIFIED',
-                                      style: TextStyle(
-                                        color: AppColors.gold,
-                                        fontSize: 9.5,
-                                        fontWeight: FontWeight.w800,
-                                        letterSpacing: 0.6,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              if (pubgId.isNotEmpty) ...[
-                                const SizedBox(width: 8),
-                                Flexible(
-                                  child: Text(
-                                    'ID: $pubgId',
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      color: Colors.white.withValues(alpha: 0.48),
-                                      fontSize: 10.5,
-                                      fontFamily: 'monospace',
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ],
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 14),
-                Container(
-                  padding: const EdgeInsets.only(top: 12),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      top: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
-                    ),
-                  ),
-                  child: Row(
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(Icons.monetization_on, size: 18, color: AppColors.gold),
-                      const SizedBox(width: 6),
                       Text(
-                        '$bal BAC',
+                        displayName.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
+                          letterSpacing: 0.4,
+                          decoration: TextDecoration.none,
                         ),
                       ),
-                      const Spacer(),
-                      OutlinedButton(
-                        onPressed: onWalletTap,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.gold,
-                          side: BorderSide(color: AppColors.gold.withValues(alpha: 0.45)),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          minimumSize: Size.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.gold.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: AppColors.gold.withValues(alpha: 0.35),
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.verified,
+                                  size: 11,
+                                  color: AppColors.gold,
+                                ),
+                                const SizedBox(width: 3),
+                                Text(
+                                  'VERIFIED',
+                                  style: TextStyle(
+                                    color: AppColors.gold,
+                                    fontSize: 9.5,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.6,
+                                    decoration: TextDecoration.none,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          'WALLET HUB >',
-                          style: TextStyle(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.6,
-                          ),
-                        ),
+                          if (pubgId.isNotEmpty) ...[
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                'ID: $pubgId',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha: 0.48),
+                                  fontSize: 10.5,
+                                  fontFamily: 'monospace',
+                                  decoration: TextDecoration.none,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 14),
+            Row(
+              children: [
+                Icon(Icons.monetization_on, size: 18, color: AppColors.gold),
+                const SizedBox(width: 6),
+                Text(
+                  '$bal BAC',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+                const Spacer(),
+                OutlinedButton(
+                  onPressed: onWalletTap,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.gold,
+                    side: BorderSide(
+                      color: AppColors.gold.withValues(alpha: 0.45),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'WALLET HUB >',
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.6,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
