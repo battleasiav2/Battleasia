@@ -200,12 +200,13 @@ html {
   font-family: 'Clash Display', 'Satoshi', 'Barlow', sans-serif !important;
 }
 
-/* Hero lockup — modern geometric display (not Clash chunk) */
+/* Hero lockup — PUBG-style condensed italic title */
 .landing-v2 .hero-wordmark,
 .landing-v2 .hero-wordmark .hero-word {
-  font-family: 'Syne', 'Satoshi', 'Barlow', sans-serif !important;
-  font-style: normal !important;
+  font-family: 'Teko', 'Clash Display', Impact, sans-serif !important;
+  font-style: italic !important;
   font-synthesis: none;
+  font-weight: 700 !important;
 }
 
 html {

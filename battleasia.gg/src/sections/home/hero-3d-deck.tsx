@@ -38,11 +38,22 @@ type HeroHudStats = {
   online: number | null;
 };
 
-/** Clean modern depth — no chunky emboss stack */
+/** Condensed italic title — PUBG HUD energy, not a clean geometric sans */
 const WHITE_WORD_SHADOW = `
-  0 1px 0 rgba(255,255,255,0.18),
-  0 10px 28px rgba(0,0,0,0.45),
-  0 2px 0 rgba(0,0,0,0.35)
+  0 1px 0 #fff,
+  2px 2px 0 #1a1a1a,
+  3px 3px 0 #0d0d0d,
+  4px 5px 0 #050505,
+  8px 12px 18px rgba(0,0,0,0.55)
+`;
+
+const GOLD_WORD_SHADOW = `
+  0 1px 0 #fff6a8,
+  2px 2px 0 #3d3a08,
+  3px 3px 0 #1a1804,
+  4px 5px 0 #0a0900,
+  0 0 28px rgba(var(--ba-gold-rgb, 203,251,36), 0.45),
+  8px 12px 18px rgba(0,0,0,0.5)
 `;
 
 export function Hero3dDeck({
@@ -85,18 +96,21 @@ export function Hero3dDeck({
     el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  // Modern geometric hero lockup
+  // PUBG-like condensed italic lockup
   const wordSx = {
     position: 'relative' as const,
     display: 'block',
     fontFamily: LANDING_V2.heroDisplay,
-    fontWeight: 800,
-    fontSize: { xs: 'clamp(2.55rem, 13.5vw, 4rem)', md: 'clamp(3rem, 6.4vw, 5.6rem)' },
-    lineHeight: 0.92,
-    letterSpacing: '-0.045em',
+    fontWeight: 700,
+    fontStyle: 'italic' as const,
+    fontSize: { xs: 'clamp(3.1rem, 16vw, 5.1rem)', md: 'clamp(4.2rem, 8.2vw, 7.2rem)' },
+    lineHeight: 0.78,
+    letterSpacing: '0.04em',
     textTransform: 'uppercase' as const,
-    transform: 'none',
+    transform: 'skewX(-8deg)',
     transformOrigin: 'left bottom',
+    WebkitTextStroke: '0.028em #070707',
+    paintOrder: 'stroke fill' as const,
   };
 
   return (
@@ -147,13 +161,8 @@ export function Hero3dDeck({
             component="span"
             sx={{
               ...wordSx,
-              background:
-                'linear-gradient(180deg, #f3ff9a 0%, var(--ba-gold, #cbfb24) 42%, #9cc410 100%)',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              color: 'transparent',
-              textShadow: 'none',
-              filter: 'drop-shadow(0 10px 24px rgba(0,0,0,0.45)) drop-shadow(0 0 22px rgba(var(--ba-gold-rgb, 203,251,36), 0.28))',
+              color: 'var(--ba-gold, #cbfb24)',
+              textShadow: GOLD_WORD_SHADOW,
             }}
           >
             ASIA
@@ -164,16 +173,18 @@ export function Hero3dDeck({
             component="span"
             sx={{
               fontFamily: LANDING_V2.heroDisplay,
-              fontWeight: 800,
-              fontSize: { xs: '0.68rem', md: 'clamp(0.68rem, 1.1vw, 0.92rem)' },
-              letterSpacing: '0.14em',
+              fontWeight: 700,
+              fontStyle: 'italic',
+              fontSize: { xs: '0.78rem', md: 'clamp(0.78rem, 1.2vw, 1.05rem)' },
+              letterSpacing: '0.12em',
               color: 'var(--ba-gold-ink, #081401)',
               background: 'linear-gradient(180deg, #f3ff8c 0%, var(--ba-gold, #cbfb24) 48%, #8fb410 100%)',
               border: '1px solid rgba(255,255,255,0.28)',
-              padding: '0.38em 0.62em',
-              borderRadius: '999px',
-              marginTop: { xs: '0.42em', md: '0.5em' },
+              padding: '0.28em 0.5em',
+              borderRadius: '3px',
+              marginTop: { xs: '0.55em', md: '0.7em' },
               lineHeight: 1,
+              transform: 'skewX(-8deg)',
               boxShadow: `
                 inset 0 1px 0 rgba(255,255,255,0.35),
                 0 8px 18px -10px rgba(var(--ba-gold-rgb, 203,251,36), 0.55)
