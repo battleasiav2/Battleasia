@@ -7,6 +7,7 @@ import { Iconify } from 'src/components/iconify/iconify';
 import { useTranslate } from 'src/locales/use-locales';
 
 import { LANDING_V2, landingCharAuraSx, landingCharImgFilter, landingCharPlinthSx, landingPanelSx, landingPrimaryBtnSx, landingSectionTitleSx } from './landing-v2-theme';
+import { LandingAtmosphere } from './landing-atmosphere';
 
 // ----------------------------------------------------------------------
 
@@ -92,15 +93,17 @@ export function HowToPlaySection() {
       sx={{
         scrollMarginTop: { xs: '80px', md: '100px' },
         position: 'relative',
-        overflowX: 'clip',
-        bgcolor: LANDING_V2.ink,
+        overflow: 'hidden',
+        isolation: 'isolate',
+        bgcolor: 'transparent',
         color: LANDING_V2.text,
         py: { xs: 9, sm: 11, md: 'clamp(72px, 10vw, 148px)' },
         px: { xs: 2.5, sm: 4, md: 5 },
         borderTop: `1px solid ${LANDING_V2.hair}`,
       }}
     >
-      <Box sx={{ maxWidth: LANDING_V2.wrap, mx: 'auto' }}>
+      <LandingAtmosphere src={LANDING_V2.assets.modes.squad} opacity={0.5} />
+      <Box sx={{ position: 'relative', zIndex: 1, maxWidth: LANDING_V2.wrap, mx: 'auto' }}>
         <Box sx={{ mb: { xs: 4, md: 5 }, maxWidth: '62ch' }}>
           <Typography
             component="h2"

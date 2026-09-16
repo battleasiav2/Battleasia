@@ -186,7 +186,13 @@ html {
 .landing-v2 {
   font-family: 'Satoshi', 'Helvetica Neue', 'Public Sans Variable', sans-serif;
   color: #f4f4f1;
-  background: #060607;
+  background-color: #060607;
+  background-image:
+    linear-gradient(180deg, rgba(6, 6, 7, 0.42) 0%, rgba(6, 6, 7, 0.62) 38%, rgba(6, 6, 7, 0.82) 100%),
+    url('/landing-v2/pulse-bg.webp');
+  background-size: cover;
+  background-position: center 18%;
+  background-repeat: no-repeat;
 }
 .landing-v2 .font-tr,
 .landing-v2 .font-brand-gaming,

@@ -20,6 +20,7 @@ import {
   landingPrimaryBtnSx,
   landingSectionTitleSx,
 } from './landing-v2-theme';
+import { LandingAtmosphere } from './landing-atmosphere';
 import { LivePulseDot } from './live-pulse-dot';
 
 export { HOME_GAME_ARTS, PLAY_YOUR_GAME_IMAGE_PATHS };
@@ -102,17 +103,20 @@ export function PlayYourGameSection() {
       sx={{
         scrollMarginTop: { xs: '80px', md: '100px' },
         position: 'relative',
-        overflowX: 'clip',
-        overflowY: 'visible',
-        bgcolor: LANDING_V2.ink,
+        overflow: 'hidden',
+        isolation: 'isolate',
+        bgcolor: 'transparent',
         color: LANDING_V2.text,
         py: { xs: 9, sm: 11, md: 'clamp(72px, 10vw, 148px)' },
         px: { xs: 2.5, sm: 4, md: 5 },
         borderTop: `1px solid ${LANDING_V2.hair}`,
       }}
     >
+      <LandingAtmosphere src={LANDING_V2.assets.games.pubg} opacity={0.48} />
       <Box
         sx={{
+          position: 'relative',
+          zIndex: 1,
           maxWidth: LANDING_V2.wrap,
           mx: 'auto',
           display: 'grid',

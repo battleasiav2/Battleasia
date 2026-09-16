@@ -49,7 +49,7 @@ export function HomeView() {
     <Box
       className="home-scroll-story landing-v2"
       sx={{
-        bgcolor: LANDING_V2.ink,
+        bgcolor: 'transparent',
         scrollSnapType: { xs: 'none', md: 'y proximity' },
         overflowX: 'clip',
         fontFamily: LANDING_V2.sans,

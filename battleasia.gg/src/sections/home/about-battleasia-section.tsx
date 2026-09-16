@@ -89,7 +89,7 @@ export function AboutBattleAsiaSection() {
         position: 'relative',
         overflow: 'hidden',
         isolation: 'isolate',
-        bgcolor: LANDING_V2.ink,
+        bgcolor: 'transparent',
         color: LANDING_V2.text,
         py: { xs: 9, sm: 11, md: 'clamp(72px, 10vw, 148px)' },
         px: { xs: 2.5, sm: 4, md: 5 },
@@ -120,7 +120,7 @@ export function AboutBattleAsiaSection() {
           position: 'absolute',
           inset: 0,
           zIndex: 0,
-          background: `radial-gradient(70% 60% at 50% 40%, rgba(var(--ba-gold-rgb, 203,251,36), 0.1), ${LANDING_V2.ink} 80%)`,
+          background: `radial-gradient(70% 60% at 50% 40%, rgba(var(--ba-gold-rgb, 203,251,36), 0.12), rgba(6,6,7,0.62) 78%)`,
           pointerEvents: 'none',
         }}
       />

@@ -1783,7 +1783,7 @@ export function LandingDashboardSection() {
                 width: '100%',
                 maxWidth: '100%',
                 boxSizing: 'border-box',
-                bgcolor: LANDING_V2.ink,
+                bgcolor: 'transparent',
                 color: LANDING_V2.text,
                 py: { xs: 9, sm: 11, md: 'clamp(72px, 10vw, 148px)' },
             }}
@@ -1803,7 +1803,7 @@ export function LandingDashboardSection() {
                     height: 1,
                     objectFit: 'cover',
                     objectPosition: 'center 30%',
-                    opacity: 0.58,
+                    opacity: 0.72,
                     filter: 'saturate(1.05)',
                     pointerEvents: 'none',
                     zIndex: -2,
@@ -1817,8 +1817,8 @@ export function LandingDashboardSection() {
                     zIndex: -1,
                     pointerEvents: 'none',
                     background: `
-                        radial-gradient(70% 55% at 50% 20%, transparent 0%, ${LANDING_V2.ink} 78%),
-                        linear-gradient(180deg, rgba(6,6,7,0.35) 0%, rgba(6,6,7,0.72) 100%)
+                        radial-gradient(70% 55% at 50% 20%, transparent 0%, rgba(6,6,7,0.55) 82%),
+                        linear-gradient(180deg, rgba(6,6,7,0.22) 0%, rgba(6,6,7,0.55) 100%)
                     `,
                 }}
             />

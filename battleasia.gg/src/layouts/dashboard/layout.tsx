@@ -22,6 +22,7 @@ import { HomeHeader } from '../components/home-header';
 import { navData as dashboardNavData } from '../nav-config-dashboard';
 import { dashboardLayoutVars, dashboardNavColorVars } from './css-vars';
 import { PublicMobileNav } from '../components/public-mobile-nav';
+import { LANDING_V2 } from 'src/sections/home/landing-v2-theme';
 
 import type { MainSectionProps } from '../core/main-section';
 import type { HeaderSectionProps } from '../core/header-section';
@@ -133,7 +134,7 @@ export function DashboardLayout({
     <MainSection
       {...slotProps?.main}
       sx={[
-        isHomePage && { bgcolor: '#000000' },
+        isHomePage && { bgcolor: 'transparent' },
         { pb: { xs: 10, lg: 0 } },
         ...(Array.isArray(slotProps?.main?.sx)
           ? slotProps.main.sx
@@ -172,7 +173,7 @@ export function DashboardLayout({
         }}
         sx={[
           {
-            bgcolor: '#000000',
+            bgcolor: isHomePage ? LANDING_V2.ink : '#000000',
             [`& .${layoutClasses.sidebarContainer}`]: {
               [theme.breakpoints.up(layoutQuery)]: {
                 pl: isNavMini ? 'var(--layout-nav-mini-width)' : 'var(--layout-nav-vertical-width)',

@@ -116,8 +116,8 @@ export function HeroVideoBanner() {
           inset: 0,
           zIndex: 2,
           background: `
-            radial-gradient(92% 78% at 62% 46%, transparent 0%, transparent 52%, rgba(6,6,7,0.28) 82%, rgba(6,6,7,0.48) 100%),
-            linear-gradient(90deg, rgba(6,6,7,0.58) 0%, rgba(6,6,7,0.2) 34%, transparent 58%, rgba(6,6,7,0.18) 100%)
+            radial-gradient(92% 78% at 62% 46%, transparent 0%, transparent 52%, rgba(6,6,7,0.18) 82%, rgba(6,6,7,0.32) 100%),
+            linear-gradient(90deg, rgba(6,6,7,0.42) 0%, rgba(6,6,7,0.14) 34%, transparent 58%, rgba(6,6,7,0.12) 100%)
           `,
           pointerEvents: 'none',
         }}

@@ -118,7 +118,7 @@ export function FooterSection() {
             width: 1,
             height: 1,
             objectFit: 'cover',
-            opacity: 0.85,
+            opacity: 0.72,
             pointerEvents: 'none',
           }}
         />
@@ -126,7 +126,7 @@ export function FooterSection() {
           sx={{
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(to bottom, ${LANDING_V2.ink} 0%, rgba(6,6,7,0.72) 28%, rgba(6,6,7,0.86) 100%)`,
+            background: `linear-gradient(to bottom, rgba(6,6,7,0.55) 0%, rgba(6,6,7,0.62) 28%, rgba(6,6,7,0.78) 100%)`,
           }}
         />
       </Box>
