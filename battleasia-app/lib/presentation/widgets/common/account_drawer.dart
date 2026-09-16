@@ -16,6 +16,7 @@ import 'package:battleasia_app/presentation/widgets/shop/shop_auth.dart';
 import 'package:battleasia_app/presentation/screens/referral/referral_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_wallet_screen.dart';
+import 'package:battleasia_app/presentation/screens/wallet/wallet_screen.dart';
 import 'package:battleasia_app/presentation/screens/my_matches/my_matches_screen.dart';
 import 'package:battleasia_app/presentation/screens/my_orders/my_orders_screen.dart';
 import 'package:battleasia_app/presentation/screens/my_statistics/my_statistics_screen.dart';
@@ -237,7 +238,8 @@ class _AccountDrawerContent extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const ShopWalletScreen(),
+                        settings: const RouteSettings(name: '/wallet'),
+                        builder: (context) => const WalletScreen(),
                       ),
                     );
                   },
@@ -403,9 +405,36 @@ class _AccountDrawerContent extends StatelessWidget {
                   },
                 ),
                 AccountMenuTile(
+                  label: 'account.settings'.tr(),
+                  nested: true,
+                  icon: Icons.settings_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AccountScreen()),
+                    );
+                  },
+                ),
+                AccountMenuTile(
                   label: 'account.wallet'.tr(),
                   nested: true,
                   icon: Icons.account_balance_wallet_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        settings: const RouteSettings(name: '/wallet'),
+                        builder: (context) => const WalletScreen(),
+                      ),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'wallet.transferTitle'.tr(),
+                  nested: true,
+                  icon: Icons.swap_horiz,
                   onTap: () {
                     Navigator.pop(context);
                     openShopRoute(

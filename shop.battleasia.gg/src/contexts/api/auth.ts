@@ -8,4 +8,21 @@ export const loginApi = (data: LoginData) => axios.post('api/v2/users/signin', d
 
 export const registerApi = (data: RegisterData) => axios.post('api/v2/users/signup', data);
 
+export const sendVerificationEmailApi = () => axios.post('api/v2/users/send-verification-email');
 
+export const resendVerificationCodeApi = (email: string) =>
+  axios.post('api/v2/users/resend-verification-code', { email });
+
+export const verifyEmailApi = (code: string) => axios.post('api/v2/users/verify-email', { code });
+
+export const verifyEmailSignupApi = (email: string, code: string) =>
+  axios.post('api/v2/users/verify-email-signup', { email, code });
+
+export const forgotPasswordApi = (email: string) =>
+  axios.post('api/v2/users/forgot-password', { email });
+
+export const verifyResetCodeApi = (email: string, code: string) =>
+  axios.post('api/v2/users/verify-reset-code', { email, code });
+
+export const resetPasswordApi = (email: string, code: string, newPassword: string) =>
+  axios.post('api/v2/users/reset-password', { email, code, newPassword });

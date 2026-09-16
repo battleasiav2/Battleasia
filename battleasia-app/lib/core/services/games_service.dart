@@ -175,6 +175,42 @@ class GamesService {
     }
   }
 
+  /// Get room credentials for a joined match (room id + password).
+  Future<Map<String, dynamic>> getMatchRoomCredentials(String matchId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/games/matches/$matchId/room'),
+        headers: headers,
+      );
+
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {
+          'success': true,
+          'data': data['data'],
+        };
+      }
+
+      return {
+        'success': false,
+        'message':
+            data['message'] as String? ?? 'Failed to fetch room credentials',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
   /// Get match result by ID (for completed matches)
   Future<Map<String, dynamic>> getMatchResult(String matchId) async {
     try {

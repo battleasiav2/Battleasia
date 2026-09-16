@@ -15,6 +15,9 @@ export const paths = {
   auth: {
     signIn: `${ROOTS.AUTH}/sign-in`,
     signUp: `${ROOTS.AUTH}/sign-up`,
+    forgotPassword: `${ROOTS.AUTH}/forgot-password`,
+    resetPassword: `${ROOTS.AUTH}/reset-password`,
+    emailVerification: `${ROOTS.AUTH}/email-verification`,
   },
   // DASHBOARD
   dashboard: {
@@ -35,6 +38,7 @@ export const paths = {
       profile: `${ROOTS.USER}/account/profile`,
       profileDetail: (userId: string | number) => `${ROOTS.USER}/account/profile/${userId}`,
       wallet: `${ROOTS.USER}/wallet`,
+      transfer: `${ROOTS.USER}/transfer`,
       withdrawal: `${ROOTS.USER}/withdrawal`,
       notifications: `${ROOTS.USER}/account/notifications`,
     },

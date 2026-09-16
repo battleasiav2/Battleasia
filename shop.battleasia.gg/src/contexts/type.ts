@@ -18,6 +18,13 @@ export type ApiContextType = {
   initialize: () => Promise<any>;
   registerApi: (data: RegisterData) => Promise<any>;
   loginApi: (data: LoginData) => Promise<any>;
+  sendVerificationEmailApi: () => Promise<any>;
+  resendVerificationCodeApi: (email: string) => Promise<any>;
+  verifyEmailApi: (code: string) => Promise<any>;
+  verifyEmailSignupApi: (email: string, code: string) => Promise<any>;
+  forgotPasswordApi: (email: string) => Promise<any>;
+  verifyResetCodeApi: (email: string, code: string) => Promise<any>;
+  resetPasswordApi: (email: string, code: string, newPassword: string) => Promise<any>;
   // shop
   listShopItemsApi: (params?: {
     page?: number;
@@ -77,5 +84,13 @@ export type ApiContextType = {
   // Get withdrawal/deposit details by ID
   getWithdrawalByIdApi: (id: string) => Promise<any>;
   getDepositByIdApi: (id: string) => Promise<any>;
+  // BAC transfer
+  getTransferSettingsApi: () => Promise<any>;
+  submitCoinTransferApi: (data: {
+    recipientUsername: string;
+    amount: number;
+    note?: string;
+  }) => Promise<any>;
+  getTransferHistoryApi: (params?: { page?: number; limit?: number }) => Promise<any>;
 };
 

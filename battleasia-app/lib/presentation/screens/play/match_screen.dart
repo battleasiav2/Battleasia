@@ -37,6 +37,9 @@ class _MatchScreenState extends State<MatchScreen> {
   bool _isLoading = false;
   String? _joiningMatchId;
   MatchModel? _selectedMatchForRoomDetails;
+  bool _roomLoading = false;
+  Map<String, dynamic>? _roomCredentials;
+  String? _roomError;
   // The match waiting for the user to confirm before joining.
   MatchModel? _confirmMatch;
 
@@ -188,13 +191,68 @@ class _MatchScreenState extends State<MatchScreen> {
   void _handleShowRoomDetails(MatchModel match) {
     setState(() {
       _selectedMatchForRoomDetails = match;
+      _roomCredentials = null;
+      _roomError = null;
+      _roomLoading = false;
     });
+    _loadRoomCredentials(match);
   }
 
   void _handleCloseRoomDetails() {
     setState(() {
       _selectedMatchForRoomDetails = null;
+      _roomLoading = false;
+      _roomCredentials = null;
+      _roomError = null;
     });
+  }
+
+  Future<void> _loadRoomCredentials(MatchModel match) async {
+    final existingId = match.roomId?.trim() ?? '';
+    if (existingId.isNotEmpty) {
+      if (!mounted) return;
+      setState(() {
+        _roomCredentials = {
+          'roomId': match.roomId ?? '',
+          'password': match.password ?? '',
+          'matchName': match.matchName,
+          'map': match.map,
+        };
+        _roomLoading = false;
+        _roomError = null;
+      });
+      return;
+    }
+
+    setState(() {
+      _roomLoading = true;
+      _roomError = null;
+    });
+
+    final result = await _gamesService.getMatchRoomCredentials(match.id);
+
+    if (!mounted || _selectedMatchForRoomDetails?.id != match.id) return;
+
+    if (result['success'] == true && result['data'] is Map) {
+      final data = Map<String, dynamic>.from(result['data'] as Map);
+      setState(() {
+        _roomCredentials = {
+          'roomId': (data['roomId'] ?? '').toString(),
+          'password': (data['password'] ?? '').toString(),
+          'matchName': (data['matchName'] ?? match.matchName).toString(),
+          'map': data['map']?.toString() ?? match.map,
+        };
+        _roomLoading = false;
+        _roomError = null;
+      });
+    } else {
+      setState(() {
+        _roomLoading = false;
+        _roomError =
+            result['message'] as String? ?? 'Failed to load room credentials';
+        _roomCredentials = null;
+      });
+    }
   }
 
   void _copyToClipboard(String text, String label) {
@@ -934,282 +992,279 @@ class _MatchScreenState extends State<MatchScreen> {
       context,
       baseSize: 16.0,
     ).clamp(8.0, 16.0);
-    
+
     final contentPadding = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 24.0,
+      baseSize: 20.0,
     ).clamp(16.0, 24.0);
-    
-    final closeButtonSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 32.0,
-    ).clamp(28.0, 32.0);
-    
-    final titleFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 36.0,
-      min: 24.0,
-      max: 40.0,
-    );
-    
-    final bodyFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 18.0,
-      min: 14.0,
-      max: 20.0,
-    );
-    
-    final labelFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 13.0,
-      min: 11.0,
-      max: 15.0,
-    );
-    
+
     final maxWidth = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: 500.0,
-    ).clamp(300.0, 500.0);
-    
+      baseSize: 420.0,
+    ).clamp(300.0, 440.0);
+
+    final roomId = (_roomCredentials?['roomId'] as String?)?.trim().isNotEmpty == true
+        ? (_roomCredentials!['roomId'] as String)
+        : (match.roomId ?? '');
+    final password =
+        (_roomCredentials?['password'] as String?)?.trim().isNotEmpty == true
+            ? (_roomCredentials!['password'] as String)
+            : (match.password ?? '');
+    final matchName =
+        (_roomCredentials?['matchName'] as String?)?.trim().isNotEmpty == true
+            ? (_roomCredentials!['matchName'] as String)
+            : match.matchName;
+    final mapName = (_roomCredentials?['map'] as String?) ?? match.map;
+
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: EdgeInsets.symmetric(horizontal: dialogPadding),
       child: Container(
         constraints: BoxConstraints(maxWidth: maxWidth),
-        margin: const EdgeInsets.only(top: 0),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E).withOpacity(0.98),
-          borderRadius: BorderRadius.circular(8),
+          color: const Color(0xFF060607),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
         ),
-        child: Stack(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Close button
-            Positioned(
-              top: contentPadding * 0.67,
-              right: contentPadding * 0.67,
-              child: SizedBox(
-                width: closeButtonSize,
-                height: closeButtonSize,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.close,
-                    color: Colors.white,
-                    size: closeButtonSize * 0.6,
-                  ),
-                  onPressed: _handleCloseRoomDetails,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
+            Container(
+              height: 3,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    AppColors.gold.withValues(alpha: 0.95),
+                    Colors.transparent,
+                  ],
                 ),
               ),
             ),
-
-            // Content
             Padding(
-              padding: EdgeInsets.all(contentPadding),
+              padding: EdgeInsets.fromLTRB(
+                contentPadding,
+                contentPadding * 0.85,
+                contentPadding * 0.55,
+                contentPadding,
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 8),
-                  // Title
-                  Text(
-                    'Room Details',
-                    style: AppTheme.heading2.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: titleFontSize,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(
-                    height: ResponsiveUtils.getResponsiveSpacing(
-                      context,
-                      baseSize: 24.0,
-                    ).clamp(16.0, 24.0),
-                  ),
-
-                  // Room ID Section
-                  Column(
+                  Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Room ID',
-                        style: AppTheme.bodySmall.copyWith(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: labelFontSize,
-                        ),
-                      ),
-                      SizedBox(
-                        height: ResponsiveUtils.getResponsiveSpacing(
-                          context,
-                          baseSize: 8.0,
-                        ).clamp(4.0, 8.0),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(
-                          ResponsiveUtils.getResponsiveSpacing(
-                            context,
-                            baseSize: 16.0,
-                          ).clamp(12.0, 16.0),
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: Text(
-                                match.roomId ?? 'N/A',
-                                style: AppTheme.bodyLarge.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: 'monospace',
-                                  fontSize: bodyFontSize,
-                                ),
+                            Text(
+                              'JOINED ACCESS',
+                              style: TextStyle(
+                                color: AppColors.gold.withValues(alpha: 0.9),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 1.2,
                               ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.copy, color: Colors.blue),
-                              onPressed: () {
-                                if (match.roomId != null) {
-                                  _copyToClipboard(match.roomId!, 'Room ID');
-                                }
-                              },
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Room Credentials',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.4,
+                              ),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: ResponsiveUtils.getResponsiveSpacing(
-                      context,
-                      baseSize: 16.0,
-                    ).clamp(12.0, 16.0),
-                  ),
-
-                  // Password Section
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Password',
-                        style: AppTheme.bodySmall.copyWith(
-                          color: Colors.white.withOpacity(0.7),
-                          fontSize: labelFontSize,
+                      IconButton(
+                        onPressed: _handleCloseRoomDetails,
+                        icon: Icon(
+                          Icons.close,
+                          color: Colors.white.withValues(alpha: 0.7),
+                          size: 20,
                         ),
-                      ),
-                      SizedBox(
-                        height: ResponsiveUtils.getResponsiveSpacing(
-                          context,
-                          baseSize: 8.0,
-                        ).clamp(4.0, 8.0),
-                      ),
-                      Container(
-                        padding: EdgeInsets.all(
-                          ResponsiveUtils.getResponsiveSpacing(
-                            context,
-                            baseSize: 16.0,
-                          ).clamp(12.0, 16.0),
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(
-                            color: Colors.white.withOpacity(0.1),
+                        style: IconButton.styleFrom(
+                          side: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.12),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                match.password ?? 'N/A',
-                                style: AppTheme.bodyLarge.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontFamily: 'monospace',
-                                  fontSize: bodyFontSize,
-                                ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  if (_roomLoading)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 40),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: AppColors.gold,
+                        ),
+                      ),
+                    )
+                  else if (_roomError != null)
+                    JoinArenaCard(
+                      accent: JoinArenaCardAccent.error,
+                      child: Column(
+                        children: [
+                          Text(
+                            _roomError!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.85),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          TextButton(
+                            onPressed: () => _loadRoomCredentials(match),
+                            child: Text(
+                              'common.retry'.tr(),
+                              style: TextStyle(
+                                color: AppColors.gold,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.copy, color: Colors.blue),
-                              onPressed: () {
-                                if (match.password != null) {
-                                  _copyToClipboard(match.password!, 'Password');
-                                }
-                              },
+                          ),
+                        ],
+                      ),
+                    )
+                  else ...[
+                    JoinArenaCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'MATCH',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.45),
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            matchName,
+                            style: TextStyle(
+                              color: AppColors.gold,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          if (mapName != null && mapName.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              'Map: $mapName',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.5),
+                                fontSize: 12,
+                              ),
                             ),
                           ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: ResponsiveUtils.getResponsiveSpacing(
-                      context,
-                      baseSize: 16.0,
-                    ).clamp(12.0, 16.0),
-                  ),
-
-                  // Match Name
-                  Container(
-                    padding: EdgeInsets.all(
-                      ResponsiveUtils.getResponsiveSpacing(
-                        context,
-                        baseSize: 16.0,
-                      ).clamp(12.0, 16.0),
-                    ),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFFF8C42).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(4),
-                      border: Border.all(
-                        color: const Color(0xFFFF8C42).withOpacity(0.3),
+                        ],
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Match',
-                          style: AppTheme.bodySmall.copyWith(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: labelFontSize,
-                          ),
-                        ),
-                        SizedBox(
-                          height: ResponsiveUtils.getResponsiveSpacing(
-                            context,
-                            baseSize: 4.0,
-                          ).clamp(2.0, 4.0),
-                        ),
-                        Text(
-                          match.matchName,
-                          style: AppTheme.heading3.copyWith(
-                            color: const Color(0xFFFF8C42),
-                            fontWeight: FontWeight.bold,
-                            fontSize: ResponsiveUtils.getResponsiveFontSize(
-                              context,
-                              baseSize: 28.0,
-                              min: 20.0,
-                              max: 32.0,
-                            ),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                    const SizedBox(height: 12),
+                    _buildRoomCredentialRow(
+                      label: 'Room ID',
+                      value: roomId.isEmpty ? 'N/A' : roomId,
+                      icon: Icons.videogame_asset_outlined,
+                      canCopy: roomId.isNotEmpty,
                     ),
-                  ),
+                    const SizedBox(height: 10),
+                    _buildRoomCredentialRow(
+                      label: 'Password',
+                      value: password.isEmpty ? 'N/A' : password,
+                      icon: Icons.lock_outline,
+                      canCopy: password.isNotEmpty,
+                    ),
+                  ],
                 ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildRoomCredentialRow({
+    required String label,
+    required String value,
+    required IconData icon,
+    required bool canCopy,
+  }) {
+    return JoinArenaCard(
+      padding: const EdgeInsets.fromLTRB(14, 14, 10, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 14, color: AppColors.gold),
+              const SizedBox(width: 6),
+              Text(
+                label.toUpperCase(),
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.45),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  value,
+                  style: TextStyle(
+                    color: canCopy
+                        ? Colors.white
+                        : Colors.white.withValues(alpha: 0.45),
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'monospace',
+                    letterSpacing: 0.4,
+                  ),
+                ),
+              ),
+              IconButton(
+                onPressed: canCopy ? () => _copyToClipboard(value, label) : null,
+                icon: Icon(
+                  Icons.copy,
+                  size: 16,
+                  color: canCopy
+                      ? AppColors.gold
+                      : Colors.white.withValues(alpha: 0.25),
+                ),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppColors.gold.withValues(alpha: 0.08),
+                  side: BorderSide(
+                    color: AppColors.gold.withValues(alpha: 0.35),
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

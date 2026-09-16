@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 import { paths } from 'src/routes/paths';
 import { useRouter } from 'src/routes/hooks';
+import { RouterLink } from 'src/routes/components';
 
 import useApi from 'src/hooks/use-api';
 import { useTranslate } from 'src/locales/use-locales';
@@ -33,7 +34,6 @@ import {
 } from './auth-form-styles';
 import { goldAlpha } from 'src/theme/accent-presets';
 
-const MAIN_APP_URL = (import.meta.env.VITE_MAIN_APP_URL as string | undefined) || 'https://battleasia.gg';
 const REMEMBER_EMAIL_KEY = 'ba_remember_email';
 
 export type SignInSchemaType = zod.infer<typeof SignInSchema>;
@@ -226,12 +226,7 @@ export function SignInView() {
                   </Box>
                 }
               />
-              <Link
-                href={`${MAIN_APP_URL.replace(/\/$/, '')}/auth/forgot-password`}
-                target="_blank"
-                rel="noopener noreferrer"
-                sx={authLinkSx}
-              >
+              <Link component={RouterLink} href={paths.auth.forgotPassword} sx={authLinkSx}>
                 {t('auth.forgotPassword')}
               </Link>
             </Stack>

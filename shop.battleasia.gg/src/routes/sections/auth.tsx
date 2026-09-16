@@ -9,15 +9,14 @@ import { AuthSplitLayout } from 'src/layouts/auth-split';
 
 import { LoadingScreen } from 'src/components/loading-screen';
 
-
 // ----------------------------------------------------------------------
 
-/** **************************************
- * Jwt
- *************************************** */
 const Auth = {
   SignInPage: lazy(() => lazyRetry(() => import('src/pages/auth/sign-in'))),
   SignUpPage: lazy(() => lazyRetry(() => import('src/pages/auth/sign-up'))),
+  ForgotPasswordPage: lazy(() => lazyRetry(() => import('src/pages/auth/forgot-password'))),
+  ResetPasswordPage: lazy(() => lazyRetry(() => import('src/pages/auth/reset-password'))),
+  EmailVerificationPage: lazy(() => lazyRetry(() => import('src/pages/auth/email-verification'))),
 };
 
 export const authRoutes: RouteObject[] = [
@@ -32,7 +31,7 @@ export const authRoutes: RouteObject[] = [
       {
         path: 'sign-in',
         element: (
-          <AuthSplitLayout >
+          <AuthSplitLayout>
             <Auth.SignInPage />
           </AuthSplitLayout>
         ),
@@ -42,6 +41,30 @@ export const authRoutes: RouteObject[] = [
         element: (
           <AuthSplitLayout>
             <Auth.SignUpPage />
+          </AuthSplitLayout>
+        ),
+      },
+      {
+        path: 'forgot-password',
+        element: (
+          <AuthSplitLayout>
+            <Auth.ForgotPasswordPage />
+          </AuthSplitLayout>
+        ),
+      },
+      {
+        path: 'reset-password',
+        element: (
+          <AuthSplitLayout>
+            <Auth.ResetPasswordPage />
+          </AuthSplitLayout>
+        ),
+      },
+      {
+        path: 'email-verification',
+        element: (
+          <AuthSplitLayout>
+            <Auth.EmailVerificationPage />
           </AuthSplitLayout>
         ),
       },
