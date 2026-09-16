@@ -94,21 +94,22 @@ class _MatchCardState extends State<MatchCard> {
                 ),
               ],
             ),
-            foregroundDecoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              border: Border(
-                left: BorderSide(
-                  color: AppColors.gold.withValues(alpha: 0.55),
-                  width: 2,
-                ),
-              ),
-            ),
-            child: Row(
+            child: Stack(
               children: [
-                Expanded(flex: 10, child: _buildBannerSection(bannerUrl)),
-                Expanded(
-                  flex: 14,
-                  child: _buildMatchInfoSection(buttonDisabled),
+                Row(
+                  children: [
+                    Expanded(flex: 10, child: _buildBannerSection(bannerUrl)),
+                    Expanded(
+                      flex: 14,
+                      child: _buildMatchInfoSection(buttonDisabled),
+                    ),
+                  ],
+                ),
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(height: 2, color: AppColors.gold),
                 ),
               ],
             ),
