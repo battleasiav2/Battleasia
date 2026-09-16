@@ -13,6 +13,9 @@ import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_buy_flow.dart';
 
+/// Deprecated: pack purchase uses [ShopBuyFlow] modal from the shop grid.
+/// Kept for deep-link/login resume safety; prefer not to navigate here from new UI.
+
 // Badge colour map — mirrors BADGE_COLOR_MAP in the web shop frontend.
 const Map<String, Color> _kBadgeBgColor = {
   'Popular': Color(0xFF22c55e),
@@ -265,7 +268,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
   Future<void> _handleConfirmPurchase() async {
     if (_item == null || _selectedChannelId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Please select a payment channel'),
         backgroundColor: Colors.red,
       ));
@@ -276,7 +279,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
         orElse: () =>
             _PaymentChannel(id: '', name: '', icon: '', enabled: false));
     if (channel.id.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Payment channel not found'),
         backgroundColor: Colors.red,
       ));
@@ -334,14 +337,14 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
   Future<void> _handleTransactionSubmit() async {
     if (_fromAddressCtrl.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Please enter the address you sent from'),
         backgroundColor: Colors.red,
       ));
       return;
     }
     if (_transactionIdCtrl.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Please enter the transaction ID'),
         backgroundColor: Colors.red,
       ));
@@ -351,7 +354,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final user = authProvider.user;
     if (user == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Please log in to make a purchase'),
         backgroundColor: Colors.red,
       ));
@@ -376,7 +379,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
       if (result['success'] == true) {
         if (mounted) {
           Navigator.of(context).pop(); // close payment details dialog
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
                 'Deposit submitted successfully! Waiting for admin approval...'),
             backgroundColor: Colors.green,
@@ -409,13 +412,13 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   void _handleBuy() {
     if (_item == null) return;
     if (_loadingSupport) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Loading payment options...'),
       ));
       return;
     }
     if (_channels.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('No payment channels available'),
         backgroundColor: Colors.orange,
       ));
@@ -616,7 +619,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                     onPressed: () => Navigator.of(context).pop(),
                     style: TextButton.styleFrom(
                         foregroundColor: Colors.grey.shade700),
-                    child: const Text('Cancel'),
+                    child: Text('Cancel'),
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
@@ -840,7 +843,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                 border: Border.all(color: const Color(0xFF93c5fd)),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Text(
+              child: Text(
                 'Please send the specified amount to the wallet address above. '
                 'After completing the payment, enter the transaction ID below '
                 'and tap Confirm to complete your purchase.',
@@ -916,7 +919,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                         },
                   style: TextButton.styleFrom(
                       foregroundColor: Colors.grey.shade700),
-                  child: const Text('Cancel'),
+                  child: Text('Cancel'),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
@@ -978,7 +981,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                   onPressed: () {
                     Clipboard.setData(ClipboardData(text: value));
                     ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Copied!')));
+                        SnackBar(content: Text('Copied!')));
                   },
                 ),
             ],
@@ -1313,7 +1316,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text(
+            child: Text(
               'Buy Now',
               style: TextStyle(
                   color: Colors.white,
@@ -1348,14 +1351,14 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
   Widget _buildCoinImage(String image) {
     if (image.isEmpty) {
-      return const Center(
+      return Center(
         child: Icon(Icons.monetization_on_outlined,
             size: 64, color: Colors.white38),
       );
     }
     final url = AppConfig.getImageUrl(image);
     if (url == null) {
-      return const Center(
+      return Center(
         child: Icon(Icons.monetization_on_outlined,
             size: 64, color: Colors.white38),
       );
