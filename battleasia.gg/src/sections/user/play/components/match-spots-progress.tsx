@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from '@mui/material';
-import { alpha, keyframes } from '@mui/material/styles';
+import { alpha } from '@mui/material/styles';
 
 import { useTranslate } from 'src/locales/use-locales';
 
@@ -13,16 +13,6 @@ import { goldAlpha } from 'src/theme/accent-presets';
 const GOLD = USER_COLORS.gold;
 const FULL_RED = '#ef4444';
 const CARD_BG = '#161618';
-
-const fillPulse = keyframes`
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.86; }
-`;
-
-const barSheen = keyframes`
-  0% { transform: translateX(-120%); }
-  100% { transform: translateX(320%); }
-`;
 
 type MatchSpotsProgressProps = MatchCapacityInput & {
   /** compact = match cards · default = inline · featured = confirm dialog */
@@ -84,28 +74,13 @@ export function MatchSpotsProgress({
           bottom: 0,
           width: `${visualPercent}%`,
           background: fillBackground,
-          boxShadow: isFull
-            ? `0 0 16px ${alpha(FULL_RED, 0.5)}`
-            : `0 0 14px ${goldAlpha(0.42)}`,
           transition: 'width 0.65s cubic-bezier(0.22, 1, 0.36, 1)',
-          animation: nearlyFull || isFull ? `${fillPulse} 1.8s ease-in-out infinite` : undefined,
           overflow: 'hidden',
           '&::before': {
             content: '""',
             position: 'absolute',
             inset: 0,
-            background: `linear-gradient(180deg, ${alpha('#ffffff', 0.28)} 0%, transparent 55%)`,
-            pointerEvents: 'none',
-          },
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '38%',
-            height: '100%',
-            background: `linear-gradient(90deg, transparent, ${alpha('#ffffff', 0.35)}, transparent)`,
-            animation: joined > 0 ? `${barSheen} 2.4s ease-in-out infinite` : undefined,
+            background: `linear-gradient(180deg, ${alpha('#ffffff', 0.18)} 0%, transparent 55%)`,
             pointerEvents: 'none',
           },
         }}
@@ -121,7 +96,6 @@ export function MatchSpotsProgress({
             width: isFeatured ? 3 : 2,
             height: isFeatured ? 14 : 10,
             bgcolor: isFull ? FULL_RED : GOLD,
-            boxShadow: `0 0 10px ${isFull ? alpha(FULL_RED, 0.45) : goldAlpha(0.45)}`,
           }}
         />
         <Typography
@@ -208,12 +182,11 @@ export function MatchSpotsProgress({
     <Box
       sx={{
         p: 1.75,
+        pt: 2,
+        borderRadius: '18px',
         bgcolor: CARD_BG,
-        border: `1px solid ${alpha('#ffffff', 0.08)}`,
-        boxShadow: `
-          inset 0 1px 0 ${alpha('#ffffff', 0.06)},
-          0 8px 24px ${alpha('#000000', 0.35)}
-        `,
+        border: `1px solid ${alpha('#ffffff', 0.09)}`,
+        boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.05)}`,
         position: 'relative',
         overflow: 'hidden',
         '&::before': {
@@ -224,7 +197,7 @@ export function MatchSpotsProgress({
           right: 0,
           height: 2,
           bgcolor: GOLD,
-          boxShadow: `0 0 12px ${goldAlpha(0.4)}`,
+          pointerEvents: 'none',
         },
       }}
     >

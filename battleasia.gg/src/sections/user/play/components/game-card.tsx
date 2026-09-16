@@ -81,9 +81,7 @@ export function GameCard(props: GameCardProps) {
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         border: `1px solid ${isFeatured ? goldAlpha(0.4) : alpha('#ffffff', 0.1)}`,
-        boxShadow: isFeatured
-          ? `inset 2px 0 0 ${GOLD}, 0 20px 48px -28px #000`
-          : 'inset 2px 0 0 transparent, 0 16px 40px -32px #000',
+        boxShadow: '0 16px 40px -32px #000, inset 0 1px 0 rgba(255,255,255,0.05)',
         cursor: isDisabled ? 'not-allowed' : 'pointer',
         opacity: isDisabled ? 0.58 : 1,
         aspectRatio: '3 / 4',
@@ -94,7 +92,7 @@ export function GameCard(props: GameCardProps) {
           : {
               transform: 'translateY(-4px)',
               borderColor: goldAlpha(0.45),
-              boxShadow: `inset 2px 0 0 ${GOLD}, 0 24px 48px -24px #000`,
+              boxShadow: '0 24px 48px -24px #000, inset 0 1px 0 rgba(255,255,255,0.06)',
               '& .game-card-art': { transform: 'scale(1.05)' },
               '& .game-card-title': { color: GOLD },
               '& .game-card-join': {
@@ -106,6 +104,17 @@ export function GameCard(props: GameCardProps) {
         '&:focus-visible': {
           outline: `2px solid ${goldAlpha(0.7)}`,
           outlineOffset: 3,
+        },
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 2,
+          bgcolor: GOLD,
+          zIndex: 2,
+          pointerEvents: 'none',
         },
       }}
     >

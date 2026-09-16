@@ -118,17 +118,18 @@ export const userGlassDialogPaperSx: SxProps<Theme> = getGlassShellSx(getDefault
   p: 0,
 });
 
-/** Match-join / match-room chrome — gold edge wash + glass shell (use with gold rail). */
+/** Shared dialog chrome — home panel: #161618 + white hairline (no gold wash). */
 export const userPolishedDialogPaperSx: SxProps<Theme> = {
   ...userGlassDialogPaperSx,
   overflow: 'hidden',
   display: 'flex',
   flexDirection: 'column',
-  border: `1px solid ${goldAlpha(0.26)}`,
-  backgroundImage: `
-    linear-gradient(180deg, ${goldAlpha(0.07)} 0%, transparent 24%),
-    linear-gradient(180deg, ${alpha('#0a0a0a', 0.97)} 0%, #050505 100%)
-  `,
+  bgcolor: '#161618',
+  backgroundColor: '#161618',
+  backgroundImage: 'none',
+  border: `1px solid ${alpha('#ffffff', 0.09)}`,
+  borderRadius: '18px',
+  boxShadow: '0 30px 80px -44px #000, inset 0 1px 0 rgba(255,255,255,0.05)',
 };
 
 export const userPolishedDialogRailSx: SxProps<Theme> = {

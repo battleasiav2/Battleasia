@@ -522,7 +522,6 @@ class _MatchScreenState extends State<MatchScreen> {
   }
 
   Widget _buildConfirmJoinDialog(MatchModel match) {
-    // Format schedule date the same way as the web frontend.
     String formatSchedule(String? raw) {
       if (raw == null) return '-';
       try {
@@ -530,48 +529,43 @@ class _MatchScreenState extends State<MatchScreen> {
         final h = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
         final m = dt.minute.toString().padLeft(2, '0');
         final ampm = dt.hour >= 12 ? 'PM' : 'AM';
-        return '${dt.day.toString().padLeft(2, '0')}/'
-            '${dt.month.toString().padLeft(2, '0')}/'
+        return '${dt.day.toString().padLeft(2, "0")}/'
+            '${dt.month.toString().padLeft(2, "0")}/'
             '${dt.year} $h:$m $ampm';
       } catch (_) {
         return raw;
       }
     }
 
-    // Try to load the local map image; fall back gracefully if not found.
     Widget mapImage(String? mapName) {
       if (mapName == null || mapName.isEmpty) return const SizedBox.shrink();
-      // Asset names are title-cased (e.g. "Erangel.webp").
       final assetPath =
           'assets/images/map/${mapName[0].toUpperCase()}${mapName.substring(1)}.webp';
       return ClipRRect(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         child: Stack(
           children: [
             Image.asset(
               assetPath,
               width: double.infinity,
-              height: 180,
+              height: 160,
               fit: BoxFit.cover,
               errorBuilder: (_, __, ___) => const SizedBox.shrink(),
             ),
-            // Map name label at bottom-left, same as web.
             Positioned(
               bottom: 0,
               left: 0,
               right: 0,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.55),
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                color: Colors.black.withValues(alpha: 0.55),
                 child: Text(
-                  mapName,
+                  'MAP ${mapName.toUpperCase()}',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 11,
+                    letterSpacing: 0.6,
                   ),
                 ),
               ),
@@ -581,308 +575,355 @@ class _MatchScreenState extends State<MatchScreen> {
       );
     }
 
-    Widget detailRow(String label, Widget value) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 12,
-              ),
-            ),
-            value,
-          ],
-        ),
-      );
-    }
-
-    Widget coinValue(double amount) {
-      return Row(
-        mainAxisSize: MainAxisSize.min,
+    Widget detailCell(String label, String value) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.asset(
-            'assets/images/currency.webp',
-            width: 16,
-            height: 16,
-            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-          ),
-          const SizedBox(width: 4),
           Text(
-            amount.toStringAsFixed(0),
+            label.toUpperCase(),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.55),
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.6,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
             style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-              color: Colors.black87,
+              color: Colors.white,
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              height: 1.35,
             ),
           ),
         ],
       );
     }
 
-    Widget detailText(String value) => Text(
-          value,
-          style: const TextStyle(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
-            color: Colors.black87,
+    Widget coinRow(double amount, {double size = 14}) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Image.asset(
+            'assets/images/currency.webp',
+            width: size,
+            height: size,
+            errorBuilder: (_, __, ___) => const SizedBox.shrink(),
           ),
-        );
+          const SizedBox(width: 4),
+          Text(
+            amount.toStringAsFixed(0),
+            style: TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: size + 1,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      );
+    }
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userBalance = authProvider.user?.balance ?? 0.0;
+    final insufficient = match.entryFee > userBalance;
+    final isFull = !isMatchJoinableByCapacity(
+      participantsCount: match.participantsCount,
+      totalPlayer: match.totalPlayer,
+    );
+
+    final detailPairs = <List<String>>[
+      ['Game', match.gameName.isNotEmpty ? match.gameName : '-'],
+      ['Schedule', formatSchedule(match.matchSchedule)],
+      ['Team Type', match.teamType ?? '-'],
+      ['Map', match.map ?? '-'],
+      ['Type', match.matchType ?? '-'],
+    ];
 
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 480),
+        constraints: const BoxConstraints(maxWidth: 480, maxHeight: 720),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          color: const Color(0xFF161618),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+          boxShadow: const [
+            BoxShadow(color: Colors.black54, blurRadius: 40, offset: Offset(0, 18)),
+          ],
         ),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Title
-                const Text(
-                  'Confirm Join Match',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black87,
-                  ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 3,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.transparent,
+                    AppColors.gold,
+                    Colors.transparent,
+                  ],
                 ),
-                const SizedBox(height: 8),
-
-                // Subtitle: Join "name" for X?
-                Row(
+              ),
+            ),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Join "${match.matchName}" for ',
+                      'SECURE ENTRY',
                       style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.grey[600],
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1.1,
+                        color: AppColors.gold.withValues(alpha: 0.9),
                       ),
                     ),
-                    Image.asset(
-                      'assets/images/currency.webp',
-                      width: 16,
-                      height: 16,
-                      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'CONFIRM ENTRY',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.4,
+                        color: Colors.white,
+                      ),
                     ),
-                    const SizedBox(width: 3),
+                    const SizedBox(height: 8),
                     Text(
-                      '${match.entryFee.toStringAsFixed(0)} ?',
+                      'Review entry details for "${match.matchName}".',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.grey[600],
+                        color: Colors.white.withValues(alpha: 0.62),
+                        height: 1.45,
                       ),
+                    ),
+                    if (match.map != null && match.map!.isNotEmpty) ...[
+                      const SizedBox(height: 14),
+                      JoinArenaCard(
+                        padding: EdgeInsets.zero,
+                        child: mapImage(match.map),
+                      ),
+                    ],
+                    const SizedBox(height: 12),
+                    JoinArenaCard(
+                      child: Column(
+                        children: [
+                          for (var i = 0; i < detailPairs.length; i += 2)
+                            Padding(
+                              padding: EdgeInsets.only(
+                                bottom: i + 2 < detailPairs.length ? 12 : 0,
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: detailCell(
+                                      detailPairs[i][0],
+                                      detailPairs[i][1],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: i + 1 < detailPairs.length
+                                        ? detailCell(
+                                            detailPairs[i + 1][0],
+                                            detailPairs[i + 1][1],
+                                          )
+                                        : const SizedBox.shrink(),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: JoinArenaCard(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'ENTRY',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.7,
+                                  ),
+                                ),
+                                coinRow(match.entryFee),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: JoinArenaCard(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'PER KILL',
+                                  style: TextStyle(
+                                    color: Colors.white.withValues(alpha: 0.7),
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: 0.7,
+                                  ),
+                                ),
+                                coinRow(match.perKill),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    if (match.prizeDescription != null &&
+                        match.prizeDescription!.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      JoinArenaCard(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'PRIZE',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.7),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.7,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              match.prizeDescription!,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 12),
+                    MatchSpotsProgress(
+                      participantsCount: match.participantsCount,
+                      totalPlayer: match.totalPlayer,
+                      variant: MatchSpotsProgressVariant.featured,
+                    ),
+                    const SizedBox(height: 12),
+                    JoinArenaCard(
+                      accent: insufficient
+                          ? JoinArenaCardAccent.error
+                          : JoinArenaCardAccent.success,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'match.yourBalance'.tr(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              coinRow(userBalance, size: 14),
+                              if (insufficient) ...[
+                                const SizedBox(width: 6),
+                                Text(
+                                  '— Insufficient',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.red.shade400,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: _handleCloseConfirm,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              side: BorderSide(
+                                color: Colors.white.withValues(alpha: 0.18),
+                              ),
+                              minimumSize: const Size.fromHeight(44),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: const Text('Cancel'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: (_joiningMatchId != null ||
+                                    insufficient ||
+                                    isFull)
+                                ? null
+                                : _handleConfirmJoin,
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.gold,
+                              side: BorderSide(
+                                color: AppColors.gold.withValues(alpha: 0.85),
+                              ),
+                              backgroundColor:
+                                  Colors.black.withValues(alpha: 0.35),
+                              minimumSize: const Size.fromHeight(44),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: _joiningMatchId != null
+                                ? SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: AppColors.gold,
+                                    ),
+                                  )
+                                : Text(
+                                    isFull
+                                        ? 'match.matchFull'.tr()
+                                        : 'Join Match',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-
-                // Details table
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF4F6F8),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    children: [
-                      detailRow('Game', detailText(match.gameName.isNotEmpty ? match.gameName : '-')),
-                      Divider(height: 1, color: Colors.grey[300]),
-                      detailRow('Schedule', detailText(formatSchedule(match.matchSchedule))),
-                      Divider(height: 1, color: Colors.grey[300]),
-                      detailRow('Entry Fee', coinValue(match.entryFee)),
-                      Divider(height: 1, color: Colors.grey[300]),
-                      detailRow('Per Kill', coinValue(match.perKill)),
-                      Divider(height: 1, color: Colors.grey[300]),
-                      detailRow('Team Type', detailText(match.teamType ?? '-')),
-                      Divider(height: 1, color: Colors.grey[300]),
-                      detailRow(
-                        'Players',
-                        detailText(
-                          '${match.participantsCount}/${match.totalPlayer}',
-                        ),
-                      ),
-                      Divider(height: 1, color: Colors.grey[300]),
-                      detailRow('Map', detailText(match.map ?? '-')),
-                      Divider(height: 1, color: Colors.grey[300]),
-                      detailRow('Type', detailText(match.matchType ?? '-')),
-                      if (match.prizeDescription != null &&
-                          match.prizeDescription!.isNotEmpty) ...[
-                        Divider(height: 1, color: Colors.grey[300]),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 6),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Prize',
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                match.prizeDescription!,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Colors.black87,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-                MatchSpotsProgress(
-                  participantsCount: match.participantsCount,
-                  totalPlayer: match.totalPlayer,
-                  variant: MatchSpotsProgressVariant.featured,
-                ),
-                const SizedBox(height: 16),
-
-                // Balance status row
-                Builder(builder: (context) {
-                  final authProvider =
-                      Provider.of<AuthProvider>(context, listen: false);
-                  final userBalance =
-                      authProvider.user?.balance ?? 0.0;
-                  final insufficient =
-                      match.entryFee > userBalance;
-                  return JoinArenaCard(
-                    accent: insufficient
-                        ? JoinArenaCardAccent.error
-                        : JoinArenaCardAccent.success,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'match.yourBalance'.tr(),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.8,
-                          ),
-                        ),
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/images/currency.webp',
-                              width: 14,
-                              height: 14,
-                              errorBuilder: (_, __, ___) =>
-                                  const SizedBox.shrink(),
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              userBalance.toStringAsFixed(0),
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                              ),
-                            ),
-                            if (insufficient) ...[
-                              const SizedBox(width: 6),
-                              Text(
-                                '— Insufficient',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.red.shade400,
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-
-                const SizedBox(height: 16),
-
-                // Action buttons
-                Builder(builder: (context) {
-                  final authProvider =
-                      Provider.of<AuthProvider>(context, listen: false);
-                  final userBalance =
-                      authProvider.user?.balance ?? 0.0;
-                  final insufficient = match.entryFee > userBalance;
-                  final isFull = !isMatchJoinableByCapacity(
-                    participantsCount: match.participantsCount,
-                    totalPlayer: match.totalPlayer,
-                  );
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      OutlinedButton(
-                        onPressed: _handleCloseConfirm,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.black87,
-                          side: const BorderSide(color: Colors.black26),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        child: const Text('Cancel'),
-                      ),
-                      const SizedBox(width: 12),
-                      ElevatedButton(
-                        onPressed: (_joiningMatchId != null || insufficient || isFull)
-                            ? null
-                            : _handleConfirmJoin,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black87,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 28, vertical: 10),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        child: _joiningMatchId != null
-                            ? const SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Text(isFull ? 'match.matchFull'.tr() : 'Join'),
-                      ),
-                    ],
-                  );
-                }),
-
-                // Map image — placed below the buttons so Cancel/Join are
-                // always visible without scrolling. Users scroll down to view
-                // the map if they want to.
-                if (match.map != null && match.map!.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  mapImage(match.map),
-                ],
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

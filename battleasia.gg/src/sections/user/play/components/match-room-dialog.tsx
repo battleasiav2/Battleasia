@@ -20,7 +20,7 @@ import {
   getGlassInnerSx,
 } from 'src/components/battle-glass-card';
 
-import { USER_COLORS, userGlassDialogPaperSx, userGoldButtonSx, goldAlpha } from 'src/layouts/user';
+import { USER_COLORS, userPolishedDialogPaperSx, userGoldButtonSx, goldAlpha } from 'src/layouts/user';
 import { useTranslate } from 'src/locales/use-locales';
 
 import { getMatchRoomCredentialsApi } from 'src/contexts/api/games';
@@ -105,14 +105,8 @@ export function MatchRoomDialog({ match, trigger }: MatchRoomDialogProps) {
         fullWidth
         PaperProps={{
           sx: {
-            ...userGlassDialogPaperSx,
+            ...userPolishedDialogPaperSx,
             maxWidth: 420,
-            overflow: 'hidden',
-            border: `1px solid ${goldAlpha(0.28)}`,
-            backgroundImage: `
-              linear-gradient(180deg, ${goldAlpha(0.08)} 0%, transparent 28%),
-              linear-gradient(180deg, ${alpha('#0a0a0a', 0.96)} 0%, #050505 100%)
-            `,
           },
         }}
       >

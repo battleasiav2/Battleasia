@@ -119,13 +119,24 @@ export function MatchCard({
         backdropFilter: 'blur(16px)',
         WebkitBackdropFilter: 'blur(16px)',
         border: `1px solid ${alpha('#ffffff', 0.09)}`,
-        boxShadow: 'inset 2px 0 0 rgba(212,168,75,0.55), 0 24px 60px -40px #000',
+        boxShadow: '0 24px 60px -40px #000, inset 0 1px 0 rgba(255,255,255,0.05)',
         cursor: isResult ? 'pointer' : 'default',
         transition: 'border-color 0.2s ease, box-shadow 0.2s ease, transform 0.25s ease',
         '&:hover': {
           borderColor: goldAlpha(0.35),
-          boxShadow: 'inset 2px 0 0 rgba(212,168,75,0.75), 0 28px 60px -32px #000',
+          boxShadow: '0 28px 60px -32px #000, inset 0 1px 0 rgba(255,255,255,0.06)',
           transform: 'translateY(-2px)',
+        },
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 2,
+          bgcolor: USER_COLORS.gold,
+          zIndex: 2,
+          pointerEvents: 'none',
         },
       }}
     >

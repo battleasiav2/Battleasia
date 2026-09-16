@@ -4,7 +4,6 @@ import { Box, type SxProps, type Theme } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 
 import { USER_COLORS } from 'src/layouts/user/user-theme';
-import { goldAlpha } from 'src/theme/accent-presets';
 
 // ----------------------------------------------------------------------
 
@@ -25,9 +24,6 @@ export function JoinArenaCard({ children, accent = 'gold', sx }: JoinArenaCardPr
         ? USER_COLORS.error
         : USER_COLORS.gold;
 
-  const accentGlow =
-    accent === 'gold' ? goldAlpha(0.35) : alpha(accentColor, 0.35);
-
   return (
     <Box
       sx={{
@@ -36,7 +32,7 @@ export function JoinArenaCard({ children, accent = 'gold', sx }: JoinArenaCardPr
         border: `1px solid ${alpha('#ffffff', 0.09)}`,
         borderRadius: '18px',
         overflow: 'hidden',
-        boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.04)}`,
+        boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.05)}`,
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -45,7 +41,7 @@ export function JoinArenaCard({ children, accent = 'gold', sx }: JoinArenaCardPr
           right: 0,
           height: 2,
           bgcolor: accentColor,
-          boxShadow: `0 0 10px ${accentGlow}`,
+          pointerEvents: 'none',
         },
         ...sx,
       }}
