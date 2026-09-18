@@ -362,7 +362,7 @@ List/detail match payloads **omit** `roomId`/`password` unless room endpoint. Er
   - `account/{profile, profile/:userId, wallet, my-matches, my-orders, my-statistics, my-referrals, notifications, leader-board, customer-support}`
 
 ### 3.2 Landing/home sections (at `/dashboard`, scroll anchors `#home #about-us #how-to-play #rules`)
-1. **Hero** — video/poster, `BATTLE ASIA 2.0` PUBG-style wordmark, APK download CTA, sticky CTA, trust row, gaming HUD/FX.
+1. **Hero** — **looped muted video + poster** like running `HeroVideoBanner`, wordmark, APK download CTA, sticky CTA, trust row, HUD/FX. See §3.4.2.
 2. **Live Pulse dashboard** (lazy) — **real admin/DB counts** via `GET /api/v3/public/dashboard` + sockets (joins, total/ongoing matches, charts, top players, live match rails). **Not** `VITE_STAT_*` fake headlines.
 3. **Play your game** — PUBG, Free Fire, COD, MLBB, Valorant (coming soon), live counts. **New unique WebP covers** (redesign §1.2), not old art.
 4. **About BattleAsia** — story + env-driven stats.
@@ -396,6 +396,27 @@ Every **BAC** number the user sees is **`[coin icon] [amount]`** — icon **firs
 **Not BAC:** fiat (BDT/INR/PKR/USD, ৳) and crypto hashes — no coin icon. Optional small fiat beside: `[coin] 500` + `(৳500 BDT)`.
 
 Amount text stays **white** (not accent). Icon square, inline-flex, nowrap. Hide-balance (`H`) still shows the coin + `••••`. Same on **PC web + shop + APK + admin**.
+
+### 3.4.2 Motion + hero video on every PC page (copy running site)
+
+**Hero video (PC web + shop — all pages that have a hero/strip/auth art):** copy running `HeroVideoBanner` (`hero-video-banner.tsx` + `/landing-v2/hero.mp4` + `hero-poster.webp`). Muted, loop, playsInline, autoplay. Poster is **LCP** (`fetchPriority=high`); video sits on top and plays when `loadeddata` (same as live). Vignette + bottom blend. `prefers-reduced-motion: reduce` → hide/pause video, keep poster. Shared one MP4 (cache); inner pages `preload="metadata"`, landing may `preload="auto"`. Pause when document hidden. Compress; do not ship uncompressed 4K.
+
+**Where the video plays:**
+- Landing full-viewport hero (running `/dashboard` #home).
+- Auth split **hero panel** (sign-in/up/forgot/reset/verify) — video + poster, not a dead still.
+- After-login page heroes / `UserArenaStrip` (Play, Shop hub, Wallet, Referral, Feed, Profile, account pages) — **same looped video** (or crop) behind the title strip, not a static Ken-Burns-only image.
+- Shop domain auth + shop/wallet/transfer/withdraw headers — same treatment.
+- Admin: optional subtle mesh only (no marketing hero video).
+
+**APK:** no looping MP4 on every screen (battery). Splash may use a short muted clip or poster. After-login: Ken Burns / aurora CSS on headers. Same animation *intent* (hover, count-up, pulse) in native widgets.
+
+**Animations wherever the running site has them — do not ship a static site.** Prefer **CSS keyframes** (not Framer on LCP). Include at least:
+- Landing: hero FX (scan/reticle/fireflies if kept, CSS), deck enter, sticky CTA, scroll-reveal below fold, live-pulse ring, count-up stats, game-card hover lift.
+- Global: page-enter, hover lift on cards/buttons, accent picker pulse, footer live-dot, chat FAB hover/Grow, NProgress bar, boot loader bar.
+- Play: join spots progress fill, ready pulse, win celebration (CSS burst — not a 3MB lib).
+- Wallet/shop: balance count-up, Copied chip.
+- Feed: story progress, double-tap heart, typing dots (redesign §17).
+- Honor `prefers-reduced-motion`. Never block LCP with Three.js/Framer.
 
 ### 3.5 Performance (ship gate — mandatory)
 - Lighthouse 90+, LCP < 2.5s, CLS < 0.1, TBT < 150ms.
@@ -534,7 +555,7 @@ Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged i
 11. **Security hardening** in this file §2.7–2.8 and `BATTLEASIA-REDESIGN-PROMPT.md` §14 is mandatory: `session.withTransaction()`, server-side balance re-fetch, double-spend constraints, idempotency keys, high-value withdraw review, rate-limit, mongo-sanitize, XSS + helmet, CORS whitelist, HttpOnly Secure cookies, `tokenVersion` JWT kill, bcryptjs, admin 2FA/OTP, room secrets participant-only, server-authoritative results, magic-byte uploads + no execute + quotas, Cloudflare WAF / DDoS / Bot Fight / origin masking.
 12. **Ledger, fraud, scale, DR, tests** in this file §2.9 and `BATTLEASIA-REDESIGN-PROMPT.md` §15: double-entry + **no delete / reversal only**, liability vs reserve monitor, velocity holds, device fingerprint / multi-account, collusion reports, KYC+age before withdraw (flagged), compound indexes, mongoose pool, live-stats cache, encrypted off-site backups, maintenance countdown, dispute evidence, automated money tests.
 13. **Player HUD keyboard shortcuts** in `BATTLEASIA-REDESIGN-PROMPT.md` §16: **J** quick-join, **C** copy room, **R** ready, **L** leave/refund-before-start, **M** match details, **W** wallet, **B** buy BAC, **T** transfer, **H** hide balance, **Enter** chat, **Tab** leaderboard (not in inputs), **F** follow/like, **S** share match, **U** mute, **Space** reel/live pause, **Esc** close overlays. APK = same actions as buttons.
-14. **Locked visual system** in `BATTLEASIA-REDESIGN-PROMPT.md` §17: 8pt spacing only (4/8/16/24/32), radius scale, `--ba-accent` trio before first paint, 5 component states, mobile bottom sheets, 44px targets, safe-area, glass+aurora, IG stories/carousel/heart/chat bubbles, Copied chip + **BAC coin icon before every amount** (§3.4.1) + fiat + receipt lightbox, Lighthouse 90+ / LCP / TBT, dynamic heavy libs, WebP/AVIF.
+14. **Locked visual system** in `BATTLEASIA-REDESIGN-PROMPT.md` §17: 8pt spacing only (4/8/16/24/32), radius scale, `--ba-accent` trio before first paint, 5 component states, mobile bottom sheets, 44px targets, safe-area, glass+aurora, **hero video + CSS motion on PC pages** (§3.4.2), IG stories/carousel/heart/chat bubbles, Copied chip + **BAC coin icon before every amount** (§3.4.1) + fiat + receipt lightbox, Lighthouse 90+ / LCP / TBT, dynamic heavy libs, WebP/AVIF.
 15. **Two player clients:** **PC Web starts on landing**; **APK starts on auth only** (no APK landing). See `BATTLEASIA-REDESIGN-PROMPT.md` §0.1.
 16. **Fill the remaining gaps:** Aurora brief locked (redesign §1); admin enterprise (redesign §5.1); Ready/Leave/lobby-chat + JSON contracts (this file §2.10); FCM + Sentry + email templates + SEO + i18n namespaces (§2.11); ship **P0 before P1/P2** (redesign §18).
 17. **No Figma:** buttons/icons/logo from the code kit; **5 new high-quality game WebPs** (PUBG first) plus generate any other needed art; **fast-load caps** (`BATTLEASIA-REDESIGN-PROMPT.md` §1.1–1.2). Do not wait for a designer. Do not reuse old screenshots.

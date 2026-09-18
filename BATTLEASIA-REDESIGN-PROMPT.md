@@ -99,7 +99,7 @@ The platform has **exactly these 5 titles** (order on landing and Play picker):
 - Landing **LCP:** only the hero (or first PUBG cover if that is LCP) gets `fetchPriority="high"`; everything else `loading="lazy"` + `decoding="async"`.
 - **srcset** 1x/2x for game cards; don’t ship a 1920px file in a 280px tile.
 - Same asset URLs on web + APK (or pre-resized APK copies) — don’t duplicate uncompressed blobs.
-- No autoplay video on first paint; poster first. Optional short hero video **below** LCP, muted, `preload="none"`.
+- No autoplay **blocking** LCP: **poster first** (`fetchPriority=high`). Then **muted looping hero video** like the running site (Master §3.4.2) — autoplay after `loadeddata`, not a static-only hero. `preload="none"`/`metadata` on inner pages. `prefers-reduced-motion` → poster only.
 - CDN/`/uploads` with cache headers; Cloudflare Polish on if available.
 
 Locked finish numbers: **§17**.
@@ -134,7 +134,7 @@ This surface is a **computer product**: min useful layout ~1280px, dense HUD, si
 
 ### Auth pages (the entry into the product)
 
-Full **PC auth** screens (split art + form is fine): Sign-in, sign-up (2-step: credentials → PUBG ID/phone/game server/terms), forgot-password, reset-password, **email-verification OTP**. After success → `/user/play` (or `returnTo`). `?ref=` captured.
+Full **PC auth** screens (split **hero video** + form): Sign-in, sign-up (2-step: credentials → PUBG ID/phone/game server/terms), forgot-password, reset-password, **email-verification OTP**. After success → `/user/play` (or `returnTo`). `?ref=` captured. Hero side = same muted loop as landing (Master §3.4.2).
 
 **OTP must show on the auth page** (Master §3.6): after sign-up / unverified sign-in the user lands on `/auth/email-verification` with a **visible 6-digit OTP** (boxed cells, timer, resend, verify). Reset-password shows the **same OTP field**. Do not skip verify. Do not hide the code input. Shop + **APK** same. Production never prints the secret code on screen; email SMTP still sends it.
 
@@ -144,7 +144,7 @@ Full **PC auth** screens (split art + form is fine): Sign-in, sign-up (2-step: c
 
 Redesign the story, but keep these blocks (anchors `#home #about-us #how-to-play #rules`):
 
-1. **Hero** — brand wordmark, primary CTA (Enter Arena), **APK download** CTA, trust signals. (New look; old was PUBG-style — invent your own.)
+1. **Hero** — **looped muted hero video + poster** like the running site (`HeroVideoBanner`: autoplay, playsInline, vignette). Wordmark, Enter Arena, **APK download**, trust. Aurora look, not gold-PUBG clone. See Master §3.4.2.
 2. **Live pulse** — **real counts from the same Mongo as Admin Dashboard** (not fake/static `500K+`). `GET /api/v3/public/dashboard` + sockets: today joins, total/processed matches, ongoing matches, winnings, **charts**, per-game live counts, top players, high-prize/ongoing rails. Admin creates/starts a match → landing number updates (cache TTL + `match-created` / `match-updated` / `dashboard-stats-updated`). After seed, **10 face users** + sample matches fill tiles/leaderboard (they are real `User` rows in Admin). If someone deletes the seed and DB is empty → **0**, not invented names. **Forbidden:** `VITE_STAT_*` / hardcoded headline numbers; **forbidden:** frontend-only fake avatars that Admin cannot see.
 3. **Play your game** — **5 unique generated high-quality covers** in order: PUBG, Free Fire, COD, MLBB, Valorant (coming soon). See §1.2 (WebP, lazy except LCP, hex overlay).
 4. **About** — story copy only; if stats/charts appear here they use the **same public dashboard API**, not env fake numbers.
@@ -153,6 +153,8 @@ Redesign the story, but keep these blocks (anchors `#home #about-us #how-to-play
 7. **Footer + live chat** — **copy running site A–Z** (Master §0.3). Footer: 3-col Follow the arena / brand+legal / User support, pay chips, trusted partners, `support@battleasia.gg`, Live support relay (pulse) → `/support`. **All 7 social networks** (exact URLs in Master — keep both Facebook share IDs). **Chat FAB:** hover scale, drag+persist, Grow panel, welcome, guest Sign In, authed socket thread, image attach max 4, in-panel socials. Seed `AppSettings.liveChat` + `messaging` from running defaults. Deferred load (no LCP hit).
 
 ### After-login user area (all `/user/*`)
+
+Page heroes / arena strips use the **same muted looping hero video** as landing (Master §3.4.2) + CSS motion (hover, count-up, pulse). Do not ship static headers.
 
 - **Play:** game picker → match list → detail + **J join** → lobby (**R ready**, **Enter chat**, **C room** when released, **L leave** before start = refund) → result.
 - **Wallet + Earn:** balance, withdrawable, balance history, engagement/earn hub (missions, streak, welcome, referral, weekly, squad, spin, season). Withdraw flow.
@@ -882,7 +884,8 @@ Dark page ink may remain `#060607` / `#0E0F14` (Aurora) with glass cards `backdr
 
 - **Glass + depth** on dark `#060607`: `backdrop-blur-md bg-white/[0.03]`.
 - **Subtle aurora mesh glow** behind hero and winner banners — accent-colored blur, **not** neon overload.
-- **Micro-animations** (dynamic import, `prefers-reduced-motion` off):
+- **Hero video on PC pages** — running-site pattern (Master §3.4.2): landing + auth hero + after-login/shop strips. Poster = LCP; muted loop MP4 on top.
+- **Micro-animations** (CSS keyframes, `prefers-reduced-motion` off) **on every surface that the live site animates** — do not ship static pages:
   - Balance / prize **count-up** (e.g. 0 → 2000 BAC).
   - Join spots **progress bar** fill in realtime.
   - Notification **pulse / blinking dot**.
@@ -918,6 +921,7 @@ Do **not** block P0 on clans/live/gifting. Flags default **OFF** for P1/P2.
 - Footer + **all 7 socials** + **live chat FAB** (hover, drag, attach, guest sign-in, seed `liveChat`+`messaging`) — Master §0.3
 - Mail **and** live-chat **100% Admin** (SMTP + inbox + widget + providers) — Master §0.4
 - **BAC coin icon in front of every balance** (header, wallet, shop, matches, admin, APK) — Master §3.4.1
+- **Hero video + full-site motion** like running site (landing/auth/user/shop strips) — Master §3.4.2
 - Auth **OTP on-screen** (sign-up/verify + reset, web + shop + APK) — Master §3.6
 - APK: splash → **auth only** → native after-login (no landing)
 - Money: deposit/withdraw/join/leave-refund/transfer + ACID + idempotency + double-entry
