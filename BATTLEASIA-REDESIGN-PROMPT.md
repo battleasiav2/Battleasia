@@ -254,6 +254,7 @@ Native Android app — apply the **same new design language** as web (parity). K
 - [ ] Flutter APK: all 30 screens re-skinned, parity verified
 - [ ] All component states (loading/empty/error/success/toast)
 - [ ] Micro-interactions + edge cases (Section 12) + production quality bar (Section 13) + security hardening (Section 14) + ledger/fraud/DR/tests (Section 15)
+- [ ] Player keyboard HUD shortcuts (Section 16) on web; APK equivalent buttons
 - [ ] New brand assets (logo, wordmark, hero media, game art, fonts, favicon, app icon)
 - [ ] Performance + parity + a11y verified before "done"
 
@@ -687,3 +688,49 @@ Companion: `BATTLEASIA-MASTER-PROMPT.md` §2.9. Modules that can wait on ops (KY
 | Requirement | Spec |
 |-------------|------|
 | **Automated unit & integration tests** | Deposit, withdraw, entry fee, refund, double-join, insufficient BAC, idempotency, **reversal**. CI must run these. |
+
+---
+
+## 16. Player keyboard HUD shortcuts (required)
+
+**These were missing — they are now in-scope.** Desktop/web player (and shop for W/B/T/H). **Do not fire letter shortcuts while focus is in an input / textarea / OTP / contenteditable.** APK: same **actions** as HUD buttons (don’t fight Android Back / volume). `?` opens a **cheatsheet**. Admin **Ctrl+K / Cmd+K** stays on admin only.
+
+Quick Join had no letter in the source list → bind **J**.
+
+### 16.1 Match / join
+
+| Key | Action |
+|-----|--------|
+| **J** | **Quick Join** — join window for the selected / next **open** match. If none: toast “No open matches”. |
+| **C** | **Copy Room ID / Pass** — only if paid participant **and** room released (§14.4). Else toast “Room not available yet”. |
+| **R** | **Ready / Confirm** — player or squad ready in lobby. Disabled until joined. Roster shows ready ticks. |
+| **L** | **Leave / Cancel entry** — before start only; refund fee via **reversal ledger** (§15). After start: blocked. Confirm dialog. |
+| **M** | **Match details** — rules, map, prize pool, fee, spots. |
+
+### 16.2 Coin & shop
+
+| Key | Action |
+|-----|--------|
+| **W** | **Open Wallet** — balance + history. |
+| **B** | **Buy BAC** — shop / deposit (`VITE_BAC_SHOP_URL`). |
+| **T** | **Transfer BAC** — P2P transfer window. |
+| **H** | **Hide / show balance** — mask as `**** BAC`. Persist `ba-hide-balance`. |
+
+### 16.3 Social & communication
+
+| Key | Action |
+|-----|--------|
+| **Enter** | **Open chat** (lobby / live). If chat input already focused, Enter **sends** (Shift+Enter = newline). |
+| **Tab** | **Leaderboard** — live score / rank. **Only when focus is not in a form** (don’t break a11y Tab). |
+| **F** | **Follow / Like** — follow focused profile or like focused post (optimistic). |
+| **S** | **Share match** — copy invite / deep link; toast “Link copied”. |
+
+### 16.4 Media & HUD
+
+| Key | Action |
+|-----|--------|
+| **U** (or system Mute) | **Audio toggle** — in-app / live mute. Persist preference. |
+| **Space** | **Play / Pause** reels or live **only when a media surface is active** (don’t steal page scroll). |
+| **Esc** | **Back / Exit** — close pop-up, modal, drawer, lightbox, join window, cheatsheet. |
+
+Disabled / flagged-off actions: short toast, never a crash.
