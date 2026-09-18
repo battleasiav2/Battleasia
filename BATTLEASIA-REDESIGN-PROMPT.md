@@ -1,26 +1,23 @@
 # BattleAsia — Redesign Prompt (New Look, Same Product)
 
-> Goal: rebuild BattleAsia with a **brand-new visual design** while keeping **100% of the product** — same features, data, API, flows, and infra. This prompt is **design-agnostic**: it tells you *what every screen must do and contain*, but the *look* is yours to invent. Nothing functional should be lost in the redesign.
+> Goal: rebuild BattleAsia with a **brand-new visual design (Aurora Arena)** while keeping **100% of the product** — same features, data, API, flows, and infra.
 >
-> For the exhaustive technical spec (every model, endpoint, env var), read the companion file `BATTLEASIA-MASTER-PROMPT.md`. This file focuses on **what to redesign and the UI requirements per surface**.
+> **LOOK = NEW. Do NOT clone the running site’s gold-glass / lime / PUBG landing.** The live site is only the **feature + URL + flow** inventory. Pixels, colors, fonts, cards, hero art, and layout follow **§1 + §1.3 mockup + §17**.
+>
+> For the exhaustive technical spec, read `BATTLEASIA-MASTER-PROMPT.md`.
 
 ---
 
 ## 0. What stays vs. what changes
 
+| Keep exactly (do NOT change) | **NEW design (do NOT copy live pixels)** |
+| --- | --- |
+| Backend API, models, JWT, RBAC, BAC money, routes, screens, sockets | Full visual language: Aurora colors, type, spacing, shapes |
+| Footer **links**, social **URLs**, chat **features**, OTP **flow**, shop **domain+login**, referral **rules** | Layout of every page, component styling, hero video **art**, icons, motion **skin** |
+| Performance gate | Iconography, illustrations, empty/loading treatments |
+| Web ↔ APK feature parity | Navigation chrome (as long as all destinations exist) |
 
-| Keep exactly (do NOT change)                                      | Redesign freely (NEW)                                      |
-| ----------------------------------------------------------------- | ---------------------------------------------------------- |
-| Backend API, all endpoints (v1–v4), 52 data models                | Full visual language: colors, typography, spacing, shapes  |
-| Auth (JWT), roles, RBAC                                           | Layout of every page, component styling                    |
-| BAC currency + money flows (deposit/withdraw/match/transfer)      | Landing/home story, hero, section order & style            |
-| All routes, screens, and features (nothing removed)               | Iconography, illustrations, motion, imagery                |
-| Socket.IO realtime events                                         | Navigation pattern (as long as all destinations reachable) |
-| Web ↔ APK feature parity rule                                     | Empty/loading/error/success visual treatments              |
-| Performance budget (Lighthouse 90+, LCP<2.5s, CLS<0.1, TBT<150ms) | Whether accent is user-selectable, dark/light, etc.        |
-
-
-**Rule:** a user of the old app must find **every feature** in the new one. Redesign = new skin + new layout, **not** new scope.
+**Rule:** a user of the old app must find **every feature** in the new one. Redesign = **new skin + new layout**, not a reskin of the old gold UI and **not** new scope.
 
 ### 0.1 Two player products (PC Web + Native Android)
 
@@ -55,6 +52,7 @@ Do **not** leave these blank. This is the new look for the rebuild:
 - **Motion:** count-up, slot progress, hover lift, shimmer — **off LCP** (dynamic import). Honor `prefers-reduced-motion`.
 - **Imagery:** hex game frames, duotone covers, aurora mesh behind hero/winners. 5 unique game arts, PUBG first.
 - **Logo + wordmark:** new `BATTLE ASIA 2.0` (gradient on one word). PC landing hero; **not** on APK (APK has no landing).
+- **Default accent:** **violet / cyan** (`#7C5CFF` → `#21D4FD`) to match the locked mockup. The other 7 presets stay switchable.
 
 ### 1.1 No Figma / no manual design (REQUIRED)
 
@@ -104,6 +102,22 @@ The platform has **exactly these 5 titles** (order on landing and Play picker):
 
 Locked finish numbers: **§17**.
 
+### 1.3 Final visual reference (homepage mockup — REQUIRED)
+
+The operator approved this **one** homepage look. Rebuild the PC landing to match its **layout + mood** (not pixel-perfect, same product):
+
+- File: `demo-mockups/battleasia-final-site-mockup.png` (copy also on Desktop).
+- Browser chrome `battleasia.gg`: glass top nav (logo, Home/About/Play/Rules, EN, 3 accent dots, Sign in, **Enter Arena**).
+- Full-bleed **aurora stadium hero video**, huge `BATTLE ASIA` + gradient `2.0`, subtitle PUBG MOBILE TOURNAMENTS, **Enter Arena** + **Download APK**, live-now counters.
+- **Live Pulse** row (joins / matches / ongoing / winnings with **coin icon first**).
+- **Play your game** — 5 **hex** covers, PUBG featured + Popular, Valorant Coming soon.
+- Footer: Follow the arena socials, `support@battleasia.gg`, Live support relay, pay chips, chat FAB.
+- Dark ink, violet-cyan, **not** gold-glass PUBG.
+
+Other screens (auth, play HUD, shop, APK, admin) use the **same tokens** (§1 + §17), not a second brand. Extra demo PNGs in Cursor `assets/aurora-*.png` are optional mood only; **this one file is the site target**.
+
+---
+
 ---
 
 
@@ -144,13 +158,13 @@ Full **PC auth** screens (split **hero video** + form): Sign-in, sign-up (2-step
 
 Redesign the story, but keep these blocks (anchors `#home #about-us #how-to-play #rules`):
 
-1. **Hero** — **looped muted hero video + poster** like the running site (`HeroVideoBanner`: autoplay, playsInline, vignette). Wordmark, Enter Arena, **APK download**, trust. Aurora look, not gold-PUBG clone. See Master §3.4.2.
+1. **Hero** — **new** Aurora stadium muted loop + poster (mockup §1.3). Same **video behavior** as live (autoplay muted after poster LCP) — **not** the old gold PUBG hero. Wordmark, Enter Arena, Download APK. Master §3.4.2.
 2. **Live pulse** — **real counts from the same Mongo as Admin Dashboard** (not fake/static `500K+`). `GET /api/v3/public/dashboard` + sockets: today joins, total/processed matches, ongoing matches, winnings, **charts**, per-game live counts, top players, high-prize/ongoing rails. Admin creates/starts a match → landing number updates (cache TTL + `match-created` / `match-updated` / `dashboard-stats-updated`). After seed, **10 face users** + sample matches fill tiles/leaderboard (they are real `User` rows in Admin). If someone deletes the seed and DB is empty → **0**, not invented names. **Forbidden:** `VITE_STAT_*` / hardcoded headline numbers; **forbidden:** frontend-only fake avatars that Admin cannot see.
 3. **Play your game** — **5 unique generated high-quality covers** in order: PUBG, Free Fire, COD, MLBB, Valorant (coming soon). See §1.2 (WebP, lazy except LCP, hex overlay).
 4. **About** — story copy only; if stats/charts appear here they use the **same public dashboard API**, not env fake numbers.
 5. **How to play / modes** — Solo, Duo, Squad, TDM.
 6. **Rules / FAQ** — accordion (fair-play, match-ops, prizes, payment rules).
-7. **Footer + live chat** — **copy running site A–Z** (Master §0.3). Footer: 3-col Follow the arena / brand+legal / User support, pay chips, trusted partners, `support@battleasia.gg`, Live support relay (pulse) → `/support`. **All 7 social networks** (exact URLs in Master — keep both Facebook share IDs). **Chat FAB:** hover scale, drag+persist, Grow panel, welcome, guest Sign In, authed socket thread, image attach max 4, in-panel socials. Seed `AppSettings.liveChat` + `messaging` from running defaults. Deferred load (no LCP hit).
+7. **Footer + live chat** — **same links + features as live** (Master §0.3), **Aurora visual** (not the old gold footer). Partners, all 7 social URLs, pay chips, `support@battleasia.gg`, Live support relay, Privacy/Terms/Rules/How to play/About. Chat FAB: hover, drag, Grow, welcome, guest Sign In, sockets, attach max 4, in-panel socials. Seed settings. Deferred load.
 
 ### After-login user area (all `/user/*`)
 
@@ -339,7 +353,7 @@ Keep all 30 screens:
 
 ## 8. Deliverables checklist (so nothing is missed)
 
-- [ ] Design brief (Section 1) **Aurora Arena — already locked**
+- [ ] Design brief (Section 1) **Aurora Arena — already locked** + **§1.3 final homepage mockup**
 - [ ] Admin enterprise (Section 5.1)
 - [ ] Ship phases (Section 18): P0 live before P1/P2 unique earn
 - [ ] Global tokens + component library (Section 2) for web + APK
@@ -921,7 +935,7 @@ Do **not** block P0 on clans/live/gifting. Flags default **OFF** for P1/P2.
 - Footer + **all 7 socials** + **live chat FAB** (hover, drag, attach, guest sign-in, seed `liveChat`+`messaging`) — Master §0.3
 - Mail **and** live-chat **100% Admin** (SMTP + inbox + widget + providers) — Master §0.4
 - **BAC coin icon in front of every balance** (header, wallet, shop, matches, admin, APK) — Master §3.4.1
-- **Hero video + full-site motion** like running site (landing/auth/user/shop strips) — Master §3.4.2
+- **Hero video + motion** (new Aurora art, live-site **behavior**) — Master §3.4.2
 - Auth **OTP on-screen** (sign-up/verify + reset, web + shop + APK) — Master §3.6
 - APK: splash → **auth only** → native after-login (no landing)
 - Money: deposit/withdraw/join/leave-refund/transfer + ACID + idempotency + double-entry

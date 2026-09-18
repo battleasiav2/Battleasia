@@ -1,6 +1,6 @@
 # BattleAsia — Full Product Master Prompt
 
-> Single source-of-truth prompt to rebuild the **entire BattleAsia platform** (API + Player web + Shop web + Admin web + Flutter APK + infra). Give this whole file to an AI/developer and nothing about scope, features, or wiring should be missed. Your own visual **design** (exact pixels, brand art, copy) is layered on top of this — this prompt defines behavior, architecture, data, and features.
+> Single source-of-truth for **product + API + flows**. Visual design is **not** the running gold/lime site. Skin = **Aurora Arena** in `BATTLEASIA-REDESIGN-PROMPT.md` §1 + the homepage mockup §1.3. Live site = features/URLs/behavior only.
 
 ---
 
@@ -53,9 +53,9 @@ This is the **live product today**. A rebuild must include **every row**. Extra 
 
 **APK after-login** mirrors player `/user/*` (no landing). Shop on APK = native Shop/Wallet/Transfer/Withdraw.
 
-### 0.3 Footer, socials, live chat (copy running site — seed allowed)
+### 0.3 Footer, socials, live chat — **same features/URLs as live, NEW Aurora skin**
 
-Copy `battleasia.gg/src/layouts/core/footer-section.tsx`, `support-chat.tsx`, `deferred-support-chat.tsx`, `social-links-fab.tsx`, and `api/src/models/AppSettings.ts` (`DEFAULT_LIVE_CHAT_SETTINGS` + `DEFAULT_MESSAGING_SETTINGS`) **A–Z**. Seed may load these defaults. Links stay **real** (they must open those URLs). Admin → Live Chat Settings / Messaging providers can edit after seed. Do **not** drop a network.
+Copy **behavior and content** from the running site (`footer-section.tsx`, `support-chat.tsx`, `AppSettings` defaults). **Do not copy** the old gold/lime visual. Skin = Aurora §1 + mockup §1.3.
 
 #### Footer (PC landing + logged-in dashboard shell)
 
@@ -395,14 +395,15 @@ List/detail match payloads **omit** `roomId`/`password` unless room endpoint. Er
 Play/matches (`v2/games`), Wallet + earn/engagement (`v2/users`, `v2/engagement`, `v4/payments/withdrawal`), in-app shop (`v4/shop`, `v3/shop/orders`) + external BAC store link, Feed/social (`v2/feed`, `v2/social`: stories, reels, DMs with attachments, search, reports), Profile + social graph (follow/block/followers/premium), Referrals, Notifications (poll + socket), Leaderboard, Customer support (tickets/chat), File uploads (`v1/files`), Public live pulse (`v3/public/dashboard`), APK settings. **Player HUD hotkeys:** `BATTLEASIA-REDESIGN-PROMPT.md` §16 (J/C/R/L/M, W/B/T/H, Enter/Tab/F/S, U/Space/Esc).
 
 ### 3.4 Design system
-- Dark esports/HUD: ink `#060607`/`#0b0b0d`, glass panels `rgba(22,22,24,0.38)`, hairline borders white 8–14%.
-- **User-selectable accent** via CSS vars `--ba-gold*` (8 presets: lime default, gold, ember, jade, cyan, violet, rose, sky), persisted `localStorage: ba-accent`, bootstrapped inline before paint.
-- Fonts: Public Sans (body), Barlow/Syne (headings), landing display Satoshi/Clash Display/**Teko** (PUBG hero). Default dark MUI theme.
+- **Aurora Arena** (redesign §1 + §1.3 mockup): page `#0E0F14`, surface `#171922`, text `#F4F5F7`, muted `#A0A4B8`, accent gradient **`#7C5CFF → #21D4FD`** (default). Light: page `#F7F8FB`, cards `#FFFFFF`, ink `#12131A`. **Not** gold-glass PUBG.
+- Hairline white 8–14%. 8pt grid. Cards 12–16px radius. Glass **only** on sticky nav.
+- **User-selectable accent** via CSS vars `--ba-accent*` (8 presets: **violet default**, lime, gold, ember, jade, cyan, rose, sky), persisted `localStorage: ba-accent`, bootstrapped inline before paint.
+- Fonts: Space Grotesk / Clash Display / Barlow (headings), Inter / Public Sans (body). Tabular numerals for BAC.
 - **BAC coin before every balance** — see §3.4.1.
 
 ### 3.4.1 BAC coin icon in front of every amount (mandatory)
 
-Every **BAC** number the user sees is **`[coin icon] [amount]`** — icon **first**, then the number. Never a bare `500` / `500 BAC` / `BAC 500` without the coin. Copy running `CoinValue` (`battleasia.gg/src/components/coin-value/coin-value.tsx`) + `CONFIG.currencyIcon` = `/assets/images/currency.webp` (same file on shop, admin, APK `assets/images/currency.webp`). Generate a new coin WebP if the brand changes — **one shared asset**.
+Every **BAC** number is **`[coin icon] [amount]`** — icon first. Keep the running **`CoinValue` component pattern**, but the coin **art** is a **new** Aurora WebP (do not keep the old gold coin if it fights the new brand). One shared asset web/shop/admin/APK.
 
 **Use the shared component everywhere (web `CoinValue`, shop same, APK `CoinValue` widget, admin same):**
 - Header / HUD **balance pill**
@@ -418,9 +419,9 @@ Every **BAC** number the user sees is **`[coin icon] [amount]`** — icon **firs
 
 Amount text stays **white** (not accent). Icon square, inline-flex, nowrap. Hide-balance (`H`) still shows the coin + `••••`. Same on **PC web + shop + APK + admin**.
 
-### 3.4.2 Motion + hero video on every PC page (copy running site)
+### 3.4.2 Motion + hero video on every PC page (**behavior** from live, **look** Aurora)
 
-**Hero video (PC web + shop — all pages that have a hero/strip/auth art):** copy running `HeroVideoBanner` (`hero-video-banner.tsx` + `/landing-v2/hero.mp4` + `hero-poster.webp`). Muted, loop, playsInline, autoplay. Poster is **LCP** (`fetchPriority=high`); video sits on top and plays when `loadeddata` (same as live). Vignette + bottom blend. `prefers-reduced-motion: reduce` → hide/pause video, keep poster. Shared one MP4 (cache); inner pages `preload="metadata"`, landing may `preload="auto"`. Pause when document hidden. Compress; do not ship uncompressed 4K.
+**Do not reuse** the old landing-v2 gold/lime CSS or the old hero.mp4 as the brand look. Generate a **new** muted loop + poster that matches the **aurora stadium mockup** (§1.3). Keep the **same player behavior** as running `HeroVideoBanner`: muted, loop, playsInline, autoplay after `loadeddata`, poster = LCP, vignette, `prefers-reduced-motion` → poster only. Shared one MP4; inner pages `preload=metadata`. Pause when tab hidden.
 
 **Where the video plays:**
 - Landing full-viewport hero (running `/dashboard` #home).
@@ -431,7 +432,7 @@ Amount text stays **white** (not accent). Icon square, inline-flex, nowrap. Hide
 
 **APK:** no looping MP4 on every screen (battery). Splash may use a short muted clip or poster. After-login: Ken Burns / aurora CSS on headers. Same animation *intent* (hover, count-up, pulse) in native widgets.
 
-**Animations wherever the running site has them — do not ship a static site.** Prefer **CSS keyframes** (not Framer on LCP). Include at least:
+**Animations of the same kinds as live** (hover, count-up, pulse, page-enter, join fill, FAB Grow) — **Aurora motion skin**, not the old gold keyframes. CSS keyframes, not Framer on LCP.
 - Landing: hero FX (scan/reticle/fireflies if kept, CSS), deck enter, sticky CTA, scroll-reveal below fold, live-pulse ring, count-up stats, game-card hover lift.
 - Global: page-enter, hover lift on cards/buttons, accent picker pulse, footer live-dot, chat FAB hover/Grow, NProgress bar, boot loader bar.
 - Play: join spots progress fill, ready pulse, win celebration (CSS burst — not a 3MB lib).
@@ -525,7 +526,7 @@ Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged i
 
 **API config (`core/config/app_config.dart`):** priority `--dart-define=API_BASE_URL` → `--dart-define=SITE_URL` → bundled `.env` → fallback `https://battleasia.gg`. `getImageUrl` maps `/uploads`→`/api/uploads`. Socket to `serverUrl` (events: balance-updated, new-notification, new-message). Mirrors `/api/v2`, `/v3/public`, `/v4/shop`, `/v4/payments`, `/v1/files`.
 
-**Design:** dark Material 3, transparent scaffold; `AppColors` gold `#F5C518`, surface `#161618`, bg `#060607`, placeholder `#9CA3AF`, borders white ~8%; 8 accent palettes persisted `ba-accent`; glass cards + gold buttons; portrait-only, edge-to-edge.
+**Design:** **Aurora Arena** (same as web §1): bg `#0E0F14`, surface `#171922`, default accent violet-cyan `#7C5CFF`, placeholder `#A0A4B8`, borders white ~8%; 8 accent palettes persisted `ba-accent`; glass only on app bar; portrait-only, edge-to-edge. **No** gold `#F5C518` as the brand default.
 
 **Android build (`android/app/build.gradle`):** `applicationId net.battleasia.app`, minSdk **24**, target/compileSdk **36**, NDK 28.2, ABIs `arm64-v8a, armeabi-v7a, x86_64`, minify + shrink + ProGuard, multidex, desugaring. **Signing:** reads `android/key.properties` (gitignored) → release keystore `battleasia-release.jks`; if missing, falls back to debug (do NOT ship debug-signed — many devices refuse to install). Manifest perms: INTERNET, CAMERA, READ_MEDIA_IMAGES/VIDEO, legacy READ_EXTERNAL_STORAGE (≤API 32); cleartext for local dev IPs only.
 
