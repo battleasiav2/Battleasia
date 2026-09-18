@@ -43,7 +43,7 @@ Rebuild **both**. Phone users use the **APK**. Computer users use **web**. Do no
 
 Do **not** leave these blank. This is the new look for the rebuild:
 
-- **Brand vibe:** premium esports × modern fintech — confident, airy, international-legible. **Not** gold-glass PUBG clone.
+- **Brand vibe:** premium esports × modern fintech. **Visual law = homepage mockup §1.3 (same-to-same).** Not gold-glass PUBG. Not design B/C/D/E.
 - **Color system:** Dark page `#0E0F14`, surface `#171922`, text `#F4F5F7`, muted `#A0A4B8`. Light page `#F7F8FB`, cards `#FFFFFF`, ink `#12131A`. Accent gradient `#7C5CFF → #21D4FD`. Success `#28E0A0`, danger `#FF5C7A`, warning `#FFC24B`. Hairline white 8–14%.
 - **Dark / light / both:** **Both required.** Toggle + 8 accent presets.
 - **Accent switcher:** lime, gold, ember, jade, cyan, violet, rose, sky — CSS `--ba-accent`, `--ba-accent-glow`, `--ba-accent-hover`; persist `ba-accent`; **before first paint**.
@@ -102,19 +102,41 @@ The platform has **exactly these 5 titles** (order on landing and Play picker):
 
 Locked finish numbers: **§17**.
 
-### 1.3 Final visual reference (homepage mockup — REQUIRED)
+### 1.3 Homepage = this mockup **same-to-same** (LAW)
 
-The operator approved this **one** homepage look. Rebuild the PC landing to match its **layout + mood** (not pixel-perfect, same product):
+**Source file (do not invent another landing):** `demo-mockups/battleasia-final-site-mockup.png`
 
-- File: `demo-mockups/battleasia-final-site-mockup.png` (copy also on Desktop).
-- Browser chrome `battleasia.gg`: glass top nav (logo, Home/About/Play/Rules, EN, 3 accent dots, Sign in, **Enter Arena**).
-- Full-bleed **aurora stadium hero video**, huge `BATTLE ASIA` + gradient `2.0`, subtitle PUBG MOBILE TOURNAMENTS, **Enter Arena** + **Download APK**, live-now counters.
-- **Live Pulse** row (joins / matches / ongoing / winnings with **coin icon first**).
-- **Play your game** — 5 **hex** covers, PUBG featured + Popular, Valorant Coming soon.
-- Footer: Follow the arena socials, `support@battleasia.gg`, Live support relay, pay chips, chat FAB.
-- Dark ink, violet-cyan, **not** gold-glass PUBG.
+**Rule:** PC `/` → `/dashboard` must look **the same as this PNG**. Same blocks, same order, same placement, same colors, same hex game row, same footer, same chat FAB. Do **not** restyle it toward the old gold site or toward designs B–E. Other pages (auth, play, shop, APK, admin) reuse these tokens so the product feels like this homepage — not a second brand.
 
-Other screens (auth, play HUD, shop, APK, admin) use the **same tokens** (§1 + §17), not a second brand. Extra demo PNGs in Cursor `assets/aurora-*.png` are optional mood only; **this one file is the site target**.
+**How to hit same-to-same (build method):**
+1. Implement the landing as a **1:1 layout of the PNG** (CSS Grid/Flex). Overlay the PNG at 40% opacity in a hidden QA mode (`?mock=1`) and nudge until blocks line up.
+2. **Do not** freehand a “similar” aurora. Generate hero **poster + muted loop video** that match this night stadium + purple-cyan sky.
+3. Recreate UI in code (SVG logo, buttons, hex masks) — don’t screenshot the mockup as the live site.
+4. Live Pulse numbers still come from **real admin Mongo** (Master), not the mockup’s fake 1248 — but the **tile layout** matches the PNG.
+
+**Exact chrome (left → right, top → bottom):**
+
+| Zone | Same as mockup |
+|------|----------------|
+| **Top bar** | Rounded hex **B** mark + `BATTLE ASIA` + gradient `2.0`. Center links **Home · About · Play · Rules** (Home active with violet underline dot). Right: **EN**, **3 accent dots** (violet/cyan/blue), outline **Sign in**, filled pill **Enter Arena →** (violet→cyan). |
+| **Hero left** | Huge condensed `BATTLE ASIA` white + `2.0` violet→cyan gradient. Eyebrow `PUBG MOBILE TOURNAMENTS`. Pill **Enter Arena →** + ghost **Download APK**. Row **LIVE NOW** · players count · matches today. |
+| **Hero center** | Full-bleed **night stadium + aurora** (purple left, cyan right). |
+| **Hero right** | 3 stacked glass cards: Live Arena Nightfall Stadium · Nightfall Stadium 12,750 · Capacity 25,000 (live counts from API when wired). |
+| **Live Pulse** | One bar: icon + LIVE PULSE · Today joins · Matches · Ongoing (green dot) · **Winnings with BAC coin icon first**. |
+| **Play your game** | Left copy “Five arenas…”. Five **hexagon** covers in order **PUBG** (Popular green chip) · **Free Fire** · **Call of Duty Mobile** · **MLBB** · **Valorant Coming soon**. Unique art per game. |
+| **Footer** | FOLLOW THE ARENA + 6 social circles. EMAIL US `support@battleasia.gg`. LIVE SUPPORT relay + green dot. PAY WITH bKash / Nagad / Crypto. |
+| **FAB** | Bottom-right round chat (magenta→cyan). |
+
+**Tokens taken from the mockup (use these, not old gold):**
+- Page/nav ink `#07080D`–`#0E0F14`
+- Cards `#12141C` / `#171922`, hairline `rgba(255,255,255,0.10)`
+- Text `#F4F5F7`, muted `#9AA0B4`
+- Accent A `#7C5CFF`, Accent B `#21D4FD`, gradient buttons left→right
+- Success green `#22C55E` (Popular, ongoing, live support)
+- Radius: nav/pills ~999 for buttons; cards ~16px; hex games
+- Display type: ultra-bold condensed (Clash/Space Grotesk)
+
+Designs A–E in `demo-mockups/design-*.png` are **rejected alternatives** unless the operator names one. **This PNG wins.**
 
 ---
 
