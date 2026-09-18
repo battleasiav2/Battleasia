@@ -253,7 +253,7 @@ Native Android app — apply the **same new design language** as web (parity). K
 - [ ] Admin web: every section in Section 5
 - [ ] Flutter APK: all 30 screens re-skinned, parity verified
 - [ ] All component states (loading/empty/error/success/toast)
-- [ ] Micro-interactions + edge cases (Section 12) + production quality bar (Section 13) + security hardening (Section 14) on web, shop, admin, APK, API
+- [ ] Micro-interactions + edge cases (Section 12) + production quality bar (Section 13) + security hardening (Section 14) + ledger/fraud/DR/tests (Section 15)
 - [ ] New brand assets (logo, wordmark, hero media, game art, fonts, favicon, app icon)
 - [ ] Performance + parity + a11y verified before "done"
 
@@ -582,7 +582,7 @@ Lighthouse gate still applies (90+, LCP < 2.5s, CLS < 0.1, TBT < 150ms).
 
 - One **form primitive**, one **toast**, one **empty-state**, one **error-boundary**, one **http client** per app — then screens compose them.
 - i18n all user-visible strings (en/bn/zh/hi/ur).
-- QA: scripted pass of §12 tables, §13 table, **and §14** before calling the rebuild done.
+- QA: scripted pass of §12 tables, §13 table, **§14, and §15** before calling the rebuild done.
 
 ---
 
@@ -642,3 +642,48 @@ Companion detail: `BATTLEASIA-MASTER-PROMPT.md` §2.7–2.8 and Cloudflare in §
 | **DDoS mitigation & rate limiting** | Filter spikes **before** the origin host. |
 | **Bot Fight Mode** | Challenge headless browsers and scrapers. |
 | **Origin IP masking** | Origin only behind reverse proxy (Cloudflare / Traefik); origin IP not in public DNS. |
+
+---
+
+## 15. Ledger, fraud, scale, DR & tests (100% ready)
+
+Companion: `BATTLEASIA-MASTER-PROMPT.md` §2.9. Modules that can wait on ops (KYC, fingerprint enforcement) still **exist** and are **admin on/off**.
+
+### 15.1 Money integrity (accounting)
+
+| Requirement | Spec |
+|-------------|------|
+| **Double-entry ledger** | Every balance change posts **debit + credit** (`LedgerEntry` + `BalanceHistory`) in the same transaction. Accounts include user wallet, match pool, platform fee, platform liability, pending-withdraw. |
+| **Immutable accounting / reversal** | **No delete, no silent edit.** Wrong deposit/payout/join fee = **reversal entry** (negative/contra) linked to the original. Admin balance adjust is a posted pair. |
+| **Platform liability vs reserve** | Admin monitor: total user BAC vs real fiat/crypto reserves on business wallets. Alert when liability exceeds reserve (or safety %). |
+| **Suspicious transaction velocity** | Too-fast withdraw/transfer/drain → **temporary hold** + admin queue. Player sees “Under review”. Limits in `AppSettings`. |
+
+### 15.2 Anti-fraud & match integrity
+
+| Requirement | Spec |
+|-------------|------|
+| **Device fingerprint & multi-account** | Track IP + device/fingerprint on signup, login, join, withdraw. Detect fake rings and referral abuse. Admin review / ban. Flag default OFF until tuned. |
+| **Collusion & win-trading** | Report players in a match (kill-share / boost). Admin queue. Optional auto-flag same device/IP in one match. |
+| **KYC & age verification** | When flag ON: identity + **18+** required **before withdraw approval**. Unverified users cannot cash out. |
+
+### 15.3 Database & high traffic
+
+| Requirement | Spec |
+|-------------|------|
+| **Compound indexing** | Unique `(matchId, userId)` participants; user+time on ledger/history; status+time on deposits/withdrawals; game+status+schedule on matches. |
+| **Connection pooling** | Mongoose `maxPoolSize` sized for concurrent joins; no connection stampede. |
+| **In-memory cache for live stats** | Public home / live pulse from cache (TTL + socket invalidation), not a full aggregation per hit. |
+
+### 15.4 Compliance, backup, DR, support
+
+| Requirement | Spec |
+|-------------|------|
+| **Automated off-site backups** | Daily encrypted dump to a **separate** cloud bucket, plus local rotation. Documented restore. |
+| **Graceful maintenance mode** | Banner + **live countdown**; player writes 503; admin remains; don’t cut mid-transaction. |
+| **Dispute & evidence** | Support: attach screenshot/video for match results; admin verifies before refund/result change. |
+
+### 15.5 Operational tests
+
+| Requirement | Spec |
+|-------------|------|
+| **Automated unit & integration tests** | Deposit, withdraw, entry fee, refund, double-join, insufficient BAC, idempotency, **reversal**. CI must run these. |

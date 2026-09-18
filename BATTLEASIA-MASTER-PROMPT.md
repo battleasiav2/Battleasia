@@ -62,7 +62,8 @@ Production domains (Coolify + Cloudflare):
 - **Social/feed:** `Feed`, `FeedCategory`, `FeedLike`, `FeedComment`, `SavedPost`, `Reel`, `Story` (TTL expiry), `Follow`, `UserBlock`, `DirectConversation`, `DirectMessage`, `SocialReport`.
 - **Notifications/support:** `Notification`, `NotificationRead`, `SupportConversation`, `SupportMessage`.
 - **Engagement (gamification):** `EngagementMission`, `EngagementBadge`, `UserEngagementProgress`, `UserEngagementBadge`, `UserEngagementLevel`, `UserEngagementStreak`, `UserEngagementWelcome`, `UserEngagementReferral`, `UserEngagementWeekly`, `UserEngagementSeason`, `UserEngagementSpin`, `UserEngagementShare`, `UserEngagementSquad`, `EngagementSquad`, `EngagementSquadWeekly`, `EngagementSquadWeeklyClaim`.
-- **Config:** `AppSettings` (single `key:'global'` doc: premium price/duration, commissionRate, transferSettings, liveChat, messaging, profileSocial, mail, appDownload, full engagement config).
+- **Config:** `AppSettings` (single `key:'global'` doc: premium price/duration, commissionRate, transferSettings, liveChat, messaging, profileSocial, mail, appDownload, full engagement config, **feature flags**, **maintenanceMode** {enabled, message, resumeAt}, **kycRequiredForWithdraw**, **highValueWithdrawBac**, **velocityLimits**, **reserveAlert**).
+- **Integrity (new, required):** `LedgerEntry` (double-entry: debitAccount, creditAccount, amount, userId, refType/refId, idempotencyKey — **never deleted**), `DeviceFingerprint` (userId, hash, ip, ua, lastSeen), `FraudHold` (userId, reason, status), `KycRecord` (userId, status, ageVerified, docs), `MatchReport` (matchId, reporterId, targetIds, type collusion/win-trade, evidence), `Dispute` (ticket + matchId + evidence files).
 
 ### 2.3 Endpoint groups (must all be present)
 - **`/api/v1/files`** — `POST /upload/:folder`, `/upload/:folder/multi`, `DELETE /` (5MB default, 100MB reels/stories).
@@ -74,10 +75,11 @@ Production domains (Coolify + Cloudflare):
 - **`/api/v2/engagement`** — home, badges, alerts; claim missions/streak/welcome/referral/weekly/squad/share/spin/season.
 - **`/api/v2/notifications`** — list, mark read, read-all.
 - **`/api/v2/customer-support`** — conversation CRUD, tickets, messages, live-chat settings.
-- **`/api/v2/app-settings`** — mail settings (admin); APK download config + upload.
+- **`/api/v2/app-settings`** — mail settings (admin); APK download config + upload; **public maintenance** payload (enabled, message, resumeAt).
 - **`/api/v3/users/auth`** — admin signin, verify-otp, logout, me, profile.
 - **`/api/v3/users/{list,roles,permissions,histories,sessions,premium,referral-settings,transfer-settings,referral-history}`** — admin user management + RBAC.
-- **`/api/v3/dashboard`** (admin stats) + **`/api/v3/public/dashboard`** (cached public live stats).
+- **`/api/v3/dashboard`** (admin stats + **liability vs reserve**) + **`/api/v3/public/dashboard`** (cached public live stats).
+- **`/api/v3/integrity/{ledger, fraud-holds, kyc, fingerprints, match-reports, disputes}`** — admin queues; player KYC submit + match report under v2.
 - **`/api/v3/games/{list,matches,participants-history}`** — admin game/match CRUD, results, distribute winnings, refunds.
 - **`/api/v3/feed/{list,categories}`**, **`/api/v3/engagement/{missions,badges,settings}`**, **`/api/v3/notifications`** (broadcast).
 - **`/api/v3/shop/orders`** (checkout, me), **`/api/v3/shop/coins`** (public rates + legacy Coingo payout).
@@ -131,6 +133,36 @@ Production domains (Coolify + Cloudflare):
 - **MIME + magic-byte validation:** inspect file headers (e.g. `file-type`), not the client extension/`Content-Type` alone. Allowlist images (and video for reels/stories). Reject HTML/JS/SVG-as-script, exe, php.
 - **Execution prevention:** serve `/uploads` as **static only** — `Content-Disposition` / `X-Content-Type-Options: nosniff`; nginx/Coolify must **not** execute scripts under the upload path. No `.html` execution.
 - **File quota:** multer **memory/disk limits** — 5MB default, 100MB reels/stories, APK cap `APP_APK_MAX_MB`. Hard-cap buffers so a huge body cannot exhaust RAM (`limit` on JSON + multipart).
+
+### 2.9 Ledger, fraud, scale, backup, tests (required for 100% ready)
+
+**Double-entry ledger**
+- Every BAC change writes **immutable** `BalanceHistory` **and** a matching **double-entry** `LedgerEntry`: debit one account, credit another (e.g. `user:{id}:wallet` ↔ `platform:liability` / `match:{id}:pool` / `platform:fee` / `reserve:pending-withdraw`). Amounts must balance (sum debit = sum credit) inside the same `withTransaction()`.
+- **Never delete or edit** a posted entry. Fix mistakes with a **reversal** (negative/contra entry) that references the original `refId`. Admin “adjust balance” = ledger pair + history, not a silent `$set`.
+
+**Platform liability vs reserve**
+- Admin dashboard widget: **sum of all `User.balance` (liability)** vs **fiat/crypto on `BusinessWallet` + pending deposits/withdrawals** (reserve). Alert (email + UI badge) if liability > reserve (or below a safety %). Feature-flag + thresholds in `AppSettings`.
+
+**Suspicious velocity**
+- If a user exceeds admin-set limits (e.g. N withdrawals / transfers / joins in T minutes, or rapid drain of a fresh deposit), **auto-hold**: freeze withdraw/transfer, queue `FraudHold`, notify admin. Player sees “Under review”, not a generic 500.
+
+**Anti-fraud & match integrity**
+- **Device fingerprint + multi-account:** on signup/signin/join/withdraw store IP + UA + (APK) device id / (web) fingerprint hash. Flag same device/IP ringing multiple accounts or referral abuse (referredBy loops, same fingerprint claiming many bonuses). Admin list + force-link/ban. Admin on/off.
+- **Collusion / win-trading:** players (and admins) can **report** participants on a match (kill-sharing, boosting). Queue in admin with match + users. Optional auto-flag: same fingerprint/IP on opposing/winning sides of one match.
+- **KYC & age:** before **first withdraw** (or above a BAC threshold), require KYC + **age 18+** when the KYC flag is ON. Admin reviews docs; unverified = withdraw blocked with CTA. Default OFF until ops ready (rule 8).
+
+**Database & traffic**
+- **Compound indexes (minimum):** `MatchParticipant { matchId:1, userId:1 }` unique; `{ userId:1, createdAt:-1 }`; `BalanceHistory`/`LedgerEntry` `{ userId:1, createdAt:-1 }`, `{ refType:1, refId:1 }`; deposits/withdrawals `{ status:1, createdAt:-1 }`; `Match { gameId:1, status:1, schedule:1 }`; fingerprints `{ hash:1 }`, `{ ip:1, createdAt:-1 }`.
+- **Mongoose connection pool:** set `maxPoolSize` / `minPoolSize` (e.g. 10–50) for many concurrent joins; timeouts; no one-connection-per-request.
+- **In-memory cache for live stats:** keep/extend public dashboard cache (`v3/public/dashboard`) with short TTL; invalidate on match-created/updated sockets. Home live pulse must not hit aggregations every page view.
+
+**Compliance, backup, DR**
+- **Automated off-site backups:** daily (or more) mongodump, **encrypted**, uploaded to a **separate cloud** (S3/R2/B2 — not only local `backups/`). Retention policy (e.g. 7 local + 30 off-site). Restore runbook in `deploy/`.
+- **Graceful maintenance mode:** `AppSettings.maintenanceMode` — player/shop/APK show branded banner + **countdown to resumeAt**; mutating player APIs return 503 + `Retry-After`; **admin stays up**. No mid-join debit without completing the transaction (drain or reject new joins).
+- **Dispute & evidence:** support tickets can attach **screenshot/video** tied to `matchId`; admin dispute queue reviews evidence before result/refund changes. Reversal ledger if payout was wrong.
+
+**Tests (automated, CI)**
+- Unit + integration for: deposit approve/reject, withdraw submit/approve/complete, join entry-fee debit, insufficient balance, **double join**, match full, **refund**, distribute winnings, **idempotency replay**, **reversal** (not delete), velocity hold. Fail CI if money tests fail.
 
 ---
 
@@ -255,7 +287,7 @@ Same stack/design family as player web (Vite 6 + MUI 6 + Redux Toolkit, persist 
 - Flutter: `API_BASE_URL, SITE_URL` (profiles `.env.emulator/.device/.production`).
 - Coolify required: `JWT_SECRET`, `ADMIN_PASSWORD` (compose fails without).
 
-**Backups/seed:** `npm run backup:mongo` (mongodump → `backups/`, keeps 7); restore via `api npm run restore-db` or embedded auto-restore; `deploy/seed-all.sh` (`npm run seed:server`) runs seed→games→dashboard→feed→social→demo. Demo logins: admin from env; `player@battleasia.local / Player@123456`.
+**Backups/seed:** `npm run backup:mongo` (mongodump → `backups/`, keeps 7) **plus encrypted off-site daily copy** (§2.9); restore via `api npm run restore-db` or embedded auto-restore; `deploy/seed-all.sh` (`npm run seed:server`) runs seed→games→dashboard→feed→social→demo. Demo logins: admin from env; `player@battleasia.local / Player@123456`.
 
 ---
 
@@ -271,6 +303,7 @@ Same stack/design family as player web (Vite 6 + MUI 6 + Redux Toolkit, persist 
 9. **Every screen has loading / empty / error / success** plus the micro-interactions and edge cases in `BATTLEASIA-REDESIGN-PROMPT.md` §12 (auth, play, money, social, admin, HTTP). No double-submit on money; optimistic social with rollback; human i18n errors, never raw API dumps.
 10. **Production quality bar** in `BATTLEASIA-REDESIGN-PROMPT.md` §13 is mandatory for a 100% ready rebuild: form trim/sanitize, first-error focus, dirty/unsaved, password toggle, masks/counters, error boundaries, 404s, timeouts, graceful degradation, offline/reconnect, token refresh + interceptors, OTP countdown, data masking, Remember Me (no JWT in localStorage), RBAC, skeletons/empty/toasts/copy, ACID + locks + idempotency, lazy routes, WebP/AVIF, debounced search.
 11. **Security hardening** in this file §2.7–2.8 and `BATTLEASIA-REDESIGN-PROMPT.md` §14 is mandatory: `session.withTransaction()`, server-side balance re-fetch, double-spend constraints, idempotency keys, high-value withdraw review, rate-limit, mongo-sanitize, XSS + helmet, CORS whitelist, HttpOnly Secure cookies, `tokenVersion` JWT kill, bcryptjs, admin 2FA/OTP, room secrets participant-only, server-authoritative results, magic-byte uploads + no execute + quotas, Cloudflare WAF / DDoS / Bot Fight / origin masking.
+12. **Ledger, fraud, scale, DR, tests** in this file §2.9 and `BATTLEASIA-REDESIGN-PROMPT.md` §15: double-entry + **no delete / reversal only**, liability vs reserve monitor, velocity holds, device fingerprint / multi-account, collusion reports, KYC+age before withdraw (flagged), compound indexes, mongoose pool, live-stats cache, encrypted off-site backups, maintenance countdown, dispute evidence, automated money tests.
 
 ---
 
