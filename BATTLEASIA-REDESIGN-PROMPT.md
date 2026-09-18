@@ -143,9 +143,9 @@ Full **PC auth** screens (split art + form is fine): Sign-in, sign-up (2-step: c
 Redesign the story, but keep these blocks (anchors `#home #about-us #how-to-play #rules`):
 
 1. **Hero** — brand wordmark, primary CTA (Enter Arena), **APK download** CTA, trust signals. (New look; old was PUBG-style — invent your own.)
-2. **Live pulse** — live stats, top players, high-prize/ongoing matches (data from public API + socket).
+2. **Live pulse** — **real counts from the same Mongo as Admin Dashboard** (not fake/static `500K+`). `GET /api/v3/public/dashboard` + sockets: today joins, total/processed matches, ongoing matches, winnings, **charts**, per-game live counts, top players, high-prize/ongoing rails. Admin creates/starts a match → landing number updates (cache TTL + `match-created` / `match-updated` / `dashboard-stats-updated`). Empty DB shows **0**. **Forbidden:** `VITE_STAT_*` / hardcoded headlines on these tiles. About story copy can be text; any **number** on landing that looks like a KPI must be API-backed.
 3. **Play your game** — **5 unique generated high-quality covers** in order: PUBG, Free Fire, COD, MLBB, Valorant (coming soon). See §1.2 (WebP, lazy except LCP, hex overlay).
-4. **About** — story + stats.
+4. **About** — story copy only; if stats/charts appear here they use the **same public dashboard API**, not env fake numbers.
 5. **How to play / modes** — Solo, Duo, Squad, TDM.
 6. **Rules / FAQ** — accordion (fair-play, match-ops, prizes, payment rules).
 7. **Footer** — partners, socials, payment methods (bKash/Nagad/crypto), legal links.
@@ -344,7 +344,7 @@ Keep all 30 screens:
 - [ ] Micro-interactions + edge cases (Section 12) + production quality bar (Section 13) + security hardening (Section 14) + ledger/fraud/DR/tests (Section 15)
 - [ ] Player keyboard HUD shortcuts (Section 16) on web; APK equivalent buttons
 - [ ] Locked visual system (Section 17): 8pt grid, 5 states, mobile/CLS, esports polish, IG feed polish, shop trust, ship gate
-- [ ] No Figma: generated SVG icon/logo kit + WebP art (§1.1)
+- [ ] No Figma: generated SVG icon/logo kit + **5 unique high-quality game WebPs** + generate other art; fast-load caps (§1.1–1.2)
 - [ ] Performance + parity + a11y verified before "done"
 
 ---

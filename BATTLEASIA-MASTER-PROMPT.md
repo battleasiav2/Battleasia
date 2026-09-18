@@ -123,7 +123,7 @@ Production domains (Coolify + Cloudflare):
 - **`/api/v3/users/{list,roles,permissions,histories,sessions,premium,referral-settings,transfer-settings,referral-history}`** — + **bulk status**, `DELETE /sessions/:sessionId`, `POST /auth/verify-password`.
 - **`/api/v3/audit-logs`** — list/filter/export.
 - **`/api/v4/payments`** — `balance-histories`, `payment-channels` (+public), `business-wallets` (+public), `deposit-history` (submit/my-history/approve/reject/stats/pending + **bulk**), `withdrawal-history` (submit/my-history/approve/complete/reject/stats + **bulk**), `coingo` (collection start + status, payout + status).
-- **`/api/v3/dashboard`** (admin stats + **liability vs reserve**) + **`/api/v3/public/dashboard`** (cached public live stats).
+- **`/api/v3/dashboard`** (admin stats: `totalUsers`, `totalMatches`, payments — **same Mongo**) + **`/api/v3/public/dashboard`** (cached public live stats for landing: `platform.todayJoinedUsers`, `processedMatches`, `ongoingMatches`, `totalWinnings`, `liveCountByGame`, charts/rails). **Landing tiles/charts must use this public API.** Do not use env fake stats (`VITE_STAT_*`) for join/match/player counts.
 - **`/api/v3/integrity/{ledger, fraud-holds, kyc, fingerprints, match-reports, disputes}`** — admin queues; player KYC submit + match report under v2.
 - **`/api/v3/games/{list,matches,participants-history}`** — admin game/match CRUD, results, distribute winnings, refunds.
 - **`/api/v3/feed/{list,categories}`**, **`/api/v3/engagement/{missions,badges,settings}`**, **`/api/v3/notifications`** (broadcast).
@@ -262,7 +262,7 @@ List/detail match payloads **omit** `roomId`/`password` unless room endpoint. Er
 
 ### 3.2 Landing/home sections (at `/dashboard`, scroll anchors `#home #about-us #how-to-play #rules`)
 1. **Hero** — video/poster, `BATTLE ASIA 2.0` PUBG-style wordmark, APK download CTA, sticky CTA, trust row, gaming HUD/FX.
-2. **Live Pulse dashboard** (lazy) — live stats, top players, high-prize/ongoing match rails (public API + socket).
+2. **Live Pulse dashboard** (lazy) — **real admin/DB counts** via `GET /api/v3/public/dashboard` + sockets (joins, total/ongoing matches, charts, top players, live match rails). **Not** `VITE_STAT_*` fake headlines.
 3. **Play your game** — PUBG, Free Fire, COD, MLBB, Valorant (coming soon), live counts. **New unique WebP covers** (redesign §1.2), not old art.
 4. **About BattleAsia** — story + env-driven stats.
 5. **How to play / modes** — Solo, Duo, Squad, TDM.
@@ -367,7 +367,7 @@ Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged i
 
 **Env vars (per app):**
 - API: `PORT, NODE_ENV, MONGODB_URI, JWT_SECRET*, ADMIN_EMAIL/PASSWORD*/USERNAME, SYNC_ADMIN_PASSWORD, CORS_ORIGINS, COINGO_MOCK, LOG_AUTH_CODES, ADMIN_LOGIN_OTP, APP_URL, CDN_URL, SMTP_*, MAIL_FROM*` (+ `MONGO_DUMP_PATH`, `APP_APK_MAX_MB`, `SENTRY_DSN`, `FCM_SERVER_KEY` / Firebase, `BACKUP_S3_*`).
-- Player fe: `VITE_PORT, VITE_SERVER_URL, VITE_BAC_SHOP_URL, VITE_CDN_URL, VITE_STAT_*`, `VITE_SENTRY_DSN`.
+- Player fe: `VITE_PORT, VITE_SERVER_URL, VITE_BAC_SHOP_URL, VITE_CDN_URL, VITE_SENTRY_DSN`. **Do not use `VITE_STAT_*` for live counters.**
 - Shop: `VITE_PORT, VITE_SERVER_URL, VITE_MAIN_APP_URL, VITE_BASE_PATH`, `VITE_SENTRY_DSN`.
 - Admin: `PORT, REACT_APP_API_URL, REACT_APP_BASENAME, PUBLIC_URL`, `REACT_APP_SENTRY_DSN`.
 - Flutter: `API_BASE_URL, SITE_URL`, Sentry DSN via dart-define or `.env`.
@@ -395,6 +395,7 @@ Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged i
 15. **Two player clients:** **PC Web starts on landing**; **APK starts on auth only** (no APK landing). See `BATTLEASIA-REDESIGN-PROMPT.md` §0.1.
 16. **Fill the remaining gaps:** Aurora brief locked (redesign §1); admin enterprise (redesign §5.1); Ready/Leave/lobby-chat + JSON contracts (this file §2.10); FCM + Sentry + email templates + SEO + i18n namespaces (§2.11); ship **P0 before P1/P2** (redesign §18).
 17. **No Figma:** buttons/icons/logo from the code kit; **5 new high-quality game WebPs** (PUBG first) plus generate any other needed art; **fast-load caps** (`BATTLEASIA-REDESIGN-PROMPT.md` §1.1–1.2). Do not wait for a designer. Do not reuse old screenshots.
+18. **Landing KPIs are live:** join/total/ongoing matches, charts, per-game counts = `GET /api/v3/public/dashboard` (same DB as admin). No fake `VITE_STAT_*` on those tiles.
 
 ---
 
