@@ -53,6 +53,32 @@ This is the **live product today**. A rebuild must include **every row**. Extra 
 
 **APK after-login** mirrors player `/user/*` (no landing). Shop on APK = native Shop/Wallet/Transfer/Withdraw.
 
+### 0.3 Footer, socials, live chat (copy running site — seed allowed)
+
+**Footer (PC landing + logged-in shell):** brand, copyright `{year}`, User support **`support@battleasia.gg`**, **Live support relay** button (pulse dot) → `/support` (opens chat). Legal: Privacy, Terms. Jump links: Rules, How to play, About. Payments chips: bKash, Nagad, Crypto. Trusted partners (new tabs): `battleasia.com`, `baccoin.shop`, `battleasia.net`, `pubg.com`, `bkash.com`, `nagadwallet.net`.
+
+**Social links — all of these (footer row + chat/FAB). Seed into `AppSettings.liveChat.socialLinks`; Admin → Live Chat Settings can edit. Do not drop a network.**
+
+| Network | Default URL (running site) |
+|---------|----------------------------|
+| Facebook | `https://www.facebook.com/share/14XUaoaUgUL/?mibextid=wwXIfr` (chat seed also has `.../1HQV9D33ic/...` — keep **both or the seeded AppSettings list**) |
+| Discord | `https://discord.gg/battleasia` |
+| TikTok | `https://www.tiktok.com/@battleasia` |
+| Instagram | `https://www.instagram.com/battleasia` |
+| YouTube | `https://www.youtube.com/@BattleAsia` |
+| Telegram | `https://t.me/battleasiaofficial` |
+| WhatsApp | `https://whatsapp.com/channel/0029VbBDBVtGpLHQgYC7WM44` |
+
+**Live chat (PC landing + after-login; APK: same features in support + optional FAB):**
+- Chat **icon FAB** (bottom-right), **hover scale**, **draggable** (persist `ba-support-chat-pos`), click opens panel.
+- Settings from `GET /api/v2/customer-support/live-chat-settings` (seed `AppSettings.liveChat`: enabled, agent name/title/avatar, logo, welcome, **socialLinks**). Admin CRUD at Live Chat Settings. Offline → toast, don’t open empty crash.
+- Guest: prompt sign-in to send (landing can show welcome + social buttons).
+- Authed: `v2/customer-support` conversation + messages; **socket** new-message + typing; **attachments** (images, max 4); welcome message; social buttons inside the panel; agent avatar/name.
+- Messaging providers (Admin): builtin chat + optional WhatsApp/Telegram/Facebook/Discord deep links (`AppSettings.messaging`) — seed defaults from running site.
+- Copy **all chat UI features** from running `support-chat.tsx` (panel, input, send, attach, grow open, hover on FAB).
+
+Seed may load footer/chat copy + 10 face users + games. Links still **real** (open those URLs).
+
 ---
 
 ## 1. Monorepo layout
@@ -146,7 +172,7 @@ Production domains (Coolify + Cloudflare):
 
 ### 2.6 Services & seeding
 - Email (SMTP or `AppSettings.mail`), Coingo gateway, disk uploads, APK distribution, in-memory cache for public dashboard, referral engine, engagement engine. **No cron/background workers** — side effects run inline.
-- Seed (`npm run seed`): roles, admin, **10 face players** (see below), 5 platform games, AppSettings, bKash/Nagad channels + wallet, coin rates, 14 BAC packs, sample matches/results so pulse + leaderboard have real rows, sample deposit/withdrawal/feed/notification/support. Partial seeds: games/dashboard/feed/social/demo. Auto-restore from `backups/…/mongo/battleasia` when embedded Mongo starts empty.
+- Seed (`npm run seed`): roles, admin, **10 face players**, 5 platform games, AppSettings including **`liveChat` + `messaging` social URLs from the running site**, bKash/Nagad channels + wallet, coin rates, 14 BAC packs, sample matches/results, sample deposit/withdrawal/feed/notification/support. Partial seeds: games/dashboard/feed/social/demo. Auto-restore from `backups/…/mongo/battleasia` when embedded Mongo starts empty.
 
 **10 face users (required seed — look “fake” on landing, real in Admin):**
 - Create **10** `User` documents, `role.type: player`, unique usernames, generated **face avatars** (WebP), optional bio. They are **real DB users** — Admin → Users list shows all 10 (edit/ban/balance like anyone). **Do not** hardcode faces only in React.
@@ -274,7 +300,7 @@ List/detail match payloads **omit** `roomId`/`password` unless room endpoint. Er
 4. **About BattleAsia** — story + env-driven stats.
 5. **How to play / modes** — Solo, Duo, Squad, TDM.
 6. **Tournament rules / FAQ** — accordion (fair-play, match-ops, prizes, payment rules).
-7. **Footer** — partners, socials, **payment chips** (bKash/Nagad/crypto), legal links.
+7. **Footer** — **running-site footer A–Z** (Master §0.3): partners, **all socials**, pay chips, support email, Live support CTA, legal + jump links.
 
 ### 3.3 After-login features → API (must map exactly)
 Play/matches (`v2/games`), Wallet + earn/engagement (`v2/users`, `v2/engagement`, `v4/payments/withdrawal`), in-app shop (`v4/shop`, `v3/shop/orders`) + external BAC store link, Feed/social (`v2/feed`, `v2/social`: stories, reels, DMs with attachments, search, reports), Profile + social graph (follow/block/followers/premium), Referrals, Notifications (poll + socket), Leaderboard, Customer support (tickets/chat), File uploads (`v1/files`), Public live pulse (`v3/public/dashboard`), APK settings. **Player HUD hotkeys:** `BATTLEASIA-REDESIGN-PROMPT.md` §16 (J/C/R/L/M, W/B/T/H, Enter/Tab/F/S, U/Space/Esc).

@@ -148,7 +148,7 @@ Redesign the story, but keep these blocks (anchors `#home #about-us #how-to-play
 4. **About** — story copy only; if stats/charts appear here they use the **same public dashboard API**, not env fake numbers.
 5. **How to play / modes** — Solo, Duo, Squad, TDM.
 6. **Rules / FAQ** — accordion (fair-play, match-ops, prizes, payment rules).
-7. **Footer** — partners, socials, payment methods (bKash/Nagad/crypto), legal links.
+7. **Footer** — **copy the running site footer A–Z** (see Master §0.3): partners, **all social URLs**, pay chips (bKash/Nagad/crypto), `support@battleasia.gg`, Live support CTA → `/support` + pulse dot, Privacy, Terms, Rules, How to play, About, copyright year. Seed/settings may override links; defaults = live URLs.
 
 ### After-login user area (all `/user/*`)
 
@@ -911,6 +911,7 @@ Do **not** block P0 on clans/live/gifting. Flags default **OFF** for P1/P2.
 ### P0 — must be live (this is “100% ready BattleAsia”)
 
 - PC landing → auth → desktop `/user/*` + shop PC + admin PC (incl. **§5.1 enterprise**)
+- Footer + **all socials** + **live chat FAB** (hover, drag, attach, seed settings) — Master §0.3
 - APK: splash → **auth only** → native after-login (no landing)
 - Money: deposit/withdraw/join/leave-refund/transfer + ACID + idempotency + double-entry
 - Room hide + participant-only + server results
