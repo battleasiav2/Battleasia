@@ -377,6 +377,25 @@ Play/matches (`v2/games`), Wallet + earn/engagement (`v2/users`, `v2/engagement`
 - Dark esports/HUD: ink `#060607`/`#0b0b0d`, glass panels `rgba(22,22,24,0.38)`, hairline borders white 8–14%.
 - **User-selectable accent** via CSS vars `--ba-gold*` (8 presets: lime default, gold, ember, jade, cyan, violet, rose, sky), persisted `localStorage: ba-accent`, bootstrapped inline before paint.
 - Fonts: Public Sans (body), Barlow/Syne (headings), landing display Satoshi/Clash Display/**Teko** (PUBG hero). Default dark MUI theme.
+- **BAC coin before every balance** — see §3.4.1.
+
+### 3.4.1 BAC coin icon in front of every amount (mandatory)
+
+Every **BAC** number the user sees is **`[coin icon] [amount]`** — icon **first**, then the number. Never a bare `500` / `500 BAC` / `BAC 500` without the coin. Copy running `CoinValue` (`battleasia.gg/src/components/coin-value/coin-value.tsx`) + `CONFIG.currencyIcon` = `/assets/images/currency.webp` (same file on shop, admin, APK `assets/images/currency.webp`). Generate a new coin WebP if the brand changes — **one shared asset**.
+
+**Use the shared component everywhere (web `CoinValue`, shop same, APK `CoinValue` widget, admin same):**
+- Header / HUD **balance pill**
+- Account drawer, profile, wallet (total, withdrawable, win/join/payout)
+- Shop packs, cart, wallet, transfer, withdraw
+- Match **entry fee**, per-kill, prize, join dialog, result winnings
+- Leaderboard, referrals, missions/earn rewards, season/spin
+- Balance history / orders / notifications that mention BAC
+- Landing pulse **winnings** tiles if they show BAC
+- **Admin:** user list balance, balance-histories, deposit/withdraw amounts, coin packs, dashboard BAC widgets
+
+**Not BAC:** fiat (BDT/INR/PKR/USD, ৳) and crypto hashes — no coin icon. Optional small fiat beside: `[coin] 500` + `(৳500 BDT)`.
+
+Amount text stays **white** (not accent). Icon square, inline-flex, nowrap. Hide-balance (`H`) still shows the coin + `••••`. Same on **PC web + shop + APK + admin**.
 
 ### 3.5 Performance (ship gate — mandatory)
 - Lighthouse 90+, LCP < 2.5s, CLS < 0.1, TBT < 150ms.
@@ -502,7 +521,7 @@ Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged i
 ---
 
 ## 8. Non-negotiable rules (apply throughout)
-1. **BAC is the single currency** on `User.balance`; every change writes `BalanceHistory`.
+1. **BAC is the single currency** on `User.balance`; every change writes `BalanceHistory`. **Every BAC amount in UI starts with the BAC coin icon** (§3.4.1).
 2. **Deposits are admin-reviewed** (submit → approve) unless Coingo auto.
 3. **Web (PC) ↔ APK (native) feature parity:** every auth / shop / after-login **flow** exists on both. Layout is **platform-native**. **Landing is PC-only.** APK has **no** home/landing — first screen after splash is Sign In.
 4. **Performance first:** hit the Lighthouse gate; heavy libs dynamic-imported; no CLS; WebP/AVIF images.
@@ -515,7 +534,7 @@ Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged i
 11. **Security hardening** in this file §2.7–2.8 and `BATTLEASIA-REDESIGN-PROMPT.md` §14 is mandatory: `session.withTransaction()`, server-side balance re-fetch, double-spend constraints, idempotency keys, high-value withdraw review, rate-limit, mongo-sanitize, XSS + helmet, CORS whitelist, HttpOnly Secure cookies, `tokenVersion` JWT kill, bcryptjs, admin 2FA/OTP, room secrets participant-only, server-authoritative results, magic-byte uploads + no execute + quotas, Cloudflare WAF / DDoS / Bot Fight / origin masking.
 12. **Ledger, fraud, scale, DR, tests** in this file §2.9 and `BATTLEASIA-REDESIGN-PROMPT.md` §15: double-entry + **no delete / reversal only**, liability vs reserve monitor, velocity holds, device fingerprint / multi-account, collusion reports, KYC+age before withdraw (flagged), compound indexes, mongoose pool, live-stats cache, encrypted off-site backups, maintenance countdown, dispute evidence, automated money tests.
 13. **Player HUD keyboard shortcuts** in `BATTLEASIA-REDESIGN-PROMPT.md` §16: **J** quick-join, **C** copy room, **R** ready, **L** leave/refund-before-start, **M** match details, **W** wallet, **B** buy BAC, **T** transfer, **H** hide balance, **Enter** chat, **Tab** leaderboard (not in inputs), **F** follow/like, **S** share match, **U** mute, **Space** reel/live pause, **Esc** close overlays. APK = same actions as buttons.
-14. **Locked visual system** in `BATTLEASIA-REDESIGN-PROMPT.md` §17: 8pt spacing only (4/8/16/24/32), radius scale, `--ba-accent` trio before first paint, 5 component states, mobile bottom sheets, 44px targets, safe-area, glass+aurora, IG stories/carousel/heart/chat bubbles, Copied chip + BAC(fiat) + receipt lightbox, Lighthouse 90+ / LCP / TBT, dynamic heavy libs, WebP/AVIF.
+14. **Locked visual system** in `BATTLEASIA-REDESIGN-PROMPT.md` §17: 8pt spacing only (4/8/16/24/32), radius scale, `--ba-accent` trio before first paint, 5 component states, mobile bottom sheets, 44px targets, safe-area, glass+aurora, IG stories/carousel/heart/chat bubbles, Copied chip + **BAC coin icon before every amount** (§3.4.1) + fiat + receipt lightbox, Lighthouse 90+ / LCP / TBT, dynamic heavy libs, WebP/AVIF.
 15. **Two player clients:** **PC Web starts on landing**; **APK starts on auth only** (no APK landing). See `BATTLEASIA-REDESIGN-PROMPT.md` §0.1.
 16. **Fill the remaining gaps:** Aurora brief locked (redesign §1); admin enterprise (redesign §5.1); Ready/Leave/lobby-chat + JSON contracts (this file §2.10); FCM + Sentry + email templates + SEO + i18n namespaces (§2.11); ship **P0 before P1/P2** (redesign §18).
 17. **No Figma:** buttons/icons/logo from the code kit; **5 new high-quality game WebPs** (PUBG first) plus generate any other needed art; **fast-load caps** (`BATTLEASIA-REDESIGN-PROMPT.md` §1.1–1.2). Do not wait for a designer. Do not reuse old screenshots.

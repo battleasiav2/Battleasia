@@ -113,8 +113,8 @@ Locked finish numbers: **§17**.
 Design one shared component/token set so web, shop, admin, and APK feel like one product. **Locked numbers: §17.**
 
 - **Tokens:** color roles, **8pt spacing only**, radii scale, hairline borders, typography scale, z-index, breakpoints.
-- **Core components:** button (primary/secondary/ghost/danger, loading, disabled), input/select/textarea/phone/OTP, checkbox/switch/radio, card/surface, **desktop modal / mobile bottom-sheet**, drawer, tabs, table/data-grid, chip/badge, avatar, tooltip, accordion, carousel, pagination, breadcrumb.
-- **App shell:** top header (logo, balance pill, notifications, account, language, accent), primary nav, footer/bottom-nav, page shell/container.
+- **Core components:** button (primary/secondary/ghost/danger, loading, disabled), input/select/textarea/phone/OTP, checkbox/switch/radio, card/surface, **desktop modal / mobile bottom-sheet**, drawer, tabs, table/data-grid, chip/badge, avatar, tooltip, accordion, carousel, pagination, breadcrumb, **`CoinValue`** (`[BAC coin icon] [amount]` — Master §3.4.1).
+- **App shell:** top header (logo, **balance pill with coin icon first**, notifications, account, language, accent), primary nav, footer/bottom-nav, page shell/container.
 
 ### 2.1 Accent color switcher (REQUIRED — keep from current product)
 - Users select their **accent color** from several presets (current app ships 8: lime, gold, ember, jade, cyan, violet, rose, sky). Redesign the presets to fit the new brand, but the **feature must remain** on both web and APK.
@@ -306,7 +306,7 @@ This is the **phone app**, not a WebView of the PC site. Same design tokens and 
 
 **Entry:** Splash → **Sign In / Sign Up only** (no landing, no marketing home). Authed → Play. Remember email+password. Forgot/reset/**OTP verify** exist as extra auth screens (6-digit OTP **visible** on those screens — Master §3.6), not as a website clone.
 
-Header: logo, balance, notifications, account drawer, language, accent. Bottom nav: Play, Shop, Referral, Feed.
+Header: logo, **balance with BAC coin icon first**, notifications, account drawer, language, accent. Bottom nav: Play, Shop, Referral, Feed. Every BAC amount uses the same coin asset as web (`currency.webp`).
 
 Keep all 30 screens:
 - Play / match list / detail / result.
@@ -897,7 +897,7 @@ Dark page ink may remain `#060607` / `#0E0F14` (Aurora) with glass cards `backdr
 ### 17.6 Finance & shop (trust)
 
 - **Copyable values:** TrxID, referral, room credentials — click → small animated **“Copied!”** chip.
-- **Fiat next to BAC:** e.g. `500 BAC (৳500 BDT)` in smaller type (region from coin rates).
+- **Fiat next to BAC:** `[coin icon] 500` then optional `(৳500 BDT)` in smaller type (region from coin rates). **Never** a BAC amount without the coin **in front** (Master §3.4.1). Same on shop, APK, admin.
 - **Receipt lightbox:** deposit screenshot → fullscreen **zoom + rotate**.
 
 ### 17.7 Ship gate (do not call done without)
@@ -917,6 +917,7 @@ Do **not** block P0 on clans/live/gifting. Flags default **OFF** for P1/P2.
 - PC landing → auth → desktop `/user/*` + **shop on `shop.battleasia.gg` (separate domain, login again)** + admin PC (incl. **§5.1 enterprise**)
 - Footer + **all 7 socials** + **live chat FAB** (hover, drag, attach, guest sign-in, seed `liveChat`+`messaging`) — Master §0.3
 - Mail **and** live-chat **100% Admin** (SMTP + inbox + widget + providers) — Master §0.4
+- **BAC coin icon in front of every balance** (header, wallet, shop, matches, admin, APK) — Master §3.4.1
 - Auth **OTP on-screen** (sign-up/verify + reset, web + shop + APK) — Master §3.6
 - APK: splash → **auth only** → native after-login (no landing)
 - Money: deposit/withdraw/join/leave-refund/transfer + ACID + idempotency + double-entry
