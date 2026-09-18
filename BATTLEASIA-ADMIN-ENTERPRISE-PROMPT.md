@@ -1,5 +1,7 @@
 # BattleAsia Admin Panel — Enterprise UI/UX & Advanced Utilities Prompt
 
+> **ARCHIVED.** For a new rebuild use **`BATTLEASIA-NEW-BUILD-PROMPT.md`** (admin enterprise is already inside it).
+
 > **Status: spec only — do not implement until asked.** Main build comes later.
 >
 > Upgrade **`admin.battleasia.gg`** with enterprise-grade data management, operational utilities, security controls, and UX — across Users, Matches, Payments, Feed, Support, and System — **without breaking existing business logic or API contracts**.

@@ -1,5 +1,7 @@
 # BattleAsia — Redesign Prompt (New Look, Same Product)
 
+> **ARCHIVED.** For a new rebuild use **`BATTLEASIA-NEW-BUILD-PROMPT.md`**.
+
 > Goal: rebuild BattleAsia with a **brand-new visual design** while keeping **100% of the product** — same features, data, API, flows, and infra. This prompt is **design-agnostic**: it tells you *what every screen must do and contain*, but the *look* is yours to invent. Nothing functional should be lost in the redesign.
 >
 > For the exhaustive technical spec (every model, endpoint, env var), read the companion file `BATTLEASIA-MASTER-PROMPT.md`. This file focuses on **what to redesign and the UI requirements per surface**.
