@@ -304,3 +304,53 @@ Apply these to lift the design from good to premium. All must respect the perfor
 
 ### 10.7 Consistency (the silent 80%)
 - Strict **8pt grid**; one radius scale + one shadow-tier scale used everywhere. Without this, nothing feels "beautiful".
+
+---
+
+## 11. Unique features & extra-earn roadmap
+
+Goal: turn BattleAsia from "play & withdraw" into a **play + earn + social ecosystem**. Build **P0 → P1 → P2**.
+
+> **HARD REQUIREMENT — every feature below must be admin on/off toggleable.** Each is a module with an enable flag (default OFF for anything not yet ready), stored in the global config (`AppSettings`, same pattern as existing engagement/transfer/messaging settings) and surfaced in the **Admin panel** (grouped "Feature Flags" / per-module settings). Clients must **hide the entire UI + block the API** when a feature is OFF. Where relevant, admin also controls the numbers (rates, fees, reward amounts, limits, min/max).
+
+### A. Extra earn — new income for users
+- **Creator earning + live gifting** — earn BAC from reel/post performance; viewers send **BAC gifts** during live, creator withdraws (platform cut % — admin set).
+- **Watch-to-earn** — small BAC for watching live matches / reels / sponsored clips (daily cap — admin set).
+- **Match prediction / fantasy** — predict winners or draft a fantasy squad → BAC reward pool (skill-based, not betting).
+- **1v1 / wager challenge** — challenge a friend for a BAC stake; auto result; platform fee %.
+- **Task / quest marketplace** — sponsored tasks (follow, install, survey) pay BAC.
+- **Tip / gift players** — tip a favorite player or gift during live.
+- **Deeper referral / affiliate** — multi-tier + sub-affiliate, referral leaderboard/contests.
+- **Cashback + deposit-bonus days** — enrich existing bonus logic.
+
+### B. Unique competitive layer
+- **Ranked seasons + divisions (MMR)** — Bronze→Elite, season rewards.
+- **Clans / Teams + Clan Wars** — clan treasury, clan leaderboard, team pages.
+- **Auto bracket / knockout tournaments** — single/double elimination.
+- **Scrim / custom-room hosting** — host a room for a fee.
+- **Faster results** — screenshot/OCR or game-API assisted result entry (less manual admin, faster payout).
+
+### C. Economy health — BAC sinks (must balance the earn side)
+> More earning needs more spending or the coin loses value. These are the sinks.
+- **Profile customization store** — animated avatars, **profile frames**, name colors, banners, card skins (bought with BAC).
+- **Collectible cosmetic badges** + season-pass premium track.
+- **Boosts** — entry-fee discount, XP boost, post spotlight (BAC).
+
+### D. Retention / delight
+- **Daily scratch card + tiered lucky wheel** (enrich existing spin).
+- **Achievements + milestone rewards**, streak calendar.
+- **Community events / giveaways**, **clip-of-the-week** contest with prize.
+- **Ambassador / campus-leader** program.
+
+### E. Trust & safety (rare in this market = differentiator)
+- **Fast KYC + instant payout**, transparent result proof, **fair-play score**, anti-cheat reporting, **provably-fair spin**.
+- **Dispute center** inside support.
+
+### Recommended first unique set (highest impact)
+1. Live streaming + gifting (creator earn)
+2. Match prediction / fantasy (extra earn, low risk)
+3. Clans + Clan Wars (retention + competitive)
+4. Profile customization store (BAC sink → healthy economy)
+5. 1v1 wager challenge (viral, unique)
+
+**Net effect:** users earn by **playing, creating, referring, and watching** — while cosmetic sinks keep BAC valuable — and admin can switch any module on/off and tune every rate/fee/limit.
