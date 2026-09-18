@@ -48,18 +48,18 @@ Everything below must be expressed **through** this new brief.
 
 ## 2. Global design system to build (all apps)
 
-Design one shared component/token set so web, shop, admin, and APK feel like one product:
+Design one shared component/token set so web, shop, admin, and APK feel like one product. **Locked numbers: §17.**
 
-- **Tokens:** color roles, spacing scale, radii, shadows/borders, typography scale, z-index, breakpoints.
-- **Core components:** button (primary/secondary/ghost/danger, loading, disabled), input/select/textarea/phone/OTP, checkbox/switch/radio, card/surface, modal/dialog/bottom-sheet, drawer, tabs, table/data-grid, chip/badge, avatar, tooltip, accordion, carousel, pagination, breadcrumb.
+- **Tokens:** color roles, **8pt spacing only**, radii scale, hairline borders, typography scale, z-index, breakpoints.
+- **Core components:** button (primary/secondary/ghost/danger, loading, disabled), input/select/textarea/phone/OTP, checkbox/switch/radio, card/surface, **desktop modal / mobile bottom-sheet**, drawer, tabs, table/data-grid, chip/badge, avatar, tooltip, accordion, carousel, pagination, breadcrumb.
 - **App shell:** top header (logo, balance pill, notifications, account, language, accent), primary nav, footer/bottom-nav, page shell/container.
 
 ### 2.1 Accent color switcher (REQUIRED — keep from current product)
 - Users select their **accent color** from several presets (current app ships 8: lime, gold, ember, jade, cyan, violet, rose, sky). Redesign the presets to fit the new brand, but the **feature must remain** on both web and APK.
-- Implement with CSS variables (`--ba-gold*` equivalent) so the whole UI recolors instantly; persist the choice (web `localStorage: ba-accent`, APK `SharedPreferences: ba-accent`) and bootstrap it before first paint (no color flash).
+- CSS root variables: **`--ba-accent`**, **`--ba-accent-glow`**, **`--ba-accent-hover`** (plus `--ba-gold*` aliases if needed). Persist `ba-accent` (web `localStorage`, APK `SharedPreferences`) and bootstrap **before first paint** (inline script / Flutter theme before first frame — **no color flash**).
 - The accent picker lives in the header (a small color/theme popover), available logged-out and logged-in.
-- **State treatments (design ALL of them):** loading skeletons, empty states, error states, success/confirmation, toasts, inline validation, offline banner.
-- **Data viz:** stat tiles, live counters, progress bars, leaderboards, charts.
+- **Five universal states** on every button, input, card, table: Default · Hover/Active · Loading · Empty · Error — see §17.2.
+- **Data viz:** stat tiles, live counters, progress bars, leaderboards, charts. **Tabular numerals** for BAC/stats.
 - **Brand loader:** boot/splash loader (must be light; one consistent loader across every page/session).
 
 ---
@@ -255,6 +255,7 @@ Native Android app — apply the **same new design language** as web (parity). K
 - [ ] All component states (loading/empty/error/success/toast)
 - [ ] Micro-interactions + edge cases (Section 12) + production quality bar (Section 13) + security hardening (Section 14) + ledger/fraud/DR/tests (Section 15)
 - [ ] Player keyboard HUD shortcuts (Section 16) on web; APK equivalent buttons
+- [ ] Locked visual system (Section 17): 8pt grid, 5 states, mobile/CLS, esports polish, IG feed polish, shop trust, ship gate
 - [ ] New brand assets (logo, wordmark, hero media, game art, fonts, favicon, app icon)
 - [ ] Performance + parity + a11y verified before "done"
 
@@ -734,3 +735,77 @@ Quick Join had no letter in the source list → bind **J**.
 | **Esc** | **Back / Exit** — close pop-up, modal, drawer, lightbox, join window, cheatsheet. |
 
 Disabled / flagged-off actions: short toast, never a crash.
+
+---
+
+## 17. Locked visual system (design tokens, 5 states, mobile, polish, ship gate)
+
+**Required on player web, shop, admin, APK.** This is the exact UI/UX finish — not optional “nice to have”. Overlaps §2, §7, §10, §3A, §13 on purpose: those sections name the jobs; **these numbers are the law**.
+
+### 17.1 Design tokens & shell
+
+**8pt grid — spacing is only 4 / 8 / 16 / 24 / 32 px** (and multiples: 40, 48, 64). **No random padding** (no 13px, 15px, 27px, etc.). Margin, gap, and padding come from this scale.
+
+**Radius & border**
+- Cards / surfaces: `rounded-xl` or `rounded-2xl` (**12–16px**).
+- Buttons & inputs: `rounded-lg` or `rounded-xl` (**8–12px**).
+- Badges & chips: `rounded-full` (pill).
+- Hairline border on dark: **white 8–14%** (`border-white/10` ≈ 10%). Same 8% language on APK.
+
+**Accent architecture**
+- 8 presets on `:root`: `--ba-accent`, `--ba-accent-glow`, `--ba-accent-hover`.
+- Load from storage **before first paint** (no flash on reload).
+
+**Typography**
+- Headings: Barlow / Syne **or** Clash Display — bold, condensed esports.
+- Body & UI copy: Public Sans **or** Poppins — readable.
+- Balance & status numbers: **tabular / monospace numerals** so digits don’t jump.
+
+Dark page ink may remain `#060607` / `#0E0F14` (Aurora) with glass cards `backdrop-blur-md` + `bg-white/[0.03]`.
+
+### 17.2 Five universal states (every button, input, card, table)
+
+| State | Spec |
+|-------|------|
+| **Default** | Resting look from tokens. |
+| **Hover / Active** | Light lift (`-translate-y-0.5`), accent glow or surface change. Pressed scale on tap. Disabled = no hover, tooltip why. |
+| **Loading** | Button: spinner inside. Regions: **content-shaped shimmer skeleton** (animated gradient), not a blank spinner page. |
+| **Empty** | Never a raw blank screen. Relevant **3D/vector illustration** + short copy + **one CTA** (e.g. “Join your first match”). |
+| **Error** | Field: **red border** + clear red text under the field. Page: error boundary + **Reload** (never a white crash). |
+
+### 17.3 Mobile-first & layout shift
+
+| Rule | Spec |
+|------|------|
+| **Zero CLS** | Images/banners have **fixed aspect-ratio** (`aspect-video`, `aspect-square`, or explicit width/height) **before** load so content below does not jump. CLS &lt; 0.1. |
+| **Bottom sheet over center modal** | On mobile, join / confirm / filters / menus = **bottom-sheet drawer** rising from the bottom. Desktop may keep centered dialog. |
+| **Touch targets** | Clickable buttons, chips, icons **≥ 44×44px**. |
+| **Safe area** | `env(safe-area-inset-top)` / `safe-area-inset-bottom` for notch and home indicator. APK JOIN/CTAs never sit under the system bar. |
+
+### 17.4 Esports polish (off LCP path)
+
+- **Glass + depth** on dark `#060607`: `backdrop-blur-md bg-white/[0.03]`.
+- **Subtle aurora mesh glow** behind hero and winner banners — accent-colored blur, **not** neon overload.
+- **Micro-animations** (dynamic import, `prefers-reduced-motion` off):
+  - Balance / prize **count-up** (e.g. 0 → 2000 BAC).
+  - Join spots **progress bar** fill in realtime.
+  - Notification **pulse / blinking dot**.
+
+### 17.5 Social / feed (Instagram-level)
+
+- **Stories tray:** tap → full screen; **5s** progress bar; **hold to pause**.
+- **Feed carousel:** swipe + **dots**; smooth horizontal snap.
+- **Double-tap heart:** two taps on media → heart scales in the center, fades out; optimistic like.
+- **Chat bubbles:** own messages **accent, right**; others **dark surface, left**; **typing dots**.
+
+### 17.6 Finance & shop (trust)
+
+- **Copyable values:** TrxID, referral, room credentials — click → small animated **“Copied!”** chip.
+- **Fiat next to BAC:** e.g. `500 BAC (৳500 BDT)` in smaller type (region from coin rates).
+- **Receipt lightbox:** deposit screenshot → fullscreen **zoom + rotate**.
+
+### 17.7 Ship gate (do not call done without)
+
+- Lighthouse **Performance 90+**, **LCP &lt; 2.5s**, **TBT &lt; 150ms**, **CLS &lt; 0.1**.
+- **Framer Motion, Three.js, Socket.IO** (and carousels) **never** on the main LCP bundle — **dynamic import** after first paint.
+- All banners, icons, photos: **WebP or AVIF**, compressed.
