@@ -269,9 +269,9 @@ Redesign the admin UI (dense, data-heavy, tables/forms) but keep every section:
 - **Shop:** coin pack CRUD, coin rates.
 - **Notifications:** broadcast/targeted push.
 - **Feed:** posts, categories, profile-social-settings, social-reports, reels-moderation.
-- **Customer support:** inbox, thread reply, live-chat + messaging-provider settings.
+- **Customer support:** **whole chat system** — inbox, thread reply/close, Live Chat Settings (widget on/off, agent, welcome, socials), Messaging Providers. Player FAB has no hardcoded chat config (Master §0.4).
 - **Engagement:** missions, badges, settings.
-- **System:** mail settings, **App Download (APK upload + version + toggle)**.
+- **System:** **Mail Settings = all SMTP** (enable, host/port/SSL, user/pass, from, test send) for OTP + every outbound mail. Env SMTP is fallback only. **App Download (APK upload + version + toggle)**.
 - **Feature flags** — every unique module on/off + rates.
 - **Integrity** — ledger, fraud holds, KYC, fingerprints, match reports, disputes, **audit logs**.
 - **Profile**, 404.
@@ -916,6 +916,7 @@ Do **not** block P0 on clans/live/gifting. Flags default **OFF** for P1/P2.
 
 - PC landing → auth → desktop `/user/*` + **shop on `shop.battleasia.gg` (separate domain, login again)** + admin PC (incl. **§5.1 enterprise**)
 - Footer + **all 7 socials** + **live chat FAB** (hover, drag, attach, guest sign-in, seed `liveChat`+`messaging`) — Master §0.3
+- Mail **and** live-chat **100% Admin** (SMTP + inbox + widget + providers) — Master §0.4
 - Auth **OTP on-screen** (sign-up/verify + reset, web + shop + APK) — Master §3.6
 - APK: splash → **auth only** → native after-login (no landing)
 - Money: deposit/withdraw/join/leave-refund/transfer + ACID + idempotency + double-entry
@@ -939,4 +940,4 @@ Do **not** block P0 on clans/live/gifting. Flags default **OFF** for P1/P2.
 - Live + gifting, watch-to-earn, fantasy, 1v1, clans/wars, customization store, OCR results
 - IG P2 (For You, voice notes, watch party)
 
-**Handover still required (not in markdown):** brand assets, secrets, keystore, live Mongo, Coolify/Cloudflare/Coingo/SMTP/Firebase accounts.
+**Handover still required (not in markdown):** brand assets, secrets, keystore, live Mongo, Coolify/Cloudflare/Coingo/Firebase accounts. **SMTP mailbox** exists at host — daily host/port/user/pass is **Admin Mail Settings**, not a required Coolify-only config.

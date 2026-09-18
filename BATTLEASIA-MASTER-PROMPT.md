@@ -43,10 +43,10 @@ This is the **live product today**. A rebuild must include **every row**. Extra 
 - Payments: wallet, deposit, withdrawal
 - Notifications
 - Feed: list, categories, profile-social-settings, social-reports, reels-moderation
-- Support: list, `:conversationId`, live-chat-settings, messaging-provider-settings
+- Support: list, `:conversationId`, live-chat-settings, messaging-provider-settings (**whole chat from Admin** — §0.4)
 - Shop: coinlist, coinrate
 - Engagement: missions, badges, settings
-- System: mail-settings, app-download
+- System: mail-settings (**all SMTP from Admin** — §0.4), app-download
 - Profile `/profile` · 404
 
 **RBAC keys (UI hide; `admin` bypasses):** `users.view|create|edit|delete` · `matches.view|create|edit|delete|result` · `payments.view|manage` · `notifications.send` · `feed.view|create|edit|delete` · `customer-support.view|reply|close` · `shop.view|create|edit|delete` · `engagement.view|edit`.
@@ -125,6 +125,24 @@ socialLinks: Facebook / YouTube / WhatsApp / TikTok (URLs + mingcute icons + bra
 
 Seed may also load 10 face users + 5 games. Footer/chat copy comes from seed; URLs remain the live ones.
 
+### 0.4 Mail + chat — **100% from Admin** (source of truth)
+
+Do **not** hardcode SMTP, chat agent, welcome, socials-in-chat, or messaging providers in player/shop/APK clients. Seed fills `AppSettings` once; after that **Admin UI owns every switch**. Players only consume the APIs.
+
+**Mail (`admin.battleasia.gg` → System → Mail Settings)** — copy running `MailSettingsView`:
+- Enable outbound email, SMTP host/port, SSL/TLS, username, password (mask `********` keep-on-save), From name, From email, **Send test**.
+- Stored `AppSettings.mail`. Used for **all** outbound: signup OTP, reset OTP, admin login OTP, deposit/withdraw approve/reject, match mail, any other HTML template.
+- APIs: `GET/PUT /api/v2/app-settings/mail-settings`, `POST .../mail-settings/test` `{ to }` (admin only).
+- `SMTP_*` / `MAIL_FROM*` env = **bootstrap fallback only** if Admin mail is empty/disabled. Once Admin saves enabled SMTP, **Admin wins**. Coolify env is not the daily config UI.
+- Disable mail in Admin → no send; OTP still works with `LOG_AUTH_CODES` logs (not shown on production page).
+
+**Chat system (`admin.battleasia.gg` → Customer support)** — the **whole** chat is admin-run:
+1. **Inbox** `/customer-support` + `:conversationId` — list all conversations, open thread, **reply**, attachments, **close**, realtime socket (same thread players use in the FAB). RBAC `customer-support.view|reply|close`.
+2. **Live Chat Settings** — enable/disable widget, agent name/title, logo URL, agent avatar, welcome message, CRUD **socialLinks** (label, icon, color, href). Player FAB/APK **reads this live**. Off → FAB hidden / offline toast.
+3. **Messaging Providers** — builtin BattleAsia Chat on/off, default provider, allow user choice; per-provider enable, label, type (builtin/whatsapp/telegram/facebook/discord/custom), icon, color, URL, open-in-new-tab. Used on profiles / Messages / optional chat deep links.
+
+Player/shop/APK: no local chat config except empty UI defaults while the public settings GET loads. Admin change → next fetch (and sockets for new messages). Seed defaults in §0.3 only so first boot is not blank.
+
 ---
 
 ## 1. Monorepo layout
@@ -148,7 +166,7 @@ battleasianew/
 
 Production domains (Coolify + Cloudflare):
 - `https://battleasia.gg/` → player web
-- `https://shop.battleasia.gg/` → shop web
+- `https://shop.battleasia.gg/` → shop web (**separate domain**; user **signs in again** — §4)
 - `https://admin.battleasia.gg/` → admin web
 - `https://battleasia.gg/api/*`, `/uploads/*`, `/socket.io/*` → API (path prefix, not a subdomain)
 
@@ -421,9 +439,9 @@ Password sign-in stays email+password (player is **not** passwordless). OTP is *
 - **Shop** `/shop/{coinlist, coinrate}` — BAC pack CRUD + fiat rates. (`listOrders` API exists, no page yet.)
 - **Notifications** `/notifications` — broadcast/targeted push.
 - **Feed** `/feed/{list, categories, profile-social-settings, social-reports, reels-moderation}`.
-- **Customer support** `/customer-support/{list, :id, live-chat-settings, messaging-provider-settings}`.
+- **Customer support** `/customer-support/{list, :id, live-chat-settings, messaging-provider-settings}` — **entire chat system** (inbox + reply/close + widget + providers). See §0.4.
 - **Engagement** `/engagement/{missions, badges, settings}`.
-- **System** `/system/{mail-settings, app-download}` — SMTP; **APK upload**.
+- **System** `/system/{mail-settings, app-download}` — **all mail/SMTP from this page** (not env as daily config); **APK upload**. See §0.4.
 - **Feature flags** — unique modules on/off + rates.
 - **Integrity / audit** — ledger, fraud, KYC, fingerprints, reports, disputes, **audit logs**.
 - **Profile** `/profile`; **404**.
@@ -472,7 +490,7 @@ Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged i
 ---
 
 **Env vars (per app):**
-- API: `PORT, NODE_ENV, MONGODB_URI, JWT_SECRET*, ADMIN_EMAIL/PASSWORD*/USERNAME, SYNC_ADMIN_PASSWORD, CORS_ORIGINS, COINGO_MOCK, LOG_AUTH_CODES, ADMIN_LOGIN_OTP, APP_URL, CDN_URL, SMTP_*, MAIL_FROM*` (+ `MONGO_DUMP_PATH`, `APP_APK_MAX_MB`, `SENTRY_DSN`, `FCM_SERVER_KEY` / Firebase, `BACKUP_S3_*`).
+- API: `PORT, NODE_ENV, MONGODB_URI, JWT_SECRET*, ADMIN_EMAIL/PASSWORD*/USERNAME, SYNC_ADMIN_PASSWORD, CORS_ORIGINS, COINGO_MOCK, LOG_AUTH_CODES, ADMIN_LOGIN_OTP, APP_URL, CDN_URL` (+ optional `SMTP_*`/`MAIL_FROM*` **fallback only** — live mail is Admin §0.4; `MONGO_DUMP_PATH`, `APP_APK_MAX_MB`, `SENTRY_DSN`, `FCM_SERVER_KEY` / Firebase, `BACKUP_S3_*`).
 - Player fe: `VITE_PORT, VITE_SERVER_URL, VITE_BAC_SHOP_URL, VITE_CDN_URL, VITE_SENTRY_DSN`. **Do not use `VITE_STAT_*` for live counters.**
 - Shop: `VITE_PORT, VITE_SERVER_URL, VITE_MAIN_APP_URL, VITE_BASE_PATH`, `VITE_SENTRY_DSN`.
 - Admin: `PORT, REACT_APP_API_URL, REACT_APP_BASENAME, PUBLIC_URL`, `REACT_APP_SENTRY_DSN`.
@@ -509,9 +527,9 @@ Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged i
 ## 9. What this prompt does NOT contain (hand these over separately)
 Taking "everything" still leaves these outside the text prompt — provide them alongside:
 - **New brand assets** (logo, wordmark, hero media, game art, fonts, favicon, app icon) — **AI/code generated** per redesign §1.1 if the operator does not hand over art. Fonts: self-hosted open/licensed WOFF2 (Clash/Inter/etc.), not a designer pack.
-- **Secrets & keystore:** real `.env` values, `JWT_SECRET`, admin password, SMTP creds, `battleasia-release.jks` + `key.properties` (password), GitHub token. (Gitignored — lose the keystore = can't update the APK.)
+- **Secrets & keystore:** real `.env` values, `JWT_SECRET`, admin password, `battleasia-release.jks` + `key.properties` (password), GitHub token. SMTP mailbox exists; **host/user/pass are saved in Admin Mail Settings** (§0.4). (Gitignored — lose the keystore = can't update the APK.)
 - **Database content:** the Mongo dump/`backups/` seed data (users, matches, settings) — code seeds structure, not your live data.
 - **Exact i18n copy** for marketing paragraphs beyond locale namespaces in §2.11 (en/bn/zh/hi/ur JSON still must cover auth/play/wallet/errors).
-- **Third-party accounts:** domain/Cloudflare, Coolify server, Coingo gateway credentials, mail provider.
+- **Third-party accounts:** domain/Cloudflare, Coolify server, Coingo gateway credentials, mail provider (then paste into Admin → Mail).
 
 Everything else — architecture, all 52 models, every route, every screen, flows, realtime, infra, build — is captured above.
