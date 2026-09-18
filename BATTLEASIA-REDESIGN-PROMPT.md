@@ -32,7 +32,8 @@ Define the new identity up front so the redesign is intentional, not random:
 
 - **Brand vibe:** (e.g. premium esports / clean fintech / neon arcade / minimal dark / bold sporty) → `______`
 - **Color system:** primary, accent, success/danger/warning, surfaces, text tiers → `______`
-- **Dark / light / both:** `______`  ·  **Accent user-switchable?** yes/no → `______`
+- **Dark / light / both:** `______`
+- **Accent color switcher (REQUIRED):** users can pick their accent from multiple color presets (keep this feature from the current product — see §2.1). Choose the preset palette → `______`
 - **Typography:** display/heading font + body font (WebP/WOFF2 self-hosted for perf) → `______`
 - **Shape language:** corner radius, border style, elevation/glass/flat → `______`
 - **Motion:** subtle/none/expressive (must stay off the LCP critical path) → `______`
@@ -52,6 +53,11 @@ Design one shared component/token set so web, shop, admin, and APK feel like one
 - **Tokens:** color roles, spacing scale, radii, shadows/borders, typography scale, z-index, breakpoints.
 - **Core components:** button (primary/secondary/ghost/danger, loading, disabled), input/select/textarea/phone/OTP, checkbox/switch/radio, card/surface, modal/dialog/bottom-sheet, drawer, tabs, table/data-grid, chip/badge, avatar, tooltip, accordion, carousel, pagination, breadcrumb.
 - **App shell:** top header (logo, balance pill, notifications, account, language, accent), primary nav, footer/bottom-nav, page shell/container.
+
+### 2.1 Accent color switcher (REQUIRED — keep from current product)
+- Users select their **accent color** from several presets (current app ships 8: lime, gold, ember, jade, cyan, violet, rose, sky). Redesign the presets to fit the new brand, but the **feature must remain** on both web and APK.
+- Implement with CSS variables (`--ba-gold*` equivalent) so the whole UI recolors instantly; persist the choice (web `localStorage: ba-accent`, APK `SharedPreferences: ba-accent`) and bootstrap it before first paint (no color flash).
+- The accent picker lives in the header (a small color/theme popover), available logged-out and logged-in.
 - **State treatments (design ALL of them):** loading skeletons, empty states, error states, success/confirmation, toasts, inline validation, offline banner.
 - **Data viz:** stat tiles, live counters, progress bars, leaderboards, charts.
 - **Brand loader:** boot/splash loader (must be light; one consistent loader across every page/session).
@@ -100,6 +106,8 @@ Sign-in, sign-up (2-step: credentials → PUBG ID/phone/game server/terms), forg
 
 
 ## 4. Shop web (`shop.battleasia.gg`) — surfaces to redesign
+
+**This is a SEPARATE app** on its own subdomain `shop.battleasia.gg` (its own codebase, its own login/session gate) — **not** a page inside the main site. The main site's in-app "shop/wallet" links out to this app (`VITE_BAC_SHOP_URL`). It shares the same account/API but requires a fresh sign-in per shop tab session (tab-scoped gate). Keep this separation.
 
 Dedicated **BAC coin store**. Redesign but keep:
 
