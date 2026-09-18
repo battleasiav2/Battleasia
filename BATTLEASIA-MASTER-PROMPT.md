@@ -442,7 +442,7 @@ Amount text stays **white** (not accent). Icon square, inline-flex, nowrap. Hide
 
 ### 3.5 Performance (ship gate — mandatory)
 - Lighthouse 90+, LCP < 2.5s, CLS < 0.1, TBT < 150ms.
-- All routes `lazy()`+Suspense; below-fold home sections + feed tabs lazy; framer-motion/socket.io/embla **never** on critical path (dynamic import only); NProgress gold top bar; boot `#boot-shell` loader (logo + gold bar, once/session, unified across app); image preload only for hero; `font-display: optional`; manual vendor chunks; lazy-retry on chunk error.
+- All routes `lazy()`+Suspense; below-fold home sections + feed tabs lazy; framer-motion/socket.io/embla **never** on critical path (dynamic import only); NProgress **accent** top bar; boot `#boot-shell` loader (logo + accent bar, once/session); image preload only for hero; `font-display: optional`; manual vendor chunks; lazy-retry on chunk error.
 
 ### 3.6 Auth flow + **OTP on the auth page (must be visible)**
 
