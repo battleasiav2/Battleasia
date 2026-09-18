@@ -253,7 +253,7 @@ Native Android app — apply the **same new design language** as web (parity). K
 - [ ] Admin web: every section in Section 5
 - [ ] Flutter APK: all 30 screens re-skinned, parity verified
 - [ ] All component states (loading/empty/error/success/toast)
-- [ ] Micro-interactions + edge cases (Section 12) + production quality bar (Section 13) on web, shop, admin, APK, API
+- [ ] Micro-interactions + edge cases (Section 12) + production quality bar (Section 13) + security hardening (Section 14) on web, shop, admin, APK, API
 - [ ] New brand assets (logo, wordmark, hero media, game art, fonts, favicon, app icon)
 - [ ] Performance + parity + a11y verified before "done"
 
@@ -558,12 +558,14 @@ BAC, match slots, and payouts **must not double-apply**. MongoDB with transactio
 
 | Requirement | Behavior |
 |-------------|----------|
-| **Atomic transactions (ACID)** | Single transaction for: match **join** (slot + `balance` debit + `MatchParticipant` + `BalanceHistory`); **deposit approve** (status + credit + history + referral/bonus side-effects); **withdraw approve/complete**; **P2P transfer** (debit sender + credit recipient + fee + two histories); **distribute winnings / refund**. Any step fails → full abort. |
-| **Race & double-spend protection** | Join: `findOneAndUpdate` only if `spotsLeft > 0` (or `participants.length < totalPlayer`) **and** `status` joinable. Balance: `$inc` only when `balance >= amount` (or transaction read + conditional). Reject a second join from the same user. Transfer cannot send more than balance. |
-| **Optimistic / pessimistic locking** | Limited match slots = **conditional update** (pessimistic occupancy). Admin result distribute: lock match doc (`winningsDistributed` flag) so two admins cannot pay twice. High-value balance adjust: version/check `updatedAt` or increment-only. |
-| **Idempotency keys** | Client sends `Idempotency-Key` (UUID) on join, deposit submit, withdraw submit, transfer, shop order. Server stores key → same key returns the **original result**, does not debit twice. UI retry after timeout **reuses the same key**. |
+| **Atomic transactions (ACID)** | MongoDB `session.withTransaction()` wrapping balance deductions and entry writes. Same txn: match **join** (slot + `balance` debit + `MatchParticipant` + `BalanceHistory`); **deposit approve**; **withdraw approve/complete**; **P2P transfer**; **distribute winnings / refund**. Abort = no partial debit. |
+| **Server-side balance validation** | Re-fetch wallet **inside** the transaction. Never trust client-sent balance. Confirm `balance >= amount` (and 70% withdrawable for cash-out) before any status change. |
+| **Race & double-spend protection** | Unique participant `(matchId, userId)`; conditional slot update; atomic `$inc` with `balance >= amount`. Parallel debit/payout of the same funds: one wins, one fails. |
+| **Optimistic / pessimistic locking** | Limited match slots = **conditional update**. Admin distribute: `winningsDistributed` / `entriesRefunded` so two admins cannot pay twice. |
+| **Idempotency keys** | `Idempotency-Key` UUID on join, deposit submit, withdraw submit, transfer, shop order. Duplicate hits discarded / return original result. Retry reuses the same key. |
+| **High-value withdrawal approval** | ≥ **1000 BAC** (admin-tunable): extra admin/2FA review before mutate. Normal withdraw still admin-reviewed. |
 
-Every BAC change still writes `BalanceHistory` (Master rule 1) **inside** the same transaction.
+Every BAC change still writes `BalanceHistory` (Master rule 1) **inside** the same transaction. Full API/auth/upload/Cloudflare hardening: **§14**.
 
 ### 13.6 Performance & code quality
 
@@ -580,4 +582,63 @@ Lighthouse gate still applies (90+, LCP < 2.5s, CLS < 0.1, TBT < 150ms).
 
 - One **form primitive**, one **toast**, one **empty-state**, one **error-boundary**, one **http client** per app — then screens compose them.
 - i18n all user-visible strings (en/bn/zh/hi/ur).
-- QA: scripted pass of §12 tables **and** this §13 table before calling the rebuild done.
+- QA: scripted pass of §12 tables, §13 table, **and §14** before calling the rebuild done.
+
+---
+
+## 14. Security hardening (100% ready — money, API, match, files, edge)
+
+Companion detail: `BATTLEASIA-MASTER-PROMPT.md` §2.7–2.8 and Cloudflare in §7. **Do not ship without this.**
+
+### 14.1 Money path (server is the only authority)
+
+| Requirement | Spec |
+|-------------|------|
+| **Atomic transactions (ACID)** | `session.withTransaction()` around debit + entry writes. Join, deposit approve, withdraw, transfer, distribute/refund. |
+| **Server-side balance validation** | Re-read `User.balance` (and withdrawable) on the server immediately before confirm. Client amounts are a hint only. |
+| **Double-spend protection** | DB unique constraints + atomic decrements / conditional `$inc`. No two parallel joins/payouts for the same slot or the same BAC. |
+| **Idempotency keys** | Unique key on payment and transfer submissions; duplicate HTTP hits discarded. |
+| **High-value withdrawal approval** | Over threshold → mandatory manual verification + admin review (+ password/2FA). Default 1000 BAC, tunable. |
+
+### 14.2 API & server hardening
+
+| Requirement | Spec |
+|-------------|------|
+| **Rate limiting & throttling** | `express-rate-limit` on auth, OTP, and payment routes (and join). Burst / brute-force → 429. |
+| **NoSQL injection prevention** | `express-mongo-sanitize` on payloads; never interpolate user JSON into queries. |
+| **XSS protection & input sanitization** | Clean incoming strings; **helmet** security headers. (`xss-clean` is unmaintained — use a maintained sanitizer.) |
+| **CORS whitelisting** | API responds only to platform domains (player, shop, admin + local dev). No wildcard. |
+
+### 14.3 Authentication & session governance
+
+| Requirement | Spec |
+|-------------|------|
+| **HttpOnly & Secure cookies** | Session JWT cookies not readable by JS; `Secure` in production. APK uses Bearer. |
+| **JWT invalidation (`tokenVersion`)** | Bump on password change or account suspension → all devices invalid immediately. |
+| **Strong password hashing** | `bcryptjs` salt + hash. |
+| **2FA / OTP** | Secondary codes on **admin login** and **high-value admin actions**. Player verify/reset OTP with countdown (see §13.3). |
+
+### 14.4 Game operations & anti-tampering
+
+| Requirement | Spec |
+|-------------|------|
+| **Room credential concealment** | Room ID/password **absent** from responses until the scheduled release threshold. |
+| **Participant-only authorization** | Credentials only for validated **paid** entries. 403 otherwise. |
+| **Server-authoritative match results** | Admin verification (or signed/OCR-assisted proof). **Never** trust client-submitted results as payout truth. |
+
+### 14.5 Storage & file upload security
+
+| Requirement | Spec |
+|-------------|------|
+| **MIME-type & magic-byte validation** | Inspect binary headers on upload; do not trust extensions. |
+| **Execution prevention** | Public `/uploads` is static-only; no script/binary execution. |
+| **File quota enforcement** | Hard-cap multer/JSON bodies (5MB default, 100MB reel/story, APK cap) to prevent memory exhaustion. |
+
+### 14.6 Cloud, network & infrastructure
+
+| Requirement | Spec |
+|-------------|------|
+| **Cloudflare WAF** | Block known exploits and injection payloads at the edge. |
+| **DDoS mitigation & rate limiting** | Filter spikes **before** the origin host. |
+| **Bot Fight Mode** | Challenge headless browsers and scrapers. |
+| **Origin IP masking** | Origin only behind reverse proxy (Cloudflare / Traefik); origin IP not in public DNS. |

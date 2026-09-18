@@ -50,13 +50,13 @@ Production domains (Coolify + Cloudflare):
 - `v4` → shop + payments
 
 ### 2.1 Auth & roles
-- Stateless **JWT**; token via `Authorization: Bearer` OR httpOnly cookie (`battleasia_token` for players, `webet_token` for admin). Admin sign-in also writes `Session` + `LoginHistory`.
+- Stateless **JWT**; token via `Authorization: Bearer` OR httpOnly cookie (`battleasia_token` for players, `webet_token` for admin). Payload includes `tokenVersion` (see §2.8). Admin sign-in also writes `Session` + `LoginHistory`.
 - Optional admin **email OTP** (`ADMIN_LOGIN_OTP=true`).
 - Roles: `admin`, `official`, `agent` (all pass admin gate), `player`. 26 granular permission keys exist for UI RBAC, but API gate is role-type based (`requireAdmin`).
 - Rate limit: 100 req / 15 min on auth paths.
 
 ### 2.2 Data models (52 collections — must all exist)
-- **Users/auth:** `User` (email, username, password, status, avatar, cover, bio, `balance` BAC, embedded `role`{type,permissions}, `roleRef`, `pubgId`, `gameServer`, `referralCode`, `referredBy`, `emailVerified`, premium fields, `privacy`), `Role`, `Session`, `LoginHistory`, `VerificationCode`.
+- **Users/auth:** `User` (email, username, password, status, avatar, cover, bio, `balance` BAC, embedded `role`{type,permissions}, `roleRef`, `pubgId`, `gameServer`, `referralCode`, `referredBy`, `emailVerified`, premium fields, `privacy`, **`tokenVersion`** integer default 0 — bump on password change / suspend / logout-all), `Role`, `Session`, `LoginHistory`, `VerificationCode`.
 - **Games/matches:** `Game`, `Match` (gameId, gameMode classic/tdm, roomId/password, schedule, entryFee, totalPlayer, teamType, perKill, map, banner, premiumOnly, platformFeePercent, status, results[], winningsDistributed, entriesRefunded), `MatchParticipant`.
 - **Wallet/payments (BAC):** `BalanceHistory`, `DepositHistory`, `WithdrawalHistory`, `PaymentChannel`, `BusinessWallet`, `CoinRate` (global/bangladesh/india/pakistan), `CoingoTransaction`, `ShopItem`, `ShopOrder`, `UserTransferHistory`, `ReferralHistory`.
 - **Social/feed:** `Feed`, `FeedCategory`, `FeedLike`, `FeedComment`, `SavedPost`, `Reel`, `Story` (TTL expiry), `Follow`, `UserBlock`, `DirectConversation`, `DirectMessage`, `SocialReport`.
@@ -102,11 +102,35 @@ Production domains (Coolify + Cloudflare):
 - Seed (`npm run seed`): roles, admin + sample player, 5 platform games, AppSettings, bKash/Nagad channels + wallet, coin rates, 14 BAC packs, sample deposit/withdrawal/feed/notification/support. Partial seeds: games/dashboard/feed/social/demo. Auto-restore from `backups/…/mongo/battleasia` when embedded Mongo starts empty.
 
 ### 2.7 Money integrity (required for 100% ready)
-- **ACID transactions** on join, deposit approve, withdraw, transfer, distribute/refund (debit/credit + `BalanceHistory` + status flags abort together).
-- **No double spend:** conditional match-slot updates; `balance >= amount` before `$inc`; one join per user per match; `winningsDistributed` / `entriesRefunded` locks.
-- **Idempotency-Key** header on join, deposit submit, withdraw submit, transfer, shop order — retries return the first result.
-- Trim/sanitize all strings server-side. Auth rate-limit 100/15min; also throttle OTP, join, transfer.
-- Additive: `POST /v2/users/refresh` (player) + admin equivalent for token auto-refresh; 401 interceptor retries GET once, never auto-retries money POSTs.
+- **Atomic transactions (ACID):** wrap balance deductions and entry writes in MongoDB `session.withTransaction()` (replica set in prod). One transaction for: match **join** (slot + debit + `MatchParticipant` + `BalanceHistory`); **deposit approve**; **withdraw approve/complete**; **P2P transfer**; **distribute winnings / refund**. Any step fails → full abort.
+- **Server-side balance validation:** never trust client-sent balance or “I can afford this”. Inside the transaction, **re-fetch** the user wallet and re-check `balance >= amount` (and withdrawable 70% rule for withdrawals) **before** any state change.
+- **Double-spend protection:** unique index `(matchId, userId)` on participants; conditional `findOneAndUpdate` only if slots remain and match is joinable; atomic `$inc` with `balance >= amount` (or equivalent filter). Parallel debit/payout of the same funds must fail one request. `winningsDistributed` / `entriesRefunded` flags prevent a second payout.
+- **Idempotency keys:** client sends `Idempotency-Key` (UUID) on join, deposit submit, withdraw submit, transfer, shop order. Persist key → duplicate hits return the **first** result, no second debit. UI retries reuse the same key.
+- **High-value withdrawal approval:** withdrawals (and manual balance adjusts) **above a threshold** (default **1000 BAC**, admin-tunable in `AppSettings`) require **mandatory extra verification**: queued for senior/admin review, password or **2FA/OTP** confirm before the API mutates. Below-threshold still follows normal admin approve→processing→complete. Deposits remain admin-reviewed at all amounts unless Coingo auto.
+
+### 2.8 API, auth, match & upload hardening (required)
+
+**API & server**
+- **Rate limit / throttle** (`express-rate-limit`): auth **100 / 15 min**; tighter on OTP send/resend, forgot-password, join, deposit/withdraw/transfer. 429 → UI countdown.
+- **NoSQL injection:** `express-mongo-sanitize` (strip `$` / `.` operators from req body/query/params). Never pass raw user objects into Mongo filters.
+- **XSS & headers:** sanitize incoming strings (maintained sanitizer; `xss-clean` is unmaintained — use `xss` / DOMPurify-equivalent on the server). **`helmet`** strict CSP, `X-Content-Type-Options`, `Referrer-Policy`, frame ancestors none. Do not serve user HTML unsanitized.
+- **CORS whitelist:** `CORS_ORIGINS` only — `https://battleasia.gg`, `https://shop.battleasia.gg`, `https://admin.battleasia.gg` (+ localhost in dev). No `*`. Credentials allowed only for those origins.
+
+**Auth & session**
+- **HttpOnly + Secure cookies:** `battleasia_token` (player), `webet_token` (admin) — `httpOnly`, `secure` in prod, `sameSite` appropriate (Lax/Strict; None only if cross-site shop needs it **and** Secure). JWT also accepted as Bearer for APK. Never put JWT in `localStorage`.
+- **JWT invalidation via `tokenVersion`:** embed `tokenVersion` in the access token. On **password change, account suspend/ban, logout-all**, increment `User.tokenVersion` so all devices fail auth immediately. Middleware rejects mismatched version.
+- **Password hashing:** `bcryptjs` with salt (cost ≥ 10). Never log or return hashes.
+- **2FA / OTP:** admin login OTP (`ADMIN_LOGIN_OTP`); also require OTP/2FA on **high-value admin money actions** (withdraw approve ≥ threshold, balance adjust). Player email-verify / reset already use `VerificationCode`.
+
+**Game ops & anti-tampering**
+- **Room credential concealment:** `roomId` / `roomPassword` **omitted** from public and pre-join match payloads. Reveal only after: user is a **paid participant** AND scheduled release time (match start / admin publish). List/detail APIs must not leak credentials.
+- **Participant-only authorization:** `GET .../room` (or equivalent) 403 unless `MatchParticipant` exists for that user with paid/joined status.
+- **Server-authoritative results:** only **admin v3** result submit / distribute. Ignore client-posted kill counts as truth unless an admin (or signed/OCR-assisted pipeline) verifies. No player can set their own winnings.
+
+**Uploads**
+- **MIME + magic-byte validation:** inspect file headers (e.g. `file-type`), not the client extension/`Content-Type` alone. Allowlist images (and video for reels/stories). Reject HTML/JS/SVG-as-script, exe, php.
+- **Execution prevention:** serve `/uploads` as **static only** — `Content-Disposition` / `X-Content-Type-Options: nosniff`; nginx/Coolify must **not** execute scripts under the upload path. No `.html` execution.
+- **File quota:** multer **memory/disk limits** — 5MB default, 100MB reels/stories, APK cap `APP_APK_MAX_MB`. Hard-cap buffers so a huge body cannot exhaust RAM (`limit` on JSON + multipart).
 
 ---
 
@@ -212,7 +236,16 @@ Same stack/design family as player web (Vite 6 + MUI 6 + Redux Toolkit, persist 
 
 **Docker:** `docker-compose.yml` (local dev, nginx :8088, API on host), `docker-compose.prod.yml` (VPS: api+fe+shop+admin+nginx+certbot SSL), `docker-compose.coolify.yml` / `docker-compose.yaml` (Coolify: mongo+api+fe+shop+admin, Traefik SSL, no bundled nginx). Per-app Dockerfiles + nginx SPA configs in `docker/`.
 
-**Coolify (primary prod):** Docker Compose resource from GitHub `battleasiav2/Battleasia` branch `main`, compose path `/docker-compose.yaml`; env vars set in Coolify UI; **git push to `main` → GitHub App webhook → auto rebuild/redeploy** (no GitHub Actions). PC helpers: `deploy/ship.ps1`, `auto-ship-watch.ps1`, `git-push.ps1`. Cloudflare SSL Full(strict) + WebSockets on.
+**Coolify (primary prod):** Docker Compose resource from GitHub `battleasiav2/Battleasia` branch `main`, compose path `/docker-compose.yaml`; env vars set in Coolify UI; **git push to `main` → GitHub App webhook → auto rebuild/redeploy** (no GitHub Actions). PC helpers: `deploy/ship.ps1`, `auto-ship-watch.ps1`, `git-push.ps1`.
+
+**Cloudflare (required in prod):**
+- SSL **Full (strict)** + WebSockets on.
+- **WAF** — managed rules to block known exploits and injection payloads.
+- **DDoS** + rate limiting at the edge (before origin).
+- **Bot Fight Mode** — challenge headless / scraper traffic.
+- **Origin IP masking** — traffic only via Cloudflare/Traefik reverse proxy; origin not published in DNS; firewall allows Cloudflare (and deploy IPs) only.
+
+---
 
 **Env vars (per app):**
 - API: `PORT, NODE_ENV, MONGODB_URI, JWT_SECRET*, ADMIN_EMAIL/PASSWORD*/USERNAME, SYNC_ADMIN_PASSWORD, CORS_ORIGINS, COINGO_MOCK, LOG_AUTH_CODES, ADMIN_LOGIN_OTP, APP_URL, CDN_URL, SMTP_*, MAIL_FROM*` (+ `MONGO_DUMP_PATH`, `APP_APK_MAX_MB`).
@@ -237,6 +270,7 @@ Same stack/design family as player web (Vite 6 + MUI 6 + Redux Toolkit, persist 
 8. **Every feature is admin on/off toggleable** — each module has an enable flag in `AppSettings` (global config, same pattern as engagement/transfer/messaging settings), surfaced in the Admin panel as feature flags, with admin-tunable rates/fees/limits. Clients hide the UI **and** the API blocks a feature when it is OFF. New unique/earn features (see `BATTLEASIA-REDESIGN-PROMPT.md` §11: live gifting, watch-to-earn, prediction/fantasy, 1v1 wager, clans, customization store, etc.) all follow this rule and default OFF until ready.
 9. **Every screen has loading / empty / error / success** plus the micro-interactions and edge cases in `BATTLEASIA-REDESIGN-PROMPT.md` §12 (auth, play, money, social, admin, HTTP). No double-submit on money; optimistic social with rollback; human i18n errors, never raw API dumps.
 10. **Production quality bar** in `BATTLEASIA-REDESIGN-PROMPT.md` §13 is mandatory for a 100% ready rebuild: form trim/sanitize, first-error focus, dirty/unsaved, password toggle, masks/counters, error boundaries, 404s, timeouts, graceful degradation, offline/reconnect, token refresh + interceptors, OTP countdown, data masking, Remember Me (no JWT in localStorage), RBAC, skeletons/empty/toasts/copy, ACID + locks + idempotency, lazy routes, WebP/AVIF, debounced search.
+11. **Security hardening** in this file §2.7–2.8 and `BATTLEASIA-REDESIGN-PROMPT.md` §14 is mandatory: `session.withTransaction()`, server-side balance re-fetch, double-spend constraints, idempotency keys, high-value withdraw review, rate-limit, mongo-sanitize, XSS + helmet, CORS whitelist, HttpOnly Secure cookies, `tokenVersion` JWT kill, bcryptjs, admin 2FA/OTP, room secrets participant-only, server-authoritative results, magic-byte uploads + no execute + quotas, Cloudflare WAF / DDoS / Bot Fight / origin masking.
 
 ---
 
