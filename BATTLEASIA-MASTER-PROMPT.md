@@ -226,7 +226,28 @@ Production domains (Coolify + Cloudflare):
 - **Withdrawal:** check withdrawable (70% of match-bet BAC rule) → submit → admin approve→processing→complete/reject.
 - **Match economy:** join deducts entry fee; **leave before start** refunds via reversal ledger; **ready** is lobby-only (does not move BAC); admin distributes winnings / refunds from v3.
 - **P2P transfer:** fee% + min/max from `AppSettings.transferSettings`.
+- **Referral (running site — 1-level, not MLM):** see §2.4.1.
 - **Coin rates:** per region; shop packs have fiat price + `paymentOptions`.
+
+### 2.4.1 Referral system (copy running site)
+
+**Not** multi-tier / sub-affiliate (that is P2). **One level only.** Same on PC `/user/referral` + `/user/account/my-referrals` and APK referral hub.
+
+**Capture:**
+- Link: `{origin}/auth/sign-up?ref={CODE}` (also landing `?ref=`). Store `localStorage: battleasia_ref`. Signup sends `referredBy`.
+- Server `resolveReferrerId`: match code (case-insensitive) or user id. Set `User.referredBy` once. Self-ref forbidden. Each user gets unique `referralCode` at signup (`generateReferralCode`).
+- Show applied code on sign-up if present.
+
+**Earn 1 — deposit commission (main money):**
+- When a **referred** player’s **deposit is approved** (manual or Coingo), referrer gets **`AppSettings.commissionRate` %** of that deposit in BAC (seed/default **10%**, Admin → Users → Referral settings, 0–100).
+- Writes `ReferralHistory` (paid) + `BalanceHistory` reason `referral_commission` + notify referrer + socket `balance-updated`. Inactive referrer / no `referredBy` → skip. No commission on join/win/transfer.
+
+**Earn 2 — invite milestones (engagement, claimable):**
+- Count of users with `referredBy = me`. Tiers (Admin engagement settings; defaults): **5 → 50 BAC**, **10 → 100 BAC**, **25 → 250 BAC**. Claim via `POST /api/v2/engagement/...` referral milestone. Flag `engagement.referralMilestones.enabled`.
+
+**Player UI:** own code + copy link (Copied chip), commission %, stats (network count, earnings), network list, commission history (CoinValue), milestone progress/claim. **Admin:** referral-settings (rate), referral-history list.
+
+**Abuse:** fingerprint/IP rings, referredBy loops — Admin flag (default OFF until tuned). No extra BAC for referring yourself.
 
 ### 2.5 Realtime (Socket.IO, path `/socket.io`, JWT in handshake)
 - Rooms: `user:{id}` (auto), `admin-room`, `game:{id}`, `conversation:{id}`.

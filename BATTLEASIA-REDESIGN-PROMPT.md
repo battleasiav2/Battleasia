@@ -159,7 +159,7 @@ Page heroes / arena strips use the **same muted looping hero video** as landing 
 - **Play:** game picker → match list → detail + **J join** → lobby (**R ready**, **Enter chat**, **C room** when released, **L leave** before start = refund) → result.
 - **Wallet + Earn:** balance, withdrawable, balance history, engagement/earn hub (missions, streak, welcome, referral, weekly, squad, spin, season). Withdraw flow.
 - **Shop (in-app):** marketing + light packs; **Buy / full store** opens `https://shop.battleasia.gg` (separate domain) → **shop login again**.
-- **Referral:** code/link share, network, commissions.
+- **Referral:** **1-level only** (Master §2.4.1): `?ref=` code → signup `referredBy` → **% of referred deposits** (Admin `commissionRate`, default 10%) + claimable invite milestones 5/10/25. Hub: code, copy link, network, history, CoinValue. Not MLM.
 - **Feed / social hub** — **must look and feel like Instagram** (see §3A for the full spec): profiles, posts, stories, reels, live, and direct messaging.
 - **Profile:** own profile/edit + public profile (follow/block/report, followers/following, suggested, premium activation).
 - **Account pages:** my-matches, my-orders, my-statistics, my-referrals, notifications, leaderboard, customer-support (tickets + chat).
