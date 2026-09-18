@@ -94,12 +94,56 @@ Sign-in, sign-up (2-step: credentials → PUBG ID/phone/game server/terms), forg
 - **Wallet + Earn:** balance, withdrawable, balance history, engagement/earn hub (missions, streak, welcome, referral, weekly, squad, spin, season). Withdraw flow.
 - **Shop (in-app):** marketing + coin packs; heavy store links to shop app.
 - **Referral:** code/link share, network, commissions.
-- **Feed / social hub** (tabbed): Feed, Explore, Reels, Saved, Messages — with stories bar, post composer, reel create/player, DMs (new chat, attachments, block/report).
+- **Feed / social hub** — **must look and feel like Instagram** (see §3A for the full spec): profiles, posts, stories, reels, live, and direct messaging.
 - **Profile:** own profile/edit + public profile (follow/block/report, followers/following, suggested, premium activation).
 - **Account pages:** my-matches, my-orders, my-statistics, my-referrals, notifications, leaderboard, customer-support (tickets + chat).
 - Public: `/profile/:userId`, `/privacy-policy`, `/terms-and-conditions`, `/support`.
 
 **Functional constraints:** JWT auth guard on `/user/`*; email-verify + password-reset flows; `returnTo` redirect; `?ref=` capture; live updates via socket (balance, notifications, matches, messages).
+
+### 3A. Social feed — Instagram-style (web + APK, full parity)
+
+The whole social area must **look and behave like Instagram**, adapted for a gaming/esports brand. Same familiar patterns players already know.
+
+**Layout & navigation**
+- **Home feed:** vertical scroll of posts; **stories tray** pinned at the top.
+- Mobile bottom tabs (IG-style): **Home · Explore/Search · Create (＋) · Reels · Profile**; a **DM/inbox icon** top-right of the feed. (This social nav is inside the Feed area; the app's main nav stays Play/Shop/Referral/Feed.)
+- Desktop: centered feed column + right rail (suggested players to follow, trending).
+
+**Posts (like IG posts)**
+- Image/video posts, multi-image **carousel** (swipe dots), caption with **#hashtags** and **@mentions**.
+- Actions: **like (double-tap + heart), comment, share/send, save/bookmark**; like count, view count.
+- Comments: threaded replies, @mentions, emoji, like-a-comment.
+- Post detail page; report/hide/mute; edit/delete own post.
+
+**Stories (like IG stories)**
+- Circular avatars with gradient ring; tap = full-screen 5s auto-advance, tap to skip, hold to pause, swipe for next user.
+- Create: photo/video, **text + stickers**, **poll/quiz sticker**; **reply to a story via DM**; **story reactions**; viewers list; auto-expire (24h); optional **highlights** pinned on profile.
+
+**Reels (like IG reels)**
+- Full-screen vertical swipe player; like/comment/share/save; caption + hashtags; creator follow button; view tracking.
+- Create: upload/record video, cover pick, caption; optional music/sound label.
+
+**Live (like IG live)**
+- Players can **go live**; viewers join, see live viewer count, send live chat comments and reactions (hearts). Host can end; optionally save the replay as a reel.
+- A **LIVE** ring/badge on the creator's story avatar while live; "LIVE" section in Explore.
+
+**Direct Messages (like IG DMs)**
+- Inbox list, 1:1 **and group/squad chats**; text, **media/attachments**, emoji, message reactions, reply-to-message, read receipts, typing indicator (realtime socket).
+- **New message** (user search), **message requests** (spam control), share a post/reel/profile into DM, online presence dot, block/report/mute.
+
+**Profiles (Instagram-style player profile)**
+- Avatar, username + **verified badge**, bio, links, **stats row: posts / followers / following** (+ gaming stats: matches, wins, rank/tier).
+- **Follow / Message** buttons; **grid of posts** (tabs: Posts · Reels · Tagged); story **highlights** row; pinned posts.
+- Public profile at `/profile/:userId`; own profile editable.
+
+**Discovery**
+- **Explore/Search:** search users/hashtags; grid of trending posts/reels; suggested creators; follow topics/games.
+
+**Esports flavor (keep the gaming identity on top of IG patterns)**
+- **Match highlight / clip** posts; **victory auto-post** ("Won 2000 BAC 🏆" — tie to match/wallet); **achievement/badge/streak** share; game-tagged posts and per-game feed filter.
+
+**Realtime:** new post/like/comment/follow/DM/live events via socket; social notifications (likes, comments, follows, mentions, DMs).
 
 ---
 
