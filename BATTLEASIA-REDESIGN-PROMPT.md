@@ -134,7 +134,9 @@ This surface is a **computer product**: min useful layout ~1280px, dense HUD, si
 
 ### Auth pages (the entry into the product)
 
-Full **PC auth** screens (split art + form is fine): Sign-in, sign-up (2-step: credentials → PUBG ID/phone/game server/terms), forgot-password, reset-password, email-verification. After success → `/user/play` (or `returnTo`). `?ref=` captured.
+Full **PC auth** screens (split art + form is fine): Sign-in, sign-up (2-step: credentials → PUBG ID/phone/game server/terms), forgot-password, reset-password, **email-verification OTP**. After success → `/user/play` (or `returnTo`). `?ref=` captured.
+
+**OTP must show on the auth page** (Master §3.6): after sign-up / unverified sign-in the user lands on `/auth/email-verification` with a **visible 6-digit OTP** (boxed cells, timer, resend, verify). Reset-password shows the **same OTP field**. Do not skip verify. Do not hide the code input. Shop + **APK** same. Production never prints the secret code on screen; email SMTP still sends it.
 
 
 
@@ -300,7 +302,7 @@ Additive APIs only: bulk payment/user/feed, `DELETE /sessions/:sessionId`, `POST
 
 This is the **phone app**, not a WebView of the PC site. Same design tokens and **all features**, native patterns.
 
-**Entry:** Splash → **Sign In / Sign Up only** (no landing, no marketing home). Authed → Play. Remember email+password. Forgot/reset/verify exist as extra auth screens, not as a website clone.
+**Entry:** Splash → **Sign In / Sign Up only** (no landing, no marketing home). Authed → Play. Remember email+password. Forgot/reset/**OTP verify** exist as extra auth screens (6-digit OTP **visible** on those screens — Master §3.6), not as a website clone.
 
 Header: logo, balance, notifications, account drawer, language, accent. Bottom nav: Play, Shop, Referral, Feed.
 
@@ -912,6 +914,7 @@ Do **not** block P0 on clans/live/gifting. Flags default **OFF** for P1/P2.
 
 - PC landing → auth → desktop `/user/*` + shop PC + admin PC (incl. **§5.1 enterprise**)
 - Footer + **all 7 socials** + **live chat FAB** (hover, drag, attach, guest sign-in, seed `liveChat`+`messaging`) — Master §0.3
+- Auth **OTP on-screen** (sign-up/verify + reset, web + shop + APK) — Master §3.6
 - APK: splash → **auth only** → native after-login (no landing)
 - Money: deposit/withdraw/join/leave-refund/transfer + ACID + idempotency + double-entry
 - Room hide + participant-only + server results

@@ -30,7 +30,7 @@ Admin web is also **PC-only**. One API serves all.
 
 This is the **live product today**. A rebuild must include **every row**. Extra items later in this prompt (Aurora, ledger, FCM, unique earn) are **additive**.
 
-**PC player (`battleasia.gg`):** `/` → `/dashboard` landing (7 blocks) · privacy · terms · `/profile/:userId` · `/support` · `/auth/{sign-in,sign-up,forgot-password,reset-password,email-verification}` · `/user/play` · `/user/play/:gameId` · `/user/play/:matchId/detail` · `/user/play/:matchId/result` · `/user/shop` · `/user/shop/wallet` · `/user/referral` · `/user/feed` · `/user/feed/:id` · explore/saved/reels/messages → feed tabs · `/user/account/{profile, wallet, my-matches, my-orders, my-statistics, my-referrals, notifications, leader-board, customer-support}` · `/user/earn` → wallet.
+**PC player (`battleasia.gg`):** `/` → `/dashboard` landing (7 blocks) · privacy · terms · `/profile/:userId` · `/support` · `/auth/{sign-in,sign-up,forgot-password,reset-password,email-verification}` (**6-digit OTP visible** on verify + reset — §3.6) · `/user/play` · `/user/play/:gameId` · `/user/play/:matchId/detail` · `/user/play/:matchId/result` · `/user/shop` · `/user/shop/wallet` · `/user/referral` · `/user/feed` · `/user/feed/:id` · explore/saved/reels/messages → feed tabs · `/user/account/{profile, wallet, my-matches, my-orders, my-statistics, my-referrals, notifications, leader-board, customer-support}` · `/user/earn` → wallet.
 
 **PC shop:** `/auth/*` (same 5) · `/user/shop` · `/user/wallet` · `/user/transfer` · `/user/withdrawal`.
 
@@ -295,7 +295,11 @@ All JSON APIs return `{ "success": true, "data": ... }` or `{ "success": false, 
 | Call | Body (in) | `data` (out, typical) |
 |------|-----------|------------------------|
 | `POST /api/v2/users/signin` | `{ email, password }` | `{ token, user: { _id, email, username, balance, role, emailVerified } }` |
-| `POST /api/v2/users/signup` | `{ email, username, password, pubgId?, phone?, gameServer?, referralCode? }` | same as signin or verify-required |
+| `POST /api/v2/users/signup` | `{ email, username, password, pubgId?, phone?, gameServer?, referralCode? }` | `{ emailVerificationRequired: true, email }` → client **shows OTP page** |
+| `POST /api/v2/users/verify-email-signup` | `{ email, code }` | `{ emailVerified, session, user }` |
+| `POST /api/v2/users/resend-verification-code` | `{ email }` | `{ status: true }` |
+| `POST /api/v2/users/forgot-password` | `{ email }` | `{ status: true }` (always generic; then **show OTP** on reset page) |
+| `POST /api/v2/users/reset-password` | `{ email, code, password }` | `{ status: true }` |
 | `POST /api/v2/users/refresh` | cookie/refresh | `{ token }` |
 | `GET /api/v2/users/me` | — | user + `withdrawableAmount` |
 | `POST /api/v2/games/matches/:id/join` | `{}` | `{ participant, balance, spotsLeft }` — **no room** until released |
@@ -360,8 +364,30 @@ Play/matches (`v2/games`), Wallet + earn/engagement (`v2/users`, `v2/engagement`
 - Lighthouse 90+, LCP < 2.5s, CLS < 0.1, TBT < 150ms.
 - All routes `lazy()`+Suspense; below-fold home sections + feed tabs lazy; framer-motion/socket.io/embla **never** on critical path (dynamic import only); NProgress gold top bar; boot `#boot-shell` loader (logo + gold bar, once/session, unified across app); image preload only for hero; `font-display: optional`; manual vendor chunks; lazy-retry on chunk error.
 
-### 3.6 Auth flow
-JWT; boot re-validates `GET v2/users/me`; sign-in → `loginAction` → redirect `returnTo` (safe `/user/*` or `/dashboard/*`) else `/user/play`; email-verify + password-reset flows; `?ref=` captured to `localStorage: battleasia_ref`.
+### 3.6 Auth flow + **OTP on the auth page (must be visible)**
+
+JWT; boot re-validates `GET v2/users/me`; sign-in → `loginAction` → redirect `returnTo` (safe `/user/*` or `/dashboard/*`) else `/user/play`; `?ref=` captured to `localStorage: battleasia_ref`.
+
+**OTP must appear on the auth screens — not email-only, not hidden.** Same on **PC web, shop web, and APK**. Copy running `/auth/email-verification` + `/auth/reset-password` + `_ref-auth-zip/auth/email-verification.html`.
+
+| When | What the user **sees** |
+|------|-------------------------|
+| Sign-up success | Immediately `/auth/email-verification?email=` (APK: Email Verification screen). **6 OTP boxes (or 6-digit code field) are on screen** + “sent to {email}” + timer + Resend + Verify. Never a dead “check your inbox” page with no input. |
+| Sign-in, email not verified | Same OTP screen (do not stay on password form). |
+| Forgot password | Email submit → `/auth/reset-password?email=` with **OTP field visible** + new password + confirm. |
+| Admin login if `ADMIN_LOGIN_OTP=true` | After password, **OTP step shows on the same login page** (6 digits + resend). |
+
+**OTP UI (all clients):**
+- 6 numeric cells (or one `maxLength=6` field styled as OTP): `inputmode=numeric`, `autocomplete=one-time-code`, paste fills all cells, auto-advance, auto-submit when complete (optional).
+- Countdown (running site: 15 min TTL; Resend disabled until timer ends). Expired/wrong/used → inline error, keep the OTP UI.
+- Resend → `POST /api/v2/users/resend-verification-code` `{ email }`. 429 → countdown.
+- Verify signup → `POST /api/v2/users/verify-email-signup` `{ email, code }` → session + `/user/play`.
+- Reset → `POST /api/v2/users/forgot-password` then `POST /api/v2/users/reset-password` `{ email, code, password }`.
+- SMTP HTML email still sends the code. **Production: never print the secret OTP on the page.** Non-prod / `LOG_AUTH_CODES=true`: code in **server logs only**.
+- Missing `?email=` → “email missing” + Go to Sign Up (running site).
+- Shop: same 5 auth pages + OTP. APK: same OTP screens after splash (no landing).
+
+Password sign-in stays email+password (player is **not** passwordless). OTP is **verify + reset** (+ admin 2FA). Seed 10 face users are already `emailVerified` so they skip OTP; **new** signups always hit the OTP screen.
 
 ---
 
