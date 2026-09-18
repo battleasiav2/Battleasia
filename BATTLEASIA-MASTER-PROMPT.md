@@ -394,12 +394,13 @@ Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged i
 14. **Locked visual system** in `BATTLEASIA-REDESIGN-PROMPT.md` §17: 8pt spacing only (4/8/16/24/32), radius scale, `--ba-accent` trio before first paint, 5 component states, mobile bottom sheets, 44px targets, safe-area, glass+aurora, IG stories/carousel/heart/chat bubbles, Copied chip + BAC(fiat) + receipt lightbox, Lighthouse 90+ / LCP / TBT, dynamic heavy libs, WebP/AVIF.
 15. **Two player clients:** **PC Web starts on landing**; **APK starts on auth only** (no APK landing). See `BATTLEASIA-REDESIGN-PROMPT.md` §0.1.
 16. **Fill the remaining gaps:** Aurora brief locked (redesign §1); admin enterprise (redesign §5.1); Ready/Leave/lobby-chat + JSON contracts (this file §2.10); FCM + Sentry + email templates + SEO + i18n namespaces (§2.11); ship **P0 before P1/P2** (redesign §18).
+17. **No Figma:** buttons/icons/logo from the code kit; images AI-generated WebP or CSS fallback (`BATTLEASIA-REDESIGN-PROMPT.md` §1.1). Do not wait for a designer.
 
 ---
 
 ## 9. What this prompt does NOT contain (hand these over separately)
 Taking "everything" still leaves these outside the text prompt — provide them alongside:
-- **Brand/design assets:** logos, hero video/images, game cover art, fonts, favicon (in each app's `assets/`/`public/` + `_ref-*` folders).
+- **New brand assets** (logo, wordmark, hero media, game art, fonts, favicon, app icon) — **AI/code generated** per redesign §1.1 if the operator does not hand over art. Fonts: self-hosted open/licensed WOFF2 (Clash/Inter/etc.), not a designer pack.
 - **Secrets & keystore:** real `.env` values, `JWT_SECRET`, admin password, SMTP creds, `battleasia-release.jks` + `key.properties` (password), GitHub token. (Gitignored — lose the keystore = can't update the APK.)
 - **Database content:** the Mongo dump/`backups/` seed data (users, matches, settings) — code seeds structure, not your live data.
 - **Exact i18n copy** for marketing paragraphs beyond locale namespaces in §2.11 (en/bn/zh/hi/ur JSON still must cover auth/play/wallet/errors).

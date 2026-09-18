@@ -56,6 +56,20 @@ Do **not** leave these blank. This is the new look for the rebuild:
 - **Imagery:** hex game frames, duotone covers, aurora mesh behind hero/winners. 5 unique game arts, PUBG first.
 - **Logo + wordmark:** new `BATTLE ASIA 2.0` (gradient on one word). PC landing hero; **not** on APK (APK has no landing).
 
+### 1.1 No Figma / no manual design (REQUIRED)
+
+The operator will **not** draw in Figma or supply a custom icon set. The rebuild **generates** the visual system in code:
+
+| Surface | How (automatic) |
+|---------|-----------------|
+| **Buttons / inputs / cards** | One component kit from §17 tokens. Primary / secondary / ghost / danger + 5 states. No per-page one-off buttons. |
+| **Icons** | One **SVG icon set** in-repo (line + gradient, hex where needed). Lucide-style or custom paths — **not** PNGs from a designer. Same set on web + APK (flutter_svg or generated). |
+| **Logo / wordmark** | SVG + CSS gradient text. Favicon + Android adaptive icon generated from the mark. |
+| **Hero / game / mode / empty-state art** | AI-generated **WebP** (unique per game, PUBG first) + hex/duotone overlay. If a generator is unavailable, use **CSS aurora + licensed-free geometric/photo fallback**, never a broken image. Compress; fixed aspect-ratio. |
+| **Pay chips** | Simple brand-colored SVG (bKash/Nagad/crypto) — not screenshots. |
+
+**Do not block the build waiting for Figma.** Tokens in §1 + §17 are the source of truth.
+
 Locked finish numbers: **§17**.
 
 ---
@@ -298,7 +312,7 @@ Keep all 30 screens:
 - [ ] Micro-interactions + edge cases (Section 12) + production quality bar (Section 13) + security hardening (Section 14) + ledger/fraud/DR/tests (Section 15)
 - [ ] Player keyboard HUD shortcuts (Section 16) on web; APK equivalent buttons
 - [ ] Locked visual system (Section 17): 8pt grid, 5 states, mobile/CLS, esports polish, IG feed polish, shop trust, ship gate
-- [ ] New brand assets (logo, wordmark, hero media, game art, fonts, favicon, app icon)
+- [ ] No Figma: generated SVG icon/logo kit + WebP art (§1.1)
 - [ ] Performance + parity + a11y verified before "done"
 
 ---
