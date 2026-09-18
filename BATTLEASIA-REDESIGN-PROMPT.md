@@ -70,6 +70,38 @@ The operator will **not** draw in Figma or supply a custom icon set. The rebuild
 
 **Do not block the build waiting for Figma.** Tokens in §1 + §17 are the source of truth.
 
+### 1.2 Five games — high-quality new images + generate everywhere + fast load (REQUIRED)
+
+The platform has **exactly these 5 titles** (order on landing and Play picker):
+
+1. **PUBG** (first, largest/featured)
+2. **Free Fire**
+3. **COD**
+4. **MLBB**
+5. **Valorant** (coming soon — still a unique cover, card disabled)
+
+**Landing** “Play your game” **must use new high-quality generated covers** — not the old repo screenshots, not random Google crops, not one reused poster for all five. Each game = its own atmosphere (maps/operators/colors) + consistent Aurora hex/duotone overlay so the row still looks like one product.
+
+**Anywhere else an image is needed, generate it in the same pass** (do not leave placeholders or ask the operator):
+
+- PC landing: hero still/poster, atmosphere/pulse bg, 5 game covers, Solo/Duo/Squad/TDM mode arts
+- Auth (PC) side art
+- Play grid + match cards (same 5 covers, smaller crops)
+- Empty states, rank badges, APK game tiles (same files, resized)
+- Shop/pay: SVG chips; optional generated pack banners
+- Admin can stay UI-only (no marketing hero)
+
+**Fast load (non-negotiable):**
+
+- Export **WebP** (AVIF extra if easy); no raw PNG/JPEG in the critical path.
+- **Max bytes:** hero ≤ ~150–200KB; game cover ≤ ~40–80KB; thumb/mode ≤ ~20–40KB. Re-compress until under cap.
+- **Fixed width/height or `aspect-ratio`** on every `<img>` — **CLS = 0**.
+- Landing **LCP:** only the hero (or first PUBG cover if that is LCP) gets `fetchPriority="high"`; everything else `loading="lazy"` + `decoding="async"`.
+- **srcset** 1x/2x for game cards; don’t ship a 1920px file in a 280px tile.
+- Same asset URLs on web + APK (or pre-resized APK copies) — don’t duplicate uncompressed blobs.
+- No autoplay video on first paint; poster first. Optional short hero video **below** LCP, muted, `preload="none"`.
+- CDN/`/uploads` with cache headers; Cloudflare Polish on if available.
+
 Locked finish numbers: **§17**.
 
 ---
@@ -112,7 +144,7 @@ Redesign the story, but keep these blocks (anchors `#home #about-us #how-to-play
 
 1. **Hero** — brand wordmark, primary CTA (Enter Arena), **APK download** CTA, trust signals. (New look; old was PUBG-style — invent your own.)
 2. **Live pulse** — live stats, top players, high-prize/ongoing matches (data from public API + socket).
-3. **Play your game** — PUBG, Free Fire, COD, MLBB, Valorant (coming soon) with live counts.
+3. **Play your game** — **5 unique generated high-quality covers** in order: PUBG, Free Fire, COD, MLBB, Valorant (coming soon). See §1.2 (WebP, lazy except LCP, hex overlay).
 4. **About** — story + stats.
 5. **How to play / modes** — Solo, Duo, Squad, TDM.
 6. **Rules / FAQ** — accordion (fair-play, match-ops, prizes, payment rules).

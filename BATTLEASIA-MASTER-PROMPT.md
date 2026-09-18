@@ -263,7 +263,7 @@ List/detail match payloads **omit** `roomId`/`password` unless room endpoint. Er
 ### 3.2 Landing/home sections (at `/dashboard`, scroll anchors `#home #about-us #how-to-play #rules`)
 1. **Hero** — video/poster, `BATTLE ASIA 2.0` PUBG-style wordmark, APK download CTA, sticky CTA, trust row, gaming HUD/FX.
 2. **Live Pulse dashboard** (lazy) — live stats, top players, high-prize/ongoing match rails (public API + socket).
-3. **Play your game** — PUBG, Free Fire, COD, MLBB, Valorant (coming soon), live counts.
+3. **Play your game** — PUBG, Free Fire, COD, MLBB, Valorant (coming soon), live counts. **New unique WebP covers** (redesign §1.2), not old art.
 4. **About BattleAsia** — story + env-driven stats.
 5. **How to play / modes** — Solo, Duo, Squad, TDM.
 6. **Tournament rules / FAQ** — accordion (fair-play, match-ops, prizes, payment rules).
@@ -394,7 +394,7 @@ Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged i
 14. **Locked visual system** in `BATTLEASIA-REDESIGN-PROMPT.md` §17: 8pt spacing only (4/8/16/24/32), radius scale, `--ba-accent` trio before first paint, 5 component states, mobile bottom sheets, 44px targets, safe-area, glass+aurora, IG stories/carousel/heart/chat bubbles, Copied chip + BAC(fiat) + receipt lightbox, Lighthouse 90+ / LCP / TBT, dynamic heavy libs, WebP/AVIF.
 15. **Two player clients:** **PC Web starts on landing**; **APK starts on auth only** (no APK landing). See `BATTLEASIA-REDESIGN-PROMPT.md` §0.1.
 16. **Fill the remaining gaps:** Aurora brief locked (redesign §1); admin enterprise (redesign §5.1); Ready/Leave/lobby-chat + JSON contracts (this file §2.10); FCM + Sentry + email templates + SEO + i18n namespaces (§2.11); ship **P0 before P1/P2** (redesign §18).
-17. **No Figma:** buttons/icons/logo from the code kit; images AI-generated WebP or CSS fallback (`BATTLEASIA-REDESIGN-PROMPT.md` §1.1). Do not wait for a designer.
+17. **No Figma:** buttons/icons/logo from the code kit; **5 new high-quality game WebPs** (PUBG first) plus generate any other needed art; **fast-load caps** (`BATTLEASIA-REDESIGN-PROMPT.md` §1.1–1.2). Do not wait for a designer. Do not reuse old screenshots.
 
 ---
 
