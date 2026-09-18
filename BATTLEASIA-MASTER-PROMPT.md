@@ -146,7 +146,14 @@ Production domains (Coolify + Cloudflare):
 
 ### 2.6 Services & seeding
 - Email (SMTP or `AppSettings.mail`), Coingo gateway, disk uploads, APK distribution, in-memory cache for public dashboard, referral engine, engagement engine. **No cron/background workers** — side effects run inline.
-- Seed (`npm run seed`): roles, admin + sample player, 5 platform games, AppSettings, bKash/Nagad channels + wallet, coin rates, 14 BAC packs, sample deposit/withdrawal/feed/notification/support. Partial seeds: games/dashboard/feed/social/demo. Auto-restore from `backups/…/mongo/battleasia` when embedded Mongo starts empty.
+- Seed (`npm run seed`): roles, admin, **10 face players** (see below), 5 platform games, AppSettings, bKash/Nagad channels + wallet, coin rates, 14 BAC packs, sample matches/results so pulse + leaderboard have real rows, sample deposit/withdrawal/feed/notification/support. Partial seeds: games/dashboard/feed/social/demo. Auto-restore from `backups/…/mongo/battleasia` when embedded Mongo starts empty.
+
+**10 face users (required seed — look “fake” on landing, real in Admin):**
+- Create **10** `User` documents, `role.type: player`, unique usernames, generated **face avatars** (WebP), optional bio. They are **real DB users** — Admin → Users list shows all 10 (edit/ban/balance like anyone). **Do not** hardcode faces only in React.
+- Use them to **fill** landing pulse, top players, leaderboard, suggested follows, empty-ish feed — because the API returns them, not because the UI invents names.
+- Give a few completed match results / BAC so counts and charts are non-zero after seed. Still **API-backed**.
+- Demo login stays `player@battleasia.local / Player@123456` (can be one of the 10 or extra). Seed faces: **not** usernames `testplayer` / `demouser` (those are filtered from public pulse today).
+- Optional internal tag `seedFace: true` for ops; **never hide from admin**.
 
 ### 2.7 Money integrity (required for 100% ready)
 - **Atomic transactions (ACID):** wrap balance deductions and entry writes in MongoDB `session.withTransaction()` (replica set in prod). One transaction for: match **join** (slot + debit + `MatchParticipant` + `BalanceHistory`); **deposit approve**; **withdraw approve/complete**; **P2P transfer**; **distribute winnings / refund**. Any step fails → full abort.
@@ -396,6 +403,7 @@ Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged i
 16. **Fill the remaining gaps:** Aurora brief locked (redesign §1); admin enterprise (redesign §5.1); Ready/Leave/lobby-chat + JSON contracts (this file §2.10); FCM + Sentry + email templates + SEO + i18n namespaces (§2.11); ship **P0 before P1/P2** (redesign §18).
 17. **No Figma:** buttons/icons/logo from the code kit; **5 new high-quality game WebPs** (PUBG first) plus generate any other needed art; **fast-load caps** (`BATTLEASIA-REDESIGN-PROMPT.md` §1.1–1.2). Do not wait for a designer. Do not reuse old screenshots.
 18. **Landing KPIs are live:** join/total/ongoing matches, charts, per-game counts = `GET /api/v3/public/dashboard` (same DB as admin). No fake `VITE_STAT_*` on those tiles.
+19. **10 seed face users** are real `User` docs (Admin can see them). They only “fill” landing/leaderboard/feed via the API — never fake faces in the frontend only.
 
 ---
 
