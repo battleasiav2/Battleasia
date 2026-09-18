@@ -145,6 +145,31 @@ The whole social area must **look and behave like Instagram**, adapted for a gam
 
 **Realtime:** new post/like/comment/follow/DM/live events via socket; social notifications (likes, comments, follows, mentions, DMs).
 
+### 3B. Social — full idea list (build order)
+
+Everything discussed, grouped so nothing is lost. Build **P0 → P1 → P2**.
+
+**P0 — core IG parity (ship first, mostly existing API + UI):**
+- Feed with posts (image/video, multi-image carousel), like/comment/save/share, threaded comments, @mention, #hashtag.
+- Stories (create/view, text + stickers, viewers, 24h expire, reply-via-DM, reactions).
+- Reels (vertical player + create).
+- DMs (1:1, media attachments, read receipts, typing, block/report, new-message search).
+- IG-style profile (avatar, verified, posts/followers/following stats, post grid, Follow/Message).
+- Explore/search (users, hashtags, trending grid, suggested creators).
+- Reactions beyond like (🔥 GG 👏), save collections/folders, hashtag pages, nice empty/loading states.
+
+**P1 — esports differentiators (makes it unique):**
+- **Match highlight / clip** posts; **victory auto-post** ("Won 2000 BAC 🏆", tied to match/wallet).
+- **Achievement / badge / streak** share; game-tagged posts + per-game feed filter; **tournament feed** ("following your games").
+- **Story poll/quiz stickers**; story **highlights** pinned on profile; pinned posts.
+- **Group / squad chat**; share a post/reel/profile into DM; message **reactions** + reply-to-message; online presence dot; **message requests** (spam control).
+
+**P2 — bigger (new backend, later):**
+- **Live** (go-live, live chat + heart reactions, viewer count, LIVE ring, save replay as reel) + **watch party** for live matches.
+- **"For You"** ranked feed; **top creators leaderboard**.
+- **Voice notes** in DM; media gallery per chat; keyword filter / mute words.
+- External share (WhatsApp/Telegram) + deep links; duet/stitch-lite for reels; music/sounds library.
+
 ---
 
 
