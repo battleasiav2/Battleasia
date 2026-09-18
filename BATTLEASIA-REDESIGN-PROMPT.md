@@ -253,7 +253,7 @@ Native Android app — apply the **same new design language** as web (parity). K
 - [ ] Admin web: every section in Section 5
 - [ ] Flutter APK: all 30 screens re-skinned, parity verified
 - [ ] All component states (loading/empty/error/success/toast)
-- [ ] Micro-interactions + edge cases + error handling (Section 12) on web, shop, admin, APK
+- [ ] Micro-interactions + edge cases (Section 12) + production quality bar (Section 13) on web, shop, admin, APK, API
 - [ ] New brand assets (logo, wordmark, hero media, game art, fonts, favicon, app icon)
 - [ ] Performance + parity + a11y verified before "done"
 
@@ -485,12 +485,7 @@ Optimistic like/follow/save; rollback on error.
 
 ### 12.9 Form & input edges
 
-- Required / format / min-max / OTP length — inline, on blur + submit.
-- Password show/hide; strength meter on change-password (admin + player).
-- Phone / PUBG ID: server + region rules.
-- Paste TrxID / room codes: trim whitespace.
-- Unsaved form leave: confirm (profile, match create, deposit proof).
-- Autofill-friendly auth fields; `autocomplete` attributes.
+See **§13.1** for the full production form bar (trim, mask, dirty, unsaved, first-error focus, etc.). Minimum here: required / format / min-max / OTP length — inline; password show/hide; phone / PUBG ID rules; paste-trim TrxID / room codes; unsaved leave confirm; autofill `autocomplete` attributes.
 
 ### 12.10 Device / a11y edges
 
@@ -502,3 +497,87 @@ Optimistic like/follow/save; rollback on error.
 - Tap targets ≥ 44px on mobile.
 
 **Done for this section:** a QA pass that hits every table row on web + shop + APK (admin rows on admin). If a state has no UI, it is not shipped.
+
+---
+
+## 13. Production quality bar (100% ready — not optional)
+
+This is the **ship gate** for a complete product. Apply on **player web, shop, admin, APK, and API**. Overlaps §12 on purpose: §12 is product cases; this section is the **engineering checklist** that must exist as shared utilities, not one-off hacks.
+
+### 13.1 Forms — input quality
+
+| Requirement | Behavior (all apps) |
+|-------------|---------------------|
+| **Input trimming & sanitization** | Trim leading/trailing whitespace on blur **and** before submit (email, username, TrxID, room ID, referral, wallet address, PUBG ID). Collapse internal double-spaces on single-line fields. Strip control chars. Server must trim again — never trust the client. Sanitize rich text (support, captions, bio) against XSS; store safe HTML or plain text. |
+| **Inline real-time validation** | Validate on change (debounced ~300ms) + blur + submit. Show the first relevant message under the field. Schema = same zod/Yup/RHF rules as API. |
+| **Auto-focus first error field** | On failed submit, `scrollIntoView` + `focus()` the first invalid field (web) / `requestFocus` (APK). Don’t only toast. |
+| **Double-submit prevention** | In-flight lock on the form: ignore extra clicks/Enter until the request settles. Unmount-safe (no setState after dispose). |
+| **Button loading states** | Spinner **inside** the submit button; label becomes “Signing in…” / “Joining…” / “Sending…”; button `disabled`. Never a blank freeze. |
+| **Dirty state tracking** | Track `isDirty` vs initial values (react-hook-form / Flutter Form). Disable Save when clean. |
+| **Unsaved changes warning** | If dirty: browser `beforeunload`; in-app route change confirm; APK `WillPopScope` / back confirm. Covers profile, match create/edit, deposit proof, admin settings. |
+| **Password visibility toggle** | Eye icon on every password field (sign-in, sign-up, reset, admin login, change-password). |
+| **Input masking** | Phone: BD `01XXXXXXXXX` (and IN/PK where used). Amounts: numeric, 2-decimal where fiat, integer BAC. OTP: N boxed digits. Card/crypto address: grouped display, store raw. |
+| **Character counter & maxLength** | Bio, caption, report reason, support message, transfer note, reject reason — live `n / max`. Enforce `maxLength` in UI **and** API. |
+
+Shared form kit (web + shop + admin) and matching Flutter widgets — do not reimplement per page.
+
+### 13.2 System resilience & error handling
+
+| Requirement | Behavior |
+|-------------|----------|
+| **Global error boundaries** | React `ErrorBoundary` around root **and** each route; Flutter `FlutterError` / zone + error widget. Crash = branded “Something went wrong” + Reload / Home — **never a white screen**. Log to console/server; no stack traces for users. |
+| **Dynamic 404 & empty routes** | Unknown path → branded 404. Missing `:matchId` / `:userId` / `:feedId` → not-found state inside the layout, not a crash. Admin unknown section → admin 404. |
+| **API timeout & network failure** | Client timeout (e.g. 15s, match APK `ApiClient`). On timeout / `ERR_NETWORK` / DNS: human copy + Retry. Money POSTs: Retry must **check history / status** first (no blind resend). |
+| **Graceful degradation** | If one widget fails (live pulse, socket, stories, Coingo), the rest of the page still works. Feature-flag OFF or endpoint 503 → hide that module, don’t block Play/Wallet. |
+| **Offline / reconnect detection** | `online`/`offline` (web) + connectivity (APK). Sticky non-modal banner: “You’re offline” → “Back online”. Socket: silent reconnect, then “Reconnecting…” chip, then refresh balance / badges. Do not enqueue duplicate money submits while offline. |
+
+### 13.3 Authentication & security edge-cases
+
+| Requirement | Behavior |
+|-------------|----------|
+| **Token expiry & auto-refresh** | Global interceptor. **401:** if a refresh token/endpoint exists, one silent refresh then retry the original **GET**; **never** auto-retry POST join/deposit/transfer/withdraw. If refresh fails or is not shipped yet, clear session → sign-in with `returnTo`. Boot always `GET /me`. Additive `POST /v2/users/refresh` (and admin equivalent) is in-scope for 100% ready. Shop 401 ≠ main-site logout. |
+| **Rate limiting & throttling** | Keep API **100 req / 15 min on auth**. Also throttle resend-OTP, forgot-password, join, transfer. UI: disable + countdown on 429. |
+| **OTP / resend countdown** | Email verify, reset, admin OTP: live timer (e.g. 60s) before Resend enabled. Expired/used code → specific error + resend. |
+| **Email & data masking** | Public/admin lists: `j***@gmail.com`, `017****1234`, truncated Tx hashes. Full value on copy (authorized) or own profile. Never log passwords, OTP, JWT in client logs. |
+| **Remember Me persistence** | APK: `ba_remember_*` email+password (existing). Web: optional remember **email** (not raw password in `localStorage`). **JWT is not stored in plaintext localStorage** — httpOnly cookie and/or memory; redux-persist **strips token on write**. Shop: tab `ba_shop_gate` only. |
+| **RBAC** | Admin nav hidden by permission; `admin` bypass. Deep link to forbidden page → 403, not an empty crash. Player cannot hit `v3` admin APIs. APK has no admin. |
+
+### 13.4 UI states & visual feedback
+
+| Requirement | Behavior |
+|-------------|----------|
+| **Skeleton shimmer loading** | Content-shaped skeletons (match cards, table rows, story rings, wallet tiles). Route-level spinner only for first boot bar. Shimmer off if `prefers-reduced-motion`. |
+| **Descriptive empty states** | Icon + short copy + **one CTA** (e.g. empty wallet → Buy BAC; empty feed → Explore; empty table → Clear filters). Empty ≠ error. |
+| **Optimistic UI updates** | Like, save, follow, unread marks: update immediately; **rollback + toast** on fail. **Not** optimistic for join, deposit, withdraw, transfer, admin approve — wait for API. |
+| **Toast & alert feedback** | Success / error / warning / info. One at a time; optional action. Confirm dialogs for destructive/money (copy names the action). |
+| **Copy to clipboard feedback** | One-click copy (referral, room ID/password, TrxID, wallet). Toast “Copied” ~1.5s; fallback select+copy if Clipboard API blocked. |
+
+### 13.5 Data integrity & concurrency (API — money-critical)
+
+BAC, match slots, and payouts **must not double-apply**. MongoDB with transactions (replica set in prod; document the local-dev fallback).
+
+| Requirement | Behavior |
+|-------------|----------|
+| **Atomic transactions (ACID)** | Single transaction for: match **join** (slot + `balance` debit + `MatchParticipant` + `BalanceHistory`); **deposit approve** (status + credit + history + referral/bonus side-effects); **withdraw approve/complete**; **P2P transfer** (debit sender + credit recipient + fee + two histories); **distribute winnings / refund**. Any step fails → full abort. |
+| **Race & double-spend protection** | Join: `findOneAndUpdate` only if `spotsLeft > 0` (or `participants.length < totalPlayer`) **and** `status` joinable. Balance: `$inc` only when `balance >= amount` (or transaction read + conditional). Reject a second join from the same user. Transfer cannot send more than balance. |
+| **Optimistic / pessimistic locking** | Limited match slots = **conditional update** (pessimistic occupancy). Admin result distribute: lock match doc (`winningsDistributed` flag) so two admins cannot pay twice. High-value balance adjust: version/check `updatedAt` or increment-only. |
+| **Idempotency keys** | Client sends `Idempotency-Key` (UUID) on join, deposit submit, withdraw submit, transfer, shop order. Server stores key → same key returns the **original result**, does not debit twice. UI retry after timeout **reuses the same key**. |
+
+Every BAC change still writes `BalanceHistory` (Master rule 1) **inside** the same transaction.
+
+### 13.6 Performance & code quality
+
+| Requirement | Behavior |
+|-------------|----------|
+| **Route code-splitting & lazy loading** | Every route `lazy()` + Suspense (web/shop/admin). APK: don’t parse unused screens at first frame if practical. Below-fold landing + feed tabs lazy. Framer / Three / socket / carousel **dynamic import only**. |
+| **Asset optimization & compression** | Images WebP/AVIF (fallback), fixed dimensions / aspect-ratio, lazy except LCP hero. Compress uploads server-side where possible. Fonts WOFF2 `font-display: optional`. |
+| **Debounced search** | User search, feed explore, admin user/match search, command palette: debounce **300–400ms**, cancel in-flight, min 2 chars, empty query = no spam. |
+| **Global response interceptors** | Axios (web/shop/admin) + APK `ApiClient`: attach Bearer; map 400 → field errors; **401** → §13.3; 403 email-verify; 429 countdown; 5xx toast + retry. Normalize `{ message }` — never show raw JSON to users. |
+
+Lighthouse gate still applies (90+, LCP < 2.5s, CLS < 0.1, TBT < 150ms).
+
+### 13.7 Shared implementation notes
+
+- One **form primitive**, one **toast**, one **empty-state**, one **error-boundary**, one **http client** per app — then screens compose them.
+- i18n all user-visible strings (en/bn/zh/hi/ur).
+- QA: scripted pass of §12 tables **and** this §13 table before calling the rebuild done.

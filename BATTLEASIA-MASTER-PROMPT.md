@@ -101,6 +101,13 @@ Production domains (Coolify + Cloudflare):
 - Email (SMTP or `AppSettings.mail`), Coingo gateway, disk uploads, APK distribution, in-memory cache for public dashboard, referral engine, engagement engine. **No cron/background workers** — side effects run inline.
 - Seed (`npm run seed`): roles, admin + sample player, 5 platform games, AppSettings, bKash/Nagad channels + wallet, coin rates, 14 BAC packs, sample deposit/withdrawal/feed/notification/support. Partial seeds: games/dashboard/feed/social/demo. Auto-restore from `backups/…/mongo/battleasia` when embedded Mongo starts empty.
 
+### 2.7 Money integrity (required for 100% ready)
+- **ACID transactions** on join, deposit approve, withdraw, transfer, distribute/refund (debit/credit + `BalanceHistory` + status flags abort together).
+- **No double spend:** conditional match-slot updates; `balance >= amount` before `$inc`; one join per user per match; `winningsDistributed` / `entriesRefunded` locks.
+- **Idempotency-Key** header on join, deposit submit, withdraw submit, transfer, shop order — retries return the first result.
+- Trim/sanitize all strings server-side. Auth rate-limit 100/15min; also throttle OTP, join, transfer.
+- Additive: `POST /v2/users/refresh` (player) + admin equivalent for token auto-refresh; 401 interceptor retries GET once, never auto-retries money POSTs.
+
 ---
 
 ## 3. Player web (`battleasia.gg`) — landing + dashboard
@@ -229,6 +236,7 @@ Same stack/design family as player web (Vite 6 + MUI 6 + Redux Toolkit, persist 
 7. Accent color is user-selectable across web + APK; dark gaming aesthetic everywhere.
 8. **Every feature is admin on/off toggleable** — each module has an enable flag in `AppSettings` (global config, same pattern as engagement/transfer/messaging settings), surfaced in the Admin panel as feature flags, with admin-tunable rates/fees/limits. Clients hide the UI **and** the API blocks a feature when it is OFF. New unique/earn features (see `BATTLEASIA-REDESIGN-PROMPT.md` §11: live gifting, watch-to-earn, prediction/fantasy, 1v1 wager, clans, customization store, etc.) all follow this rule and default OFF until ready.
 9. **Every screen has loading / empty / error / success** plus the micro-interactions and edge cases in `BATTLEASIA-REDESIGN-PROMPT.md` §12 (auth, play, money, social, admin, HTTP). No double-submit on money; optimistic social with rollback; human i18n errors, never raw API dumps.
+10. **Production quality bar** in `BATTLEASIA-REDESIGN-PROMPT.md` §13 is mandatory for a 100% ready rebuild: form trim/sanitize, first-error focus, dirty/unsaved, password toggle, masks/counters, error boundaries, 404s, timeouts, graceful degradation, offline/reconnect, token refresh + interceptors, OTP countdown, data masking, Remember Me (no JWT in localStorage), RBAC, skeletons/empty/toasts/copy, ACID + locks + idempotency, lazy routes, WebP/AVIF, debounced search.
 
 ---
 
