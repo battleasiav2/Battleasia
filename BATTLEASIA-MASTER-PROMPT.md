@@ -26,6 +26,33 @@ Admin web is also **PC-only**. One API serves all.
 
 **One shared backend API** serves all four clients. Currency = **BAC** stored on `User.balance`; every movement is logged.
 
+### 0.2 Running site + admin — A–Z inventory (must all exist)
+
+This is the **live product today**. A rebuild must include **every row**. Extra items later in this prompt (Aurora, ledger, FCM, unique earn) are **additive**.
+
+**PC player (`battleasia.gg`):** `/` → `/dashboard` landing (7 blocks) · privacy · terms · `/profile/:userId` · `/support` · `/auth/{sign-in,sign-up,forgot-password,reset-password,email-verification}` · `/user/play` · `/user/play/:gameId` · `/user/play/:matchId/detail` · `/user/play/:matchId/result` · `/user/shop` · `/user/shop/wallet` · `/user/referral` · `/user/feed` · `/user/feed/:id` · explore/saved/reels/messages → feed tabs · `/user/account/{profile, wallet, my-matches, my-orders, my-statistics, my-referrals, notifications, leader-board, customer-support}` · `/user/earn` → wallet.
+
+**PC shop:** `/auth/*` (same 5) · `/user/shop` · `/user/wallet` · `/user/transfer` · `/user/withdrawal`.
+
+**Admin (`admin.battleasia.gg`) — every nav item live now:**
+- Auth: `/auth/login` (+ optional OTP). No public register.
+- Dashboard `/dashboard`
+- Users: list, role, history, online, premium, referral-settings, transfer-settings, referral-history
+- Games: list, matches, `matches/:id/result`, participants-history
+- Balance: balance-histories
+- Payments: wallet, deposit, withdrawal
+- Notifications
+- Feed: list, categories, profile-social-settings, social-reports, reels-moderation
+- Support: list, `:conversationId`, live-chat-settings, messaging-provider-settings
+- Shop: coinlist, coinrate
+- Engagement: missions, badges, settings
+- System: mail-settings, app-download
+- Profile `/profile` · 404
+
+**RBAC keys (UI hide; `admin` bypasses):** `users.view|create|edit|delete` · `matches.view|create|edit|delete|result` · `payments.view|manage` · `notifications.send` · `feed.view|create|edit|delete` · `customer-support.view|reply|close` · `shop.view|create|edit|delete` · `engagement.view|edit`.
+
+**APK after-login** mirrors player `/user/*` (no landing). Shop on APK = native Shop/Wallet/Transfer/Withdraw.
+
 ---
 
 ## 1. Monorepo layout
@@ -68,7 +95,7 @@ Production domains (Coolify + Cloudflare):
 ### 2.1 Auth & roles
 - Stateless **JWT**; token via `Authorization: Bearer` OR httpOnly cookie (`battleasia_token` for players, `webet_token` for admin). Payload includes `tokenVersion` (see §2.8). Admin sign-in also writes `Session` + `LoginHistory`.
 - Optional admin **email OTP** (`ADMIN_LOGIN_OTP=true`).
-- Roles: `admin`, `official`, `agent` (all pass admin gate), `player`. 26 granular permission keys exist for UI RBAC, but API gate is role-type based (`requireAdmin`).
+- Roles: `admin`, `official`, `agent` (all pass admin gate), `player`. **RBAC keys** listed in §0.2. API gate is still role-type (`requireAdmin`); UI hides by permission.
 - Rate limit: 100 req / 15 min on auth paths.
 
 ### 2.2 Data models (52 collections — must all exist)
@@ -375,7 +402,7 @@ Taking "everything" still leaves these outside the text prompt — provide them 
 - **Brand/design assets:** logos, hero video/images, game cover art, fonts, favicon (in each app's `assets/`/`public/` + `_ref-*` folders).
 - **Secrets & keystore:** real `.env` values, `JWT_SECRET`, admin password, SMTP creds, `battleasia-release.jks` + `key.properties` (password), GitHub token. (Gitignored — lose the keystore = can't update the APK.)
 - **Database content:** the Mongo dump/`backups/` seed data (users, matches, settings) — code seeds structure, not your live data.
-- **Exact copy/i18n text** beyond what the components define (locale JSON per app).
+- **Exact i18n copy** for marketing paragraphs beyond locale namespaces in §2.11 (en/bn/zh/hi/ur JSON still must cover auth/play/wallet/errors).
 - **Third-party accounts:** domain/Cloudflare, Coolify server, Coingo gateway credentials, mail provider.
 
 Everything else — architecture, all 52 models, every route, every screen, flows, realtime, infra, build — is captured above.
