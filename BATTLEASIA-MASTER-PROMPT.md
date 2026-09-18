@@ -15,10 +15,12 @@ A **mobile-games esports tournament platform** (PUBG, Free Fire, COD, MLBB, Valo
 | **PC Web** | Full **desktop** app at `battleasia.gg` + `shop.battleasia.gg`. Designed for **computer** (wide HUD, sidebar, hover, keyboard §16). This is **not** a phone website. |
 | **Native Android** | Flutter APK `net.battleasia.app`. This is the **phone** product (bottom nav, touch, bottom sheets). |
 
-**Entry for the logged-in product is always Auth** (same account, same API):
+**Entry (strict):**
 
-- **Web:** public landing → **Enter Arena / Sign in** → `/auth/sign-in` (or sign-up) → after JWT → `/user/play`. Shop: own `/auth/*` then shop.
-- **APK:** Splash → **Auth** (guest → Sign In / Sign Up) → Play. Remember email+password. No skipping auth into a fake guest play for paid matches.
+- **PC Web:** **Landing first.** `/` → `/dashboard` (hero, games, APK download). From there Sign in / Enter Arena → `/auth/*` → `/user/play`. Do **not** skip landing on a cold visit.
+- **Native APK:** **Auth only — no landing.** Splash → Sign In (or Sign Up if they tap create). Logged-in → Play. **Do not** build a marketing home / landing / hero on the APK. Phone landing = the PC site.
+
+Same account, same API. Paid Play/Shop still require auth on both.
 
 Admin web is also **PC-only**. One API serves all.
 
@@ -258,15 +260,17 @@ JWT; boot re-validates `GET v2/users/me`; sign-in → `loginAction` → redirect
 
 ---
 
-## 6. Flutter Android app (`battleasia-app`)
+## 6. Flutter Android app (`battleasia-app`) — **native phone product**
+
+Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged in → Play.
 
 **Stack:** Flutter/Dart (SDK ≥3.8, FVM 3.32.4), `provider` (AuthProvider, AccentProvider), `http` via central `ApiClient` (15s), `socket_io_client`, `cached_network_image`/`image_picker`/`video_player`/`chewie`, `shared_preferences`, `easy_localization` (en/bn/zh/hi/ur), `flutter_dotenv`, `url_launcher`, `intl_phone_field`, `flutter_html`. Fonts: Poppins. Imperative `Navigator` (no go_router). Package `battleasia_app` v1.0.1+2.
 
 **Architecture:** `core/` (config, constants, providers, 10 services, theme, utils) + `data/models/` (28 models) + `presentation/{screens(30), widgets(59)}`. No domain layer.
 
-**Entry:** `main.dart` → SplashScreen → **AuthWrapper** (authed → PlayScreen; guest → SignInScreen). Bottom nav: **Play, Shop, Referral, Feed**. Global gaming backdrop (`gs-bg.webp` + gradient).
+**Entry:** `main.dart` → SplashScreen → **AuthWrapper** (authed → PlayScreen; **guest → SignInScreen only** — never a Home/landing). Bottom nav after login: **Play, Shop, Referral, Feed**.
 
-**Screens (30) mirror web after-login:** auth (sign-in with **remember email+password** via SharedPreferences `ba_remember_*`, sign-up 2-step with PUBG ID/phone/server, email-verify, forgot/reset); play/match list/detail/result; **shop with `ShopAuthGate`** + shop footer nav (Shop/Wallet/Transfer/Withdraw) + buy flow; wallet (Overview/Earn/History); feed hub (Feed/Explore/Reels/Saved/Messages) with stories, composer, reel create/player, DM (new chat, attachments, block/report, external-messaging fallback); profile/account + public profile (follow/block/report, follower lists, suggested); my-matches/orders/statistics/referrals; referral hub; notifications (socket live); leaderboard; customer support (chat + attachments). Marketing Home screen exists but isn't the entry.
+**Screens (30) mirror web after-login (not web landing):** auth first for guests; then play/match list/detail/result; **shop with `ShopAuthGate`** + shop footer nav (Shop/Wallet/Transfer/Withdraw) + buy flow; wallet (Overview/Earn/History); feed hub; profile; my-matches/orders/statistics/referrals; referral hub; notifications; leaderboard; customer support. **No marketing Home / landing screen on APK — delete it if present.**
 
 **API config (`core/config/app_config.dart`):** priority `--dart-define=API_BASE_URL` → `--dart-define=SITE_URL` → bundled `.env` → fallback `https://battleasia.gg`. `getImageUrl` maps `/uploads`→`/api/uploads`. Socket to `serverUrl` (events: balance-updated, new-notification, new-message). Mirrors `/api/v2`, `/v3/public`, `/v4/shop`, `/v4/payments`, `/v1/files`.
 
@@ -310,7 +314,7 @@ JWT; boot re-validates `GET v2/users/me`; sign-in → `loginAction` → redirect
 ## 8. Non-negotiable rules (apply throughout)
 1. **BAC is the single currency** on `User.balance`; every change writes `BalanceHistory`.
 2. **Deposits are admin-reviewed** (submit → approve) unless Coingo auto.
-3. **Web (PC) ↔ APK (native) feature parity:** every auth / shop / after-login **flow** exists on both. Layout is **platform-native**: PC web = desktop shell + keyboard; Android = native widgets + touch. Home/landing is **web-only** unless asked. Do **not** ship the phone experience as a cramped mobile website instead of the APK.
+3. **Web (PC) ↔ APK (native) feature parity:** every auth / shop / after-login **flow** exists on both. Layout is **platform-native**. **Landing is PC-only.** APK has **no** home/landing — first screen after splash is Sign In.
 4. **Performance first:** hit the Lighthouse gate; heavy libs dynamic-imported; no CLS; WebP/AVIF images.
 5. **Secrets server-side / gitignored:** `.env*`, `key.properties`, `*.jks`, `deploy/.github-token.local`, `backups/`. Never commit them.
 6. **Ship APK signed with the real release keystore** (never debug) so every device can install and future updates keep the same signature.
@@ -322,7 +326,7 @@ JWT; boot re-validates `GET v2/users/me`; sign-in → `loginAction` → redirect
 12. **Ledger, fraud, scale, DR, tests** in this file §2.9 and `BATTLEASIA-REDESIGN-PROMPT.md` §15: double-entry + **no delete / reversal only**, liability vs reserve monitor, velocity holds, device fingerprint / multi-account, collusion reports, KYC+age before withdraw (flagged), compound indexes, mongoose pool, live-stats cache, encrypted off-site backups, maintenance countdown, dispute evidence, automated money tests.
 13. **Player HUD keyboard shortcuts** in `BATTLEASIA-REDESIGN-PROMPT.md` §16: **J** quick-join, **C** copy room, **R** ready, **L** leave/refund-before-start, **M** match details, **W** wallet, **B** buy BAC, **T** transfer, **H** hide balance, **Enter** chat, **Tab** leaderboard (not in inputs), **F** follow/like, **S** share match, **U** mute, **Space** reel/live pause, **Esc** close overlays. APK = same actions as buttons.
 14. **Locked visual system** in `BATTLEASIA-REDESIGN-PROMPT.md` §17: 8pt spacing only (4/8/16/24/32), radius scale, `--ba-accent` trio before first paint, 5 component states, mobile bottom sheets, 44px targets, safe-area, glass+aurora, IG stories/carousel/heart/chat bubbles, Copied chip + BAC(fiat) + receipt lightbox, Lighthouse 90+ / LCP / TBT, dynamic heavy libs, WebP/AVIF.
-15. **Two player clients:** **PC Web** (full desktop product, auth-gated after landing) **and** **native Android APK** (auth-gated from splash). Both in every prompt/rebuild. See `BATTLEASIA-REDESIGN-PROMPT.md` §0.1.
+15. **Two player clients:** **PC Web starts on landing**; **APK starts on auth only** (no APK landing). See `BATTLEASIA-REDESIGN-PROMPT.md` §0.1.
 
 ---
 

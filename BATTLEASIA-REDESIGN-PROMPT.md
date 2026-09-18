@@ -30,12 +30,13 @@ Rebuild **both**. Phone users use the **APK**. Computer users use **web**. Do no
 |--|--------------------------------------|----------------------------------------|
 | Role | Full **desktop** product | Full **phone** product |
 | Shell | Wide canvas, left/top HUD, hover, **keyboard §16** | Bottom nav, drawers, bottom sheets, haptics |
-| Entry | Landing (marketing) → **Auth pages** → `/user/*` | Splash → **Auth screens** → Play |
-| Auth | `/auth/sign-in`, sign-up (2-step), forgot, reset, email-verify | Same flows, native widgets, remember email+password |
-| Shop | Separate PC app `shop.battleasia.gg` + its **auth pages** | Native Shop gate + Shop/Wallet/Transfer/Withdraw |
-| Landing | Web only (hero, APK download CTA) | Not the APK home unless asked |
+| **First screen** | **Landing** (`/` → `/dashboard`) | **Auth** (Splash → Sign In / Sign Up) |
+| Then | Landing CTA → `/auth/*` → `/user/play` | After login → Play (no landing in between) |
+| Auth screens | PC split layout | Native widgets, remember email+password |
+| Shop | PC shop app + its auth | Native shop + `ShopAuthGate` |
+| Landing / hero | **Required on PC** (incl. APK download CTA) | **Forbidden on APK** — do not clone the website home |
 
-**Auth is the gate** for Play, Wallet, Shop money, Feed, etc. Same account + API. Visual language shared; **layout native to PC vs Android**.
+**PC = landing dia dhuke. APK = sudhu auth dia dhuke.** Same account + API. Layout native to each.
 
 ---
 
@@ -231,7 +232,7 @@ Redesign the admin UI (dense, data-heavy, tables/forms) but keep every section:
 
 This is the **phone app**, not a WebView of the PC site. Same design tokens and **all features**, native patterns.
 
-**Entry:** Splash → **Auth** (guest → Sign In / Sign Up — **auth pages first**, same 2-step sign-up, verify, forgot/reset, remember email+password). Authed → Play.
+**Entry:** Splash → **Sign In / Sign Up only** (no landing, no marketing home). Authed → Play. Remember email+password. Forgot/reset/verify exist as extra auth screens, not as a website clone.
 
 Header: logo, balance, notifications, account drawer, language, accent. Bottom nav: Play, Shop, Referral, Feed.
 
@@ -251,7 +252,7 @@ Keep all 30 screens:
 
 ## 7. Cross-cutting requirements (still mandatory in the new design)
 
-1. **PC Web ↔ Native APK feature parity** — every auth / shop / after-login **flow** on both. Desktop chrome on web; native chrome on Android. Landing is web-only unless asked.
+1. **PC Web ↔ Native APK feature parity** — after-login flows on both. **PC opens on landing. APK opens on auth only (no landing).**
 2. **Performance gate** — Lighthouse 90+, LCP<2.5s, CLS<0.1, TBT<150ms. Heavy libs (framer-motion, three.js, socket.io, carousel) dynamic-imported, never on LCP path. WebP/AVIF, fixed dimensions, lazy below-fold, route code-split, one light boot loader.
 3. **PC web is desktop-first**; **APK is mobile-first**. Bottom sheets / 44px / safe-area are **required on Android** (and if web is squeezed). Do not ship a phone-only website as the PC product.
 4. **Accessibility** — contrast, focus states, labels, keyboard nav (web HUD §16).
@@ -266,8 +267,8 @@ Keep all 30 screens:
 
 - [ ] Design brief (Section 1) filled in
 - [ ] Global tokens + component library (Section 2) for web + APK
-- [ ] PC Web: landing + **auth entry** + full desktop `/user/*` + shop web (desktop)
-- [ ] Native Android APK: **auth entry** + all 30 screens, parity of features (not a WebView)
+- [ ] PC Web: **starts on landing** → auth → desktop `/user/*` + shop web
+- [ ] Native Android APK: **starts on auth only** (no landing/home) → then 30 screens
 - [ ] Admin web (PC): every section in Section 5
 - [ ] All component states (loading/empty/error/success/toast)
 - [ ] Micro-interactions + edge cases (Section 12) + production quality bar (Section 13) + security hardening (Section 14) + ledger/fraud/DR/tests (Section 15)
