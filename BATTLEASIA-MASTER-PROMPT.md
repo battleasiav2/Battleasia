@@ -1,7 +1,5 @@
 # BattleAsia — Full Product Master Prompt
 
-> **ARCHIVED.** For a new rebuild use **`BATTLEASIA-NEW-BUILD-PROMPT.md`** (this file + redesign + admin enterprise, merged).
-
 > Single source-of-truth prompt to rebuild the **entire BattleAsia platform** (API + Player web + Shop web + Admin web + Flutter APK + infra). Give this whole file to an AI/developer and nothing about scope, features, or wiring should be missed. Your own visual **design** (exact pixels, brand art, copy) is layered on top of this — this prompt defines behavior, architecture, data, and features.
 
 ---
