@@ -2,25 +2,29 @@
 
 > Goal: rebuild BattleAsia with a **brand-new visual design** while keeping **100% of the product** — same features, data, API, flows, and infra. This prompt is **design-agnostic**: it tells you *what every screen must do and contain*, but the *look* is yours to invent. Nothing functional should be lost in the redesign.
 >
-> For the exhaustive technical spec (every model, endpoint, env var), read the companion file **`BATTLEASIA-MASTER-PROMPT.md`**. This file focuses on **what to redesign and the UI requirements per surface**.
+> For the exhaustive technical spec (every model, endpoint, env var), read the companion file `BATTLEASIA-MASTER-PROMPT.md`. This file focuses on **what to redesign and the UI requirements per surface**.
 
 ---
 
 ## 0. What stays vs. what changes
 
-| Keep exactly (do NOT change) | Redesign freely (NEW) |
-|------------------------------|------------------------|
-| Backend API, all endpoints (v1–v4), 52 data models | Full visual language: colors, typography, spacing, shapes |
-| Auth (JWT), roles, RBAC | Layout of every page, component styling |
-| BAC currency + money flows (deposit/withdraw/match/transfer) | Landing/home story, hero, section order & style |
-| All routes, screens, and features (nothing removed) | Iconography, illustrations, motion, imagery |
-| Socket.IO realtime events | Navigation pattern (as long as all destinations reachable) |
-| Web ↔ APK feature parity rule | Empty/loading/error/success visual treatments |
-| Performance budget (Lighthouse 90+, LCP<2.5s, CLS<0.1, TBT<150ms) | Whether accent is user-selectable, dark/light, etc. |
+
+| Keep exactly (do NOT change)                                      | Redesign freely (NEW)                                      |
+| ----------------------------------------------------------------- | ---------------------------------------------------------- |
+| Backend API, all endpoints (v1–v4), 52 data models                | Full visual language: colors, typography, spacing, shapes  |
+| Auth (JWT), roles, RBAC                                           | Layout of every page, component styling                    |
+| BAC currency + money flows (deposit/withdraw/match/transfer)      | Landing/home story, hero, section order & style            |
+| All routes, screens, and features (nothing removed)               | Iconography, illustrations, motion, imagery                |
+| Socket.IO realtime events                                         | Navigation pattern (as long as all destinations reachable) |
+| Web ↔ APK feature parity rule                                     | Empty/loading/error/success visual treatments              |
+| Performance budget (Lighthouse 90+, LCP<2.5s, CLS<0.1, TBT<150ms) | Whether accent is user-selectable, dark/light, etc.        |
+
 
 **Rule:** a user of the old app must find **every feature** in the new one. Redesign = new skin + new layout, **not** new scope.
 
 ---
+
+
 
 ## 1. Design brief (fill this in before building)
 
@@ -39,6 +43,8 @@ Everything below must be expressed **through** this new brief.
 
 ---
 
+
+
 ## 2. Global design system to build (all apps)
 
 Design one shared component/token set so web, shop, admin, and APK feel like one product:
@@ -52,10 +58,16 @@ Design one shared component/token set so web, shop, admin, and APK feel like one
 
 ---
 
+
+
 ## 3. Player web (`battleasia.gg`) — surfaces to redesign
 
+
+
 ### Landing / home (`/dashboard`) — new hero + sections
+
 Redesign the story, but keep these blocks (anchors `#home #about-us #how-to-play #rules`):
+
 1. **Hero** — brand wordmark, primary CTA (Enter Arena), **APK download** CTA, trust signals. (New look; old was PUBG-style — invent your own.)
 2. **Live pulse** — live stats, top players, high-prize/ongoing matches (data from public API + socket).
 3. **Play your game** — PUBG, Free Fire, COD, MLBB, Valorant (coming soon) with live counts.
@@ -64,10 +76,14 @@ Redesign the story, but keep these blocks (anchors `#home #about-us #how-to-play
 6. **Rules / FAQ** — accordion (fair-play, match-ops, prizes, payment rules).
 7. **Footer** — partners, socials, payment methods (bKash/Nagad/crypto), legal links.
 
+
+
 ### Auth pages
+
 Sign-in, sign-up (2-step: credentials → PUBG ID/phone/game server/terms), forgot-password, reset-password, email-verification.
 
 ### After-login user area (all `/user/*`)
+
 - **Play:** game picker → match list (per game) → match detail + join → match result. Show entry fee, prize, spots progress, room ID/password after join.
 - **Wallet + Earn:** balance, withdrawable, balance history, engagement/earn hub (missions, streak, welcome, referral, weekly, squad, spin, season). Withdraw flow.
 - **Shop (in-app):** marketing + coin packs; heavy store links to shop app.
@@ -77,13 +93,16 @@ Sign-in, sign-up (2-step: credentials → PUBG ID/phone/game server/terms), forg
 - **Account pages:** my-matches, my-orders, my-statistics, my-referrals, notifications, leaderboard, customer-support (tickets + chat).
 - Public: `/profile/:userId`, `/privacy-policy`, `/terms-and-conditions`, `/support`.
 
-**Functional constraints:** JWT auth guard on `/user/*`; email-verify + password-reset flows; `returnTo` redirect; `?ref=` capture; live updates via socket (balance, notifications, matches, messages).
+**Functional constraints:** JWT auth guard on `/user/`*; email-verify + password-reset flows; `returnTo` redirect; `?ref=` capture; live updates via socket (balance, notifications, matches, messages).
 
 ---
+
+
 
 ## 4. Shop web (`shop.battleasia.gg`) — surfaces to redesign
 
 Dedicated **BAC coin store**. Redesign but keep:
+
 - Auth pages (full set) + **tab-scoped login gate** (must sign in per shop tab session).
 - **Shop:** coin packs, payment channel + currency select, premium discount, buy = manual deposit submit (address/QR + transaction proof) with "waiting for admin approval" state.
 - **Wallet:** total BAC + fiat equivalents, withdrawable, transaction history (this is the order/purchase history surface).
@@ -92,9 +111,12 @@ Dedicated **BAC coin store**. Redesign but keep:
 
 ---
 
+
+
 ## 5. Admin web (`admin.battleasia.gg`) — surfaces to redesign
 
 Redesign the admin UI (dense, data-heavy, tables/forms) but keep every section:
+
 - **Auth:** login + optional OTP.
 - **Dashboard:** overview stats.
 - **Users:** list/CRUD, balance adjust, status, roles/permissions (RBAC), history, online, premium, referral-settings, transfer-settings, referral-history.
@@ -111,9 +133,12 @@ Redesign the admin UI (dense, data-heavy, tables/forms) but keep every section:
 
 ---
 
+
+
 ## 6. Flutter APK (`battleasia-app`) — surfaces to redesign
 
 Native Android app — apply the **same new design language** as web (parity). Keep all 30 screens:
+
 - Splash → auth wrapper (authed → Play, guest → Sign In). Bottom nav: Play, Shop, Referral, Feed. Header: logo, balance, notifications, account drawer, language, accent.
 - Auth (sign-in with **remember email+password**, 2-step sign-up, verify, forgot/reset).
 - Play / match list / detail / result.
@@ -127,6 +152,8 @@ Native Android app — apply the **same new design language** as web (parity). K
 
 ---
 
+
+
 ## 7. Cross-cutting requirements (still mandatory in the new design)
 
 1. **Web ↔ APK parity** — every auth/shop/after-login screen must match in behavior and visual intent on both.
@@ -137,6 +164,8 @@ Native Android app — apply the **same new design language** as web (parity). K
 6. **i18n-ready** — layouts must survive en/bn/zh/hi/ur text lengths.
 
 ---
+
+
 
 ## 8. Deliverables checklist (so nothing is missed)
 
@@ -152,6 +181,49 @@ Native Android app — apply the **same new design language** as web (parity). K
 
 ---
 
+
+
 ## 9. New assets you must create (old ones are being replaced)
 
 Since this is a new look, you will produce fresh: brand logo + `BATTLE ASIA` wordmark, hero image/video + poster, 5 game cover arts, mode art (solo/duo/squad/tdm), payment icons, favicon, Android adaptive app icon, fonts, and any illustrations. Everything **functional/technical stays** as in `BATTLEASIA-MASTER-PROMPT.md`; only the **skin** is new.
+
+---
+
+## 10. Premium polish — how to make it "wow" (not just clean)
+
+Apply these to lift the design from good to premium. All must respect the performance gate (Section 7): motion/particles are dynamic-imported and off the LCP critical path; images WebP/AVIF.
+
+### 10.1 Depth & light
+- Subtle **aurora gradient mesh glow** (accent color) blurred behind hero + key cards only — not flat.
+- **Glass top nav**: background blur + thin gradient border; sticky on scroll.
+- Two-tier soft shadows + faint **noise/grain** texture for an "expensive" feel.
+- Accent-only glow (buttons, live dot); everything else stays neutral.
+
+### 10.2 Motion & micro-interaction (perf-safe)
+- Number **count-up** (balance, prize, players); animated **progress-bar fill**.
+- Card **hover lift + cursor spotlight** (desktop); **gradient shimmer/pulse** on primary buttons.
+- **Skeleton shimmer** loading; smooth page/tab transitions.
+- **Win celebration** (coin burst / confetti); **streak flame** animation.
+
+### 10.3 Signature hero
+- **3D character cutout** or parallax layers (subject vs background move independently).
+- **Animated gradient wordmark** + light spark/particle FX (lightweight canvas), or short **hero video** loop behind a poster.
+
+### 10.4 Typography craft
+- Strong display↔body contrast; tight tracking on big headlines.
+- **Gradient text** on one key word/number (e.g. prize, "ASIA").
+- **Tabular/mono numerals** for stats and balances (clean alignment).
+
+### 10.5 Iconography & game-art treatment
+- Custom **line + gradient icon set**; **hexagon-framed** game icons.
+- Consistent **duotone/gradient overlay** on all game banners so every card looks premium (not random screenshots).
+- **Rank/tier badge** system (Bronze → Elite) on profile, leaderboard, match cards.
+
+### 10.6 Delight & richness
+- **Custom illustrations** for empty states (not bare text).
+- **Bento-grid** (asymmetric card sizes) on landing for a modern, unique layout.
+- Live **pulse** on "LIVE" dots; animated leaderboard rows.
+- Achievement/badge showcase, streak calendar, season-pass **progress ring**.
+
+### 10.7 Consistency (the silent 80%)
+- Strict **8pt grid**; one radius scale + one shadow-tier scale used everywhere. Without this, nothing feels "beautiful".
