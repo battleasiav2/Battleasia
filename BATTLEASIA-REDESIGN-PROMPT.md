@@ -253,6 +253,7 @@ Native Android app — apply the **same new design language** as web (parity). K
 - [ ] Admin web: every section in Section 5
 - [ ] Flutter APK: all 30 screens re-skinned, parity verified
 - [ ] All component states (loading/empty/error/success/toast)
+- [ ] Micro-interactions + edge cases + error handling (Section 12) on web, shop, admin, APK
 - [ ] New brand assets (logo, wordmark, hero media, game art, fonts, favicon, app icon)
 - [ ] Performance + parity + a11y verified before "done"
 
@@ -354,3 +355,150 @@ Goal: turn BattleAsia from "play & withdraw" into a **play + earn + social ecosy
 5. 1v1 wager challenge (viral, unique)
 
 **Net effect:** users earn by **playing, creating, referring, and watching** — while cosmetic sinks keep BAC valuable — and admin can switch any module on/off and tune every rate/fee/limit.
+
+---
+
+## 12. UI/UX micro-interactions, edge cases & error handling
+
+**Required on player web, shop web, admin, and APK** (same intent; platform-native motion). Happy path is not enough. Every screen in this prompt must have loading, empty, error, success, and the edge cases below. Motion stays **off the LCP path** (CSS / lightweight; no blocking libraries).
+
+### 12.1 Shared interaction language
+
+- **Press:** buttons compress slightly; disabled = no press, tooltip *why* (e.g. “Match full”, “Need 50 BAC”).
+- **Focus:** visible keyboard ring; Enter submits the focused form; Esc closes dialog / sheet / lightbox.
+- **Copy:** TrxID, room ID, password, referral, wallet address → “Copied” toast 1.5s.
+- **Numbers:** BAC / prize / spots **count-up** on first view; header balance **ticks** on `balance-updated`.
+- **Progress:** join spots, season pass, upload %, withdrawable — fill animation, not a jump.
+- **Like / save / follow:** optimistic UI; heart pop; undo if API fails (rollback + toast).
+- **Pull-to-refresh** on APK lists (play, feed, wallet, notifications); web: refresh control or stale-while-revalidate.
+- **Haptics (APK):** light on tap, success on join/deposit submit, error on fail. Respect system reduce-motion / haptics off.
+- **Toasts:** success / info / warning / error; one at a time; action link when useful (“Open wallet”). Never block the CTA.
+- **Dialogs:** confirm destructive / money actions (join paid match, transfer, withdraw, admin approve/reject/ban). Confirm labels name the action (“Join for 50 BAC”), not generic “OK”.
+- **Offline banner** (sticky, non-modal) when network drops; auto-hide on reconnect; queue-safe: do not double-submit money on retry.
+- **Reduce motion:** honor `prefers-reduced-motion` / OS setting — skip count-up, burst, shimmer; keep state changes instant.
+
+### 12.2 Global loading & boot
+
+- One **brand boot bar** (logo + thin bar, no fake percent) once per session; then **skeletons** matching layout (cards, rows, story rings) — not a full-page spinner on every route.
+- Button loading: spinner **inside** the button, label “Joining…” / “Sending…”; prevent double-click.
+- Uploads (receipt, avatar, reel, story): progress + cancel; fail → retry, file stays selected.
+- Pagination / infinite scroll: footer spinner; end-of-list line; no duplicate page fetch.
+- Socket reconnect: silent reconnect; if > few seconds, “Reconnecting…” chip; after recover, refresh pending badges / balance.
+
+### 12.3 Auth edge cases
+
+| Case | UI |
+|------|----|
+| Empty / invalid email, weak password | Inline field error, not only toast |
+| Wrong password | “Incorrect email or password” + forgot-password link; do **not** reveal which field |
+| Unverified email | 403 → verify screen; resend with **cooldown timer** |
+| Expired / used reset or verify code | Clear “code expired” + resend |
+| Rate limit (100/15 min) | Wait-N-seconds message; disable submit |
+| Session expired / 401 | Sign-in with `returnTo`; no data loss of typed forms if possible |
+| Shop tab missing `ba_shop_gate` | Shop sign-in only — **do not** sign out the main site |
+| Remember-me APK | Prefill email+password from `ba_remember_*`; still allow edit |
+| `?ref=` | Capture silently; show applied referral on sign-up success |
+| 2-step sign-up back | Keep step-1 values; don’t wipe on validation fail |
+
+### 12.4 Play / match edge cases
+
+| Case | UI |
+|------|----|
+| No games / no matches | Illustrated empty + “Check back” / notify |
+| Valorant coming soon | Disabled card, not a dead click |
+| Match full / already started / cancelled | Badge + Join disabled + reason |
+| Already joined | “Joined” + room reveal (ID/password) + copy |
+| Insufficient BAC | Join opens “Need X BAC” → Shop / Wallet CTA |
+| Premium-only match | Lock + Premium activate path |
+| Join in-flight | Button locked; on fail restore + toast (balance unchanged) |
+| Room not yet published | “Room drops at start” waiting state, then socket reveal |
+| Result pending | Skeleton/placeholder “Results soon” — never fake winners |
+| After result | Win burst **once**; loss = calm summary; winnings in history |
+| Feature flag OFF | Hide Play module / mode entirely |
+
+### 12.5 Wallet, shop, deposit, withdraw, transfer
+
+| Case | UI |
+|------|----|
+| BAC = 0 | Empty wallet illustration + first-deposit CTA |
+| Deposit waiting admin | Persistent “Pending review” (not a one-shot toast) |
+| Deposit rejected | Reason + resubmit |
+| Duplicate submit | Idempotent; “Already submitted” |
+| Missing receipt / TrxID | Inline required; cannot submit |
+| Withdraw > withdrawable (70% match-bet rule) | Live remaining + why locked |
+| Withdraw / transfer below min or above max | Inline limit from settings |
+| Transfer to self / unknown user | Block with copy |
+| Fee preview | Amount + fee + **net** before confirm |
+| Channel / wallet missing | “Payments paused” — no broken QR |
+| Coingo fail / timeout | Retry + fallback to manual |
+| High-value (admin ≥ 1000 BAC) | Password / 2FA confirm |
+| Socket `balance-updated` | Header + wallet tick; no full remount |
+
+Money actions: **disable submit until the response**; never double-charge on retry; success screen with amount + “View history”.
+
+### 12.6 Feed / social / DM
+
+| Case | UI |
+|------|----|
+| Empty feed | Suggested follows + Explore CTA |
+| Failed image / video | Broken-media placeholder + retry |
+| Story expired | Skip; ring gone |
+| Mute / hidden / blocked | Removed from feed; blocked profile = limited view |
+| Message request | Requests inbox; not in main DM until accept |
+| Send fail | Unsent with retry (no silent drop) |
+| Live ended | “Live ended” → replay/reel if any |
+| Report / hide | Confirm + “Thanks, we’ll review” |
+| Upload too large | Size cap message (5MB default, 100MB reel/story) |
+| Notifications empty | Calm empty, not error |
+
+Optimistic like/follow/save; rollback on error.
+
+### 12.7 Admin ops edge cases
+
+| Case | UI |
+|------|----|
+| Empty table / filter no rows | Icon + “Clear filters” |
+| Bulk with 0 selected | Toolbar hidden |
+| Bulk reject | Reason required |
+| Payout > collected fees | **Block submit** + numbers |
+| Receipt missing | Copy still works; lightbox no-op with “No image” |
+| Audit / export large | Progress; don’t freeze UI |
+| Permission denied | Hide nav; 403 page if deep-linked |
+| Chime flood | Mute in header; no stacked audio |
+
+### 12.8 HTTP & system errors (map every API call)
+
+| Signal | Player-facing |
+|--------|----------------|
+| 400 / validation | Field-level messages from API |
+| 401 | Re-auth, keep `returnTo` |
+| 403 email | Verify flow |
+| 403 other | “You can’t do that” + support |
+| 404 resource | Illustrated not-found + back |
+| 409 conflict (already joined, duplicate) | Specific copy |
+| 413 upload | File too large |
+| 429 | Cooldown timer |
+| 5xx / network | Retry button; APK offline illustration |
+| Timeout | Retry; money endpoints extra caution (check history before resubmit) |
+
+**Copy rules:** human, i18n (en/bn/zh/hi/ur), no raw stack traces, no “undefined”. Support link on persistent failures.
+
+### 12.9 Form & input edges
+
+- Required / format / min-max / OTP length — inline, on blur + submit.
+- Password show/hide; strength meter on change-password (admin + player).
+- Phone / PUBG ID: server + region rules.
+- Paste TrxID / room codes: trim whitespace.
+- Unsaved form leave: confirm (profile, match create, deposit proof).
+- Autofill-friendly auth fields; `autocomplete` attributes.
+
+### 12.10 Device / a11y edges
+
+- Slow 2G: skeletons + compressed images; no autoplay video (hero poster first).
+- Notch / safe-area; APK JOIN / shop CTA never clipped.
+- Landscape web ok; APK portrait-only (existing) — don’t break.
+- RTL-unneeded but **long bn/ur strings** must not overflow buttons.
+- Color not the only error signal (icon + text). Contrast WCAG AA.
+- Tap targets ≥ 44px on mobile.
+
+**Done for this section:** a QA pass that hits every table row on web + shop + APK (admin rows on admin). If a state has no UI, it is not shipped.

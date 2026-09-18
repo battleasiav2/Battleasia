@@ -228,6 +228,7 @@ Same stack/design family as player web (Vite 6 + MUI 6 + Redux Toolkit, persist 
 6. **Ship APK signed with the real release keystore** (never debug) so every device can install and future updates keep the same signature.
 7. Accent color is user-selectable across web + APK; dark gaming aesthetic everywhere.
 8. **Every feature is admin on/off toggleable** — each module has an enable flag in `AppSettings` (global config, same pattern as engagement/transfer/messaging settings), surfaced in the Admin panel as feature flags, with admin-tunable rates/fees/limits. Clients hide the UI **and** the API blocks a feature when it is OFF. New unique/earn features (see `BATTLEASIA-REDESIGN-PROMPT.md` §11: live gifting, watch-to-earn, prediction/fantasy, 1v1 wager, clans, customization store, etc.) all follow this rule and default OFF until ready.
+9. **Every screen has loading / empty / error / success** plus the micro-interactions and edge cases in `BATTLEASIA-REDESIGN-PROMPT.md` §12 (auth, play, money, social, admin, HTTP). No double-submit on money; optimistic social with rollback; human i18n errors, never raw API dumps.
 
 ---
 
