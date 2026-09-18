@@ -192,7 +192,11 @@ Dedicated **BAC coin store**. Redesign but keep:
 
 ## 5. Admin web (`admin.battleasia.gg`) — surfaces to redesign
 
-Redesign the admin UI (dense, data-heavy, tables/forms) but keep every section:
+Redesign the admin UI (dense, data-heavy, tables/forms) but keep every section.
+
+**Enterprise ops (later build):** full spec in `BATTLEASIA-ADMIN-ENTERPRISE-PROMPT.md` — DataGrid bulk actions, CSV/Excel/print, date filters, slug/room generators, live payout preview, receipt lightbox, high-value password confirm, password strength meter, session revoke, audit logs, queue chimes, Ctrl+K. **Do not implement until asked.**
+
+Keep every section:
 
 - **Auth:** login + optional OTP.
 - **Dashboard:** overview stats.
