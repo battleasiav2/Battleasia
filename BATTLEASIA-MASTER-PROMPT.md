@@ -6,7 +6,21 @@
 
 ## 0. What BattleAsia is
 
-A **mobile-esports tournament platform** (PUBG, Free Fire, COD, MLBB, Valorant). Players join paid matches, win an in-app coin called **BAC**, and cash out. It has a social layer (feed, reels, stories, DMs), an engagement/rewards layer (missions, streaks, squads, spin, season pass), a coin **shop** with manual + gateway deposits, and an **admin panel** to run everything. Delivered as a **web app**, a separate **coin-shop web app**, an **admin web app**, and a native **Android APK**.
+A **mobile-games esports tournament platform** (PUBG, Free Fire, COD, MLBB, Valorant). Players join paid matches, win in-app coin **BAC**, and cash out. Social (feed, reels, stories, DMs), engagement (missions, streaks, squads, spin, season), coin **shop**, and **admin**.
+
+**Two player products (both required in every rebuild):**
+
+| Client | What it is |
+|--------|------------|
+| **PC Web** | Full **desktop** app at `battleasia.gg` + `shop.battleasia.gg`. Designed for **computer** (wide HUD, sidebar, hover, keyboard §16). This is **not** a phone website. |
+| **Native Android** | Flutter APK `net.battleasia.app`. This is the **phone** product (bottom nav, touch, bottom sheets). |
+
+**Entry for the logged-in product is always Auth** (same account, same API):
+
+- **Web:** public landing → **Enter Arena / Sign in** → `/auth/sign-in` (or sign-up) → after JWT → `/user/play`. Shop: own `/auth/*` then shop.
+- **APK:** Splash → **Auth** (guest → Sign In / Sign Up) → Play. Remember email+password. No skipping auth into a fake guest play for paid matches.
+
+Admin web is also **PC-only**. One API serves all.
 
 **One shared backend API** serves all four clients. Currency = **BAC** stored on `User.balance`; every movement is logged.
 
@@ -166,7 +180,9 @@ Production domains (Coolify + Cloudflare):
 
 ---
 
-## 3. Player web (`battleasia.gg`) — landing + dashboard
+## 3. Player web (`battleasia.gg`) — **PC / desktop** landing + dashboard
+
+**Desktop-first.** Auth pages are the gate into `/user/*`. Keyboard HUD §16. Phone users are expected to use the **APK**.
 
 **Stack:** React 18 + TS + Vite 6 (SWC), React Router 7, MUI 6, Redux Toolkit + redux-persist (auth persisted, **token stripped** on write), react-hook-form + zod, Axios (Bearer + toast interceptors, 401→logout, 403→email-verify), socket.io-client (dynamic import), i18next (en/bn/zh/hi/ur), Tailwind (preflight off) + Emotion. Dev port **8081**; proxies `/api`,`/uploads`,`/socket.io` → `VITE_SERVER_URL` (default `:5050`).
 
@@ -206,9 +222,9 @@ JWT; boot re-validates `GET v2/users/me`; sign-in → `loginAction` → redirect
 
 ---
 
-## 4. Shop web (`shop.battleasia.gg`)
+## 4. Shop web (`shop.battleasia.gg`) — **PC shop**
 
-Same stack/design family as player web (Vite 6 + MUI 6 + Redux Toolkit, persist key **`battleasia-shop`**). Dev port **8082**. Purpose: dedicated **BAC coin store + wallet + transfer + withdraw**.
+**Desktop shop app** (phone shop is native APK). Same stack/design family as player web (Vite 6 + MUI 6 + Redux Toolkit, persist key **`battleasia-shop`**). Dev port **8082**. Purpose: dedicated **BAC coin store + wallet + transfer + withdraw**. **Entry = shop auth pages.**
 
 - **Routes:** `/auth/*` (full set); protected `/user` (=shop), `/user/shop`, `/user/wallet`, `/user/transfer`, `/user/withdrawal`; 404.
 - **Auth model (not seamless SSO):** same account + API as main site, Bearer token + `withCredentials`; **tab-scoped gate** `sessionStorage: ba_shop_gate` set on sign-in; `AuthGuard` forces re-login if gate missing / offline / logged out; isolated persist key; token stripped on rehydrate. `VITE_MAIN_APP_URL` links back to main site.
@@ -294,7 +310,7 @@ Same stack/design family as player web (Vite 6 + MUI 6 + Redux Toolkit, persist 
 ## 8. Non-negotiable rules (apply throughout)
 1. **BAC is the single currency** on `User.balance`; every change writes `BalanceHistory`.
 2. **Deposits are admin-reviewed** (submit → approve) unless Coingo auto.
-3. **Web ↔ APK parity:** any change to auth/shop/after-login UI or flow on web must be mirrored in the Flutter app the same turn (home/landing exempt unless asked).
+3. **Web (PC) ↔ APK (native) feature parity:** every auth / shop / after-login **flow** exists on both. Layout is **platform-native**: PC web = desktop shell + keyboard; Android = native widgets + touch. Home/landing is **web-only** unless asked. Do **not** ship the phone experience as a cramped mobile website instead of the APK.
 4. **Performance first:** hit the Lighthouse gate; heavy libs dynamic-imported; no CLS; WebP/AVIF images.
 5. **Secrets server-side / gitignored:** `.env*`, `key.properties`, `*.jks`, `deploy/.github-token.local`, `backups/`. Never commit them.
 6. **Ship APK signed with the real release keystore** (never debug) so every device can install and future updates keep the same signature.
@@ -306,6 +322,7 @@ Same stack/design family as player web (Vite 6 + MUI 6 + Redux Toolkit, persist 
 12. **Ledger, fraud, scale, DR, tests** in this file §2.9 and `BATTLEASIA-REDESIGN-PROMPT.md` §15: double-entry + **no delete / reversal only**, liability vs reserve monitor, velocity holds, device fingerprint / multi-account, collusion reports, KYC+age before withdraw (flagged), compound indexes, mongoose pool, live-stats cache, encrypted off-site backups, maintenance countdown, dispute evidence, automated money tests.
 13. **Player HUD keyboard shortcuts** in `BATTLEASIA-REDESIGN-PROMPT.md` §16: **J** quick-join, **C** copy room, **R** ready, **L** leave/refund-before-start, **M** match details, **W** wallet, **B** buy BAC, **T** transfer, **H** hide balance, **Enter** chat, **Tab** leaderboard (not in inputs), **F** follow/like, **S** share match, **U** mute, **Space** reel/live pause, **Esc** close overlays. APK = same actions as buttons.
 14. **Locked visual system** in `BATTLEASIA-REDESIGN-PROMPT.md` §17: 8pt spacing only (4/8/16/24/32), radius scale, `--ba-accent` trio before first paint, 5 component states, mobile bottom sheets, 44px targets, safe-area, glass+aurora, IG stories/carousel/heart/chat bubbles, Copied chip + BAC(fiat) + receipt lightbox, Lighthouse 90+ / LCP / TBT, dynamic heavy libs, WebP/AVIF.
+15. **Two player clients:** **PC Web** (full desktop product, auth-gated after landing) **and** **native Android APK** (auth-gated from splash). Both in every prompt/rebuild. See `BATTLEASIA-REDESIGN-PROMPT.md` §0.1.
 
 ---
 

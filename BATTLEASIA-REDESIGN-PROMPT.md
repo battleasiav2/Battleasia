@@ -22,6 +22,21 @@
 
 **Rule:** a user of the old app must find **every feature** in the new one. Redesign = new skin + new layout, **not** new scope.
 
+### 0.1 Two player products (PC Web + Native Android)
+
+Rebuild **both**. Phone users use the **APK**. Computer users use **web**. Do not replace the native app with a mobile website.
+
+| | **PC Web** (`battleasia.gg` + shop) | **Native Android** (`battleasia-app`) |
+|--|--------------------------------------|----------------------------------------|
+| Role | Full **desktop** product | Full **phone** product |
+| Shell | Wide canvas, left/top HUD, hover, **keyboard §16** | Bottom nav, drawers, bottom sheets, haptics |
+| Entry | Landing (marketing) → **Auth pages** → `/user/*` | Splash → **Auth screens** → Play |
+| Auth | `/auth/sign-in`, sign-up (2-step), forgot, reset, email-verify | Same flows, native widgets, remember email+password |
+| Shop | Separate PC app `shop.battleasia.gg` + its **auth pages** | Native Shop gate + Shop/Wallet/Transfer/Withdraw |
+| Landing | Web only (hero, APK download CTA) | Not the APK home unless asked |
+
+**Auth is the gate** for Play, Wallet, Shop money, Feed, etc. Same account + API. Visual language shared; **layout native to PC vs Android**.
+
 ---
 
 
@@ -66,7 +81,13 @@ Design one shared component/token set so web, shop, admin, and APK feel like one
 
 
 
-## 3. Player web (`battleasia.gg`) — surfaces to redesign
+## 3. Player web (`battleasia.gg`) — **full PC / desktop app**
+
+This surface is a **computer product**: min useful layout ~1280px, dense HUD, side navigation or top+subnav, hover, keyboard shortcuts (§16). It must still not explode if the window is narrower, but **do not design the web app as a phone UI**. Phone = APK.
+
+### Auth pages (the entry into the product)
+
+Full **PC auth** screens (split art + form is fine): Sign-in, sign-up (2-step: credentials → PUBG ID/phone/game server/terms), forgot-password, reset-password, email-verification. After success → `/user/play` (or `returnTo`). `?ref=` captured.
 
 
 
@@ -81,12 +102,6 @@ Redesign the story, but keep these blocks (anchors `#home #about-us #how-to-play
 5. **How to play / modes** — Solo, Duo, Squad, TDM.
 6. **Rules / FAQ** — accordion (fair-play, match-ops, prizes, payment rules).
 7. **Footer** — partners, socials, payment methods (bKash/Nagad/crypto), legal links.
-
-
-
-### Auth pages
-
-Sign-in, sign-up (2-step: credentials → PUBG ID/phone/game server/terms), forgot-password, reset-password, email-verification.
 
 ### After-login user area (all `/user/*`)
 
@@ -174,9 +189,9 @@ Everything discussed, grouped so nothing is lost. Build **P0 → P1 → P2**.
 
 
 
-## 4. Shop web (`shop.battleasia.gg`) — surfaces to redesign
+## 4. Shop web (`shop.battleasia.gg`) — **PC shop app**
 
-**This is a SEPARATE app** on its own subdomain `shop.battleasia.gg` (its own codebase, its own login/session gate) — **not** a page inside the main site. The main site's in-app "shop/wallet" links out to this app (`VITE_BAC_SHOP_URL`). It shares the same account/API but requires a fresh sign-in per shop tab session (tab-scoped gate). Keep this separation.
+**This is a SEPARATE desktop app** on `shop.battleasia.gg` — **not** a page on the main site, **not** a phone site. Phone shop = **native APK** shop screens. Own codebase, own **auth pages** + tab-scoped gate.
 
 Dedicated **BAC coin store**. Redesign but keep:
 
@@ -212,12 +227,15 @@ Redesign the admin UI (dense, data-heavy, tables/forms) but keep every section:
 
 
 
-## 6. Flutter APK (`battleasia-app`) — surfaces to redesign
+## 6. Flutter APK (`battleasia-app`) — **native Android product**
 
-Native Android app — apply the **same new design language** as web (parity). Keep all 30 screens:
+This is the **phone app**, not a WebView of the PC site. Same design tokens and **all features**, native patterns.
 
-- Splash → auth wrapper (authed → Play, guest → Sign In). Bottom nav: Play, Shop, Referral, Feed. Header: logo, balance, notifications, account drawer, language, accent.
-- Auth (sign-in with **remember email+password**, 2-step sign-up, verify, forgot/reset).
+**Entry:** Splash → **Auth** (guest → Sign In / Sign Up — **auth pages first**, same 2-step sign-up, verify, forgot/reset, remember email+password). Authed → Play.
+
+Header: logo, balance, notifications, account drawer, language, accent. Bottom nav: Play, Shop, Referral, Feed.
+
+Keep all 30 screens:
 - Play / match list / detail / result.
 - Shop (login gate) + shop nav (Shop/Wallet/Transfer/Withdraw) + buy flow.
 - Wallet (Overview/Earn/History).
@@ -233,10 +251,10 @@ Native Android app — apply the **same new design language** as web (parity). K
 
 ## 7. Cross-cutting requirements (still mandatory in the new design)
 
-1. **Web ↔ APK parity** — every auth/shop/after-login screen must match in behavior and visual intent on both.
+1. **PC Web ↔ Native APK feature parity** — every auth / shop / after-login **flow** on both. Desktop chrome on web; native chrome on Android. Landing is web-only unless asked.
 2. **Performance gate** — Lighthouse 90+, LCP<2.5s, CLS<0.1, TBT<150ms. Heavy libs (framer-motion, three.js, socket.io, carousel) dynamic-imported, never on LCP path. WebP/AVIF, fixed dimensions, lazy below-fold, route code-split, one light boot loader.
-3. **Responsive + mobile-first**, reserve space (no layout shift).
-4. **Accessibility** — contrast, focus states, labels, keyboard nav.
+3. **PC web is desktop-first**; **APK is mobile-first**. Bottom sheets / 44px / safe-area are **required on Android** (and if web is squeezed). Do not ship a phone-only website as the PC product.
+4. **Accessibility** — contrast, focus states, labels, keyboard nav (web HUD §16).
 5. **All states designed** — loading/empty/error/success everywhere, not just the happy path.
 6. **i18n-ready** — layouts must survive en/bn/zh/hi/ur text lengths.
 
@@ -248,10 +266,9 @@ Native Android app — apply the **same new design language** as web (parity). K
 
 - [ ] Design brief (Section 1) filled in
 - [ ] Global tokens + component library (Section 2) for web + APK
-- [ ] Player web: landing (7 blocks) + all auth + all `/user/*` pages
-- [ ] Shop web: auth + shop + wallet + transfer + withdrawal
-- [ ] Admin web: every section in Section 5
-- [ ] Flutter APK: all 30 screens re-skinned, parity verified
+- [ ] PC Web: landing + **auth entry** + full desktop `/user/*` + shop web (desktop)
+- [ ] Native Android APK: **auth entry** + all 30 screens, parity of features (not a WebView)
+- [ ] Admin web (PC): every section in Section 5
 - [ ] All component states (loading/empty/error/success/toast)
 - [ ] Micro-interactions + edge cases (Section 12) + production quality bar (Section 13) + security hardening (Section 14) + ledger/fraud/DR/tests (Section 15)
 - [ ] Player keyboard HUD shortcuts (Section 16) on web; APK equivalent buttons
@@ -773,14 +790,18 @@ Dark page ink may remain `#060607` / `#0E0F14` (Aurora) with glass cards `backdr
 | **Empty** | Never a raw blank screen. Relevant **3D/vector illustration** + short copy + **one CTA** (e.g. “Join your first match”). |
 | **Error** | Field: **red border** + clear red text under the field. Page: error boundary + **Reload** (never a white crash). |
 
-### 17.3 Mobile-first & layout shift
+### 17.3 Layout shift & Android (PC web stays desktop)
+
+**PC web:** desktop HUD; hover; keyboard. CLS still &lt; 0.1 (fixed aspect-ratio on images).
+
+**Native APK (and tiny web windows):**
 
 | Rule | Spec |
 |------|------|
-| **Zero CLS** | Images/banners have **fixed aspect-ratio** (`aspect-video`, `aspect-square`, or explicit width/height) **before** load so content below does not jump. CLS &lt; 0.1. |
-| **Bottom sheet over center modal** | On mobile, join / confirm / filters / menus = **bottom-sheet drawer** rising from the bottom. Desktop may keep centered dialog. |
-| **Touch targets** | Clickable buttons, chips, icons **≥ 44×44px**. |
-| **Safe area** | `env(safe-area-inset-top)` / `safe-area-inset-bottom` for notch and home indicator. APK JOIN/CTAs never sit under the system bar. |
+| **Zero CLS** | Images/banners have **fixed aspect-ratio** (`aspect-video`, `aspect-square`, or explicit width/height) **before** load. |
+| **Bottom sheet over center modal** | Join / confirm / filters / menus = **bottom-sheet**. Desktop web may keep centered dialog. |
+| **Touch targets** | **≥ 44×44px** on APK. |
+| **Safe area** | `safe-area-inset-*` / Flutter SafeArea. JOIN/CTAs never under the system bar. |
 
 ### 17.4 Esports polish (off LCP path)
 
