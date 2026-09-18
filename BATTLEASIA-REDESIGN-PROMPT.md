@@ -156,7 +156,7 @@ Redesign the story, but keep these blocks (anchors `#home #about-us #how-to-play
 
 - **Play:** game picker → match list → detail + **J join** → lobby (**R ready**, **Enter chat**, **C room** when released, **L leave** before start = refund) → result.
 - **Wallet + Earn:** balance, withdrawable, balance history, engagement/earn hub (missions, streak, welcome, referral, weekly, squad, spin, season). Withdraw flow.
-- **Shop (in-app):** marketing + coin packs; heavy store links to shop app.
+- **Shop (in-app):** marketing + light packs; **Buy / full store** opens `https://shop.battleasia.gg` (separate domain) → **shop login again**.
 - **Referral:** code/link share, network, commissions.
 - **Feed / social hub** — **must look and feel like Instagram** (see §3A for the full spec): profiles, posts, stories, reels, live, and direct messaging.
 - **Profile:** own profile/edit + public profile (follow/block/report, followers/following, suggested, premium activation).
@@ -238,13 +238,15 @@ Everything discussed, grouped so nothing is lost. Build **P0 → P1 → P2**.
 
 
 
-## 4. Shop web (`shop.battleasia.gg`) — **PC shop app**
+## 4. Shop web (`shop.battleasia.gg`) — **PC shop app, separate domain**
 
-**This is a SEPARATE desktop app** on `shop.battleasia.gg` — **not** a page on the main site, **not** a phone site. Phone shop = **native APK** shop screens. Own codebase, own **auth pages** + tab-scoped gate.
+**This is a SEPARATE desktop app on a SEPARATE domain** `https://shop.battleasia.gg` — **not** a page/path on `battleasia.gg`, **not** a phone site. Phone shop = **native APK** shop screens. Own codebase, own **auth pages**.
+
+**Login again on shop — required.** Same account as the main site, but **no SSO**. User already logged into `battleasia.gg` still **must sign in on shop** (email+password + OTP if unverified). Tab-scoped `ba_shop_gate`: new tab / closed tab / missing gate → shop login again. Shop login must **not** sign them out of the main site.
 
 Dedicated **BAC coin store**. Redesign but keep:
 
-- Auth pages (full set) + **tab-scoped login gate** (must sign in per shop tab session).
+- Auth pages (full set + **visible OTP**) + **tab-scoped login gate** (must sign in per shop tab session).
 - **Shop:** coin packs, payment channel + currency select, premium discount, buy = manual deposit submit (address/QR + transaction proof) with "waiting for admin approval" state.
 - **Wallet:** total BAC + fiat equivalents, withdrawable, transaction history (this is the order/purchase history surface).
 - **Transfer:** P2P BAC (recipient, amount, fee, note, history).
@@ -912,7 +914,7 @@ Do **not** block P0 on clans/live/gifting. Flags default **OFF** for P1/P2.
 
 ### P0 — must be live (this is “100% ready BattleAsia”)
 
-- PC landing → auth → desktop `/user/*` + shop PC + admin PC (incl. **§5.1 enterprise**)
+- PC landing → auth → desktop `/user/*` + **shop on `shop.battleasia.gg` (separate domain, login again)** + admin PC (incl. **§5.1 enterprise**)
 - Footer + **all 7 socials** + **live chat FAB** (hover, drag, attach, guest sign-in, seed `liveChat`+`messaging`) — Master §0.3
 - Auth **OTP on-screen** (sign-up/verify + reset, web + shop + APK) — Master §3.6
 - APK: splash → **auth only** → native after-login (no landing)

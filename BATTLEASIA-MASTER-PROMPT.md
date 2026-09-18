@@ -12,7 +12,7 @@ A **mobile-games esports tournament platform** (PUBG, Free Fire, COD, MLBB, Valo
 
 | Client | What it is |
 |--------|------------|
-| **PC Web** | Full **desktop** app at `battleasia.gg` + `shop.battleasia.gg`. Designed for **computer** (wide HUD, sidebar, hover, keyboard §16). This is **not** a phone website. |
+| **PC Web** | Full **desktop** app at `battleasia.gg` **and** separate shop at `shop.battleasia.gg` (login again on shop). Designed for **computer** (wide HUD, sidebar, hover, keyboard §16). This is **not** a phone website. |
 | **Native Android** | Flutter APK `net.battleasia.app`. This is the **phone** product (bottom nav, touch, bottom sheets). |
 
 **Entry (strict):**
@@ -32,7 +32,7 @@ This is the **live product today**. A rebuild must include **every row**. Extra 
 
 **PC player (`battleasia.gg`):** `/` → `/dashboard` landing (7 blocks) · privacy · terms · `/profile/:userId` · `/support` · `/auth/{sign-in,sign-up,forgot-password,reset-password,email-verification}` (**6-digit OTP visible** on verify + reset — §3.6) · `/user/play` · `/user/play/:gameId` · `/user/play/:matchId/detail` · `/user/play/:matchId/result` · `/user/shop` · `/user/shop/wallet` · `/user/referral` · `/user/feed` · `/user/feed/:id` · explore/saved/reels/messages → feed tabs · `/user/account/{profile, wallet, my-matches, my-orders, my-statistics, my-referrals, notifications, leader-board, customer-support}` · `/user/earn` → wallet.
 
-**PC shop:** `/auth/*` (same 5) · `/user/shop` · `/user/wallet` · `/user/transfer` · `/user/withdrawal`.
+**PC shop (`shop.battleasia.gg` — separate domain, own login):** `/auth/*` (same 5 + OTP) · `/user/shop` · `/user/wallet` · `/user/transfer` · `/user/withdrawal`. Logged in on `battleasia.gg` does **not** open shop — user **signs in again** on the shop domain (§4).
 
 **Admin (`admin.battleasia.gg`) — every nav item live now:**
 - Auth: `/auth/login` (+ optional OTP). No public register.
@@ -391,12 +391,13 @@ Password sign-in stays email+password (player is **not** passwordless). OTP is *
 
 ---
 
-## 4. Shop web (`shop.battleasia.gg`) — **PC shop**
+## 4. Shop web (`shop.battleasia.gg`) — **PC shop, separate domain**
 
-**Desktop shop app** (phone shop is native APK). Same stack/design family as player web (Vite 6 + MUI 6 + Redux Toolkit, persist key **`battleasia-shop`**). Dev port **8082**. Purpose: dedicated **BAC coin store + wallet + transfer + withdraw**. **Entry = shop auth pages.**
+**Own domain, own app, own login.** `https://shop.battleasia.gg` is **not** a path on `battleasia.gg`. Phone shop = native APK (no shop domain). Same stack/design family as player web (Vite 6 + MUI 6 + Redux Toolkit, persist key **`battleasia-shop`**). Dev port **8082**. Purpose: dedicated **BAC coin store + wallet + transfer + withdraw**.
 
-- **Routes:** `/auth/*` (full set); protected `/user` (=shop), `/user/shop`, `/user/wallet`, `/user/transfer`, `/user/withdrawal`; 404.
-- **Auth model (not seamless SSO):** same account + API as main site, Bearer token + `withCredentials`; **tab-scoped gate** `sessionStorage: ba_shop_gate` set on sign-in; `AuthGuard` forces re-login if gate missing / offline / logged out; isolated persist key; token stripped on rehydrate. `VITE_MAIN_APP_URL` links back to main site.
+**User must log in again to enter shop (every shop visit / new tab).** Same email+password as the main site (one account, one API) — **not** seamless SSO. Opening Shop from `battleasia.gg` (usually new tab → `VITE_BAC_SHOP_URL`) lands on **shop auth**. `AuthGuard` + `sessionStorage: ba_shop_gate` (set only after shop sign-in). Missing gate / new tab / logged out / offline → **shop sign-in again**. Do **not** auto-copy JWT from the main site. Do **not** log the user out of `battleasia.gg` when shop asks for login. Isolated persist; token stripped on rehydrate. `VITE_MAIN_APP_URL` links back to main site.
+
+- **Routes:** `/auth/*` (full set + **visible OTP** §3.6); protected `/user` (=shop), `/user/shop`, `/user/wallet`, `/user/transfer`, `/user/withdrawal`; 404.
 - **Shop:** coin packs (`v4/shop/items`), rates (`v4/shop/coins`), public channels/wallets; buy = **manual deposit submit** (`v4/payments/deposit-history/submit`) with premium discounts; Coingo PayIn API exists but manual is the active path.
 - **Wallet:** total BAC + fiat (BDT/INR/PKR/USD), withdrawable, **transaction history** (`v2/users/balance-history`) enriched with deposit/withdrawal status — this is the de-facto order history (no separate orders page).
 - **Transfer:** `v2/users/transfer` (settings/submit/history).
