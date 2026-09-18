@@ -55,29 +55,75 @@ This is the **live product today**. A rebuild must include **every row**. Extra 
 
 ### 0.3 Footer, socials, live chat (copy running site — seed allowed)
 
-**Footer (PC landing + logged-in shell):** brand, copyright `{year}`, User support **`support@battleasia.gg`**, **Live support relay** button (pulse dot) → `/support` (opens chat). Legal: Privacy, Terms. Jump links: Rules, How to play, About. Payments chips: bKash, Nagad, Crypto. Trusted partners (new tabs): `battleasia.com`, `baccoin.shop`, `battleasia.net`, `pubg.com`, `bkash.com`, `nagadwallet.net`.
+Copy `battleasia.gg/src/layouts/core/footer-section.tsx`, `support-chat.tsx`, `deferred-support-chat.tsx`, `social-links-fab.tsx`, and `api/src/models/AppSettings.ts` (`DEFAULT_LIVE_CHAT_SETTINGS` + `DEFAULT_MESSAGING_SETTINGS`) **A–Z**. Seed may load these defaults. Links stay **real** (they must open those URLs). Admin → Live Chat Settings / Messaging providers can edit after seed. Do **not** drop a network.
 
-**Social links — all of these (footer row + chat/FAB). Seed into `AppSettings.liveChat.socialLinks`; Admin → Live Chat Settings can edit. Do not drop a network.**
+#### Footer (PC landing + logged-in dashboard shell)
 
-| Network | Default URL (running site) |
-|---------|----------------------------|
-| Facebook | `https://www.facebook.com/share/14XUaoaUgUL/?mibextid=wwXIfr` (chat seed also has `.../1HQV9D33ic/...` — keep **both or the seeded AppSettings list**) |
-| Discord | `https://discord.gg/battleasia` |
-| TikTok | `https://www.tiktok.com/@battleasia` |
-| Instagram | `https://www.instagram.com/battleasia` |
-| YouTube | `https://www.youtube.com/@BattleAsia` |
-| Telegram | `https://t.me/battleasiaofficial` |
-| WhatsApp | `https://whatsapp.com/channel/0029VbBDBVtGpLHQgYC7WM44` |
+Source: `FooterSection`. Show on `/dashboard` **and** after-login layout. Lazy footer bg image + dark gradient overlay (must not block LCP). Top hairline + centered chevron. Three columns (stack on mobile):
 
-**Live chat (PC landing + after-login; APK: same features in support + optional FAB):**
-- Chat **icon FAB** (bottom-right), **hover scale**, **draggable** (persist `ba-support-chat-pos`), click opens panel.
-- Settings from `GET /api/v2/customer-support/live-chat-settings` (seed `AppSettings.liveChat`: enabled, agent name/title/avatar, logo, welcome, **socialLinks**). Admin CRUD at Live Chat Settings. Offline → toast, don’t open empty crash.
-- Guest: prompt sign-in to send (landing can show welcome + social buttons).
-- Authed: `v2/customer-support` conversation + messages; **socket** new-message + typing; **attachments** (images, max 4); welcome message; social buttons inside the panel; agent avatar/name.
-- Messaging providers (Admin): builtin chat + optional WhatsApp/Telegram/Facebook/Discord deep links (`AppSettings.messaging`) — seed defaults from running site.
-- Copy **all chat UI features** from running `support-chat.tsx` (panel, input, send, attach, grow open, hover on FAB).
+1. **Follow the arena** — circular icon buttons (46px), `target=_blank`, hover fill gold + lift `-3px`. Networks: Facebook, Discord, TikTok, Instagram, YouTube, Telegram (footer row URLs below).
+2. **Brand center** — logo 72×72, wordmark (`2.0` in accent), tagline, then legal/jump nav: Privacy `/privacy-policy`, Terms `/terms-and-conditions`, Rules → `#rules` / `/dashboard/rules`, How to play → `#how-to-play`, About → `#about-us`. Copyright `{year}`.
+3. **User support** — `mailto:support@battleasia.gg`, **Live support relay** button (gold border, pulse live-dot animation) → `/support` (opens live chat). Hover inverts to gold fill.
 
-Seed may load footer/chat copy + 10 face users + games. Links still **real** (open those URLs).
+Bottom bar (blur): **Payments** chips with logos — bKash, Nagad, Crypto. **Trusted partners** pills (new tab): `https://battleasia.com`, `https://baccoin.shop`, `https://battleasia.net`, `https://www.pubg.com`, `https://www.bkash.com`, `https://nagadwallet.net`.
+
+#### Social URLs (keep every unique href)
+
+| Network | Where | Default URL |
+|---------|--------|-------------|
+| Facebook | Footer | `https://www.facebook.com/share/14XUaoaUgUL/?mibextid=wwXIfr` |
+| Facebook | Live-chat seed + social FAB | `https://www.facebook.com/share/1HQV9D33ic/?mibextid=wwXIfr` |
+| Discord | Footer | `https://discord.gg/battleasia` |
+| TikTok | Footer | `https://www.tiktok.com/@battleasia?_r=1&_t=ZN-93nBYQnjiGU` |
+| TikTok | Live-chat seed + social FAB | `https://www.tiktok.com/@battleasia?_r=1&_t=ZN-91f9vFOUJcc` |
+| Instagram | Footer | `https://www.instagram.com/battleasia` |
+| YouTube | Footer | `https://www.youtube.com/@BattleAsia` |
+| YouTube | Live-chat seed + social FAB | `https://youtube.com/@battleasia?si=9ROsHqQNc3mVFMvl` |
+| Telegram | Footer | `https://t.me/battleasiaofficial` |
+| WhatsApp | Live-chat seed + social FAB | `https://whatsapp.com/channel/0029VbBDBVtGpLHQgYC7WM44` |
+
+Footer row = 6 networks (no WhatsApp). Chat/FAB seed = Facebook, YouTube, WhatsApp, TikTok. Rebuild must expose **all 7 networks** (Instagram + Discord + Telegram on footer; WhatsApp on chat/FAB). Keep both Facebook share IDs (footer vs seed). Admin can override `AppSettings.liveChat.socialLinks`.
+
+**Social FAB** (`social-links-fab.tsx`): fixed bottom-right; click/hover fans out brand-color buttons (Facebook, YouTube, WhatsApp, TikTok). Do not cover the live-chat FAB (offset). Optional if live-chat panel already shows the same four; URLs still required in seed.
+
+#### Live chat (PC landing + after-login; APK: same features in support + optional FAB)
+
+Copy **every** inner feature of running `support-chat.tsx`. Load **after idle** (`DeferredSupportChat`, `requestIdleCallback` ~4.5s) so it never blocks LCP.
+
+**FAB icon (hover + drag):**
+- Fixed, default bottom-right, size 52. Icon `solar:chat-round-call-bold`; when open → close icon.
+- **Hover:** scale ~1.04, gold border/fill. Cursor grab. Title: “Drag to move · Click to open”.
+- **Drag:** pointer capture, 8px threshold, clamp to viewport; persist `{x,y}` in `localStorage` key `ba-support-chat-pos`. Resize reclamps. Mobile: extra bottom clearance (~84px) so it sits above bottom nav.
+- Click (not a drag) toggles panel. If `liveChat.enabled === false`: toast “live chat offline”, do **not** open / hide FAB when closed.
+
+**Panel (Grow open, origin bottom-right or top-right if FAB is low on screen):**
+- Dark card ~300×380 (mobile `min(52vh, 360)`), gold edge shadow, close button (hover scale).
+- Header: agent avatar/logo, **agentName** (“BattleAsia Support”), green online dot + **agentTitle** (“Live Support”).
+- Welcome card: seeded `welcomeMessage`.
+- **Guest:** copy “Sign in to chat…” + Sign In CTA → `/auth/sign-in`; composer placeholder “Sign in to chat…”. Sending/uploading while guest → toast + redirect sign-in. Welcome + **in-panel social buttons** still visible.
+- **Authed:** `getOrCreateConversation` + last 40 messages; loading spinner; bubbles (me = gold tint, agent = muted + agent name); auto-scroll to bottom.
+- **Realtime:** Socket.IO join conversation; `onNewMessage` append (dedupe by id); leave on close.
+- **Attachments:** gallery button, `accept=image/*` multiple, max **4**, folder `support`; pending thumbs + remove; send with message (body may be space if image-only); render image thumbs (click open new tab) or file label.
+- Composer: attach + input + send (Enter to send, Shift+Enter newline). Hover scale on attach/send. Disabled while sending/uploading/offline. Sending spinner.
+- In-panel **socialLinks** row (from settings): brand-color icon buttons, `target=_blank`, hover lift.
+- Hide entire widget when disabled and panel closed.
+
+**Seed `AppSettings.liveChat` (exact running defaults):**
+```
+enabled: true
+agentName: BattleAsia Support
+agentTitle: Live Support
+agentAvatar: ""
+logoUrl: /logo/logo.webp
+welcomeMessage: Hi! How can we help you today? Chat with our team or reach us on social.
+socialLinks: Facebook / YouTube / WhatsApp / TikTok (URLs + mingcute icons + brand colors from table above)
+```
+
+**Seed `AppSettings.messaging`:** builtin “BattleAsia Chat” ON as default; WhatsApp / Telegram / Facebook / Discord providers present, default **enabled: false**, `openInNewTab: true`, `allowUserChoice: true`. Admin: `/customer-support/live-chat-settings` + `messaging-provider-settings`. Public GET: `/api/v2/customer-support/live-chat-settings`. Authed chat: `/api/v2/customer-support` conversations + messages + uploads.
+
+**APK:** same conversation/messages/attachments/welcome/socials in native support; optional draggable FAB. No marketing landing.
+
+Seed may also load 10 face users + 5 games. Footer/chat copy comes from seed; URLs remain the live ones.
 
 ---
 
@@ -300,7 +346,7 @@ List/detail match payloads **omit** `roomId`/`password` unless room endpoint. Er
 4. **About BattleAsia** — story + env-driven stats.
 5. **How to play / modes** — Solo, Duo, Squad, TDM.
 6. **Tournament rules / FAQ** — accordion (fair-play, match-ops, prizes, payment rules).
-7. **Footer** — **running-site footer A–Z** (Master §0.3): partners, **all socials**, pay chips, support email, Live support CTA, legal + jump links.
+7. **Footer + live chat** — **running-site A–Z** (Master §0.3): 3-col footer, all 7 socials, pay chips, partners, support email, Live support relay, **chat FAB** (hover/drag/attach/seed).
 
 ### 3.3 After-login features → API (must map exactly)
 Play/matches (`v2/games`), Wallet + earn/engagement (`v2/users`, `v2/engagement`, `v4/payments/withdrawal`), in-app shop (`v4/shop`, `v3/shop/orders`) + external BAC store link, Feed/social (`v2/feed`, `v2/social`: stories, reels, DMs with attachments, search, reports), Profile + social graph (follow/block/followers/premium), Referrals, Notifications (poll + socket), Leaderboard, Customer support (tickets/chat), File uploads (`v1/files`), Public live pulse (`v3/public/dashboard`), APK settings. **Player HUD hotkeys:** `BATTLEASIA-REDESIGN-PROMPT.md` §16 (J/C/R/L/M, W/B/T/H, Enter/Tab/F/S, U/Space/Esc).
