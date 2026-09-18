@@ -73,19 +73,19 @@ Production domains (Coolify + Cloudflare):
 
 ### 2.2 Data models (52 collections — must all exist)
 - **Users/auth:** `User` (email, username, password, status, avatar, cover, bio, `balance` BAC, embedded `role`{type,permissions}, `roleRef`, `pubgId`, `gameServer`, `referralCode`, `referredBy`, `emailVerified`, premium fields, `privacy`, **`tokenVersion`** integer default 0 — bump on password change / suspend / logout-all), `Role`, `Session`, `LoginHistory`, `VerificationCode`.
-- **Games/matches:** `Game`, `Match` (gameId, gameMode classic/tdm, roomId/password, schedule, entryFee, totalPlayer, teamType, perKill, map, banner, premiumOnly, platformFeePercent, status, results[], winningsDistributed, entriesRefunded), `MatchParticipant`.
+- **Games/matches:** `Game`, `Match` (gameId, gameMode classic/tdm, roomId/password, schedule, entryFee, totalPlayer, teamType, perKill, map, banner, premiumOnly, platformFeePercent, status, results[], winningsDistributed, entriesRefunded, **slug**), `MatchParticipant` (**ready** boolean, unique `{matchId,userId}`), `MatchChatMessage` (matchId, userId, body, createdAt).
 - **Wallet/payments (BAC):** `BalanceHistory`, `DepositHistory`, `WithdrawalHistory`, `PaymentChannel`, `BusinessWallet`, `CoinRate` (global/bangladesh/india/pakistan), `CoingoTransaction`, `ShopItem`, `ShopOrder`, `UserTransferHistory`, `ReferralHistory`.
 - **Social/feed:** `Feed`, `FeedCategory`, `FeedLike`, `FeedComment`, `SavedPost`, `Reel`, `Story` (TTL expiry), `Follow`, `UserBlock`, `DirectConversation`, `DirectMessage`, `SocialReport`.
 - **Notifications/support:** `Notification`, `NotificationRead`, `SupportConversation`, `SupportMessage`.
 - **Engagement (gamification):** `EngagementMission`, `EngagementBadge`, `UserEngagementProgress`, `UserEngagementBadge`, `UserEngagementLevel`, `UserEngagementStreak`, `UserEngagementWelcome`, `UserEngagementReferral`, `UserEngagementWeekly`, `UserEngagementSeason`, `UserEngagementSpin`, `UserEngagementShare`, `UserEngagementSquad`, `EngagementSquad`, `EngagementSquadWeekly`, `EngagementSquadWeeklyClaim`.
 - **Config:** `AppSettings` (single `key:'global'` doc: premium price/duration, commissionRate, transferSettings, liveChat, messaging, profileSocial, mail, appDownload, full engagement config, **feature flags**, **maintenanceMode** {enabled, message, resumeAt}, **kycRequiredForWithdraw**, **highValueWithdrawBac**, **velocityLimits**, **reserveAlert**).
-- **Integrity (new, required):** `LedgerEntry` (double-entry: debitAccount, creditAccount, amount, userId, refType/refId, idempotencyKey — **never deleted**), `DeviceFingerprint` (userId, hash, ip, ua, lastSeen), `FraudHold` (userId, reason, status), `KycRecord` (userId, status, ageVerified, docs), `MatchReport` (matchId, reporterId, targetIds, type collusion/win-trade, evidence), `Dispute` (ticket + matchId + evidence files).
+- **Integrity (new, required):** `LedgerEntry` (debitAccount, creditAccount, amount, userId, refType/refId, idempotencyKey — **never deleted**), `DeviceFingerprint` (userId, hash, ip, ua, lastSeen), `FraudHold`, `KycRecord`, `MatchReport`, `Dispute`, **`AuditLog`**, **`DevicePushToken`** (userId, token, platform `android|web`).
 
 ### 2.3 Endpoint groups (must all be present)
 - **`/api/v1/files`** — `POST /upload/:folder`, `/upload/:folder/multi`, `DELETE /` (5MB default, 100MB reels/stories).
-- **`/api/v2/users`** — signup, signin, logout; email verify (send/verify/verify-signup/resend); password reset (forgot/verify-code/reset); `GET/PUT /me`; leaderboard; withdrawable-amount; balance-history; referrals + settings + stats + commissions; premium details/activate; match history; follow/unfollow/block/followers/following/suggested/mutual.
+- **`/api/v2/games`** — games list; matches list/detail/result/**room** (participant-only); check-join; **join**; **leave** (before start → fee reversal); **ready** `{ ready: boolean }`; **lobby chat** GET/POST `/matches/:id/chat`; history (me + by user).
+- **`/api/v2/users`** — signup, signin, logout; email verify; password reset; `GET/PUT /me`; **`POST /refresh`**; **`POST /me/push-token`** `{ token, platform }`; leaderboard; withdrawable-amount; balance-history; referrals; premium; match history; follow/unfollow/block/followers/following/suggested/mutual.
 - **`/api/v2/users/transfer`** — settings, P2P transfer, history.
-- **`/api/v2/games`** — games list; matches list/detail/result/room; check-join; join; history (me + by user).
 - **`/api/v2/feed`** — categories, list, create, explore, saved, comments, like, save, view, by-user.
 - **`/api/v2/social`** — stories CRUD/view; reels CRUD/view (+admin); reports; DM conversations/messages; user search; messaging + profile-social settings.
 - **`/api/v2/engagement`** — home, badges, alerts; claim missions/streak/welcome/referral/weekly/squad/share/spin/season.
@@ -93,27 +93,29 @@ Production domains (Coolify + Cloudflare):
 - **`/api/v2/customer-support`** — conversation CRUD, tickets, messages, live-chat settings.
 - **`/api/v2/app-settings`** — mail settings (admin); APK download config + upload; **public maintenance** payload (enabled, message, resumeAt).
 - **`/api/v3/users/auth`** — admin signin, verify-otp, logout, me, profile.
-- **`/api/v3/users/{list,roles,permissions,histories,sessions,premium,referral-settings,transfer-settings,referral-history}`** — admin user management + RBAC.
+- **`/api/v3/users/{list,roles,permissions,histories,sessions,premium,referral-settings,transfer-settings,referral-history}`** — + **bulk status**, `DELETE /sessions/:sessionId`, `POST /auth/verify-password`.
+- **`/api/v3/audit-logs`** — list/filter/export.
+- **`/api/v4/payments`** — `balance-histories`, `payment-channels` (+public), `business-wallets` (+public), `deposit-history` (submit/my-history/approve/reject/stats/pending + **bulk**), `withdrawal-history` (submit/my-history/approve/complete/reject/stats + **bulk**), `coingo` (collection start + status, payout + status).
 - **`/api/v3/dashboard`** (admin stats + **liability vs reserve**) + **`/api/v3/public/dashboard`** (cached public live stats).
 - **`/api/v3/integrity/{ledger, fraud-holds, kyc, fingerprints, match-reports, disputes}`** — admin queues; player KYC submit + match report under v2.
 - **`/api/v3/games/{list,matches,participants-history}`** — admin game/match CRUD, results, distribute winnings, refunds.
 - **`/api/v3/feed/{list,categories}`**, **`/api/v3/engagement/{missions,badges,settings}`**, **`/api/v3/notifications`** (broadcast).
 - **`/api/v3/shop/orders`** (checkout, me), **`/api/v3/shop/coins`** (public rates + legacy Coingo payout).
-- **`/api/v4/payments`** — `balance-histories`, `payment-channels` (+public), `business-wallets` (+public), `deposit-history` (submit/my-history/approve/reject/stats/pending), `withdrawal-history` (submit/my-history/approve/complete/reject/stats), `coingo` (collection start + status, payout + status).
 - **`/api/v4/shop`** — `items` (list/get + admin CRUD), `coins` (rates + admin CRUD), `orders` (admin list).
 - **`/health`, `/ready`, `/uploads/*`** (serves images + `uploads/app/BattleAsia.apk`).
 
 ### 2.4 Money flows (critical logic)
 - **Deposit (manual):** player picks channel (bKash/Nagad/crypto) → gets business-wallet address/QR → submits proof (`deposit-history/submit`) → admin approves → credits BAC + `BalanceHistory` + referral commission + welcome/deposit bonuses + socket events. **Alt:** Coingo gateway (auto in mock).
 - **Withdrawal:** check withdrawable (70% of match-bet BAC rule) → submit → admin approve→processing→complete/reject.
-- **Match economy:** join deducts entry fee; admin distributes winnings / refunds from v3 match admin.
+- **Match economy:** join deducts entry fee; **leave before start** refunds via reversal ledger; **ready** is lobby-only (does not move BAC); admin distributes winnings / refunds from v3.
 - **P2P transfer:** fee% + min/max from `AppSettings.transferSettings`.
 - **Coin rates:** per region; shop packs have fiat price + `paymentOptions`.
 
 ### 2.5 Realtime (Socket.IO, path `/socket.io`, JWT in handshake)
 - Rooms: `user:{id}` (auto), `admin-room`, `game:{id}`, `conversation:{id}`.
 - Client→server: `join-admin-room`, `join-game`, `join-conversation`, `typing`, and leaves.
-- Server→client: `pending-deposits-count`, `pending-withdrawals-count`, `new-deposit`, `new-withdrawal`, `new-notification`, `new-message`, `balance-updated`, `user-stats-updated`, `match-created`, `match-updated`, `dashboard-stats-updated`, `user-typing`.
+- Server→client: `pending-deposits-count`, `pending-withdrawals-count`, `new-deposit`, `new-withdrawal`, `new-notification`, `new-message`, `balance-updated`, `user-stats-updated`, `match-created`, `match-updated`, `dashboard-stats-updated`, `user-typing`, **`match-chat-message`**, **`match-ready-updated`**, **`match-participant-left`**.
+- Push: in-app `Notification` **and FCM** when APK token registered (deposit result, match starting, DM). Web may use same API no-op if no token.
 
 ### 2.6 Services & seeding
 - Email (SMTP or `AppSettings.mail`), Coingo gateway, disk uploads, APK distribution, in-memory cache for public dashboard, referral engine, engagement engine. **No cron/background workers** — side effects run inline.
@@ -178,7 +180,40 @@ Production domains (Coolify + Cloudflare):
 - **Dispute & evidence:** support tickets can attach **screenshot/video** tied to `matchId`; admin dispute queue reviews evidence before result/refund changes. Reversal ledger if payout was wrong.
 
 **Tests (automated, CI)**
-- Unit + integration for: deposit approve/reject, withdraw submit/approve/complete, join entry-fee debit, insufficient balance, **double join**, match full, **refund**, distribute winnings, **idempotency replay**, **reversal** (not delete), velocity hold. Fail CI if money tests fail.
+- Unit + integration for: deposit approve/reject, withdraw submit/approve/complete, join entry-fee debit, insufficient balance, **double join**, match full, **leave/refund**, **ready**, distribute winnings, **idempotency replay**, **reversal** (not delete), velocity hold. Fail CI if money tests fail.
+
+### 2.10 Critical API JSON (envelope + money/match)
+
+All JSON APIs return `{ "success": true, "data": ... }` or `{ "success": false, "message": "human i18n key or English fallback", "errors": { "field": "msg" } }`. Auth: `Authorization: Bearer` and/or cookie. Money mutating POSTs send header **`Idempotency-Key`**: UUID.
+
+| Call | Body (in) | `data` (out, typical) |
+|------|-----------|------------------------|
+| `POST /api/v2/users/signin` | `{ email, password }` | `{ token, user: { _id, email, username, balance, role, emailVerified } }` |
+| `POST /api/v2/users/signup` | `{ email, username, password, pubgId?, phone?, gameServer?, referralCode? }` | same as signin or verify-required |
+| `POST /api/v2/users/refresh` | cookie/refresh | `{ token }` |
+| `GET /api/v2/users/me` | — | user + `withdrawableAmount` |
+| `POST /api/v2/games/matches/:id/join` | `{}` | `{ participant, balance, spotsLeft }` — **no room** until released |
+| `POST /api/v2/games/matches/:id/leave` | `{}` | `{ refunded, balance }` — **403** if match started |
+| `PATCH /api/v2/games/matches/:id/ready` | `{ ready: true }` | `{ ready, userId, matchId }` |
+| `GET /api/v2/games/matches/:id/room` | — | `{ roomId, password }` — **403** if not participant or too early |
+| `GET/POST /api/v2/games/matches/:id/chat` | POST `{ body }` | `{ messages[] }` / `{ message }` |
+| `POST /api/v4/payments/deposit-history/submit` | `{ channelId, amount, trxId, proofUrl, walletId? }` | `{ _id, status: "pending" }` |
+| `POST /api/v2/users/transfer` | `{ recipient, amount, note? }` | `{ transfer, fee, balance }` |
+| `POST /api/v4/payments/withdrawal-history/submit` | `{ amount, method, destination }` | `{ _id, status }` |
+| `POST /api/v2/users/me/push-token` | `{ token, platform: "android"\|"web" }` | `{ ok: true }` |
+| Bulk admin | `{ ids: string[], rejection_reason? }` | `{ updated: n }` |
+
+List/detail match payloads **omit** `roomId`/`password` unless room endpoint. Errors: 401, 403, 404, 409 (already joined), 422 validation, 429.
+
+### 2.11 Observability, email, SEO, i18n, FCM
+
+- **Sentry (or equivalent):** `SENTRY_DSN` on API + player web + shop + admin + Flutter. Capture 5xx and client ErrorBoundary. No PII in breadcrumbs (no password/OTP/JWT).
+- **Logs:** structured JSON on API (request id, user id, route). Never log tokens or card/Trx secrets in full.
+- **Email HTML templates** (SMTP): verify email, reset password, deposit approved/rejected, withdraw complete/reject, match starting (optional). Same i18n locales.
+- **SEO (PC landing only):** unique title/description, Open Graph, `robots.txt`, `sitemap.xml` for public routes. `/user/*` `noindex`.
+- **i18n files** (en, bn, zh, hi, ur) namespaces: `common`, `auth`, `play`, `wallet`, `shop`, `feed`, `errors`, `admin`. **No hardcoded user-visible English** in components. Auth/play/wallet/error strings must exist in all 5 locales before ship.
+- **FCM:** Android `google-services.json` gitignored; register token after login; server send on notification insert. Fail open if FCM unset in dev.
+- **Analytics (optional):** no blocking third-party on LCP. If added, consent + after load.
 
 ---
 
@@ -255,8 +290,12 @@ JWT; boot re-validates `GET v2/users/me`; sign-in → `loginAction` → redirect
 - **Feed** `/feed/{list, categories, profile-social-settings, social-reports, reels-moderation}`.
 - **Customer support** `/customer-support/{list, :id, live-chat-settings, messaging-provider-settings}`.
 - **Engagement** `/engagement/{missions, badges, settings}`.
-- **System** `/system/{mail-settings, app-download}` — SMTP config; **APK upload** + version + enable/disable download (`v2/app-settings/app-download/upload`).
+- **System** `/system/{mail-settings, app-download}` — SMTP; **APK upload**.
+- **Feature flags** — unique modules on/off + rates.
+- **Integrity / audit** — ledger, fraud, KYC, fingerprints, reports, disputes, **audit logs**.
 - **Profile** `/profile`; **404**.
+
+**Enterprise ops (required):** bulk DataGrid, CSV/Excel/Print, date chips, slug + room generate, payout cap block, receipt lightbox, high-value 2FA, password meter, session revoke, audit page, deposit/withdraw **chime + mute**, **Ctrl+K and Cmd+K**. See redesign §5.1.
 
 ---
 
@@ -300,11 +339,11 @@ Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged i
 ---
 
 **Env vars (per app):**
-- API: `PORT, NODE_ENV, MONGODB_URI, JWT_SECRET*, ADMIN_EMAIL/PASSWORD*/USERNAME, SYNC_ADMIN_PASSWORD, CORS_ORIGINS, COINGO_MOCK, LOG_AUTH_CODES, ADMIN_LOGIN_OTP, APP_URL, CDN_URL, SMTP_*, MAIL_FROM*` (+ `MONGO_DUMP_PATH`, `APP_APK_MAX_MB`).
-- Player fe: `VITE_PORT, VITE_SERVER_URL, VITE_BAC_SHOP_URL, VITE_CDN_URL, VITE_STAT_*`.
-- Shop: `VITE_PORT, VITE_SERVER_URL, VITE_MAIN_APP_URL, VITE_BASE_PATH`.
-- Admin: `PORT, REACT_APP_API_URL, REACT_APP_BASENAME, PUBLIC_URL`.
-- Flutter: `API_BASE_URL, SITE_URL` (profiles `.env.emulator/.device/.production`).
+- API: `PORT, NODE_ENV, MONGODB_URI, JWT_SECRET*, ADMIN_EMAIL/PASSWORD*/USERNAME, SYNC_ADMIN_PASSWORD, CORS_ORIGINS, COINGO_MOCK, LOG_AUTH_CODES, ADMIN_LOGIN_OTP, APP_URL, CDN_URL, SMTP_*, MAIL_FROM*` (+ `MONGO_DUMP_PATH`, `APP_APK_MAX_MB`, `SENTRY_DSN`, `FCM_SERVER_KEY` / Firebase, `BACKUP_S3_*`).
+- Player fe: `VITE_PORT, VITE_SERVER_URL, VITE_BAC_SHOP_URL, VITE_CDN_URL, VITE_STAT_*`, `VITE_SENTRY_DSN`.
+- Shop: `VITE_PORT, VITE_SERVER_URL, VITE_MAIN_APP_URL, VITE_BASE_PATH`, `VITE_SENTRY_DSN`.
+- Admin: `PORT, REACT_APP_API_URL, REACT_APP_BASENAME, PUBLIC_URL`, `REACT_APP_SENTRY_DSN`.
+- Flutter: `API_BASE_URL, SITE_URL`, Sentry DSN via dart-define or `.env`.
 - Coolify required: `JWT_SECRET`, `ADMIN_PASSWORD` (compose fails without).
 
 **Backups/seed:** `npm run backup:mongo` (mongodump → `backups/`, keeps 7) **plus encrypted off-site daily copy** (§2.9); restore via `api npm run restore-db` or embedded auto-restore; `deploy/seed-all.sh` (`npm run seed:server`) runs seed→games→dashboard→feed→social→demo. Demo logins: admin from env; `player@battleasia.local / Player@123456`.
@@ -327,6 +366,7 @@ Not a WebView. **No landing.** Splash → Sign In (or Sign Up). Already logged i
 13. **Player HUD keyboard shortcuts** in `BATTLEASIA-REDESIGN-PROMPT.md` §16: **J** quick-join, **C** copy room, **R** ready, **L** leave/refund-before-start, **M** match details, **W** wallet, **B** buy BAC, **T** transfer, **H** hide balance, **Enter** chat, **Tab** leaderboard (not in inputs), **F** follow/like, **S** share match, **U** mute, **Space** reel/live pause, **Esc** close overlays. APK = same actions as buttons.
 14. **Locked visual system** in `BATTLEASIA-REDESIGN-PROMPT.md` §17: 8pt spacing only (4/8/16/24/32), radius scale, `--ba-accent` trio before first paint, 5 component states, mobile bottom sheets, 44px targets, safe-area, glass+aurora, IG stories/carousel/heart/chat bubbles, Copied chip + BAC(fiat) + receipt lightbox, Lighthouse 90+ / LCP / TBT, dynamic heavy libs, WebP/AVIF.
 15. **Two player clients:** **PC Web starts on landing**; **APK starts on auth only** (no APK landing). See `BATTLEASIA-REDESIGN-PROMPT.md` §0.1.
+16. **Fill the remaining gaps:** Aurora brief locked (redesign §1); admin enterprise (redesign §5.1); Ready/Leave/lobby-chat + JSON contracts (this file §2.10); FCM + Sentry + email templates + SEO + i18n namespaces (§2.11); ship **P0 before P1/P2** (redesign §18).
 
 ---
 

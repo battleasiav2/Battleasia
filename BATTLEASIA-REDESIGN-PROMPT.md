@@ -42,21 +42,21 @@ Rebuild **both**. Phone users use the **APK**. Computer users use **web**. Do no
 
 
 
-## 1. Design brief (fill this in before building)
+## 1. Design brief (LOCKED — Aurora Arena)
 
-Define the new identity up front so the redesign is intentional, not random:
+Do **not** leave these blank. This is the new look for the rebuild:
 
-- **Brand vibe:** (e.g. premium esports / clean fintech / neon arcade / minimal dark / bold sporty) → `______`
-- **Color system:** primary, accent, success/danger/warning, surfaces, text tiers → `______`
-- **Dark / light / both:** `______`
-- **Accent color switcher (REQUIRED):** users can pick their accent from multiple color presets (keep this feature from the current product — see §2.1). Choose the preset palette → `______`
-- **Typography:** display/heading font + body font (WebP/WOFF2 self-hosted for perf) → `______`
-- **Shape language:** corner radius, border style, elevation/glass/flat → `______`
-- **Motion:** subtle/none/expressive (must stay off the LCP critical path) → `______`
-- **Imagery:** photography / 3D / illustration / game art treatment → `______`
-- **Logo + wordmark:** new `BATTLE ASIA` treatment → `______`
+- **Brand vibe:** premium esports × modern fintech — confident, airy, international-legible. **Not** gold-glass PUBG clone.
+- **Color system:** Dark page `#0E0F14`, surface `#171922`, text `#F4F5F7`, muted `#A0A4B8`. Light page `#F7F8FB`, cards `#FFFFFF`, ink `#12131A`. Accent gradient `#7C5CFF → #21D4FD`. Success `#28E0A0`, danger `#FF5C7A`, warning `#FFC24B`. Hairline white 8–14%.
+- **Dark / light / both:** **Both required.** Toggle + 8 accent presets.
+- **Accent switcher:** lime, gold, ember, jade, cyan, violet, rose, sky — CSS `--ba-accent`, `--ba-accent-glow`, `--ba-accent-hover`; persist `ba-accent`; **before first paint**.
+- **Typography:** headings Space Grotesk / Clash Display / Barlow / Syne (bold condensed). Body Inter / Public Sans / Poppins. **Tabular numerals** for BAC.
+- **Shape:** 8pt grid only; cards 12–16px radius; buttons/inputs 8–12px; chips pill. Flat luminous cards; glass only on sticky nav.
+- **Motion:** count-up, slot progress, hover lift, shimmer — **off LCP** (dynamic import). Honor `prefers-reduced-motion`.
+- **Imagery:** hex game frames, duotone covers, aurora mesh behind hero/winners. 5 unique game arts, PUBG first.
+- **Logo + wordmark:** new `BATTLE ASIA 2.0` (gradient on one word). PC landing hero; **not** on APK (APK has no landing).
 
-Everything below must be expressed **through** this new brief.
+Locked finish numbers: **§17**.
 
 ---
 
@@ -106,7 +106,7 @@ Redesign the story, but keep these blocks (anchors `#home #about-us #how-to-play
 
 ### After-login user area (all `/user/*`)
 
-- **Play:** game picker → match list (per game) → match detail + join → match result. Show entry fee, prize, spots progress, room ID/password after join.
+- **Play:** game picker → match list → detail + **J join** → lobby (**R ready**, **Enter chat**, **C room** when released, **L leave** before start = refund) → result.
 - **Wallet + Earn:** balance, withdrawable, balance history, engagement/earn hub (missions, streak, welcome, referral, weekly, squad, spin, season). Withdraw flow.
 - **Shop (in-app):** marketing + coin packs; heavy store links to shop app.
 - **Referral:** code/link share, network, commissions.
@@ -222,7 +222,29 @@ Redesign the admin UI (dense, data-heavy, tables/forms) but keep every section:
 - **Customer support:** inbox, thread reply, live-chat + messaging-provider settings.
 - **Engagement:** missions, badges, settings.
 - **System:** mail settings, **App Download (APK upload + version + toggle)**.
+- **Feature flags** — every unique module on/off + rates.
+- **Integrity** — ledger, fraud holds, KYC, fingerprints, match reports, disputes, **audit logs**.
 - **Profile**, 404.
+
+### 5.1 Admin enterprise (required — not a later add-on)
+
+All list views (Users, Matches, Deposits, Withdrawals, Feed, Balance):
+
+- Checkbox select-all (page **or** filtered set) + floating bulk toolbar.
+- Bulk: deposits/withdrawals Approve + Reject (reason); users Ban/Suspend + status; feed/reels Delete/Hide.
+- Export CSV + Excel; **Print** branded ledger (`@media print` hides chrome).
+- Date chips: Today / Yesterday / Last 7 / This Month / custom. Column visibility + density.
+- Game/Match forms: **auto slug** + override; **Generate Room ID / Password**.
+- Results: live gross / fee% / net; **block if payout > collected fees**.
+- Deposit receipt lightbox (zoom/pan/rotate) + copy TrxID / phone.
+- High-value (≥ 1000 BAC): password or 2FA confirm.
+- Profile: current password + **strength meter**; sessions list; revoke one or all others.
+- Audit page: who, action, target, IP, time; filter/export.
+- Socket **chime** on `new-deposit` / `new-withdrawal` + header **mute**.
+- **Ctrl+K and Cmd+K** command palette; Esc closes dialogs.
+- Skeleton + illustrated empty.
+
+Additive APIs only: bulk payment/user/feed, `DELETE /sessions/:sessionId`, `POST /auth/verify-password`. If rebuilding this repo, wire existing `AdminDataGrid` rather than reinvent.
 
 ---
 
@@ -265,7 +287,9 @@ Keep all 30 screens:
 
 ## 8. Deliverables checklist (so nothing is missed)
 
-- [ ] Design brief (Section 1) filled in
+- [ ] Design brief (Section 1) **Aurora Arena — already locked**
+- [ ] Admin enterprise (Section 5.1)
+- [ ] Ship phases (Section 18): P0 live before P1/P2 unique earn
 - [ ] Global tokens + component library (Section 2) for web + APK
 - [ ] PC Web: **starts on landing** → auth → desktop `/user/*` + shop web
 - [ ] Native Android APK: **starts on auth only** (no landing/home) → then 30 screens
@@ -831,3 +855,36 @@ Dark page ink may remain `#060607` / `#0E0F14` (Aurora) with glass cards `backdr
 - Lighthouse **Performance 90+**, **LCP &lt; 2.5s**, **TBT &lt; 150ms**, **CLS &lt; 0.1**.
 - **Framer Motion, Three.js, Socket.IO** (and carousels) **never** on the main LCP bundle — **dynamic import** after first paint.
 - All banners, icons, photos: **WebP or AVIF**, compressed.
+
+---
+
+## 18. Ship phases (100% product vs later)
+
+Do **not** block P0 on clans/live/gifting. Flags default **OFF** for P1/P2.
+
+### P0 — must be live (this is “100% ready BattleAsia”)
+
+- PC landing → auth → desktop `/user/*` + shop PC + admin PC (incl. **§5.1 enterprise**)
+- APK: splash → **auth only** → native after-login (no landing)
+- Money: deposit/withdraw/join/leave-refund/transfer + ACID + idempotency + double-entry
+- Room hide + participant-only + server results
+- Ready + lobby chat + keyboard §16 (web)
+- IG **P0** (posts, stories, reels, DM, profile, explore)
+- Engagement that already exists (missions, streak, referral, spin, season, squad)
+- Security §14 baseline (rate limit, sanitize, helmet, CORS, cookies, tokenVersion, bcrypt, magic-byte uploads)
+- FCM register + send for core notifications; Sentry; email templates; landing SEO; 5 locale namespaces for auth/play/wallet/errors
+- Lighthouse ship gate; tests in §2.9
+
+### P1 — next (flags on when ready)
+
+- IG P1 (victory auto-post, highlights, squad chat extras, message requests)
+- KYC + age before withdraw; velocity holds tuned; fingerprint admin UI
+- Admin liability vs reserve alerts; off-site backup automation live
+- Unique earn that is small: cashback days, tip (if wanted)
+
+### P2 — later (new backend)
+
+- Live + gifting, watch-to-earn, fantasy, 1v1, clans/wars, customization store, OCR results
+- IG P2 (For You, voice notes, watch party)
+
+**Handover still required (not in markdown):** brand assets, secrets, keystore, live Mongo, Coolify/Cloudflare/Coingo/SMTP/Firebase accounts.
