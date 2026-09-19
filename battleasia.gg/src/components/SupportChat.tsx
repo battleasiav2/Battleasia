@@ -71,6 +71,15 @@ export function SupportChat({ forceOpen }: Props) {
         setSettings({
           ...DEFAULTS,
           ...data,
+          agentName: /[\u0980-\u09FF]/.test(String(data.agentName || ''))
+            ? DEFAULTS.agentName
+            : data.agentName || DEFAULTS.agentName,
+          agentTitle: /[\u0980-\u09FF]/.test(String(data.agentTitle || ''))
+            ? DEFAULTS.agentTitle
+            : data.agentTitle || DEFAULTS.agentTitle,
+          welcomeMessage: /[\u0980-\u09FF]/.test(String(data.welcomeMessage || ''))
+            ? DEFAULTS.welcomeMessage
+            : data.welcomeMessage || DEFAULTS.welcomeMessage,
           logoUrl: safeHref(data.logoUrl) || DEFAULTS.logoUrl,
           socialLinks: (data.socialLinks?.length ? data.socialLinks : DEFAULTS.socialLinks)
             .map((l) => ({ ...l, href: safeHref(l.href) }))

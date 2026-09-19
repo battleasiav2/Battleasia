@@ -732,10 +732,19 @@ export function normalizeLiveChatSettings(raw?: Partial<LiveChatSettings> | null
         .filter((item) => item.href)
     : DEFAULT_LIVE_CHAT_SETTINGS.socialLinks;
 
+  /** Live-chat copy is English-only (admin UI text). Strip accidental Bangla/script paste. */
+  const englishOnly = (value: unknown, fallback: string, max: number) => {
+    const text = String(value || '').trim().slice(0, max);
+    if (!text) return fallback;
+    // Bengali block + common Bangla punctuation
+    if (/[\u0980-\u09FF]/.test(text)) return fallback;
+    return text;
+  };
+
   return {
     enabled: raw?.enabled !== false,
-    agentName: String(raw?.agentName || DEFAULT_LIVE_CHAT_SETTINGS.agentName).slice(0, 80),
-    agentTitle: String(raw?.agentTitle || DEFAULT_LIVE_CHAT_SETTINGS.agentTitle).slice(0, 80),
+    agentName: englishOnly(raw?.agentName, DEFAULT_LIVE_CHAT_SETTINGS.agentName, 80),
+    agentTitle: englishOnly(raw?.agentTitle, DEFAULT_LIVE_CHAT_SETTINGS.agentTitle, 80),
     agentAvatar: (() => {
       const rawAv = String(raw?.agentAvatar || '').trim().slice(0, 500);
       if (!rawAv) return '';
@@ -747,7 +756,7 @@ export function normalizeLiveChatSettings(raw?: Partial<LiveChatSettings> | null
       if (rawLogo.startsWith('/')) return rawLogo;
       return sanitizePublicUrl(rawLogo, 500) || DEFAULT_LIVE_CHAT_SETTINGS.logoUrl;
     })(),
-    welcomeMessage: String(raw?.welcomeMessage || DEFAULT_LIVE_CHAT_SETTINGS.welcomeMessage).slice(0, 500),
+    welcomeMessage: englishOnly(raw?.welcomeMessage, DEFAULT_LIVE_CHAT_SETTINGS.welcomeMessage, 500),
     socialLinks: socialLinks.length ? socialLinks : DEFAULT_LIVE_CHAT_SETTINGS.socialLinks,
   };
 }
@@ -1216,6 +1225,17 @@ export async function getAppSettings() {
   if (!settings.liveChat) {
     settings.liveChat = { ...DEFAULT_LIVE_CHAT_SETTINGS };
     dirty = true;
+  } else {
+    const cleaned = normalizeLiveChatSettings(settings.liveChat);
+    const prev = settings.liveChat;
+    if (
+      cleaned.agentName !== prev.agentName ||
+      cleaned.agentTitle !== prev.agentTitle ||
+      cleaned.welcomeMessage !== prev.welcomeMessage
+    ) {
+      settings.liveChat = cleaned;
+      dirty = true;
+    }
   }
 
   if (!settings.messaging) {
