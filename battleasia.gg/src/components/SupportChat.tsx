@@ -147,36 +147,49 @@ export function SupportChat({ forceOpen }: Props) {
   function onPointerDown(e: PointerEvent<HTMLButtonElement>) {
     const el = fabRef.current;
     if (!el) return;
+    e.preventDefault();
     el.setPointerCapture(e.pointerId);
+    el.classList.add('is-dragging');
     const rect = el.getBoundingClientRect();
     drag.current = { active: true, moved: false, x: rect.left, y: rect.top, startX: e.clientX, startY: e.clientY };
   }
 
   function onPointerMove(e: PointerEvent<HTMLButtonElement>) {
     if (!drag.current.active || !fabRef.current) return;
+    e.preventDefault();
     const dx = e.clientX - drag.current.startX;
     const dy = e.clientY - drag.current.startY;
-    if (Math.hypot(dx, dy) > 8) drag.current.moved = true;
+    if (Math.hypot(dx, dy) > 6) drag.current.moved = true;
     if (!drag.current.moved) return;
-    const x = Math.max(8, Math.min(window.innerWidth - 60, drag.current.x + dx));
-    const y = Math.max(8, Math.min(window.innerHeight - 60, drag.current.y + dy));
+    const size = fabRef.current.offsetWidth || 44;
+    const x = Math.max(8, Math.min(window.innerWidth - size - 8, drag.current.x + dx));
+    const y = Math.max(8, Math.min(window.innerHeight - size - 8, drag.current.y + dy));
     fabRef.current.style.left = `${x}px`;
     fabRef.current.style.top = `${y}px`;
     fabRef.current.style.right = 'auto';
     fabRef.current.style.bottom = 'auto';
   }
 
-  function onPointerUp() {
+  function endDrag(toggle = true) {
+    fabRef.current?.classList.remove('is-dragging');
     if (drag.current.moved && fabRef.current) {
       const rect = fabRef.current.getBoundingClientRect();
       localStorage.setItem(POS_KEY, JSON.stringify({ x: rect.left, y: rect.top }));
-    } else if (settings.enabled) {
+    } else if (toggle && settings.enabled) {
       setOpen((v) => !v);
-    } else {
+    } else if (toggle) {
       showToast(t('chat.offline'));
     }
     drag.current.active = false;
     drag.current.moved = false;
+  }
+
+  function onPointerUp() {
+    endDrag(true);
+  }
+
+  function onPointerCancel() {
+    endDrag(false);
   }
 
   async function onSend(e: FormEvent) {
@@ -212,6 +225,7 @@ export function SupportChat({ forceOpen }: Props) {
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
       >
         {open ? <IconClose /> : <IconChat />}
       </button>

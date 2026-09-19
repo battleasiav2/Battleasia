@@ -417,11 +417,21 @@ svg {
   .chat-fab {
     right: 16px;
     bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: 42px;
+    height: 42px;
   }
 
   .social-fab {
-    right: 76px;
+    right: 66px;
     bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: 38px;
+    height: 38px;
+  }
+
+  .social-fab-btn,
+  .social-fab-item {
+    width: 38px;
+    height: 38px;
   }
 
   .toast {

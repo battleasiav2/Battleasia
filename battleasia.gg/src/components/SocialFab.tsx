@@ -31,7 +31,7 @@ export function SocialFab() {
               target="_blank"
               rel="noopener noreferrer"
               title={item.label}
-              style={{ color: item.color || '#fff', transform: `translateY(${-56 * (i + 1)}px)` }}
+              style={{ color: item.color || '#fff', transform: `translateY(${-50 * (i + 1)}px)` }}
             >
               <SocialGlyph name={item.label} />
             </a>

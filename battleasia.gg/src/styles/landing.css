@@ -1481,19 +1481,19 @@ html[data-theme='light'] .topbar {
 
 .social-fab {
   position: fixed;
-  right: 96px;
+  right: 84px;
   bottom: 28px;
   z-index: 39;
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
 }
 
 .social-fab-btn,
 .social-fab-item {
   position: absolute;
   inset: 0;
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
   border: 1px solid var(--ba-hair);
   background: var(--ba-card);
@@ -1501,10 +1501,22 @@ html[data-theme='light'] .topbar {
   display: grid;
   place-items: center;
   cursor: pointer;
+  touch-action: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.social-fab-btn {
+  animation: fab-bob 2.4s ease-in-out infinite;
+  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.55);
+}
+
+.social-fab.is-open .social-fab-btn {
+  animation: none;
 }
 
 .social-fab-item {
   inset: auto 0 0 0;
+  animation: fab-pop 0.28s ease both;
 }
 
 .dm-split {
@@ -1714,23 +1726,56 @@ html[data-theme='light'] .topbar {
   position: fixed;
   right: 28px;
   bottom: 28px;
-  width: 56px;
-  height: 56px;
+  width: 44px;
+  height: 44px;
   border-radius: 999px;
   border: 0;
   cursor: grab;
   color: #fff;
   background: linear-gradient(135deg, #c026d3, var(--ba-accent-b));
-  box-shadow: 0 12px 30px -12px rgba(192, 38, 211, 0.8);
+  box-shadow: 0 12px 28px -12px rgba(192, 38, 211, 0.75);
   z-index: 40;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  animation: fab-bob 2.6s ease-in-out infinite;
+  display: grid;
+  place-items: center;
 }
 
 .chat-fab:hover {
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
-.chat-fab:active {
+.chat-fab:active,
+.chat-fab.is-dragging {
   cursor: grabbing;
+  animation: none;
+}
+
+.chat-fab svg {
+  width: 20px;
+  height: 20px;
+}
+
+@keyframes fab-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes fab-pop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.85);
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .chat-panel.origin-br {
@@ -2680,7 +2725,9 @@ html[data-theme='light'] .topbar {
   .hex:hover .hex-frame img,
   .mode-card:hover img,
   .battle-card:hover,
-  .hero-media {
+  .hero-media,
+  .chat-fab,
+  .social-fab-btn {
     animation: none;
     transform: none;
   }
