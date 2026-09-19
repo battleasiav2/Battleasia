@@ -581,7 +581,7 @@ export function MatchFormPage() {
           <small>Prize pool preview</small>
           <p>
             Income {totalIncome.toLocaleString()} − fee {((totalIncome * feePercent) / 100).toLocaleString()} = pool{' '}
-            <b>{prizePool.toLocaleString()}</b> · per kill <b>{(autoPerKill ?? Number(form.perKill) || 0).toLocaleString()}</b>
+            <b>{prizePool.toLocaleString()}</b> · per kill <b>{((autoPerKill ?? Number(form.perKill)) || 0).toLocaleString()}</b>
           </p>
         </div>
 

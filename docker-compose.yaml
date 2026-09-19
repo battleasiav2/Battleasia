@@ -85,9 +85,8 @@ services:
       context: .
       dockerfile: docker/admin/Dockerfile.prod
       args:
-        REACT_APP_API_URL: ${REACT_APP_API_URL:-https://battleasia.gg}
-        REACT_APP_BASENAME: ${REACT_APP_BASENAME:-}
-        PUBLIC_URL: ${PUBLIC_URL:-}
+        VITE_PLAYER_URL: ${VITE_PLAYER_URL:-https://battleasia.gg}
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN:-}
     restart: unless-stopped
     expose:
       - "80"
