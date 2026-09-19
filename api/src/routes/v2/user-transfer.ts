@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
+import { MoneyError } from '../../utils/money.js';
 import { UserTransferHistory, serializeUserTransferHistory } from '../../models/UserTransferHistory.js';
 import { paginatedResults, parsePagination } from '../../utils/pagination.js';
 import {
@@ -32,6 +33,7 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
       recipientUsername: String(recipientUsername || ''),
       amount: Number(amount),
       note,
+      idempotencyKey: String(req.header('Idempotency-Key') || '').trim() || undefined,
     });
 
     return res.json({
@@ -40,6 +42,9 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
       data: result,
     });
   } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
     const message = error instanceof Error ? error.message : 'Transfer failed';
     const statusCode = message === 'Unauthorized' ? 401 : 400;
     if (statusCode >= 500) {

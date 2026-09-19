@@ -16,6 +16,7 @@ import {
   notifyAdminBalanceDebit,
 } from '../../../utils/payment-notifications.js';
 import { processReferralCommission } from '../../../utils/referral.js';
+import { writeAudit } from '../../../models/AuditLog.js';
 
 const router = Router();
 
@@ -54,6 +55,34 @@ router.get('/', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('users list error:', error);
     return res.status(500).json({ status: false, message: 'Failed to fetch users' });
+  }
+});
+
+router.patch('/bulk/status', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const ids = Array.isArray(req.body?.ids) ? req.body.ids.map((id: unknown) => String(id)).filter(Boolean) : [];
+    const status = Boolean(req.body?.status);
+    const reason = String(req.body?.reason || '').trim();
+    if (!ids.length) {
+      return res.status(400).json({ status: false, message: 'Select at least one user' });
+    }
+    if (!status && !reason) {
+      return res.status(400).json({ status: false, message: 'Reason required to disable users' });
+    }
+    const result = await User.updateMany(
+      { _id: { $in: ids }, 'role.type': { $ne: 'admin' } },
+      { $set: { status } },
+    );
+    await writeAudit({
+      actorId: req.userId,
+      action: 'users.bulk-status',
+      target: ids.join(','),
+      detail: `${status ? 'enable' : 'disable'} ${result.modifiedCount} · ${reason}`,
+    });
+    return res.json({ status: true, message: `Updated ${result.modifiedCount} users`, data: { count: result.modifiedCount } });
+  } catch (error) {
+    console.error('bulk status error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to update users' });
   }
 });
 

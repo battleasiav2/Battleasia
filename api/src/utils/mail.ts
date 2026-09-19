@@ -6,28 +6,20 @@ import {
 } from '../models/AppSettings.js';
 import { env } from '../config/env.js';
 import { logAuthCode } from './auth-log.js';
+import {
+  authMailCopy,
+  mailExpiresLabel,
+  mailFoot,
+  opsMailCopy,
+  pickMailLocale,
+  type AuthMailType,
+  type MailLocale,
+  type OpsMailKind,
+} from './mail-copy.js';
 
-type AuthMailType = 'signup' | 'reset' | 'admin_login';
+export type { AuthMailType, MailLocale, OpsMailKind };
 
 let warnedMailDisabled = false;
-
-const MAIL_COPY: Record<AuthMailType, { subject: string; intro: string; ttl: string }> = {
-  signup: {
-    subject: 'Verify your BattleAsia email',
-    intro: 'Use this code to verify your BattleAsia account:',
-    ttl: '15 minutes',
-  },
-  reset: {
-    subject: 'BattleAsia password reset code',
-    intro: 'Use this code to reset your BattleAsia password:',
-    ttl: '15 minutes',
-  },
-  admin_login: {
-    subject: 'BattleAsia admin login code',
-    intro: 'Use this code to complete your admin sign in:',
-    ttl: '10 minutes',
-  },
-};
 
 function envMailSettings(): MailSettings | null {
   const { mail } = env;
@@ -105,26 +97,35 @@ export async function sendAuthEmail(options: {
   }
 }
 
+function auroraHtml(title: string, body: string, locale: MailLocale = 'en') {
+  return `<!doctype html><html lang="${locale}"><body style="margin:0;background:#0E0F14;color:#F4F5F7;font-family:Arial,sans-serif">
+  <div style="max-width:520px;margin:24px auto;padding:32px;background:#171922;border:1px solid rgba(255,255,255,.1);border-radius:16px">
+    <p style="margin:0 0 8px;font-size:12px;letter-spacing:.2em;color:#21D4FD">BATTLE ASIA 2.0</p>
+    <h1 style="margin:0 0 16px;font-size:22px;background:linear-gradient(90deg,#7C5CFF,#21D4FD);-webkit-background-clip:text;color:transparent">${title}</h1>
+    ${body}
+    <p style="margin:24px 0 0;color:#9AA0B4;font-size:12px">${mailFoot(locale)}</p>
+  </div></body></html>`;
+}
+
 export async function sendVerificationCodeEmail(
   email: string,
   code: string,
-  type: AuthMailType
+  type: AuthMailType,
+  localeRaw?: string | string[] | null
 ) {
-  const copy = MAIL_COPY[type];
-  const html = `
-    <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111;">
-      <p>${copy.intro}</p>
-      <p style="font-size:28px;font-weight:700;letter-spacing:4px;margin:16px 0;">${code}</p>
-      <p>This code expires in ${copy.ttl}.</p>
-      <p style="color:#666;font-size:13px;">If you did not request this, you can ignore this email.</p>
-    </div>
-  `;
+  const locale = pickMailLocale(localeRaw);
+  const copy = authMailCopy(locale, type);
+  const html = auroraHtml(
+    copy.subject,
+    `<p>${copy.intro}</p><p style="font-size:28px;font-weight:700;letter-spacing:6px;margin:16px 0">${code}</p><p>${mailExpiresLabel(locale)} ${copy.ttl}.</p>`,
+    locale
+  );
 
   const result = await sendAuthEmail({
     to: email,
     subject: copy.subject,
     html,
-    text: `${copy.intro} ${code}. Expires in ${copy.ttl}.`,
+    text: `${copy.intro} ${code}. ${mailExpiresLabel(locale)} ${copy.ttl}.`,
   });
 
   if (!result.sent) {
@@ -138,7 +139,23 @@ export async function sendTestMail(to: string) {
   return sendAuthEmail({
     to,
     subject: 'BattleAsia SMTP test',
-    html: '<p>Your BattleAsia mail configuration is working.</p>',
+    html: auroraHtml('SMTP test', '<p>Your BattleAsia mail configuration is working.</p>', 'en'),
     text: 'Your BattleAsia mail configuration is working.',
+  });
+}
+
+export async function sendOpsEmail(
+  to: string,
+  kind: OpsMailKind,
+  detail: string,
+  localeRaw?: string | string[] | null
+) {
+  const locale = pickMailLocale(localeRaw);
+  const copy = opsMailCopy(locale, kind);
+  return sendAuthEmail({
+    to,
+    subject: copy.subject,
+    html: auroraHtml(copy.subject, `<p>${copy.intro}</p><p>${detail}</p>`, locale),
+    text: `${copy.intro} ${detail}`,
   });
 }

@@ -1,4 +1,9 @@
 User-agent: *
 Allow: /
-
+Allow: /dashboard
+Allow: /privacy-policy
+Allow: /terms-and-conditions
+Allow: /support
+Disallow: /user
+Disallow: /auth
 Sitemap: https://battleasia.gg/sitemap.xml

@@ -1,5 +1,7 @@
 import { Notification } from '../models/Notification.js';
 import { MatchParticipant } from '../models/MatchParticipant.js';
+import { User } from '../models/User.js';
+import { sendOpsEmail } from './mail.js';
 import { emitUserNotification } from './socket.js';
 
 type SystemNotificationParams = {
@@ -46,6 +48,12 @@ export async function createSystemNotification(params: SystemNotificationParams)
   };
 
   emitUserNotification(params.recipientId, payload);
+  void import('./fcm.js').then(({ sendFcmToUser }) =>
+    sendFcmToUser(params.recipientId, params.title, params.message, {
+      type: params.type,
+      entityId: params.entityId || '',
+    })
+  );
   return notification;
 }
 
@@ -82,11 +90,29 @@ export async function notifyDepositSubmitted(params: {
   });
 }
 
+async function mailUser(
+  userId: string,
+  kind: 'deposit_approved' | 'deposit_rejected' | 'withdraw_complete' | 'withdraw_reject' | 'match_starting',
+  detail: string
+) {
+  try {
+    const user = await User.findById(userId).select('email');
+    if (user?.email) await sendOpsEmail(user.email, kind, detail);
+  } catch {
+    /* mail fail-open */
+  }
+}
+
 export async function notifyDepositApproved(params: {
   userId: string;
   amount: number;
   depositId: string;
 }) {
+  await mailUser(
+    params.userId,
+    'deposit_approved',
+    `Your deposit of ${params.amount} coins has been approved and credited to your wallet.`
+  );
   return createSystemNotification({
     recipientId: params.userId,
     title: 'Deposit Approved',
@@ -105,6 +131,11 @@ export async function notifyDepositRejected(params: {
   reason?: string;
 }) {
   const reason = params.reason?.trim() ? ` Reason: ${params.reason.trim()}` : '';
+  await mailUser(
+    params.userId,
+    'deposit_rejected',
+    `Your deposit of ${params.amount} coins was rejected.${reason}`
+  );
   return createSystemNotification({
     recipientId: params.userId,
     title: 'Deposit Rejected',
@@ -153,6 +184,11 @@ export async function notifyWithdrawalCompleted(params: {
   amount: number;
   withdrawalId: string;
 }) {
+  await mailUser(
+    params.userId,
+    'withdraw_complete',
+    `Your withdrawal of ${params.amount} coins has been completed successfully.`
+  );
   return createSystemNotification({
     recipientId: params.userId,
     title: 'Withdrawal Completed',
@@ -173,6 +209,11 @@ export async function notifyWithdrawalRejected(params: {
 }) {
   const reason = params.reason?.trim() ? ` Reason: ${params.reason.trim()}` : '';
   const refund = params.refunded ? ' Coins have been refunded to your wallet.' : '';
+  await mailUser(
+    params.userId,
+    'withdraw_reject',
+    `Your withdrawal of ${params.amount} coins was rejected.${refund}${reason}`
+  );
   return createSystemNotification({
     recipientId: params.userId,
     title: 'Withdrawal Rejected',
@@ -289,6 +330,16 @@ export async function notifyMatchStarted(params: {
   matchId: string;
   matchName: string;
 }) {
+  try {
+    const participants = await MatchParticipant.find({ matchId: params.matchId }).select('userId');
+    await Promise.all(
+      participants.map((p) =>
+        mailUser(p.userId.toString(), 'match_starting', `“${params.matchName}” has started. Join the room now!`)
+      )
+    );
+  } catch {
+    /* mail fail-open */
+  }
   return notifyMatchPlayers(params.matchId, () => ({
     title: 'Match Started',
     message: `“${params.matchName}” has started. Join the room now!`,
@@ -319,6 +370,8 @@ export async function notifyMatchWinnings(params: {
   matchId: string;
   matchName: string;
 }) {
+  const { maybeVictoryAutoPost } = await import('./victory-post.js');
+  void maybeVictoryAutoPost(params);
   return createSystemNotification({
     recipientId: params.userId,
     title: 'Match Winnings',

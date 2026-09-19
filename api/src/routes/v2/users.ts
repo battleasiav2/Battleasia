@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import type { Response } from 'express';
 import { User } from '../../models/User.js';
@@ -7,14 +8,18 @@ import { LoginHistory } from '../../models/LoginHistory.js';
 import { Session } from '../../models/Session.js';
 import { VerificationCode } from '../../models/VerificationCode.js';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
-import { signToken } from '../../utils/jwt.js';
+import { attachPlayerCookies, issuePair, refreshSession, sessionPayload, userVer } from '../../utils/token-session.js';
 import { BalanceHistory } from '../../models/BalanceHistory.js';
 import { ReferralHistory } from '../../models/ReferralHistory.js';
 import { serializeUser, generateReferralCode } from '../../utils/serialize.js';
 import { getLeaderboardEntries } from '../../utils/leaderboard.js';
+import { emitDashboardStatsUpdated } from '../../utils/socket.js';
+import { invalidateCache } from '../../utils/cache.js';
+import { PUBLIC_DASHBOARD_CACHE_KEY } from '../../utils/public-dashboard.js';
 import { paginatedResults, parsePagination } from '../../utils/pagination.js';
 import { Follow } from '../../models/Follow.js';
 import { UserBlock } from '../../models/UserBlock.js';
+import { sanitizePublicUrl } from '../../utils/safe-url.js';
 import { serializePublicUser, getFollowCounts } from '../../utils/social-serialize.js';
 import { createActivityNotification } from '../../utils/social-notifications.js';
 import { getWithdrawableInfo } from '../../utils/withdrawable-amount.js';
@@ -36,7 +41,10 @@ import { buildMyMatchHistory, buildUserMatchHistory } from '../../utils/match-hi
 import { resolveReferrerId } from '../../utils/referral.js';
 import { logAuthCode } from '../../utils/auth-log.js';
 import { sendVerificationCodeEmail } from '../../utils/mail.js';
-import { clearAllAuthCookies, setAuthCookie } from '../../utils/auth-cookie.js';
+import { clearAllAuthCookies } from '../../utils/auth-cookie.js';
+import { recordFingerprint } from '../../utils/fingerprint.js';
+import { KycRecord } from '../../models/KycRecord.js';
+import { DevicePushToken } from '../../models/DevicePushToken.js';
 import mongoose from 'mongoose';
 
 const router = Router();
@@ -55,17 +63,17 @@ function getClientIp(req: {
 }
 
 function generateSixDigitCode() {
-  return String(Math.floor(100000 + Math.random() * 900000));
+  return String(crypto.randomInt(100000, 1000000));
 }
 
-async function saveVerificationCode(email: string, type: 'signup' | 'reset') {
+async function saveVerificationCode(email: string, type: 'signup' | 'reset', locale?: string | string[] | null) {
   const code = generateSixDigitCode();
   const expiresAt = new Date(Date.now() + CODE_TTL_MS);
 
   await VerificationCode.deleteMany({ email, type });
   await VerificationCode.create({ email, code, type, expiresAt });
 
-  await sendVerificationCodeEmail(email, code, type);
+  await sendVerificationCodeEmail(email, code, type, locale);
   logAuthCode(`${type} verification code`, email, code);
   return code;
 }
@@ -86,9 +94,9 @@ async function createLoginSession(
   req: { ip?: string; headers: Record<string, string | string[] | undefined>; socket?: { remoteAddress?: string } },
   res?: Response
 ) {
-  const accessToken = signToken(user._id.toString());
+  const pair = issuePair(user._id.toString(), userVer(user));
   const ip = getClientIp(req);
-  const expiration = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const expiration = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   await Promise.all([
     LoginHistory.create({
@@ -115,15 +123,47 @@ async function createLoginSession(
   ]);
 
   if (res) {
-    setAuthCookie(res, accessToken);
+    attachPlayerCookies(res, pair.accessToken, pair.refreshToken);
   }
 
   syncDailyStreak(user._id.toString()).catch((error) => {
     console.error('streak sync on login failed:', error);
   });
 
-  return accessToken;
+  return pair;
 }
+
+/** Public email availability check for signup live validation */
+router.get('/check-email', async (req, res) => {
+  try {
+    const email = String(req.query.email || '')
+      .toLowerCase()
+      .trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ status: false, available: false, message: 'Invalid email' });
+    }
+    const existing = await User.findOne({ email }).select('email emailVerified').lean();
+    if (!existing) {
+      return res.json({ status: true, available: true });
+    }
+    if (!existing.emailVerified) {
+      return res.json({
+        status: true,
+        available: false,
+        pending: true,
+        message: 'Email verification is pending',
+      });
+    }
+    return res.json({
+      status: true,
+      available: false,
+      message: 'Email already registered',
+    });
+  } catch (error) {
+    console.error('check-email error:', error);
+    return res.status(500).json({ status: false, available: false, message: 'Could not check email' });
+  }
+});
 
 router.post('/signup', async (req, res) => {
   try {
@@ -168,7 +208,7 @@ router.post('/signup', async (req, res) => {
 
     if (existing) {
       if (!existing.emailVerified && existing.email === normalizedEmail) {
-        await saveVerificationCode(normalizedEmail, 'signup');
+        await saveVerificationCode(normalizedEmail, 'signup', req.headers['accept-language']);
         return res.status(409).json({
           status: false,
           message: 'Email verification is pending. A new code has been sent.',
@@ -217,7 +257,7 @@ router.post('/signup', async (req, res) => {
       });
     }
 
-    await saveVerificationCode(normalizedEmail, 'signup');
+    await saveVerificationCode(normalizedEmail, 'signup', req.headers['accept-language']);
 
     return res.json({
       status: true,
@@ -234,6 +274,36 @@ router.post('/signup', async (req, res) => {
 router.post('/logout', (_req, res) => {
   clearAllAuthCookies(res);
   return res.json({ status: true, message: 'Logged out' });
+});
+
+router.post('/refresh', async (req, res) => {
+  try {
+    const pair = await refreshSession(req, res, 'player');
+    if (!pair) {
+      return res.status(401).json({ status: false, message: 'Invalid token' });
+    }
+    return res.json(sessionPayload(pair.accessToken, pair.refreshToken));
+  } catch (error) {
+    console.error('refresh error:', error);
+    return res.status(500).json({ status: false, message: 'Refresh failed' });
+  }
+});
+
+router.post('/verify-password', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const password = String(req.body?.password || '').trim();
+    if (!password) {
+      return res.status(400).json({ status: false, message: 'Password is required' });
+    }
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(401).json({ status: false, message: 'Unauthorized' });
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(403).json({ status: false, message: 'Password confirmation failed' });
+    return res.json({ status: true, data: { ok: true } });
+  } catch (error) {
+    console.error('verify-password error:', error);
+    return res.status(500).json({ status: false, message: 'Verify failed' });
+  }
 });
 
 router.post('/signin', async (req, res) => {
@@ -255,7 +325,7 @@ router.post('/signin', async (req, res) => {
     }
 
     if (!user.status && user.emailVerified === false) {
-      await saveVerificationCode(user.email, 'signup');
+      await saveVerificationCode(user.email, 'signup', req.headers['accept-language']);
       return res.status(403).json({
         status: false,
         message: 'Email verification required',
@@ -268,12 +338,15 @@ router.post('/signin', async (req, res) => {
       return res.status(403).json({ status: false, message: 'Account is disabled' });
     }
 
-    const accessToken = await createLoginSession(user, req, res);
+    const pair = await createLoginSession(user, req, res);
+    void recordFingerprint(req, user._id.toString());
     const serialized = serializeUser(user);
 
     return res.json({
       status: true,
-      session: { accessToken },
+      token: pair.accessToken,
+      refreshToken: pair.refreshToken,
+      session: { accessToken: pair.accessToken, refreshToken: pair.refreshToken },
       user: serialized,
       balance: { balance: user.balance ?? 0 },
     });
@@ -579,7 +652,7 @@ router.post('/send-verification-email', requireAuth, async (req: AuthedRequest, 
       return res.status(400).json({ status: false, message: 'Email is already verified' });
     }
 
-    await saveVerificationCode(user.email, 'signup');
+    await saveVerificationCode(user.email, 'signup', req.headers['accept-language']);
     return res.json({ status: true, message: 'Verification code sent' });
   } catch (error) {
     console.error('send-verification-email error:', error);
@@ -636,6 +709,88 @@ router.get('/me', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
+router.post('/me/presence', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    await User.findByIdAndUpdate(req.userId, { $set: { lastSeenAt: new Date() } });
+    return res.json({ status: true });
+  } catch (error) {
+    console.error('presence error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to ping presence' });
+  }
+});
+
+router.post('/tip', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const { executePlayerTip } = await import('../../utils/user-transfer.js');
+    const result = await executePlayerTip({
+      senderId: String(req.userId),
+      recipientUsername: String(req.body?.recipientUsername || ''),
+      amount: Number(req.body?.amount),
+      idempotencyKey: String(req.header('Idempotency-Key') || '').trim() || undefined,
+    });
+    return res.json({ status: true, message: 'Tip sent', data: result });
+  } catch (error) {
+    const { MoneyError } = await import('../../utils/money.js');
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
+    const message = error instanceof Error ? error.message : 'Tip failed';
+    return res.status(400).json({ status: false, message });
+  }
+});
+
+router.post('/me/kyc', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const dob = String(req.body?.dateOfBirth || '').trim();
+    if (!dob) return res.status(400).json({ status: false, message: 'dateOfBirth required' });
+    const dateOfBirth = new Date(dob);
+    if (Number.isNaN(dateOfBirth.getTime())) {
+      return res.status(400).json({ status: false, message: 'Invalid date' });
+    }
+    const age = (Date.now() - dateOfBirth.getTime()) / (365.25 * 24 * 3600 * 1000);
+    if (age < 18) {
+      return res.status(403).json({ status: false, message: 'You must be 18 or older' });
+    }
+    const user = await User.findByIdAndUpdate(
+      req.userId,
+      { $set: { dateOfBirth, kycStatus: 'pending' } },
+      { new: true }
+    );
+    if (!user) return res.status(401).json({ status: false, message: 'Unauthorized' });
+    await KycRecord.findOneAndUpdate(
+      { userId: user._id },
+      { $set: { dateOfBirth, status: 'pending' }, $setOnInsert: { userId: user._id } },
+      { upsert: true },
+    );
+    return res.json({ status: true, data: { kycStatus: user.kycStatus, dateOfBirth: user.dateOfBirth } });
+  } catch (error) {
+    console.error('kyc submit error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to submit KYC' });
+  }
+});
+
+router.post('/me/push-token', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const token = String(req.body?.token || '').trim().slice(0, 4096);
+    const platform = req.body?.platform === 'android' ? 'android' : 'web';
+    if (!token) {
+      return res.status(400).json({ status: false, message: 'token required' });
+    }
+    await User.findByIdAndUpdate(req.userId, {
+      $set: { [`fcm.${platform}`]: token, fcmUpdatedAt: new Date() },
+    });
+    await DevicePushToken.findOneAndUpdate(
+      { userId: req.userId, platform, token },
+      { $set: { lastSeen: new Date() }, $setOnInsert: { userId: req.userId, platform, token } },
+      { upsert: true },
+    );
+    return res.json({ status: true, data: { ok: true } });
+  } catch (error) {
+    console.error('push-token error:', error);
+    return res.json({ status: true, data: { ok: true } });
+  }
+});
+
 router.put('/me', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -646,7 +801,6 @@ router.put('/me', requireAuth, async (req: AuthedRequest, res) => {
     const body = req.body as Record<string, unknown>;
     const allowed = [
       'username',
-      'email',
       'countryCode',
       'mobileNo',
       'pubgId',
@@ -661,12 +815,32 @@ router.put('/me', requireAuth, async (req: AuthedRequest, res) => {
       'facebookLink',
       'instagramLink',
       'privacy',
+      'muteWords',
+      'cosmeticId',
     ] as const;
 
+    const urlFields = new Set(['website', 'twitterLink', 'facebookLink', 'instagramLink', 'avatar', 'coverUrl']);
+
     for (const key of allowed) {
-      if (body[key] !== undefined) {
-        (user as unknown as Record<string, unknown>)[key] = body[key];
+      if (body[key] === undefined) continue;
+      if (urlFields.has(key)) {
+        (user as unknown as Record<string, unknown>)[key] = sanitizePublicUrl(body[key]);
+        continue;
       }
+      (user as unknown as Record<string, unknown>)[key] = body[key];
+    }
+
+    // Email changes are disabled here — use verified email-change flow only.
+    if (body.email !== undefined && String(body.email).toLowerCase().trim() !== user.email) {
+      return res.status(400).json({
+        status: false,
+        message: 'Email cannot be changed from profile. Contact support if you need a new email.',
+      });
+    }
+
+    if (body.muteWords !== undefined) {
+      const raw = Array.isArray(body.muteWords) ? body.muteWords : String(body.muteWords).split(',');
+      user.muteWords = raw.map((w) => String(w).toLowerCase().trim()).filter(Boolean).slice(0, 24);
     }
 
     if (typeof body.username === 'string' && body.username.trim()) {
@@ -680,8 +854,16 @@ router.put('/me', requireAuth, async (req: AuthedRequest, res) => {
       user.username = body.username.trim();
     }
 
+    const avatarChanged = body.avatar !== undefined || body.coverUrl !== undefined;
     await user.save();
     const data = await serializePublicUser(user, req.userId);
+
+    if (avatarChanged) {
+      invalidateCache(PUBLIC_DASHBOARD_CACHE_KEY);
+      emitDashboardStatsUpdated().catch((error) => {
+        console.error('dashboard refresh after avatar failed:', error);
+      });
+    }
 
     bumpProgressForAction(user._id.toString(), 'complete_profile', 1).catch((error) => {
       console.error('engagement complete_profile bump failed:', error);
@@ -982,7 +1164,7 @@ router.post('/resend-verification-code', async (req, res) => {
       return res.status(400).json({ status: false, message: 'Email is already verified' });
     }
 
-    await saveVerificationCode(normalizedEmail, 'signup');
+    await saveVerificationCode(normalizedEmail, 'signup', req.headers['accept-language']);
 
     return res.json({ status: true, message: 'Verification code resent' });
   } catch (error) {
@@ -1019,7 +1201,8 @@ router.post('/verify-email-signup', async (req, res) => {
     user.status = true;
     await user.save();
 
-    const accessToken = await createLoginSession(user, req, res);
+    const pair = await createLoginSession(user, req, res);
+    void recordFingerprint(req, user._id.toString());
 
     touchWelcomeEligibility(user._id.toString()).catch((error) => {
       console.error('engagement welcome touch failed:', error);
@@ -1028,7 +1211,9 @@ router.post('/verify-email-signup', async (req, res) => {
     return res.json({
       status: true,
       emailVerified: true,
-      session: { accessToken },
+      token: pair.accessToken,
+      refreshToken: pair.refreshToken,
+      session: { accessToken: pair.accessToken, refreshToken: pair.refreshToken },
       user: serializeUser(user),
     });
   } catch (error) {
@@ -1051,9 +1236,9 @@ router.post('/forgot-password', async (req, res) => {
       return res.json({ status: true, message: 'If the email exists, a reset code has been sent' });
     }
 
-    await saveVerificationCode(normalizedEmail, 'reset');
+    await saveVerificationCode(normalizedEmail, 'reset', req.headers['accept-language']);
 
-    return res.json({ status: true, message: 'Reset code sent' });
+    return res.json({ status: true, message: 'If the email exists, a reset code has been sent' });
   } catch (error) {
     console.error('forgot-password error:', error);
     return res.status(500).json({ status: false, message: 'Failed to send reset code' });
@@ -1123,6 +1308,7 @@ router.post('/reset-password', async (req, res) => {
     }
 
     user.password = await bcrypt.hash(newPassword, 10);
+    user.tokenVersion = userVer(user) + 1;
     await user.save();
     await VerificationCode.deleteMany({ email: normalizedEmail, type: 'reset' });
 

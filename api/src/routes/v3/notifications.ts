@@ -71,6 +71,8 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
     for (const recipientId of recipients) {
       emitUserNotification(recipientId, payload);
     }
+    const { sendFcmToUsers } = await import('../../utils/fcm.js');
+    void sendFcmToUsers(recipients, title, message, { type: String(type) });
 
     return res.status(201).json({ status: true, data: payload });
   } catch (error) {

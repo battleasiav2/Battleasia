@@ -29,6 +29,8 @@ export function serializeFeed(feed: IFeed, category?: IFeedCategory | null) {
     hashtags: feed.hashtags || [],
     visibility: feed.visibility || 'public',
     pinnedAt: feed.pinnedAt || null,
+    gameTag: feed.gameTag || '',
+    entityId: feed.entityId || '',
     status: feed.status,
     premiumOnly: feed.premiumOnly ?? false,
     categoryId: feed.categoryId.toString(),

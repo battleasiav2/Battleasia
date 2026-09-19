@@ -16,6 +16,11 @@ import {
   leaveEngagementSquad,
 } from '../../utils/engagement-squad.js';
 import { claimSeasonPassReward } from '../../utils/engagement-season-pass.js';
+import { EngagementSquad } from '../../models/EngagementSquad.js';
+import { SquadChatMessage } from '../../models/SquadChatMessage.js';
+import { User } from '../../models/User.js';
+import { getAppSettings } from '../../models/AppSettings.js';
+import { normalizeP1Flags } from '../../utils/p1-flags.js';
 
 const router = Router();
 
@@ -245,6 +250,54 @@ router.post('/squad/claim', requireAuth, async (req: AuthedRequest, res) => {
   } catch (error) {
     console.error('engagement squad claim error:', error);
     return res.status(500).json({ status: false, message: 'Failed to claim squad reward' });
+  }
+});
+
+router.get('/squad/chat', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const flags = normalizeP1Flags((await getAppSettings()).p1);
+    if (!flags.squadChat) return res.json({ status: true, data: [] });
+    const squad = await EngagementSquad.findOne({ memberIds: req.userId });
+    if (!squad) return res.json({ status: true, data: [] });
+    const rows = await SquadChatMessage.find({ squadId: squad._id }).sort({ createdAt: -1 }).limit(40);
+    return res.json({
+      status: true,
+      data: rows.reverse().map((m) => ({
+        id: m._id.toString(),
+        username: m.username,
+        body: m.body,
+        createdAt: m.createdAt,
+        isMine: m.userId.toString() === req.userId,
+      })),
+    });
+  } catch (error) {
+    console.error('squad chat list error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to load squad chat' });
+  }
+});
+
+router.post('/squad/chat', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const flags = normalizeP1Flags((await getAppSettings()).p1);
+    if (!flags.squadChat) return res.status(403).json({ status: false, message: 'Squad chat is off' });
+    const body = String(req.body?.body || '').trim();
+    if (!body) return res.status(400).json({ status: false, message: 'Message required' });
+    const squad = await EngagementSquad.findOne({ memberIds: req.userId });
+    if (!squad) return res.status(400).json({ status: false, message: 'Join a squad first' });
+    const user = await User.findById(req.userId).select('username');
+    const msg = await SquadChatMessage.create({
+      squadId: squad._id,
+      userId: req.userId,
+      username: user?.username || '',
+      body: body.slice(0, 500),
+    });
+    return res.status(201).json({
+      status: true,
+      data: { id: msg._id.toString(), username: msg.username, body: msg.body, createdAt: msg.createdAt, isMine: true },
+    });
+  } catch (error) {
+    console.error('squad chat post error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to send' });
   }
 });
 

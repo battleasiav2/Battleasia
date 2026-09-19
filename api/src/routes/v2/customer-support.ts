@@ -15,6 +15,7 @@ import {
 import { getSocketServer } from '../../utils/socket.js';
 import { notifySupportReply } from '../../utils/payment-notifications.js';
 import { getAppSettings, normalizeLiveChatSettings } from '../../models/AppSettings.js';
+import { sanitizeAttachmentList } from '../../utils/safe-url.js';
 
 const router = Router();
 
@@ -131,6 +132,25 @@ router.post('/conversation', requireAuth, async (req: AuthedRequest, res) => {
       status: 'open',
       lastMessageAt: new Date(),
     });
+
+    const matchId = String(req.body?.matchId || '').trim();
+    const evidenceUrls = Array.isArray(req.body?.evidenceUrls)
+      ? req.body.evidenceUrls.map((u: unknown) => String(u).slice(0, 500)).filter(Boolean).slice(0, 8)
+      : attachments.map((a: { url?: string }) => String(a?.url || '')).filter(Boolean).slice(0, 8);
+    if (category === 'match' || matchId || evidenceUrls.length) {
+      const { Dispute } = await import('../../models/Dispute.js');
+      const { default: mongoose } = await import('mongoose');
+      await Dispute.create({
+        userId: req.userId,
+        matchId: mongoose.isValidObjectId(matchId) ? matchId : undefined,
+        conversationId: conversation._id,
+        subject,
+        evidenceUrls,
+        status: 'open',
+      }).catch((error) => {
+        console.warn('[dispute] fail-open', error instanceof Error ? error.message : error);
+      });
+    }
 
     const message = await SupportMessage.create({
       conversationId: conversation._id,
@@ -284,7 +304,7 @@ router.post('/message', requireAuth, async (req: AuthedRequest, res) => {
       senderName: sender.username,
       senderAvatar: sender.avatar || '',
       isAdmin,
-      attachments: Array.isArray(attachments) ? attachments : [],
+      attachments: sanitizeAttachmentList(attachments),
     });
 
     conversation.lastMessageAt = new Date();

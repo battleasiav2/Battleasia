@@ -1,66 +1,135 @@
+# Local full stack — player + shop + admin + api + mongo + nginx
+# From this folder:
+#   docker compose up -d --build
+# Stop host Vite/API first if ports 8088 / 8083 / 3000 / 5050 are taken.
+#
+# http://localhost:8088  player
+# http://localhost:8083  shop
+# http://localhost:3000  admin
+# http://localhost:5050/health  api
+#
+# Optional hosts file:
+#   127.0.0.1 battleasia.local shop.battleasia.local admin.battleasia.local
+
+name: battleasia
+
 services:
-  fe:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    command: ["--replSet", "rs0", "--bind_ip_all"]
+    ports:
+      - "127.0.0.1:27018:27017"
+    volumes:
+      - battleasia_mongo:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--quiet",
+          "--eval",
+          "try { rs.status().ok } catch (e) { rs.initiate({_id:'rs0',members:[{_id:0,host:'mongo:27017'}]}).ok }",
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 15s
+
+  api:
+    build:
+      context: ${API_PATH:-../../battleasianew/api}
+      dockerfile: deploy/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5050:5050"
+    environment:
+      NODE_ENV: development
+      PORT: 5050
+      MONGODB_URI: mongodb://mongo:27017/battleasia?replicaSet=rs0
+      JWT_SECRET: ${JWT_SECRET:-battleasia-local-docker-jwt-change-before-prod}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@battleasia.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-Admin@123456}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8088,http://localhost:8083,http://localhost:3000,http://127.0.0.1:8088,http://127.0.0.1:8083,http://127.0.0.1:3000,http://battleasia.local:8088,http://shop.battleasia.local:8088,http://admin.battleasia.local:8088}
+      APP_URL: ${APP_URL:-http://localhost:8088}
+      COINGO_MOCK: "true"
+      LOG_AUTH_CODES: "true"
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_SECURE: ${SMTP_SECURE:-true}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-BattleAsia}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      FCM_SERVER_KEY: ${FCM_SERVER_KEY:-}
+      BACKUP_S3_ACCESS_KEY: ${BACKUP_S3_ACCESS_KEY:-}
+      BACKUP_S3_SECRET_KEY: ${BACKUP_S3_SECRET_KEY:-}
+      BACKUP_S3_BUCKET: ${BACKUP_S3_BUCKET:-}
+      BACKUP_S3_REGION: ${BACKUP_S3_REGION:-}
+      BACKUP_OFFSITE_CMD: ${BACKUP_OFFSITE_CMD:-}
+    volumes:
+      - api_uploads:/app/uploads
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  player:
     build:
       context: .
-      dockerfile: docker/fe/Dockerfile
-    volumes:
-      - ./battleasia.gg:/app
-      - fe_node_modules:/app/node_modules
-    environment:
-      VITE_PORT: 8081
-      VITE_SERVER_URL: ""
-      VITE_HMR_HOST: battleasia.local
-      VITE_HMR_CLIENT_PORT: 8088
+      dockerfile: docker/player.Dockerfile
+      args:
+        VITE_BAC_SHOP_URL: ${VITE_BAC_SHOP_URL:-http://localhost:8083}
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN:-}
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
     expose:
-      - "8081"
+      - "80"
 
   shop:
     build:
       context: .
-      dockerfile: docker/shop/Dockerfile
-    volumes:
-      - ./shop.battleasia.gg:/app
-      - shop_node_modules:/app/node_modules
-    environment:
-      VITE_PORT: 8082
-      VITE_SERVER_URL: ""
-      VITE_HMR_HOST: shop.battleasia.local
-      VITE_HMR_CLIENT_PORT: 8088
-    expose:
-      - "8082"
+      dockerfile: docker/shop.Dockerfile
+      args:
+        VITE_MAIN_APP_URL: ${VITE_MAIN_APP_URL:-http://localhost:8088}
+        VITE_BAC_SHOP_URL: ${VITE_BAC_SHOP_URL:-http://localhost:8083}
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN:-}
+    restart: unless-stopped
+    ports:
+      - "8083:80"
+    depends_on:
+      api:
+        condition: service_healthy
 
   admin:
     build:
       context: .
-      dockerfile: docker/admin/Dockerfile
-    volumes:
-      - ./admin.battleasia.gg:/app
-      - admin_node_modules:/app/node_modules
-    environment:
-      PORT: 3000
-      HOST: 0.0.0.0
-      BROWSER: none
-      REACT_APP_API_URL: http://battleasia.local:8088
-      WDS_SOCKET_HOST: admin.battleasia.local
-      WDS_SOCKET_PORT: 8088
-      DANGEROUSLY_DISABLE_HOST_CHECK: "true"
-    expose:
-      - "3000"
+      dockerfile: docker/admin.Dockerfile
+      args:
+        VITE_PLAYER_URL: ${VITE_PLAYER_URL:-http://localhost:8088}
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN:-}
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      api:
+        condition: service_healthy
 
   nginx:
     image: nginx:1.27-alpine
+    restart: unless-stopped
     ports:
       - "8088:80"
     volumes:
-      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./docker/nginx/gateway.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
-      - fe
+      - player
       - shop
       - admin
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
 volumes:
-  fe_node_modules:
-  shop_node_modules:
-  admin_node_modules:
+  battleasia_mongo:
+  api_uploads:

@@ -1,162 +1,56 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" translate="no" class="notranslate" data-theme="dark" data-accent="violet">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#000000" />
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
-    <script>
-      (function () {
-        var palettes = {
-          lime: ['#cbfb24', '#e2ff58', '#9de006', '#081401', '203, 251, 36', '226, 255, 88'],
-          gold: ['#f5c518', '#fbbf24', '#d97706', '#111111', '245, 197, 24', '251, 191, 36'],
-          ember: ['#ff8a1a', '#ffb347', '#e05d00', '#111111', '255, 138, 26', '255, 179, 71'],
-          jade: ['#34d399', '#6ee7b7', '#059669', '#042f1e', '52, 211, 153', '110, 231, 183'],
-          cyan: ['#22d3ee', '#67e8f9', '#0891b2', '#082f38', '34, 211, 238', '103, 232, 249'],
-          violet: ['#a78bfa', '#c4b5fd', '#7c3aed', '#1e1038', '167, 139, 250', '196, 181, 253'],
-          rose: ['#fb7185', '#fda4af', '#e11d48', '#3f0a14', '251, 113, 133', '253, 164, 175'],
-          sky: ['#38bdf8', '#7dd3fc', '#0284c7', '#0b2838', '56, 189, 248', '125, 211, 252'],
-        };
-        var legacy = { default: 'gold', preset1: 'sky', preset2: 'violet', preset3: 'cyan', preset4: 'ember', preset5: 'rose' };
-        var id = 'lime';
-        try {
-          id = localStorage.getItem('ba-accent') || '';
-          if (!palettes[id]) {
-            var s = JSON.parse(localStorage.getItem('app-settings') || '{}');
-            id = s.primaryColor || 'lime';
-          }
-        } catch (e) {}
-        if (legacy[id]) id = legacy[id];
-        var p = palettes[id] || palettes.lime;
-        var r = document.documentElement;
-        r.style.setProperty('--ba-gold', p[0]);
-        r.style.setProperty('--ba-gold-light', p[1]);
-        r.style.setProperty('--ba-gold-dark', p[2]);
-        r.style.setProperty('--ba-gold-ink', p[3]);
-        r.style.setProperty('--ba-gold-rgb', p[4]);
-        r.style.setProperty('--ba-gold-light-rgb', p[5]);
-        r.dataset.accent = id;
-      })();
+    <meta name="google" content="notranslate" />
+    <link rel="icon" type="image/webp" href="/logo/logo-sm.webp?v=8" />
+    <link rel="apple-touch-icon" href="/logo/logo-sm.webp?v=8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0E0F14" />
+    <title>BattleAsia 2.0 — Tournaments</title>
+    <meta name="description" content="PUBG, Free Fire, COD, and MLBB tournaments. Buy BAC, join paid rooms, and cash out winnings." />
+    <link rel="canonical" href="https://battleasia.gg/dashboard" />
+    <meta property="og:site_name" content="BattleAsia" />
+    <meta property="og:title" content="BattleAsia 2.0 — Tournaments" />
+    <meta property="og:description" content="PUBG, Free Fire, COD, and MLBB tournaments. Buy BAC, join paid rooms, and cash out winnings." />
+    <meta property="og:image" content="https://battleasia.gg/assets/hero/hero-poster.webp" />
+    <meta property="og:url" content="https://battleasia.gg/dashboard" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="BattleAsia 2.0 — Tournaments" />
+    <meta name="twitter:description" content="PUBG, Free Fire, COD, and MLBB tournaments. Buy BAC, join paid rooms, and cash out winnings." />
+    <script type="application/ld+json">
+      {"@context":"https://schema.org","@type":"WebSite","name":"BattleAsia","url":"https://battleasia.gg/","description":"Mobile esports tournaments. Play, earn BAC, cash out."}
     </script>
-    <meta
-      name="description"
-      content="BattleAsia — play mobile esports tournaments, win real rewards. PUBG Mobile, Free Fire, COD, Valorant and more."
-    />
-    <link rel="icon" href="/logo/logo.webp" type="image/webp" />
-    <link rel="apple-touch-icon" href="/logo/logo.webp" />
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=satoshi@400,500,700,900&display=swap"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&display=swap"
-    />
-
-    <!-- Brand logo preload -->
-    <link
-      id="boot-logo-preload"
-      rel="preload"
-      as="image"
-      href="/logo/logo.webp"
-      type="image/webp"
-      fetchpriority="high"
-    />
-
-    <style id="boot-shell-css">
-      html,
-      body {
-        margin: 0;
-        background: #060607;
-      }
-      #boot-shell {
-        position: fixed;
-        inset: 0;
-        z-index: 2147483000;
-        background: #060607;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      #boot-shell[hidden] {
-        display: none !important;
-      }
-      #boot-loader-center {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-      }
-      .boot-logo-icon {
-        width: 56px;
-        height: 56px;
-        object-fit: contain;
-      }
-      .boot-bar-track {
-        width: 220px;
-        height: 3px;
-        border-radius: 99px;
-        background: rgba(255,255,255,0.12);
-        overflow: hidden;
-      }
-      #boot-loader-bar {
-        height: 100%;
-        width: 42%;
-        border-radius: 99px;
-        background: var(--ba-gold, #cbfb24);
-        animation: boot-simple-load 1.05s ease-in-out infinite;
-      }
-      @keyframes boot-simple-load {
-        0% { transform: translateX(-130%); }
-        100% { transform: translateX(280%); }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        #boot-loader-bar { animation: none; width: 100%; opacity: 0.7; }
-      }
+    <style>
+      html,body{margin:0;background:#0E0F14;color:#f4f5f7}
+      #boot-shell{position:fixed;inset:0;background:#0E0F14;z-index:99}
     </style>
-
-    <title>BattleAsia | Mobile Esports Tournaments</title>
-  </head>
-
-  <body>
-    <!-- Instant first-paint loader — same simple bar as every page -->
-    <div id="boot-shell" hidden>
-      <div id="boot-loader-center">
-        <img
-          class="boot-logo-icon"
-          src="/logo/logo.webp"
-          alt=""
-          width="56"
-          height="56"
-          fetchpriority="high"
-          decoding="sync"
-        />
-        <div class="boot-bar-track">
-          <div id="boot-loader-bar"></div>
-        </div>
-      </div>
-    </div>
+    <link rel="preload" as="image" href="/assets/hero/hero-live-poster.webp" fetchpriority="high" type="image/webp" />
     <script>
       (function () {
-        var hasShown = false;
-        try {
-          hasShown = !!sessionStorage.getItem('ba_home_loader_shown');
-        } catch (e) {}
-
-        var el = document.getElementById('boot-shell');
-        if (hasShown) {
-          if (el) el.remove();
-          return;
-        }
-        if (el) el.hidden = false;
+        window.setTimeout(function () {
+          var l = document.createElement('link');
+          l.rel = 'stylesheet';
+          l.href =
+            'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap';
+          document.head.appendChild(l);
+        }, 2500);
       })();
     </script>
+    <script>
+      (function () {
+        try {
+          var id = localStorage.getItem('ba-accent') || 'violet';
+          document.documentElement.dataset.accent = id;
+          var theme = localStorage.getItem('ba-theme') || 'dark';
+          document.documentElement.dataset.theme = theme;
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="boot-shell" aria-hidden="true"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

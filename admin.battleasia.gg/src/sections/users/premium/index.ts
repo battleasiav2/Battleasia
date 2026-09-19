@@ -1,2 +1,0 @@
-export { UserPremiumView } from './view';
-

@@ -1,45 +1,33 @@
-import { Suspense, StrictMode } from 'react';
-import { Provider } from 'react-redux';
-import { createRoot } from 'react-dom/client';
-import { HelmetProvider } from 'react-helmet-async';
-import { PersistGate } from 'redux-persist/integration/react';
-import { Outlet, RouterProvider, createBrowserRouter } from 'react-router';
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.tsx'
+import { ErrorBoundary } from './components/ErrorBoundary'
+import { I18nProvider } from './lib/i18n'
+import { captureReferral } from './lib/ref'
+import { bootSentry } from './lib/sentry'
+import { bootTheme } from './lib/theme'
 
-import App from './app';
-import { store, persister } from './store';
-import { routesSection } from './routes/sections';
-import { ErrorBoundary } from './routes/components';
-import { LoadingScreen } from './components/loading-screen';
-import { SoftRemountBoundary } from './components/soft-remount-boundary';
+bootTheme()
+captureReferral()
+try {
+  const lang = localStorage.getItem('ba-lang')
+  if (lang) document.documentElement.lang = lang
+} catch {
+  /* ignore */
+}
+document.getElementById('boot-shell')?.remove()
 
-// ----------------------------------------------------------------------
+const idle = window.requestIdleCallback?.bind(window)
+if (idle) idle(() => bootSentry(), { timeout: 4000 })
+else window.setTimeout(() => bootSentry(), 2500)
 
-const router = createBrowserRouter([
-  {
-    Component: () => (
-      <SoftRemountBoundary>
-        <App>
-          <Suspense fallback={<LoadingScreen />}>
-            <Outlet />
-          </Suspense>
-        </App>
-      </SoftRemountBoundary>
-    ),
-    errorElement: <ErrorBoundary />,
-    children: routesSection,
-  },
-]);
-
-const root = createRoot(document.getElementById('root')!);
-
-root.render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persister}>
-        <HelmetProvider>
-          <RouterProvider router={router} />
-        </HelmetProvider>
-      </PersistGate>
-    </Provider>
-  </StrictMode>
-);
+    <ErrorBoundary>
+      <I18nProvider>
+        <App />
+      </I18nProvider>
+    </ErrorBoundary>
+  </StrictMode>,
+)

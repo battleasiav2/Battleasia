@@ -11,6 +11,7 @@ export interface IMatchParticipant extends Document {
   placement?: number | null;
   kills?: number;
   points?: number;
+  ready?: boolean;
   joinedAt: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -29,6 +30,7 @@ const participantSchema = new Schema<IMatchParticipant>(
     kills: { type: Number, default: 0 },
     points: { type: Number, default: 0 },
     joinedAt: { type: Date, default: Date.now },
+    ready: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

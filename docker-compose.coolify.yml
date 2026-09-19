@@ -1,43 +1,49 @@
-# BattleAsia — Coolify deploy (no bundled nginx; Coolify proxy handles SSL + domains)
+# Coolify — no bundled nginx (Coolify / Traefik owns SSL + domains)
 #
-# Coolify → New Resource → Docker Compose → compose file: docker-compose.coolify.yml
-# Domains (see deploy/COOLIFY-BN.md):
-#   fe    → https://battleasia.gg
-#   shop  → https://shop.battleasia.gg
-#   admin → https://admin.battleasia.gg
-#   api   → https://battleasia.gg/api  (+ optional /api on shop & admin)
+# Domains:
+#   player → https://battleasia.gg
+#   shop   → https://shop.battleasia.gg
+#   admin  → https://admin.battleasia.gg
+#   api    → https://battleasia.gg/api  (and /api on shop + admin if needed)
 #
-# MongoDB: default = local container `mongo` (host VPS DB).
-# Override MONGODB_URI only if you use Atlas or OS-installed Mongo.
-#
+# Required Coolify env: JWT_SECRET, ADMIN_PASSWORD
+
+name: battleasia-coolify
+
 services:
   mongo:
     image: mongo:7
     restart: unless-stopped
+    command: ["--replSet", "rs0", "--bind_ip_all"]
     volumes:
-      - mongo_data:/data/db
-    # Not exposed publicly — only other containers in this stack can reach it
+      - battleasia_mongo:/data/db
     expose:
       - "27017"
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--quiet",
+          "--eval",
+          "try { rs.status().ok } catch (e) { rs.initiate({_id:'rs0',members:[{_id:0,host:'mongo:27017'}]}).ok }",
+        ]
       interval: 20s
-      timeout: 5s
-      retries: 5
+      timeout: 10s
+      retries: 10
       start_period: 20s
 
   api:
     build:
-      context: .
-      dockerfile: docker/api/Dockerfile.prod
+      context: ${API_PATH:-../../battleasianew/api}
+      dockerfile: deploy/Dockerfile
     restart: unless-stopped
     expose:
       - "5050"
     environment:
       NODE_ENV: production
       PORT: 5050
-      # Default: same-stack Mongo. Coolify env can override (e.g. Atlas).
-      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/battleasia}
+      MONGODB_URI: ${MONGODB_URI:-mongodb://mongo:27017/battleasia?replicaSet=rs0}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@battleasia.gg}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}
@@ -47,26 +53,33 @@ services:
       CDN_URL: ${CDN_URL:-}
       COINGO_MOCK: "false"
       LOG_AUTH_CODES: "false"
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-465}
+      SMTP_SECURE: ${SMTP_SECURE:-true}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-BattleAsia}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+      FCM_SERVER_KEY: ${FCM_SERVER_KEY:-}
+      BACKUP_S3_ACCESS_KEY: ${BACKUP_S3_ACCESS_KEY:-}
+      BACKUP_S3_SECRET_KEY: ${BACKUP_S3_SECRET_KEY:-}
+      BACKUP_S3_BUCKET: ${BACKUP_S3_BUCKET:-}
+      BACKUP_S3_REGION: ${BACKUP_S3_REGION:-}
+      BACKUP_OFFSITE_CMD: ${BACKUP_OFFSITE_CMD:-}
     volumes:
       - api_uploads:/app/uploads
     depends_on:
       mongo:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:5050/ready',(r)=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-      start_period: 40s
 
-  fe:
+  player:
     build:
       context: .
-      dockerfile: docker/fe/Dockerfile.prod
+      dockerfile: docker/player.Dockerfile
       args:
-        VITE_SERVER_URL: ${VITE_SERVER_URL:-}
-        VITE_CDN_URL: ${VITE_CDN_URL:-}
-        VITE_BAC_SHOP_URL: ${VITE_BAC_SHOP_URL:-https://shop.battleasia.gg/user/shop}
+        VITE_BAC_SHOP_URL: ${VITE_BAC_SHOP_URL:-https://shop.battleasia.gg}
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN:-}
     restart: unless-stopped
     expose:
       - "80"
@@ -77,12 +90,11 @@ services:
   shop:
     build:
       context: .
-      dockerfile: docker/shop/Dockerfile.prod
+      dockerfile: docker/shop.Dockerfile
       args:
-        VITE_SERVER_URL: ${VITE_SERVER_URL:-}
-        VITE_CDN_URL: ${VITE_CDN_URL:-}
         VITE_MAIN_APP_URL: ${VITE_MAIN_APP_URL:-https://battleasia.gg}
-        VITE_BASE_PATH: ${VITE_BASE_PATH:-/}
+        VITE_BAC_SHOP_URL: ${VITE_BAC_SHOP_URL:-https://shop.battleasia.gg}
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN:-}
     restart: unless-stopped
     expose:
       - "80"
@@ -93,11 +105,10 @@ services:
   admin:
     build:
       context: .
-      dockerfile: docker/admin/Dockerfile.prod
+      dockerfile: docker/admin.Dockerfile
       args:
-        REACT_APP_API_URL: ${REACT_APP_API_URL:-https://battleasia.gg}
-        REACT_APP_BASENAME: ${REACT_APP_BASENAME:-}
-        PUBLIC_URL: ${PUBLIC_URL:-}
+        VITE_PLAYER_URL: ${VITE_PLAYER_URL:-https://battleasia.gg}
+        VITE_SENTRY_DSN: ${VITE_SENTRY_DSN:-}
     restart: unless-stopped
     expose:
       - "80"
@@ -106,5 +117,5 @@ services:
         condition: service_healthy
 
 volumes:
+  battleasia_mongo:
   api_uploads:
-  mongo_data:

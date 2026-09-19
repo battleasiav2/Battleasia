@@ -6,6 +6,9 @@ import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
 import { requireAdmin } from '../../../middleware/admin.js';
 import { paginatedResults, parsePagination } from '../../../utils/pagination.js';
 import { recordBalanceHistory } from '../../../utils/balance-history.js';
+import { approveWithdrawMoney, completeWithdrawMoney, refundWithdrawMoney, MoneyError } from '../../../utils/money.js';
+import { assertHighValuePassword, HighValueError } from '../../../utils/high-value.js';
+import { writeAudit } from '../../../models/AuditLog.js';
 import { serializeWithdrawal } from '../../../utils/payment-serialize.js';
 import { emitNewWithdrawal, emitPendingPaymentCounts } from '../../../utils/socket.js';
 import { getWithdrawableInfo } from '../../../utils/withdrawable-amount.js';
@@ -89,6 +92,26 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
       return res.status(401).json({ status: false, message: 'Unauthorized' });
     }
 
+    const { getAppSettings } = await import('../../../models/AppSettings.js');
+    const { normalizeP1Flags } = await import('../../../utils/p1-flags.js');
+    const flags = normalizeP1Flags((await getAppSettings()).p1);
+    if (flags.kycBeforeWithdraw) {
+      if (user.kycStatus !== 'approved') {
+        return res.status(403).json({ status: false, message: 'Complete KYC and wait for approval before withdrawing' });
+      }
+      if (user.dateOfBirth) {
+        const age = (Date.now() - new Date(user.dateOfBirth).getTime()) / (365.25 * 24 * 3600 * 1000);
+        if (age < 18) {
+          return res.status(403).json({ status: false, message: 'You must be 18 or older to withdraw' });
+        }
+      } else {
+        return res.status(403).json({ status: false, message: 'Add your date of birth to complete KYC' });
+      }
+    }
+
+    const { assertClearOfVelocity } = await import('../../../utils/velocity.js');
+    await assertClearOfVelocity(user._id.toString(), 'withdraw');
+
     const withdrawableInfo = await getWithdrawableInfo(user._id.toString(), user.balance ?? 0);
     if (withdrawableInfo.hasPendingWithdrawal) {
       return res.status(400).json({
@@ -102,6 +125,9 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
         message: `Exceeds withdrawable amount. Maximum: ${withdrawableInfo.withdrawableAmount.toFixed(2)} BAC`,
       });
     }
+
+    const { recordFingerprint } = await import('../../../utils/fingerprint.js');
+    void recordFingerprint(req, user._id.toString());
 
     const withdrawal = await WithdrawalHistory.create({
       userId: user._id,
@@ -131,6 +157,9 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
       data: serializeWithdrawal(withdrawal),
     });
   } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
     console.error('submit withdrawal error:', error);
     return res.status(500).json({ status: false, message: 'Failed to submit withdrawal' });
   }
@@ -180,56 +209,34 @@ router.get('/:id', requireAuth, async (req: AuthedRequest, res) => {
 
 router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
   try {
+    const existing = await WithdrawalHistory.findById(req.params.id);
+    if (!existing) return res.status(404).json({ status: false, message: 'Withdrawal not found' });
+    await assertHighValuePassword(req, Number(existing.coin_amount));
+    const key = String(req.header('Idempotency-Key') || '').trim() || undefined;
+    await approveWithdrawMoney({ withdrawalId: String(req.params.id), idempotencyKey: key });
     const withdrawal = await WithdrawalHistory.findById(req.params.id);
-    if (!withdrawal) {
-      return res.status(404).json({ status: false, message: 'Withdrawal not found' });
-    }
-    if (withdrawal.status !== 'pending') {
-      return res.status(400).json({ status: false, message: 'Withdrawal is not pending' });
-    }
-
+    if (!withdrawal) return res.status(404).json({ status: false, message: 'Withdrawal not found' });
     const user = await User.findById(withdrawal.userId);
-    if (!user) {
-      return res.status(404).json({ status: false, message: 'User not found' });
-    }
-
-    const balanceBefore = user.balance ?? 0;
-    if (balanceBefore < withdrawal.coin_amount) {
-      return res.status(400).json({ status: false, message: 'Insufficient user balance' });
-    }
-
-    const admin = req.userId ? await User.findById(req.userId) : null;
-    user.balance = balanceBefore - withdrawal.coin_amount;
-    await user.save();
-
-    withdrawal.status = 'processing';
-    withdrawal.processed_at = new Date();
-    withdrawal.processed_by = req.userId as unknown as import('mongoose').Types.ObjectId;
-    await withdrawal.save();
-
-    await recordBalanceHistory({
-      user,
-      amount: withdrawal.coin_amount,
-      type: 'withdraw',
-      balanceBefore,
-      balanceAfter: user.balance,
-      performedBy: req.userId,
-      detail: {
-        reason: 'withdrawal_approved',
-        withdrawal_id: withdrawal._id.toString(),
-        adminName: admin?.username || 'Admin',
-      },
-    });
-
     await emitPendingPaymentCounts();
-    await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
+    if (user) {
+      await notifyBalanceChange(user._id.toString(), user.balance ?? 0, (user.balance ?? 0) + withdrawal.coin_amount);
+    }
     await notifyWithdrawalApproved({
-      userId: user._id.toString(),
+      userId: withdrawal.userId.toString(),
       amount: withdrawal.coin_amount,
       withdrawalId: withdrawal._id.toString(),
     });
+    await writeAudit({
+      actorId: req.userId,
+      action: 'withdraw.approve',
+      target: withdrawal._id.toString(),
+      detail: `${withdrawal.coin_amount} BAC`,
+    });
     return res.json({ status: true, data: serializeWithdrawal(withdrawal) });
   } catch (error) {
+    if (error instanceof HighValueError || error instanceof MoneyError) {
+      return res.status((error as { status: number }).status).json({ status: false, message: error.message });
+    }
     console.error('approve withdrawal error:', error);
     return res.status(500).json({ status: false, message: 'Failed to approve withdrawal' });
   }
@@ -237,27 +244,33 @@ router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
 
 router.patch('/:id/complete', requireAdmin, async (req: AuthedRequest, res) => {
   try {
+    const existing = await WithdrawalHistory.findById(req.params.id);
+    if (!existing) return res.status(404).json({ status: false, message: 'Withdrawal not found' });
+    await assertHighValuePassword(req, Number(existing.coin_amount));
+    const key = String(req.header('Idempotency-Key') || '').trim() || undefined;
+    await completeWithdrawMoney({
+      withdrawalId: String(req.params.id),
+      transactionHash: req.body.transaction_hash || '',
+      idempotencyKey: key,
+    });
     const withdrawal = await WithdrawalHistory.findById(req.params.id);
-    if (!withdrawal) {
-      return res.status(404).json({ status: false, message: 'Withdrawal not found' });
-    }
-    if (withdrawal.status !== 'processing') {
-      return res.status(400).json({ status: false, message: 'Withdrawal is not processing' });
-    }
-
-    withdrawal.status = 'completed';
-    withdrawal.transaction_hash = req.body.transaction_hash || '';
-    withdrawal.processed_at = new Date();
-    await withdrawal.save();
-
+    if (!withdrawal) return res.status(404).json({ status: false, message: 'Withdrawal not found' });
     await notifyWithdrawalCompleted({
       userId: withdrawal.userId.toString(),
       amount: withdrawal.coin_amount,
       withdrawalId: withdrawal._id.toString(),
     });
-
+    await writeAudit({
+      actorId: req.userId,
+      action: 'withdraw.complete',
+      target: withdrawal._id.toString(),
+      detail: `${withdrawal.coin_amount} BAC`,
+    });
     return res.json({ status: true, data: serializeWithdrawal(withdrawal) });
   } catch (error) {
+    if (error instanceof HighValueError || error instanceof MoneyError) {
+      return res.status((error as { status: number }).status).json({ status: false, message: error.message });
+    }
     console.error('complete withdrawal error:', error);
     return res.status(500).json({ status: false, message: 'Failed to complete withdrawal' });
   }
@@ -282,24 +295,14 @@ router.patch('/:id/reject', requireAdmin, async (req: AuthedRequest, res) => {
     const wasProcessing = withdrawal.status === 'processing';
 
     if (wasProcessing) {
-      const balanceBefore = user.balance ?? 0;
-      user.balance = balanceBefore + withdrawal.coin_amount;
-      await user.save();
-
-      await recordBalanceHistory({
-        user,
-        amount: withdrawal.coin_amount,
-        type: 'deposit',
-        balanceBefore,
-        balanceAfter: user.balance,
-        performedBy: req.userId,
-        detail: {
-          reason: 'withdrawal_rejected_refund',
-          withdrawal_id: withdrawal._id.toString(),
-          adminName: admin?.username || 'Admin',
-        },
-      });
-      await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
+      const key = String(req.header('Idempotency-Key') || '').trim() || undefined;
+      await refundWithdrawMoney({ withdrawalId: String(withdrawal._id), idempotencyKey: key });
+    } else {
+      withdrawal.status = 'rejected';
+      withdrawal.rejection_reason = req.body.rejection_reason || '';
+      withdrawal.processed_at = new Date();
+      withdrawal.processed_by = req.userId as unknown as import('mongoose').Types.ObjectId;
+      await withdrawal.save();
     }
 
     withdrawal.status = 'rejected';
@@ -318,6 +321,9 @@ router.patch('/:id/reject', requireAdmin, async (req: AuthedRequest, res) => {
     });
     return res.json({ status: true, data: serializeWithdrawal(withdrawal) });
   } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
     console.error('reject withdrawal error:', error);
     return res.status(500).json({ status: false, message: 'Failed to reject withdrawal' });
   }

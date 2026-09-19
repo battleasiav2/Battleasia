@@ -7,6 +7,7 @@ export interface IFeedComment extends Document {
   avatar: string;
   content: string;
   parentId?: Types.ObjectId | null;
+  likedBy: Types.ObjectId[];
   mentions: string[];
   createdAt: Date;
   updatedAt: Date;
@@ -20,6 +21,7 @@ const feedCommentSchema = new Schema<IFeedComment>(
     avatar: { type: String, default: '' },
     content: { type: String, required: true, trim: true },
     parentId: { type: Schema.Types.ObjectId, ref: 'FeedComment', default: null },
+    likedBy: { type: [Schema.Types.ObjectId], ref: 'User', default: [] },
     mentions: { type: [String], default: [] },
   },
   { timestamps: true }

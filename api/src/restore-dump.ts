@@ -3,6 +3,8 @@ import path from 'path';
 import mongoose from 'mongoose';
 import { BSON } from 'mongodb';
 import { env } from './config/env.js';
+import { DEFAULT_P1_FLAGS } from './utils/p1-flags.js';
+import { DEFAULT_P2_FLAGS } from './utils/p2-flags.js';
 
 export async function restoreDump(dumpDir: string, shouldDisconnect = false) {
   let isStandalone = false;
@@ -43,6 +45,13 @@ export async function restoreDump(dumpDir: string, shouldDisconnect = false) {
   }
 
   console.log('[Import] MongoDB database restore complete!');
+
+  const flags = await db.collection('appsettings').updateMany(
+    {},
+    { $set: { p1: { ...DEFAULT_P1_FLAGS }, p2: { ...DEFAULT_P2_FLAGS } } },
+  );
+  console.log(`[Import] P1/P2 flags enabled on ${flags.modifiedCount} appsettings doc(s)`);
+
   if (isStandalone || shouldDisconnect) {
     await mongoose.disconnect();
   }

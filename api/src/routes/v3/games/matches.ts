@@ -3,7 +3,6 @@ import type { Types } from 'mongoose';
 import { Game } from '../../../models/Game.js';
 import { Match, type IMatchResultEntry } from '../../../models/Match.js';
 import { MatchParticipant } from '../../../models/MatchParticipant.js';
-import { User } from '../../../models/User.js';
 import { requireAuth } from '../../../middleware/auth.js';
 import {
   buildSearchFilter,
@@ -11,7 +10,7 @@ import {
   parsePagination,
 } from '../../../utils/pagination.js';
 import { serializeMatch } from '../../../utils/serialize.js';
-import { recordBalanceHistory } from '../../../utils/balance-history.js';
+import { distributeMatchWinnings, refundMatchEntries, MoneyError } from '../../../utils/money.js';
 import { notifyBalanceChange } from '../../../utils/balance-notify.js';
 import {
   notifyMatchCancelled,
@@ -178,54 +177,26 @@ router.post('/:id/distribute-winnings', requireAuth, async (req, res) => {
       });
     }
 
-    for (const entry of match.results || []) {
-      const totalWin =
-        (Number(entry.winPrize) || 0) +
-        (Number(entry.bonus) || 0) +
-        (Number(entry.placePoint) || 0);
-      if (totalWin <= 0) continue;
-
-      const participant = await MatchParticipant.findById(entry.participantId);
-      if (!participant) continue;
-
-      const user = await User.findById(participant.userId);
-      if (!user) continue;
-
-      const balanceBefore = user.balance ?? 0;
-      user.balance = balanceBefore + totalWin;
-      await user.save();
-
-      await recordBalanceHistory({
-        user,
-        amount: totalWin,
-        type: 'deposit',
-        balanceBefore,
-        balanceAfter: user.balance,
-        detail: {
-          reason: 'match_winnings',
-          matchId: match._id.toString(),
-          matchName: match.matchName,
-        },
-      });
-      await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
+    const { payouts } = await distributeMatchWinnings(match._id.toString());
+    for (const payout of payouts) {
+      await notifyBalanceChange(payout.userId, payout.balance, payout.before);
       await notifyMatchWinnings({
-        userId: user._id.toString(),
-        amount: totalWin,
+        userId: payout.userId,
+        amount: payout.amount,
         matchId: match._id.toString(),
         matchName: match.matchName,
       });
     }
-
-    match.winningsDistributed = true;
-    match.status = 'complete';
-    await match.save();
-
+    const paid = await Match.findById(match._id);
     const game = await Game.findById(match.gameId);
-    const data = serializeMatch(match, game?.name);
+    const data = serializeMatch(paid || match, game?.name);
     emitMatchUpdated({ ...data, gameId: match.gameId.toString() });
     await emitDashboardStatsUpdated();
     return res.json({ status: true, data });
   } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
     console.error('distribute winnings error:', error);
     return res.status(500).json({ status: false, message: 'Failed to distribute winnings' });
   }
@@ -241,50 +212,29 @@ router.post('/:id/refund', requireAuth, async (req, res) => {
       return res.status(400).json({ status: false, message: 'Entries already refunded' });
     }
 
-    const participants = await MatchParticipant.find({ matchId: match._id });
-    for (const participant of participants) {
-      if (participant.entryFee <= 0) continue;
-
-      const user = await User.findById(participant.userId);
-      if (!user) continue;
-
-      const balanceBefore = user.balance ?? 0;
-      user.balance = balanceBefore + participant.entryFee;
-      await user.save();
-
-      await recordBalanceHistory({
-        user,
-        amount: participant.entryFee,
-        type: 'deposit',
-        balanceBefore,
-        balanceAfter: user.balance,
-        detail: {
-          reason: 'match_entry_refund',
-          matchId: match._id.toString(),
-          matchName: match.matchName,
-        },
-      });
-      await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
+    const { refunds } = await refundMatchEntries(match._id.toString());
+    for (const row of refunds) {
+      await notifyBalanceChange(row.userId, row.balance, row.before);
       await notifyMatchRefund({
-        userId: user._id.toString(),
-        amount: participant.entryFee,
+        userId: row.userId,
+        amount: row.amount,
         matchId: match._id.toString(),
         matchName: match.matchName,
       });
     }
-
-    match.entriesRefunded = true;
-    match.status = 'cancel';
-    await match.save();
 
     await notifyMatchCancelled({
       matchId: match._id.toString(),
       matchName: match.matchName,
     });
 
+    const cancelled = await Match.findById(match._id);
     const game = await Game.findById(match.gameId);
-    return res.json({ status: true, data: serializeMatch(match, game?.name) });
+    return res.json({ status: true, data: serializeMatch(cancelled || match, game?.name) });
   } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
     console.error('refund error:', error);
     return res.status(500).json({ status: false, message: 'Failed to refund entries' });
   }

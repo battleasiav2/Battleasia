@@ -7,6 +7,8 @@ export interface IDirectMessage extends Document {
   senderAvatar: string;
   body: string;
   attachments: string[];
+  replyTo?: Types.ObjectId | null;
+  reactions: Array<{ userId: Types.ObjectId; emoji: string }>;
   readBy: Types.ObjectId[];
   editedAt?: Date | null;
   deletedForEveryone: boolean;
@@ -21,6 +23,16 @@ const directMessageSchema = new Schema<IDirectMessage>(
     senderAvatar: { type: String, default: '' },
     body: { type: String, default: '' },
     attachments: { type: [String], default: [] },
+    replyTo: { type: Schema.Types.ObjectId, ref: 'DirectMessage', default: null },
+    reactions: {
+      type: [
+        {
+          userId: { type: Schema.Types.ObjectId, ref: 'User' },
+          emoji: { type: String, default: '' },
+        },
+      ],
+      default: [],
+    },
     readBy: { type: [Schema.Types.ObjectId], ref: 'User', default: [] },
     editedAt: { type: Date, default: null },
     deletedForEveryone: { type: Boolean, default: false },

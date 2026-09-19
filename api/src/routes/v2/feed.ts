@@ -16,11 +16,13 @@ import { serializeFeed, serializeFeedCategory } from '../../utils/feed-serialize
 import { createActivityNotification } from '../../utils/social-notifications.js';
 import { safeObjectId } from '../../utils/query-filter.js';
 import { enrichFeed, enrichFeedsBatch } from '../../utils/feed-enrich.js';
+import { getAppSettings } from '../../models/AppSettings.js';
+import { normalizeP2Flags } from '../../utils/p2-flags.js';
 
 const router = Router();
 
 function getSortOption(sortBy?: string, feedMode?: string): Record<string, 1 | -1> {
-  if (feedMode === 'trending' || sortBy === 'popular') {
+  if (feedMode === 'trending' || feedMode === 'fyp' || sortBy === 'popular') {
     return { totalLikes: -1, totalViews: -1, createdAt: -1 };
   }
   if (sortBy === 'oldest') return { createdAt: 1 };
@@ -31,6 +33,29 @@ function getSortOption(sortBy?: string, feedMode?: string): Record<string, 1 | -
 function extractHashtags(text: string) {
   const matches = text.match(/#[\w\u0980-\u09FF]+/g);
   return matches ? [...new Set(matches.map((t) => t.slice(1).toLowerCase()))] : [];
+}
+
+function extractMentions(text: string) {
+  const matches = text.match(/@[\w.]+/g);
+  return matches ? [...new Set(matches.map((t) => t.slice(1).toLowerCase()))] : [];
+}
+
+function mapComment(comment: InstanceType<typeof FeedComment>, userId?: string) {
+  const liked = comment.likedBy || [];
+  return {
+    id: comment._id.toString(),
+    content: comment.content,
+    createdAt: comment.createdAt,
+    parentId: comment.parentId?.toString() || null,
+    mentions: comment.mentions || [],
+    totalLikes: liked.length,
+    isLiked: Boolean(userId && liked.some((id) => id.toString() === userId)),
+    user: {
+      id: comment.userId.toString(),
+      username: comment.username,
+      avatar: comment.avatar,
+    },
+  };
 }
 
 async function getCommunityCategoryId() {
@@ -68,22 +93,40 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
     const categoryId = safeObjectId(req.query.categoryId);
     if (categoryId) filter.categoryId = categoryId;
     if (req.query.hashtag) filter.hashtags = String(req.query.hashtag).toLowerCase();
+    if (req.query.gameTag) filter.gameTag = String(req.query.gameTag).toLowerCase();
+    if (req.query.postType) filter.postType = String(req.query.postType);
 
-    const feedMode = String(req.query.feedMode || 'all');
+    let feedMode = String(req.query.feedMode || 'all');
     const sortBy = String(req.query.sortBy || 'latest');
+    if (feedMode === 'fyp') {
+      const p2 = normalizeP2Flags((await getAppSettings()).p2);
+      if (!p2.igForYou) feedMode = 'all';
+    }
+
+    if (feedMode === 'games') {
+      filter.gameTag = { $nin: [null, ''] };
+    }
 
     if (feedMode === 'following') {
       const following = await Follow.find({ followerId: req.userId }).select('followingId');
       const followingIds = following.map((f) => f.followingId);
-      filter.authorId = { $in: followingIds };
+      // Include own posts so the following timeline isn't empty after posting
+      filter.authorId = { $in: [...followingIds, req.userId] };
     }
 
     if (feedMode === 'recommended') {
       filter.totalLikes = { $gte: 5 };
     }
 
+    if (feedMode === 'fyp') {
+      filter.totalLikes = { $gte: 0 };
+    }
+
     const [feeds, total] = await Promise.all([
-      Feed.find(filter).sort(getSortOption(sortBy, feedMode)).skip(skip).limit(limit),
+      Feed.find(filter)
+        .sort({ pinnedAt: -1, ...getSortOption(sortBy, feedMode) })
+        .skip(skip)
+        .limit(limit),
       Feed.countDocuments(filter),
     ]);
 
@@ -91,7 +134,27 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
     const categories = await FeedCategory.find({ _id: { $in: categoryIds } });
     const categoryMap = new Map(categories.map((c) => [c._id.toString(), c]));
 
-    const results = await enrichFeedsBatch(feeds, categoryMap, req.userId);
+    let results = await enrichFeedsBatch(feeds, categoryMap, req.userId);
+    if (feedMode === 'fyp') {
+      const following = await Follow.find({ followerId: req.userId }).select('followingId');
+      const boost = new Set(following.map((f) => f.followingId.toString()));
+      results = [...results].sort((a, b) => {
+        const score = (row: typeof a) => {
+          const ageH = row.createdAt ? (Date.now() - new Date(row.createdAt).getTime()) / 36e5 : 48;
+          const recency = Math.max(0, 24 - ageH);
+          return (row.totalLikes || 0) + (row.totalViews || 0) * 0.05 + (boost.has(row.author?.id || '') ? 40 : 0) + recency;
+        };
+        return score(b) - score(a);
+      });
+    }
+    const viewer = await User.findById(req.userId).select('muteWords');
+    const muted = (viewer?.muteWords || []).map((w) => w.toLowerCase()).filter(Boolean);
+    if (muted.length) {
+      results = results.filter((p) => {
+        const blob = `${p.description || ''} ${p.title || ''} ${(p.hashtags || []).join(' ')}`.toLowerCase();
+        return !muted.some((w) => blob.includes(w));
+      });
+    }
 
     return res.json(paginatedWithTotal(results, total));
   } catch (error) {
@@ -116,6 +179,8 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
       visibility,
       status,
       categoryId,
+      gameTag,
+      entityId,
     } = req.body as {
       title?: string;
       description?: string;
@@ -125,6 +190,8 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
       visibility?: string;
       status?: string;
       categoryId?: string;
+      gameTag?: string;
+      entityId?: string;
     };
 
     const content = String(description || title || '').trim();
@@ -148,6 +215,8 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
       authorId: user._id,
       authorName: user.username,
       authorAvatar: user.avatar || '',
+      gameTag: String(gameTag || '').toLowerCase().slice(0, 32),
+      entityId: String(entityId || '').slice(0, 64),
     });
 
     const category = await FeedCategory.findById(feed.categoryId);
@@ -233,7 +302,13 @@ router.get('/saved/me', requireAuth, async (req: AuthedRequest, res) => {
       req.userId
     );
 
-    return res.json(paginatedWithTotal(results, results.length));
+    const savedMap = new Map(saved.map((s) => [s.feedId.toString(), s.collectionName || 'Saved']));
+    const tagged = results.map((row) => ({
+      ...row,
+      collectionName: savedMap.get(String(row.id || row._id)) || 'Saved',
+    }));
+
+    return res.json(paginatedWithTotal(tagged, tagged.length));
   } catch (error) {
     console.error('v2 saved feeds error:', error);
     return res.status(500).json({ status: false, message: 'Failed to fetch saved posts' });
@@ -288,26 +363,8 @@ router.get('/:id/comments', requireAuth, async (req: AuthedRequest, res) => {
     const results = comments.map((comment) => {
       const replies = repliesByParent.get(comment._id.toString()) || [];
       return {
-        id: comment._id.toString(),
-        content: comment.content,
-        createdAt: comment.createdAt,
-        parentId: comment.parentId?.toString() || null,
-        user: {
-          id: comment.userId.toString(),
-          username: comment.username,
-          avatar: comment.avatar,
-        },
-        replies: replies.slice(0, 20).map((r) => ({
-          id: r._id.toString(),
-          content: r.content,
-          createdAt: r.createdAt,
-          parentId: r.parentId?.toString() || null,
-          user: {
-            id: r.userId.toString(),
-            username: r.username,
-            avatar: r.avatar,
-          },
-        })),
+        ...mapComment(comment, req.userId),
+        replies: replies.slice(0, 20).map((r) => mapComment(r, req.userId)),
       };
     });
 
@@ -346,7 +403,7 @@ router.post('/:id/comments', requireAuth, async (req: AuthedRequest, res) => {
       avatar: user.avatar || '',
       content,
       parentId: parentId || null,
-      mentions: extractHashtags(content),
+      mentions: extractMentions(content),
     });
 
     feed.totalComments = (feed.totalComments || 0) + 1;
@@ -366,26 +423,40 @@ router.post('/:id/comments', requireAuth, async (req: AuthedRequest, res) => {
     return res.json({
       status: true,
       data: {
-        id: comment._id.toString(),
-        content: comment.content,
+        ...mapComment(comment, req.userId),
         totalComments: feed.totalComments,
-        parentId: comment.parentId?.toString() || null,
         author: {
           id: user._id.toString(),
           name: user.username,
           avatarUrl: user.avatar || '',
         },
-        user: {
-          id: user._id.toString(),
-          username: user.username,
-          avatar: user.avatar || '',
-        },
-        createdAt: comment.createdAt,
       },
     });
   } catch (error) {
     console.error('v2 add comment error:', error);
     return res.status(500).json({ status: false, message: 'Failed to add comment' });
+  }
+});
+
+router.post('/:id/comments/:commentId/like', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const comment = await FeedComment.findOne({ _id: req.params.commentId, feedId: req.params.id });
+    if (!comment) return res.status(404).json({ status: false, message: 'Comment not found' });
+    const uid = req.userId!;
+    const liked = (comment.likedBy || []).some((id) => id.toString() === uid);
+    if (liked) {
+      comment.likedBy = (comment.likedBy || []).filter((id) => id.toString() !== uid);
+    } else {
+      comment.likedBy = [...(comment.likedBy || []), uid as unknown as typeof comment.likedBy[number]];
+    }
+    await comment.save();
+    return res.json({
+      status: true,
+      data: { isLiked: !liked, totalLikes: comment.likedBy.length },
+    });
+  } catch (error) {
+    console.error('like comment error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to like comment' });
   }
 });
 
@@ -397,7 +468,13 @@ router.post('/:id/save', requireAuth, async (req: AuthedRequest, res) => {
     }
 
     const existing = await SavedPost.findOne({ userId: req.userId, feedId: feed._id });
+    const folder = String(req.body?.collectionName || '').trim().slice(0, 40);
     if (existing) {
+      if (folder && folder !== existing.collectionName) {
+        existing.collectionName = folder;
+        await existing.save();
+        return res.json({ status: true, data: { isSaved: true, collectionName: existing.collectionName } });
+      }
       await existing.deleteOne();
       return res.json({ status: true, data: { isSaved: false } });
     }
@@ -475,6 +552,27 @@ router.post('/:id/view', requireAuth, async (req: AuthedRequest, res) => {
   } catch (error) {
     console.error('v2 increment views error:', error);
     return res.status(500).json({ status: false, message: 'Failed to increment views' });
+  }
+});
+
+router.post('/:id/pin', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const { normalizeP1Flags } = await import('../../utils/p1-flags.js');
+    const { getAppSettings } = await import('../../models/AppSettings.js');
+    if (!normalizeP1Flags((await getAppSettings()).p1).igPinnedPosts) {
+      return res.status(403).json({ status: false, message: 'Pinned posts are off' });
+    }
+    const feed = await Feed.findById(req.params.id);
+    if (!feed) return res.status(404).json({ status: false, message: 'Feed not found' });
+    if (feed.authorId?.toString() !== req.userId) {
+      return res.status(403).json({ status: false, message: 'Only the author can pin' });
+    }
+    feed.pinnedAt = feed.pinnedAt ? null : new Date();
+    await feed.save();
+    return res.json({ status: true, data: { pinnedAt: feed.pinnedAt } });
+  } catch (error) {
+    console.error('pin feed error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to pin post' });
   }
 });
 

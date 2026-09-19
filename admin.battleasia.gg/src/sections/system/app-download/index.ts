@@ -1,1 +1,0 @@
-export { AppDownloadSettingsView } from './view';

@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" translate="no">
+  <defs>
+    <linearGradient id="g" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a1020"/>
+      <stop offset=".5" stop-color="#1a0810"/>
+      <stop offset="1" stop-color="#0a0709"/>
+    </linearGradient>
+    <radialGradient id="r" cx="28%" cy="28%" r="58%">
+      <stop offset="0" stop-color="#fda4af"/>
+      <stop offset=".4" stop-color="#fb7185" stop-opacity=".8"/>
+      <stop offset="1" stop-color="#fb7185" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#g)"/>
+  <rect width="1600" height="1000" fill="url(#r)"/>
+  <polygon points="1280,80 1560,500 1280,920 1180,920 1460,500 1180,80" fill="#fb7185" fill-opacity=".28"/>
+  <polygon points="1280,160 1480,500 1280,840 1220,840 1420,500 1220,160" fill="none" stroke="#fda4af" stroke-width="8"/>
+  <path d="M80 120 H340" stroke="#fda4af" stroke-width="6"/>
+  <text x="80" y="210" fill="#fda4af" font-family="Space Grotesk, Inter, sans-serif" font-size="42" font-weight="700" letter-spacing="10">5V5 TACTICAL</text>
+  <text x="72" y="430" fill="#ffe4e8" font-family="Space Grotesk, Inter, sans-serif" font-size="92" font-weight="800" letter-spacing="-1">VALORANT</text>
+  <text x="80" y="510" fill="#fb7185" font-family="Inter, sans-serif" font-size="28" font-weight="700" letter-spacing="8">MOBILE ARENA</text>
+</svg>

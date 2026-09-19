@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" translate="no">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3a2a08"/>
+      <stop offset=".45" stop-color="#1a1408"/>
+      <stop offset="1" stop-color="#0a0906"/>
+    </linearGradient>
+    <radialGradient id="r" cx="78%" cy="22%" r="55%">
+      <stop offset="0" stop-color="#ffe066"/>
+      <stop offset=".4" stop-color="#f5c518" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#f5c518" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#g)"/>
+  <rect width="1600" height="1000" fill="url(#r)"/>
+  <circle cx="1280" cy="240" r="220" fill="none" stroke="#ffe066" stroke-opacity=".55" stroke-width="10"/>
+  <circle cx="1280" cy="240" r="120" fill="none" stroke="#f5c518" stroke-opacity=".9" stroke-width="6"/>
+  <circle cx="1280" cy="240" r="42" fill="#ffe066"/>
+  <path d="M80 120 H420" stroke="#f5c518" stroke-width="6" stroke-opacity=".7"/>
+  <text x="80" y="210" fill="#ffe066" font-family="Space Grotesk, Inter, sans-serif" font-size="42" font-weight="700" letter-spacing="10">BATTLEGROUNDS</text>
+  <text x="72" y="430" fill="#fff6c2" font-family="Space Grotesk, Inter, sans-serif" font-size="168" font-weight="800" letter-spacing="-4">PUBG</text>
+  <text x="80" y="520" fill="#f5c518" font-family="Inter, sans-serif" font-size="28" font-weight="700" letter-spacing="8">MOBILE ARENA</text>
+</svg>

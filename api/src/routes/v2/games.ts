@@ -3,7 +3,7 @@ import { Game } from '../../models/Game.js';
 import { Match } from '../../models/Match.js';
 import { MatchParticipant } from '../../models/MatchParticipant.js';
 import { User } from '../../models/User.js';
-import { BalanceHistory } from '../../models/BalanceHistory.js';
+import { joinPaidMatch, leavePaidMatch, MoneyError } from '../../utils/money.js';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
 import { serializeMatch } from '../../utils/serialize.js';
 import { notifyBalanceChange } from '../../utils/balance-notify.js';
@@ -14,6 +14,9 @@ import { bumpProgressForAction } from '../../utils/engagement-service.js';
 import { awardMatchXp } from '../../utils/engagement-level.js';
 import { bumpSeasonPassXp } from '../../utils/engagement-season-pass.js';
 import { touchWelcomeEligibility } from '../../utils/engagement-welcome.js';
+import { recordFingerprint } from '../../utils/fingerprint.js';
+import { MatchReport } from '../../models/MatchReport.js';
+import mongoose from 'mongoose';
 
 const router = Router();
 
@@ -137,6 +140,7 @@ router.get('/matches/:id/result', requireAuth, async (req, res) => {
         placement: entry.placement ?? null,
         kills: Number(entry.kills) || 0,
         points: Number(entry.points) || 0,
+        placePoint: Number(entry.placePoint) || 0,
         winPrize: Number(entry.winPrize) || 0,
         bonus: Number(entry.bonus) || 0,
         refund: Number(entry.refund) || 0,
@@ -156,6 +160,7 @@ router.get('/matches/:id/result', requireAuth, async (req, res) => {
           placement: p.placement ?? null,
           kills: p.kills ?? 0,
           points: p.points ?? 0,
+          placePoint: 0,
           winPrize: 0,
           bonus: 0,
           refund: 0,
@@ -291,88 +296,92 @@ router.post('/matches/:id/join', requireAuth, async (req: AuthedRequest, res) =>
       return res.status(403).json({ status: false, message: 'Premium membership required' });
     }
 
-    const existing = await MatchParticipant.findOne({ matchId: match._id, userId: user._id });
-    if (existing) {
-      return res.status(400).json({ status: false, message: 'Already joined this match' });
-    }
+    const key = String(req.header('Idempotency-Key') || '').trim() || undefined;
+    const result = await joinPaidMatch({ userId: user._id.toString(), matchId: match._id.toString(), idempotencyKey: key });
+    void recordFingerprint(req, user._id.toString());
 
-    const participantCount = await MatchParticipant.countDocuments({ matchId: match._id });
-    if (participantCount >= match.totalPlayer) {
-      return res.status(400).json({ status: false, message: 'Match is full' });
-    }
-
-    const entryFee = match.matchType === 'free' ? 0 : match.entryFee;
-    if (entryFee > (user.balance ?? 0)) {
-      return res.status(400).json({ status: false, message: 'Insufficient balance' });
-    }
-
-    const balanceBefore = user.balance ?? 0;
-    if (entryFee > 0) {
-      user.balance = balanceBefore - entryFee;
-      await user.save();
-
-      await BalanceHistory.create({
-        userId: user._id,
-        username: user.username,
-        email: user.email,
-        avatar: user.avatar || '',
-        amount: entryFee,
-        type: 'withdraw',
-        balanceBefore,
-        balanceAfter: user.balance,
-        detail: { reason: 'match_entry_fee', matchId: match._id.toString(), matchName: match.matchName },
+    if (!result.replayed) {
+      await notifyBalanceChange(user._id.toString(), result.balance, user.balance ?? 0);
+      await notifyMatchJoined({
+        userId: user._id.toString(),
+        matchId: match._id.toString(),
+        matchName: match.matchName,
+        entryFee: match.matchType === 'free' ? 0 : match.entryFee,
       });
-
-      await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
+      bumpProgressForAction(user._id.toString(), 'join_match', 1, {
+        gameId: match.gameId?.toString(),
+      }).catch((error) => {
+        console.error('engagement join_match bump failed:', error);
+      });
+      awardMatchXp(user._id.toString(), { joined: true }).catch((error) => {
+        console.error('engagement join xp failed:', error);
+      });
+      bumpSeasonPassXp(user._id.toString(), { join: true }).catch((error) => {
+        console.error('engagement season join xp failed:', error);
+      });
+      touchWelcomeEligibility(user._id.toString()).catch((error) => {
+        console.error('engagement welcome touch failed:', error);
+      });
     }
-
-    const participant = await MatchParticipant.create({
-      matchId: match._id,
-      userId: user._id,
-      username: user.username,
-      email: user.email,
-      avatar: user.avatar || '',
-      pubgId: user.pubgId,
-      entryFee,
-      joinedAt: new Date(),
-    });
-
-    await notifyMatchJoined({
-      userId: user._id.toString(),
-      matchId: match._id.toString(),
-      matchName: match.matchName,
-      entryFee,
-    });
-
-    bumpProgressForAction(user._id.toString(), 'join_match', 1, {
-      gameId: match.gameId?.toString(),
-    }).catch((error) => {
-      console.error('engagement join_match bump failed:', error);
-    });
-
-    awardMatchXp(user._id.toString(), { joined: true }).catch((error) => {
-      console.error('engagement join xp failed:', error);
-    });
-    bumpSeasonPassXp(user._id.toString(), { join: true }).catch((error) => {
-      console.error('engagement season join xp failed:', error);
-    });
-
-    touchWelcomeEligibility(user._id.toString()).catch((error) => {
-      console.error('engagement welcome touch failed:', error);
-    });
 
     return res.json({
       status: true,
       message: 'Joined match successfully',
       data: {
-        participantId: participant._id.toString(),
-        balance: user.balance,
+        participantId: result.participantId,
+        balance: result.balance,
         isJoined: true,
       },
     });
   } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
+    if ((error as { code?: number }).code === 11000) {
+      return res.status(409).json({ status: false, message: 'Already joined this match' });
+    }
     console.error('v2 join match error:', error);
     return res.status(500).json({ status: false, message: 'Failed to join match' });
+  }
+});
+
+router.post('/matches/:id/leave', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const key = String(req.header('Idempotency-Key') || '').trim() || undefined;
+    const result = await leavePaidMatch({
+      userId: String(req.userId),
+      matchId: String(req.params.id),
+      idempotencyKey: key,
+    });
+    await notifyBalanceChange(String(req.userId), result.balance, result.balance - result.refunded);
+    return res.json({ status: true, data: { refunded: result.refunded, balance: result.balance } });
+  } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
+    console.error('v2 leave match error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to leave match' });
+  }
+});
+
+router.patch('/matches/:id/ready', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const match = await Match.findById(req.params.id);
+    if (!match) return res.status(404).json({ status: false, message: 'Match not found' });
+    if (match.status !== 'active') {
+      return res.status(403).json({ status: false, message: 'Ready is lobby-only' });
+    }
+    const part = await MatchParticipant.findOne({ matchId: match._id, userId: req.userId });
+    if (!part) return res.status(403).json({ status: false, message: 'Join the match first' });
+    part.ready = Boolean(req.body?.ready);
+    await part.save();
+    return res.json({
+      status: true,
+      data: { ready: part.ready, userId: String(req.userId), matchId: match._id.toString() },
+    });
+  } catch (error) {
+    console.error('v2 ready error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to update ready' });
   }
 });
 
@@ -425,6 +434,7 @@ router.get('/matches/:id', requireAuth, async (req: AuthedRequest, res) => {
         password: showRoom ? match.password : undefined,
         participants: participants.map((p) => ({
           id: p._id.toString(),
+          userId: p.userId.toString(),
           username: p.username,
           pubgId: p.pubgId,
           avatar: p.avatar || '',
@@ -435,6 +445,40 @@ router.get('/matches/:id', requireAuth, async (req: AuthedRequest, res) => {
   } catch (error) {
     console.error('v2 match detail error:', error);
     return res.status(500).json({ status: false, message: 'Failed to fetch match detail' });
+  }
+});
+
+router.post('/matches/:id/report', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ status: false, message: 'Invalid match' });
+    }
+    const targetUserId = String(req.body?.targetUserId || '').trim();
+    if (!mongoose.isValidObjectId(targetUserId)) {
+      return res.status(400).json({ status: false, message: 'targetUserId required' });
+    }
+    if (targetUserId === req.userId) {
+      return res.status(400).json({ status: false, message: 'Cannot report yourself' });
+    }
+    const match = await Match.findById(req.params.id).select('_id');
+    if (!match) return res.status(404).json({ status: false, message: 'Match not found' });
+    const reason = String(req.body?.reason || 'collusion').trim().slice(0, 80);
+    const detail = String(req.body?.detail || '').trim().slice(0, 1000);
+    const row = await MatchReport.findOneAndUpdate(
+      { matchId: match._id, reporterId: req.userId, targetUserId },
+      { $setOnInsert: { matchId: match._id, reporterId: req.userId, targetUserId, reason, detail, status: 'open' } },
+      { upsert: true, new: true },
+    );
+    return res.json({
+      status: true,
+      data: { id: row._id.toString(), status: row.status },
+    });
+  } catch (error) {
+    if ((error as { code?: number }).code === 11000) {
+      return res.status(409).json({ status: false, message: 'Already reported' });
+    }
+    console.error('match report error:', error);
+    return res.status(500).json({ status: false, message: 'Could not submit report' });
   }
 });
 

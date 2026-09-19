@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" translate="no">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#163044"/>
+      <stop offset=".55" stop-color="#0b121c"/>
+      <stop offset="1" stop-color="#06080c"/>
+    </linearGradient>
+    <radialGradient id="r" cx="82%" cy="68%" r="52%">
+      <stop offset="0" stop-color="#7af0ff"/>
+      <stop offset=".4" stop-color="#21d4fd" stop-opacity=".75"/>
+      <stop offset="1" stop-color="#21d4fd" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#g)"/>
+  <rect width="1600" height="1000" fill="url(#r)"/>
+  <rect x="1120" y="140" width="340" height="340" fill="none" stroke="#7af0ff" stroke-opacity=".85" stroke-width="8"/>
+  <rect x="1180" y="200" width="220" height="220" fill="#21d4fd" fill-opacity=".16"/>
+  <path d="M80 120 H300" stroke="#7af0ff" stroke-width="6"/>
+  <text x="80" y="210" fill="#7af0ff" font-family="Space Grotesk, Inter, sans-serif" font-size="42" font-weight="700" letter-spacing="10">TACTICAL FPS</text>
+  <text x="72" y="400" fill="#e8fbff" font-family="Space Grotesk, Inter, sans-serif" font-size="148" font-weight="800" letter-spacing="-3">COD</text>
+  <text x="80" y="490" fill="#67e8f9" font-family="Inter, sans-serif" font-size="28" font-weight="700" letter-spacing="8">MOBILE ARENA</text>
+</svg>

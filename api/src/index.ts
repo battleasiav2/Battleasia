@@ -3,7 +3,10 @@ import { connectDb } from './db/connect.js';
 import { createApp, createSocketServer } from './app.js';
 import { User } from './models/User.js';
 import { setSocketServer } from './utils/socket.js';
+import { bootApiSentry, captureApiException } from './utils/sentry.js';
 import bcrypt from 'bcryptjs';
+
+bootApiSentry();
 
 async function ensureAdminUser() {
   const email = env.adminEmail.toLowerCase();
@@ -65,5 +68,6 @@ async function main() {
 
 main().catch((error) => {
   console.error('Failed to start API:', error);
+  captureApiException(error, { kind: 'startup' });
   process.exit(1);
 });

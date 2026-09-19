@@ -1,0 +1,68 @@
+@import './styles/tokens.css';
+@import './styles/landing.css';
+@import './styles/auth.css';
+@import './styles/play.css';
+@import './styles/phone.css';
+@import './styles/phone-hub.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+  min-height: 100svh;
+}
+
+body {
+  font-family: var(--ba-font-body);
+  background: var(--ba-page);
+  color: var(--ba-text);
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: '';
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='80' height='80' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+}
+
+button,
+a {
+  font-family: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.hero-poster,
+.hero-media img {
+  max-width: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--ba-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

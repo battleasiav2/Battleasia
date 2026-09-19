@@ -6,6 +6,7 @@ export interface IReel extends Document {
   avatar: string;
   videoUrl: string;
   caption: string;
+  parentReelId?: string;
   musicTitle: string;
   totalViews: number;
   totalLikes: number;
@@ -23,6 +24,7 @@ const reelSchema = new Schema<IReel>(
     videoUrl: { type: String, required: true },
     caption: { type: String, default: '' },
     musicTitle: { type: String, default: '' },
+    parentReelId: { type: String, default: '' },
     totalViews: { type: Number, default: 0 },
     totalLikes: { type: Number, default: 0 },
     totalComments: { type: Number, default: 0 },

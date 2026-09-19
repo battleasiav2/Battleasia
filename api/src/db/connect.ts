@@ -71,7 +71,14 @@ export async function connectDb() {
       const dumpPath = dumpCandidates.find((p) => existsSync(p));
       if (dumpPath) {
         console.log(`[DB] Database is empty. Restoring dump from ${dumpPath}...`);
-        await restoreDump(dumpPath);
+        try {
+          await restoreDump(dumpPath);
+        } catch (restoreError) {
+          console.warn(
+            '[DB] Dump restore skipped:',
+            restoreError instanceof Error ? restoreError.message : restoreError
+          );
+        }
       } else {
         console.log('[DB] Database is empty and no local mongodump was found; continuing with empty DB.');
       }

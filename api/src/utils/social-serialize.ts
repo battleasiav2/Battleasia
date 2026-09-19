@@ -6,6 +6,7 @@ import { Story } from '../models/Story.js';
 import { UserBlock } from '../models/UserBlock.js';
 import { MatchParticipant } from '../models/MatchParticipant.js';
 import { Match } from '../models/Match.js';
+import { isUserPremium } from './serialize.js';
 
 export async function getFollowCounts(userId: string) {
   const [followers, following] = await Promise.all([
@@ -134,6 +135,11 @@ export async function serializePublicUser(
     isFollowing: following,
     isBlocked: blockedByViewer,
     isOwnProfile: viewerId === userId,
+    isVerified: isUserPremium(user) || Boolean(user.emailVerified),
+    isPremium: isUserPremium(user),
+    lastSeenAt: user.lastSeenAt || null,
+    isOnline: Boolean(user.lastSeenAt && Date.now() - user.lastSeenAt.getTime() < 2 * 60 * 1000),
+    cosmeticId: user.cosmeticId || '',
     privacy: user.privacy || { profile: 'public' },
     gamingStats,
     socialStats,

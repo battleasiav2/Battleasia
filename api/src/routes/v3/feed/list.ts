@@ -11,6 +11,7 @@ import {
 } from '../../../utils/pagination.js';
 import { serializeFeed } from '../../../utils/feed-serialize.js';
 import { safeQueryStatus, FEED_STATUSES } from '../../../utils/query-filter.js';
+import { writeAudit } from '../../../models/AuditLog.js';
 
 const router = Router();
 
@@ -47,6 +48,34 @@ router.get('/', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('feed list error:', error);
     return res.status(500).json({ status: false, message: 'Failed to fetch feeds' });
+  }
+});
+
+router.patch('/bulk', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const ids = Array.isArray(req.body?.ids) ? req.body.ids.map((id: unknown) => String(id)).filter(Boolean) : [];
+    const next = String(req.body?.status || 'draft');
+    const reason = String(req.body?.reason || '').trim();
+    if (!ids.length) {
+      return res.status(400).json({ status: false, message: 'Select at least one post' });
+    }
+    if (!FEED_STATUSES.includes(next as (typeof FEED_STATUSES)[number])) {
+      return res.status(400).json({ status: false, message: 'Status must be published or draft' });
+    }
+    if (next === 'draft' && !reason) {
+      return res.status(400).json({ status: false, message: 'Reason required to hide posts' });
+    }
+    const result = await Feed.updateMany({ _id: { $in: ids } }, { $set: { status: next } });
+    await writeAudit({
+      actorId: req.userId,
+      action: 'feed.bulk-status',
+      target: ids.join(','),
+      detail: `${next} ${result.modifiedCount} · ${reason}`,
+    });
+    return res.json({ status: true, message: `Updated ${result.modifiedCount} posts`, data: { count: result.modifiedCount } });
+  } catch (error) {
+    console.error('feed bulk error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to update feeds' });
   }
 });
 

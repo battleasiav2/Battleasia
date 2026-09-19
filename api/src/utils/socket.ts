@@ -61,19 +61,31 @@ export function emitUserStatsUpdated(userId: string, balance: number) {
 }
 
 export function emitMatchCreated(match: Record<string, unknown>) {
-  const gameId = match.gameId as string | undefined;
+  const safe = {
+    ...match,
+    roomId: undefined,
+    password: undefined,
+    matchPrivateDescription: undefined,
+  };
+  const gameId = safe.gameId as string | undefined;
   if (gameId) {
-    ioInstance?.to(`game:${gameId}`).emit('match-created', match);
+    ioInstance?.to(`game:${gameId}`).emit('match-created', safe);
   }
-  ioInstance?.emit('match-created', match);
+  ioInstance?.emit('match-created', safe);
 }
 
 export function emitMatchUpdated(match: Record<string, unknown>) {
-  const gameId = match.gameId as string | undefined;
+  const safe = {
+    ...match,
+    roomId: undefined,
+    password: undefined,
+    matchPrivateDescription: undefined,
+  };
+  const gameId = safe.gameId as string | undefined;
   if (gameId) {
-    ioInstance?.to(`game:${gameId}`).emit('match-updated', match);
+    ioInstance?.to(`game:${gameId}`).emit('match-updated', safe);
   }
-  ioInstance?.emit('match-updated', match);
+  ioInstance?.emit('match-updated', safe);
 }
 
 export async function emitDashboardStatsUpdated() {

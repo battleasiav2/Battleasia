@@ -72,5 +72,11 @@ export async function createActivityNotification(params: {
   };
 
   emitUserNotification(params.recipientId, payload);
+  void import('./fcm.js').then(({ sendFcmToUser }) =>
+    sendFcmToUser(params.recipientId, notification.title, notification.message, {
+      type: params.type,
+      entityId: params.entityId || '',
+    })
+  );
   return notification;
 }

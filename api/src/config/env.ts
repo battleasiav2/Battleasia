@@ -9,8 +9,13 @@ function parseCorsOrigins(): string[] {
   const defaults = [
     'http://localhost:8081',
     'http://localhost:8082',
+    'http://localhost:8083',
+    'http://localhost:8088',
     'http://localhost:3000',
     'http://localhost:3001',
+    'http://127.0.0.1:8083',
+    'http://127.0.0.1:8088',
+    'http://127.0.0.1:3000',
     'http://battleasia.local:8080',
     'http://shop.battleasia.local:8080',
     'http://admin.battleasia.local:8080',

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /user
+Disallow: /auth
+Disallow: /shop

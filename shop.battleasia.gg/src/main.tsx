@@ -1,47 +1,32 @@
 import { StrictMode } from 'react';
-import { Provider } from 'react-redux';
 import { createRoot } from 'react-dom/client';
-import { HelmetProvider } from 'react-helmet-async';
-import { PersistGate } from 'redux-persist/integration/react';
-import { Outlet, RouterProvider, createBrowserRouter } from 'react-router';
+import './index.css';
+import App from './App.tsx';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { I18nProvider } from './lib/i18n';
+import { captureReferral } from './lib/ref';
+import { bootSentry } from './lib/sentry';
+import { bootTheme } from './lib/theme';
+import { consumePlayerHandoff } from './lib/handoff';
 
-import App from './app';
-import { store, persister } from './store';
-import { routesSection } from './routes/sections';
-import { ErrorBoundary } from './routes/components';
-import { SoftRemountBoundary } from './components/soft-remount-boundary';
+bootTheme();
+consumePlayerHandoff();
+captureReferral();
+bootSentry();
+try {
+  const lang = localStorage.getItem('ba-lang');
+  if (lang) document.documentElement.lang = lang;
+} catch {
+  /* ignore */
+}
+document.getElementById('boot-shell')?.remove();
 
-// ----------------------------------------------------------------------
-
-const shopBasename = (import.meta.env.VITE_BASE_PATH || '/').replace(/\/$/, '');
-
-const router = createBrowserRouter(
-  [
-    {
-      Component: () => (
-        <SoftRemountBoundary>
-          <App>
-            <Outlet />
-          </App>
-        </SoftRemountBoundary>
-      ),
-      errorElement: <ErrorBoundary />,
-      children: routesSection,
-    },
-  ],
-  shopBasename ? { basename: shopBasename } : undefined
-);
-
-const root = createRoot(document.getElementById('root')!);
-
-root.render(
+createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persister}>
-        <HelmetProvider>
-          <RouterProvider router={router} />
-        </HelmetProvider>
-      </PersistGate>
-    </Provider>
+    <ErrorBoundary>
+      <I18nProvider>
+        <App />
+      </I18nProvider>
+    </ErrorBoundary>
   </StrictMode>
 );

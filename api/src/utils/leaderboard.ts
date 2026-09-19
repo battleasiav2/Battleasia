@@ -115,7 +115,8 @@ export async function getLeaderboardEntries(period: Period = 'all', limit = 50) 
       id: row.userId.toString(),
       rank,
       username: user?.username || row.username || 'Player',
-      avatar: user?.avatar || row.avatar || null,
+      // Profile photo is source of truth — uploaded avatars on User win over match snapshots
+      avatar: (user?.avatar && String(user.avatar).trim()) || row.avatar || null,
       totalScore,
       gamesPlayed: row.totalMatches,
       averageScore: Math.round((totalScore / gamesPlayed) * 10) / 10,

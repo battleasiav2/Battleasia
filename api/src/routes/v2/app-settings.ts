@@ -13,6 +13,9 @@ import {
   type MailSettings,
 } from '../../models/AppSettings.js';
 import { sendTestMail } from '../../utils/mail.js';
+import { normalizeP1Flags } from '../../utils/p1-flags.js';
+import { normalizeP2Flags } from '../../utils/p2-flags.js';
+import { normalizeVelocitySettings } from '../../utils/velocity.js';
 import { appDownloadDir, appDownloadFileName, appDownloadPath } from '../../utils/uploads-path.js';
 
 const router = Router();
@@ -241,4 +244,75 @@ router.post('/app-download/upload', requireAuth, requireAdmin, handleApkUpload, 
   }
 });
 
+router.get('/p1', requireAuth, async (_req, res) => {
+  try {
+    const settings = await getAppSettings();
+    return res.json({ status: true, data: normalizeP1Flags(settings.p1) });
+  } catch (error) {
+    console.error('p1 flags get error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to load flags' });
+  }
+});
+
+router.put('/p1', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const settings = await getAppSettings();
+    settings.p1 = normalizeP1Flags({ ...normalizeP1Flags(settings.p1), ...(req.body || {}) });
+    await settings.save();
+    return res.json({ status: true, data: settings.p1 });
+  } catch (error) {
+    console.error('p1 flags put error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to save flags' });
+  }
+});
+
+router.get('/p2', requireAuth, async (_req, res) => {
+  try {
+    const settings = await getAppSettings();
+    return res.json({ status: true, data: normalizeP2Flags(settings.p2) });
+  } catch (error) {
+    console.error('p2 flags get error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to load flags' });
+  }
+});
+
+router.put('/p2', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const settings = await getAppSettings();
+    settings.p2 = normalizeP2Flags({ ...normalizeP2Flags(settings.p2), ...(req.body || {}) });
+    await settings.save();
+    return res.json({ status: true, data: settings.p2 });
+  } catch (error) {
+    console.error('p2 flags put error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to save flags' });
+  }
+});
+
+router.get('/velocity', requireAuth, requireAdmin, async (_req, res) => {
+  try {
+    const settings = await getAppSettings();
+    return res.json({ status: true, data: normalizeVelocitySettings(settings.velocitySettings) });
+  } catch (error) {
+    console.error('velocity get error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to load velocity' });
+  }
+});
+
+router.put('/velocity', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const settings = await getAppSettings();
+    settings.velocitySettings = normalizeVelocitySettings({
+      ...normalizeVelocitySettings(settings.velocitySettings),
+      ...(req.body || {}),
+    });
+    await settings.save();
+    return res.json({ status: true, data: settings.velocitySettings });
+  } catch (error) {
+    console.error('velocity put error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to save velocity' });
+  }
+});
+
 export default router;
+
+

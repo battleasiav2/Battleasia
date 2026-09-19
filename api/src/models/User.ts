@@ -38,11 +38,19 @@ export interface IUser extends Document {
   facebookLink?: string;
   instagramLink?: string;
   privacy?: IUserPrivacy;
-    emailVerified: boolean;
-    isPremium?: boolean;
-    premiumSince?: Date;
-    premiumExpiresAt?: Date;
-    createdAt: Date;
+  emailVerified: boolean;
+  kycStatus?: string;
+  dateOfBirth?: Date;
+  fcm?: { web?: string; android?: string };
+  fcmUpdatedAt?: Date;
+  lastSeenAt?: Date;
+  muteWords?: string[];
+  cosmeticId?: string;
+  tokenVersion?: number;
+  isPremium?: boolean;
+  premiumSince?: Date;
+  premiumExpiresAt?: Date;
+  createdAt: Date;
   updatedAt: Date;
 }
 
@@ -99,6 +107,17 @@ const userSchema = new Schema<IUser>(
     referralCode: { type: String, default: '' },
     referredBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
     emailVerified: { type: Boolean, default: false },
+    kycStatus: { type: String, default: 'none' },
+    dateOfBirth: { type: Date },
+    fcm: {
+      web: { type: String, default: '' },
+      android: { type: String, default: '' },
+    },
+    fcmUpdatedAt: { type: Date },
+    lastSeenAt: { type: Date },
+    muteWords: { type: [String], default: [] },
+    cosmeticId: { type: String, default: '' },
+    tokenVersion: { type: Number, default: 0 },
     isPremium: { type: Boolean, default: false },
     premiumSince: { type: Date },
     premiumExpiresAt: { type: Date },

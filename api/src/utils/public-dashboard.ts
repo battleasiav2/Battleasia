@@ -108,7 +108,8 @@ async function aggregatePlayerStats(sortField: 'totalWinnings' | 'totalKills', l
         {
           ...row,
           username: user?.username || row.username,
-          avatar: user?.avatar || row.avatar,
+          // Profile photo is source of truth — uploaded avatars on User win over match snapshots
+          avatar: (user?.avatar && String(user.avatar).trim()) || row.avatar || '',
         },
         sortField === 'totalKills'
           ? { averageScore: Math.round((row.totalKills / Math.max(row.totalMatches, 1)) * 10) / 10 }

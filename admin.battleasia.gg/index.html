@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en" translate="no" class="notranslate" data-theme="dark" data-accent="violet">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/webp" href="/logo/logo.webp?v=8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0E0F14" />
+    <meta name="google" content="notranslate" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>BattleAsia Admin</title>
+    <script>
+      (function () {
+        try {
+          var id = localStorage.getItem('ba-accent') || 'violet';
+          document.documentElement.dataset.accent = id;
+          var theme = localStorage.getItem('ba-theme') || 'dark';
+          document.documentElement.dataset.theme = theme;
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="boot-shell" style="position:fixed;inset:0;background:#0E0F14;display:grid;place-items:center;z-index:99">
+      <img src="/logo/logo.webp?v=8" width="56" height="56" alt="BattleAsia" />
+    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

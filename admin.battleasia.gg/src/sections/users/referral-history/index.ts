@@ -1,1 +1,0 @@
-export { UserReferralHistoryView } from './view';

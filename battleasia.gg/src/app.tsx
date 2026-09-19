@@ -1,85 +1,120 @@
-import 'src/global.css';
-import '@fontsource/barlow/latin-600.css';
-import '@fontsource/barlow/latin-700.css';
-import '@fontsource/barlow/latin-800.css';
-import '@fontsource/barlow/latin-900.css';
-import '@fontsource/syne/700.css';
-import '@fontsource/syne/800.css';
+import { lazy, Suspense, useEffect } from 'react'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { RouteProgress } from './components/RouteProgress'
+import { Seo } from './components/Seo'
+import { OfflineBanner } from './components/OfflineBanner'
+import { useI18n } from './lib/i18n'
+import { getBacShopWalletUrl } from './lib/wallet'
 
-import { useEffect } from 'react';
-
-import { usePathname } from 'src/routes/hooks';
-
-import { ApiProvider } from 'src/contexts/ApiContext';
-import { themeConfig, ThemeProvider } from 'src/theme';
-import { I18nProvider, LocalizationProvider } from 'src/locales';
-
-import { DeferredSettingsDrawer } from 'src/components/settings/deferred-settings-drawer';
-import { DeferredSupportChat } from 'src/components/deferred-support-chat';
-import { defaultSettings, SettingsProvider } from 'src/components/settings';
-
-import { AuthConsumer } from './utils/authcheck';
-import { LiveSyncProvider } from 'src/providers/live-sync-provider';
-import { Toaster } from 'react-hot-toast';
-import { LostLightLoader } from 'src/components/loading-screen';
-import { ProgressBar } from 'src/components/progress-bar';
-import { TacticalCursor } from 'src/components/gaming-cursor';
-
-// ----------------------------------------------------------------------
-
-type AppProps = {
-  children: React.ReactNode;
-};
-
-export default function App({ children }: AppProps) {
-  useScrollToTop();
-
+function ShopWalletRedirect() {
+  const { t } = useI18n()
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const ref = urlParams.get('ref');
-    if (ref) {
-      localStorage.setItem('battleasia_ref', ref);
-    }
-  }, []);
-
+    window.location.replace(getBacShopWalletUrl())
+  }, [])
   return (
-    <I18nProvider>
-      <ApiProvider>
-        <LocalizationProvider>
-          <SettingsProvider defaultSettings={defaultSettings}>
-            <ThemeProvider
-              noSsr
-              defaultMode={themeConfig.defaultMode}
-              modeStorageKey={themeConfig.modeStorageKey}
-            >
-              <TacticalCursor />
-              <ProgressBar />
-              <LostLightLoader />
-              <DeferredSettingsDrawer defaultSettings={defaultSettings} />
-              <AuthConsumer>
-                <LiveSyncProvider>{children}</LiveSyncProvider>
-              </AuthConsumer>
-              <DeferredSupportChat />
-              <Toaster
-                position="top-center"
-                toastOptions={{
-                  duration: 3000,
-                }}
-              />
-            </ThemeProvider>
-          </SettingsProvider>
-        </LocalizationProvider>
-      </ApiProvider>
-    </I18nProvider>
-  );
+    <main className="play-main">
+      <p className="play-lead">{t('wallet.redirecting')}</p>
+    </main>
+  )
 }
 
-function useScrollToTop() {
-  const pathname = usePathname();
+const Spotlight = lazy(() => import('./components/Spotlight').then((m) => ({ default: m.Spotlight })))
+const RequireAuth = lazy(() => import('./components/user/RequireAuth').then((m) => ({ default: m.RequireAuth })))
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
+import { Landing } from './pages/Landing'
+const LegalPage = lazy(() => import('./pages/Legal').then((m) => ({ default: m.LegalPage })))
+const UserShell = lazy(() => import('./components/user/UserShell').then((m) => ({ default: m.UserShell })))
 
-  return null;
+const SignInPage = lazy(() => import('./pages/auth/SignIn').then((m) => ({ default: m.SignInPage })))
+const SignUpPage = lazy(() => import('./pages/auth/SignUp').then((m) => ({ default: m.SignUpPage })))
+const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPassword').then((m) => ({ default: m.ForgotPasswordPage })))
+const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPassword').then((m) => ({ default: m.ResetPasswordPage })))
+const EmailVerificationPage = lazy(() => import('./pages/auth/EmailVerification').then((m) => ({ default: m.EmailVerificationPage })))
+const PlayPage = lazy(() => import('./pages/user/Play').then((m) => ({ default: m.PlayPage })))
+const MatchListPage = lazy(() => import('./pages/user/MatchList').then((m) => ({ default: m.MatchListPage })))
+const MatchDetailPage = lazy(() => import('./pages/user/MatchDetail').then((m) => ({ default: m.MatchDetailPage })))
+const MatchResultPage = lazy(() => import('./pages/user/MatchResult').then((m) => ({ default: m.MatchResultPage })))
+const WalletPage = lazy(() => import('./pages/user/Wallet').then((m) => ({ default: m.WalletPage })))
+const ShopPage = lazy(() => import('./pages/user/Shop').then((m) => ({ default: m.ShopPage })))
+const TransferPage = lazy(() => import('./pages/user/Transfer').then((m) => ({ default: m.TransferPage })))
+const ReferralPage = lazy(() => import('./pages/user/Referral').then((m) => ({ default: m.ReferralPage })))
+const HashtagPage = lazy(() => import('./pages/user/Hashtag').then((m) => ({ default: m.HashtagPage })))
+const FeedPage = lazy(() => import('./pages/user/Feed').then((m) => ({ default: m.FeedPage })))
+const FeedSwitch = lazy(() => import('./pages/user/Feed').then((m) => ({ default: m.FeedSwitch })))
+const ProfilePage = lazy(() => import('./pages/user/Profile').then((m) => ({ default: m.ProfilePage })))
+const FollowListPage = lazy(() => import('./pages/user/FollowList').then((m) => ({ default: m.FollowListPage })))
+const AccountLayout = lazy(() => import('./components/user/AccountLayout').then((m) => ({ default: m.AccountLayout })))
+const MyMatchesPage = lazy(() => import('./pages/user/MyMatches').then((m) => ({ default: m.MyMatchesPage })))
+const MyOrdersPage = lazy(() => import('./pages/user/MyOrders').then((m) => ({ default: m.MyOrdersPage })))
+const StatsPage = lazy(() => import('./pages/user/Stats').then((m) => ({ default: m.StatsPage })))
+const NotificationsPage = lazy(() => import('./pages/user/Notifications').then((m) => ({ default: m.NotificationsPage })))
+const LeaderboardPage = lazy(() => import('./pages/user/Leaderboard').then((m) => ({ default: m.LeaderboardPage })))
+const CustomerSupportPage = lazy(() => import('./pages/user/CustomerSupport').then((m) => ({ default: m.CustomerSupportPage })))
+const EarnPage = lazy(() => import('./pages/user/Earn').then((m) => ({ default: m.EarnPage })))
+const LabsPage = lazy(() => import('./pages/user/Labs').then((m) => ({ default: m.LabsPage })))
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Seo />
+      <OfflineBanner />
+      <Suspense fallback={null}>
+        <Spotlight />
+      </Suspense>
+      <RouteProgress />
+      <Suspense fallback={<div className="landing" style={{ minHeight: '100svh', background: 'var(--ba-page)' }} />}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Landing />} />
+          <Route path="/support" element={<Landing openChat />} />
+          <Route path="/privacy-policy" element={<LegalPage kind="privacy" />} />
+          <Route path="/terms-and-conditions" element={<LegalPage kind="terms" />} />
+          <Route path="/auth/sign-in" element={<SignInPage />} />
+          <Route path="/auth/sign-up" element={<SignUpPage />} />
+          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/auth/email-verification" element={<EmailVerificationPage />} />
+          <Route
+            element={
+              <RequireAuth>
+                <UserShell />
+              </RequireAuth>
+            }
+          >
+            <Route path="/user/play" element={<PlayPage />} />
+            <Route path="/user/play/:matchId/detail" element={<MatchDetailPage />} />
+            <Route path="/user/play/:matchId/result" element={<MatchResultPage />} />
+            <Route path="/user/play/:gameId" element={<MatchListPage />} />
+            <Route path="/user/wallet" element={<WalletPage />} />
+            <Route path="/user/shop/wallet" element={<ShopWalletRedirect />} />
+            <Route path="/user/account/wallet" element={<Navigate to="/user/wallet" replace />} />
+            <Route path="/user/earn" element={<EarnPage />} />
+            <Route path="/user/labs" element={<LabsPage />} />
+            <Route path="/user/labs/:feature" element={<LabsPage />} />
+            <Route path="/user/shop" element={<ShopPage />} />
+            <Route path="/user/transfer" element={<TransferPage />} />
+            <Route path="/user/referral" element={<ReferralPage />} />
+            <Route path="/user/feed" element={<FeedPage />} />
+            <Route path="/user/hashtag/:tag" element={<HashtagPage />} />
+            <Route path="/user/feed/:tab" element={<FeedSwitch />} />
+            <Route path="/profile/:userId/followers" element={<FollowListPage kind="followers" />} />
+            <Route path="/profile/:userId/following" element={<FollowListPage kind="following" />} />
+            <Route path="/profile/:userId" element={<ProfilePage />} />
+            <Route path="/user/account" element={<AccountLayout />}>
+              <Route index element={<Navigate to="/user/account/profile" replace />} />
+              <Route path="profile" element={<ProfilePage own />} />
+              <Route path="my-matches" element={<MyMatchesPage />} />
+              <Route path="my-orders" element={<MyOrdersPage />} />
+              <Route path="my-statistics" element={<StatsPage />} />
+              <Route path="my-referrals" element={<ReferralPage />} />
+              <Route path="notifications" element={<NotificationsPage />} />
+              <Route path="leader-board" element={<LeaderboardPage />} />
+              <Route path="customer-support" element={<CustomerSupportPage />} />
+            </Route>
+          </Route>
+          <Route path="*" element={<LegalPage kind="notFound" />} />
+        </Routes>
+      </Suspense>
+    </BrowserRouter>
+  )
 }

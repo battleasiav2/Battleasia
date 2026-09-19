@@ -33,6 +33,11 @@ export function serializeUser(user: IUser, roleDoc?: IRole | null) {
     facebookLink: user.facebookLink || '',
     instagramLink: user.instagramLink || '',
     emailVerified: user.emailVerified,
+    kycStatus: user.kycStatus || 'none',
+    isVerified: isPremiumActive || Boolean(user.emailVerified),
+    dateOfBirth: user.dateOfBirth || null,
+    muteWords: user.muteWords || [],
+    cosmeticId: user.cosmeticId || '',
     isPremium: isPremiumActive,
     premiumSince: user.premiumSince || null,
     premiumExpiresAt: user.premiumExpiresAt || null,
@@ -117,6 +122,20 @@ export function serializeMatch(match: IMatch, gameName?: string) {
     results: match.results || [],
     createdAt: match.createdAt,
     updatedAt: match.updatedAt,
+  };
+}
+
+/** Public socket / list payload — never include room secrets. */
+export function serializeMatchPublic(match: IMatch | Record<string, unknown>, gameName?: string) {
+  const base =
+    typeof (match as IMatch).toObject === 'function' || (match as IMatch).gameId
+      ? serializeMatch(match as IMatch, gameName)
+      : ({ ...(match as Record<string, unknown>) } as ReturnType<typeof serializeMatch>);
+  return {
+    ...base,
+    roomId: undefined,
+    password: undefined,
+    matchPrivateDescription: undefined,
   };
 }
 

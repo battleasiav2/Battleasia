@@ -1,4 +1,7 @@
 import mongoose, { Schema, type Document } from 'mongoose';
+import { DEFAULT_P1_FLAGS, normalizeP1Flags, type P1Flags } from '../utils/p1-flags.js';
+import { DEFAULT_P2_FLAGS, normalizeP2Flags, type P2Flags } from '../utils/p2-flags.js';
+import { sanitizePublicUrl } from '../utils/safe-url.js';
 
 export type LiveChatSocialLink = {
   label: string;
@@ -643,6 +646,17 @@ export interface IAppSettings extends Document {
   mail: MailSettings;
   appDownload: AppDownloadSettings;
   engagement: EngagementSettings;
+  p1: P1Flags;
+  p2: P2Flags;
+  reserveBac: number;
+  highValueWithdrawBac: number;
+  velocitySettings?: {
+    enabled: boolean;
+    windowMinutes: number;
+    maxWithdrawals: number;
+    maxTransfers: number;
+    maxJoins: number;
+  };
 }
 
 const appSettingsSchema = new Schema<IAppSettings>(
@@ -675,6 +689,17 @@ const appSettingsSchema = new Schema<IAppSettings>(
       type: Schema.Types.Mixed,
       default: () => ({ ...DEFAULT_APP_DOWNLOAD_SETTINGS }),
     },
+    p1: {
+      type: Schema.Types.Mixed,
+      default: () => ({ ...DEFAULT_P1_FLAGS }),
+    },
+    p2: {
+      type: Schema.Types.Mixed,
+      default: () => ({ ...DEFAULT_P2_FLAGS }),
+    },
+    reserveBac: { type: Number, default: 0 },
+    highValueWithdrawBac: { type: Number, default: 1000 },
+    velocitySettings: { type: Schema.Types.Mixed, default: () => ({ enabled: false, windowMinutes: 15, maxWithdrawals: 5, maxTransfers: 8, maxJoins: 30 }) },
     engagement: {
       type: Schema.Types.Mixed,
       default: () => ({ ...DEFAULT_ENGAGEMENT_SETTINGS }),
@@ -702,16 +727,26 @@ export function normalizeLiveChatSettings(raw?: Partial<LiveChatSettings> | null
           label: String(item.label || 'Link').slice(0, 40),
           icon: String(item.icon || 'solar:link-bold').slice(0, 80),
           color: String(item.color || '#f5c518').slice(0, 20),
-          href: String(item.href).trim().slice(0, 500),
+          href: sanitizePublicUrl(item.href, 500),
         }))
+        .filter((item) => item.href)
     : DEFAULT_LIVE_CHAT_SETTINGS.socialLinks;
 
   return {
     enabled: raw?.enabled !== false,
     agentName: String(raw?.agentName || DEFAULT_LIVE_CHAT_SETTINGS.agentName).slice(0, 80),
     agentTitle: String(raw?.agentTitle || DEFAULT_LIVE_CHAT_SETTINGS.agentTitle).slice(0, 80),
-    agentAvatar: String(raw?.agentAvatar || '').slice(0, 500),
-    logoUrl: String(raw?.logoUrl || DEFAULT_LIVE_CHAT_SETTINGS.logoUrl).slice(0, 500),
+    agentAvatar: (() => {
+      const rawAv = String(raw?.agentAvatar || '').trim().slice(0, 500);
+      if (!rawAv) return '';
+      if (rawAv.startsWith('/')) return rawAv;
+      return sanitizePublicUrl(rawAv, 500);
+    })(),
+    logoUrl: (() => {
+      const rawLogo = String(raw?.logoUrl || DEFAULT_LIVE_CHAT_SETTINGS.logoUrl).trim().slice(0, 500);
+      if (rawLogo.startsWith('/')) return rawLogo;
+      return sanitizePublicUrl(rawLogo, 500) || DEFAULT_LIVE_CHAT_SETTINGS.logoUrl;
+    })(),
     welcomeMessage: String(raw?.welcomeMessage || DEFAULT_LIVE_CHAT_SETTINGS.welcomeMessage).slice(0, 500),
     socialLinks: socialLinks.length ? socialLinks : DEFAULT_LIVE_CHAT_SETTINGS.socialLinks,
   };
@@ -1169,6 +1204,10 @@ export async function getAppSettings() {
       mail: { ...DEFAULT_MAIL_SETTINGS },
       appDownload: { ...DEFAULT_APP_DOWNLOAD_SETTINGS },
       engagement: normalizeEngagementSettings(DEFAULT_ENGAGEMENT_SETTINGS),
+      p1: { ...DEFAULT_P1_FLAGS },
+      p2: { ...DEFAULT_P2_FLAGS },
+      reserveBac: 0,
+      highValueWithdrawBac: 1000,
     });
   }
 
@@ -1209,6 +1248,30 @@ export async function getAppSettings() {
 
   if (!settings.transferSettings) {
     settings.transferSettings = { ...DEFAULT_TRANSFER_SETTINGS };
+    dirty = true;
+  }
+
+  if (!settings.p1) {
+    settings.p1 = { ...DEFAULT_P1_FLAGS };
+    dirty = true;
+  } else {
+    settings.p1 = normalizeP1Flags(settings.p1);
+  }
+
+  if (!settings.p2) {
+    settings.p2 = { ...DEFAULT_P2_FLAGS };
+    dirty = true;
+  } else {
+    settings.p2 = normalizeP2Flags(settings.p2);
+  }
+
+  if (settings.reserveBac == null || Number.isNaN(Number(settings.reserveBac))) {
+    settings.reserveBac = 0;
+    dirty = true;
+  }
+
+  if (settings.highValueWithdrawBac == null || Number.isNaN(Number(settings.highValueWithdrawBac)) || Number(settings.highValueWithdrawBac) <= 0) {
+    settings.highValueWithdrawBac = 1000;
     dirty = true;
   }
 

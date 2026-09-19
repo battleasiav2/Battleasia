@@ -1,1 +1,0 @@
-export { UserReferralSettingsView } from './view';

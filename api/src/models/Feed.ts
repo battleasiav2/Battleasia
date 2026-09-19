@@ -30,8 +30,10 @@ export interface IFeed extends Document {
   authorId?: Types.ObjectId;
   authorName: string;
   authorAvatar: string;
-  pinnedAt?: Date | null;
-  createdAt: Date;
+    pinnedAt?: Date | null;
+    entityId?: string;
+    gameTag?: string;
+    createdAt: Date;
   updatedAt: Date;
 }
 
@@ -59,6 +61,8 @@ const feedSchema = new Schema<IFeed>(
     authorId: { type: Schema.Types.ObjectId, ref: 'User', default: null },
     authorName: { type: String, default: 'Admin' },
     authorAvatar: { type: String, default: '' },
+    entityId: { type: String, default: '', index: true },
+    gameTag: { type: String, default: '', index: true },
   },
   { timestamps: true }
 );

@@ -1,10 +1,7 @@
 import type { Types } from 'mongoose';
 import type { IUser } from '../models/User.js';
-import {
-  getAppSettings,
-  normalizeEngagementSettings,
-  type DepositBonusDaysSettings,
-} from '../models/AppSettings.js';
+import { getAppSettings, normalizeEngagementSettings, type DepositBonusDaysSettings } from '../models/AppSettings.js';
+import { normalizeP1Flags } from './p1-flags.js';
 import { isMissionInSchedule } from './engagement-period.js';
 import { recordBalanceHistory } from './balance-history.js';
 import { notifyBalanceChange } from './balance-notify.js';
@@ -60,8 +57,9 @@ export function serializeDepositBonusDaysState(config: DepositBonusDaysSettings,
 
 export async function syncDepositBonusDays() {
   const settingsDoc = await getAppSettings();
+  const flags = normalizeP1Flags(settingsDoc.p1);
   const settings = normalizeEngagementSettings(settingsDoc.engagement);
-  if (!settings.enabled) {
+  if (!settings.enabled || !flags.cashbackDays) {
     return serializeDepositBonusDaysState({ ...settings.depositBonusDays, enabled: false });
   }
   return serializeDepositBonusDaysState(settings.depositBonusDays);
@@ -74,10 +72,11 @@ export async function applyDepositBonusOnApproval(params: {
   performedBy?: Types.ObjectId | string | null;
 }) {
   const settingsDoc = await getAppSettings();
+  const flags = normalizeP1Flags(settingsDoc.p1);
   const settings = normalizeEngagementSettings(settingsDoc.engagement);
   const config = settings.depositBonusDays;
 
-  if (!settings.enabled || !isDepositBonusWindowActive(config)) {
+  if (!flags.cashbackDays || !settings.enabled || !isDepositBonusWindowActive(config)) {
     return { applied: false as const, bonusAmount: 0 };
   }
 

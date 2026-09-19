@@ -1,21 +1,16 @@
 import { Router } from 'express';
+import crypto from 'node:crypto';
 import bcrypt from 'bcryptjs';
 import { User } from '../../models/User.js';
 import { LoginHistory } from '../../models/LoginHistory.js';
 import { Session } from '../../models/Session.js';
 import { VerificationCode } from '../../models/VerificationCode.js';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
-import { signToken } from '../../utils/jwt.js';
+import { attachAdminCookies, issuePair, refreshSession, sessionPayload, userVer } from '../../utils/token-session.js';
 import { serializeUser } from '../../utils/serialize.js';
 import { logAuthCode } from '../../utils/auth-log.js';
 import { sendVerificationCodeEmail } from '../../utils/mail.js';
-import {
-  ADMIN_AUTH_COOKIE_NAME,
-  AUTH_COOKIE_NAME,
-  clearAllAuthCookies,
-  clearAuthCookie,
-  setAuthCookie,
-} from '../../utils/auth-cookie.js';
+import { AUTH_COOKIE_NAME, clearAllAuthCookies, clearAuthCookie } from '../../utils/auth-cookie.js';
 import { env } from '../../config/env.js';
 import type { Response } from 'express';
 
@@ -37,9 +32,9 @@ async function createAdminSession(
   user: InstanceType<typeof User>,
   req: { ip?: string; headers: Record<string, string | string[] | undefined>; socket?: { remoteAddress?: string } }
 ) {
-  const accessToken = signToken(user._id.toString());
+  const pair = issuePair(user._id.toString(), userVer(user));
   const ip = getClientIp(req);
-  const expiration = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const expiration = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   await Promise.all([
     LoginHistory.create({
@@ -65,7 +60,7 @@ async function createAdminSession(
     }),
   ]);
 
-  return accessToken;
+  return pair;
 }
 
 async function completeAdminLogin(
@@ -73,14 +68,16 @@ async function completeAdminLogin(
   req: { ip?: string; headers: Record<string, string | string[] | undefined>; socket?: { remoteAddress?: string } },
   res: Response
 ) {
-  const accessToken = await createAdminSession(user, req);
+  const pair = await createAdminSession(user, req);
   clearAuthCookie(res, AUTH_COOKIE_NAME);
-  setAuthCookie(res, accessToken, ADMIN_AUTH_COOKIE_NAME);
+  attachAdminCookies(res, pair.accessToken, pair.refreshToken);
 
   return res.json({
     status: true,
+    token: pair.accessToken,
+    refreshToken: pair.refreshToken,
     user: serializeUser(user),
-    session: { accessToken },
+    session: { accessToken: pair.accessToken, refreshToken: pair.refreshToken },
     balance: { balance: user.balance ?? 0 },
   });
 }
@@ -118,7 +115,7 @@ router.post('/signin', async (req, res) => {
       return completeAdminLogin(user, req, res);
     }
 
-    const otpCode = String(Math.floor(100000 + Math.random() * 900000));
+    const otpCode = String(crypto.randomInt(100000, 1000000));
     await VerificationCode.deleteMany({ email: user.email, type: 'admin_login' });
     await VerificationCode.create({
       email: user.email,
@@ -126,7 +123,7 @@ router.post('/signin', async (req, res) => {
       type: 'admin_login',
       expiresAt: new Date(Date.now() + OTP_TTL_MS),
     });
-    await sendVerificationCodeEmail(user.email, otpCode, 'admin_login');
+    await sendVerificationCodeEmail(user.email, otpCode, 'admin_login', req.headers['accept-language']);
     logAuthCode('admin OTP', user.email, otpCode);
 
     return res.json({
@@ -190,6 +187,36 @@ router.post('/logout', (_req, res) => {
   return res.json({ status: true, message: 'Logged out' });
 });
 
+router.post('/refresh', async (req, res) => {
+  try {
+    const pair = await refreshSession(req, res, 'admin');
+    if (!pair) {
+      return res.status(401).json({ status: false, message: 'Invalid token' });
+    }
+    return res.json(sessionPayload(pair.accessToken, pair.refreshToken));
+  } catch (error) {
+    console.error('admin refresh error:', error);
+    return res.status(500).json({ status: false, message: 'Refresh failed' });
+  }
+});
+
+router.post('/verify-password', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const password = String(req.body?.password || '').trim();
+    if (!password) {
+      return res.status(400).json({ status: false, message: 'Password is required' });
+    }
+    const user = await User.findById(req.userId);
+    if (!user) return res.status(401).json({ status: false, message: 'Unauthorized' });
+    const valid = await bcrypt.compare(password, user.password);
+    if (!valid) return res.status(403).json({ status: false, message: 'Password confirmation failed' });
+    return res.json({ status: true, data: { ok: true } });
+  } catch (error) {
+    console.error('verify-password error:', error);
+    return res.status(500).json({ status: false, message: 'Verify failed' });
+  }
+});
+
 router.get('/me', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -211,13 +238,15 @@ router.patch('/profile', requireAuth, async (req: AuthedRequest, res) => {
       return res.status(401).json({ message: 'Unauthorized' });
     }
 
-    const { currentPassword, newPassword, avatar } = req.body as {
+    const { currentPassword, newPassword, password, avatar } = req.body as {
       currentPassword?: string;
       newPassword?: string;
+      password?: string;
       avatar?: string;
     };
+    const nextPassword = newPassword || password;
 
-    if (newPassword) {
+    if (nextPassword) {
       if (!currentPassword) {
         return res.status(400).json({ message: 'Current password is required' });
       }
@@ -225,7 +254,8 @@ router.patch('/profile', requireAuth, async (req: AuthedRequest, res) => {
       if (!valid) {
         return res.status(400).json({ message: 'Current password is incorrect' });
       }
-      user.password = await bcrypt.hash(newPassword, 10);
+      user.password = await bcrypt.hash(nextPassword, 10);
+      user.tokenVersion = userVer(user) + 1;
     }
 
     if (typeof avatar === 'string') {

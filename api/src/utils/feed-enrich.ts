@@ -4,6 +4,7 @@ import { FeedCategory } from '../models/FeedCategory.js';
 import { SavedPost } from '../models/SavedPost.js';
 import { User } from '../models/User.js';
 import { serializeFeed } from './feed-serialize.js';
+import { isUserPremium } from './serialize.js';
 
 export async function enrichFeedsBatch(
   feeds: InstanceType<typeof Feed>[],
@@ -23,7 +24,7 @@ export async function enrichFeedsBatch(
 
   const [authors, likes, saves] = await Promise.all([
     authorIds.length
-      ? User.find({ _id: { $in: authorIds } }).select('role roleRef')
+      ? User.find({ _id: { $in: authorIds } }).select('role roleRef emailVerified isPremium premiumExpiresAt')
       : Promise.resolve([]),
     userId
       ? FeedLike.find({ userId, feedId: { $in: feedIds } }).select('feedId')
@@ -56,6 +57,7 @@ export async function enrichFeedsBatch(
       author: {
         ...base.author,
         role: authorRole,
+        isVerified: author ? isUserPremium(author) || Boolean(author.emailVerified) : false,
       },
     };
   });

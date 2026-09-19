@@ -9,6 +9,7 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 
 import rateLimit from 'express-rate-limit';
+import { mongoSanitize } from './middleware/mongo-sanitize.js';
 
 import path from 'path';
 
@@ -79,6 +80,8 @@ import v2FeedRoutes from './routes/v2/feed.js';
 import v2EngagementRoutes from './routes/v2/engagement.js';
 
 import v2SocialRoutes from './routes/v2/social.js';
+import v2LabsRoutes from './routes/v2/labs.js';
+import integrityRoutes from './routes/v3/integrity.js';
 
 import v3ShopOrdersRoutes from './routes/v3/shop/orders.js';
 
@@ -95,7 +98,7 @@ import { emitPendingPaymentCounts } from './utils/socket.js';
 import { env } from './config/env.js';
 
 import { User } from './models/User.js';
-
+import { DirectConversation } from './models/DirectConversation.js';
 import { SupportConversation } from './models/SupportConversation.js';
 
 import { isAdminRole } from './utils/admin-role.js';
@@ -171,11 +174,14 @@ export function createApp() {
   });
 
   app.use('/api/v2/users/auth', authLimiter);
+  app.use('/api/v2/users/signin', authLimiter);
+  app.use('/api/v2/users/refresh', authLimiter);
   app.use('/api/v3/users/auth', authLimiter);
+  app.use('/api/v3/users/auth/refresh', authLimiter);
 
   app.use(express.json({ limit: '2mb' }));
-
   app.use(express.urlencoded({ extended: true }));
+  app.use(mongoSanitize);
 
   const uploadsStatic = express.static(uploadsRoot, {
     maxAge: env.isProduction ? '7d' : 0,
@@ -273,6 +279,7 @@ export function createApp() {
   app.use('/api/v3/engagement/badges', requireAdmin, engagementBadgesRoutes);
 
   app.use('/api/v3/engagement/settings', requireAdmin, engagementSettingsRoutes);
+  app.use('/api/v3/integrity', requireAdmin, integrityRoutes);
 
   app.use('/api/v3/notifications', requireAdmin, notificationsRoutes);
 
@@ -290,6 +297,8 @@ export function createApp() {
   app.use('/api/v2/feed', v2FeedRoutes);
 
   app.use('/api/v2/social', v2SocialRoutes);
+
+  app.use('/api/v2/labs', v2LabsRoutes);
 
   app.use('/api/v2/engagement', v2EngagementRoutes);
 
@@ -326,21 +335,17 @@ export function createSocketServer(app: express.Express) {
 
 
   io.use((socket, next) => {
-
     const token = (socket.handshake.auth?.token as string) || '';
-
-    const payload = verifyToken(token);
-
-    if (!payload?.userId) {
-
-      return next(new Error('Unauthorized'));
-
+    if (!token) {
+      socket.data.public = true;
+      return next();
     }
-
+    const payload = verifyToken(token);
+    if (!payload?.userId || payload.typ === 'refresh') {
+      return next(new Error('Unauthorized'));
+    }
     socket.data.userId = payload.userId;
-
     return next();
-
   });
 
 
@@ -393,7 +398,8 @@ export function createSocketServer(app: express.Express) {
 
       if (!conversationId) return;
 
-      const userId = socket.data.userId as string;
+      const userId = socket.data.userId as string | undefined;
+      if (!userId) return;
 
       const [user, conversation] = await Promise.all([
 
@@ -411,6 +417,19 @@ export function createSocketServer(app: express.Express) {
 
     });
 
+    socket.on('join-dm', async (conversationId: string) => {
+      if (!conversationId) return;
+      const userId = socket.data.userId as string | undefined;
+      if (!userId) return;
+      const conversation = await DirectConversation.findById(conversationId);
+      if (!conversation || !conversation.participants.some((p) => p.toString() === userId)) return;
+      socket.join(`conversation:${conversationId}`);
+    });
+
+    socket.on('leave-dm', (conversationId: string) => {
+      if (conversationId) socket.leave(`conversation:${conversationId}`);
+    });
+
 
 
     socket.on('leave-conversation', (conversationId: string) => {
@@ -426,13 +445,15 @@ export function createSocketServer(app: express.Express) {
 
 
     socket.on('typing', (data: { conversationId?: string; isTyping?: boolean }) => {
-
-      if (data?.conversationId) {
-
-        socket.to(`conversation:${data.conversationId}`).emit('user-typing', data);
-
-      }
-
+      const conversationId = data?.conversationId;
+      if (!conversationId) return;
+      // Only relay typing if this socket already joined the room (membership gated on join).
+      if (!socket.rooms.has(`conversation:${conversationId}`)) return;
+      socket.to(`conversation:${conversationId}`).emit('user-typing', {
+        conversationId,
+        isTyping: Boolean(data.isTyping),
+        userId: socket.data.userId,
+      });
     });
 
 

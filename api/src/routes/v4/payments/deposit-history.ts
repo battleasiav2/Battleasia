@@ -6,7 +6,7 @@ import { User } from '../../../models/User.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
 import { requireAdmin } from '../../../middleware/admin.js';
 import { paginatedResults, parsePagination } from '../../../utils/pagination.js';
-import { recordBalanceHistory } from '../../../utils/balance-history.js';
+import { approveDepositMoney, MoneyError, rejectDepositMoney } from '../../../utils/money.js';
 import { serializeDeposit } from '../../../utils/payment-serialize.js';
 import { emitNewDeposit, emitPendingPaymentCounts } from '../../../utils/socket.js';
 import { notifyBalanceChange } from '../../../utils/balance-notify.js';
@@ -208,45 +208,15 @@ router.get('/:id', requireAuth, async (req: AuthedRequest, res) => {
 
 router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
   try {
+    const key = String(req.header('Idempotency-Key') || '').trim() || undefined;
+    await approveDepositMoney({ depositId: String(req.params.id), adminId: req.userId, idempotencyKey: key });
     const deposit = await DepositHistory.findById(req.params.id);
-    if (!deposit) {
-      return res.status(404).json({ status: false, message: 'Deposit not found' });
-    }
-    if (deposit.status !== 'pending') {
-      return res.status(400).json({ status: false, message: 'Deposit is not pending' });
-    }
-
+    if (!deposit) return res.status(404).json({ status: false, message: 'Deposit not found' });
     const user = await User.findById(deposit.userId);
-    if (!user) {
-      return res.status(404).json({ status: false, message: 'User not found' });
-    }
-
-    const admin = req.userId ? await User.findById(req.userId) : null;
-    const balanceBefore = user.balance ?? 0;
-    user.balance = balanceBefore + deposit.coin_amount;
-    await user.save();
-
-    deposit.status = 'completed';
-    deposit.processed_at = new Date();
-    deposit.processed_by = req.userId as unknown as import('mongoose').Types.ObjectId;
-    await deposit.save();
-
-    await recordBalanceHistory({
-      user,
-      amount: deposit.coin_amount,
-      type: 'deposit',
-      balanceBefore,
-      balanceAfter: user.balance,
-      performedBy: req.userId,
-      detail: {
-        reason: 'deposit_approved',
-        deposit_id: deposit._id.toString(),
-        adminName: admin?.username || 'Admin',
-      },
-    });
+    if (!user) return res.status(404).json({ status: false, message: 'User not found' });
 
     await emitPendingPaymentCounts();
-    await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
+    await notifyBalanceChange(user._id.toString(), user.balance ?? 0, (user.balance ?? 0) - deposit.coin_amount);
     await notifyDepositApproved({
       userId: user._id.toString(),
       amount: deposit.coin_amount,
@@ -278,6 +248,9 @@ router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
     const channel = await PaymentChannel.findById(deposit.payment_channel);
     return res.json({ status: true, data: serializeDeposit(deposit, channel) });
   } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
     console.error('approve deposit error:', error);
     return res.status(500).json({ status: false, message: 'Failed to approve deposit' });
   }
@@ -285,17 +258,10 @@ router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
 
 router.patch('/:id/reject', requireAdmin, async (req: AuthedRequest, res) => {
   try {
+    await rejectDepositMoney(String(req.params.id));
     const deposit = await DepositHistory.findById(req.params.id);
-    if (!deposit) {
-      return res.status(404).json({ status: false, message: 'Deposit not found' });
-    }
-    if (deposit.status !== 'pending') {
-      return res.status(400).json({ status: false, message: 'Deposit is not pending' });
-    }
-
-    deposit.status = 'rejected';
+    if (!deposit) return res.status(404).json({ status: false, message: 'Deposit not found' });
     deposit.rejection_reason = req.body.rejection_reason || '';
-    deposit.processed_at = new Date();
     deposit.processed_by = req.userId as unknown as import('mongoose').Types.ObjectId;
     await deposit.save();
 
@@ -309,6 +275,9 @@ router.patch('/:id/reject', requireAdmin, async (req: AuthedRequest, res) => {
     const channel = await PaymentChannel.findById(deposit.payment_channel);
     return res.json({ status: true, data: serializeDeposit(deposit, channel) });
   } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
     console.error('reject deposit error:', error);
     return res.status(500).json({ status: false, message: 'Failed to reject deposit' });
   }

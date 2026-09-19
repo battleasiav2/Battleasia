@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { User } from '../models/User.js';
 import { verifyToken } from '../utils/jwt.js';
 import { AUTH_COOKIE_NAME, ADMIN_AUTH_COOKIE_NAME } from '../utils/auth-cookie.js';
+import { userVer } from '../utils/token-session.js';
 
 export type AuthedRequest = Request & {
   userId?: string;
@@ -30,13 +31,16 @@ export async function requireAuth(req: AuthedRequest, res: Response, next: NextF
   }
 
   const payload = verifyToken(token);
-  if (!payload?.userId) {
+  if (!payload?.userId || payload.typ === 'refresh') {
     return res.status(401).json({ message: 'Invalid token' });
   }
 
   const user = await User.findById(payload.userId);
   if (!user || !user.status) {
     return res.status(401).json({ message: 'Unauthorized' });
+  }
+  if (payload.ver != null && Number(payload.ver) !== userVer(user)) {
+    return res.status(401).json({ message: 'Invalid token' });
   }
 
   req.userId = payload.userId;

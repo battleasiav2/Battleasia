@@ -1,1 +1,0 @@
-export { LiveChatSettingsView } from './view';
