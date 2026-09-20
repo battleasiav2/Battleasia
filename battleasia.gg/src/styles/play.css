@@ -153,6 +153,16 @@
   margin-left: auto;
 }
 
+.play-hud .hud-balance {
+  flex-shrink: 0;
+}
+
+.play-hud .locale-select .accent-pop,
+.play-hud .lang-pop {
+  right: 0;
+  left: auto;
+}
+
 .play-hud .theme-dock .theme-chip,
 .play-hud .theme-dock .theme-mode {
   width: 34px;

@@ -247,7 +247,6 @@ export function Landing({ openChat }: { openChat?: boolean }) {
             </a>
           </nav>
           <div className="top-actions" onPointerDown={(e) => e.stopPropagation()}>
-            <LocaleSelect />
             <ThemeDock />
             {inArena ? (
               <>
@@ -266,6 +265,7 @@ export function Landing({ openChat }: { openChat?: boolean }) {
             <Link className="btn btn-primary" to={arenaTo}>
               {t('cta.signup')}
             </Link>
+            <LocaleSelect />
           </div>
         </header>
 

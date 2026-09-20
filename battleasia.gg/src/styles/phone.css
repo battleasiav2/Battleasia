@@ -272,14 +272,26 @@ svg {
     flex: 1 1 auto;
   }
 
-  .play-hud .hud-account {
+  .play-hud .hud-balance {
     order: 2;
+    display: inline-flex;
+    margin-left: auto;
+    max-width: 42vw;
+  }
+
+  .play-hud .hud-balance .coin b,
+  .play-hud .hud-balance .coin {
+    font-size: 12px;
+  }
+
+  .play-hud .hud-account {
+    order: 3;
     margin-left: 0;
   }
 
   .play-hud .nav-burger {
     display: grid;
-    order: 3;
+    order: 4;
     margin-left: 0;
   }
 
@@ -297,7 +309,7 @@ svg {
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: stretch;
-    order: 4;
+    order: 5;
     gap: 0;
     padding: 10px 0 4px;
     margin-top: 8px;
@@ -336,13 +348,24 @@ svg {
 
   .play-hud.is-open .play-hud-right {
     display: flex;
-    order: 5;
+    order: 6;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: flex-end;
     gap: 10px;
     padding: 8px 0 10px;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .play-hud.is-open .play-hud-right .locale-select {
+    margin-left: auto;
+  }
+
+  .play-hud.is-open .locale-select .accent-pop,
+  .play-hud.is-open .lang-pop {
+    right: 0;
+    left: auto;
+    min-width: min(220px, calc(100vw - 32px));
   }
 
   .brand-name {

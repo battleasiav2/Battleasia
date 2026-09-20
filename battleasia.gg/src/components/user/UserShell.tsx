@@ -302,22 +302,7 @@ function UserChrome() {
           </div>
         </nav>
         <div className="play-hud-right">
-          <LocaleSelect />
           <ThemeDock />
-          <button
-            type="button"
-            className="balance-pill"
-            onClick={() => {
-              setHide((v) => {
-                const next = !v;
-                localStorage.setItem('ba-hide-balance', next ? '1' : '0');
-                return next;
-              });
-            }}
-            title={t('hud.balanceHint')}
-          >
-            {hide ? <span className="coin"><b>**** BAC</b></span> : <CoinValue value={balance} />}
-          </button>
           <Link
             className={`hud-bell ${location.pathname.startsWith('/user/account/notifications') ? 'active' : ''}`}
             to="/user/account/notifications"
@@ -332,7 +317,22 @@ function UserChrome() {
             </svg>
             {alerts > 0 ? <span className="hud-dot">{alerts > 9 ? '9+' : alerts}</span> : null}
           </Link>
+          <LocaleSelect />
         </div>
+        <button
+          type="button"
+          className="balance-pill hud-balance"
+          onClick={() => {
+            setHide((v) => {
+              const next = !v;
+              localStorage.setItem('ba-hide-balance', next ? '1' : '0');
+              return next;
+            });
+          }}
+          title={t('hud.balanceHint')}
+        >
+          {hide ? <span className="coin"><b>**** BAC</b></span> : <CoinValue value={balance} />}
+        </button>
         <div className="hud-account" onPointerDown={(e) => e.stopPropagation()}>
           <button
             type="button"
