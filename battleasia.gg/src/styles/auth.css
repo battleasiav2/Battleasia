@@ -11,7 +11,10 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  border-right: 1px solid var(--ba-hair);
+  border-right: 1px solid color-mix(in srgb, var(--ba-hair) 70%, transparent);
+  background:
+    radial-gradient(70% 42% at 0% 0%, color-mix(in srgb, var(--ba-accent) 12%, transparent), transparent 58%),
+    var(--ba-page-ink);
 }
 
 .auth-toolbar {
@@ -48,60 +51,35 @@
   font-size: 14px;
 }
 
+.auth-switch a,
+a.auth-link {
+  color: color-mix(in srgb, var(--ba-accent) 55%, #a78bfa);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-switch a:hover,
+a.auth-link:hover {
+  color: var(--ba-accent);
+  text-decoration: underline;
+}
+
+/* Flat form — no card chrome; fields sit on the page ink. */
 .auth-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  margin-top: 24px;
-  padding: 22px;
-  border-radius: 24px;
-  border: 1px solid var(--ba-hair);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 42%),
-    rgba(14, 16, 24, 0.55);
+  margin-top: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   position: relative;
-}
-
-.auth-seal {
-  display: flex;
-  justify-content: center;
-  margin: -4px 0 4px;
-}
-
-.auth-seal-svg {
-  display: block;
-  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.45));
-}
-
-.auth-trust {
-  list-style: none;
-  margin: 4px 0 0;
-  padding: 14px 0 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px 16px;
-  order: 50;
-}
-
-.auth-trust li {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--ba-muted);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-}
-
-.auth-trust svg {
-  color: var(--ba-accent);
-  flex-shrink: 0;
+  box-shadow: none;
 }
 
 .auth-form > .auth-switch {
-  order: 60;
+  margin-top: 4px;
 }
 
 .auth-meta {
@@ -459,16 +437,16 @@
 .step-bar {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0;
-  padding: 4px;
-  border-radius: 999px;
-  border: 1px solid var(--ba-hair);
-  background: rgba(255, 255, 255, 0.04);
+  gap: 12px;
+  margin: 0 0 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   font-size: 12px;
   font-weight: 700;
   color: var(--ba-muted);
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
@@ -479,9 +457,9 @@
   font: inherit;
   letter-spacing: inherit;
   text-transform: inherit;
-  min-height: 36px;
-  padding: 0 12px;
-  border-radius: 999px;
+  min-height: 28px;
+  padding: 0;
+  border-radius: 0;
   cursor: pointer;
 }
 
@@ -492,23 +470,17 @@
 
 .step-bar button.on {
   color: var(--ba-text);
-  background: color-mix(in srgb, var(--ba-accent) 24%, transparent);
+  background: none;
 }
 
 .step-bar i {
   flex: 1;
-  height: 2px;
-  background: var(--ba-hair);
+  height: 1px;
+  background: color-mix(in srgb, var(--ba-hair) 80%, transparent);
 }
 
 .auth-form-pane .btn {
   width: 100%;
-}
-
-.auth-form-pane {
-  background:
-    radial-gradient(80% 50% at 0% 0%, color-mix(in srgb, var(--ba-accent) 18%, transparent), transparent 60%),
-    var(--ba-page-ink);
 }
 
 .field input:focus,

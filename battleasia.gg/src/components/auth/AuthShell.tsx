@@ -1,35 +1,15 @@
-import { Children, cloneElement, isValidElement, type ReactElement, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ASSETS } from '../../lib/assets';
 import { useI18n } from '../../lib/i18n';
 import { LocaleSelect } from '../LocaleSelect';
 import { ThemeDock } from '../ThemeDock';
-import { AuthFormSeal } from './AuthFormSeal';
-import { AuthTrustRow } from './AuthTrustRow';
 
 type Props = {
   title: string;
   subtitle?: string;
   children: ReactNode;
 };
-
-function withFormChrome(children: ReactNode) {
-  return Children.map(children, (child) => {
-    if (!isValidElement(child)) return child;
-    const el = child as ReactElement<{ className?: string; children?: ReactNode }>;
-    const className = el.props.className || '';
-    if (!className.split(/\s+/).includes('auth-form')) return child;
-    return cloneElement(el, {
-      children: (
-        <>
-          <AuthFormSeal />
-          {el.props.children}
-          <AuthTrustRow />
-        </>
-      ),
-    });
-  });
-}
 
 export function AuthShell({ title, subtitle, children }: Props) {
   const { t } = useI18n();
@@ -50,7 +30,7 @@ export function AuthShell({ title, subtitle, children }: Props) {
         </div>
         <h1>{title}</h1>
         {subtitle ? <p className="auth-sub">{subtitle}</p> : null}
-        {withFormChrome(children)}
+        {children}
       </section>
       <aside className="auth-hero">
         <div className="hero-media" aria-hidden>

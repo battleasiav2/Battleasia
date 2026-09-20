@@ -881,18 +881,19 @@ a.result-row {
 
 .play-head {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 16px;
 }
 
 .play-count {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  min-height: 64px;
-  padding: 10px 16px;
-  border-radius: 18px;
+  gap: 8px;
+  flex-shrink: 0;
+  min-height: 36px;
+  padding: 4px 12px;
+  border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 70%),
@@ -901,14 +902,31 @@ a.result-row {
 
 .play-count strong {
   font-family: var(--ba-font-display);
-  font-size: 28px;
+  font-size: 16px;
   line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.play-count .coin {
+  font-size: inherit;
+  gap: 6px;
+}
+
+.play-count .coin img {
+  width: 16px;
+  height: 16px;
+}
+
+.play-count .coin b {
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .play-count small {
   color: var(--ba-muted);
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
