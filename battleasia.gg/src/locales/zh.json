@@ -714,7 +714,7 @@
   "http.5xx": "服务器繁忙，请稍后重试。",
   "http.canceled": "已取消上传",
   "http.uploadFail": "上传失败",
-  "match.listTitle": "开放房间",
+  "match.listTitle": "{game} open rooms",
   "match.listLead": "选择房间，满员前加入，然后进入大厅。",
   "match.rooms": "房间",
   "match.none": "还没有比赛",

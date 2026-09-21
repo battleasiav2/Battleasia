@@ -12,6 +12,7 @@ import {
   checkJoin,
   coverForGame,
   estimateMatchWinningPool,
+  fetchGames,
   fetchMatches,
   formatWhen,
   gameKey,
@@ -62,6 +63,7 @@ export function MatchListPage() {
   const outlet = useOutletContext<ShellCtx>();
   const setBalance = outlet?.setBalance;
   const [matches, setMatches] = useState<MatchItem[] | null>(null);
+  const [gameName, setGameName] = useState('');
   const [error, setError] = useState('');
   const [selected, setSelected] = useState('');
   const [filter, setFilter] = useState<MatchFilter>('all');
@@ -78,10 +80,20 @@ export function MatchListPage() {
 
   useEffect(() => {
     let live = true;
+    fetchGames()
+      .then((list) => {
+        if (!live) return;
+        const hit = list.find(
+          (g) => g.id === gameId || gameKey(g) === gameId || g.name.toLowerCase().replace(/\s+/g, '') === gameId.toLowerCase(),
+        );
+        if (hit?.name) setGameName(hit.name);
+      })
+      .catch(() => {});
     fetchMatches(gameId)
       .then((list) => {
         if (!live) return;
         setMatches(list);
+        setGameName((prev) => prev || list[0]?.gameName || '');
         const first = list.find(isJoinable) || list[0];
         if (first) setSelected(first.id);
       })
@@ -232,7 +244,7 @@ export function MatchListPage() {
       </Link>
       <header className="play-head play-head-compact">
         <div>
-          <h1>{t('match.listTitle')}</h1>
+          <h1>{t('match.listTitle').replace('{game}', gameName || t('nav.play'))}</h1>
         </div>
       </header>
       {matches === null ? (

@@ -714,7 +714,7 @@
   "http.5xx": "سرور مصروف ہے۔ تھोड़ी دیر بعد کوشش کریں۔",
   "http.canceled": "اپ لوڈ منسوخ",
   "http.uploadFail": "اپ لوڈ نہیں ہوا",
-  "match.listTitle": "اوپن روم",
+  "match.listTitle": "{game} open rooms",
   "match.listLead": "روم چنیں، بھرنے سے پہلے جوائن کریں، پھر لابی میں جائیں۔",
   "match.rooms": "رومز",
   "match.none": "ابھی میچ نہیں",

@@ -125,7 +125,7 @@ export function PlayPage() {
       </header>
       {games === null ? (
         <div className="play-stage">
-          <div className="play-grid">
+          <div className="play-grid play-grid-rail">
             {Array.from({ length: 5 }).map((_, i) => (
               <div className="play-card skeleton" key={i} />
             ))}
@@ -142,7 +142,7 @@ export function PlayPage() {
         </div>
       ) : (
         <div className="play-stage">
-          <div className="play-grid">
+          <div className="play-grid play-grid-rail">
             {games.map((game) => {
               const open =
                 openByGame[game.id] ?? openMatchesForGame(game.name, openByGame);
@@ -162,7 +162,7 @@ export function PlayPage() {
                     <img
                       src={coverForGame(game)}
                       srcSet={webpSrcSet(coverForGame(game), 360, 720)}
-                      sizes="(max-width: 1100px) 46vw, 22vw"
+                      sizes="(max-width: 1100px) 50vw, 22vw"
                       alt=""
                       width={640}
                       height={400}

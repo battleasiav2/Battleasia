@@ -102,6 +102,25 @@ export function gameKey(game: { name?: string; packageName?: string; banner?: st
   return 'arena';
 }
 
+/** Play grid order: PUBG first, then FF, COD, MLBB, Valorant. */
+const GAME_ORDER: Record<string, number> = {
+  pubg: 0,
+  freefire: 1,
+  cod: 2,
+  mlbb: 3,
+  valorant: 4,
+  arena: 9,
+};
+
+export function sortGames<T extends { name?: string; packageName?: string; banner?: string }>(games: T[]) {
+  return [...games].sort((a, b) => {
+    const da = GAME_ORDER[gameKey(a)] ?? 8;
+    const db = GAME_ORDER[gameKey(b)] ?? 8;
+    if (da !== db) return da - db;
+    return String(a.name || '').localeCompare(String(b.name || ''));
+  });
+}
+
 function isObjectId(value: string) {
   return /^[a-f\d]{24}$/i.test(value);
 }
@@ -152,7 +171,7 @@ export async function fetchGames() {
   try {
     const payload = await api('/api/v2/games');
     const list = unwrapData<GameItem[]>(payload) || [];
-    return list.map((g) => ({ ...g, id: idOf(g) })).filter((g) => g.id);
+    return sortGames(list.map((g) => ({ ...g, id: idOf(g) })).filter((g) => g.id));
   } catch {
     return [];
   }

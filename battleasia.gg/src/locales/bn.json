@@ -937,7 +937,7 @@
   "http.5xx": "সার্ভার ব্যস্ত। একটু পর আবার চেষ্টা করুন।",
   "http.canceled": "আপলোড বাতিল",
   "http.uploadFail": "আপলোড হয়নি",
-  "match.listTitle": "ওপেন রুম",
+  "match.listTitle": "{game} open rooms",
   "match.demoJoin": "ডেমো রুম — শুধু প্রিভিউ। রিয়েল জয়েন বন্ধ।",
   "match.listLead": "রুম বেছে নিন, ভর্তি হওয়ার আগে জয়েন করুন, তারপর লবিতে যান।",
   "match.filters": "ম্যাচ ফিল্টার",

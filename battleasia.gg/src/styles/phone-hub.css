@@ -15,6 +15,22 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .play-grid.play-grid-rail,
+  .play-stage .play-grid.play-grid-rail {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .play-grid.play-grid-rail > .play-card {
+    flex: none;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+  }
+
   .play-head {
     flex-wrap: wrap;
     align-items: flex-start;
@@ -129,6 +145,15 @@
     grid-template-areas: none;
   }
 
+  .play-grid.play-grid-rail,
+  .play-stage .play-grid.play-grid-rail,
+  .hub-stage .play-grid.play-grid-rail {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    overflow: visible;
+  }
+
   .match-row {
     grid-template-columns: 88px minmax(0, 1fr);
     grid-template-areas:
@@ -163,6 +188,16 @@
   .play-stage {
     padding: 12px;
     border-radius: 22px;
+  }
+
+  .play-stage:has(.play-grid-rail),
+  .play-stage:has(.match-table),
+  .play-stage:has(.match-filters) {
+    padding: 0;
+    border-radius: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
   }
 
   .play-count {
@@ -312,7 +347,7 @@
   }
 
   .profile-head h1 {
-    margin-top: 28px;
+    margin-top: 0;
     font-size: 22px;
   }
 
@@ -322,13 +357,36 @@
 
   .ig-profile-main {
     grid-template-columns: 77px minmax(0, 1fr);
-    gap: 14px;
+    grid-template-areas:
+      'avatar counts'
+      'user user'
+      'bio bio';
+    gap: 12px 12px;
   }
 
   .ig-avatar,
-  .ig-avatar-wrap .user-avatar {
+  .ig-avatar-wrap .user-avatar,
+  .ig-avatar-wrap.profile-avatar-wrap .user-avatar {
     width: 77px !important;
     height: 77px !important;
+  }
+
+  .ig-profile-info {
+    display: contents;
+  }
+
+  .ig-counts {
+    grid-area: counts;
+    justify-content: space-around;
+  }
+
+  .ig-user-row {
+    grid-area: user;
+  }
+
+  .ig-bio {
+    grid-area: bio;
+    max-width: none;
   }
 }
 

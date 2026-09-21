@@ -714,7 +714,7 @@
   "http.5xx": "सर्वर व्यस्त है। थोड़ी देर बाद कोशिश करें।",
   "http.canceled": "अपलोड रद्द",
   "http.uploadFail": "अपलोड नहीं हुआ",
-  "match.listTitle": "ओपन रूम",
+  "match.listTitle": "{game} open rooms",
   "match.listLead": "रूम चुनें, भरने से पहले जॉइन करें, फिर लॉबी में जाएँ।",
   "match.rooms": "रूम",
   "match.none": "अभी मैच नहीं",

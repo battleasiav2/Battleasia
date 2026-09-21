@@ -272,7 +272,8 @@ export function EarnPage() {
                 {welcome.milestones.map((w) => (
                   <li key={w.key}>
                     <span>
-                      {w.title} <CoinValue value={w.bacAmount || 0} />
+                      <span className="earn-welcome-title">{w.title}</span>
+                      <CoinValue value={w.bacAmount || 0} />
                     </span>
                     {w.canClaim && w.key ? (
                       <button className="btn btn-ghost" type="button" onClick={() => void run(w.key!, () => claimWelcome(w.key!))}>
