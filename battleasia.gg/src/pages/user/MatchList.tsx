@@ -184,7 +184,7 @@ export function MatchListPage() {
       );
       toast(t('match.joinedSuccessfully'));
       setConfirmMatch(null);
-      navigate(`/user/play/${match.id}/detail?from=${gameId}`);
+      navigate(`/user/play/${match.id}/detail?from=${encodeURIComponent(gameId)}#match-room`);
     } catch (err) {
       toast(isApiError(err) ? err.message : t('match.joinFail'));
     } finally {
@@ -375,7 +375,7 @@ export function MatchListPage() {
                     ) : match.isJoined ? (
                       <Link
                         className="btn btn-primary"
-                        to={`/user/play/${match.id}/detail?from=${gameId}`}
+                        to={`/user/play/${match.id}/detail?from=${encodeURIComponent(gameId)}#match-room`}
                         onClick={(e) => e.stopPropagation()}
                       >
                         {t('match.lobby')}

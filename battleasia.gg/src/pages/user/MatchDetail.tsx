@@ -89,6 +89,25 @@ export function MatchDetailPage() {
     if (!joined) return;
     let live = true;
     const tick = () => {
+      fetchRoom(matchId)
+        .then((creds) => {
+          if (!live) return;
+          setRoom(creds);
+        })
+        .catch(() => undefined);
+    };
+    tick();
+    const id = window.setInterval(tick, 8000);
+    return () => {
+      live = false;
+      window.clearInterval(id);
+    };
+  }, [joined, matchId]);
+
+  useEffect(() => {
+    if (!joined) return;
+    let live = true;
+    const tick = () => {
       fetchChat(matchId)
         .then((rows) => {
           if (live) setChat(rows);
@@ -151,9 +170,21 @@ export function MatchDetailPage() {
       const joinedRes = await joinMatch(matchId);
       if (joinedRes?.balance != null) setBalance(Number(joinedRes.balance) || 0);
       else if (fee > 0) setBalance(Math.max(balance - fee, 0));
+      if (joinedRes?.roomId || joinedRes?.password) {
+        setRoom({
+          roomId: joinedRes.roomId || '',
+          password: joinedRes.password || '',
+          matchName: match.matchName,
+          map: match.map,
+          matchSchedule: match.matchSchedule,
+        });
+      }
       toast(t('match.joinedSuccessfully'));
       setJoinOpen(false);
       await load();
+      window.requestAnimationFrame(() => {
+        document.getElementById('match-room')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
     } catch (err) {
       toast(isApiError(err) ? err.message : t('match.joinFail'));
     } finally {
@@ -211,6 +242,18 @@ export function MatchDetailPage() {
     toast(t('match.roomCopied'));
   }, [joined, match?.password, match?.roomId, room, t, toast]);
 
+  const copyField = useCallback(
+    async (value: string, okToast: string) => {
+      if (!value) {
+        toast(t('match.roomSoon'));
+        return;
+      }
+      await navigator.clipboard.writeText(value);
+      toast(okToast);
+    },
+    [t, toast],
+  );
+
   const focusChat = useCallback(() => {
     if (!joined) {
       toast(t('match.chatHint'));
@@ -242,6 +285,14 @@ export function MatchDetailPage() {
       leaderboard: () => navigate(`/user/play/${matchId}/result`),
     });
   }, [copyRoom, doReady, focusChat, joined, matchId, navigate, register, requestJoin, t, toast]);
+
+  useEffect(() => {
+    if (!joined) return;
+    if (window.location.hash !== '#match-room') return;
+    window.requestAnimationFrame(() => {
+      document.getElementById('match-room')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, [joined, room]);
 
   async function onSend(e: React.FormEvent) {
     e.preventDefault();
@@ -364,6 +415,47 @@ export function MatchDetailPage() {
             {t('match.results')}
           </Link>
         </div>
+
+        <section id="match-room" className="room-card room-creds">
+          <h2>{t('match.roomCreds')}</h2>
+          {!joined ? (
+            <p className="play-muted">{t('match.roomHidden')}</p>
+          ) : roomId ? (
+            <>
+              <div className="pay-copy">
+                <small>{t('match.roomIdLabel')}</small>
+                <p className="pay-addr">
+                  <b>{roomId}</b>
+                </p>
+                <button className="btn btn-ghost" type="button" onClick={() => void copyField(String(roomId), t('match.roomCopied'))}>
+                  {t('match.copyId')}
+                </button>
+              </div>
+              {roomPass ? (
+                <div className="pay-copy">
+                  <small>{t('match.passLabel')}</small>
+                  <p className="pay-addr">
+                    <b>{roomPass}</b>
+                  </p>
+                  <button
+                    className="btn btn-ghost"
+                    type="button"
+                    onClick={() => void copyField(String(roomPass), t('match.roomCopied'))}
+                  >
+                    {t('match.copyPass')}
+                  </button>
+                </div>
+              ) : null}
+              <button className="btn btn-primary" type="button" onClick={() => void copyRoom()}>
+                {t('match.copyRoom')}
+              </button>
+              {match.matchPrivateDescription ? <p className="play-muted">{match.matchPrivateDescription}</p> : null}
+            </>
+          ) : (
+            <p className="play-muted">{t('match.roomPending')}</p>
+          )}
+        </section>
+
         <section id="match-rules" className="match-facts">
           <article>
             <small>{t('match.entry')}</small>
@@ -395,21 +487,6 @@ export function MatchDetailPage() {
         </section>
         <p className="play-lead">{match.prizeDescription || match.matchDescription || t('match.prizeFallback')}</p>
       </div>
-      {joined && roomId ? (
-        <section className="room-card">
-          <h2>{t('match.roomCreds')}</h2>
-          <p>
-            ID <b>{roomId}</b>
-            {roomPass ? (
-              <>
-                {' '}
-                · {t('match.pass')} <b>{roomPass}</b>
-              </>
-            ) : null}
-          </p>
-          <p className="play-muted">{match.matchPrivateDescription}</p>
-        </section>
-      ) : null}
       <div className="hub-stage">
         <section className="room-card">
           <h2>{t('match.roster')}</h2>

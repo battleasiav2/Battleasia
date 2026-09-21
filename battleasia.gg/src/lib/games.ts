@@ -223,7 +223,13 @@ export async function checkJoin(id: string) {
 
 export async function joinMatch(id: string) {
   const payload = await api(`/api/v2/games/matches/${id}/join`, { method: 'POST' });
-  return unwrapData<{ balance?: number; isJoined?: boolean }>(payload);
+  return unwrapData<{
+    balance?: number;
+    isJoined?: boolean;
+    roomId?: string;
+    password?: string;
+    matchPrivateDescription?: string;
+  }>(payload);
 }
 
 export async function reportMatch(id: string, targetUserId: string, reason = 'collusion') {

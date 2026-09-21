@@ -331,6 +331,9 @@ router.post('/matches/:id/join', requireAuth, async (req: AuthedRequest, res) =>
         participantId: result.participantId,
         balance: result.balance,
         isJoined: true,
+        roomId: match.roomId || '',
+        password: match.password || '',
+        matchPrivateDescription: match.matchPrivateDescription || '',
       },
     });
   } catch (error) {
