@@ -184,6 +184,21 @@ export async function sendTransfer(
   return unwrapData<TransferRow>(payload);
 }
 
+export type TransferPreviewUser = {
+  id: string;
+  username: string;
+  avatar?: string;
+  bio?: string;
+  displayName?: string;
+};
+
+export async function lookupTransferUser(username: string) {
+  const q = username.trim();
+  if (!q) return null;
+  const payload = await api(`/api/v2/users/by-username/${encodeURIComponent(q)}`);
+  return unwrapData<TransferPreviewUser>(payload);
+}
+
 export async function fetchTransferHistory() {
   const payload = await api('/api/v2/users/transfer/history?limit=20');
   return unwrapList<TransferRow>(payload).map((row) => ({ ...row, id: nid(row) }));

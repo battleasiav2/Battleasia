@@ -28,6 +28,34 @@ body {
   background: var(--ba-page);
   color: var(--ba-text);
   -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
+}
+
+html[data-theme='light'] body {
+  color-scheme: light;
+}
+
+/* Native <select> popups: stop white-on-white option text across admin */
+select {
+  color: var(--ba-text);
+  background-color: var(--ba-input);
+  color-scheme: dark;
+}
+
+html[data-theme='light'] select {
+  color-scheme: light;
+}
+
+select option,
+select optgroup {
+  color: var(--ba-text);
+  background-color: var(--ba-card);
+}
+
+html[data-theme='light'] select option,
+html[data-theme='light'] select optgroup {
+  color: #12141c;
+  background-color: #ffffff;
 }
 
 button,

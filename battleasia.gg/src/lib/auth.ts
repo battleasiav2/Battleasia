@@ -12,6 +12,7 @@ export type AuthUser = {
   balance?: number;
   emailVerified?: boolean;
   referralCode?: string;
+  usernameChangedAt?: string | null;
   pubgId?: string;
   bio?: string;
   gameServer?: string;

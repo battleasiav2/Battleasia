@@ -498,10 +498,26 @@ svg {
   .faq,
   .footer,
   .footer-cols,
-  .mode-grid,
   .pulse-rails {
     grid-template-columns: 1fr;
     grid-template-areas: none;
+  }
+
+  .mode-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .mode-card-media {
+    aspect-ratio: 5 / 4;
+  }
+
+  .mode-card h3 {
+    font-size: 15px;
+  }
+
+  .mode-card p {
+    font-size: 12px;
   }
 
   .pulse {

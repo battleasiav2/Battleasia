@@ -158,13 +158,15 @@ export function coverForGame(game: {
   const remote = game.banner || game.image || game.logo || '';
   if (remote && !isMissingArt(remote) && !remote.startsWith('/covers/')) return remote;
   const key = gameKey(game);
-  if (key !== 'arena') return `/covers/${key}.webp`;
+  if (key !== 'arena') return `/covers/${key}.webp?v=5`;
   return '/covers/arena.svg';
 }
 
 export function webpSrcSet(src: string, smW: number, fullW: number) {
-  if (!src.endsWith('.webp')) return undefined;
-  return `${src.replace(/\.webp$/, '-sm.webp')} ${smW}w, ${src} ${fullW}w`;
+  if (!src.includes('.webp')) return undefined;
+  const bare = src.split('?')[0];
+  const q = src.includes('?') ? `?${src.split('?')[1]}` : '';
+  return `${bare.replace(/\.webp$/, '-sm.webp')}${q} ${smW}w, ${bare}${q} ${fullW}w`;
 }
 
 export async function fetchGames() {

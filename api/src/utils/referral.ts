@@ -20,7 +20,13 @@ export async function resolveReferrerId(referredBy: string): Promise<Types.Objec
   const byCode = await User.findOne({
     referralCode: { $regex: new RegExp(`^${trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
   });
-  return byCode?._id ?? null;
+  if (byCode) return byCode._id;
+
+  const byUsername = await User.findOne({
+    username: { $regex: new RegExp(`^${trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+    status: true,
+  });
+  return byUsername?._id ?? null;
 }
 
 function roundMoney(value: number) {

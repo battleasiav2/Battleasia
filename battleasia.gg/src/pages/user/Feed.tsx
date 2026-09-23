@@ -264,32 +264,26 @@ export function FeedPage() {
   }, [openChat, t]);
 
   return (
-    <main className="play-main">
-      <header className="play-head">
+    <main className="play-main play-main-tight ig-feed">
+      <header className="play-head play-head-compact ig-feed-head">
         <div>
-          <p className="eyebrow">{t('feed.eyebrow')}</p>
           <h1>{t('feed.arena')}</h1>
-          <p className="play-lead">{t('feed.lead')}</p>
         </div>
-        <p className="play-count">
-          <strong>{active === 'messages' ? chats.length : posts?.length ?? '—'}</strong>
-          <small>{active === 'messages' ? t('feed.inbox') : t('feed.posts')}</small>
-        </p>
+        <nav className="ig-feed-tabs" aria-label={t('feed.eyebrow')}>
+          {TABS.map((tab) => (
+            <Link key={tab.id} className={`tab-link ${active === tab.id ? 'active' : ''}`} to={tab.to}>
+              {t(tab.label)}
+            </Link>
+          ))}
+          {p2?.igForYou ? (
+            <Link className={`tab-link ${active === 'fyp' ? 'active' : ''}`} to="/user/feed/fyp">
+              {t('feed.fyp')}
+            </Link>
+          ) : null}
+        </nav>
       </header>
-      <div className="money-tabs">
-        {TABS.map((tab) => (
-          <Link key={tab.id} className={`tab-link ${active === tab.id ? 'active' : ''}`} to={tab.to}>
-            {t(tab.label)}
-          </Link>
-        ))}
-        {p2?.igForYou ? (
-          <Link className={`tab-link ${active === 'fyp' ? 'active' : ''}`} to="/user/feed/fyp">
-            {t('feed.fyp')}
-          </Link>
-        ) : null}
-      </div>
       {active === 'home' ? (
-        <div className="money-tabs feed-scope-tabs">
+        <div className="money-tabs feed-scope-tabs ig-scope">
           <button type="button" className={homeScope === 'all' ? 'active' : ''} onClick={() => setHomeScope('all')}>
             {t('feed.forEveryone')}
           </button>
@@ -303,7 +297,7 @@ export function FeedPage() {
         </div>
       ) : null}
       {active === 'home' ? (
-        <div className="story-tray">
+        <div className="story-tray ig-stories">
           <label className="story-dot story-add">
             <span className="ph">+</span>
             <small>{t('feed.yourStory')}</small>
@@ -337,14 +331,25 @@ export function FeedPage() {
         </div>
       ) : null}
       {active === 'home' && creators.length ? (
-        <section className="feed-rail">
-          <h2>{t('feed.suggested')}</h2>
-          <div className="creator-row">
+        <section className="feed-rail ig-suggest">
+          <div className="ig-suggest-head">
+            <h2>{t('feed.suggested')}</h2>
+          </div>
+          <div className="ig-suggest-row">
             {creators.slice(0, 8).map((c) => (
-              <span key={c.id} className="creator-chip">
-                <Link to={`/profile/${c.id}`}>{c.username}</Link>
+              <article key={c.id} className="ig-suggest-card">
+                <Link to={`/profile/${c.id}`} className="ig-suggest-avatar">
+                  {c.avatar ? (
+                    <img src={c.avatar} alt="" width={56} height={56} />
+                  ) : (
+                    <span aria-hidden>{(c.username || '?').slice(0, 1).toUpperCase()}</span>
+                  )}
+                </Link>
+                <Link to={`/profile/${c.id}`} className="ig-suggest-name">
+                  {c.username}
+                </Link>
                 <button
-                  className="text-link"
+                  className={`btn ${c.isFollowing ? 'btn-ghost' : 'btn-primary'} ig-suggest-follow`}
                   type="button"
                   onClick={async () => {
                     try {
@@ -368,14 +373,14 @@ export function FeedPage() {
                 >
                   {c.isFollowing ? t('profile.following') : t('feed.follow')}
                 </button>
-              </span>
+              </article>
             ))}
           </div>
         </section>
       ) : null}
       {active === 'home' ? (
         <form
-          className="money-form room-card"
+          className="money-form room-card ig-composer"
           onSubmit={async (e) => {
             e.preventDefault();
             if (!draft.trim() && !postFiles.length) return;
@@ -402,17 +407,27 @@ export function FeedPage() {
             }
           }}
         >
-          <h2>{t('feed.newPost')}</h2>
-          <label className="field">
-            {t('feed.dropLine')}
-            <input value={draft} maxLength={500} onChange={(e) => setDraft(e.target.value)} placeholder={t('feed.dropLine')} />
-            <span className="field-hint">{draft.length}/500</span>
-          </label>
+                    <div className="ig-composer-row">
+            {me?.avatar ? (
+              <img className="ig-composer-avatar" src={me.avatar} alt="" width={40} height={40} />
+            ) : (
+              <span className="ig-composer-avatar ph" aria-hidden>
+                {(me?.username || '?').slice(0, 1).toUpperCase()}
+              </span>
+            )}
+            <label className="field ig-composer-field">
+              <span className="sr-only">{t('feed.dropLine')}</span>
+              <input value={draft} maxLength={500} onChange={(e) => setDraft(e.target.value)} placeholder={t('feed.dropLine')} />
+            </label>
+            <button className="btn btn-primary ig-composer-go" type="submit" disabled={busy || (!draft.trim() && !postFiles.length)}>
+              {busy ? t('feed.publishing') : t('feed.publish')}
+            </button>
+          </div>
           <FilePick
             accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
             multiple
             disabled={busy}
-            hint={t('feed.dropMany')}
+            hint={t('feed.photo') + ' / video'}
             files={postFiles}
             onFiles={setPostFiles}
           />
@@ -431,13 +446,11 @@ export function FeedPage() {
               </button>
             </div>
           ) : null}
-          <button className="btn btn-primary" type="submit" disabled={busy}>
-            {busy ? t('feed.publishing') : t('feed.publish')}
-          </button>
+
         </form>
       ) : null}
       {active === 'home' && (p2?.igForYou || p2?.voiceNotes) ? (
-        <details className="feed-rail">
+        <details className="feed-rail ig-mutes">
         <summary>{t('feed.mutes')}</summary>
         <form
           className="money-form"
@@ -467,7 +480,7 @@ export function FeedPage() {
         </details>
       ) : null}
       {active === 'home' && flags?.igGameFeed ? (
-        <div className="money-tabs">
+        <div className="money-tabs ig-game-chips">
           {[['','feed.allGames'],['pubg','PUBG'],['freefire','Free Fire'],['cod','COD'],['mlbb','MLBB'],['valorant','Valorant']].map(([g, label]) => (
             <button key={g || 'all'} type="button" className={!gameTag && !g ? 'active' : gameTag === g ? 'active' : ''} onClick={() => setGameTag(g)}>
               {g ? label : t(label)}

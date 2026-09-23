@@ -12,6 +12,33 @@ import { LocaleSelect } from './LocaleSelect';
 
 const OPEN_KEY = 'ba-admin-nav-open';
 const RAIL_KEY = 'ba-admin-rail';
+const MODE_KEY = 'ba-admin-mode';
+
+type AdminMode = 'arena' | 'shop';
+
+const ARENA_HOME = '/dashboard';
+const SHOP_HOME = '/shop/coinlist';
+
+const GROUP_MODE: Record<string, AdminMode | 'both'> = {
+  'nav.overview': 'both',
+  'nav.users': 'both',
+  'nav.games': 'arena',
+  'nav.money': 'shop',
+  'nav.community': 'both',
+  'nav.engagement': 'arena',
+  'nav.system': 'both',
+};
+
+function modeFromPath(path: string): AdminMode | null {
+  if (path.startsWith('/games') || path.startsWith('/engagement')) return 'arena';
+  if (path.startsWith('/payments') || path.startsWith('/shop') || path.startsWith('/balance')) return 'shop';
+  return null;
+}
+
+function readMode(): AdminMode {
+  const saved = localStorage.getItem(MODE_KEY);
+  return saved === 'shop' ? 'shop' : 'arena';
+}
 
 function readOpen(): string[] | null {
   try {
@@ -45,6 +72,7 @@ export function AdminShell() {
   const [drawer, setDrawer] = useState(false);
   const [account, setAccount] = useState(false);
   const [rail, setRail] = useState(() => localStorage.getItem(RAIL_KEY) === '1');
+  const [mode, setMode] = useState<AdminMode>(() => modeFromPath(location.pathname) || readMode());
   const [open, setOpen] = useState<string[]>(() => {
     const saved = readOpen();
     const current = groupForPath(location.pathname);
@@ -56,6 +84,14 @@ export function AdminShell() {
   muteRef.current = mute;
   const mac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
   const initials = (user?.username || user?.email || 'A').slice(0, 1).toUpperCase();
+
+  useEffect(() => {
+    const fromPath = modeFromPath(location.pathname);
+    if (fromPath && fromPath !== mode) {
+      setMode(fromPath);
+      localStorage.setItem(MODE_KEY, fromPath);
+    }
+  }, [location.pathname, mode]);
 
   useEffect(() => {
     fetchAdminMe().catch((err) => {
@@ -136,12 +172,18 @@ export function AdminShell() {
   }, [t]);
 
   const items = useMemo(() => {
-    const all = paletteItems().filter((i) => can(i.perm));
+    const all = paletteItems().filter((i) => {
+      if (!can(i.perm)) return false;
+      const group = NAV.find((g) => g.items.some((it) => it.to === i.to))?.label;
+      if (!group) return true;
+      const scope = GROUP_MODE[group] || 'both';
+      return scope === 'both' || scope === mode;
+    });
     const query = q.trim().toLowerCase();
     return query
       ? all.filter((i) => t(i.label).toLowerCase().includes(query) || i.label.toLowerCase().includes(query) || i.to.includes(query))
       : all;
-  }, [q, t]);
+  }, [q, t, mode]);
 
   function ping(msg: string) {
     setToast(msg);
@@ -173,7 +215,21 @@ export function AdminShell() {
     localStorage.setItem(RAIL_KEY, next ? '1' : '0');
   }
 
+  function enterMode(next: AdminMode) {
+    setMode(next);
+    localStorage.setItem(MODE_KEY, next);
+    setDrawer(false);
+    navigate(next === 'shop' ? SHOP_HOME : ARENA_HOME);
+  }
+
   const pendingTotal = pending.deposits + pending.withdrawals;
+  const navGroups = useMemo(
+    () => NAV.filter((group) => {
+      const scope = GROUP_MODE[group.label] || 'both';
+      return scope === 'both' || scope === mode;
+    }),
+    [mode]
+  );
 
   return (
     <div className={`admin-app notranslate${rail ? ' is-rail' : ''}${drawer ? ' is-drawer' : ''}`} translate="no">
@@ -192,7 +248,7 @@ export function AdminShell() {
           </button>
         </div>
         <nav>
-          {NAV.map((group) => {
+          {navGroups.map((group) => {
             const visible = group.items.filter((i) => can(i.perm));
             if (!visible.length) return null;
             const expanded = rail || open.includes(group.label);
@@ -230,6 +286,26 @@ export function AdminShell() {
           <button className="admin-burger" type="button" aria-label={t('chrome.menu')} onClick={() => setDrawer((v) => !v)}>
             <span />
           </button>
+          <div className="admin-mode" role="tablist" aria-label={t('chrome.modeSwitch')}>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'arena'}
+              className={mode === 'arena' ? 'is-on' : ''}
+              onClick={() => enterMode('arena')}
+            >
+              {t('chrome.arena')}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={mode === 'shop'}
+              className={mode === 'shop' ? 'is-on' : ''}
+              onClick={() => enterMode('shop')}
+            >
+              {t('chrome.shop')}
+            </button>
+          </div>
           <button className="admin-search" type="button" onClick={() => setPalette(true)}>
             <NavGlyph name="scan" />
             <span>{t('chrome.search')}</span>

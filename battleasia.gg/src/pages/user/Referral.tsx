@@ -15,7 +15,9 @@ import { useI18n } from '../../lib/i18n';
 export function ReferralPage() {
   const { t } = useI18n();
   const { toast } = useHudPage();
-  const [code, setCode] = useState(readSessionUser()?.referralCode || '');
+  const session = readSessionUser();
+  const [username, setUsername] = useState(session?.username || '');
+  const [code, setCode] = useState(session?.referralCode || '');
   const [stats, setStats] = useState<ReferralStats | null>(null);
   const [people, setPeople] = useState<Array<{ id: string; username: string; totalEarnings?: number; status?: string }>>([]);
   const [history, setHistory] = useState<Array<{ id: string; referredUsername?: string; commissionAmount?: number; createdAt?: string }>>([]);
@@ -24,6 +26,7 @@ export function ReferralPage() {
   useEffect(() => {
     fetchMe()
       .then((u) => {
+        if (u.username) setUsername(u.username);
         if (u.referralCode) setCode(u.referralCode);
       })
       .catch(() => undefined);
@@ -36,7 +39,7 @@ export function ReferralPage() {
       .catch((err) => setError(isApiError(err) ? err.message : t('ref.offline')));
   }, [t]);
 
-  const link = `${window.location.origin}/auth/sign-up?ref=${encodeURIComponent(code || '')}`;
+  const link = `${window.location.origin}/auth/sign-up?ref=${encodeURIComponent(username || code || '')}`;
 
   function statusLabel(status?: string) {
     const s = (status || '').toLowerCase();
@@ -110,19 +113,29 @@ export function ReferralPage() {
 
       <div className="hub-stage">
         <section className="room-card">
-          <h2>{t('ref.code')}</h2>
+          <h2>{t('ref.invite')}</h2>
           <div className="pay-copy">
-            <p className="pay-addr">{code || '—'}</p>
-            <button className="btn btn-ghost" type="button" disabled={!code} onClick={() => void copy(code, t('ref.codeCopied'))}>
-              {t('ref.copyCode')}
+            <p className="pay-addr">@{username || '—'}</p>
+            <button
+              className="btn btn-ghost"
+              type="button"
+              disabled={!username}
+              onClick={() => void copy(username, t('ref.usernameCopied'))}
+            >
+              {t('ref.copyUsername')}
             </button>
           </div>
           <div className="pay-copy">
             <p className="pay-addr">{link}</p>
-            <button className="btn btn-primary" type="button" disabled={!code} onClick={() => void copy(link, t('ref.copied'))}>
+            <button className="btn btn-primary" type="button" disabled={!username && !code} onClick={() => void copy(link, t('ref.copied'))}>
               {t('ref.copy')}
             </button>
           </div>
+          {code ? (
+            <p className="play-muted" style={{ marginTop: 10 }}>
+              {t('ref.legacyCode')}: <code>{code}</code>
+            </p>
+          ) : null}
         </section>
         <section className="room-card">
           <h2>{t('ref.milestones')}</h2>
@@ -143,8 +156,8 @@ export function ReferralPage() {
                           await claimReferralMilestone(m.key!);
                           toast(t('ref.claimOk'));
                           setStats(await fetchReferralStats());
-                        } catch (err) {
-                          toast(isApiError(err) ? err.message : t('ref.claimFail'));
+                        } catch {
+                          toast(t('ref.claimFail'));
                         }
                       }}
                     >
@@ -160,46 +173,56 @@ export function ReferralPage() {
         </section>
       </div>
 
-      <div className="hub-stage">
-        <section className="room-card">
-          <h2>{t('ref.network')}</h2>
-          {people.length === 0 ? (
-            <p className="play-muted">{t('ref.emptyLead')}</p>
-          ) : (
-            <div className="xfer-list">
-              {people.map((p) => (
-                <article className="xfer-item" key={p.id}>
-                  <div>
-                    <b>{p.username}</b>
-                    <small>
-                      <span className={`xfer-dir ${statusTone(p.status)}`}>{statusLabel(p.status)}</span>
-                    </small>
-                  </div>
-                  <CoinValue value={p.totalEarnings || 0} />
-                </article>
-              ))}
+      <section className="room-card" style={{ marginTop: 16 }}>
+        <h2>{t('ref.network')}</h2>
+        {people.length === 0 ? (
+          <div className="play-empty play-empty-inline">
+            <h2>{t('ref.empty')}</h2>
+            <p>{t('ref.emptyLead')}</p>
+          </div>
+        ) : (
+          <div className="wallet-table result-table">
+            <div className="result-head">
+              <span>{t('ref.player')}</span>
+              <span>{t('ref.status')}</span>
+              <span>{t('ref.earned')}</span>
             </div>
-          )}
-        </section>
-        <section className="room-card">
-          <h2>{t('ref.history')}</h2>
-          {history.length === 0 ? (
-            <p className="play-muted">{t('ref.noHist')}</p>
-          ) : (
-            <div className="xfer-list">
-              {history.map((h) => (
-                <article className="xfer-item" key={h.id}>
-                  <div>
-                    <b>{h.referredUsername || '—'}</b>
-                    <small>{whenLabel(h.createdAt)}</small>
-                  </div>
-                  <CoinValue value={h.commissionAmount || 0} />
-                </article>
-              ))}
+            {people.map((row) => (
+              <div className="result-row" key={row.id}>
+                <span>{row.username}</span>
+                <span className={`xfer-dir ${statusTone(row.status)}`}>{statusLabel(row.status)}</span>
+                <span>
+                  <CoinValue value={row.totalEarnings ?? 0} />
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="room-card" style={{ marginTop: 16 }}>
+        <h2>{t('ref.history')}</h2>
+        {history.length === 0 ? (
+          <p className="play-muted">{t('ref.noHist')}</p>
+        ) : (
+          <div className="wallet-table result-table">
+            <div className="result-head">
+              <span>{t('ref.player')}</span>
+              <span>{t('ref.earned')}</span>
+              <span>{t('xfer.when') || 'When'}</span>
             </div>
-          )}
-        </section>
-      </div>
+            {history.map((row) => (
+              <div className="result-row" key={row.id}>
+                <span>{row.referredUsername || '—'}</span>
+                <span>
+                  <CoinValue value={row.commissionAmount ?? 0} />
+                </span>
+                <span>{whenLabel(row.createdAt)}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
     </main>
   );
 }

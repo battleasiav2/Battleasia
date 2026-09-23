@@ -39,7 +39,43 @@
   font-family: var(--ba-font-display);
   font-size: 40px;
   letter-spacing: -0.04em;
-  margin: 32px 0 8px;
+  margin: 16px 0 8px;
+}
+
+.auth-seal {
+  display: flex;
+  justify-content: flex-start;
+  margin: 20px 0 0;
+}
+
+.auth-seal-svg {
+  display: block;
+  filter: drop-shadow(0 10px 22px color-mix(in srgb, var(--ba-accent) 28%, transparent));
+}
+
+.auth-trust {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 14px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+
+.auth-trust li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ba-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.auth-trust svg {
+  color: var(--ba-accent);
+  flex-shrink: 0;
 }
 
 .auth-sub,
@@ -230,6 +266,9 @@ a.auth-link:hover {
   overflow: hidden;
   display: grid;
   align-items: end;
+  background:
+    #07080d
+    url('/assets/hero/auth-login.png?v=4') center / cover no-repeat;
 }
 
 .auth-hero-shade {
@@ -238,8 +277,8 @@ a.auth-link:hover {
   z-index: 1;
   pointer-events: none;
   background:
-    linear-gradient(90deg, rgba(7, 8, 13, 0.88) 0%, rgba(7, 8, 13, 0.55) 42%, rgba(7, 8, 13, 0.2) 72%, transparent 100%),
-    linear-gradient(180deg, rgba(7, 8, 13, 0.35) 0%, transparent 28%, rgba(7, 8, 13, 0.75) 78%, rgba(7, 8, 13, 0.92) 100%);
+    linear-gradient(90deg, rgba(7, 8, 13, 0.62) 0%, rgba(7, 8, 13, 0.18) 42%, transparent 72%),
+    linear-gradient(180deg, rgba(7, 8, 13, 0.2) 0%, transparent 28%, rgba(7, 8, 13, 0.82) 100%);
 }
 
 .auth-promo {
@@ -491,17 +530,16 @@ a.auth-link:hover {
     flex-wrap: wrap;
   }
 
-  /* Form first; promo panel sits below on mobile */
+  /* Form first; cinematic art sits below on mobile */
   .auth-hero {
     order: 2;
-    min-height: min(420px, 58svh);
+    min-height: min(280px, 42svh);
     max-height: none;
-    align-items: end;
   }
 
   .auth-hero-shade {
     background:
-      linear-gradient(180deg, rgba(7, 8, 13, 0.45) 0%, rgba(7, 8, 13, 0.25) 35%, rgba(7, 8, 13, 0.82) 72%, rgba(7, 8, 13, 0.94) 100%);
+      linear-gradient(180deg, rgba(7, 8, 13, 0.08) 0%, rgba(7, 8, 13, 0.35) 70%, rgba(7, 8, 13, 0.88) 100%);
   }
 
   .auth-hero-copy {

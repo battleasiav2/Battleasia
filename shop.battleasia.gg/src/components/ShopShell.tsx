@@ -79,7 +79,7 @@ function ShopChrome() {
     <div className="play-app">
       <header className={`play-hud${navOpen ? ' is-open' : ''}`}>
         <Link className="brand" to="/user/shop">
-          <img src={ASSETS.logo} width={40} height={40} alt="BattleAsia Shop" />
+          <img src={ASSETS.logo} width={44} height={44} alt="BattleAsia Shop" />
           <div className="brand-name">
             BATTLE ASIA <span>SHOP</span>
           </div>

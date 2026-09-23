@@ -3,9 +3,20 @@ import { splitCaption } from '../lib/text';
 
 export function CaptionText({ text, className = '' }: { text: string; className?: string }) {
   if (!text) return null;
+  const clean = text
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+  if (!clean) return null;
   return (
     <p className={className}>
-      {splitCaption(text).map((part, i) => {
+      {splitCaption(clean).map((part, i) => {
         if (part.startsWith('#')) {
           return (
             <Link key={`${part}-${i}`} className="tag-link" to={`/user/hashtag/${encodeURIComponent(part.slice(1).toLowerCase())}`}>

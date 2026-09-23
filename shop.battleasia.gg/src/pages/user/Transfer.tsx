@@ -8,7 +8,9 @@ import { useI18n } from '../../lib/i18n';
 import {
   fetchTransferHistory,
   fetchTransferSettings,
+  lookupTransferUser,
   sendTransfer,
+  type TransferPreviewUser,
   type TransferRow,
   type TransferSettings,
 } from '../../lib/wallet';
@@ -30,6 +32,9 @@ export function TransferPage() {
   const [idem, setIdem] = useState(() => crypto.randomUUID());
   const [doneAmt, setDoneAmt] = useState(0);
   const [fieldErr, setFieldErr] = useState('');
+  const [preview, setPreview] = useState<TransferPreviewUser | null>(null);
+  const [previewBusy, setPreviewBusy] = useState(false);
+  const [previewErr, setPreviewErr] = useState('');
 
   useEffect(() => {
     return register({
@@ -65,6 +70,39 @@ export function TransferPage() {
     };
   }, [t]);
 
+  useEffect(() => {
+    const q = to.trim();
+    if (q.length < 2) {
+      setPreview(null);
+      setPreviewErr('');
+      setPreviewBusy(false);
+      return;
+    }
+    let live = true;
+    setPreviewBusy(true);
+    setPreviewErr('');
+    const timer = window.setTimeout(() => {
+      lookupTransferUser(q)
+        .then((user) => {
+          if (!live) return;
+          setPreview(user);
+          setPreviewErr(user ? '' : t('xfer.userMissing'));
+        })
+        .catch((err) => {
+          if (!live) return;
+          setPreview(null);
+          setPreviewErr(isApiError(err) && err.status === 404 ? t('xfer.userMissing') : isApiError(err) ? err.message : t('xfer.userMissing'));
+        })
+        .finally(() => {
+          if (live) setPreviewBusy(false);
+        });
+    }, 350);
+    return () => {
+      live = false;
+      window.clearTimeout(timer);
+    };
+  }, [to, t]);
+
   const amt = Number(amount) || 0;
   const fee = useMemo(() => {
     if (!settings) return 0;
@@ -98,6 +136,7 @@ export function TransferPage() {
   function validate() {
     if (!settings?.enabled) return t('xfer.disabled');
     if (!to.trim()) return t('xfer.needUser');
+    if (!preview || preview.username.toLowerCase() !== to.trim().toLowerCase()) return t('xfer.userMissing');
     const me = readSessionUser();
     const dest = to.trim().toLowerCase();
     if (dest && (dest === (me?.username || '').toLowerCase() || dest === (me?.email || '').toLowerCase())) {
@@ -130,8 +169,8 @@ export function TransferPage() {
   }
 
   return (
-    <main className="play-main">
-      <header className="play-head">
+    <main className="play-main xfer-hub">
+      <header className="play-head xfer-hub-head">
         <div>
           <p className="eyebrow">{t('nav.transfer')}</p>
           <h1>{t('xfer.title')}</h1>
@@ -154,9 +193,9 @@ export function TransferPage() {
           </Link>
         </div>
       ) : (
-        <div className="hub-stage">
+        <div className="hub-stage xfer-hub-stage">
           <form
-            className="money-form room-card"
+            className="money-form room-card xfer-hub-form"
             onSubmit={(e) => {
               e.preventDefault();
               const msg = validate();
@@ -171,8 +210,31 @@ export function TransferPage() {
             <h2>{t('xfer.sendTo')}</h2>
             <label className="field">
               {t('xfer.user')}
-              <input value={to} onChange={(e) => setTo(e.target.value)} autoComplete="off" maxLength={32} />
+              <input
+                value={to}
+                onChange={(e) => setTo(e.target.value)}
+                onBlur={(e) => setTo(e.target.value.trim())}
+                autoComplete="off"
+                maxLength={32}
+              />
             </label>
+            {previewBusy ? <p className="play-muted">{t('xfer.looking')}</p> : null}
+            {preview ? (
+              <div className="xfer-preview">
+                {preview.avatar ? (
+                  <img src={preview.avatar} alt="" width={44} height={44} />
+                ) : (
+                  <span className="xfer-preview-fallback" aria-hidden>
+                    {(preview.username || '?').slice(0, 1).toUpperCase()}
+                  </span>
+                )}
+                <div>
+                  <strong>@{preview.username}</strong>
+                  {preview.bio ? <small>{preview.bio}</small> : <small>{t('xfer.found')}</small>}
+                </div>
+              </div>
+            ) : null}
+            {!previewBusy && previewErr && to.trim().length >= 2 ? <p className="field-error">{previewErr}</p> : null}
             <label className="field">
               {t('wallet.amount')}
               <input type="number" min={1} step={1} value={amount} onChange={(e) => setAmount(e.target.value)} />
@@ -220,7 +282,7 @@ export function TransferPage() {
               {t('xfer.continue')}
             </button>
           </form>
-          <section className="room-card">
+          <section className="room-card xfer-hub-recent">
             <h2>{t('xfer.recent')}</h2>
             {rows === null ? (
               <div className="match-row skeleton" />

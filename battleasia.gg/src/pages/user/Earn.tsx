@@ -128,54 +128,63 @@ export function EarnPage() {
   const welcome = home.welcome || {};
 
   const claimableMissions = missions.filter((m) => m.status === 'completed').length;
+  const level = home.level?.level ?? 1;
+  const progressPct = Math.min(100, Number(home.level?.progressPct ?? 0));
+  const ranks = [
+    { min: 1, title: 'Rookie', tone: 'bronze' },
+    { min: 5, title: 'Contender', tone: 'silver' },
+    { min: 10, title: 'Veteran', tone: 'gold' },
+    { min: 20, title: 'Elite', tone: 'platinum' },
+    { min: 35, title: 'Champion', tone: 'diamond' },
+    { min: 50, title: 'Legend', tone: 'master' },
+  ] as const;
+  const activeRank = [...ranks].reverse().find((r) => level >= r.min) || ranks[0];
 
   return (
-    <main className="play-main">
-      <header className="play-head">
+    <main className="play-main play-main-tight earn-hub earn-board">
+      <header className="play-head play-head-compact earn-hub-head">
         <div>
           <p className="eyebrow">{t('nav.earn')}</p>
           <h1>{t('earn.title')}</h1>
-          <p className="play-lead">{t('earn.lead')}</p>
         </div>
         <p className="play-count">
-          <strong>{home.level?.level ?? 1}</strong>
-            <small>{home.level?.title?.title || t('earn.rookie')}</small>
+          <strong>{level}</strong>
+          <small>{home.level?.title?.title || t('earn.rookie')}</small>
         </p>
       </header>
-      {home.level ? (
-        <section className="match-facts">
-          <article>
-            <small>{t('earn.level')}</small>
-            <strong>{home.level.level ?? 1}</strong>
-          </article>
-          <article>
-            <small>{t('earn.xp')}</small>
-            <strong>{home.level.xp ?? 0}</strong>
-          </article>
-          <article>
-            <small>{t('earn.titleLabel')}</small>
-            <strong>{home.level.title?.title || t('earn.rookie')}</strong>
-          </article>
-          <article>
-            <small>{t('earn.toNext')}</small>
-            <strong>{home.level.progressPct ?? 0}%</strong>
-          </article>
-        </section>
-      ) : null}
-      {tab === 'overview' && home.depositBonusDays?.active ? (
-        <div className="wallet-pending">
-          <span className="match-status is-upcoming">{t('earn.depositBonus')}</span>
+
+      <section className="earn-ranks" aria-label={t('earn.titleLabel')}>
+        {ranks.map((r) => (
+          <div key={r.title} className={`earn-rank ${r.tone} ${activeRank.title === r.title ? 'is-on' : level >= r.min ? 'is-done' : ''}`}>
+            <span className="earn-rank-orb" aria-hidden />
+            <small>{r.title}</small>
+          </div>
+        ))}
+      </section>
+
+      <section className="earn-hero">
+        <div
+          className="earn-ring"
+          style={{ ['--pct' as string]: String(progressPct) }}
+          aria-label={`${t('earn.toNext')} ${progressPct}%`}
+        >
+          <strong>{progressPct}%</strong>
+          <small>{t('earn.toNext')}</small>
+        </div>
+        <div className="earn-hero-copy">
+          <h2>{home.level?.title?.title || t('earn.rookie')}</h2>
           <p>
-            +{home.depositBonusDays.percent}% {home.depositBonusDays.title}
+            {t('earn.level')} {level} · {t('earn.xp')} {home.level?.xp ?? 0}
           </p>
+          {tab === 'overview' && home.depositBonusDays?.active ? (
+            <p className="earn-hero-tip">
+              +{home.depositBonusDays.percent}% {home.depositBonusDays.title}
+            </p>
+          ) : null}
+          {tab === 'overview' && flags?.cashbackDays ? <p className="earn-hero-tip">{t('earn.cashbackOn')}</p> : null}
         </div>
-      ) : null}
-      {tab === 'overview' && flags?.cashbackDays ? (
-        <div className="wallet-pending">
-          <span className="match-status is-upcoming">{t('earn.cashbackTitle')}</span>
-          <p>{t('earn.cashbackOn')}</p>
-        </div>
-      ) : null}
+      </section>
+
       <div className="money-tabs earn-tabs">
         {TABS.map(([id, label]) => (
           <button key={id} type="button" className={tab === id ? 'active' : ''} onClick={() => setParams({ tab: id })}>
@@ -185,48 +194,134 @@ export function EarnPage() {
       </div>
 
       {tab === 'overview' ? (
-        <div className="earn-mods">
-          <button type="button" className="earn-mod" onClick={() => setParams({ tab: 'missions' })}>
-            <small>{t('earn.tabMissions')}</small>
-            <strong>{missions.length}</strong>
-            <span>
-              {claimableMissions ? `${claimableMissions} ${t('earn.claimable')}` : t('earn.openTab')}
-            </span>
-          </button>
-          <button type="button" className="earn-mod" onClick={() => setParams({ tab: 'streak' })}>
-            <small>{t('earn.tabStreak')}</small>
-            <strong>{streak.currentStreak ?? 0}</strong>
-            <span>{t('earn.current')}</span>
-          </button>
-          <button type="button" className="earn-mod" onClick={() => setParams({ tab: 'spin' })}>
-            <small>{t('earn.tabSpin')}</small>
-            <strong>{spin.remaining ?? 0}</strong>
-            <span>{t('earn.spinLeft')}</span>
-          </button>
-          <button type="button" className="earn-mod" onClick={() => setParams({ tab: 'squad' })}>
-            <small>{t('earn.tabSquad')}</small>
-            <strong>
-              {squad.winCount ?? 0}/{squad.targetWins ?? 0}
-            </strong>
-            <span>{t('earn.wins')}</span>
-          </button>
-          <button type="button" className="earn-mod" onClick={() => setParams({ tab: 'season' })}>
-            <small>{t('earn.tabSeason')}</small>
-            <strong>{season.currentTier ?? 0}</strong>
-            <span>{t('earn.tier')}</span>
-          </button>
-          <button type="button" className="earn-mod" onClick={() => setParams({ tab: 'badges' })}>
-            <small>{t('earn.tabBadges')}</small>
-            <strong>{badges.filter((b) => b.unlocked).length}</strong>
-            <span>
-              {badges.length} {t('earn.tabBadges').toLowerCase()}
-            </span>
-          </button>
-        </div>
+        <section className="earn-tasks">
+          <h2>{t('earn.tabMissions')}</h2>
+          <ul className="earn-task-list">
+            {(welcome.enabled ? welcome.milestones || [] : []).map((w) => (
+              <li key={w.key || w.title} className={`earn-task ${w.canClaim ? 'is-ready' : w.claimed ? 'is-done' : ''}`}>
+                <span className="earn-task-icon" aria-hidden>
+                  ★
+                </span>
+                <div className="earn-task-body">
+                  <strong>{w.title}</strong>
+                  <small>{w.claimed ? t('earn.claimed') : t('earn.welcome')}</small>
+                </div>
+                <span className="earn-task-reward">
+                  +<CoinValue value={w.bacAmount || 0} />
+                </span>
+                {w.canClaim && w.key ? (
+                  <button className="btn btn-primary earn-task-go" type="button" disabled={busy === w.key} onClick={() => void run(w.key!, () => claimWelcome(w.key!))}>
+                    {busy === w.key ? t('earn.claiming') : t('earn.claim')}
+                  </button>
+                ) : (
+                  <button className="btn btn-ghost earn-task-go" type="button" disabled>
+                    {w.claimed ? t('earn.claimed') : t('earn.openTab')}
+                  </button>
+                )}
+              </li>
+            ))}
+            <li className="earn-task">
+              <span className="earn-task-icon" aria-hidden>
+                ✓
+              </span>
+              <div className="earn-task-body">
+                <strong>{t('earn.tabMissions')}</strong>
+                <small>
+                  {claimableMissions ? `${claimableMissions} ${t('earn.claimable')}` : `${missions.length} ${t('earn.openTab')}`}
+                </small>
+              </div>
+              <span className="earn-task-reward">{missions.length}</span>
+              <button className="btn btn-primary earn-task-go" type="button" onClick={() => setParams({ tab: 'missions' })}>
+                {t('earn.openTab')}
+              </button>
+            </li>
+            <li className="earn-task">
+              <span className="earn-task-icon" aria-hidden>
+                🔥
+              </span>
+              <div className="earn-task-body">
+                <strong>{t('earn.tabStreak')}</strong>
+                <small>
+                  {t('earn.current')} {streak.currentStreak ?? 0}
+                </small>
+              </div>
+              <span className="earn-task-reward">
+                +<CoinValue value={streak.todayReward || 0} />
+              </span>
+              <button className="btn btn-primary earn-task-go" type="button" onClick={() => setParams({ tab: 'streak' })}>
+                {streak.canClaim ? t('earn.claim') : t('earn.openTab')}
+              </button>
+            </li>
+            <li className="earn-task">
+              <span className="earn-task-icon" aria-hidden>
+                🎡
+              </span>
+              <div className="earn-task-body">
+                <strong>{t('earn.tabSpin')}</strong>
+                <small>
+                  {spin.remaining ?? 0} {t('earn.spinLeft')}
+                </small>
+              </div>
+              <span className="earn-task-reward">{spin.remaining ?? 0}</span>
+              <button className="btn btn-primary earn-task-go" type="button" onClick={() => setParams({ tab: 'spin' })}>
+                {t('earn.spin')}
+              </button>
+            </li>
+            <li className="earn-task">
+              <span className="earn-task-icon" aria-hidden>
+                👥
+              </span>
+              <div className="earn-task-body">
+                <strong>{t('earn.tabSquad')}</strong>
+                <small>
+                  {t('earn.wins')} {squad.winCount ?? 0}/{squad.targetWins ?? 0}
+                </small>
+              </div>
+              <span className="earn-task-reward">
+                {squad.winCount ?? 0}/{squad.targetWins ?? 0}
+              </span>
+              <button className="btn btn-primary earn-task-go" type="button" onClick={() => setParams({ tab: 'squad' })}>
+                {t('earn.openTab')}
+              </button>
+            </li>
+            <li className="earn-task">
+              <span className="earn-task-icon" aria-hidden>
+                🎖
+              </span>
+              <div className="earn-task-body">
+                <strong>{t('earn.tabSeason')}</strong>
+                <small>
+                  {t('earn.tier')} {season.currentTier ?? 0}
+                </small>
+              </div>
+              <span className="earn-task-reward">{season.claimableCount ?? 0}</span>
+              <button className="btn btn-primary earn-task-go" type="button" onClick={() => setParams({ tab: 'season' })}>
+                {t('earn.openTab')}
+              </button>
+            </li>
+            {home.weeklyArena?.enabled ? (
+              <li className="earn-task is-ready">
+                <span className="earn-task-icon" aria-hidden>
+                  🏆
+                </span>
+                <div className="earn-task-body">
+                  <strong>{t('earn.weekly')}</strong>
+                  <small>
+                    {t('earn.yourRank')}: {home.weeklyArena.viewerRank ?? '—'}
+                  </small>
+                </div>
+                <span className="earn-task-reward">BAC</span>
+                <button className="btn btn-primary earn-task-go" type="button" disabled={busy === 'weekly'} onClick={() => void run('weekly', claimWeekly)}>
+                  {t('earn.claimWeekly')}
+                </button>
+              </li>
+            ) : null}
+          </ul>
+        </section>
       ) : null}
 
       {tab === 'missions' ? (
-        <section>
+        <section className="earn-tasks">
           <h2>{t('earn.tabMissions')}</h2>
           {missions.length === 0 ? (
             <div className="play-empty">
@@ -237,66 +332,39 @@ export function EarnPage() {
               </Link>
             </div>
           ) : (
-            <ul className="earn-list">
+            <ul className="earn-task-list">
               {missions.map((m) => (
-                <li key={m.id}>
-                  <div>
+                <li key={m.id} className={`earn-task ${m.status === 'completed' ? 'is-ready' : ''}`}>
+                  <span className="earn-task-icon" aria-hidden>
+                    ◆
+                  </span>
+                  <div className="earn-task-body">
                     <strong>{m.mission?.title || t('earn.missionFallback')}</strong>
-                    <p className="play-muted">{m.mission?.description}</p>
+                    <small>{m.mission?.description}</small>
                     <div className="earn-bar" aria-hidden>
                       <i style={{ width: `${Math.min(100, (m.progress / Math.max(m.target, 1)) * 100)}%` }} />
                     </div>
                     <small>
-                      {m.progress}/{m.target} · <CoinValue value={m.mission?.reward?.bacAmount || 0} />
+                      {m.progress}/{m.target}
                     </small>
-                    <span className={`match-status is-${(m.status || 'active').toLowerCase()}`}>{m.status}</span>
                   </div>
+                  <span className="earn-task-reward">
+                    +<CoinValue value={m.mission?.reward?.bacAmount || 0} />
+                  </span>
                   {m.status === 'completed' ? (
-                    <button className="btn btn-primary" type="button" disabled={busy === m.id} onClick={() => void run(m.id, () => claimMission(m.id))}>
+                    <button className="btn btn-primary earn-task-go" type="button" disabled={busy === m.id} onClick={() => void run(m.id, () => claimMission(m.id))}>
                       {busy === m.id ? t('earn.claiming') : t('earn.claim')}
                     </button>
-                  ) : null}
+                  ) : (
+                    <Link className="btn btn-ghost earn-task-go" to="/user/play">
+                      {t('nav.play')}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
           )}
         </section>
-      ) : null}
-
-      {tab === 'overview' && (welcome.enabled && welcome.milestones?.length || home.weeklyArena?.enabled) ? (
-        <div className="hub-stage">
-          {welcome.enabled && welcome.milestones?.length ? (
-            <div className="room-card">
-              <h2>{t('earn.welcome')}</h2>
-              <ul className="roster">
-                {welcome.milestones.map((w) => (
-                  <li key={w.key}>
-                    <span>
-                      <span className="earn-welcome-title">{w.title}</span>
-                      <CoinValue value={w.bacAmount || 0} />
-                    </span>
-                    {w.canClaim && w.key ? (
-                      <button className="btn btn-ghost" type="button" onClick={() => void run(w.key!, () => claimWelcome(w.key!))}>
-                        {t('earn.claim')}
-                      </button>
-                    ) : (
-                      <small>{w.claimed ? t('earn.claimed') : ''}</small>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-          {home.weeklyArena?.enabled ? (
-            <section className="room-card">
-              <h2>{t('earn.weekly')}</h2>
-              <p>{t('earn.yourRank')}: {home.weeklyArena.viewerRank ?? '—'}</p>
-              <button className="btn btn-ghost" type="button" onClick={() => void run('weekly', claimWeekly)}>
-                {t('earn.claimWeekly')}
-              </button>
-            </section>
-          ) : null}
-        </div>
       ) : null}
 
       {tab === 'streak' ? (

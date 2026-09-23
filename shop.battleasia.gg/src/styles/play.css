@@ -217,6 +217,7 @@
 
 .money-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin: 16px 0 24px;
 }
@@ -796,12 +797,89 @@ a.result-row {
 }
 
 .shop-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.shop-buy {
+  width: min(1080px, calc(100% - 48px));
+  padding: 20px 0 40px;
+  display: grid;
+  gap: 12px;
+}
+
+.shop-buy-head {
+  align-items: end;
+  gap: 12px 20px;
+}
+
+.shop-buy-head h1 {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 34px);
+  letter-spacing: -0.04em;
+}
+
+.shop-buy-head .play-lead {
+  margin: 6px 0 0;
+  font-size: 13px;
+  max-width: 42ch;
+}
+
+.shop-buy-head .eyebrow {
+  margin-bottom: 4px;
+}
+
+.shop-buy-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.shop-buy-actions {
+  margin: 0;
+}
+
+.shop-buy-pending {
+  margin: 0;
+  padding: 10px 12px;
+  gap: 4px;
+  border-radius: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shop-buy-pending p {
+  font-size: 13px;
+}
+
+.shop-buy .money-alert {
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.shop-buy-stage {
+  gap: 14px;
+  margin-top: 0;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.95fr);
+  align-items: stretch;
+}
+
+.shop-buy-packs {
+  min-width: 0;
+}
+
+.shop-buy .shop-grid {
+  margin-top: 0;
+  height: 100%;
+  align-content: start;
 }
 
 .shop-grid .play-card {
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--ba-card);
   border: 1px solid var(--ba-hair);
   overflow: hidden;
@@ -821,14 +899,14 @@ a.result-row {
   position: relative;
   aspect-ratio: auto;
   background: none;
-  padding: 12px 10px 0;
+  padding: 10px 8px 0;
   overflow: visible;
   min-height: 0;
 }
 
 .shop-grid .play-card-art .shop-pack-coin {
-  width: 52px;
-  height: 52px;
+  width: 40px;
+  height: 40px;
   margin: 0 auto;
   display: block;
   object-fit: contain;
@@ -841,8 +919,8 @@ a.result-row {
 }
 
 .shop-grid .play-card-meta {
-  padding: 8px 10px 10px;
-  gap: 3px;
+  padding: 6px 10px 10px;
+  gap: 2px;
 }
 
 .shop-grid .play-card-meta .coin {
@@ -850,12 +928,12 @@ a.result-row {
 }
 
 .shop-grid .play-card-meta .coin img {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
 }
 
 .shop-grid .play-card-meta strong {
-  font-size: 17px;
+  font-size: 16px;
   letter-spacing: -0.03em;
   display: inline-flex;
   align-items: center;
@@ -873,10 +951,408 @@ a.result-row {
 }
 
 .shop-grid .shop-off {
-  top: 8px;
-  right: 8px;
-  padding: 3px 7px;
+  top: 6px;
+  right: 6px;
+  padding: 2px 6px;
   font-size: 9px;
+}
+
+.shop-buy-pay {
+  margin: 0;
+  padding: 14px 14px 16px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.shop-buy-pay h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.shop-buy-pay .money-form {
+  gap: 10px;
+  margin: 0;
+  max-width: none;
+}
+
+.shop-buy-pay .field {
+  gap: 6px;
+}
+
+.shop-buy-pay .field input {
+  min-height: 40px;
+}
+
+.shop-buy-pay .xfer-break {
+  margin: 0;
+  padding: 10px;
+}
+
+.shop-buy-pay .pay-box {
+  padding: 10px;
+  margin: 0;
+}
+
+.shop-buy-pay .pay-box img {
+  width: 120px;
+  height: 120px;
+  margin: 6px 0 0;
+}
+
+@media (max-width: 900px) {
+  .shop-buy-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .shop-buy-head {
+    align-items: start;
+  }
+
+  .shop-buy-tools {
+    justify-content: flex-start;
+  }
+}
+
+.wallet-hub {
+  width: min(1080px, calc(100% - 48px));
+  padding: 20px 0 40px;
+  display: grid;
+  gap: 12px;
+}
+
+.wallet-hub-head {
+  align-items: end;
+  gap: 12px 20px;
+}
+
+.wallet-hub-head h1 {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 34px);
+  letter-spacing: -0.04em;
+}
+
+.wallet-hub-head .eyebrow {
+  margin-bottom: 4px;
+}
+
+.wallet-hub-tabs {
+  margin: 0;
+}
+
+.wallet-hub-stage {
+  gap: 14px;
+  margin-top: 0;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  align-items: start;
+}
+
+.wallet-hub-summary {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.wallet-hub-facts {
+  margin: 0;
+  gap: 8px;
+}
+
+.wallet-hub-facts article {
+  min-height: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.wallet-hub-facts strong {
+  margin-top: 6px;
+  font-size: 20px;
+}
+
+.wallet-hub-note {
+  margin: 0;
+  font-size: 12px;
+  max-width: none;
+  line-height: 1.45;
+}
+
+.wallet-hub .money-alert {
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.wallet-hub-actions {
+  margin: 0;
+}
+
+.wallet-hub-pay {
+  margin: 0;
+  padding: 14px 14px 16px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.wallet-hub-pay h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.wallet-hub-pay .money-form {
+  gap: 10px;
+  margin: 0;
+  max-width: none;
+}
+
+.wallet-hub-pay .field {
+  gap: 6px;
+}
+
+.wallet-hub-pay .field input,
+.wallet-hub-pay .field select {
+  min-height: 40px;
+}
+
+.wallet-hub .result-table {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .wallet-hub-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .wallet-hub-head {
+    align-items: start;
+  }
+
+  .wallet-hub-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.xfer-hub {
+  width: min(1080px, calc(100% - 48px));
+  padding: 20px 0 40px;
+  display: grid;
+  gap: 12px;
+}
+
+.xfer-hub-head {
+  align-items: end;
+  gap: 12px 20px;
+}
+
+.xfer-hub-head h1 {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 34px);
+  letter-spacing: -0.04em;
+}
+
+.xfer-hub-head .play-lead {
+  margin: 6px 0 0;
+  font-size: 13px;
+  max-width: 42ch;
+}
+
+.xfer-hub-head .eyebrow {
+  margin-bottom: 4px;
+}
+
+.xfer-hub-stage {
+  gap: 14px;
+  margin-top: 0;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  align-items: start;
+}
+
+.xfer-hub-form,
+.xfer-hub-recent {
+  margin: 0;
+  padding: 14px 14px 16px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.xfer-hub-form h2,
+.xfer-hub-recent h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.xfer-hub-form.money-form {
+  gap: 10px;
+  margin: 0;
+  max-width: none;
+}
+
+.xfer-hub-form .field {
+  gap: 6px;
+}
+
+.xfer-hub-form .field input {
+  min-height: 40px;
+}
+
+.xfer-hub-form .xfer-preview {
+  margin: 0;
+  padding: 8px 10px;
+  gap: 10px;
+  border-radius: 12px;
+}
+
+.xfer-hub-form .xfer-preview img,
+.xfer-hub-form .xfer-preview-fallback {
+  width: 36px;
+  height: 36px;
+}
+
+.xfer-hub-form .xfer-break {
+  margin: 0;
+  padding: 10px;
+}
+
+.xfer-hub .money-alert {
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.xfer-hub-recent .xfer-list {
+  gap: 0;
+}
+
+.xfer-hub-recent .xfer-item {
+  padding: 10px 0;
+}
+
+@media (max-width: 900px) {
+  .xfer-hub-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .xfer-hub-head {
+    align-items: start;
+  }
+}
+
+.wd-hub {
+  width: min(1080px, calc(100% - 48px));
+  padding: 20px 0 40px;
+  display: grid;
+  gap: 12px;
+}
+
+.wd-hub-head {
+  align-items: end;
+  gap: 12px 20px;
+}
+
+.wd-hub-head h1 {
+  margin: 0;
+  font-size: clamp(26px, 3vw, 34px);
+  letter-spacing: -0.04em;
+}
+
+.wd-hub-head .eyebrow {
+  margin-bottom: 4px;
+}
+
+.wd-hub-facts {
+  margin: 0;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(120px, 160px));
+  width: auto;
+}
+
+.wd-hub-facts article {
+  min-height: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.wd-hub-facts strong {
+  margin-top: 6px;
+  font-size: 20px;
+}
+
+.wd-hub-note {
+  margin: 0;
+  font-size: 12px;
+  max-width: none;
+  line-height: 1.45;
+}
+
+.wd-hub .money-alert {
+  margin: 0;
+  padding: 10px 12px;
+}
+
+.wd-hub-stage {
+  gap: 14px;
+  margin-top: 0;
+  grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+  align-items: start;
+}
+
+.wd-hub-form,
+.wd-hub-recent {
+  margin: 0;
+  padding: 14px 14px 16px;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.wd-hub-form h2,
+.wd-hub-recent h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.wd-hub-form .money-form {
+  gap: 10px;
+  margin: 0;
+  max-width: none;
+}
+
+.wd-hub-form .field {
+  gap: 6px;
+}
+
+.wd-hub-form .field input,
+.wd-hub-form .field select {
+  min-height: 40px;
+}
+
+.wd-hub-table {
+  margin-top: 0;
+}
+
+.wd-hub-table .result-row {
+  padding: 10px 0;
+  font-size: 13px;
+}
+
+.wd-hub-recent .play-empty {
+  padding: 16px 8px;
+}
+
+@media (max-width: 900px) {
+  .wd-hub-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .wd-hub-head {
+    align-items: start;
+  }
+
+  .wd-hub-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
 }
 
 .play-head {
@@ -1003,14 +1479,24 @@ a.result-row {
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(8, 9, 12, 0.55);
   color: var(--ba-text);
+  color-scheme: dark;
   padding: 0 12px;
   font: inherit;
 }
 
+.field select option {
+  background: #12141c;
+  color: #f4f5f7;
+}
+
 .field .money-tabs {
   margin: 0;
-  width: max-content;
-  align-self: flex-start;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-self: stretch;
 }
 
 .hub-stage .money-form,
@@ -1023,6 +1509,51 @@ a.result-row {
 .wallet-table .result-head,
 .wallet-table .result-row {
   grid-template-columns: minmax(140px, 1.2fr) minmax(120px, 0.9fr) 120px 120px;
+}
+
+.xfer-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 4px 0 8px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--ba-accent) 35%, var(--ba-hair));
+  background: color-mix(in srgb, var(--ba-accent) 8%, rgba(8, 9, 12, 0.45));
+}
+
+.xfer-preview img,
+.xfer-preview-fallback {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.xfer-preview-fallback {
+  display: grid;
+  place-items: center;
+  background: color-mix(in srgb, var(--ba-accent) 25%, #12141c);
+  font-weight: 800;
+}
+
+.xfer-preview div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.xfer-preview strong {
+  font-size: 14px;
+}
+
+.xfer-preview small {
+  color: var(--ba-muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .xfer-break {

@@ -67,6 +67,7 @@ export type PublicProfile = {
   pubgId?: string;
   gameServer?: string;
   referralCode?: string;
+  usernameChangedAt?: string | null;
   countryCode?: string;
   mobileNo?: string;
   twitterLink?: string;
@@ -413,7 +414,15 @@ export async function fetchProfile(id: string) {
 }
 
 export async function updateMe(body: Record<string, unknown>) {
-  return api('/api/v2/users/me', { method: 'PUT', body: JSON.stringify(body) });
+  const payload = await api('/api/v2/users/me', { method: 'PUT', body: JSON.stringify(body) });
+  const row = (payload || {}) as {
+    user?: PublicProfile & { usernameChangedAt?: string | null; email?: string };
+    data?: PublicProfile;
+  };
+  return {
+    user: row.user || null,
+    data: row.data || null,
+  };
 }
 
 export type FollowUser = {

@@ -112,87 +112,94 @@ export function WalletPage() {
   }
 
   return (
-    <main className="play-main">
-      <p className="eyebrow">{t('nav.wallet')}</p>
-      <h1>{t('wallet.title')}</h1>
-      <div className="money-tabs">
-        <button type="button" className={tab === 'overview' ? 'active' : ''} onClick={() => setParams({})}>
-          {t('wallet.overview')}
-        </button>
-        <button
-          type="button"
-          className={tab === 'history' ? 'active' : ''}
-          onClick={() => setParams({ tab: 'history' })}
-        >
-          {t('wallet.history')}
-        </button>
-      </div>
+    <main className="play-main wallet-hub">
+      <header className="play-head wallet-hub-head">
+        <div>
+          <p className="eyebrow">{t('nav.wallet')}</p>
+          <h1>{t('wallet.title')}</h1>
+        </div>
+        <div className="money-tabs wallet-hub-tabs">
+          <button type="button" className={tab === 'overview' ? 'active' : ''} onClick={() => setParams({})}>
+            {t('wallet.overview')}
+          </button>
+          <button
+            type="button"
+            className={tab === 'history' ? 'active' : ''}
+            onClick={() => setParams({ tab: 'history' })}
+          >
+            {t('wallet.history')}
+          </button>
+        </div>
+      </header>
 
       {error ? <p className="form-error">{error}</p> : null}
 
       {tab === 'overview' ? (
-        <>
-          {info === null && !error ? <div className="match-row skeleton" /> : null}
-          {balance === 0 && info ? (
-            <div className="play-empty">
-              <div className="play-empty-art" aria-hidden />
-              <h2>{t('wallet.empty')}</h2>
-              <p>{t('wallet.emptyLead')}</p>
+        <div className="hub-stage wallet-hub-stage">
+          <div className="wallet-hub-summary">
+            {info === null && !error ? <div className="match-row skeleton" /> : null}
+            {balance === 0 && info ? (
+              <div className="play-empty">
+                <div className="play-empty-art" aria-hidden />
+                <h2>{t('wallet.empty')}</h2>
+                <p>{t('wallet.emptyLead')}</p>
+                <Link className="btn btn-primary" to="/user/shop">
+                  {t('wallet.buy')}
+                </Link>
+              </div>
+            ) : (
+              <section className="match-facts wallet-hub-facts">
+                <article>
+                  <small>{t('wallet.total')}</small>
+                  <strong>
+                    <CoinValue value={balance} />
+                  </strong>
+                </article>
+                <article>
+                  <small>{t('wallet.withdrawable')}</small>
+                  <strong>
+                    <CoinValue value={withdrawable} />
+                  </strong>
+                </article>
+                <article>
+                  <small>USD</small>
+                  <strong>{usd == null ? '—' : usd.toFixed(2)}</strong>
+                </article>
+                <article>
+                  <small>BDT</small>
+                  <strong>{bdt == null ? '—' : bdt.toFixed(0)}</strong>
+                </article>
+              </section>
+            )}
+            <p className="play-muted wallet-hub-note">{t('wallet.rule')}</p>
+            {info && balance > withdrawable ? (
+              <p className="play-muted wallet-hub-note">
+                {t('wallet.lockedWhy')} <CoinValue value={balance - withdrawable} />
+                {info.totalMatchBets ? ` · ${t('wallet.locked')} ${info.totalMatchBets} BAC` : ''}.
+              </p>
+            ) : null}
+            {doneAmt ? (
+              <div className="money-alert">
+                <strong>{t('wallet.done')}</strong>
+                <p>
+                  <CoinValue value={doneAmt} /> ·{' '}
+                  <button type="button" className="text-link" onClick={() => setParams({ tab: 'history' })}>
+                    {t('wallet.viewHist')}
+                  </button>
+                </p>
+              </div>
+            ) : null}
+            <div className="match-actions wallet-hub-actions">
               <Link className="btn btn-primary" to="/user/shop">
                 {t('wallet.buy')}
               </Link>
+              <Link className="btn btn-ghost" to="/user/transfer">
+                {t('nav.transfer')}
+              </Link>
             </div>
-          ) : (
-            <section className="match-facts">
-              <article>
-                <small>{t('wallet.total')}</small>
-                <strong>
-                  <CoinValue value={balance} />
-                </strong>
-              </article>
-              <article>
-                <small>{t('wallet.withdrawable')}</small>
-                <strong>
-                  <CoinValue value={withdrawable} />
-                </strong>
-              </article>
-              <article>
-                <small>USD</small>
-                <strong>{usd == null ? '—' : usd.toFixed(2)}</strong>
-              </article>
-              <article>
-                <small>BDT</small>
-                <strong>{bdt == null ? '—' : bdt.toFixed(0)}</strong>
-              </article>
-            </section>
-          )}
-          <p className="play-muted">{t('wallet.rule')}</p>
-          {info && balance > withdrawable ? (
-            <p className="play-muted">
-              {t('wallet.lockedWhy')} <CoinValue value={balance - withdrawable} />
-              {info.totalMatchBets ? ` · ${t('wallet.locked')} ${info.totalMatchBets} BAC` : ''}.
-            </p>
-          ) : null}
-          {doneAmt ? (
-            <div className="money-alert">
-              <strong>{t('wallet.done')}</strong>
-              <p>
-                <CoinValue value={doneAmt} /> ·{' '}
-                <button type="button" className="text-link" onClick={() => setParams({ tab: 'history' })}>
-                  {t('wallet.viewHist')}
-                </button>
-              </p>
-            </div>
-          ) : null}
-          <div className="match-actions">
-            <Link className="btn btn-primary" to="/user/shop">
-              {t('wallet.buy')}
-            </Link>
-            <Link className="btn btn-ghost" to="/user/transfer">
-              {t('nav.transfer')}
-            </Link>
           </div>
-          <section className="room-card">
+
+          <section className="room-card wallet-hub-pay">
             <h2>{t('wallet.withdraw')}</h2>
             {info?.hasPendingWithdrawal ? (
               <p className="play-muted">{t('wallet.pending')}</p>
@@ -246,7 +253,7 @@ export function WalletPage() {
               </form>
             )}
           </section>
-        </>
+        </div>
       ) : rows === null ? (
         <div className="match-row skeleton" />
       ) : rows.length === 0 ? (

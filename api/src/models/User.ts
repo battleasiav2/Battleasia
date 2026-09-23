@@ -34,6 +34,7 @@ export interface IUser extends Document {
   mobileNo?: string;
   referralCode?: string;
   referredBy?: mongoose.Types.ObjectId;
+  usernameChangedAt?: Date;
   twitterLink?: string;
   facebookLink?: string;
   instagramLink?: string;
@@ -106,6 +107,7 @@ const userSchema = new Schema<IUser>(
     mobileNo: { type: String, default: '' },
     referralCode: { type: String, default: '' },
     referredBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+    usernameChangedAt: { type: Date },
     emailVerified: { type: Boolean, default: false },
     kycStatus: { type: String, default: 'none' },
     dateOfBirth: { type: Date },

@@ -40,7 +40,7 @@ export function AuthShell({ title, subtitle, children }: Props) {
         <div className="hero-media" aria-hidden>
           <img
             className="hero-poster"
-            src="/assets/hero/auth-login.png?v=3"
+            src="/assets/hero/auth-login.png?v=4"
             alt=""
             width={960}
             height={1280}

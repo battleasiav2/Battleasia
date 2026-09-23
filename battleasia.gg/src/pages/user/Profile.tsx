@@ -140,6 +140,7 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
               pubgId: me.pubgId || p.pubgId,
               gameServer: me.gameServer || p.gameServer,
               referralCode: me.referralCode || p.referralCode,
+              usernameChangedAt: me.usernameChangedAt ?? p.usernameChangedAt,
               countryCode: me.countryCode || p.countryCode,
               mobileNo: me.mobileNo || p.mobileNo,
               twitterLink: me.twitterLink || p.twitterLink,
@@ -187,6 +188,11 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
   if (!profile || !form) return <main className="play-main"><div className="match-row skeleton" /></main>;
 
   const isOwn = own || profile.isOwnProfile || profile.id === session?.id;
+  const usernameCooldownMs = 7 * 24 * 60 * 60 * 1000;
+  const usernameChangedAtMs = profile.usernameChangedAt ? new Date(profile.usernameChangedAt).getTime() : 0;
+  const usernameLockedUntil = usernameChangedAtMs ? usernameChangedAtMs + usernameCooldownMs : 0;
+  const usernameLocked = Boolean(isOwn && usernameLockedUntil > Date.now());
+  const usernameLockDays = usernameLocked ? Math.ceil((usernameLockedUntil - Date.now()) / (24 * 60 * 60 * 1000)) : 0;
   const grid =
     tab === 'highlights'
       ? []
@@ -265,6 +271,18 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
                 <VerifiedBadge on={profile.isVerified} />
                 {profile.isOnline ? <i className="ig-online" title={t('profile.live')} /> : null}
               </h1>
+              {isOwn ? (
+                <button
+                  className="btn btn-ghost ig-btn ig-copy-user"
+                  type="button"
+                  onClick={async () => {
+                    await navigator.clipboard.writeText(profile.username);
+                    toast(t('profile.usernameCopied'));
+                  }}
+                >
+                  {t('profile.copyUsername')}
+                </button>
+              ) : null}
               <div className="ig-actions">
                 {isOwn ? (
                   <button
@@ -494,17 +512,23 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
                 facebookLink,
                 instagramLink,
               };
-              await updateMe(payload);
+              const saved = await updateMe(payload);
               const nextProfile: PublicProfile = {
                 ...profile,
                 ...payload,
                 countryCode,
+                usernameChangedAt: saved.user?.usernameChangedAt ?? profile.usernameChangedAt,
               };
               const nextForm = formFromProfile(nextProfile);
               setProfile(nextProfile);
               setForm(nextForm);
               setBaseline(nextForm);
-              markSignedIn({ ...readSessionUser(), ...payload, countryCode });
+              markSignedIn({
+                ...readSessionUser(),
+                ...payload,
+                countryCode,
+                usernameChangedAt: saved.user?.usernameChangedAt ?? readSessionUser()?.usernameChangedAt,
+              });
               toast(t('profile.saved'));
               setEditing(false);
             } catch (err) {
@@ -516,13 +540,31 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
         >
           <label className="field">
             {t('auth.username')}
-            <input
-              value={form.username}
-              autoComplete="username"
-              maxLength={32}
-              onChange={(e) => setField('username', e.target.value)}
-              onBlur={(e) => setField('username', sanitizeLine(e.target.value))}
-            />
+            <span className="username-edit-row">
+              <input
+                value={form.username}
+                autoComplete="username"
+                maxLength={32}
+                disabled={usernameLocked}
+                onChange={(e) => setField('username', e.target.value)}
+                onBlur={(e) => setField('username', sanitizeLine(e.target.value))}
+              />
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={async () => {
+                  await navigator.clipboard.writeText(form.username || profile.username);
+                  toast(t('profile.usernameCopied'));
+                }}
+              >
+                {t('profile.copy')}
+              </button>
+            </span>
+            {usernameLocked ? (
+              <span className="field-hint">{t('profile.usernameCooldown').replace('{n}', String(usernameLockDays))}</span>
+            ) : (
+              <span className="field-hint">{t('profile.usernameHint')}</span>
+            )}
             {fieldErrors.username ? <span className="field-error">{fieldErrors.username}</span> : null}
           </label>
 

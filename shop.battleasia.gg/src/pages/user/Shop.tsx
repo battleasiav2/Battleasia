@@ -19,6 +19,12 @@ import {
   type ShopPack,
 } from '../../lib/wallet';
 
+/** ShopItem.symbol is the coin ticker (BAC); pack price is fiat (BDT). */
+function packFiatPrefix(symbol?: string) {
+  if (!symbol || symbol === 'BAC' || symbol === 'BDT') return '৳';
+  return `${symbol} `;
+}
+
 export function ShopPage() {
   const { t } = useI18n();
   const { toast, register } = useHud();
@@ -134,30 +140,32 @@ export function ShopPage() {
   }
 
   return (
-    <main className="play-main">
-      <header className="play-head">
+    <main className="play-main shop-buy">
+      <header className="play-head shop-buy-head">
         <div>
           <p className="eyebrow">{t('nav.shop')}</p>
           <h1>{t('shop.title')}</h1>
           <p className="play-lead">{t('shop.lead')}</p>
         </div>
-        {packs && packs.length > 0 ? (
-          <p className="play-count">
-            <strong>{packs.length}</strong>
-            <small>{t('shop.packs')}</small>
-          </p>
-        ) : null}
+        <div className="shop-buy-tools">
+          {packs && packs.length > 0 ? (
+            <p className="play-count">
+              <strong>{packs.length}</strong>
+              <small>{t('shop.packs')}</small>
+            </p>
+          ) : null}
+          <div className="match-actions shop-buy-actions">
+            <Link className="btn btn-ghost" to="/user/wallet">
+              {t('nav.wallet')}
+            </Link>
+            <Link className="btn btn-ghost" to="/user/withdrawal">
+              {t('nav.withdraw')}
+            </Link>
+          </div>
+        </div>
       </header>
-      <div className="match-actions">
-        <Link className="btn btn-ghost" to="/user/wallet">
-          {t('nav.wallet')}
-        </Link>
-        <Link className="btn btn-ghost" to="/user/withdrawal">
-          {t('nav.withdraw')}
-        </Link>
-      </div>
       {pending.length ? (
-        <div className="wallet-pending">
+        <div className="wallet-pending shop-buy-pending">
           <span className="match-status is-upcoming">{t('shop.pendingTitle')}</span>
           <p>
             {pending.length} {pending.length === 1 ? t('shop.pendingOne') : t('shop.pending')}
@@ -179,10 +187,10 @@ export function ShopPage() {
         </div>
       ) : null}
       {error ? <p className="form-error">{error}</p> : null}
-      <div className="hub-stage">
-      <div>
+      <div className="hub-stage shop-buy-stage">
+      <div className="shop-buy-packs">
       {packs === null ? (
-        <div className="play-grid">
+        <div className="play-grid shop-grid">
           {Array.from({ length: 4 }).map((_, i) => (
             <div className="play-card skeleton" key={i} />
           ))}
@@ -206,15 +214,15 @@ export function ShopPage() {
               onClick={() => setPack(item)}
             >
               <div className="play-card-art">
-                <img className="shop-pack-coin" src={ASSETS.coin} alt="" width={52} height={52} decoding="async" />
+                <img className="shop-pack-coin" src={ASSETS.coin} alt="" width={40} height={40} decoding="async" />
                 {item.discountPercent ? <span className="shop-off">{item.discountPercent}{t('shop.off')}</span> : null}
               </div>
               <div className="play-card-meta">
                 <strong>
-                  <CoinValue value={item.amount} size={15} />
+                  <CoinValue value={item.amount} size={14} />
                 </strong>
                 <small>
-                  {(item.symbol || 'BDT') === 'BDT' ? '৳' : `${item.symbol} `}
+                  {packFiatPrefix(item.symbol)}
                   {item.price}
                 </small>
                 <span className="play-card-go">{pack?.id === item.id ? t('shop.selected') : t('shop.select')}</span>
@@ -225,7 +233,7 @@ export function ShopPage() {
       )}
       </div>
 
-      <section className="room-card">
+      <section className="room-card shop-buy-pay">
         <h2>{t('shop.pay')}</h2>
         {packs !== null && channels.length === 0 ? (
           <div className="play-empty">
@@ -245,7 +253,7 @@ export function ShopPage() {
               <div>
                 <small>{t('shop.youPay')}</small>
                 <strong>
-                  {(pack.symbol || 'BDT') === 'BDT' ? '৳' : `${pack.symbol} `}
+                  {packFiatPrefix(pack.symbol)}
                   {pack.price}
                 </strong>
               </div>

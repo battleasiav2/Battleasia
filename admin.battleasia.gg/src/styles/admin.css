@@ -363,6 +363,42 @@
   z-index: 5;
 }
 
+.admin-mode {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--ba-hair);
+  background: color-mix(in srgb, var(--ba-input) 80%, transparent);
+  gap: 2px;
+}
+
+.admin-mode button {
+  min-height: 34px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ba-muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.admin-mode button:hover {
+  color: var(--ba-text);
+}
+
+.admin-mode button.is-on {
+  color: var(--ba-gold-ink);
+  background: linear-gradient(90deg, var(--ba-accent), var(--ba-accent-b));
+  box-shadow: 0 8px 18px -12px var(--ba-accent-glow);
+}
+
 .admin-search {
   display: flex;
   align-items: center;
@@ -856,8 +892,17 @@
   border: 1px solid var(--ba-hair);
   background: var(--ba-input);
   color: var(--ba-text);
+  color-scheme: dark;
   padding: 0 8px;
   font: inherit;
+}
+
+.admin-table td select option,
+.table-tools select option,
+.money-form select option,
+.field select option {
+  color: var(--ba-text);
+  background-color: var(--ba-card);
 }
 
 .stat-mark {
@@ -892,6 +937,17 @@
   gap: 16px;
 }
 
+.money-form select,
+.money-form .field select {
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--ba-hair);
+  background: var(--ba-input);
+  color: var(--ba-text);
+  color-scheme: dark;
+  padding: 0 12px;
+}
+
 .table-tools {
   display: flex;
   flex-wrap: wrap;
@@ -912,6 +968,7 @@
   border: 1px solid var(--ba-hair);
   background: var(--ba-input);
   color: var(--ba-text);
+  color-scheme: dark;
   padding: 0 12px;
 }
 
@@ -1268,6 +1325,11 @@
   }
   .admin-top {
     padding: 12px 16px;
+    gap: 10px;
+  }
+  .admin-mode button {
+    padding: 0 12px;
+    font-size: 11px;
   }
   .admin-search {
     min-width: 0;

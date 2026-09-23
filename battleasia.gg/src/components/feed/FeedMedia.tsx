@@ -82,6 +82,12 @@ export function PostCard({
   const { t } = useI18n();
   const [heart, setHeart] = useState(false);
   const lastTap = useRef(0);
+  const authorName = post.author?.name || t('feed.player');
+  const avatar = post.author?.avatarUrl;
+  const initial = (authorName || '?').slice(0, 1).toUpperCase();
+  const when = post.createdAt
+    ? new Date(post.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    : '';
 
   async function like() {
     try {
@@ -103,35 +109,61 @@ export function PostCard({
   }
 
   return (
-    <article className="feed-card">
-      <header className="feed-card-head">
-        <Link to={post.author?.id ? `/profile/${post.author.id}` : `/user/feed/${post.id}`}>
-          {post.author?.name || t('feed.player')}
-          <VerifiedBadge on={post.author?.isVerified} />
+    <article className="feed-card ig-post">
+      <header className="feed-card-head ig-post-head">
+        <Link className="ig-post-user" to={post.author?.id ? `/profile/${post.author.id}` : `/user/feed/${post.id}`}>
+          {avatar ? (
+            <img className="ig-post-avatar" src={avatar} alt="" width={36} height={36} />
+          ) : (
+            <span className="ig-post-avatar ph" aria-hidden>
+              {initial}
+            </span>
+          )}
+          <span className="ig-post-meta">
+            <strong>
+              {authorName}
+              <VerifiedBadge on={post.author?.isVerified} />
+            </strong>
+            <small>
+              {post.postType === 'match_result' ? t('feed.victory') : post.gameTag || t('feed.arenaTag')}
+              {post.pinnedAt ? ` · ${t('feed.pinned')}` : ''}
+              {when ? ` · ${when}` : ''}
+            </small>
+          </span>
         </Link>
-        <small>
-          {post.postType === 'match_result' ? t('feed.victory') : post.gameTag || t('feed.arenaTag')}
-          {post.pinnedAt ? ` · ${t('feed.pinned')}` : ''}
-        </small>
+        <Link className="ig-post-open" to={`/user/feed/${post.id}`} aria-label={t('feed.open')}>
+          ···
+        </Link>
       </header>
-      <div className="feed-media" onPointerUp={onMediaPointer}>
+      <div className="feed-media ig-post-media" onPointerUp={onMediaPointer}>
         {(() => {
           const slides = post.mediaUrls?.length ? post.mediaUrls : post.coverUrl ? [post.coverUrl] : [];
-          if (!slides.length) return null;
+          if (!slides.length) {
+            return (
+              <div className="ig-post-text-only">
+                <CaptionText text={post.description || ''} />
+              </div>
+            );
+          }
           return <Carousel slides={slides} />;
         })()}
-        {heart ? <span className="feed-heart" aria-hidden>♥</span> : null}
+        {heart ? (
+          <span className="feed-heart" aria-hidden>
+            ♥
+          </span>
+        ) : null}
       </div>
-      <CaptionText text={post.description || ''} />
-      <div className="feed-actions">
-        <button className="text-link" type="button" onClick={() => void like()}>
-          {post.isLiked ? '♥' : '♡'} {post.totalLikes || 0}
+      <div className="feed-actions ig-post-actions">
+        <button className={`ig-act ${post.isLiked ? 'is-on' : ''}`} type="button" onClick={() => void like()}>
+          <span aria-hidden>{post.isLiked ? '♥' : '♡'}</span>
+          <b>{post.totalLikes || 0}</b>
         </button>
-        <Link className="text-link" to={`/user/feed/${post.id}`}>
-          💬 {post.totalComments || 0}
+        <Link className="ig-act" to={`/user/feed/${post.id}`}>
+          <span aria-hidden>💬</span>
+          <b>{post.totalComments || 0}</b>
         </Link>
         <button
-          className="text-link"
+          className={`ig-act ig-act-save ${post.isSaved ? 'is-on' : ''}`}
           type="button"
           onClick={async () => {
             try {
@@ -146,12 +178,23 @@ export function PostCard({
             }
           }}
         >
-          {post.isSaved ? t('feed.saved') : t('feed.save')}
+          <span aria-hidden>{post.isSaved ? '★' : '☆'}</span>
+          <b>{post.isSaved ? t('feed.saved') : t('feed.save')}</b>
         </button>
-        <Link className="text-link" to={`/user/feed/${post.id}`}>
-          {t('feed.open')}
-        </Link>
       </div>
+      {(post.totalLikes || 0) > 0 ? (
+        <p className="ig-post-likes">
+          {post.totalLikes} {t('labs.likes')}
+        </p>
+      ) : null}
+      {post.description && (post.mediaUrls?.length || post.coverUrl) ? (
+        <div className="ig-post-caption">
+          <Link to={post.author?.id ? `/profile/${post.author.id}` : `/user/feed/${post.id}`}>
+            <b>{authorName}</b>
+          </Link>{' '}
+          <CaptionText text={post.description} />
+        </div>
+      ) : null}
     </article>
   );
 }

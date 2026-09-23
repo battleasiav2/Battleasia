@@ -26,6 +26,7 @@ export function serializeUser(user: IUser, roleDoc?: IRole | null) {
     countryCode: user.countryCode || '',
     mobileNo: user.mobileNo || '',
     referralCode: user.referralCode || '',
+    usernameChangedAt: user.usernameChangedAt ? user.usernameChangedAt.toISOString() : null,
     bio: user.bio || '',
     coverUrl: user.coverUrl || '',
     website: user.website || '',

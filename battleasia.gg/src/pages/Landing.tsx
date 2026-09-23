@@ -10,6 +10,7 @@ import { UserAvatar } from '../components/UserAvatar';
 import { fetchMe, isSignedIn, readSessionUser, clearSignedIn } from '../lib/auth';
 import { ThemeDock } from '../components/ThemeDock';
 import { coverForGame, fetchGames, gameKey, webpSrcSet } from '../lib/games';
+import { fetchAppDownload, formatApkSize, type AppDownloadInfo } from '../lib/app-download';
 
 const SiteFooter = lazy(() => import('../components/SiteFooter').then((m) => ({ default: m.SiteFooter })));
 const DeferredSupportChat = lazy(() =>
@@ -32,11 +33,11 @@ type LandingGame = {
 };
 
 const FALLBACK_GAMES: LandingGame[] = [
-  { slug: 'pubg', id: 'pubg', src: '/covers/pubg.webp', popular: true, soon: false, matchName: 'PUBG Mobile' },
-  { slug: 'freefire', id: 'freefire', src: '/covers/freefire.webp', popular: false, soon: false, matchName: 'Free Fire' },
-  { slug: 'cod', id: 'cod', src: '/covers/cod.webp', popular: false, soon: false, matchName: 'Call of Duty Mobile' },
-  { slug: 'mlbb', id: 'mlbb', src: '/covers/mlbb.webp', popular: false, soon: false, matchName: 'Mobile Legends' },
-  { slug: 'valorant', id: 'valorant', src: '/covers/valorant.webp', popular: false, soon: true, matchName: 'Valorant Mobile' },
+  { slug: 'pubg', id: 'pubg', src: '/covers/pubg.webp?v=5', popular: true, soon: false, matchName: 'PUBG Mobile' },
+  { slug: 'freefire', id: 'freefire', src: '/covers/freefire.webp?v=5', popular: false, soon: false, matchName: 'Free Fire' },
+  { slug: 'cod', id: 'cod', src: '/covers/cod.webp?v=5', popular: false, soon: false, matchName: 'Call of Duty Mobile' },
+  { slug: 'mlbb', id: 'mlbb', src: '/covers/mlbb.webp?v=5', popular: false, soon: false, matchName: 'Mobile Legends' },
+  { slug: 'valorant', id: 'valorant', src: '/covers/valorant.webp?v=5', popular: false, soon: true, matchName: 'Valorant Mobile' },
 ];
 
 const MODES = [
@@ -95,7 +96,18 @@ export function Landing({ openChat }: { openChat?: boolean }) {
   const [me, setMe] = useState(readSessionUser());
   const [inArena, setInArena] = useState(isSignedIn());
   const [arenaGames, setArenaGames] = useState<LandingGame[]>(FALLBACK_GAMES);
+  const [apk, setApk] = useState<AppDownloadInfo | null>(null);
   const arenaTo = inArena ? '/user/play' : '/auth/sign-up';
+
+  useEffect(() => {
+    let live = true;
+    fetchAppDownload().then((info) => {
+      if (live) setApk(info);
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
 
   useEffect(() => {
     setNavOpen(false);
@@ -281,9 +293,24 @@ export function Landing({ openChat }: { openChat?: boolean }) {
                 <Link className="btn btn-primary" to={arenaTo}>
                   {t('cta.signup')}
                 </Link>
-                <a className="btn btn-ghost" href="/api/uploads/app/BattleAsia.apk">
-                  {t('cta.apk')}
-                </a>
+                {apk && !apk.enabled ? (
+                  <span className="btn btn-ghost" aria-disabled="true">
+                    {t('cta.apkOff')}
+                  </span>
+                ) : (
+                  <a
+                    className="btn btn-ghost"
+                    href={apk?.downloadUrl || '/api/uploads/app/BattleAsia.apk'}
+                    download={apk?.fileName || 'BattleAsia.apk'}
+                  >
+                    {apk?.version
+                      ? t('cta.apkVer').replace('{0}', apk.version)
+                      : t('cta.apk')}
+                    {apk?.fileSize ? (
+                      <span className="apk-size"> · {formatApkSize(apk.fileSize)}</span>
+                    ) : null}
+                  </a>
+                )}
               </div>
               <div className="live-row">
                 <span className="live-pill">
@@ -448,20 +475,27 @@ export function Landing({ openChat }: { openChat?: boolean }) {
             <p>{t('modes.lead')}</p>
           </div>
           <div className="mode-grid">
-            {MODES.map((mode) => (
-              <article key={mode.id} className="mode-card">
-                <img
-                  src={mode.src}
-                  srcSet={webpSrcSet(mode.src, 480, 960)}
-                  sizes="(max-width: 900px) 92vw, 22vw"
-                  width={320}
-                  height={140}
-                  alt={t(`modes.${mode.id}.title`)}
-                  loading="lazy"
-                  decoding="async"
-                />
-                <h3>{t(`modes.${mode.id}.title`)}</h3>
-                <p>{t(`modes.${mode.id}.copy`)}</p>
+            {MODES.map((mode, i) => (
+              <article key={mode.id} className="mode-card" data-mode={mode.id}>
+                <div className="mode-card-media">
+                  <img
+                    src={mode.src}
+                    srcSet={webpSrcSet(mode.src, 480, 960)}
+                    sizes="(max-width: 900px) 46vw, 22vw"
+                    width={320}
+                    height={200}
+                    alt={t(`modes.${mode.id}.title`)}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <span className="mode-card-index" aria-hidden>
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                </div>
+                <div className="mode-card-copy">
+                  <h3>{t(`modes.${mode.id}.title`)}</h3>
+                  <p>{t(`modes.${mode.id}.copy`)}</p>
+                </div>
               </article>
             ))}
           </div>
