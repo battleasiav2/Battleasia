@@ -116,9 +116,16 @@ svg {
     flex: 1 1 auto;
   }
 
-  .play-hud .hud-account {
+  .play-hud .hud-balance {
     order: 2;
-    margin-left: 0;
+    display: inline-flex;
+    margin-left: auto;
+    max-width: 42vw;
+  }
+
+  .play-hud .hud-balance .coin b,
+  .play-hud .hud-balance .coin {
+    font-size: 12px;
   }
 
   .play-hud .nav-burger {
@@ -273,6 +280,38 @@ svg {
   .wallet-table .result-head,
   .wallet-table .result-row {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .wd-hub-table,
+  .wd-hub-table .result-table {
+    overflow: visible;
+  }
+
+  .wd-hub-table .result-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4px 12px;
+    align-items: start;
+  }
+
+  .wd-hub-table .result-row > span:nth-child(1) {
+    grid-column: 1;
+    font-weight: 700;
+    text-transform: capitalize;
+  }
+
+  .wd-hub-table .result-row > span:nth-child(3) {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    justify-self: end;
+  }
+
+  .wd-hub-table .result-row > span:nth-child(2),
+  .wd-hub-table .result-row > span:nth-child(4) {
+    grid-column: 1;
+    color: var(--ba-muted, var(--ink-soft));
+    font-size: 12px;
   }
 
   .money-tabs,

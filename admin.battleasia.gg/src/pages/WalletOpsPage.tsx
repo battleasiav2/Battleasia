@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { api, isApiError, unwrapList } from '../lib/api';
 import { cell, pick, rowId } from '../lib/format';
+import { useI18n } from '../lib/i18n';
 
 export function WalletOpsPage() {
-  const [channels, setChannels] = useState<Array<Record<string, unknown>>>([]);
-  const [wallets, setWallets] = useState<Array<Record<string, unknown>>>([]);
+  const { t } = useI18n();
+  const [channels, setChannels] = useState<Array<Record<string, unknown>> | null>(null);
+  const [wallets, setWallets] = useState<Array<Record<string, unknown>> | null>(null);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -16,44 +18,81 @@ export function WalletOpsPage() {
         setChannels(unwrapList<Record<string, unknown>>(c));
         setWallets(unwrapList<Record<string, unknown>>(w));
       })
-      .catch((err) => setError(isApiError(err) ? err.message : 'Wallets offline'));
-  }, []);
+      .catch((err) => {
+        setChannels([]);
+        setWallets([]);
+        setError(isApiError(err) ? err.message : t('list.loadFail'));
+      });
+  }, [t]);
 
   return (
     <main className="admin-body">
-      <h1>Payment wallets</h1>
-      <p className="admin-lead">Channels and business wallets. CRUD lives on the same v4 admin APIs.</p>
+      <header className="dash-head">
+        <p className="dash-eyebrow">{t('nav.money')}</p>
+        <h1>{t('nav.wallets')}</h1>
+        <p className="admin-lead">{t('walletOps.lead')}</p>
+      </header>
       {error ? <p className="form-error">{error}</p> : null}
-      <h2>Channels</h2>
-      <Table rows={channels} cols={['channel_name', 'description']} />
-      <h2>Business wallets</h2>
-      <Table rows={wallets} cols={['wallet_address', 'currency_type']} />
+
+      <section className="wallet-block">
+        <h2>{t('walletOps.channels')}</h2>
+        <Table rows={channels} cols={['channel_name', 'description']} loadingLabel={t('list.loading')} empty={t('list.empty')} />
+      </section>
+
+      <section className="wallet-block">
+        <h2>{t('walletOps.business')}</h2>
+        <Table
+          rows={wallets}
+          cols={['wallet_address', 'currency_type']}
+          loadingLabel={t('list.loading')}
+          empty={t('list.empty')}
+        />
+      </section>
     </main>
   );
 }
 
-function Table({ rows, cols }: { rows: Array<Record<string, unknown>>; cols: string[] }) {
-  if (!rows.length) return <div className="admin-empty">No rows</div>;
+function Table({
+  rows,
+  cols,
+  loadingLabel,
+  empty,
+}: {
+  rows: Array<Record<string, unknown>> | null;
+  cols: string[];
+  loadingLabel: string;
+  empty: string;
+}) {
+  if (rows === null) return <p className="admin-lead">{loadingLabel}…</p>;
+  if (!rows.length) {
+    return (
+      <div className="admin-empty">
+        <h2>{empty}</h2>
+      </div>
+    );
+  }
   return (
-    <div className="admin-table-wrap" style={{ marginBottom: 24 }}>
-      <table className="admin-table">
-        <thead>
-          <tr>
-            {cols.map((c) => (
-              <th key={c}>{c}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={rowId(row) || JSON.stringify(row).slice(0, 24)}>
+    <div className="dash-stage list-stage">
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
               {cols.map((c) => (
-                <td key={c}>{cell(pick(row, c))}</td>
+                <th key={c}>{c}</th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={rowId(row) || JSON.stringify(row).slice(0, 24)}>
+                {cols.map((c) => (
+                  <td key={c}>{cell(pick(row, c))}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

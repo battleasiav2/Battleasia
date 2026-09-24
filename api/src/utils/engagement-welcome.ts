@@ -187,8 +187,22 @@ export async function claimWelcomeBonus(userId: Types.ObjectId | string, rawKey:
     return { ok: false as const, message: 'Milestone is not ready to claim yet' };
   }
 
+  // Atomic lock on nested milestone status — amount is server-configured only.
+  const locked = await UserEngagementWelcome.findOneAndUpdate(
+    { userId, [`${field}.status`]: 'ready' },
+    { $set: { [`${field}.status`]: 'claimed', [`${field}.claimedAt`]: new Date() } },
+    { new: true }
+  );
+  if (!locked) {
+    return { ok: false as const, message: 'Already claimed' };
+  }
+
   const user = await User.findById(userId);
   if (!user) {
+    await UserEngagementWelcome.updateOne(
+      { userId },
+      { $set: { [`${field}.status`]: 'ready', [`${field}.claimedAt`]: null } }
+    );
     return { ok: false as const, message: 'User not found' };
   }
 
@@ -209,11 +223,6 @@ export async function claimWelcomeBonus(userId: Types.ObjectId | string, rawKey:
       welcomeTitle: config.title,
     },
   });
-
-  state.status = 'claimed';
-  state.claimedAt = new Date();
-  refreshed.markModified(field);
-  await refreshed.save();
 
   notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
 

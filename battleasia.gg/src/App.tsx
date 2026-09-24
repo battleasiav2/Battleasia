@@ -19,6 +19,9 @@ function ShopWalletRedirect() {
 }
 
 const Spotlight = lazy(() => import('./components/Spotlight').then((m) => ({ default: m.Spotlight })))
+const SiteNoticeModal = lazy(() =>
+  import('./components/SiteNoticeModal').then((m) => ({ default: m.SiteNoticeModal }))
+)
 const RequireAuth = lazy(() => import('./components/user/RequireAuth').then((m) => ({ default: m.RequireAuth })))
 
 import { Landing } from './pages/Landing'
@@ -60,6 +63,9 @@ export default function App() {
       <OfflineBanner />
       <Suspense fallback={null}>
         <Spotlight />
+      </Suspense>
+      <Suspense fallback={null}>
+        <SiteNoticeModal />
       </Suspense>
       <RouteProgress />
       <Suspense fallback={<div className="landing" style={{ minHeight: '100svh', background: 'var(--ba-page)' }} />}>

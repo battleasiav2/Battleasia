@@ -64,22 +64,6 @@ export async function buildMyMatchHistory(userId: string) {
 }
 
 export async function buildUserMatchHistory(userId: string) {
-  const participations = await MatchParticipant.find({ userId }).sort({ joinedAt: -1 });
-  const matchIds = participations.map((p) => p.matchId);
-  const matches = await Match.find({ _id: { $in: matchIds } });
-  const matchMap = new Map(matches.map((m) => [m._id.toString(), m]));
-
-  return participations.map((p) => {
-    const match = matchMap.get(p.matchId.toString());
-    return {
-      _id: p._id.toString(),
-      id: p._id.toString(),
-      matchId: p.matchId.toString(),
-      matchName: match?.matchName || '',
-      entryFee: p.entryFee,
-      kills: p.kills ?? 0,
-      placement: p.placement,
-      joinedAt: p.joinedAt,
-    };
-  });
+  // Same shape as own history so profile/public tabs show rank, kills, winnings.
+  return buildMyMatchHistory(userId);
 }

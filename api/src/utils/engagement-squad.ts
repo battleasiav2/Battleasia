@@ -433,8 +433,26 @@ export async function claimSquadChallengeReward(userId: Types.ObjectId | string)
     return { ok: false as const, message: 'Already claimed this week' };
   }
 
+  // Reserve claim row first (unique userId+periodKey) so concurrent claims cannot double-credit.
+  let claimRow;
+  try {
+    claimRow = await EngagementSquadWeeklyClaim.create({
+      userId,
+      squadId: membership.squadId,
+      periodKey,
+      claimedAt: new Date(),
+    });
+  } catch (error: unknown) {
+    const code = (error as { code?: number })?.code;
+    if (code === 11000) {
+      return { ok: false as const, message: 'Already claimed this week' };
+    }
+    throw error;
+  }
+
   const user = await User.findById(userId);
   if (!user) {
+    await EngagementSquadWeeklyClaim.deleteOne({ _id: claimRow._id });
     return { ok: false as const, message: 'User not found' };
   }
 
@@ -456,13 +474,6 @@ export async function claimSquadChallengeReward(userId: Types.ObjectId | string)
       squadWinCount: weeklyDoc.winCount,
       squadId: membership.squadId.toString(),
     },
-  });
-
-  await EngagementSquadWeeklyClaim.create({
-    userId,
-    squadId: membership.squadId,
-    periodKey,
-    claimedAt: new Date(),
   });
 
   notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);

@@ -20,7 +20,7 @@ export function AuthShell({ title, subtitle, children }: Props) {
       <section className="auth-form-pane">
         <div className="auth-toolbar">
           <Link className="brand" to="/dashboard">
-            <img src={ASSETS.logo} width={40} height={40} alt="BattleAsia" />
+            <img src={ASSETS.logo} width={48} height={48} alt="BattleAsia" />
             <div className="brand-name">
               BATTLE ASIA <span>2.0</span>
             </div>

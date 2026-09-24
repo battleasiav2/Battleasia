@@ -39,6 +39,10 @@ function readAccess() {
   }
 }
 
+export function readAccessToken() {
+  return readAccess();
+}
+
 function writeAccess(token: string) {
   try {
     if (token) sessionStorage.setItem(ACCESS, token);

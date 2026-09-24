@@ -4,10 +4,20 @@ import { CoinValue } from '../../components/CoinValue';
 import { useHud } from '../../contexts/HudContext';
 import { isApiError } from '../../lib/api';
 import { readSessionUser } from '../../lib/auth';
+import {
+  formatWhen,
+  isCredit,
+  rowCategory,
+  rowLabel,
+  statusTone,
+  type HistFilter,
+} from '../../lib/history';
 import { useI18n } from '../../lib/i18n';
 import {
   fetchBalanceHistory,
   fetchCoinRates,
+  fetchMyDeposits,
+  fetchMyWithdrawals,
   fetchWithdrawable,
   fiatFor,
   submitWithdraw,
@@ -18,16 +28,29 @@ import {
 
 type ShellCtx = { setBalance: (n: number) => void };
 
+const FILTERS: Array<{ id: HistFilter; key: string }> = [
+  { id: 'all', key: 'wallet.filtAll' },
+  { id: 'deposit', key: 'wallet.filtDeposit' },
+  { id: 'withdraw', key: 'wallet.filtWithdraw' },
+  { id: 'game', key: 'wallet.filtGame' },
+  { id: 'claim', key: 'wallet.filtClaim' },
+  { id: 'transfer', key: 'wallet.filtTransfer' },
+];
+
 export function WalletPage() {
   const { t } = useI18n();
   const { toast, register } = useHud();
   const { setBalance } = useOutletContext<ShellCtx>();
   const [params, setParams] = useSearchParams();
-  const tab = params.get('tab') === 'history' ? 'history' : 'overview';
+  const tab = params.get('tab') === 'history' ? 'history' : params.get('tab') === 'orders' ? 'orders' : 'overview';
+  const filt = (params.get('filt') as HistFilter) || 'all';
+  const orderTab = params.get('orders') === 'out' ? 'out' : 'in';
   const sessionBal = Number(readSessionUser()?.balance) || 0;
   const [info, setInfo] = useState<WithdrawableInfo | null>(null);
   const [rates, setRates] = useState<CoinRate[]>([]);
   const [rows, setRows] = useState<HistoryRow[] | null>(null);
+  const [deposits, setDeposits] = useState<Array<Record<string, unknown>> | null>(null);
+  const [withdrawals, setWithdrawals] = useState<Array<Record<string, unknown>> | null>(null);
   const [error, setError] = useState('');
   const [amount, setAmount] = useState('');
   const [address, setAddress] = useState('');
@@ -58,28 +81,55 @@ export function WalletPage() {
 
   useEffect(() => {
     let live = true;
-    Promise.all([fetchWithdrawable(), fetchCoinRates(), fetchBalanceHistory()])
-      .then(([w, r, h]) => {
+    Promise.all([
+      fetchWithdrawable(),
+      fetchCoinRates(),
+      fetchBalanceHistory(),
+      fetchMyDeposits(),
+      fetchMyWithdrawals(),
+    ])
+      .then(([w, r, h, d, out]) => {
         if (!live) return;
         setInfo(w);
         setRates(r);
         setRows(h);
+        setDeposits(d);
+        setWithdrawals(out);
         if (w?.balance != null) setBalance(w.balance);
       })
       .catch((err) => {
         if (!live) return;
         setError(isApiError(err) ? err.message : t('errors.walletOffline'));
         setRows([]);
+        setDeposits([]);
+        setWithdrawals([]);
       });
     return () => {
       live = false;
     };
   }, [setBalance, t]);
 
+  useEffect(() => {
+    function onBal(e: Event) {
+      const next = Number((e as CustomEvent<number>).detail);
+      if (!Number.isFinite(next)) return;
+      setInfo((prev) => (prev ? { ...prev, balance: next } : prev));
+      setBalance(next);
+    }
+    window.addEventListener('ba-balance', onBal);
+    return () => window.removeEventListener('ba-balance', onBal);
+  }, [setBalance]);
+
   const usd = useMemo(() => fiatFor(balance, rates, 'USD'), [balance, rates]);
   const bdt = useMemo(() => fiatFor(balance, rates, 'BDT'), [balance, rates]);
   const withdrawable = info?.withdrawableAmount ?? 0;
   const maxAmt = Number(amount) || 0;
+
+  const filtered = useMemo(() => {
+    if (!rows) return [];
+    if (filt === 'all') return rows;
+    return rows.filter((row) => rowCategory(row) === filt);
+  }, [rows, filt]);
 
   async function doWithdraw() {
     if (busy) return;
@@ -104,12 +154,20 @@ export function WalletPage() {
       const next = await fetchWithdrawable();
       setInfo(next);
       setRows(await fetchBalanceHistory());
+      setWithdrawals(await fetchMyWithdrawals());
     } catch (err) {
       toast(isApiError(err) ? err.message : t('wallet.submitFail'));
     } finally {
       setBusy(false);
     }
   }
+
+  function setTab(next: string, extra: Record<string, string> = {}) {
+    if (next === 'overview') setParams(extra);
+    else setParams({ tab: next, ...extra });
+  }
+
+  const orderRows = orderTab === 'out' ? withdrawals : deposits;
 
   return (
     <main className="play-main wallet-hub">
@@ -119,15 +177,14 @@ export function WalletPage() {
           <h1>{t('wallet.title')}</h1>
         </div>
         <div className="money-tabs wallet-hub-tabs">
-          <button type="button" className={tab === 'overview' ? 'active' : ''} onClick={() => setParams({})}>
+          <button type="button" className={tab === 'overview' ? 'active' : ''} onClick={() => setTab('overview')}>
             {t('wallet.overview')}
           </button>
-          <button
-            type="button"
-            className={tab === 'history' ? 'active' : ''}
-            onClick={() => setParams({ tab: 'history' })}
-          >
+          <button type="button" className={tab === 'history' ? 'active' : ''} onClick={() => setTab('history')}>
             {t('wallet.history')}
+          </button>
+          <button type="button" className={tab === 'orders' ? 'active' : ''} onClick={() => setTab('orders')}>
+            {t('wallet.orders')}
           </button>
         </div>
       </header>
@@ -183,7 +240,7 @@ export function WalletPage() {
                 <strong>{t('wallet.done')}</strong>
                 <p>
                   <CoinValue value={doneAmt} /> ·{' '}
-                  <button type="button" className="text-link" onClick={() => setParams({ tab: 'history' })}>
+                  <button type="button" className="text-link" onClick={() => setTab('history')}>
                     {t('wallet.viewHist')}
                   </button>
                 </p>
@@ -254,38 +311,128 @@ export function WalletPage() {
             )}
           </section>
         </div>
-      ) : rows === null ? (
-        <div className="match-row skeleton" />
-      ) : rows.length === 0 ? (
-        <div className="play-empty">
-          <h2>{t('wallet.emptyHist')}</h2>
-          <p>{t('wallet.emptyHistLead')}</p>
-          <Link className="btn btn-primary" to="/user/shop">
-            {t('wallet.buy')}
-          </Link>
-        </div>
-      ) : (
-        <div className="result-table">
-          <div className="result-head">
-            <span>{t('wallet.when')}</span>
-            <span>{t('wallet.type')}</span>
-            <span>{t('wallet.amountCol')}</span>
-            <span>{t('wallet.balanceCol')}</span>
+      ) : null}
+
+      {tab === 'history' ? (
+        <div className="hist-panel">
+          <div className="hist-filters" role="tablist" aria-label={t('wallet.history')}>
+            {FILTERS.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                role="tab"
+                aria-selected={filt === f.id}
+                className={filt === f.id ? 'active' : ''}
+                onClick={() => setTab('history', { filt: f.id })}
+              >
+                {t(f.key)}
+              </button>
+            ))}
           </div>
-          {rows.map((row) => (
-            <div className="result-row" key={row.id}>
-              <span>{row.createdAt ? new Date(row.createdAt).toLocaleString() : '—'}</span>
-              <span>{row.type}</span>
-              <span>
-                <CoinValue value={row.amount} />
-              </span>
-              <span>
-                <CoinValue value={row.balanceAfter ?? 0} />
-              </span>
+          {rows === null ? (
+            <div className="match-row skeleton" />
+          ) : filtered.length === 0 ? (
+            <div className="play-empty">
+              <h2>{t('wallet.emptyHist')}</h2>
+              <p>{t('wallet.emptyHistLead')}</p>
+              <Link className="btn btn-primary" to="/user/shop">
+                {t('wallet.buy')}
+              </Link>
             </div>
-          ))}
+          ) : (
+            <ul className="hist-feed">
+              {filtered.map((row) => {
+                const credit = isCredit(row);
+                const cat = rowCategory(row);
+                return (
+                  <li key={row.id} className={`hist-item hist-${cat}`}>
+                    <div className="hist-item-main">
+                      <span className={`hist-pill hist-pill-${cat}`}>
+                        {cat === 'deposit'
+                          ? t('wallet.filtDeposit')
+                          : cat === 'withdraw'
+                            ? t('wallet.filtWithdraw')
+                            : cat === 'game'
+                              ? t('wallet.filtGame')
+                              : cat === 'claim'
+                                ? t('wallet.filtClaim')
+                                : cat === 'transfer'
+                                  ? t('wallet.filtTransfer')
+                                  : cat}
+                      </span>
+                      <strong>{rowLabel(row)}</strong>
+                      <small>{formatWhen(row.createdAt)}</small>
+                    </div>
+                    <div className={`hist-amt ${credit ? 'is-in' : 'is-out'}`}>
+                      <span>
+                        {credit ? '+' : '−'}
+                        <CoinValue value={Math.abs(Number(row.amount) || 0)} />
+                      </span>
+                      <small>
+                        {t('wallet.balanceCol')} <CoinValue value={row.balanceAfter ?? 0} />
+                      </small>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
-      )}
+      ) : null}
+
+      {tab === 'orders' ? (
+        <div className="hist-panel">
+          <div className="hist-filters">
+            <button
+              type="button"
+              className={orderTab === 'in' ? 'active' : ''}
+              onClick={() => setTab('orders', { orders: 'in' })}
+            >
+              {t('wallet.filtDeposit')}
+            </button>
+            <button
+              type="button"
+              className={orderTab === 'out' ? 'active' : ''}
+              onClick={() => setTab('orders', { orders: 'out' })}
+            >
+              {t('wallet.filtWithdraw')}
+            </button>
+          </div>
+          {orderRows === null ? (
+            <div className="match-row skeleton" />
+          ) : orderRows.length === 0 ? (
+            <div className="play-empty">
+              <h2>{t('wallet.emptyOrders')}</h2>
+              <p>{t('wallet.emptyOrdersLead')}</p>
+            </div>
+          ) : (
+            <ul className="hist-feed">
+              {orderRows.map((row) => {
+                const id = String(row._id || row.id);
+                const status = String(row.status || '');
+                const tone = statusTone(status);
+                const amt = Number(row.coin_amount ?? row.amount) || 0;
+                const when = String(row.created_at || row.createdAt || '');
+                const trx = String(row.transaction_id || row.wallet_address || '');
+                return (
+                  <li key={id} className="hist-item">
+                    <div className="hist-item-main">
+                      <span className={`hist-status hist-status-${tone}`}>{status || '—'}</span>
+                      <strong>
+                        <CoinValue value={amt} />
+                      </strong>
+                      <small>
+                        {formatWhen(when)}
+                        {trx ? ` · ${trx}` : ''}
+                      </small>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      ) : null}
 
       {confirm ? (
         <div className="play-sheet" role="dialog" aria-labelledby="wd-title">

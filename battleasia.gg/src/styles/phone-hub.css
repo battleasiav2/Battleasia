@@ -54,24 +54,58 @@
   .auth-shell {
     grid-template-columns: 1fr;
     min-height: 100dvh;
-  }
-
-  .auth-form-pane {
-    border-right: 0;
-    border-bottom: 0;
-    padding: 20px 16px 24px;
-    justify-content: flex-start;
-    order: 1;
-  }
-
-  .auth-toolbar {
-    flex-wrap: wrap;
+    align-content: start;
+    background:
+      linear-gradient(180deg, rgba(7, 8, 13, 0.82) 0%, rgba(7, 8, 13, 0.9) 45%, rgba(7, 8, 13, 0.94) 100%),
+      radial-gradient(80% 50% at 50% 0%, rgba(0, 0, 0, 0.35), transparent 70%),
+      #07080d
+      url('/assets/hero/auth-login.png?v=4') center 28% / cover no-repeat;
   }
 
   .auth-hero {
-    order: 2;
-    min-height: min(420px, 58svh);
-    max-height: none;
+    display: none;
+  }
+
+  .auth-form-pane {
+    order: 1;
+    border-right: 0;
+    border-bottom: 0;
+    padding: 16px 16px 28px;
+    justify-content: flex-start;
+    background: transparent;
+  }
+
+  .auth-toolbar {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .auth-toolbar .brand img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .auth-toolbar-right {
+    margin-left: auto;
+  }
+
+  .auth-seal {
+    margin: 8px 0 0;
+  }
+
+  .auth-seal-mark {
+    width: 44px;
+    height: 44px;
+  }
+
+  .auth-form-pane h1 {
+    font-size: 28px;
+    margin: 8px 0 2px;
+  }
+
+  .auth-form {
+    margin-top: 12px;
+    gap: 10px;
   }
 
   .auth-hero-copy {
@@ -79,9 +113,9 @@
   }
 
   .auth-promo {
-    width: calc(100% - 32px);
-    margin: 0 16px 16px;
-    gap: 8px;
+    width: calc(100% - 28px);
+    margin: 0 14px 14px;
+    gap: 6px;
   }
 
   .auth-promo-title {
@@ -89,20 +123,13 @@
   }
 
   .auth-promo-lead {
+    display: block;
+    font-size: 12px;
+    max-width: 28ch;
+  }
+
+  .auth-promo-stats {
     display: none;
-  }
-
-  .auth-promo-stats article {
-    padding: 8px 6px;
-  }
-
-  .auth-promo-stats b {
-    font-size: 13px;
-  }
-
-  .auth-form-pane h1 {
-    font-size: 32px;
-    margin-top: 16px;
   }
 
   .auth-row,
@@ -116,7 +143,7 @@
   }
 
   .auth-meta .auth-link {
-    white-space: normal;
+    font-size: 12px;
   }
 
   .otp-row {
@@ -131,7 +158,6 @@
 
   .play-grid,
   .lobby-grid,
-  .match-facts,
   .hub-stage,
   .match-row,
   .account-wrap,
@@ -143,6 +169,22 @@
   .hub-stage .play-grid {
     grid-template-columns: 1fr;
     grid-template-areas: none;
+  }
+
+  .match-facts {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .match-facts article {
+    min-height: 96px;
+    padding: 14px 12px 12px;
+    border-radius: 16px;
+  }
+
+  .match-facts strong {
+    font-size: 20px;
+    margin-top: 8px;
   }
 
   .play-grid.play-grid-rail,
@@ -180,9 +222,15 @@
     grid-template-columns: 40px minmax(0, 1fr) 72px 56px;
   }
 
+  .wallet-table.result-table {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   .wallet-table .result-head,
   .wallet-table .result-row {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(110px, 1.2fr) minmax(90px, 0.9fr) minmax(88px, 100px) minmax(88px, 110px);
+    min-width: 420px;
   }
 
   .play-stage {
@@ -192,7 +240,9 @@
 
   .play-stage:has(.play-grid-rail),
   .play-stage:has(.match-table),
-  .play-stage:has(.match-filters) {
+  .play-stage:has(.match-filters),
+  .play-stage:has(.match-facts),
+  .play-stage:has(.match-hero) {
     padding: 0;
     border-radius: 0;
     border: 0;

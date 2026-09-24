@@ -31,6 +31,7 @@ import {
   serializeFollowUsers,
 } from '../../utils/profile-social.js';
 import { recordBalanceHistory } from '../../utils/balance-history.js';
+import { classifyBalanceRow } from '../../utils/balance-classify.js';
 import { notifyBalanceChange } from '../../utils/balance-notify.js';
 import { syncDailyStreak } from '../../utils/engagement-streak.js';
 import { touchReferrerMilestones, syncUserReferralMilestones } from '../../utils/engagement-referral.js';
@@ -401,23 +402,15 @@ router.get('/balance-history', requireAuth, async (req: AuthedRequest, res) => {
         string,
         unknown
       >;
-      const reason = detail.reason;
-      let type: string = item.type;
-      if (reason === 'match_winnings' || reason === 'match_result_update' || reason === 'match_reward' || reason === 'engagement_reward' || reason === 'engagement_streak_reward' || reason === 'engagement_welcome_reward') {
-        type = 'earning';
-      }
-      if (reason === 'user_transfer_sent') {
-        type = 'transfer_sent';
-      }
-      if (reason === 'user_transfer_received') {
-        type = 'transfer_received';
-      }
+      const classified = classifyBalanceRow({ type: item.type, detail });
 
       return {
         _id: String(item._id),
         id: String(item._id),
         amount: item.amount ?? 0,
-        type,
+        type: classified.type,
+        category: classified.category,
+        reason: classified.reason,
         balanceBefore: item.balanceBefore ?? 0,
         balanceAfter: item.balanceAfter ?? 0,
         performedBy: item.performedBy ? String(item.performedBy) : '',

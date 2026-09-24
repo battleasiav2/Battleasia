@@ -16,6 +16,7 @@ import {
   formatWhen,
   joinMatch,
   leaveMatch,
+  localCoverForGame,
   reportMatch,
   sendChat,
   setReady,
@@ -25,6 +26,7 @@ import {
   type RoomCreds,
 } from '../../lib/games';
 import { isDemoMatchId } from '../../lib/demoMatches';
+import { httpCopy } from '../../lib/form';
 import { useI18n } from '../../lib/i18n';
 import { readSessionUser, isPremiumUser } from '../../lib/auth';
 
@@ -49,6 +51,7 @@ export function MatchDetailPage() {
   const [ready, setReadyOn] = useState(false);
   const [leaveOpen, setLeaveOpen] = useState(false);
   const [joinOpen, setJoinOpen] = useState(false);
+  const [joinError, setJoinError] = useState('');
   const [room, setRoom] = useState<RoomCreds | null>(null);
   const [chat, setChat] = useState<ChatMessage[]>([]);
   const [draft, setDraft] = useState('');
@@ -144,28 +147,45 @@ export function MatchDetailPage() {
         return;
       }
     }
+    setJoinError(isDemoMatchId(matchId) ? t('match.demoDisabled') : '');
     setJoinOpen(true);
   }, [balance, busy, match, matchId, t, toast]);
 
   const doJoin = useCallback(async () => {
     if (!match || busy) return;
     const fee = Number(match.entryFee) || 0;
+    setJoinError('');
     if (fee > balance) {
-      toast(t('match.insufficientBalance'));
+      const msg = t('match.insufficientBalance');
+      setJoinError(msg);
+      toast(msg);
       return;
     }
 
     if (isDemoMatchId(matchId)) {
-      toast(t('match.demoDisabled'));
+      const msg = t('match.demoDisabled');
+      setJoinError(msg);
+      toast(msg);
       return;
     }
 
     setBusy(true);
     try {
       try {
-        await checkJoin(matchId);
-      } catch {
-        /* join still attempts if check-join is missing */
+        const check = await checkJoin(matchId);
+        if (check && check.canJoin === false) {
+          const msg = (check.issues || []).filter(Boolean).join(' · ') || t('match.joinFail');
+          setJoinError(msg);
+          toast(msg);
+          return;
+        }
+      } catch (err) {
+        if (isApiError(err) && err.status !== 404) {
+          const msg = httpCopy(err, t, t('match.joinFail'));
+          setJoinError(msg);
+          toast(msg);
+          return;
+        }
       }
       const joinedRes = await joinMatch(matchId);
       if (joinedRes?.balance != null) setBalance(Number(joinedRes.balance) || 0);
@@ -181,12 +201,15 @@ export function MatchDetailPage() {
       }
       toast(t('match.joinedSuccessfully'));
       setJoinOpen(false);
+      setJoinError('');
       await load();
       window.requestAnimationFrame(() => {
         document.getElementById('match-room')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('match.joinFail'));
+      const msg = httpCopy(err, t, t('match.joinFail'));
+      setJoinError(msg);
+      toast(msg);
     } finally {
       setBusy(false);
     }
@@ -223,11 +246,20 @@ export function MatchDetailPage() {
     try {
       await setReady(matchId, next);
       setReadyOn(next);
+      setMatch((prev) => {
+        if (!prev?.participants) return prev;
+        return {
+          ...prev,
+          participants: prev.participants.map((p) =>
+            meId && p.userId === meId ? { ...p, ready: next } : p
+          ),
+        };
+      });
       toast(next ? t('match.ready') : t('match.notReady'));
     } catch (err) {
       toast(isApiError(err) ? err.message : t('match.readyFail'));
     }
-  }, [joined, matchId, ready, t, toast]);
+  }, [joined, matchId, meId, ready, t, toast]);
 
   const copyRoom = useCallback(async () => {
     const id = room?.roomId || match?.roomId;
@@ -355,14 +387,21 @@ export function MatchDetailPage() {
         </p>
       </header>
       <div className="play-stage">
-        <div className="match-hero">
+        <div className={`match-hero${match.banner || match.gameName ? '' : ' is-empty'}`}>
           <img
             src={coverForGame({ name: match.gameName, banner: match.banner })}
             alt=""
             width={1260}
             height={420}
             onError={(e) => {
-              e.currentTarget.style.display = 'none';
+              const img = e.currentTarget;
+              const local = localCoverForGame({ name: match.gameName });
+              if (img.getAttribute('src') === local || img.src.includes(local)) {
+                img.style.display = 'none';
+                img.parentElement?.classList.add('is-empty');
+                return;
+              }
+              img.src = local;
             }}
           />
         </div>
@@ -396,9 +435,6 @@ export function MatchDetailPage() {
             <>
               <button className="btn btn-primary" type="button" onClick={() => void doReady()}>
                 {ready ? t('match.unready') : t('match.ready')}
-              </button>
-              <button className="btn btn-ghost" type="button" onClick={copyRoom}>
-                {t('match.copyRoom')}
               </button>
               <button
                 className="btn btn-ghost"
@@ -497,7 +533,7 @@ export function MatchDetailPage() {
                   <b>{p.username}</b>
                   {p.pubgId ? <small>{p.pubgId}</small> : null}
                 </span>
-                {p.ready || ready ? <i className="ready-tick" title={t('match.ready')} /> : null}
+                {p.ready ? <i className="ready-tick" title={t('match.ready')} /> : null}
                 {joined && p.userId && p.userId !== meId ? (
                   <button
                     type="button"
@@ -565,7 +601,12 @@ export function MatchDetailPage() {
         match={joinOpen ? match : null}
         balance={balance}
         joining={busy}
-        onClose={() => !busy && setJoinOpen(false)}
+        error={joinError}
+        onClose={() => {
+          if (busy) return;
+          setJoinOpen(false);
+          setJoinError('');
+        }}
         onConfirm={() => void doJoin()}
       />
     </main>

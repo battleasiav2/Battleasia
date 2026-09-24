@@ -37,6 +37,18 @@ export function markShopGate(user?: AuthUser) {
   if (user) sessionStorage.setItem(USER, JSON.stringify(user));
 }
 
+export function patchSessionBalance(balance: number) {
+  try {
+    const raw = sessionStorage.getItem(USER);
+    const user = raw ? (JSON.parse(raw) as AuthUser) : {};
+    const next = { ...user, balance };
+    sessionStorage.setItem(USER, JSON.stringify(next));
+    window.dispatchEvent(new CustomEvent('ba-balance', { detail: balance }));
+  } catch {
+    window.dispatchEvent(new CustomEvent('ba-balance', { detail: balance }));
+  }
+}
+
 export function clearShopGate() {
   sessionStorage.removeItem(GATE);
   sessionStorage.removeItem(USER);
@@ -136,5 +148,6 @@ export async function fetchMe() {
 }
 
 export function leaveShop() {
+  void import('./socket').then(({ disconnectSocket }) => disconnectSocket());
   clearShopGate();
 }

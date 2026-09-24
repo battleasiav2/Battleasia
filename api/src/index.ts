@@ -4,6 +4,7 @@ import { createApp, createSocketServer } from './app.js';
 import { User } from './models/User.js';
 import { setSocketServer } from './utils/socket.js';
 import { bootApiSentry, captureApiException } from './utils/sentry.js';
+import { ensureCoinRates } from './utils/coin-rates.js';
 import bcrypt from 'bcryptjs';
 
 bootApiSentry();
@@ -56,6 +57,7 @@ async function ensureAdminUser() {
 async function main() {
   await connectDb();
   await ensureAdminUser();
+  await ensureCoinRates();
 
   const app = createApp();
   const { httpServer, io } = createSocketServer(app);

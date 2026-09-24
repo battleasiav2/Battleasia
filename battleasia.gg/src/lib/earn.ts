@@ -178,3 +178,24 @@ export async function claimSeason(level: number, track: 'free' | 'plus') {
   });
   return unwrapData<{ balanceAfter?: number }>(payload);
 }
+
+export type ShareEarnState = {
+  enabled?: boolean;
+  bacAmount?: number;
+  title?: string;
+  claimedForMatch?: boolean;
+  cooldownHours?: number;
+};
+
+export async function fetchShareStatus(matchId: string) {
+  const payload = await api(`/api/v2/engagement/share/${encodeURIComponent(matchId)}`);
+  return unwrapData<ShareEarnState>(payload);
+}
+
+export async function claimShare(matchId: string, platform = 'native') {
+  const payload = await api('/api/v2/engagement/share/claim', {
+    method: 'POST',
+    body: JSON.stringify({ matchId, platform }),
+  });
+  return unwrapData<{ balanceAfter?: number; rewardAmount?: number; shareToEarn?: ShareEarnState }>(payload);
+}

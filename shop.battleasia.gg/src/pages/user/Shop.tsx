@@ -210,22 +210,40 @@ export function ShopPage() {
             <button
               type="button"
               key={item.id}
-              className={`play-card ${pack?.id === item.id ? 'is-selected' : ''}`}
+              className={`shop-pack ${pack?.id === item.id ? 'is-selected' : ''}`}
               onClick={() => setPack(item)}
             >
-              <div className="play-card-art">
-                <img className="shop-pack-coin" src={ASSETS.coin} alt="" width={40} height={40} decoding="async" />
-                {item.discountPercent ? <span className="shop-off">{item.discountPercent}{t('shop.off')}</span> : null}
-              </div>
-              <div className="play-card-meta">
-                <strong>
-                  <CoinValue value={item.amount} size={14} />
-                </strong>
-                <small>
-                  {packFiatPrefix(item.symbol)}
-                  {item.price}
-                </small>
-                <span className="play-card-go">{pack?.id === item.id ? t('shop.selected') : t('shop.select')}</span>
+              {item.discountPercent ? (
+                <span className="shop-pack-off">
+                  {item.discountPercent}
+                  {t('shop.off')}
+                </span>
+              ) : null}
+              <div className="shop-pack-body">
+                <div className="shop-pack-copy">
+                  <div className="shop-pack-amount">
+                    <span className="shop-pack-amt">{Number(item.amount).toLocaleString()}</span>
+                    <img className="shop-pack-amt-coin" src={ASSETS.coin} alt="" width={28} height={28} decoding="async" />
+                  </div>
+                  <p className="shop-pack-price">
+                    {packFiatPrefix(item.symbol)}
+                    {item.price}
+                  </p>
+                  <span className="shop-pack-cta">
+                    {pack?.id === item.id ? t('shop.selected') : t('shop.select')}
+                    <i aria-hidden>›</i>
+                  </span>
+                </div>
+                <div className="shop-pack-art" aria-hidden>
+                  <span className="shop-pack-glow" />
+                  <div className="shop-pack-stack">
+                    <img src={ASSETS.coin} className="shop-pack-stack-coin is-back" alt="" decoding="async" />
+                    <img src={ASSETS.coin} className="shop-pack-stack-coin is-mid" alt="" decoding="async" />
+                    <img src={ASSETS.coin} className="shop-pack-stack-coin is-front" alt="" decoding="async" />
+                    <img src={ASSETS.coin} className="shop-pack-stack-coin is-hero" alt="" decoding="async" />
+                    <span className="shop-pack-flare" />
+                  </div>
+                </div>
               </div>
             </button>
           ))}

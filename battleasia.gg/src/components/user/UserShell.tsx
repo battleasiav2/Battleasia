@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { HudProvider, useHud } from '../../contexts/HudContext';
 import { ASSETS } from '../../lib/assets';
-import { fetchMe, logout, readSessionUser } from '../../lib/auth';
+import { fetchMe, logout, patchSessionBalance, readSessionUser } from '../../lib/auth';
 import { isApiError } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
 import { fetchP2Flags } from '../../lib/p2';
@@ -15,7 +15,6 @@ import { ThemeDock } from '../ThemeDock';
 import { UserAvatar } from '../UserAvatar';
 import { openBacShop } from '../../lib/wallet';
 
-const SiteFooter = lazy(() => import('../SiteFooter').then((m) => ({ default: m.SiteFooter })));
 const DeferredSupportChat = lazy(() =>
   import('../SupportChat').then((m) => ({ default: m.DeferredSupportChat })),
 );
@@ -140,7 +139,11 @@ function UserChrome() {
     getAuthedSocket().then((sock) => {
       if (!sock) return;
       const onBal = (data: { balance?: number }) => {
-        if (data?.balance != null) setBalance(Number(data.balance) || 0);
+        if (data?.balance == null) return;
+        const next = Number(data.balance) || 0;
+        setBalance(next);
+        patchSessionBalance(next);
+        setMe((prev) => (prev ? { ...prev, balance: next } : prev));
       };
       const onNote = (data: { subject?: string; title?: string; message?: string }) => {
         setAlerts((n) => n + 1);
@@ -375,9 +378,6 @@ function UserChrome() {
       <ErrorBoundary>
         <Outlet context={{ toast, setBalance, balance, muted }} />
       </ErrorBoundary>
-      <Suspense fallback={null}>
-        <SiteFooter />
-      </Suspense>
       <Suspense fallback={null}>
         <SocialFab />
         <DeferredSupportChat />

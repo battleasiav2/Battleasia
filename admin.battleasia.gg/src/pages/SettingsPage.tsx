@@ -43,7 +43,7 @@ export function SettingsPage() {
       const parsed = JSON.parse(raw) as Record<string, unknown>;
       const body = spec.wrap ? { [spec.wrap]: parsed[spec.wrap] ?? parsed } : parsed;
       await api(spec.put, { method: 'PUT', body: JSON.stringify(body) });
-      toast('Saved');
+      toast(t('settings.save'));
     } catch (err) {
       toast(isApiError(err) ? err.message : t('settings.fail'));
     } finally {
@@ -53,33 +53,61 @@ export function SettingsPage() {
 
   return (
     <main className="admin-body">
-      <h1>{t(spec.title)}</h1>
-      <p className="admin-lead">{t('settings.lead')}</p>
+      <header className="dash-head">
+        <p className="dash-eyebrow">{t('nav.system')}</p>
+        <h1>{t(spec.title)}</h1>
+        <p className="admin-lead">{t('settings.lead')}</p>
+      </header>
       {error ? <p className="form-error">{error}</p> : null}
-      <textarea className="json-box" value={raw} onChange={(e) => setRaw(e.target.value)} />
-      <div className="table-tools" style={{ marginTop: 12 }}>
-        <button className="btn btn-primary" type="button" disabled={busy || !spec.put} onClick={() => void save()}>
-          {busy ? t('settings.saving') : t('settings.save')}
-        </button>
-        {spec.testPath ? (
-          <>
-            <input value={testTo} placeholder={t('settings.testEmail')} onChange={(e) => setTestTo(e.target.value)} />
-            <button
-              className="btn btn-ghost"
-              type="button"
-              onClick={async () => {
-                try {
-                  await api(spec.testPath!, { method: 'POST', body: JSON.stringify({ to: testTo.trim() }) });
-                  toast('Test mail sent');
-                } catch (err) {
-                  toast(isApiError(err) ? err.message : 'Test failed');
-                }
-              }}
-            >
-              Send test
+      <div className="dash-stage form-stage">
+        <form
+          className="admin-form"
+          style={{ maxWidth: 'none' }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            void save();
+          }}
+        >
+          <textarea className="json-box" value={raw} onChange={(e) => setRaw(e.target.value)} spellCheck={false} />
+          <div className="form-actions">
+            <button className="btn btn-primary" type="submit" disabled={busy || !spec.put}>
+              {busy ? t('settings.saving') : t('settings.save')}
             </button>
-          </>
-        ) : null}
+            {spec.testPath ? (
+              <>
+                <input
+                  value={testTo}
+                  placeholder={t('settings.testEmail')}
+                  onChange={(e) => setTestTo(e.target.value)}
+                  style={{
+                    minWidth: 0,
+                    flex: '1 1 180px',
+                    minHeight: 40,
+                    borderRadius: 12,
+                    border: '1px solid var(--ba-hair)',
+                    background: 'var(--ba-input)',
+                    color: 'var(--ba-text)',
+                    padding: '0 12px',
+                  }}
+                />
+                <button
+                  className="btn btn-ghost"
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      await api(spec.testPath!, { method: 'POST', body: JSON.stringify({ to: testTo.trim() }) });
+                      toast(t('mail.sendTest'));
+                    } catch (err) {
+                      toast(isApiError(err) ? err.message : t('settings.fail'));
+                    }
+                  }}
+                >
+                  {t('mail.sendTest')}
+                </button>
+              </>
+            ) : null}
+          </div>
+        </form>
       </div>
     </main>
   );

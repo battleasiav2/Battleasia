@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthShell } from '../../components/auth/AuthShell';
-import { isApiError } from '../../lib/api';
 import { forgotPassword } from '../../lib/auth';
+import { httpCopy } from '../../lib/form';
 import { useI18n } from '../../lib/i18n';
 
 export function ForgotPasswordPage() {
@@ -24,7 +24,7 @@ export function ForgotPasswordPage() {
       await forgotPassword(email);
       navigate(`/auth/reset-password?email=${encodeURIComponent(email.trim())}`);
     } catch (err) {
-      setError(isApiError(err) ? err.message : t('auth.sendFail'));
+      setError(httpCopy(err, t, t('auth.sendFail')));
     } finally {
       setBusy(false);
     }
@@ -33,11 +33,23 @@ export function ForgotPasswordPage() {
   return (
     <AuthShell title={t('auth.forgot')} subtitle={t('auth.forgotSub')}>
       <form className="auth-form" onSubmit={onSubmit}>
+        {error ? (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        ) : null}
         <label className="field" htmlFor="email">
           {t('auth.email')}
-          <input id="email" type="email" autoComplete="email" value={email} disabled={busy} onChange={(e) => setEmail(e.target.value)} onBlur={(e) => setEmail(e.target.value.trim())} />
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            value={email}
+            disabled={busy}
+            onChange={(e) => setEmail(e.target.value)}
+            onBlur={(e) => setEmail(e.target.value.trim())}
+          />
         </label>
-        {error ? <p className="field-error">{error}</p> : null}
         <button className="btn btn-primary" type="submit" disabled={busy}>
           {busy ? t('auth.sending') : t('auth.sendCode')}
         </button>

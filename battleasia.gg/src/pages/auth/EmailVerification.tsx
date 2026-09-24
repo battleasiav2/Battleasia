@@ -2,8 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthShell } from '../../components/auth/AuthShell';
 import { OtpInputs } from '../../components/auth/OtpInputs';
-import { isApiError } from '../../lib/api';
 import { markSignedIn, resendVerification, verifyEmailSignup } from '../../lib/auth';
+import { httpCopy } from '../../lib/form';
 import { useI18n } from '../../lib/i18n';
 import { registerPushToken } from '../../lib/push';
 
@@ -44,7 +44,7 @@ export function EmailVerificationPage() {
       void registerPushToken('web');
       navigate('/user/play', { replace: true });
     } catch (err) {
-      setError(isApiError(err) ? err.message : t('errors.otp'));
+      setError(httpCopy(err, t, t('errors.otp')));
     } finally {
       setBusy(false);
     }
@@ -58,7 +58,7 @@ export function EmailVerificationPage() {
       setSeconds(60);
       setInfo(t('auth.codeSent'));
     } catch (err) {
-      setError(isApiError(err) ? err.message : t('auth.sendFail'));
+      setError(httpCopy(err, t, t('auth.sendFail')));
     } finally {
       setBusy(false);
     }
@@ -85,6 +85,11 @@ export function EmailVerificationPage() {
           void verify();
         }}
       >
+        {error ? (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        ) : null}
         <OtpInputs
           value={code}
           disabled={busy}

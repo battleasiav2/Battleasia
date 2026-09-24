@@ -1,17 +1,19 @@
 import { CoinValue } from './CoinValue';
 import { SpotBar } from './SpotBar';
-import { coverForGame, formatWhen, spotsLeft, type MatchItem } from '../lib/games';
+import { isDemoMatchId } from '../lib/demoMatches';
+import { coverForGame, formatWhen, localCoverForGame, spotsLeft, type MatchItem } from '../lib/games';
 import { useI18n } from '../lib/i18n';
 
 type Props = {
   match: MatchItem | null;
   balance: number;
   joining?: boolean;
+  error?: string;
   onClose: () => void;
   onConfirm: () => void;
 };
 
-export function MatchJoinDialog({ match, balance, joining, onClose, onConfirm }: Props) {
+export function MatchJoinDialog({ match, balance, joining, error, onClose, onConfirm }: Props) {
   const { t } = useI18n();
   if (!match) return null;
 
@@ -21,7 +23,9 @@ export function MatchJoinDialog({ match, balance, joining, onClose, onConfirm }:
   const isFull = left <= 0;
   const used = match.participantsCount || 0;
   const cap = match.totalPlayer || 0;
-  const cover = coverForGame({ name: match.gameName, banner: match.banner, packageName: match.map });
+  const gameRef = { name: match.gameName, banner: match.banner };
+  const localCover = localCoverForGame(gameRef);
+  const demo = isDemoMatchId(match.id);
 
   const rows = [
     { label: t('match.game'), value: match.gameName || '—' },
@@ -30,6 +34,16 @@ export function MatchJoinDialog({ match, balance, joining, onClose, onConfirm }:
     { label: t('match.map'), value: match.map || t('match.mapTbd') },
     { label: t('match.typeLabel'), value: match.matchType || '—' },
   ];
+
+  const signal =
+    error ||
+    (demo
+      ? t('match.demoDisabled')
+      : insufficient
+        ? t('match.insufficientBalance')
+        : isFull
+          ? t('match.matchFullToast')
+          : '');
 
   return (
     <div className="play-sheet join-sheet" role="dialog" aria-labelledby="join-title">
@@ -47,8 +61,28 @@ export function MatchJoinDialog({ match, balance, joining, onClose, onConfirm }:
         </header>
 
         <div className="join-dialog-body">
+          {signal ? (
+            <p className="join-signal" role="alert">
+              {signal}
+            </p>
+          ) : null}
+
           <div className="join-map-card">
-            <img src={cover} alt="" width={480} height={200} />
+            <img
+              src={localCover}
+              alt=""
+              width={480}
+              height={200}
+              onError={(e) => {
+                const img = e.currentTarget;
+                const webp = coverForGame({ name: match.gameName });
+                if (img.src.includes('.svg') && webp !== img.getAttribute('src')) {
+                  img.src = webp;
+                  return;
+                }
+                img.src = '/covers/arena.svg';
+              }}
+            />
             <div className="join-map-overlay">
               <small>{t('match.map')}</small>
               <strong>{match.map || t('match.mapTbd')}</strong>
@@ -113,9 +147,15 @@ export function MatchJoinDialog({ match, balance, joining, onClose, onConfirm }:
               type="button"
               className="btn btn-primary"
               onClick={onConfirm}
-              disabled={joining || insufficient || isFull}
+              disabled={joining || insufficient || isFull || demo}
             >
-              {joining ? t('match.joining') : isFull ? t('match.matchFull') : t('match.joinMatch')}
+              {joining
+                ? t('match.joining')
+                : isFull
+                  ? t('match.matchFull')
+                  : demo
+                    ? t('match.demoShort')
+                    : t('match.joinMatch')}
             </button>
           </div>
         </footer>

@@ -148,6 +148,17 @@ function isMissingArt(src: string) {
   return /\/assets\/(images\/games\/art|games)\//.test(src);
 }
 
+/** Dark branded local art per game (always ships in /public/covers). */
+export function localCoverForGame(game: {
+  name?: string;
+  packageName?: string;
+  banner?: string;
+}) {
+  const key = gameKey(game);
+  if (key === 'arena') return '/covers/arena.svg';
+  return `/covers/${key}.svg`;
+}
+
 export function coverForGame(game: {
   name?: string;
   packageName?: string;
@@ -159,7 +170,7 @@ export function coverForGame(game: {
   if (remote && !isMissingArt(remote) && !remote.startsWith('/covers/')) return remote;
   const key = gameKey(game);
   if (key !== 'arena') return `/covers/${key}.webp?v=5`;
-  return '/covers/arena.svg';
+  return localCoverForGame(game);
 }
 
 export function webpSrcSet(src: string, smW: number, fullW: number) {
@@ -220,7 +231,14 @@ export async function fetchRoom(id: string) {
 }
 
 export async function checkJoin(id: string) {
-  return api(`/api/v2/games/matches/${id}/check-join`, { method: 'POST' });
+  const payload = await api(`/api/v2/games/matches/${id}/check-join`, { method: 'POST' });
+  return unwrapData<{
+    canJoin?: boolean;
+    issues?: string[];
+    isJoined?: boolean;
+    balance?: number;
+    entryFee?: number;
+  }>(payload);
 }
 
 export async function joinMatch(id: string) {

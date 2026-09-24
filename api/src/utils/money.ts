@@ -148,6 +148,23 @@ export async function joinPaidMatch(input: {
     const existing = await MatchParticipant.findOne({ matchId: match._id, userId: user._id }).session(session);
     if (existing) throw new MoneyError('Already joined this match');
 
+    // One live match at a time — block joining another while still in active/start.
+    const otherParts = await MatchParticipant.find({ userId: user._id }).session(session).select('matchId');
+    if (otherParts.length) {
+      const otherIds = otherParts.map((p) => p.matchId);
+      const blocking = await Match.findOne({
+        _id: { $in: otherIds },
+        status: { $in: ['active', 'start'] },
+      })
+        .session(session)
+        .select('matchName status');
+      if (blocking) {
+        throw new MoneyError(
+          `You can only join one live match at a time. Leave or finish “${blocking.matchName}” first.`
+        );
+      }
+    }
+
     const participantCount = await MatchParticipant.countDocuments({ matchId: match._id }).session(session);
     if (participantCount >= match.totalPlayer) throw new MoneyError('Match is full');
 

@@ -36,15 +36,25 @@ export function writeRememberedEmail(email: string, on: boolean) {
 }
 
 export function httpCopy(err: unknown, t: (key: string) => string, fallback: string) {
-  if (!isApiError(err)) return fallback;
+  if (!isApiError(err)) {
+    if (err instanceof Error && err.message) return err.message;
+    return fallback;
+  }
+  const msg = (err.message || '').trim();
+  // Prefer the real server reason when it is specific.
+  if (msg && err.status !== 429 && err.status !== 413 && err.status < 500) {
+    if (err.status === 403 && /verif/i.test(msg)) return msg;
+    if (err.status === 400 || err.status === 401 || err.status === 409) return msg;
+    if (msg.length > 8 && !/^request failed$/i.test(msg)) return msg;
+  }
   if (err.status === 429) return t('http.429').replace('{n}', String(err.retryAfter || 60));
   if (err.status === 413) return t('http.413');
-  if (err.status === 409) return t('http.409');
-  if (err.status === 404) return t('http.404');
-  if (err.status === 403) return /verif/i.test(err.message) ? err.message : t('http.403');
+  if (err.status === 409) return msg || t('http.409');
+  if (err.status === 404) return msg || t('http.404');
+  if (err.status === 403) return /verif/i.test(msg) ? msg : t('http.403');
   if (err.status >= 500) return t('http.5xx');
-  if (err.status === 0 && /cancel/i.test(err.message)) return t('http.canceled');
-  return err.message || fallback;
+  if (err.status === 0 && /cancel/i.test(msg)) return t('http.canceled');
+  return msg || fallback;
 }
 
 export function useUnsaved(dirty: boolean) {

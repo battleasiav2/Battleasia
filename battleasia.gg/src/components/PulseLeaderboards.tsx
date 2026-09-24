@@ -37,19 +37,24 @@ function BoardCard({
   metricLabel,
   players,
   metric,
+  tone,
 }: {
   title: string;
   metricLabel: string;
   players: PulsePlayer[];
   metric: 'winnings' | 'kills';
+  tone: 'profit' | 'kills';
 }) {
   const { t } = useI18n();
   const boardHref = '/user/account/leader-board';
 
   return (
-    <article className="pulse-board">
+    <article className={`pulse-board pulse-board--${tone}`}>
       <header className="pulse-board-head">
-        <h3>{title}</h3>
+        <div className="pulse-board-title">
+          <span className="pulse-board-eyebrow">{tone === 'profit' ? t('pulse.winningsCol') : t('pulse.killsCol')}</span>
+          <h3>{title}</h3>
+        </div>
         <span className="pulse-board-live">
           <i /> {t('pulse.live')}
         </span>
@@ -65,7 +70,7 @@ function BoardCard({
             const rank = i + 1;
             const value = metric === 'winnings' ? p.totalWinnings : p.totalKills;
             return (
-              <li key={p.userId || `${p.username}-${rank}`}>
+              <li key={p.userId || `${p.username}-${rank}`} className={rank <= 3 ? `is-top is-top-${rank}` : undefined}>
                 <div className="pulse-board-rank">
                   <RankMark rank={rank} />
                 </div>
@@ -82,7 +87,7 @@ function BoardCard({
                   {metric === 'winnings' ? (
                     <CoinValue value={value} size={18} />
                   ) : (
-                    <b>{Number(value || 0).toLocaleString()}</b>
+                    <b className="pulse-board-kills">{Number(value || 0).toLocaleString()}</b>
                   )}
                 </div>
               </li>
@@ -114,12 +119,14 @@ export function PulseLeaderboards({
         metricLabel={t('pulse.winningsCol')}
         players={profit}
         metric="winnings"
+        tone="profit"
       />
       <BoardCard
         title={t('pulse.topKillers')}
         metricLabel={t('pulse.killsCol')}
         players={killers}
         metric="kills"
+        tone="kills"
       />
     </section>
   );

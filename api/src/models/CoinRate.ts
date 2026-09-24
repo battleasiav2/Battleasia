@@ -1,7 +1,9 @@
 import mongoose, { Schema, type Document } from 'mongoose';
 
 export interface ICoinRate extends Document {
-  region: 'global' | 'bangladesh' | 'india' | 'pakistan';
+  /** Country / market slug, e.g. bangladesh, india, global */
+  region: string;
+  /** ISO-ish currency code — fiat units per 1 BAC */
   currency: string;
   rate: number;
   isActive: boolean;
@@ -11,9 +13,9 @@ export interface ICoinRate extends Document {
 
 const coinRateSchema = new Schema<ICoinRate>(
   {
-    region: { type: String, enum: ['global', 'bangladesh', 'india', 'pakistan'], required: true },
-    currency: { type: String, required: true },
-    rate: { type: Number, required: true },
+    region: { type: String, required: true, trim: true, lowercase: true },
+    currency: { type: String, required: true, trim: true, uppercase: true },
+    rate: { type: Number, required: true, min: 0 },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

@@ -3,8 +3,8 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthShell } from '../../components/auth/AuthShell';
 import { OtpInputs } from '../../components/auth/OtpInputs';
 import { PasswordField } from '../../components/auth/PasswordField';
-import { isApiError } from '../../lib/api';
 import { forgotPassword, resetPassword } from '../../lib/auth';
+import { httpCopy } from '../../lib/form';
 import { useI18n } from '../../lib/i18n';
 
 export function ResetPasswordPage() {
@@ -35,7 +35,7 @@ export function ResetPasswordPage() {
       await resetPassword(email, code, password);
       navigate('/auth/sign-in');
     } catch (err) {
-      setError(isApiError(err) ? err.message : t('errors.otp'));
+      setError(httpCopy(err, t, t('errors.otp')));
     } finally {
       setBusy(false);
     }
@@ -56,10 +56,29 @@ export function ResetPasswordPage() {
   return (
     <AuthShell title={t('auth.reset')} subtitle={t('auth.resetSub')}>
       <form className="auth-form" onSubmit={onSubmit}>
+        {error ? (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        ) : null}
         <OtpInputs value={code} onChange={setCode} disabled={busy} />
-        <PasswordField id="password" label={t('auth.newPassword')} value={password} autoComplete="new-password" disabled={busy} meter onChange={setPassword} />
-        <PasswordField id="confirm" label={t('auth.confirm')} value={confirm} autoComplete="new-password" disabled={busy} onChange={setConfirm} />
-        {error ? <p className="field-error">{error}</p> : null}
+        <PasswordField
+          id="password"
+          label={t('auth.newPassword')}
+          value={password}
+          autoComplete="new-password"
+          disabled={busy}
+          meter
+          onChange={setPassword}
+        />
+        <PasswordField
+          id="confirm"
+          label={t('auth.confirm')}
+          value={confirm}
+          autoComplete="new-password"
+          disabled={busy}
+          onChange={setConfirm}
+        />
         <button className="btn btn-primary" type="submit" disabled={busy}>
           {busy ? t('auth.sending') : t('auth.reset')}
         </button>
@@ -71,13 +90,17 @@ export function ResetPasswordPage() {
             try {
               await forgotPassword(email);
               setSeconds(60);
+              setError('');
             } catch (err) {
-              setError(isApiError(err) ? err.message : t('errors.otp'));
+              setError(httpCopy(err, t, t('errors.otp')));
             }
           }}
         >
           {seconds > 0 ? `${t('auth.resend')} ${seconds}s` : t('auth.resend')}
         </button>
+        <p className="auth-switch">
+          <Link to="/auth/sign-in">{t('auth.back')}</Link>
+        </p>
       </form>
     </AuthShell>
   );

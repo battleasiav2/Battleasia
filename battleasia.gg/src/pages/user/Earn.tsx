@@ -24,7 +24,7 @@ import {
 import { fetchP1Flags, type P1Flags } from '../../lib/p1';
 import { useI18n } from '../../lib/i18n';
 import { createPost } from '../../lib/social';
-import { openBacShop } from '../../lib/wallet';
+import { openBacShop, fetchBalanceHistory, type HistoryRow } from '../../lib/wallet';
 
 type ShellCtx = { setBalance: (n: number) => void };
 
@@ -36,6 +36,7 @@ const TABS = [
   ['squad', 'earn.tabSquad'],
   ['season', 'earn.tabSeason'],
   ['badges', 'earn.tabBadges'],
+  ['claims', 'earn.tabClaims'],
 ] as const;
 
 export function EarnPage() {
@@ -51,6 +52,7 @@ export function EarnPage() {
   const [squadName, setSquadName] = useState('');
   const [invite, setInvite] = useState('');
   const [flags, setFlags] = useState<P1Flags | null>(null);
+  const [claims, setClaims] = useState<HistoryRow[] | null>(null);
 
   const reload = useCallback(async () => {
     const data = await fetchEarnHome();
@@ -70,6 +72,36 @@ export function EarnPage() {
   useEffect(() => {
     fetchP1Flags().then(setFlags);
   }, []);
+
+  useEffect(() => {
+    if (tab !== 'claims') return;
+    let live = true;
+    fetchBalanceHistory()
+      .then((rows) => {
+        if (!live) return;
+        setClaims(
+          rows.filter((row) => {
+            const cat = String(row.category || '');
+            const type = String(row.type || '');
+            const reason = String(row.detail?.reason || row.reason || '');
+            return (
+              cat === 'claim' ||
+              type.startsWith('engagement_') ||
+              reason.startsWith('engagement_') ||
+              reason === 'referral_commission' ||
+              reason === 'watch_to_earn' ||
+              type === 'earning'
+            );
+          })
+        );
+      })
+      .catch(() => {
+        if (live) setClaims([]);
+      });
+    return () => {
+      live = false;
+    };
+  }, [tab]);
 
   async function run(id: string, fn: () => Promise<{ balanceAfter?: number } | unknown>) {
     setBusy(id);
@@ -477,36 +509,38 @@ export function EarnPage() {
                   <p>
                     {squad.squad.name} · code <b>{squad.squad.inviteCode}</b>
                   </p>
-                  <button
-                    className="btn btn-ghost"
-                    type="button"
-                    onClick={async () => {
-                      await navigator.clipboard.writeText(squad.squad?.inviteCode || '');
-                      toast(t('earn.inviteCopied'));
-                    }}
-                  >
-                    {t('earn.copyInvite')}
-                  </button>
-                  {squad.canClaim ? (
-                    <button className="btn btn-primary" type="button" disabled={busy === 'squad'} onClick={() => void run('squad', claimSquad)}>
-                      {t('earn.claimSquad')}
+                  <div className="earn-squad-actions">
+                    <button
+                      className="btn btn-ghost"
+                      type="button"
+                      onClick={async () => {
+                        await navigator.clipboard.writeText(squad.squad?.inviteCode || '');
+                        toast(t('earn.inviteCopied'));
+                      }}
+                    >
+                      {t('earn.copyInvite')}
                     </button>
-                  ) : null}
-                  <button
-                    className="btn btn-ghost"
-                    type="button"
-                    onClick={async () => {
-                      try {
-                        await leaveSquad();
-                        toast(t('earn.leftSquad'));
-                        await reload();
-                      } catch (err) {
-                        toast(isApiError(err) ? err.message : t('earn.leaveFail'));
-                      }
-                    }}
-                  >
-                    {t('earn.leave')}
-                  </button>
+                    {squad.canClaim ? (
+                      <button className="btn btn-primary" type="button" disabled={busy === 'squad'} onClick={() => void run('squad', claimSquad)}>
+                        {t('earn.claimSquad')}
+                      </button>
+                    ) : null}
+                    <button
+                      className="btn btn-ghost"
+                      type="button"
+                      onClick={async () => {
+                        try {
+                          await leaveSquad();
+                          toast(t('earn.leftSquad'));
+                          await reload();
+                        } catch (err) {
+                          toast(isApiError(err) ? err.message : t('earn.leaveFail'));
+                        }
+                      }}
+                    >
+                      {t('earn.leave')}
+                    </button>
+                  </div>
                   {flags?.squadChat ? <SquadChatBox toast={toast} /> : null}
                 </>
               ) : (
@@ -627,6 +661,52 @@ export function EarnPage() {
                 </article>
               ))}
             </div>
+          )}
+        </section>
+      ) : null}
+
+      {tab === 'claims' ? (
+        <section className="earn-claims">
+          <h2>{t('earn.tabClaims')}</h2>
+          <p className="play-lead">{t('earn.claimsLead')}</p>
+          {claims === null ? (
+            <div className="match-row skeleton" />
+          ) : claims.length === 0 ? (
+            <div className="play-empty">
+              <h2>{t('earn.noClaims')}</h2>
+              <p>{t('earn.noClaimsLead')}</p>
+            </div>
+          ) : (
+            <ul className="hist-feed orders-feed">
+              {claims.map((row) => {
+                const label =
+                  String(row.detail?.missionTitle || '') ||
+                  String(row.type || row.reason || 'claim').replace(/_/g, ' ');
+                const when = row.createdAt
+                  ? new Date(row.createdAt).toLocaleString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                    })
+                  : '—';
+                return (
+                  <li key={row.id} className="hist-item">
+                    <div className="hist-item-main">
+                      <span className="hist-pill hist-pill-claim">{t('earn.claim')}</span>
+                      <strong>{label}</strong>
+                      <small>{when}</small>
+                    </div>
+                    <div className="hist-amt is-in">
+                      <span>
+                        +
+                        <CoinValue value={Number(row.amount) || 0} />
+                      </span>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
           )}
         </section>
       ) : null}

@@ -57,6 +57,17 @@ export function markSignedIn(user?: AuthUser) {
   if (user) sessionStorage.setItem('ba-user', JSON.stringify(user));
 }
 
+export function patchSessionBalance(balance: number) {
+  try {
+    const raw = sessionStorage.getItem('ba-user');
+    const user = raw ? (JSON.parse(raw) as AuthUser) : {};
+    sessionStorage.setItem('ba-user', JSON.stringify({ ...user, balance }));
+    window.dispatchEvent(new CustomEvent('ba-balance', { detail: balance }));
+  } catch {
+    window.dispatchEvent(new CustomEvent('ba-balance', { detail: balance }));
+  }
+}
+
 export function clearSignedIn() {
   sessionStorage.removeItem(FLAG);
   sessionStorage.removeItem('ba-user');

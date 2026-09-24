@@ -25,59 +25,81 @@ export function SiteFooter() {
 
   return (
     <footer className="site-footer">
-      <div className="footer-cols">
-        <div>
-          <h3>{t('footer.follow')}</h3>
-          <div className="socials">
-            {socials.map((item) => {
-              const href = safeHref(item.href);
-              if (!href) return null;
-              return (
-              <a key={item.label + href} href={href} target="_blank" rel="noopener noreferrer" title={item.label}>
-                <SocialGlyph name={item.label} />
-              </a>
-              );
-            })}
+      <div className="footer-inner">
+        <div className="footer-cols">
+          <div className="footer-col footer-social">
+            <h3>{t('footer.follow')}</h3>
+            <div className="socials">
+              {socials.map((item) => {
+                const href = safeHref(item.href);
+                if (!href) return null;
+                return (
+                  <a
+                    key={item.label + href}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={item.label}
+                    aria-label={item.label}
+                  >
+                    <SocialGlyph name={item.label} />
+                  </a>
+                );
+              })}
+            </div>
           </div>
-        </div>
-        <div className="footer-brand">
-          <img src={ASSETS.logo} width={72} height={72} alt="BattleAsia" />
-          <div className="brand-name">
-            BATTLE ASIA <span>2.0</span>
+
+          <div className="footer-brand">
+            <img src={ASSETS.logoLg} width={96} height={96} alt="BattleAsia" />
+            <div className="brand-name">
+              BATTLE ASIA <span>2.0</span>
+            </div>
+            <p>{t('footer.tag')}</p>
+            <nav className="footer-legal" aria-label={t('footer.about')}>
+              <Link to="/privacy-policy">{t('footer.privacy')}</Link>
+              <Link to="/terms-and-conditions">{t('footer.terms')}</Link>
+              <a href="/dashboard#rules">{t('footer.rules')}</a>
+              <a href="/dashboard#how-to-play">{t('footer.how')}</a>
+              <a href="/dashboard#about-us">{t('footer.about')}</a>
+            </nav>
+            <small>© {new Date().getFullYear()} BattleAsia</small>
           </div>
-          <p>{t('footer.tag')}</p>
-          <nav>
-            <Link to="/privacy-policy">{t('footer.privacy')}</Link>
-            <Link to="/terms-and-conditions">{t('footer.terms')}</Link>
-            <a href="/dashboard#rules">{t('footer.rules')}</a>
-            <a href="/dashboard#how-to-play">{t('footer.how')}</a>
-            <a href="/dashboard#about-us">{t('footer.about')}</a>
-          </nav>
-          <small>© {new Date().getFullYear()} BattleAsia</small>
-        </div>
-        <div>
-          <h3>{t('footer.support')}</h3>
-          <a className="mail" href="mailto:support@battleasia.gg">
-            support@battleasia.gg
-          </a>
-        </div>
-      </div>
-      <div className="footer-bottom">
-        <div className="pays">
-          <PayChip kind="bkash" />
-          <PayChip kind="nagad" />
-          <PayChip kind="crypto" />
-        </div>
-        <div className="partners">
-          {PARTNERS.map((p) => {
-            const href = safeHref(p.href);
-            if (!href) return null;
-            return (
-            <a key={href} href={href} target="_blank" rel="noopener noreferrer">
-              {p.label}
+
+          <div className="footer-col footer-support">
+            <h3>{t('footer.support')}</h3>
+            <p className="footer-support-lead">{t('footer.questionsLead')}</p>
+            <a className="mail" href="mailto:support@battleasia.gg">
+              support@battleasia.gg
             </a>
-            );
-          })}
+            <a className="footer-support-cta" href="mailto:support@battleasia.gg">
+              {t('footer.contactSupport')}
+            </a>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <div className="footer-pays">
+            <span className="footer-bottom-label">{t('footer.payments') || 'Payments'}</span>
+            <div className="pays">
+              <PayChip kind="bkash" />
+              <PayChip kind="nagad" />
+              <PayChip kind="crypto" />
+            </div>
+          </div>
+          <div className="footer-partners">
+            <span className="footer-bottom-label">{t('footer.partners') || 'Partners'}</span>
+            <div className="partners">
+              {PARTNERS.map((p) => {
+                const href = safeHref(p.href);
+                if (!href) return null;
+                return (
+                  <a key={href} href={href} target="_blank" rel="noopener noreferrer">
+                    {p.label}
+                  </a>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </footer>

@@ -18,6 +18,7 @@ import {
   gameKey,
   isJoinable,
   joinMatch,
+  localCoverForGame,
   spotsLeft,
   webpSrcSet,
   type MatchItem,
@@ -29,30 +30,41 @@ type ShellCtx = {
   balance?: number;
 };
 
-type MatchFilter = 'all' | 'open' | 'highPrize' | 'lowPrize' | 'free';
+type MatchFilter = 'all' | 'joined' | 'open' | 'highPrize' | 'lowPrize' | 'free';
 
-const FILTERS: MatchFilter[] = ['all', 'open', 'highPrize', 'lowPrize', 'free'];
+const FILTERS: MatchFilter[] = ['all', 'joined', 'open', 'highPrize', 'lowPrize', 'free'];
+
+function pinJoinedFirst(list: MatchItem[]) {
+  return [...list].sort((a, b) => Number(Boolean(b.isJoined)) - Number(Boolean(a.isJoined)));
+}
 
 function applyMatchFilter(list: MatchItem[], filter: MatchFilter) {
   const withPrize = (m: MatchItem) => estimateMatchWinningPool(m);
 
+  if (filter === 'joined') {
+    return pinJoinedFirst(list.filter((m) => m.isJoined));
+  }
   if (filter === 'open') {
-    return list.filter(isJoinable);
+    return pinJoinedFirst(list.filter(isJoinable));
   }
   if (filter === 'free') {
-    return list.filter((m) => m.matchType === 'free' || !m.entryFee);
+    return pinJoinedFirst(list.filter((m) => m.matchType === 'free' || !m.entryFee));
   }
   if (filter === 'highPrize') {
-    return [...list]
-      .filter((m) => withPrize(m) > 0)
-      .sort((a, b) => withPrize(b) - withPrize(a) || spotsLeft(b) - spotsLeft(a));
+    return pinJoinedFirst(
+      [...list]
+        .filter((m) => withPrize(m) > 0)
+        .sort((a, b) => withPrize(b) - withPrize(a) || spotsLeft(b) - spotsLeft(a)),
+    );
   }
   if (filter === 'lowPrize') {
-    return [...list]
-      .filter((m) => withPrize(m) > 0)
-      .sort((a, b) => withPrize(a) - withPrize(b) || spotsLeft(b) - spotsLeft(a));
+    return pinJoinedFirst(
+      [...list]
+        .filter((m) => withPrize(m) > 0)
+        .sort((a, b) => withPrize(a) - withPrize(b) || spotsLeft(b) - spotsLeft(a)),
+    );
   }
-  return list;
+  return pinJoinedFirst(list);
 }
 
 export function MatchListPage() {
@@ -69,6 +81,7 @@ export function MatchListPage() {
   const [filter, setFilter] = useState<MatchFilter>('all');
   const [confirmMatch, setConfirmMatch] = useState<MatchItem | null>(null);
   const [joining, setJoining] = useState(false);
+  const [joinError, setJoinError] = useState('');
   const selectedRef = useRef('');
   const balance = Number(outlet?.balance ?? readSessionUser()?.balance) || 0;
 
@@ -94,7 +107,7 @@ export function MatchListPage() {
         if (!live) return;
         setMatches(list);
         setGameName((prev) => prev || list[0]?.gameName || '');
-        const first = list.find(isJoinable) || list[0];
+        const first = list.find((m) => m.isJoined) || list.find(isJoinable) || list[0];
         if (first) setSelected(first.id);
       })
       .catch((err) => {
@@ -121,6 +134,13 @@ export function MatchListPage() {
         navigate(`/user/play/${match.id}/detail?from=${gameId}`);
         return;
       }
+      const otherLive = (matches || []).find(
+        (m) => m.isJoined && m.id !== match.id && isJoinable(m),
+      );
+      if (otherLive) {
+        toast(t('match.oneAtATime').replace('{name}', otherLive.matchName || 'your current match'));
+        return;
+      }
       if (!isJoinable(match)) {
         if (spotsLeft(match) <= 0) toast(t('match.matchFullToast'));
         else navigate(`/user/play/${match.id}/detail?from=${gameId}`);
@@ -140,33 +160,50 @@ export function MatchListPage() {
         toast(t('match.pubgIdRequired'));
         return;
       }
+      setJoinError(isDemoMatchId(match.id) ? t('match.demoDisabled') : '');
       setConfirmMatch(match);
     },
-    [balance, gameId, joining, navigate, t, toast],
+    [balance, gameId, joining, matches, navigate, t, toast],
   );
 
   const confirmJoin = useCallback(async () => {
     if (!confirmMatch || joining) return;
     const match = confirmMatch;
     const fee = Number(match.entryFee) || 0;
+    setJoinError('');
 
     if (fee > balance) {
-      toast(t('match.insufficientBalance'));
+      const msg = t('match.insufficientBalance');
+      setJoinError(msg);
+      toast(msg);
       return;
     }
 
     if (isDemoMatchId(match.id)) {
-      setConfirmMatch(null);
-      toast(t('match.demoDisabled'));
+      const msg = t('match.demoDisabled');
+      setJoinError(msg);
+      toast(msg);
       return;
     }
 
     setJoining(true);
     try {
       try {
-        await checkJoin(match.id);
-      } catch {
-        /* join still attempts if check-join is missing */
+        const check = await checkJoin(match.id);
+        if (check && check.canJoin === false) {
+          const msg = (check.issues || []).filter(Boolean).join(' · ') || t('match.joinFail');
+          setJoinError(msg);
+          toast(msg);
+          return;
+        }
+      } catch (err) {
+        /* join still attempts if check-join is missing; keep signal if check fails hard */
+        if (isApiError(err) && err.status !== 404) {
+          const msg = httpCopy(err, t, t('match.joinFail'));
+          setJoinError(msg);
+          toast(msg);
+          return;
+        }
       }
       const joinedRes = await joinMatch(match.id);
       if (joinedRes?.balance != null) setBalance?.(Number(joinedRes.balance) || 0);
@@ -184,9 +221,12 @@ export function MatchListPage() {
       );
       toast(t('match.joinedSuccessfully'));
       setConfirmMatch(null);
+      setJoinError('');
       navigate(`/user/play/${match.id}/detail?from=${encodeURIComponent(gameId)}#match-room`);
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('match.joinFail'));
+      const msg = httpCopy(err, t, t('match.joinFail'));
+      setJoinError(msg);
+      toast(msg);
     } finally {
       setJoining(false);
     }
@@ -231,6 +271,7 @@ export function MatchListPage() {
 
   const filterLabel: Record<MatchFilter, string> = {
     all: t('match.filterAll'),
+    joined: t('match.filterJoined'),
     open: t('match.filterOpen'),
     highPrize: t('match.filterHighPrize'),
     lowPrize: t('match.filterLowPrize'),
@@ -297,12 +338,19 @@ export function MatchListPage() {
                 const cap = match.totalPlayer || 0;
                 const prize = estimateMatchWinningPool(match);
                 return (
-                  <button
+                  <div
                     key={match.id}
-                    type="button"
-                    className={`match-row ${selected === match.id ? 'is-selected' : ''}`}
+                    role="listitem"
+                    tabIndex={0}
+                    className={`match-row ${selected === match.id ? 'is-selected' : ''}${match.isJoined ? ' is-mine-joined' : ''}`}
                     onClick={() => setSelected(match.id)}
                     onDoubleClick={() => navigate(`/user/play/${match.id}/detail?from=${gameId}`)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        navigate(`/user/play/${match.id}/detail?from=${gameId}`);
+                      }
+                    }}
                   >
                     <span className="match-banner" data-game={gameKey({ name: match.gameName, banner: match.banner })}>
                       <img
@@ -314,12 +362,12 @@ export function MatchListPage() {
                         height={124}
                         onError={(e) => {
                           const img = e.currentTarget;
-                          const local = coverForGame({ name: match.gameName });
-                          if (img.src.includes(local)) {
+                          const local = localCoverForGame({ name: match.gameName });
+                          if (img.getAttribute('src') === local || img.src.endsWith(local)) {
                             img.style.display = 'none';
                             return;
                           }
-                          img.srcset = '';
+                          img.removeAttribute('srcset');
                           img.src = local;
                         }}
                       />
@@ -381,24 +429,16 @@ export function MatchListPage() {
                         {t('match.lobby')}
                       </Link>
                     ) : open ? (
-                      <span
+                      <button
+                        type="button"
                         className="btn btn-primary"
-                        role="button"
-                        tabIndex={0}
                         onClick={(e) => {
                           e.stopPropagation();
                           requestJoin(match);
                         }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            requestJoin(match);
-                          }
-                        }}
                       >
                         {t('match.join')}
-                      </span>
+                      </button>
                     ) : (
                       <Link
                         className="btn btn-primary"
@@ -408,7 +448,7 @@ export function MatchListPage() {
                         {t('match.view')}
                       </Link>
                     )}
-                  </button>
+                  </div>
                 );
               })}
             </div>
@@ -419,7 +459,12 @@ export function MatchListPage() {
         match={confirmMatch}
         balance={balance}
         joining={joining}
-        onClose={() => !joining && setConfirmMatch(null)}
+        error={joinError}
+        onClose={() => {
+          if (joining) return;
+          setConfirmMatch(null);
+          setJoinError('');
+        }}
         onConfirm={() => void confirmJoin()}
       />
     </main>

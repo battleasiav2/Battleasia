@@ -116,21 +116,23 @@ export function MailSettingsPage() {
       <p className="admin-lead">{t('mail.lead')}</p>
       {error ? <p className="form-error">{error}</p> : null}
 
-      <div className="mail-settings match-form-grid">
+      <div className="mail-settings match-form-grid dash-stage form-stage">
         <div className="prize-preview" style={{ marginBottom: 16 }}>
           <small>{t('mail.tipTitle')}</small>
           <p>{t('mail.tipBody')}</p>
         </div>
 
-        <label className="field field-check">
-          <input
-            type="checkbox"
-            checked={form.enabled}
-            disabled={loading}
-            onChange={(e) => update('enabled', e.target.checked)}
-          />
-          {t('mail.enabled')}
-        </label>
+        <div className="form-toggles" style={{ marginBottom: 14 }}>
+          <label className="field-check">
+            <input
+              type="checkbox"
+              checked={form.enabled}
+              disabled={loading}
+              onChange={(e) => update('enabled', e.target.checked)}
+            />
+            {t('mail.enabled')}
+          </label>
+        </div>
 
         <div className="mail-grid">
           <label className="field">
@@ -158,7 +160,7 @@ export function MailSettingsPage() {
               }}
             />
           </label>
-          <label className="field field-check">
+          <label className="field field-check span-all">
             <input
               type="checkbox"
               checked={form.secure}
@@ -207,7 +209,7 @@ export function MailSettingsPage() {
           </label>
         </div>
 
-        <div className="table-tools" style={{ marginTop: 8 }}>
+        <div className="form-actions" style={{ marginTop: 8 }}>
           <button className="btn btn-primary" type="button" disabled={loading || busy} onClick={() => void save()}>
             {busy ? t('settings.saving') : t('mail.save')}
           </button>
@@ -218,12 +220,21 @@ export function MailSettingsPage() {
 
         <div className="prize-preview" style={{ marginTop: 20 }}>
           <small>{t('mail.testTitle')}</small>
-          <div className="table-tools" style={{ marginTop: 10 }}>
+          <div className="form-actions" style={{ marginTop: 10 }}>
             <input
               value={testTo}
               placeholder={t('settings.testEmail')}
               onChange={(e) => setTestTo(e.target.value)}
-              style={{ minWidth: 240 }}
+              style={{
+                minWidth: 0,
+                flex: '1 1 200px',
+                minHeight: 40,
+                borderRadius: 12,
+                border: '1px solid var(--ba-hair)',
+                background: 'var(--ba-input)',
+                color: 'var(--ba-text)',
+                padding: '0 12px',
+              }}
             />
             <button className="btn btn-ghost" type="button" disabled={testing || loading} onClick={() => void sendTest()}>
               {testing ? t('mail.sending') : t('mail.sendTest')}

@@ -140,6 +140,13 @@ export async function performLuckySpin(userId: Types.ObjectId | string) {
     spunAt: now,
   });
 
+  // Re-check after insert so concurrent spins cannot exceed dailyFreeSpins.
+  const spinsAfter = await UserEngagementSpin.countDocuments({ userId, periodKey });
+  if (spinsAfter > config.dailyFreeSpins) {
+    await UserEngagementSpin.deleteOne({ _id: spinDoc._id });
+    return { ok: false as const, message: 'No free spins remaining today' };
+  }
+
   let balanceAfter: number | undefined;
   const rewardAmount = Math.max(Number(prize.bacAmount) || 0, 0);
 

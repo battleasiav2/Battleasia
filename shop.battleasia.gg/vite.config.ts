@@ -10,6 +10,14 @@ export default defineConfig({
     proxy: {
       '/api': { target: 'http://127.0.0.1:5050', changeOrigin: true },
       '/uploads': { target: 'http://127.0.0.1:5050', changeOrigin: true },
+      '/socket.io': { target: 'http://127.0.0.1:5050', ws: true, changeOrigin: true },
+    },
+  },
+  preview: {
+    proxy: {
+      '/api': { target: 'http://127.0.0.1:5050', changeOrigin: true },
+      '/uploads': { target: 'http://127.0.0.1:5050', changeOrigin: true },
+      '/socket.io': { target: 'http://127.0.0.1:5050', ws: true, changeOrigin: true },
     },
   },
 })

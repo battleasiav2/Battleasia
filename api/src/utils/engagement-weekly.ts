@@ -214,8 +214,21 @@ export async function claimWeeklyArenaReward(userId: Types.ObjectId | string) {
     return { ok: false as const, message: 'Weekly challenge is not complete yet' };
   }
 
+  const locked = await UserEngagementWeekly.findOneAndUpdate(
+    { userId, periodKey, status: 'completed' },
+    { $set: { status: 'claimed', claimedAt: new Date() } },
+    { new: true }
+  );
+  if (!locked) {
+    return { ok: false as const, message: 'Already claimed this week' };
+  }
+
   const user = await User.findById(userId);
   if (!user) {
+    await UserEngagementWeekly.updateOne(
+      { _id: locked._id },
+      { $set: { status: 'completed', claimedAt: null } }
+    );
     return { ok: false as const, message: 'User not found' };
   }
 
@@ -234,13 +247,9 @@ export async function claimWeeklyArenaReward(userId: Types.ObjectId | string) {
       reason: 'engagement_weekly_reward',
       weeklyPeriodKey: periodKey,
       weeklyTitle: config.title,
-      weeklyWinCount: doc.winCount,
+      weeklyWinCount: locked.winCount,
     },
   });
-
-  doc.status = 'claimed';
-  doc.claimedAt = new Date();
-  await doc.save();
 
   notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
 

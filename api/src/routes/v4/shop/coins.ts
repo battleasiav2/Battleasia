@@ -35,7 +35,21 @@ router.post('/', requireAdmin, async (req, res) => {
       return res.status(400).json({ status: false, message: 'Region, currency and rate are required' });
     }
 
-    const coinRate = await CoinRate.create({ region, currency, rate, isActive: Boolean(isActive) });
+    const regionNorm = String(region).trim().toLowerCase();
+    const currencyNorm = String(currency).trim().toUpperCase();
+    const rateNum = Number(rate);
+    if (!Number.isFinite(rateNum) || rateNum < 0) {
+      return res.status(400).json({ status: false, message: 'Rate must be a non-negative number' });
+    }
+    // Base lock: 1 BAC = 1 BDT
+    const finalRate = currencyNorm === 'BDT' ? 1 : rateNum;
+
+    const coinRate = await CoinRate.create({
+      region: regionNorm,
+      currency: currencyNorm,
+      rate: finalRate,
+      isActive: Boolean(isActive),
+    });
     return res.status(201).json({ status: true, data: serializeCoinRate(coinRate) });
   } catch (error: unknown) {
     if ((error as { code?: number }).code === 11000) {
@@ -54,9 +68,16 @@ router.put('/:id', requireAdmin, async (req, res) => {
     }
 
     const { region, currency, rate, isActive } = req.body;
-    if (region) coinRate.region = region;
-    if (currency) coinRate.currency = currency;
-    if (rate != null) coinRate.rate = rate;
+    if (region) coinRate.region = String(region).trim().toLowerCase();
+    if (currency) coinRate.currency = String(currency).trim().toUpperCase();
+    if (rate != null) {
+      const rateNum = Number(rate);
+      if (!Number.isFinite(rateNum) || rateNum < 0) {
+        return res.status(400).json({ status: false, message: 'Rate must be a non-negative number' });
+      }
+      coinRate.rate = coinRate.currency === 'BDT' ? 1 : rateNum;
+    }
+    if (coinRate.currency === 'BDT') coinRate.rate = 1;
     if (typeof isActive === 'boolean') coinRate.isActive = isActive;
 
     await coinRate.save();

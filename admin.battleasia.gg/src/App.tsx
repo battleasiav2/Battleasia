@@ -13,8 +13,23 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage').then((m) => ({ de
 const MailSettingsPage = lazy(() =>
   import('./pages/MailSettingsPage').then((m) => ({ default: m.MailSettingsPage }))
 );
+const AppDownloadPage = lazy(() =>
+  import('./pages/AppDownloadPage').then((m) => ({ default: m.AppDownloadPage }))
+);
+const CoinRatesPage = lazy(() =>
+  import('./pages/CoinRatesPage').then((m) => ({ default: m.CoinRatesPage }))
+);
 const PaymentsPage = lazy(() => import('./pages/PaymentsPage').then((m) => ({ default: m.PaymentsPage })));
 const WalletOpsPage = lazy(() => import('./pages/WalletOpsPage').then((m) => ({ default: m.WalletOpsPage })));
+const PremiumSettingsPage = lazy(() =>
+  import('./pages/PremiumSettingsPage').then((m) => ({ default: m.PremiumSettingsPage }))
+);
+const NotificationsPage = lazy(() =>
+  import('./pages/NotificationsPage').then((m) => ({ default: m.NotificationsPage }))
+);
+const SiteNoticePage = lazy(() =>
+  import('./pages/SiteNoticePage').then((m) => ({ default: m.SiteNoticePage }))
+);
 const GameFormPage = lazy(() => import('./pages/GameFormPage').then((m) => ({ default: m.GameFormPage })));
 const MatchFormPage = lazy(() => import('./pages/MatchFormPage').then((m) => ({ default: m.MatchFormPage })));
 const MatchResultPage = lazy(() => import('./pages/MatchResultPage').then((m) => ({ default: m.MatchResultPage })));
@@ -25,7 +40,9 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage').then((m) => ({ defa
 const ForbiddenPage = lazy(() => import('./pages/StatusPages').then((m) => ({ default: m.ForbiddenPage })));
 const NotFoundPage = lazy(() => import('./pages/StatusPages').then((m) => ({ default: m.NotFoundPage })));
 
-const GENERIC_SETTINGS = Object.keys(SETTINGS).filter((path) => path !== '/system/mail-settings');
+const GENERIC_SETTINGS = Object.keys(SETTINGS).filter(
+  (path) => path !== '/system/mail-settings' && path !== '/system/app-download' && path !== '/system/site-notice',
+);
 
 export default function App() {
   return (
@@ -54,10 +71,15 @@ export default function App() {
               <Route key={path} path={path} element={<IntegrityPage />} />
             ))}
             <Route path="/system/mail-settings" element={<MailSettingsPage />} />
+            <Route path="/system/app-download" element={<AppDownloadPage />} />
+            <Route path="/shop/coinrate" element={<CoinRatesPage />} />
             <Route path="/feature-flags" element={<FlagsPage />} />
             <Route path="/payments/wallet" element={<WalletOpsPage />} />
             <Route path="/payments/deposit" element={<PaymentsPage />} />
             <Route path="/payments/withdrawal" element={<PaymentsPage />} />
+            <Route path="/users/premium" element={<PremiumSettingsPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/system/site-notice" element={<SiteNoticePage />} />
             <Route path="/games/list/new" element={<GameFormPage />} />
             <Route path="/games/list/:id/edit" element={<GameFormPage />} />
             <Route path="/games/matches/new" element={<MatchFormPage />} />

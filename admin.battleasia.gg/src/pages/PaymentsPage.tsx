@@ -12,16 +12,20 @@ const COLS = {
   withdrawal: ['status', 'username', 'coin_amount', 'wallet_type', 'created_at'],
 };
 
-const CHIPS = ['all', 'today', '7d', 'month', 'custom'] as const;
+const DATE_CHIPS = ['all', 'today', '7d', 'month', 'custom'] as const;
+const DEPOSIT_STATUS = ['pending', 'completed', 'rejected', ''] as const;
+const WITHDRAWAL_STATUS = ['pending', 'processing', 'completed', 'rejected', ''] as const;
 
 export function PaymentsPage() {
   const { t } = useI18n();
   const { toast } = useOutletContext<Ctx>();
   const kind = useLocation().pathname.includes('withdrawal') ? 'withdrawal' : 'deposit';
   const base = kind === 'deposit' ? '/api/v4/payments/deposit-history' : '/api/v4/payments/withdrawal-history';
+  const statusOptions = kind === 'deposit' ? DEPOSIT_STATUS : WITHDRAWAL_STATUS;
   const [rows, setRows] = useState<Array<Record<string, unknown>> | null>(null);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
+  const [status, setStatus] = useState('pending');
   const [chip, setChip] = useState('all');
   const [selected, setSelected] = useState<string[]>([]);
   const [confirm, setConfirm] = useState<{ id: string; action: string; amount: number } | null>(null);
@@ -40,6 +44,7 @@ export function PaymentsPage() {
   function load() {
     const range = rangeFor(chip, { from, to });
     const params = new URLSearchParams({ limit: '50' });
+    if (status) params.set('status', status);
     if (search.trim().length >= 2) params.set('search', search.trim());
     if (range.startDate) params.set('startDate', range.startDate);
     if (range.endDate) params.set('endDate', range.endDate);
@@ -52,9 +57,15 @@ export function PaymentsPage() {
   }
 
   useEffect(() => {
+    setStatus('pending');
+    setSelected([]);
+    setRows(null);
+  }, [kind]);
+
+  useEffect(() => {
     const timer = window.setTimeout(load, 300);
     return () => window.clearTimeout(timer);
-  }, [base, search, chip, from, to]);
+  }, [base, search, status, chip, from, to]);
 
   useEffect(() => {
     api('/api/v3/integrity/ops')
@@ -91,7 +102,20 @@ export function PaymentsPage() {
       <div className="dash-stage list-stage">
       <div className="table-tools">
         <input value={search} placeholder={t('list.search')} onChange={(e) => setSearch(e.target.value)} />
-        {CHIPS.map((id) => (
+        {statusOptions.map((id) => (
+          <button
+            key={id || 'all-status'}
+            type="button"
+            className={`chip ${status === id ? 'on' : ''}`}
+            onClick={() => {
+              setStatus(id);
+              setSelected([]);
+            }}
+          >
+            {t(id ? `pay.status.${id}` : 'pay.status.all')}
+          </button>
+        ))}
+        {DATE_CHIPS.map((id) => (
           <button key={id} type="button" className={`chip ${chip === id ? 'on' : ''}`} onClick={() => setChip(id)}>
             {t(`pay.chip.${id}`)}
           </button>
@@ -120,6 +144,7 @@ export function PaymentsPage() {
             className="btn btn-ghost"
             onClick={() => {
               setSearch('');
+              setStatus('pending');
               setChip('all');
               setFrom('');
               setTo('');
@@ -134,7 +159,17 @@ export function PaymentsPage() {
             <thead>
               <tr>
                 <th>
-                  <input type="checkbox" aria-label={t('pay.selectAll')} onChange={(e) => setSelected(e.target.checked ? rows.map(rowId) : [])} />
+                  <input
+                    type="checkbox"
+                    aria-label={t('pay.selectAll')}
+                    onChange={(e) =>
+                      setSelected(
+                        e.target.checked
+                          ? rows.filter((r) => String(r.status || '') === 'pending').map(rowId)
+                          : []
+                      )
+                    }
+                  />
                 </th>
                 {cols.map((c) => (
                   <th key={c}>{c}</th>
@@ -147,26 +182,39 @@ export function PaymentsPage() {
                 const id = rowId(row);
                 const amount = Number(row.coin_amount || row.amount || 0);
                 const shot = String(row.receipt || row.screenshot || row.image || '');
+                const rowStatus = String(row.status || '');
+                const canApprove = rowStatus === 'pending';
+                const canComplete = kind === 'withdrawal' && rowStatus === 'processing';
+                const canReject = rowStatus === 'pending' || rowStatus === 'processing';
                 return (
                   <tr key={id}>
                     <td>
-                      <input type="checkbox" checked={selected.includes(id)} onChange={(e) => setSelected((cur) => (e.target.checked ? [...cur, id] : cur.filter((x) => x !== id)))} />
+                      <input
+                        type="checkbox"
+                        disabled={!canApprove}
+                        checked={selected.includes(id)}
+                        onChange={(e) => setSelected((cur) => (e.target.checked ? [...cur, id] : cur.filter((x) => x !== id)))}
+                      />
                     </td>
                     {cols.map((c) => (
                       <td key={c}>{cell(pick(row, c))}</td>
                     ))}
                     <td>
-                      <button className="btn btn-ghost" type="button" onClick={() => setConfirm({ id, action: 'approve', amount })}>
-                        {t('pay.approve')}
-                      </button>
-                      {kind === 'withdrawal' ? (
+                      {canApprove ? (
+                        <button className="btn btn-ghost" type="button" onClick={() => setConfirm({ id, action: 'approve', amount })}>
+                          {t('pay.approve')}
+                        </button>
+                      ) : null}
+                      {canComplete ? (
                         <button className="btn btn-ghost" type="button" onClick={() => setConfirm({ id, action: 'complete', amount })}>
                           {t('pay.complete')}
                         </button>
                       ) : null}
-                      <button className="btn btn-danger" type="button" onClick={() => setConfirm({ id, action: 'reject', amount })}>
-                        {t('pay.reject')}
-                      </button>
+                      {canReject ? (
+                        <button className="btn btn-danger" type="button" onClick={() => setConfirm({ id, action: 'reject', amount })}>
+                          {t('pay.reject')}
+                        </button>
+                      ) : null}
                       {shot ? (
                         <button
                           className="btn btn-ghost"

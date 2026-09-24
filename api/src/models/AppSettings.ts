@@ -1,7 +1,7 @@
 import mongoose, { Schema, type Document } from 'mongoose';
 import { DEFAULT_P1_FLAGS, normalizeP1Flags, type P1Flags } from '../utils/p1-flags.js';
 import { DEFAULT_P2_FLAGS, normalizeP2Flags, type P2Flags } from '../utils/p2-flags.js';
-import { sanitizePublicUrl } from '../utils/safe-url.js';
+import { sanitizePublicUrl, sanitizeUploadAttachment } from '../utils/safe-url.js';
 
 export type LiveChatSocialLink = {
   label: string;
@@ -81,6 +81,20 @@ export type AppDownloadSettings = {
   fileName: string;
   fileSize: number;
   version: string;
+  updatedAt: string | null;
+};
+
+/** Global notice modal shown to all visitors / players. */
+export type SiteNoticeSettings = {
+  enabled: boolean;
+  title: string;
+  message: string;
+  imageUrl: string;
+  ctaLabel: string;
+  ctaUrl: string;
+  dismissible: boolean;
+  /** Bumped when admin publishes so dismissed users see the new notice. */
+  version: number;
   updatedAt: string | null;
 };
 
@@ -530,6 +544,18 @@ export const DEFAULT_APP_DOWNLOAD_SETTINGS: AppDownloadSettings = {
   updatedAt: null,
 };
 
+export const DEFAULT_SITE_NOTICE_SETTINGS: SiteNoticeSettings = {
+  enabled: false,
+  title: '',
+  message: '',
+  imageUrl: '',
+  ctaLabel: '',
+  ctaUrl: '',
+  dismissible: true,
+  version: 1,
+  updatedAt: null,
+};
+
 export const DEFAULT_PROFILE_SOCIAL_SETTINGS: ProfileSocialSettings = {
   showMutualFollowers: true,
   showSuggestedFollows: true,
@@ -645,6 +671,7 @@ export interface IAppSettings extends Document {
   profileSocial: ProfileSocialSettings;
   mail: MailSettings;
   appDownload: AppDownloadSettings;
+  siteNotice: SiteNoticeSettings;
   engagement: EngagementSettings;
   p1: P1Flags;
   p2: P2Flags;
@@ -688,6 +715,10 @@ const appSettingsSchema = new Schema<IAppSettings>(
     appDownload: {
       type: Schema.Types.Mixed,
       default: () => ({ ...DEFAULT_APP_DOWNLOAD_SETTINGS }),
+    },
+    siteNotice: {
+      type: Schema.Types.Mixed,
+      default: () => ({ ...DEFAULT_SITE_NOTICE_SETTINGS }),
     },
     p1: {
       type: Schema.Types.Mixed,
@@ -852,6 +883,30 @@ export function normalizeAppDownloadSettings(raw?: Partial<AppDownloadSettings> 
     fileName,
     fileSize: Math.max(Number(raw?.fileSize) || 0, 0),
     version: String(raw?.version || '').trim().slice(0, 40),
+    updatedAt: raw?.updatedAt ? String(raw.updatedAt) : null,
+  };
+}
+
+function sanitizeNoticeCtaUrl(raw: unknown): string {
+  const value = String(raw || '').trim().slice(0, 500);
+  if (!value) return '';
+  if (value.startsWith('/') && !value.startsWith('//') && !value.includes('..')) {
+    return value.slice(0, 300);
+  }
+  return sanitizePublicUrl(value, 500);
+}
+
+export function normalizeSiteNoticeSettings(raw?: Partial<SiteNoticeSettings> | null): SiteNoticeSettings {
+  const version = Math.max(Math.floor(Number(raw?.version) || DEFAULT_SITE_NOTICE_SETTINGS.version), 1);
+  return {
+    enabled: raw?.enabled === true,
+    title: String(raw?.title || '').trim().slice(0, 120),
+    message: String(raw?.message || '').trim().slice(0, 2000),
+    imageUrl: sanitizeUploadAttachment(raw?.imageUrl, 500),
+    ctaLabel: String(raw?.ctaLabel || '').trim().slice(0, 40),
+    ctaUrl: sanitizeNoticeCtaUrl(raw?.ctaUrl),
+    dismissible: raw?.dismissible !== false,
+    version,
     updatedAt: raw?.updatedAt ? String(raw.updatedAt) : null,
   };
 }
@@ -1212,6 +1267,7 @@ export async function getAppSettings() {
       profileSocial: normalizeProfileSocialSettings(DEFAULT_PROFILE_SOCIAL_SETTINGS),
       mail: { ...DEFAULT_MAIL_SETTINGS },
       appDownload: { ...DEFAULT_APP_DOWNLOAD_SETTINGS },
+      siteNotice: { ...DEFAULT_SITE_NOTICE_SETTINGS },
       engagement: normalizeEngagementSettings(DEFAULT_ENGAGEMENT_SETTINGS),
       p1: { ...DEFAULT_P1_FLAGS },
       p2: { ...DEFAULT_P2_FLAGS },
@@ -1255,6 +1311,11 @@ export async function getAppSettings() {
 
   if (!settings.appDownload) {
     settings.appDownload = { ...DEFAULT_APP_DOWNLOAD_SETTINGS };
+    dirty = true;
+  }
+
+  if (!settings.siteNotice) {
+    settings.siteNotice = { ...DEFAULT_SITE_NOTICE_SETTINGS };
     dirty = true;
   }
 

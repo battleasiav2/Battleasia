@@ -418,6 +418,10 @@ export async function claimEngagementReward(userId: Types.ObjectId | string, pro
     return { ok: false as const, message: 'Mission progress not found' };
   }
 
+  if (progress.status === 'claimed') {
+    return { ok: false as const, message: 'Reward already claimed' };
+  }
+
   if (progress.status !== 'completed') {
     return { ok: false as const, message: 'Mission is not ready to claim' };
   }
@@ -427,13 +431,28 @@ export async function claimEngagementReward(userId: Types.ObjectId | string, pro
     return { ok: false as const, message: 'Mission is no longer active' };
   }
 
+  // Reward amount comes from server mission config only — client cannot set it.
   const rewardAmount = Math.max(Number(mission.reward?.bacAmount) || 0, 0);
   if (rewardAmount <= 0) {
     return { ok: false as const, message: 'No reward configured for this mission' };
   }
 
+  // Atomic claim lock: only one concurrent request can win.
+  const locked = await UserEngagementProgress.findOneAndUpdate(
+    { _id: progressId, userId, status: 'completed' },
+    { $set: { status: 'claimed', claimedAt: new Date() } },
+    { new: true }
+  );
+  if (!locked) {
+    return { ok: false as const, message: 'Reward already claimed' };
+  }
+
   const user = await User.findById(userId);
   if (!user) {
+    await UserEngagementProgress.updateOne(
+      { _id: progressId, userId },
+      { $set: { status: 'completed', claimedAt: null } }
+    );
     return { ok: false as const, message: 'User not found' };
   }
 
@@ -457,10 +476,6 @@ export async function claimEngagementReward(userId: Types.ObjectId | string, pro
     },
   });
 
-  progress.status = 'claimed';
-  progress.claimedAt = new Date();
-  await progress.save();
-
   notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
 
   awardMissionClaimXp(userId).catch((error) => {
@@ -475,7 +490,7 @@ export async function claimEngagementReward(userId: Types.ObjectId | string, pro
     data: {
       rewardAmount,
       balanceAfter,
-      progress: serializeUserEngagementProgress(progress, serializeEngagementMission(mission)),
+      progress: serializeUserEngagementProgress(locked, serializeEngagementMission(mission)),
     },
   };
 }

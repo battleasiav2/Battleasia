@@ -5,7 +5,6 @@ import { Role } from './models/Role.js';
 import { AppSettings } from './models/AppSettings.js';
 import { PaymentChannel } from './models/PaymentChannel.js';
 import { BusinessWallet } from './models/BusinessWallet.js';
-import { CoinRate } from './models/CoinRate.js';
 import { ShopItem } from './models/ShopItem.js';
 import { DepositHistory } from './models/DepositHistory.js';
 import { WithdrawalHistory } from './models/WithdrawalHistory.js';
@@ -21,6 +20,7 @@ import { seedDemoUser } from './seed-demo-user.js';
 import { seedFeedPosts } from './seed-feed-posts.js';
 import { seedSocialContent } from './seed-social-content.js';
 import { ensurePlatformGames } from './utils/ensure-games.js';
+import { ensureCoinRates } from './utils/coin-rates.js';
 
 async function seed() {
   await connectDb();
@@ -172,17 +172,8 @@ async function seed() {
     console.log('Business wallet created for bKash');
   }
 
-  const globalRate = await CoinRate.findOne({ region: 'global', currency: 'USD' });
-  if (!globalRate) {
-    await CoinRate.create({ region: 'global', currency: 'USD', rate: 0.01, isActive: true });
-    console.log('Coin rate created: global/USD');
-  }
-
-  const bdRate = await CoinRate.findOne({ region: 'bangladesh', currency: 'BDT' });
-  if (!bdRate) {
-    await CoinRate.create({ region: 'bangladesh', currency: 'BDT', rate: 1.2, isActive: true });
-    console.log('Coin rate created: bangladesh/BDT');
-  }
+  // 1 BAC = 1 BDT base; other countries seeded from FX (admin-editable)
+  await ensureCoinRates();
 
   const demoCoinPacks: Array<{
     amount: number;

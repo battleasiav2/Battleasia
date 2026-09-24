@@ -3,7 +3,7 @@ import { Link, useOutletContext } from 'react-router-dom';
 import { CoinValue } from '../../components/CoinValue';
 import { useHud } from '../../contexts/HudContext';
 import { isApiError } from '../../lib/api';
-import { fetchMe, readSessionUser } from '../../lib/auth';
+import { fetchMe, patchSessionBalance, readSessionUser } from '../../lib/auth';
 import { useI18n } from '../../lib/i18n';
 import {
   fetchTransferHistory,
@@ -159,7 +159,11 @@ export function TransferPage() {
       setFieldErr('');
       setIdem(crypto.randomUUID());
       const me = await fetchMe();
-      if (me?.balance != null) setBalance(Number(me.balance) || 0);
+      if (me?.balance != null) {
+        const next = Number(me.balance) || 0;
+        setBalance(next);
+        patchSessionBalance(next);
+      }
       setRows(await fetchTransferHistory());
     } catch (err) {
       toast(isApiError(err) ? err.message : t('xfer.fail'));

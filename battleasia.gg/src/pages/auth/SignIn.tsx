@@ -56,7 +56,10 @@ export function SignInPage() {
         return;
       }
       if (isApiError(err) && err.status === 429) setWait(err.retryAfter || 60);
-      setErrors({ form: httpCopy(err, t, t('errors.login')) });
+      const form = httpCopy(err, t, t('errors.login'));
+      const fields = isApiError(err) ? err.fields || {} : {};
+      setErrors({ ...fields, form: fields.form || form });
+      focusFirstError([fields.email ? 'email' : fields.password ? 'password' : 'email']);
     } finally {
       setBusy(false);
     }
@@ -68,15 +71,24 @@ export function SignInPage() {
         {errors.form ? <p className="form-error">{errors.form}</p> : null}
         <label className="field" htmlFor="email">
           {t('auth.email')}
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            value={email}
-            disabled={busy || wait > 0}
-            onChange={(e) => setEmail(e.target.value)}
-            onBlur={(e) => setEmail(sanitizeLine(e.target.value))}
-          />
+          <span className="field-control">
+            <span className="field-ico" aria-hidden>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M4 7l8 6 8-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder={t('auth.emailPh') || 'you@email.com'}
+              value={email}
+              disabled={busy || wait > 0}
+              onChange={(e) => setEmail(e.target.value)}
+              onBlur={(e) => setEmail(sanitizeLine(e.target.value))}
+            />
+          </span>
           {errors.email ? <span className="field-error">{errors.email}</span> : null}
         </label>
         <PasswordField

@@ -218,6 +218,19 @@ router.post('/matches/:id/check-join', requireAuth, async (req: AuthedRequest, r
     if (match.entryFee > (user.balance ?? 0) && !existing) issues.push('Insufficient balance');
     if (match.premiumOnly && user && !isUserPremium(user)) issues.push('Premium required');
 
+    if (!existing) {
+      const otherParts = await MatchParticipant.find({ userId: user._id }).select('matchId');
+      if (otherParts.length) {
+        const blocking = await Match.findOne({
+          _id: { $in: otherParts.map((p) => p.matchId) },
+          status: { $in: ['active', 'start'] },
+        }).select('matchName');
+        if (blocking) {
+          issues.push(`Already in live match: ${blocking.matchName}`);
+        }
+      }
+    }
+
     return res.json({
       status: true,
       data: {

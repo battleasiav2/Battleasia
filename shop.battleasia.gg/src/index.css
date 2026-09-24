@@ -1,7 +1,7 @@
 @import './styles/tokens.css';
 @import './styles/landing.css';
-@import './styles/auth.css';
 @import './styles/play.css';
+@import './styles/auth.css';
 @import './styles/phone.css';
 
 *,

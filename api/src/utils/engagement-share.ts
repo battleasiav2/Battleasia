@@ -137,15 +137,24 @@ export async function claimShareReward(
   const now = new Date();
   const safePlatform = String(platform || 'native').trim().slice(0, 40) || 'native';
 
-  const shareDoc = await UserEngagementShare.create({
-    userId,
-    matchId,
-    status: 'claimed',
-    platform: safePlatform,
-    bacAmount: rewardAmount,
-    sharedAt: now,
-    claimedAt: now,
-  });
+  let shareDoc;
+  try {
+    shareDoc = await UserEngagementShare.create({
+      userId,
+      matchId,
+      status: 'claimed',
+      platform: safePlatform,
+      bacAmount: rewardAmount,
+      sharedAt: now,
+      claimedAt: now,
+    });
+  } catch (error: unknown) {
+    const code = (error as { code?: number })?.code;
+    if (code === 11000) {
+      return { ok: false as const, message: 'Already claimed share reward for this match' };
+    }
+    throw error;
+  }
 
   let balanceAfter: number | undefined;
 

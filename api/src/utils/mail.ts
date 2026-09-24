@@ -159,3 +159,95 @@ export async function sendOpsEmail(
     text: `${copy.intro} ${detail}`,
   });
 }
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function absolutePublicUrl(pathOrUrl: string): string {
+  const raw = String(pathOrUrl || '').trim();
+  if (!raw) return '';
+  if (/^https?:\/\//i.test(raw)) return raw;
+  const base = (env.appUrl || env.corsOrigins[0] || '').replace(/\/$/, '');
+  if (!base) return raw.startsWith('/') ? raw : `/${raw}`;
+  const path = raw.startsWith('/') ? raw : `/${raw}`;
+  return `${base}${path}`;
+}
+
+export type SiteNoticeMailPayload = {
+  title: string;
+  message: string;
+  imageUrl?: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
+};
+
+export async function sendSiteNoticeEmail(to: string, notice: SiteNoticeMailPayload) {
+  const title = String(notice.title || 'BattleAsia Notice').trim() || 'BattleAsia Notice';
+  const message = String(notice.message || '').trim();
+  const imageUrl = absolutePublicUrl(String(notice.imageUrl || ''));
+  const ctaLabel = String(notice.ctaLabel || '').trim();
+  const ctaUrl = absolutePublicUrl(String(notice.ctaUrl || '')) || absolutePublicUrl('/dashboard');
+
+  const safeTitle = escapeHtml(title);
+  const safeMessage = escapeHtml(message).replace(/\n/g, '<br/>');
+  const imageBlock = imageUrl
+    ? `<p style="margin:0 0 16px"><img src="${escapeHtml(imageUrl)}" alt="" style="display:block;width:100%;max-width:456px;border-radius:12px;border:1px solid rgba(255,255,255,.08)"/></p>`
+    : '';
+  const ctaBlock =
+    ctaLabel && ctaUrl
+      ? `<p style="margin:20px 0 0"><a href="${escapeHtml(ctaUrl)}" style="display:inline-block;padding:12px 20px;border-radius:10px;background:linear-gradient(90deg,#7C5CFF,#21D4FD);color:#0E0F14;font-weight:700;text-decoration:none">${escapeHtml(ctaLabel)}</a></p>`
+      : '';
+
+  const html = auroraHtml(
+    safeTitle,
+    `${imageBlock}<p style="margin:0;line-height:1.55;color:#D7DBE8">${safeMessage || 'A new notice is waiting for you in BattleAsia.'}</p>${ctaBlock}`,
+    'en'
+  );
+
+  return sendAuthEmail({
+    to,
+    subject: title.slice(0, 120),
+    html,
+    text: [title, message, ctaLabel && ctaUrl ? `${ctaLabel}: ${ctaUrl}` : ''].filter(Boolean).join('\n\n'),
+  });
+}
+
+/** Email all non-admin players. Runs in batches; returns counts (does not throw on per-user failures). */
+export async function broadcastSiteNoticeEmail(notice: SiteNoticeMailPayload) {
+  const { User } = await import('../models/User.js');
+  const users = await User.find({ 'role.type': { $ne: 'admin' }, email: { $exists: true, $ne: '' } })
+    .select('email')
+    .lean();
+
+  const emails = [
+    ...new Set(
+      users
+        .map((u) => String((u as { email?: string }).email || '').trim().toLowerCase())
+        .filter((e) => e.includes('@'))
+    ),
+  ];
+
+  let sent = 0;
+  let failed = 0;
+  const batchSize = 20;
+  for (let i = 0; i < emails.length; i += batchSize) {
+    const batch = emails.slice(i, i + batchSize);
+    const results = await Promise.all(
+      batch.map((email) =>
+        sendSiteNoticeEmail(email, notice).catch(() => ({ sent: false as const, reason: 'send_failed' as const }))
+      )
+    );
+    for (const result of results) {
+      if (result.sent) sent += 1;
+      else failed += 1;
+    }
+  }
+
+  return { total: emails.length, sent, failed };
+}

@@ -73,6 +73,14 @@ html[data-accent='rose'] {
   --ba-gold-ink: #3f0a14;
   --ba-gold-rgb: 251, 113, 133;
 }
+html[data-accent='red'] {
+  --ba-accent: #ef4444;
+  --ba-accent-b: #f87171;
+  --ba-accent-hover: #f87171;
+  --ba-accent-glow: rgba(239, 68, 68, 0.42);
+  --ba-gold-ink: #450a0a;
+  --ba-gold-rgb: 239, 68, 68;
+}
 html[data-accent='sky'] {
   --ba-accent: #38bdf8;
   --ba-accent-b: #0284c7;

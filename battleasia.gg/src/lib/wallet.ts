@@ -81,6 +81,8 @@ export type HistoryRow = {
   _id?: string;
   amount: number;
   type: string;
+  category?: string;
+  reason?: string;
   balanceBefore?: number;
   balanceAfter?: number;
   detail?: Record<string, unknown>;
@@ -154,7 +156,7 @@ export async function fetchWithdrawable() {
 }
 
 export async function fetchBalanceHistory(page = 1) {
-  const payload = await api(`/api/v2/users/balance-history?page=${page}&limit=20`);
+  const payload = await api(`/api/v2/users/balance-history?page=${page}&limit=50`);
   return unwrapList<HistoryRow>(payload).map((row) => ({ ...row, id: nid(row) }));
 }
 
@@ -212,7 +214,12 @@ export async function submitWithdraw(body: Record<string, string | number>, key 
 }
 
 export async function fetchMyDeposits() {
-  const payload = await api('/api/v4/payments/deposit-history/my-history?limit=10');
+  const payload = await api('/api/v4/payments/deposit-history/my-history?limit=30');
+  return unwrapList<Record<string, unknown>>(payload);
+}
+
+export async function fetchMyWithdrawals() {
+  const payload = await api('/api/v4/payments/withdrawal-history/my-history?limit=30');
   return unwrapList<Record<string, unknown>>(payload);
 }
 

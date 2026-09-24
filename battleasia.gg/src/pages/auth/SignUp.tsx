@@ -4,6 +4,7 @@ import { AuthShell } from '../../components/auth/AuthShell';
 import { isPasswordStrong, PasswordField } from '../../components/auth/PasswordField';
 import { isApiError } from '../../lib/api';
 import { checkEmailAvailable, signUp } from '../../lib/auth';
+import { focusFirstError, httpCopy } from '../../lib/form';
 import { captureReferral, readReferral } from '../../lib/ref';
 import { useI18n } from '../../lib/i18n';
 import { countries, countryDial } from '../../lib/countries';
@@ -211,18 +212,28 @@ export function SignUpPage() {
       });
       navigate(`/auth/email-verification?email=${encodeURIComponent(form.email.trim())}`);
     } catch (err) {
-      const msg = isApiError(err) ? err.message : t('errors.signup');
-      if (/email already/i.test(msg)) {
-        setErrors({ email: t('errors.emailTaken'), form: '' });
+      const msg = httpCopy(err, t, t('errors.signup'));
+      const fields = isApiError(err) ? err.fields || {} : {};
+      if (fields.email || /email already|already in use|taken/i.test(msg)) {
+        setErrors({ ...fields, email: fields.email || t('errors.emailTaken'), form: fields.form || '' });
         setStep(1);
+        focusFirstError(['email']);
         return;
       }
-      if (/password/i.test(msg)) {
-        setErrors({ password: msg, form: '' });
+      if (fields.password || /password/i.test(msg)) {
+        setErrors({ ...fields, password: fields.password || msg, form: '' });
         setStep(1);
+        focusFirstError(['password']);
         return;
       }
-      setErrors({ form: msg });
+      if (fields.username || fields.pubgId || fields.mobileNo || fields.gameServer) {
+        setErrors({ ...fields, form: fields.form || msg });
+        setStep(2);
+        focusFirstError(['inGameUserName', 'pubgId', 'mobile', 'gameServer']);
+        return;
+      }
+      setErrors({ ...fields, form: msg });
+      focusFirstError(['email']);
     } finally {
       setBusy(false);
     }

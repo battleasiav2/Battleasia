@@ -57,7 +57,7 @@
   "auth.signin": "সাইন ইন",
   "auth.promo.line1": "ড্রপ ইন। আউটপ্লে।",
   "auth.promo.line2": "গেট পেইড।",
-  "auth.promo.lead": "প্রতিদিন সোলো, ডুও ও স্কোয়াড ম্যাচ — ভেরিফাইড রুম, ইনস্ট্যান্ট রেজাল্ট ও সিকিউর ক্যাশআউট।",
+  "auth.promo.lead": "ভেরিফাইড রুম। লাইভ রেজাল্ট। আসল ক্যাশ প্রাইজ।",
   "auth.promo.players": "অ্যাকটিভ প্লেয়ার",
   "auth.promo.playersVal": "500K+",
   "auth.promo.prizes": "প্রাইজ পেইড",
@@ -125,6 +125,15 @@
   "wallet.title": "বিএসি হাব",
   "wallet.overview": "ওভারভিউ",
   "wallet.history": "হিস্ট্রি",
+  "wallet.orders": "অর্ডার",
+  "wallet.filtAll": "সব",
+  "wallet.filtDeposit": "ডিপোজিট",
+  "wallet.filtWithdraw": "উইথড্র",
+  "wallet.filtGame": "গেম",
+  "wallet.filtClaim": "ক্লেইম",
+  "wallet.filtTransfer": "ট্রান্সফার",
+  "wallet.emptyOrders": "এখনো অর্ডার নেই",
+  "wallet.emptyOrdersLead": "ডিপোজিট ও উইথড্র রিকোয়েস্ট স্ট্যাটাসসহ এখানে দেখাবে।",
   "wallet.total": "মোট",
   "wallet.withdrawable": "উইথড্রযোগ্য",
   "wallet.empty": "ওয়ালেট খালি",
@@ -288,7 +297,6 @@
   "auth.pwHint.case": "বড় ও ছোট হাতের অক্ষর",
   "auth.pwHint.number": "কমপক্ষে একটি সংখ্যা",
   "auth.pwHint.special": "কমপক্ষে একটি সিম্বল (!@#…)",
-
   "err.broke": "কিছু একটা ভেঙেছে",
   "err.reloadLead": "পেজ রিলোড করুন। বারবার হলে support@battleasia.gg-এ লিখুন",
   "err.reload": "রিলোড",
@@ -327,5 +335,9 @@
   "auth.verifyNeed": "সাইন-আপ বা সাইন-ইন থেকে এই পেজ খুলুন।",
   "auth.resetNeed": "ফরগট পাসওয়ার্ড থেকে শুরু করুন।",
   "auth.goSignup": "সাইন আপ এ যান",
-  "auth.emailMissing": "ইমেইল নেই"
+  "auth.emailMissing": "ইমেইল নেই",
+  "auth.emailPh": "you@email.com",
+  "auth.passwordPh": "••••••••",
+  "auth.hidePassword": "পাসওয়ার্ড লুকাও",
+  "auth.showPassword": "পাসওয়ার্ড দেখাও"
 }

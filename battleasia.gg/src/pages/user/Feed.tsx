@@ -264,7 +264,7 @@ export function FeedPage() {
   }, [openChat, t]);
 
   return (
-    <main className="play-main play-main-tight ig-feed">
+    <main className={`play-main play-main-tight ig-feed${active === 'home' ? ' ig-feed--home' : ''}`}>
       <header className="play-head play-head-compact ig-feed-head">
         <div>
           <h1>{t('feed.arena')}</h1>
@@ -329,54 +329,6 @@ export function FeedPage() {
             </button>
           ))}
         </div>
-      ) : null}
-      {active === 'home' && creators.length ? (
-        <section className="feed-rail ig-suggest">
-          <div className="ig-suggest-head">
-            <h2>{t('feed.suggested')}</h2>
-          </div>
-          <div className="ig-suggest-row">
-            {creators.slice(0, 8).map((c) => (
-              <article key={c.id} className="ig-suggest-card">
-                <Link to={`/profile/${c.id}`} className="ig-suggest-avatar">
-                  {c.avatar ? (
-                    <img src={c.avatar} alt="" width={56} height={56} />
-                  ) : (
-                    <span aria-hidden>{(c.username || '?').slice(0, 1).toUpperCase()}</span>
-                  )}
-                </Link>
-                <Link to={`/profile/${c.id}`} className="ig-suggest-name">
-                  {c.username}
-                </Link>
-                <button
-                  className={`btn ${c.isFollowing ? 'btn-ghost' : 'btn-primary'} ig-suggest-follow`}
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      if (c.isFollowing) {
-                        await unfollowUser(c.id);
-                        setCreators((prev) =>
-                          prev.map((u) => (u.id === c.id ? { ...u, isFollowing: false } : u))
-                        );
-                        toast(t('profile.unfollowed'));
-                      } else {
-                        await followUser(c.id);
-                        setCreators((prev) =>
-                          prev.map((u) => (u.id === c.id ? { ...u, isFollowing: true } : u))
-                        );
-                        toast(`${t('feed.following')} ${c.username}`);
-                      }
-                    } catch (err) {
-                      toast(isApiError(err) ? err.message : t('feed.followFail'));
-                    }
-                  }}
-                >
-                  {c.isFollowing ? t('profile.following') : t('feed.follow')}
-                </button>
-              </article>
-            ))}
-          </div>
-        </section>
       ) : null}
       {active === 'home' ? (
         <form
@@ -449,49 +401,101 @@ export function FeedPage() {
 
         </form>
       ) : null}
-      {active === 'home' && (p2?.igForYou || p2?.voiceNotes) ? (
-        <details className="feed-rail ig-mutes">
-        <summary>{t('feed.mutes')}</summary>
-        <form
-          className="money-form"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const muteWords = muteDraft
-              .split(',')
-              .map((w) => w.trim().toLowerCase())
-              .filter(Boolean)
-              .slice(0, 24);
-            try {
-              await updateMe({ muteWords });
-              toast(t('feed.mutesSaved'));
-            } catch (err) {
-              toast(isApiError(err) ? err.message : t('feed.mutesFail'));
-            }
-          }}
-        >
-          <label className="field">
-            {t('feed.mutes')}
-            <input value={muteDraft} onChange={(e) => setMuteDraft(e.target.value)} placeholder={t('feed.mutePh')} />
-          </label>
-          <button className="btn btn-ghost" type="submit">
-            {t('feed.saveMutes')}
-          </button>
-        </form>
-        </details>
+      {active === 'home' && creators.length ? (
+        <section className="feed-rail ig-suggest">
+          <div className="ig-suggest-head">
+            <h2>{t('feed.suggested')}</h2>
+          </div>
+          <div className="ig-suggest-row">
+            {creators.slice(0, 8).map((c) => (
+              <article key={c.id} className="ig-suggest-card">
+                <Link to={`/profile/${c.id}`} className="ig-suggest-avatar">
+                  {c.avatar ? (
+                    <img src={c.avatar} alt="" width={56} height={56} />
+                  ) : (
+                    <span aria-hidden>{(c.username || '?').slice(0, 1).toUpperCase()}</span>
+                  )}
+                </Link>
+                <div className="ig-suggest-meta">
+                  <Link to={`/profile/${c.id}`} className="ig-suggest-name">
+                    {c.username}
+                  </Link>
+                  <button
+                    className={`btn ${c.isFollowing ? 'btn-ghost' : 'btn-primary'} ig-suggest-follow`}
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        if (c.isFollowing) {
+                          await unfollowUser(c.id);
+                          setCreators((prev) =>
+                            prev.map((u) => (u.id === c.id ? { ...u, isFollowing: false } : u))
+                          );
+                          toast(t('profile.unfollowed'));
+                        } else {
+                          await followUser(c.id);
+                          setCreators((prev) =>
+                            prev.map((u) => (u.id === c.id ? { ...u, isFollowing: true } : u))
+                          );
+                          toast(`${t('feed.following')} ${c.username}`);
+                        }
+                      } catch (err) {
+                        toast(isApiError(err) ? err.message : t('feed.followFail'));
+                      }
+                    }}
+                  >
+                    {c.isFollowing ? t('profile.following') : t('feed.follow')}
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
       ) : null}
-      {active === 'home' && flags?.igGameFeed ? (
-        <div className="money-tabs ig-game-chips">
-          {[['','feed.allGames'],['pubg','PUBG'],['freefire','Free Fire'],['cod','COD'],['mlbb','MLBB'],['valorant','Valorant']].map(([g, label]) => (
-            <button key={g || 'all'} type="button" className={!gameTag && !g ? 'active' : gameTag === g ? 'active' : ''} onClick={() => setGameTag(g)}>
-              {g ? label : t(label)}
-            </button>
-          ))}
-          {flags.igHighlights ? (
-            <button type="button" className={postType === 'match_result' ? 'active' : ''} onClick={() => setPostType(postType === 'match_result' ? '' : 'match_result')}>
-              Highlights
-            </button>
+      {active === 'home' && (p2?.igForYou || p2?.voiceNotes || flags?.igGameFeed) ? (
+        <details className="feed-rail ig-tools">
+          <summary>{t('feed.mutes')} · Filters</summary>
+          {p2?.igForYou || p2?.voiceNotes ? (
+            <form
+              className="money-form"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const muteWords = muteDraft
+                  .split(',')
+                  .map((w) => w.trim().toLowerCase())
+                  .filter(Boolean)
+                  .slice(0, 24);
+                try {
+                  await updateMe({ muteWords });
+                  toast(t('feed.mutesSaved'));
+                } catch (err) {
+                  toast(isApiError(err) ? err.message : t('feed.mutesFail'));
+                }
+              }}
+            >
+              <label className="field">
+                {t('feed.mutes')}
+                <input value={muteDraft} onChange={(e) => setMuteDraft(e.target.value)} placeholder={t('feed.mutePh')} />
+              </label>
+              <button className="btn btn-ghost" type="submit">
+                {t('feed.saveMutes')}
+              </button>
+            </form>
           ) : null}
-        </div>
+          {flags?.igGameFeed ? (
+            <div className="money-tabs ig-game-chips">
+              {[['','feed.allGames'],['pubg','PUBG'],['freefire','Free Fire'],['cod','COD'],['mlbb','MLBB'],['valorant','Valorant']].map(([g, label]) => (
+                <button key={g || 'all'} type="button" className={!gameTag && !g ? 'active' : gameTag === g ? 'active' : ''} onClick={() => setGameTag(g)}>
+                  {g ? label : t(label)}
+                </button>
+              ))}
+              {flags.igHighlights ? (
+                <button type="button" className={postType === 'match_result' ? 'active' : ''} onClick={() => setPostType(postType === 'match_result' ? '' : 'match_result')}>
+                  Highlights
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+        </details>
       ) : null}
       {error ? <p className="form-error">{error}</p> : null}
       {active === 'explore' ? (

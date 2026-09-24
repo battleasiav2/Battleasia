@@ -190,9 +190,9 @@ export async function claimSeasonPassReward(
   }
 
   const doc = await ensureSeasonDoc(userId, config.seasonKey);
-  const claimedLevels = track === 'free' ? doc.claimedFreeLevels : doc.claimedPlusLevels;
+  const claimedField = track === 'free' ? 'claimedFreeLevels' : 'claimedPlusLevels';
 
-  if (claimedLevels.includes(level)) {
+  if ((doc[claimedField] as number[]).includes(level)) {
     return { ok: false as const, message: 'Reward already claimed' };
   }
 
@@ -203,14 +203,34 @@ export async function claimSeasonPassReward(
   const reward = track === 'free' ? tier.freeReward : tier.plusReward;
   const rewardAmount = Math.max(Number(reward.bacAmount) || 0, 0);
 
+  const locked = await UserEngagementSeason.findOneAndUpdate(
+    {
+      userId,
+      seasonKey: config.seasonKey,
+      xp: { $gte: tier.xpRequired },
+      [claimedField]: { $nin: [level] },
+    },
+    { $addToSet: { [claimedField]: level } },
+    { new: true }
+  );
+  if (!locked) {
+    return { ok: false as const, message: 'Reward already claimed' };
+  }
+
   if (rewardAmount > 0) {
-    const balanceBefore = user.balance ?? 0;
+    const freshUser = await User.findById(userId);
+    if (!freshUser) {
+      await UserEngagementSeason.updateOne({ _id: locked._id }, { $pull: { [claimedField]: level } });
+      return { ok: false as const, message: 'User not found' };
+    }
+
+    const balanceBefore = freshUser.balance ?? 0;
     const balanceAfter = balanceBefore + rewardAmount;
-    user.balance = balanceAfter;
-    await user.save();
+    freshUser.balance = balanceAfter;
+    await freshUser.save();
 
     await recordBalanceHistory({
-      user,
+      user: freshUser,
       amount: rewardAmount,
       type: 'deposit',
       balanceBefore,
@@ -225,15 +245,8 @@ export async function claimSeasonPassReward(
       },
     });
 
-    notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
+    notifyBalanceChange(freshUser._id.toString(), balanceAfter, balanceBefore);
   }
-
-  if (track === 'free') {
-    doc.claimedFreeLevels = [...doc.claimedFreeLevels, level].sort((a, b) => a - b);
-  } else {
-    doc.claimedPlusLevels = [...doc.claimedPlusLevels, level].sort((a, b) => a - b);
-  }
-  await doc.save();
 
   const seasonPass = await syncUserSeasonPass(userId);
 
@@ -241,7 +254,7 @@ export async function claimSeasonPassReward(
     ok: true as const,
     data: {
       rewardAmount,
-      balanceAfter: user.balance ?? 0,
+      balanceAfter: (await User.findById(userId))?.balance ?? 0,
       seasonPass,
     },
   };

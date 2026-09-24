@@ -127,8 +127,25 @@ export async function claimDailyStreakReward(userId: Types.ObjectId | string) {
     return { ok: false as const, message: 'No streak reward configured' };
   }
 
+  // Atomic day lock — client cannot set amount; only one claim per day wins.
+  const locked = await UserEngagementStreak.findOneAndUpdate(
+    { userId, lastCheckInDate: todayKey, lastClaimDate: { $ne: todayKey } },
+    {
+      $set: { lastClaimDate: todayKey },
+      $push: { claimDates: { $each: [todayKey], $slice: -60 } },
+    },
+    { new: true }
+  );
+  if (!locked) {
+    return { ok: false as const, message: 'Already claimed today' };
+  }
+
   const user = await User.findById(userId);
   if (!user) {
+    await UserEngagementStreak.updateOne(
+      { userId, lastClaimDate: todayKey },
+      { $set: { lastClaimDate: streak.lastClaimDate || '' }, $pull: { claimDates: todayKey } }
+    );
     return { ok: false as const, message: 'User not found' };
   }
 
@@ -145,14 +162,10 @@ export async function claimDailyStreakReward(userId: Types.ObjectId | string) {
     balanceAfter,
     detail: {
       reason: 'engagement_streak_reward',
-      streakDay: streak.currentStreak,
+      streakDay: locked.currentStreak,
       dateKey: todayKey,
     },
   });
-
-  streak.lastClaimDate = todayKey;
-  streak.claimDates = trimDateHistory([...(streak.claimDates || []), todayKey]);
-  await streak.save();
 
   notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
 
@@ -161,7 +174,7 @@ export async function claimDailyStreakReward(userId: Types.ObjectId | string) {
     data: {
       rewardAmount: totalReward,
       balanceAfter,
-      streak: serializeStreakState(streak, settings, todayKey),
+      streak: serializeStreakState(locked, settings, todayKey),
     },
   };
 }

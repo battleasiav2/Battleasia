@@ -165,8 +165,21 @@ export async function claimReferralMilestone(userId: Types.ObjectId | string, ra
     return { ok: false as const, message: 'Tier is not ready to claim yet' };
   }
 
+  const locked = await UserEngagementReferral.findOneAndUpdate(
+    { userId, [`${field}.status`]: 'ready' },
+    { $set: { [`${field}.status`]: 'claimed', [`${field}.claimedAt`]: new Date() } },
+    { new: true }
+  );
+  if (!locked) {
+    return { ok: false as const, message: 'Already claimed' };
+  }
+
   const user = await User.findById(userId);
   if (!user) {
+    await UserEngagementReferral.updateOne(
+      { userId },
+      { $set: { [`${field}.status`]: 'ready', [`${field}.claimedAt`]: null } }
+    );
     return { ok: false as const, message: 'User not found' };
   }
 
@@ -188,11 +201,6 @@ export async function claimReferralMilestone(userId: Types.ObjectId | string, ra
       referralThreshold: config.threshold,
     },
   });
-
-  state.status = 'claimed';
-  state.claimedAt = new Date();
-  refreshed.markModified(field);
-  await refreshed.save();
 
   notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
 

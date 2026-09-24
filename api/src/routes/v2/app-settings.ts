@@ -8,11 +8,13 @@ import {
   getAppSettings,
   normalizeAppDownloadSettings,
   normalizeMailSettings,
+  normalizeSiteNoticeSettings,
   serializeMailSettingsForAdmin,
   type AppDownloadSettings,
   type MailSettings,
+  type SiteNoticeSettings,
 } from '../../models/AppSettings.js';
-import { sendTestMail } from '../../utils/mail.js';
+import { sendTestMail, broadcastSiteNoticeEmail } from '../../utils/mail.js';
 import { normalizeP1Flags } from '../../utils/p1-flags.js';
 import { normalizeP2Flags } from '../../utils/p2-flags.js';
 import { normalizeVelocitySettings } from '../../utils/velocity.js';
@@ -203,6 +205,87 @@ router.put('/app-download', requireAuth, requireAdmin, async (req, res) => {
   } catch (error) {
     console.error('update app download error:', error);
     return res.status(500).json({ status: false, message: 'Failed to update app download settings' });
+  }
+});
+
+router.get('/site-notice', async (_req, res) => {
+  try {
+    const settings = await getAppSettings();
+    const notice = normalizeSiteNoticeSettings(settings.siteNotice);
+    return res.json({ status: true, data: notice });
+  } catch (error) {
+    console.error('get site notice error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to load site notice' });
+  }
+});
+
+router.put('/site-notice', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const settings = await getAppSettings();
+    const body = req.body as Partial<SiteNoticeSettings> & { bumpVersion?: boolean; sendEmail?: boolean };
+    const current = normalizeSiteNoticeSettings(settings.siteNotice);
+    const merged = normalizeSiteNoticeSettings({
+      ...current,
+      enabled: body.enabled,
+      title: body.title,
+      message: body.message,
+      imageUrl: body.imageUrl,
+      ctaLabel: body.ctaLabel,
+      ctaUrl: body.ctaUrl,
+      dismissible: body.dismissible,
+      updatedAt: new Date().toISOString(),
+    });
+
+    const contentChanged =
+      merged.title !== current.title ||
+      merged.message !== current.message ||
+      merged.imageUrl !== current.imageUrl ||
+      merged.ctaLabel !== current.ctaLabel ||
+      merged.ctaUrl !== current.ctaUrl;
+
+    const shouldBump =
+      body.bumpVersion === true ||
+      (merged.enabled && (!current.enabled || contentChanged));
+
+    merged.version = shouldBump ? current.version + 1 : current.version;
+    settings.siteNotice = merged;
+    await settings.save();
+
+    const wantEmail = body.sendEmail === true;
+    const canEmail =
+      wantEmail &&
+      merged.enabled &&
+      Boolean(merged.title.trim() || merged.message.trim() || merged.imageUrl);
+
+    let emailQueued = false;
+    if (canEmail) {
+      emailQueued = true;
+      void broadcastSiteNoticeEmail({
+        title: merged.title,
+        message: merged.message,
+        imageUrl: merged.imageUrl,
+        ctaLabel: merged.ctaLabel,
+        ctaUrl: merged.ctaUrl,
+      })
+        .then((stats) => {
+          console.info(
+            `[site-notice] email broadcast done sent=${stats.sent} failed=${stats.failed} total=${stats.total}`
+          );
+        })
+        .catch((error) => {
+          console.error('site notice email broadcast error:', error);
+        });
+    }
+
+    return res.json({
+      status: true,
+      message: emailQueued ? 'Site notice updated · emailing all players' : 'Site notice updated',
+      data: merged,
+      emailQueued,
+    });
+  } catch (error) {
+    console.error('update site notice error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to update site notice' });
   }
 });
 
