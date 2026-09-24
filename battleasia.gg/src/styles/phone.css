@@ -383,11 +383,32 @@ svg {
     display: inline-flex;
     margin-left: auto;
     max-width: 42vw;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .play-hud .hud-balance .coin {
+    min-width: 0;
+    overflow: hidden;
   }
 
   .play-hud .hud-balance .coin b,
   .play-hud .hud-balance .coin {
     font-size: 12px;
+  }
+
+  .play-hud .hud-balance .coin b {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .play-hud .brand-name {
+    max-width: 34vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .play-hud .hud-account {
@@ -596,6 +617,11 @@ svg {
     transform: none;
     width: auto;
     text-align: center;
+  }
+
+  .play-main,
+  .play-main-tight {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
   }
 
   .legal-body {

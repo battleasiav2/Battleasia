@@ -3803,6 +3803,29 @@ a.hist-item-link {
   white-space: nowrap;
 }
 
+@media (max-width: 820px) {
+  .earn-hub .earn-tabs,
+  .money-tabs.earn-tabs {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .earn-hub .earn-tabs::-webkit-scrollbar,
+  .money-tabs.earn-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .earn-hub .earn-tabs button {
+    flex: 0 0 auto;
+  }
+}
+
 @media (max-width: 700px) {
   .earn-ranks {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3824,27 +3847,6 @@ a.hist-item-link {
     width: 100%;
   }
 
-  .earn-hub .earn-tabs,
-  .money-tabs.earn-tabs {
-    display: flex;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    overflow-x: auto;
-    flex-wrap: nowrap;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-
-  .earn-hub .earn-tabs::-webkit-scrollbar,
-  .money-tabs.earn-tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .earn-hub .earn-tabs button {
-    flex: 0 0 auto;
-  }
-
   .earn-squad-actions .btn {
     flex: 1 1 auto;
     min-width: 120px;
@@ -3853,6 +3855,11 @@ a.hist-item-link {
 
   .earn-board {
     width: min(720px, calc(100% - 24px));
+  }
+
+  .streak-cal span {
+    width: min(40px, 11vw);
+    height: min(40px, 11vw);
   }
 }
 
@@ -3945,11 +3952,20 @@ a.hist-item-link {
   display: flex;
   gap: 8px;
   margin: 16px 0;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.streak-cal::-webkit-scrollbar {
+  display: none;
 }
 
 .streak-cal span {
   width: 40px;
   height: 40px;
+  flex: 0 0 auto;
   display: grid;
   place-items: center;
   border-radius: 12px;

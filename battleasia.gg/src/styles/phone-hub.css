@@ -373,6 +373,24 @@
     max-width: 100%;
   }
 
+  .money-tabs.earn-tabs,
+  .earn-hub .earn-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .money-tabs.earn-tabs::-webkit-scrollbar,
+  .earn-hub .earn-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .money-tabs.earn-tabs button,
+  .earn-hub .earn-tabs button {
+    flex: 0 0 auto;
+  }
+
   .xfer-item {
     flex-wrap: wrap;
     align-items: flex-start;
@@ -447,6 +465,14 @@
 
   .shop-grid {
     grid-template-columns: 1fr;
+  }
+
+  .match-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .match-facts article {
+    min-height: 84px;
   }
 
   .result-head,

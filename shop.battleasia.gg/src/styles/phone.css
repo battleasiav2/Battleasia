@@ -121,11 +121,32 @@ svg {
     display: inline-flex;
     margin-left: auto;
     max-width: 42vw;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .play-hud .hud-balance .coin {
+    min-width: 0;
+    overflow: hidden;
   }
 
   .play-hud .hud-balance .coin b,
   .play-hud .hud-balance .coin {
     font-size: 12px;
+  }
+
+  .play-hud .hud-balance .coin b {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .play-hud .brand-name {
+    max-width: 34vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .play-hud .nav-burger {
@@ -267,6 +288,24 @@ svg {
     gap: 10px;
   }
 
+  .play-head,
+  .shop-buy-head,
+  .wallet-hub-head,
+  .xfer-hub-head,
+  .wd-hub-head {
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .wd-hub-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .wd-hub-facts {
+    width: 100%;
+  }
+
   .result-table {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -338,14 +377,16 @@ svg {
   }
 }
 
+@media (max-width: 520px) {
+  .shop-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
 @media (max-width: 420px) {
   .play-hud-right .btn {
     width: 100%;
-  }
-
-  .shop-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
   }
 
   .result-head,
