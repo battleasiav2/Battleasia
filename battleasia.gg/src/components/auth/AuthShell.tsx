@@ -17,6 +17,7 @@ export function AuthShell({ title, subtitle, children }: Props) {
   return (
     <div className="auth-shell">
       <section className="auth-form-pane">
+        <div className="auth-card">
         <div className="auth-toolbar">
           <Link className="brand" to="/dashboard">
             <img src={ASSETS.logo} width={48} height={48} alt="BattleAsia" />
@@ -33,6 +34,7 @@ export function AuthShell({ title, subtitle, children }: Props) {
         {subtitle ? <p className="auth-sub">{subtitle}</p> : null}
         {children}
         <AuthTrustRow />
+        </div>
       </section>
       <aside className="auth-hero">
         <div className="hero-media" aria-hidden>

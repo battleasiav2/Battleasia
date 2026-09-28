@@ -35,7 +35,24 @@ export function ForgotPasswordPage() {
       <form className="auth-form" onSubmit={onSubmit}>
         <label className="field" htmlFor="email">
           {t('auth.email')}
-          <input id="email" type="email" autoComplete="email" value={email} disabled={busy} onChange={(e) => setEmail(e.target.value)} onBlur={(e) => setEmail(e.target.value.trim())} />
+          <span className="field-control">
+            <span className="field-ico" aria-hidden>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M4 7l8 6 8-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+            <input
+              id="email"
+              type="email"
+              autoComplete="email"
+              placeholder={t('auth.emailPh') || 'you@email.com'}
+              value={email}
+              disabled={busy}
+              onChange={(e) => setEmail(e.target.value)}
+              onBlur={(e) => setEmail(e.target.value.trim())}
+            />
+          </span>
         </label>
         {error ? <p className="field-error">{error}</p> : null}
         <button className="btn btn-primary" type="submit" disabled={busy}>

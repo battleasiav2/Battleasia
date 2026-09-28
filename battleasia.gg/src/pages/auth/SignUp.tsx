@@ -257,20 +257,29 @@ export function SignUpPage() {
           <>
             <label className="field" htmlFor="email">
               {t('auth.email')}
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                value={form.email}
-                disabled={busy}
-                onChange={(e) => onEmailChange(e.target.value)}
-                onBlur={(e) => {
-                  const v = e.target.value.trim();
-                  set('email', v);
-                  window.clearTimeout(emailTimer.current);
-                  void runEmailCheck(v);
-                }}
-              />
+              <span className="field-control">
+                <span className="field-ico" aria-hidden>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" strokeWidth="1.8" />
+                    <path d="M4 7l8 6 8-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder={t('auth.emailPh') || 'you@email.com'}
+                  value={form.email}
+                  disabled={busy}
+                  onChange={(e) => onEmailChange(e.target.value)}
+                  onBlur={(e) => {
+                    const v = e.target.value.trim();
+                    set('email', v);
+                    window.clearTimeout(emailTimer.current);
+                    void runEmailCheck(v);
+                  }}
+                />
+              </span>
               {emailChecking ? <span className="field-hint">{t('auth.emailChecking')}</span> : null}
               {errors.email ? <span className="field-error">{errors.email}</span> : null}
               {!errors.email && !emailChecking && form.email && EMAIL_RE.test(form.email.trim()) ? (

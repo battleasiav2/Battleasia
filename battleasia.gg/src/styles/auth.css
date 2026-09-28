@@ -7,7 +7,7 @@
 }
 
 .auth-form-pane {
-  padding: 28px 40px;
+  padding: 28px 24px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -15,6 +15,15 @@
   background:
     radial-gradient(70% 42% at 0% 0%, color-mix(in srgb, var(--ba-accent) 12%, transparent), transparent 58%),
     var(--ba-page-ink);
+}
+
+.auth-card {
+  width: 100%;
+  padding: 22px 22px 18px;
+  border-radius: 18px;
+  border: 1px solid color-mix(in srgb, var(--ba-text) 14%, transparent);
+  background: color-mix(in srgb, var(--ba-text) 4%, var(--ba-card));
+  box-shadow: 0 16px 36px color-mix(in srgb, #000 18%, transparent);
 }
 
 .auth-toolbar {
@@ -646,6 +655,12 @@ a.auth-link:hover {
     border-right: 0;
     justify-content: flex-start;
     background: transparent;
+  }
+
+  .auth-card {
+    padding: 16px 14px 14px;
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--ba-page-ink) 88%, transparent);
   }
 
   .auth-toolbar {
