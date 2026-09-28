@@ -7,29 +7,35 @@ import type { PulsePlayer } from '../lib/dashboard';
 function RankMark({ rank }: { rank: number }) {
   if (rank === 1) {
     return (
-      <svg className="pulse-board-medal gold" viewBox="0 0 24 24" width="18" height="18" aria-hidden>
+      <svg className="pulse-board-medal gold" viewBox="0 0 24 24" width="20" height="20" aria-hidden>
         <path
-          fill="currentColor"
-          d="M12 2.5 14.2 8l5.8.5-4.4 3.7 1.4 5.6L12 14.8 6.9 17.8l1.4-5.6L4 8.5 9.8 8 12 2.5Z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinejoin="round"
+          d="M4.5 16.5h15l-1.1-8.2-3.6 3L12 5.2 9.2 11.3 5.6 8.3 4.5 16.5Z"
         />
+        <path fill="currentColor" d="M7 18.2h10v1.6H7z" />
       </svg>
     );
   }
-  if (rank === 2 || rank === 3) {
+  if (rank === 2) {
     return (
-      <svg
-        className={`pulse-board-medal ${rank === 2 ? 'silver' : 'bronze'}`}
-        viewBox="0 0 24 24"
-        width="18"
-        height="18"
-        aria-hidden
-      >
-        <circle cx="12" cy="11" r="6.2" fill="currentColor" />
-        <path d="M9 17.5 8 21l4-1.6L16 21l-1-3.5" fill="currentColor" opacity="0.85" />
+      <svg className="pulse-board-medal silver" viewBox="0 0 24 24" width="20" height="20" aria-hidden>
+        <circle cx="12" cy="9" r="4.2" fill="none" stroke="currentColor" strokeWidth="1.7" />
+        <path fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinejoin="round" d="M9.2 12.6 8 19.5 12 17.2l4 2.3-1.2-6.9" />
       </svg>
     );
   }
-  return <span className="pulse-board-num">{String(rank).padStart(2, '0')}</span>;
+  if (rank === 3) {
+    return (
+      <svg className="pulse-board-medal bronze" viewBox="0 0 24 24" width="20" height="20" aria-hidden>
+        <circle cx="12" cy="8.5" r="3.6" fill="none" stroke="currentColor" strokeWidth="1.7" />
+        <path fill="currentColor" d="M8.2 12.2 6.4 20l5.6-2.4L17.6 20l-1.8-7.8H8.2Z" />
+      </svg>
+    );
+  }
+  return <span className="pulse-board-num">{rank}</span>;
 }
 
 function BoardCard({
@@ -76,13 +82,11 @@ function BoardCard({
                 </div>
                 <Link className="pulse-board-player" to={`/profile/${p.userId}`}>
                   <UserAvatar src={p.avatar} name={p.username} size={36} />
-                  <span>
-                    <b>{p.username}</b>
-                    <small>
-                      {p.winRate != null ? `${p.winRate}% ${t('pulse.wr')}` : '—'}
-                    </small>
-                  </span>
+                  <b>{p.username}</b>
                 </Link>
+                <span className="pulse-board-wr">
+                  {p.winRate != null ? `${p.winRate}% ${t('pulse.wr')}` : '—'}
+                </span>
                 <div className="pulse-board-metric">
                   {metric === 'winnings' ? (
                     <CoinValue value={value} size={18} />

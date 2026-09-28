@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { CoinValue } from './CoinValue';
 import { HudProvider, useHud } from '../contexts/HudContext';
@@ -9,6 +9,7 @@ import { shopUntil } from '../lib/shopSession';
 import { useI18n } from '../lib/i18n';
 import { getAuthedSocket } from '../lib/socket';
 import { LocaleSelect } from './LocaleSelect';
+import { DrawerIcons, MobileDrawer } from './MobileDrawer';
 import { ThemeDock } from './ThemeDock';
 
 function inEditable(target: EventTarget | null) {
@@ -120,9 +121,12 @@ function ShopChrome() {
     setNavOpen(false);
   }, [location.pathname]);
 
+  const closeNav = useCallback(() => setNavOpen(false), []);
+  const path = location.pathname;
+
   return (
     <div className="play-app">
-      <header className={`play-hud${navOpen ? ' is-open' : ''}`}>
+      <header className="play-hud">
         <Link className="brand" to="/user/shop">
           <img src={ASSETS.logo} width={44} height={44} alt="BattleAsia Shop" />
           <div className="brand-name">
@@ -133,7 +137,7 @@ function ShopChrome() {
           className="nav-burger"
           type="button"
           aria-expanded={navOpen}
-          aria-label={navOpen ? 'Close menu' : 'Open menu'}
+          aria-label={navOpen ? t('hud.closeMenu') : t('hud.openMenu')}
           onClick={() => setNavOpen((v) => !v)}
         >
           <span />
@@ -183,6 +187,58 @@ function ShopChrome() {
           </button>
         </div>
       </header>
+      <MobileDrawer
+        open={navOpen}
+        onClose={closeNav}
+        logo={ASSETS.logo}
+        title="BATTLE ASIA SHOP"
+        subtitle={t('drawer.shopTagline')}
+        links={[
+          { key: 'shop', label: t('nav.shop'), to: '/user/shop', active: path.startsWith('/user/shop') || path === '/user' },
+          { key: 'wallet', label: t('nav.wallet'), to: '/user/wallet', active: path.startsWith('/user/wallet') },
+        ]}
+        section={{
+          title: t('drawer.money'),
+          cards: [
+            {
+              key: 'transfer',
+              label: t('nav.transfer'),
+              desc: t('drawer.transferDesc'),
+              icon: DrawerIcons.send,
+              to: '/user/transfer',
+              active: path.startsWith('/user/transfer'),
+            },
+            {
+              key: 'withdraw',
+              label: t('nav.withdraw'),
+              desc: t('drawer.withdrawDesc'),
+              icon: DrawerIcons.cash,
+              to: '/user/withdrawal',
+              active: path.startsWith('/user/withdrawal'),
+            },
+          ],
+        }}
+        tools={{
+          label: t('drawer.settings'),
+          content: (
+            <>
+              <ThemeDock />
+              <LocaleSelect />
+            </>
+          ),
+        }}
+        footer={{
+          icon: {
+            label: t('auth.leaveShop'),
+            icon: DrawerIcons.logout,
+            onClick: () => {
+              leaveShop();
+              window.location.assign(getMainAppUrl());
+            },
+          },
+          primary: { label: t('auth.arena'), href: getMainAppUrl(), arrow: true },
+        }}
+      />
       <Outlet context={{ toast, setBalance }} />
       {toastText ? <div className="play-toast" role="status">{toastText}</div> : null}
     </div>

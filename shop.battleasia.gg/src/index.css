@@ -3,6 +3,7 @@
 @import './styles/play.css';
 @import './styles/auth.css';
 @import './styles/phone.css';
+@import './styles/drawer.css';
 
 *,
 *::before,

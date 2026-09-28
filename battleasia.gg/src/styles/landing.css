@@ -729,6 +729,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 16px;
   padding: 0 40px 32px;
+  align-items: start;
 }
 
 .pulse-board {
@@ -736,26 +737,16 @@
   flex-direction: column;
   gap: 0;
   min-height: 0;
-  padding: 18px 18px 14px;
-  border-radius: 16px;
-  border: 1px solid var(--ba-hair);
-  background: var(--ba-card);
-  box-shadow: 0 18px 40px -32px rgba(0, 0, 0, 0.9);
-  transition: transform 0.18s ease, border-color 0.18s ease;
-  overflow: hidden;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
-.pulse-board:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.18);
-}
-
-/* Profit board — warm gold / BAC treatment */
-.pulse-board--profit {
-  border-color: color-mix(in srgb, var(--ba-accent) 28%, var(--ba-hair));
-  background:
-    radial-gradient(90% 70% at 100% 0%, color-mix(in srgb, var(--ba-accent) 16%, transparent), transparent 55%),
-    linear-gradient(165deg, color-mix(in srgb, var(--ba-accent) 6%, var(--ba-card)), var(--ba-card));
+.pulse-board--profit,
+.pulse-board--kills {
+  border: 0;
+  background: transparent;
 }
 
 .pulse-board--profit .pulse-board-eyebrow {
@@ -767,61 +758,19 @@
   color: color-mix(in srgb, var(--ba-accent) 70%, var(--ba-muted));
 }
 
-.pulse-board--profit .pulse-board-list li.is-top-1 {
-  background: linear-gradient(90deg, color-mix(in srgb, var(--ba-accent) 14%, transparent), transparent 70%);
-  border-radius: 10px;
-  border-bottom-color: transparent;
-  margin: 2px 0;
-  padding-inline: 8px;
-}
-
 .pulse-board--profit .pulse-board-metric {
-  color: var(--ba-accent);
-}
-
-/* Killers board — cool combat strip treatment */
-.pulse-board--kills {
-  border-color: color-mix(in srgb, var(--ba-accent-b, #21d4fd) 22%, var(--ba-hair));
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), transparent 40%),
-    var(--ba-card);
+  color: var(--ba-text);
 }
 
 .pulse-board--kills .pulse-board-eyebrow {
   color: var(--ba-accent-b, #21d4fd);
 }
 
-.pulse-board--kills .pulse-board-head {
-  padding-bottom: 12px;
-  margin-bottom: 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--ba-accent-b, #21d4fd) 18%, var(--ba-hair));
-}
-
-.pulse-board--kills .pulse-board-cols {
-  border-bottom: 0;
-  padding-top: 12px;
-  opacity: 0.85;
-}
-
-.pulse-board--kills .pulse-board-list li {
-  min-height: 56px;
-  padding: 8px 10px;
-  border-bottom: 0;
-  border-radius: 10px;
-  margin: 2px 0;
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.pulse-board--kills .pulse-board-list li.is-top-1 {
-  background: color-mix(in srgb, var(--ba-accent-b, #21d4fd) 10%, rgba(255, 255, 255, 0.03));
-  box-shadow: inset 3px 0 0 var(--ba-accent-b, #21d4fd);
-}
-
 .pulse-board--kills .pulse-board-kills {
-  font-family: var(--ba-font-display);
-  font-size: 16px;
-  letter-spacing: -0.03em;
-  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0;
+  color: var(--ba-text);
 }
 
 .pulse-board--kills .pulse-board-more {
@@ -884,16 +833,7 @@
 }
 
 .pulse-board-cols {
-  display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) auto;
-  gap: 10px;
-  padding: 0 4px 10px;
-  border-bottom: 1px solid var(--ba-hair);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ba-muted);
+  display: none;
 }
 
 .pulse-board-cols span:last-child {
@@ -902,22 +842,30 @@
 
 .pulse-board-list {
   list-style: none;
-  margin: 0;
+  display: grid;
+  gap: 10px;
+  margin: 2px 0 0;
   padding: 0;
 }
 
-.pulse-board-list li {
+.pulse-board-list li,
+.pulse-board-list li:last-child {
   display: grid;
-  grid-template-columns: 40px minmax(0, 1fr) auto;
-  gap: 10px;
+  grid-template-columns: 28px minmax(0, 1fr) auto minmax(92px, auto);
+  gap: 12px 14px;
   align-items: center;
-  min-height: 64px;
-  padding: 10px 4px;
-  border-bottom: 1px solid var(--ba-hair);
+  min-height: 62px;
+  margin: 0;
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--ba-text) 16%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--ba-text) 3%, var(--ba-card));
+  box-shadow: none;
 }
 
-.pulse-board-list li:last-child {
-  border-bottom: 0;
+.pulse-board-list li.is-top-1 {
+  border-color: color-mix(in srgb, var(--ba-accent) 40%, var(--ba-hair));
+  background: color-mix(in srgb, var(--ba-accent) 8%, var(--ba-card));
 }
 
 .pulse-board-rank {
@@ -927,7 +875,7 @@
 
 .pulse-board-num {
   color: var(--ba-muted);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
@@ -937,11 +885,11 @@
 }
 
 .pulse-board-medal.silver {
-  color: #c0c7d4;
+  color: color-mix(in srgb, var(--ba-accent) 55%, var(--ba-text));
 }
 
 .pulse-board-medal.bronze {
-  color: #d08a4c;
+  color: color-mix(in srgb, var(--ba-accent) 70%, var(--ba-muted));
 }
 
 .pulse-board-player {
@@ -953,27 +901,29 @@
   color: inherit;
 }
 
-.pulse-board-player span {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-
 .pulse-board-player b {
+  min-width: 0;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   color: var(--ba-text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.pulse-board-player small {
-  color: var(--ba-muted);
-  font-size: 11px;
+.pulse-board-wr {
+  color: var(--ba-accent);
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .pulse-board-metric {
+  min-width: 92px;
   text-align: right;
   font-variant-numeric: tabular-nums;
   color: var(--ba-text);
@@ -1010,6 +960,20 @@
   .pulse-boards {
     grid-template-columns: 1fr;
     padding: 0 20px 28px;
+  }
+}
+
+@media (max-width: 420px) {
+  .pulse-board-list li,
+  .pulse-board-list li:last-child {
+    gap: 8px 10px;
+    padding: 10px 12px;
+  }
+
+  .pulse-board-wr,
+  .pulse-board-metric {
+    min-width: 0;
+    font-size: 12px;
   }
 }
 

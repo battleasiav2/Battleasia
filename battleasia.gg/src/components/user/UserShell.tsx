@@ -11,6 +11,7 @@ import { fetchNotifications, pingPresence } from '../../lib/social';
 import { CoinValue } from '../CoinValue';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { LocaleSelect } from '../LocaleSelect';
+import { DrawerIcons, MobileDrawer } from '../MobileDrawer';
 import { ThemeDock } from '../ThemeDock';
 import { UserAvatar } from '../UserAvatar';
 import { openBacShop } from '../../lib/wallet';
@@ -162,6 +163,9 @@ function UserChrome() {
   }, [t, toast]);
 
   const closeSheet = useCallback(() => setSheet(false), []);
+  const closeNav = useCallback(() => setNavOpen(false), []);
+  const path = location.pathname;
+  const onReferral = path.startsWith('/user/referral') || path.includes('referr');
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -234,7 +238,7 @@ function UserChrome() {
 
   return (
     <div className="play-app">
-      <header className={`play-hud${navOpen ? ' is-open' : ''}`}>
+      <header className="play-hud">
         <Link className="brand" to="/dashboard">
           <img src={ASSETS.logo} width={44} height={44} alt="BattleAsia" />
           <div className="brand-name">
@@ -375,6 +379,83 @@ function UserChrome() {
           ) : null}
         </div>
       </header>
+      <MobileDrawer
+        open={navOpen}
+        onClose={closeNav}
+        logo={ASSETS.logo}
+        title="BATTLE ASIA 2.0"
+        subtitle={t('drawer.tagline')}
+        links={[
+          { key: 'play', label: t('nav.play'), to: '/user/play', active: path.startsWith('/user/play') },
+          { key: 'earn', label: t('nav.earn'), to: '/user/earn', active: path.startsWith('/user/earn') },
+          { key: 'feed', label: t('nav.feed'), to: '/user/feed', active: path.startsWith('/user/feed') },
+          { key: 'shop', label: t('nav.shop'), to: '/user/shop', active: path === '/user/shop' },
+          { key: 'transfer', label: t('nav.transfer'), onClick: () => openBacShop('transfer'), external: true },
+        ]}
+        section={{
+          title: t('nav.more'),
+          cards: [
+            {
+              key: 'referral',
+              label: t('nav.referral'),
+              desc: t('drawer.referralDesc'),
+              icon: DrawerIcons.gift,
+              to: '/user/referral',
+              active: onReferral,
+            },
+            ...(labsOn
+              ? [
+                  {
+                    key: 'labs',
+                    label: t('nav.labs'),
+                    desc: t('drawer.labsDesc'),
+                    icon: DrawerIcons.flask,
+                    to: '/user/labs',
+                    active: path.startsWith('/user/labs'),
+                  },
+                ]
+              : []),
+            {
+              key: 'alerts',
+              label: t('hud.alerts'),
+              desc: t('drawer.alertsDesc'),
+              icon: DrawerIcons.bell,
+              to: '/user/account/notifications',
+              badge: alerts,
+              active: path.startsWith('/user/account/notifications'),
+            },
+            {
+              key: 'account',
+              label: t('nav.account'),
+              desc: t('drawer.accountDesc'),
+              icon: DrawerIcons.user,
+              to: '/user/account/profile',
+              active: path.startsWith('/user/account') && !path.startsWith('/user/account/notifications'),
+            },
+          ],
+        }}
+        tools={{
+          label: t('drawer.settings'),
+          content: (
+            <>
+              <ThemeDock />
+              <LocaleSelect />
+            </>
+          ),
+        }}
+        footer={{
+          icon: {
+            label: t('cta.signout'),
+            icon: DrawerIcons.logout,
+            onClick: async () => {
+              disconnectSocket();
+              await logout();
+              navigate('/dashboard');
+            },
+          },
+          primary: { label: t('drawer.buyBac'), onClick: () => openBacShop('entry'), arrow: true },
+        }}
+      />
       <ErrorBoundary>
         <Outlet context={{ toast, setBalance, balance, muted }} />
       </ErrorBoundary>

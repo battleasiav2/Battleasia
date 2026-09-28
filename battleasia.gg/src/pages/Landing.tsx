@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { CountUpCoin, CountUpNumber } from '../components/CountUp';
 import { HeroVideo } from '../components/HeroVideo';
@@ -6,6 +6,7 @@ import { EMPTY_PULSE, fetchPublicDashboard, mapPulse, openMatchesForGame, type P
 import { ASSETS } from '../lib/assets';
 import { useI18n } from '../lib/i18n';
 import { LocaleSelect } from '../components/LocaleSelect';
+import { DrawerIcons, MobileDrawer, type DrawerCard } from '../components/MobileDrawer';
 import { UserAvatar } from '../components/UserAvatar';
 import { fetchMe, isSignedIn, readSessionUser, clearSignedIn } from '../lib/auth';
 import { ThemeDock } from '../components/ThemeDock';
@@ -98,6 +99,7 @@ export function Landing({ openChat }: { openChat?: boolean }) {
   const [arenaGames, setArenaGames] = useState<LandingGame[]>(FALLBACK_GAMES);
   const [apk, setApk] = useState<AppDownloadInfo | null>(null);
   const arenaTo = inArena ? '/user/play' : '/auth/sign-up';
+  const closeNav = useCallback(() => setNavOpen(false), []);
 
   useEffect(() => {
     let live = true;
@@ -223,7 +225,7 @@ export function Landing({ openChat }: { openChat?: boolean }) {
             />
           </label>
         ) : null}
-        <header className={`topbar${navOpen ? ' is-open' : ''}`}>
+        <header className="topbar">
           <a className="brand" href="#home">
             <img src={ASSETS.logo} width={40} height={40} alt="BattleAsia" />
             <div className="brand-name">
@@ -280,6 +282,83 @@ export function Landing({ openChat }: { openChat?: boolean }) {
             <LocaleSelect />
           </div>
         </header>
+        <MobileDrawer
+          open={navOpen}
+          onClose={closeNav}
+          logo={ASSETS.logo}
+          title="BATTLE ASIA 2.0"
+          subtitle={t('drawer.tagline')}
+          links={[
+            { key: 'home', label: t('nav.home'), href: '#home', active: hash === '#home' || hash === '' },
+            { key: 'about', label: t('nav.about'), href: '#about-us', active: hash === '#about-us' },
+            { key: 'play', label: t('nav.play'), href: '#play', active: hash === '#play' },
+            { key: 'rules', label: t('nav.rules'), href: '#rules', active: hash === '#rules' },
+          ]}
+          section={{
+            title: t('drawer.quick'),
+            cards: [
+              ...(inArena
+                ? [
+                    {
+                      key: 'arena',
+                      label: t('drawer.arena'),
+                      desc: t('drawer.arenaDesc'),
+                      icon: DrawerIcons.gamepad,
+                      to: '/user/play',
+                    },
+                    {
+                      key: 'account',
+                      label: t('nav.account'),
+                      desc: t('drawer.accountDesc'),
+                      icon: DrawerIcons.user,
+                      to: '/user/account/profile',
+                    },
+                  ]
+                : [
+                    {
+                      key: 'signin',
+                      label: t('cta.signin'),
+                      desc: t('drawer.signinDesc'),
+                      icon: DrawerIcons.login,
+                      to: '/auth/sign-in',
+                    },
+                  ]),
+              ...(apk && !apk.enabled
+                ? []
+                : [
+                    {
+                      key: 'apk',
+                      label: t('drawer.apk'),
+                      desc: [
+                        t('drawer.apkDesc'),
+                        apk?.version ? `v${apk.version}` : '',
+                        apk?.fileSize ? formatApkSize(apk.fileSize) : '',
+                      ]
+                        .filter(Boolean)
+                        .join(' · '),
+                      icon: DrawerIcons.download,
+                      href: apk?.downloadUrl || '/api/uploads/app/BattleAsia.apk',
+                      download: apk?.fileName || 'BattleAsia.apk',
+                    },
+                  ]),
+            ] satisfies DrawerCard[],
+          }}
+          tools={{
+            label: t('drawer.settings'),
+            content: (
+              <>
+                <ThemeDock />
+                <LocaleSelect />
+              </>
+            ),
+          }}
+          footer={{
+            icon: inArena
+              ? { label: t('nav.account'), icon: DrawerIcons.user, to: '/user/account/profile' }
+              : { label: t('cta.signin'), icon: DrawerIcons.login, to: '/auth/sign-in' },
+            primary: { label: t('cta.signup'), to: arenaTo },
+          }}
+        />
 
         <section className="hero" id="home">
           <HeroVideo className="hero-media" priority />

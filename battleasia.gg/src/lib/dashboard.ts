@@ -139,65 +139,6 @@ export function openMatchesForGame(gameName: string, openByGame: Record<string, 
   return hit ? hit[1] : 0;
 }
 
-/** Fake live-rail cards when API has no status=start matches yet. */
-export function fakeLiveBattles(limit = 5): PulseMatch[] {
-  const rows: Array<Omit<PulseMatch, 'status'>> = [
-    {
-      id: 'live-fake-pubg',
-      matchName: 'PUBG Night Scrims Live',
-      gameName: 'PUBG Mobile',
-      entryFee: 40,
-      totalPlayer: 100,
-      participantsCount: 67,
-      prizeEstimate: 4000,
-    },
-    {
-      id: 'live-fake-cod',
-      matchName: 'COD Domination Live',
-      gameName: 'Call of Duty Mobile',
-      entryFee: 30,
-      totalPlayer: 40,
-      participantsCount: 28,
-      prizeEstimate: 1200,
-    },
-    {
-      id: 'live-fake-ff',
-      matchName: 'Free Fire Clash Live',
-      gameName: 'Free Fire',
-      entryFee: 20,
-      totalPlayer: 48,
-      participantsCount: 36,
-      prizeEstimate: 960,
-    },
-    {
-      id: 'live-fake-valo',
-      matchName: 'Valorant Spike Rush Live',
-      gameName: 'Valorant Mobile',
-      entryFee: 25,
-      totalPlayer: 10,
-      participantsCount: 8,
-      prizeEstimate: 250,
-    },
-    {
-      id: 'live-fake-mlbb',
-      matchName: 'MLBB Ranked Live',
-      gameName: 'Mobile Legends',
-      entryFee: 15,
-      totalPlayer: 10,
-      participantsCount: 9,
-      prizeEstimate: 150,
-    },
-  ];
-  return rows.slice(0, limit).map((m) => ({ ...m, status: 'start' }));
-}
-
-function fillLiveBattles(real: PulseMatch[], limit = 5) {
-  if (real.length >= limit) return real.slice(0, limit);
-  const usedGames = new Set(real.map((m) => m.gameName.toLowerCase()));
-  const fakes = fakeLiveBattles(limit).filter((m) => !usedGames.has(m.gameName.toLowerCase()));
-  return [...real, ...fakes].slice(0, limit);
-}
-
 export function mapPulse(raw: unknown): PulseStats {
   const root = asRecord(raw);
   const data = asRecord(root.data ?? root);
@@ -232,7 +173,7 @@ export function mapPulse(raw: unknown): PulseStats {
     openByGame,
     topProfit: asList(data.topProfitPlayers).map(mapPlayer),
     topKillers: asList(data.topPlayers).map(mapPlayer),
-    ongoingMatches: fillLiveBattles(ongoingReal, 5),
+    ongoingMatches: ongoingReal,
     highPrizeMatches: asList(data.highPrizeMatches).map(mapMatch),
   };
 }
@@ -243,11 +184,9 @@ export async function fetchPublicDashboard(): Promise<PulseStats> {
       credentials: 'include',
       signal: AbortSignal.timeout(2500),
     });
-    if (!res.ok) {
-      return { ...EMPTY_PULSE, ongoingMatches: fakeLiveBattles(5), ongoing: 5 };
-    }
+    if (!res.ok) return EMPTY_PULSE;
     return mapPulse(await res.json());
   } catch {
-    return { ...EMPTY_PULSE, ongoingMatches: fakeLiveBattles(5), ongoing: 5 };
+    return EMPTY_PULSE;
   }
 }

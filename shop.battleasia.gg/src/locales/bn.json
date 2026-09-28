@@ -339,5 +339,10 @@
   "auth.emailPh": "you@email.com",
   "auth.passwordPh": "••••••••",
   "auth.hidePassword": "পাসওয়ার্ড লুকাও",
-  "auth.showPassword": "পাসওয়ার্ড দেখাও"
+  "auth.showPassword": "পাসওয়ার্ড দেখাও",
+  "drawer.shopTagline": "BAC ওয়ালেট ও শপ",
+  "drawer.money": "লেনদেন",
+  "drawer.transferDesc": "অন্য প্লেয়ারকে BAC পাঠান",
+  "drawer.withdrawDesc": "জেতা BAC ক্যাশ আউট করুন",
+  "drawer.settings": "থিম ও ভাষা"
 }

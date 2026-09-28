@@ -1206,5 +1206,18 @@
   "board.level": "Level",
   "board.top3": "Top three",
   "auth.emailPh": "you@email.com",
-  "auth.passwordPh": "••••••••"
+  "auth.passwordPh": "••••••••",
+  "drawer.tagline": "Mobile esports arena",
+  "drawer.referralDesc": "Invite friends and earn BAC rewards",
+  "drawer.labsDesc": "Try new features before everyone else",
+  "drawer.alertsDesc": "Match updates, results and rewards",
+  "drawer.accountDesc": "Profile, matches, orders and stats",
+  "drawer.settings": "Theme & language",
+  "drawer.buyBac": "Buy BAC",
+  "drawer.quick": "Quick access",
+  "drawer.arena": "Open arena",
+  "drawer.arenaDesc": "Join live rooms and tournaments",
+  "drawer.signinDesc": "Already have an account? Continue here",
+  "drawer.apk": "Android app",
+  "drawer.apkDesc": "Download the BattleAsia APK"
 }

@@ -21,6 +21,8 @@
   "cta.signin": "登录",
   "cta.signup": "进入竞技场 →",
   "cta.apk": "↓ 下载 APK",
+  "cta.apkVer": "↓ Download APK · v{0}",
+  "cta.apkOff": "APK coming soon",
   "cta.signout": "退出",
   "hero.eyebrow": "PUBG MOBILE 锦标赛",
   "hero.live": "正在直播",

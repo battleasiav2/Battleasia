@@ -349,5 +349,10 @@
   "auth.emailPh": "you@email.com",
   "auth.passwordPh": "••••••••",
   "auth.hidePassword": "Hide password",
-  "auth.showPassword": "Show password"
+  "auth.showPassword": "Show password",
+  "drawer.shopTagline": "BAC wallet & shop",
+  "drawer.money": "Money",
+  "drawer.transferDesc": "Send BAC to another player",
+  "drawer.withdrawDesc": "Cash out your BAC winnings",
+  "drawer.settings": "Theme & language"
 }

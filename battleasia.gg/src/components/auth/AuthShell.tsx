@@ -4,7 +4,6 @@ import { ASSETS } from '../../lib/assets';
 import { useI18n } from '../../lib/i18n';
 import { LocaleSelect } from '../LocaleSelect';
 import { ThemeDock } from '../ThemeDock';
-import { AuthFormSeal } from './AuthFormSeal';
 import { AuthTrustRow } from './AuthTrustRow';
 
 type Props = {
@@ -30,7 +29,6 @@ export function AuthShell({ title, subtitle, children }: Props) {
             <ThemeDock />
           </div>
         </div>
-        <AuthFormSeal />
         <h1>{title}</h1>
         {subtitle ? <p className="auth-sub">{subtitle}</p> : null}
         {children}

@@ -21,6 +21,8 @@
   "cta.signin": "साइन इन",
   "cta.signup": "एरेना में जाएँ →",
   "cta.apk": "↓ APK डाउनलोड",
+  "cta.apkVer": "↓ Download APK · v{0}",
+  "cta.apkOff": "APK coming soon",
   "cta.signout": "साइन आउट",
   "hero.eyebrow": "PUBG MOBILE टूर्नामेंट",
   "hero.live": "लाइव नाउ",
