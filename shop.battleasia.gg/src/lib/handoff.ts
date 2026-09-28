@@ -1,3 +1,5 @@
+import { beginShopHour, SHOP_ACCESS, SHOP_GATE, SHOP_REFRESH, writeShopKey } from './shopSession';
+
 /** Consume player → shop session handoff from URL hash (`#ba_a=…&ba_r=…`). Clears hash immediately. */
 export function consumePlayerHandoff() {
   if (typeof window === 'undefined') return false;
@@ -14,9 +16,10 @@ export function consumePlayerHandoff() {
     const refresh = params.get('ba_r') || '';
     if (!access && !refresh) return false;
 
-    if (access) sessionStorage.setItem('ba-shop-access', access);
-    if (refresh) sessionStorage.setItem('ba-shop-refresh', refresh);
-    sessionStorage.setItem('ba_shop_gate', '1');
+    if (access) writeShopKey(SHOP_ACCESS, access);
+    if (refresh) writeShopKey(SHOP_REFRESH, refresh);
+    writeShopKey(SHOP_GATE, '1');
+    beginShopHour();
     return true;
   } catch {
     return false;

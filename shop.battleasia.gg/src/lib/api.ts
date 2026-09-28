@@ -1,3 +1,12 @@
+import {
+  clearShopSession,
+  readShopKey,
+  SHOP_ACCESS,
+  SHOP_REFRESH,
+  shopSessionAlive,
+  writeShopKey,
+} from './shopSession';
+
 export type ApiError = {
   status: number;
   message: string;
@@ -7,36 +16,18 @@ export type ApiError = {
 
 export type ApiInit = RequestInit & { idempotencyKey?: string; skipRefresh?: boolean };
 
-const GATE = 'ba_shop_gate';
-const USER = 'ba-shop-user';
-const REFRESH = 'ba-shop-refresh';
-const ACCESS = 'ba-shop-access';
-
 let refreshInflight: Promise<boolean> | null = null;
 
 function readRefresh() {
-  try {
-    return sessionStorage.getItem(REFRESH) || '';
-  } catch {
-    return '';
-  }
+  return readShopKey(SHOP_REFRESH);
 }
 
 function writeRefresh(token: string) {
-  try {
-    if (token) sessionStorage.setItem(REFRESH, token);
-    else sessionStorage.removeItem(REFRESH);
-  } catch {
-    /* ignore */
-  }
+  writeShopKey(SHOP_REFRESH, token);
 }
 
 function readAccess() {
-  try {
-    return sessionStorage.getItem(ACCESS) || '';
-  } catch {
-    return '';
-  }
+  return readShopKey(SHOP_ACCESS);
 }
 
 export function readAccessToken() {
@@ -44,23 +35,11 @@ export function readAccessToken() {
 }
 
 function writeAccess(token: string) {
-  try {
-    if (token) sessionStorage.setItem(ACCESS, token);
-    else sessionStorage.removeItem(ACCESS);
-  } catch {
-    /* ignore */
-  }
+  writeShopKey(SHOP_ACCESS, token);
 }
 
 function clearShopOnly() {
-  try {
-    sessionStorage.removeItem(GATE);
-    sessionStorage.removeItem(USER);
-    sessionStorage.removeItem(REFRESH);
-    sessionStorage.removeItem(ACCESS);
-  } catch {
-    /* ignore */
-  }
+  clearShopSession();
 }
 
 function kickToShopSignIn() {
@@ -87,6 +66,7 @@ function captureRefreshPayload(payload: unknown) {
 }
 
 async function silentRefresh() {
+  if (!shopSessionAlive()) return false;
   if (refreshInflight) return refreshInflight;
   refreshInflight = (async () => {
     try {

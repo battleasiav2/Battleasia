@@ -5,6 +5,7 @@ import { HudProvider, useHud } from '../contexts/HudContext';
 import { ASSETS } from '../lib/assets';
 import { fetchMe, getMainAppUrl, isShopAuthed, leaveShop, patchSessionBalance, readSessionUser } from '../lib/auth';
 import { isApiError } from '../lib/api';
+import { shopUntil } from '../lib/shopSession';
 import { useI18n } from '../lib/i18n';
 import { getAuthedSocket } from '../lib/socket';
 import { LocaleSelect } from './LocaleSelect';
@@ -57,6 +58,24 @@ function ShopChrome() {
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [handlers, navigate]);
+
+  useEffect(() => {
+    const until = shopUntil();
+    if (!until) return;
+    function expire() {
+      if (shopUntil() > Date.now()) return;
+      leaveShop();
+      navigate('/auth/sign-in?reauth=1', { replace: true });
+    }
+    const id = window.setTimeout(expire, Math.max(0, until - Date.now()));
+    window.addEventListener('focus', expire);
+    document.addEventListener('visibilitychange', expire);
+    return () => {
+      window.clearTimeout(id);
+      window.removeEventListener('focus', expire);
+      document.removeEventListener('visibilitychange', expire);
+    };
+  }, [navigate]);
 
   useEffect(() => {
     if (!isShopAuthed()) return;

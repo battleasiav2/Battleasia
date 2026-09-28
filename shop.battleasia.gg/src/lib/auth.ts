@@ -1,9 +1,15 @@
 import { api, rememberShopRefresh, unwrapUser } from './api';
 import { readReferral } from './ref';
+import {
+  beginShopHour,
+  clearShopSession,
+  readShopKey,
+  SHOP_GATE,
+  SHOP_USER,
+  shopSessionAlive,
+  writeShopKey,
+} from './shopSession';
 import { withThemeQuery } from './theme';
-
-const GATE = 'ba_shop_gate';
-const USER = 'ba-shop-user';
 
 export function getMainAppUrl(path = '/') {
   const configured = (import.meta.env.VITE_MAIN_APP_URL as string | undefined) || 'https://battleasia.gg';
@@ -33,16 +39,17 @@ export type AuthUser = {
 };
 
 export function markShopGate(user?: AuthUser) {
-  sessionStorage.setItem(GATE, '1');
-  if (user) sessionStorage.setItem(USER, JSON.stringify(user));
+  beginShopHour();
+  writeShopKey(SHOP_GATE, '1');
+  if (user) writeShopKey(SHOP_USER, JSON.stringify(user));
 }
 
 export function patchSessionBalance(balance: number) {
   try {
-    const raw = sessionStorage.getItem(USER);
+    const raw = readShopKey(SHOP_USER);
     const user = raw ? (JSON.parse(raw) as AuthUser) : {};
     const next = { ...user, balance };
-    sessionStorage.setItem(USER, JSON.stringify(next));
+    writeShopKey(SHOP_USER, JSON.stringify(next));
     window.dispatchEvent(new CustomEvent('ba-balance', { detail: balance }));
   } catch {
     window.dispatchEvent(new CustomEvent('ba-balance', { detail: balance }));
@@ -50,19 +57,21 @@ export function patchSessionBalance(balance: number) {
 }
 
 export function clearShopGate() {
-  sessionStorage.removeItem(GATE);
-  sessionStorage.removeItem(USER);
-  sessionStorage.removeItem('ba-shop-refresh');
-  sessionStorage.removeItem('ba-shop-access');
+  clearShopSession();
 }
 
 export function isShopAuthed() {
-  return sessionStorage.getItem(GATE) === '1';
+  if (!shopSessionAlive()) {
+    if (readShopKey(SHOP_GATE)) clearShopSession();
+    return false;
+  }
+  return readShopKey(SHOP_GATE) === '1';
 }
 
 export function readSessionUser(): AuthUser | null {
+  if (!shopSessionAlive()) return null;
   try {
-    const raw = sessionStorage.getItem(USER);
+    const raw = readShopKey(SHOP_USER);
     return raw ? (JSON.parse(raw) as AuthUser) : null;
   } catch {
     return null;

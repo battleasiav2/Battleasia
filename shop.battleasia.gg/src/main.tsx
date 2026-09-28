@@ -8,8 +8,10 @@ import { captureReferral } from './lib/ref';
 import { bootSentry } from './lib/sentry';
 import { bootTheme } from './lib/theme';
 import { consumePlayerHandoff } from './lib/handoff';
+import { migrateShopSession } from './lib/shopSession';
 
 bootTheme();
+migrateShopSession();
 consumePlayerHandoff();
 captureReferral();
 bootSentry();

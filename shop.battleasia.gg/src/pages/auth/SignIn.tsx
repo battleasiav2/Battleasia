@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { AuthShell } from '../../components/auth/AuthShell';
 import { PasswordField } from '../../components/auth/PasswordField';
 import { isApiError } from '../../lib/api';
-import { markShopGate, clearShopGate, safeReturnTo, signIn } from '../../lib/auth';
+import { markShopGate, clearShopGate, isShopAuthed, safeReturnTo, signIn } from '../../lib/auth';
 import { focusFirstError, httpCopy, readRememberedEmail, sanitizeLine, writeRememberedEmail } from '../../lib/form';
 import { registerPushToken } from '../../lib/push';
 import { captureReferral } from '../../lib/ref';
@@ -28,8 +28,12 @@ export function SignInPage() {
   useEffect(() => {
     if (params.get('reauth') === '1') {
       clearShopGate();
+      return;
     }
-  }, [params]);
+    if (isShopAuthed()) {
+      navigate(safeReturnTo(params.get('returnTo')), { replace: true });
+    }
+  }, [navigate, params]);
 
   useEffect(() => {
     if (!wait) return;
