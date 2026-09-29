@@ -67,30 +67,12 @@ function gameHref(id: string) {
   return `/auth/sign-in?returnTo=${encodeURIComponent(play)}`;
 }
 
-function Spark({ series }: { series: number[] }) {
-  const vals = series.length > 1 ? series : [0, series[0] || 0];
-  const max = Math.max(1, ...vals);
-  const d = vals
-    .map((v, i) => {
-      const x = (i / Math.max(1, vals.length - 1)) * 72;
-      const y = 26 - (v / max) * 22;
-      return `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`;
-    })
-    .join(' ');
-  return (
-    <svg className="spark" viewBox="0 0 72 28" width="72" height="28" aria-hidden>
-      <path d={d} fill="none" />
-    </svg>
-  );
-}
-
 export function Landing({ openChat }: { openChat?: boolean }) {
   const { t } = useI18n();
   const location = useLocation();
   const [params] = useSearchParams();
   const mock = params.get('mock') === '1';
   const [stats, setStats] = useState<PulseStats>(EMPTY_PULSE);
-  const [hist, setHist] = useState<Array<{ j: number; m: number; o: number; w: number }>>([]);
   const [navOpen, setNavOpen] = useState(false);
   const [faq, setFaq] = useState<string>(RULES[0].q);
   const hash = location.hash || '#home';
@@ -192,12 +174,6 @@ export function Landing({ openChat }: { openChat?: boolean }) {
   }, []);
 
   useEffect(() => {
-    setHist((rows) =>
-      [...rows, { j: stats.todayJoins, m: stats.matches, o: stats.ongoing, w: stats.winnings }].slice(-16),
-    );
-  }, [stats.todayJoins, stats.matches, stats.ongoing, stats.winnings]);
-
-  useEffect(() => {
     if (location.hash) {
       document.querySelector(location.hash)?.scrollIntoView({ behavior: 'smooth' });
     }
@@ -261,16 +237,16 @@ export function Landing({ openChat }: { openChat?: boolean }) {
             </a>
           </nav>
           <div className="top-actions" onPointerDown={(e) => e.stopPropagation()}>
+            {inArena ? (
+              <Link className="hud-user" to="/user/account/profile" title={me?.username || t('nav.account')} aria-label={t('nav.account')}>
+                <UserAvatar src={me?.avatar} name={me?.username} size={40} />
+              </Link>
+            ) : null}
             <ThemeDock />
             {inArena ? (
-              <>
-                <Link className="btn btn-ghost" to="/user/play">
-                  {t('nav.play')}
-                </Link>
-                <Link className="hud-user" to="/user/account/profile" title={me?.username || t('nav.account')} aria-label={t('nav.account')}>
-                  <UserAvatar src={me?.avatar} name={me?.username} size={36} />
-                </Link>
-              </>
+              <Link className="btn btn-ghost" to="/user/play">
+                {t('nav.play')}
+              </Link>
             ) : (
               <Link className="btn btn-ghost" to="/auth/sign-in">
                 {t('cta.signin')}
@@ -429,44 +405,53 @@ export function Landing({ openChat }: { openChat?: boolean }) {
           </div>
         </section>
 
-        <section className="pulse" aria-label={t('pulse.liveLabel')}>
-          <h2>
-            <span className="pulse-ico" /> {t('pulse.title')}
-          </h2>
-          <div className="pulse-stat">
-            {t('pulse.joins')} <b><CountUpNumber value={stats.todayJoins} /></b>
-            <Spark series={hist.map((h) => h.j)} />
+        <div className="arena-board">
+          <header className="arena-head">
+            <div className="arena-brand">
+              Battle<span>Arena</span>
+            </div>
+            <div className="arena-live">
+              <i />
+              {t('pulse.live')}
+            </div>
+          </header>
+          <div className="arena-stats" aria-label={t('pulse.liveLabel')}>
+            <div className="arena-stat">
+              <span className="arena-stat-k">{t('pulse.joins')}</span>
+              <div className="arena-stat-v">
+                <CountUpNumber value={stats.todayJoins} />
+              </div>
+            </div>
+            <div className="arena-stat">
+              <span className="arena-stat-k">{t('pulse.matches')}</span>
+              <div className="arena-stat-v">
+                <CountUpNumber value={stats.matches} />
+              </div>
+            </div>
+            <div className="arena-stat">
+              <span className="arena-stat-k">{t('pulse.ongoing')}</span>
+              <div className="arena-stat-v">
+                <i className="arena-stat-dot" />
+                <CountUpNumber value={stats.ongoing} />
+              </div>
+            </div>
+            <div className="arena-stat">
+              <span className="arena-stat-k">{t('pulse.winnings')}</span>
+              <div className="arena-stat-v">
+                <CountUpCoin value={stats.winnings} size={22} />
+              </div>
+            </div>
           </div>
-          <div className="pulse-stat">
-            {t('pulse.matches')} <b><CountUpNumber value={stats.matches} /></b>
-            <Spark series={hist.map((h) => h.m)} />
-          </div>
-          <div className="pulse-stat">
-            {t('pulse.ongoing')} <b><span className="online-dot" /> <CountUpNumber value={stats.ongoing} /></b>
-            <Spark series={hist.map((h) => h.o)} />
-          </div>
-          <div className="pulse-stat">
-            {t('pulse.winnings')}
-            <b>
-              <CountUpCoin value={stats.winnings} size={22} />
-            </b>
-            <Spark series={hist.map((h) => h.w)} />
-          </div>
-        </section>
+          <Suspense fallback={null}>
+            <PulseLeaderboards profit={stats.topProfit} killers={stats.topKillers} />
+          </Suspense>
+        </div>
 
         <Suspense fallback={null}>
-          <PulseLeaderboards profit={stats.topProfit} killers={stats.topKillers} />
           <MatchBattleRail
-            title={t('pulse.highPrizeBattles')}
-            matches={stats.highPrizeMatches}
+            prizeMatches={stats.highPrizeMatches}
+            liveMatches={stats.ongoingMatches}
             signedIn={inArena}
-            variant="prize"
-          />
-          <MatchBattleRail
-            title={t('pulse.liveBattles')}
-            matches={stats.ongoingMatches}
-            signedIn={inArena}
-            variant="ongoing"
           />
         </Suspense>
         <section className="games" id="play">

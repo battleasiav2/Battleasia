@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CoinValue } from './CoinValue';
 import { useI18n } from '../lib/i18n';
@@ -20,17 +20,18 @@ function isFull(m: PulseMatch) {
 }
 
 export function MatchBattleRail({
-  title,
-  matches,
+  prizeMatches,
+  liveMatches,
   signedIn,
-  variant = 'prize',
 }: {
-  title: string;
-  matches: PulseMatch[];
+  prizeMatches: PulseMatch[];
+  liveMatches: PulseMatch[];
   signedIn: boolean;
-  variant?: 'prize' | 'ongoing';
 }) {
   const { t } = useI18n();
+  const [variant, setVariant] = useState<'prize' | 'ongoing'>('prize');
+  const matches = variant === 'prize' ? prizeMatches : liveMatches;
+  const title = variant === 'prize' ? t('pulse.highPrizeBattles') : t('pulse.liveBattles');
   const railRef = useRef<HTMLDivElement>(null);
   const playHref = signedIn ? '/user/play' : `/auth/sign-in?returnTo=${encodeURIComponent('/user/play')}`;
 
@@ -45,7 +46,14 @@ export function MatchBattleRail({
   return (
     <section className={`battle-rail battle-rail-${variant}`} aria-label={title}>
       <div className="battle-rail-head">
-        <h2>{title}</h2>
+        <div className="battle-rail-tabs" role="group" aria-label={title}>
+          <button type="button" aria-pressed={variant === 'prize'} onClick={() => setVariant('prize')}>
+            {t('pulse.highPrizeBattles')}
+          </button>
+          <button type="button" aria-pressed={variant === 'ongoing'} onClick={() => setVariant('ongoing')}>
+            {t('pulse.liveBattles')}
+          </button>
+        </div>
         <div className="battle-rail-nav">
           <button type="button" aria-label={t('rail.prev')} onClick={() => scroll(-1)}>
             ‹
@@ -57,7 +65,7 @@ export function MatchBattleRail({
       </div>
 
       {matches.length ? (
-        <div className="battle-rail-track" ref={railRef}>
+        <div className="battle-rail-track" ref={railRef} key={variant}>
           {matches.slice(0, 5).map((m) => {
             const cap = m.totalPlayer || 0;
             const filled = m.participantsCount || 0;
