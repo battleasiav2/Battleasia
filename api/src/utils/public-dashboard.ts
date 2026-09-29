@@ -207,17 +207,19 @@ async function getTopMatchPerGame(statuses: Array<'active' | 'start'>, limit = 5
   ]);
 }
 
-/** Live matches for Pulse: prefer one per game, then fill remaining slots. */
-async function getOngoingMatchList(limit = 5) {
-  const perGame = await getTopMatchPerGame(['start'], limit);
-  if (perGame.length >= limit) return perGame;
-
-  const usedIds = perGame.map((m) => m._id);
-  const extras = await Match.aggregate<MatchSummarySource>([
+/** Real rooms used to fill the live rail: live first, then open, then finished. */
+async function getMatchFill(
+  status: 'start' | 'active' | 'complete',
+  limit: number,
+  excludeIds: MatchSummarySource['_id'][] = [],
+) {
+  if (limit <= 0) return [];
+  const newestFirst = status === 'complete';
+  return Match.aggregate<MatchSummarySource>([
     {
       $match: {
-        status: 'start',
-        ...(usedIds.length ? { _id: { $nin: usedIds } } : {}),
+        status,
+        ...(excludeIds.length ? { _id: { $nin: excludeIds } } : {}),
       },
     },
     {
@@ -227,11 +229,28 @@ async function getOngoingMatchList(limit = 5) {
         },
       },
     },
-    { $sort: { _prize: -1, matchSchedule: 1 } },
-    { $limit: limit - perGame.length },
+    { $sort: newestFirst ? { matchSchedule: -1 } : { _prize: -1, matchSchedule: 1 } },
+    { $limit: limit },
   ]);
+}
 
-  return [...perGame, ...extras];
+/** Live battles always asks for 5 real matches. Live rooms come first, then open rooms, then finished rooms. */
+async function getOngoingMatchList(limit = 5) {
+  const picked: MatchSummarySource[] = [];
+  const perGame = await getTopMatchPerGame(['start'], limit);
+  picked.push(...perGame);
+
+  for (const status of ['start', 'active', 'complete'] as const) {
+    if (picked.length >= limit) break;
+    const more = await getMatchFill(
+      status,
+      limit - picked.length,
+      picked.map((m) => m._id),
+    );
+    picked.push(...more);
+  }
+
+  return picked.slice(0, limit);
 }
 
 export async function getPublicDashboardStats() {

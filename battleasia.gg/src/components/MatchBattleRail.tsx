@@ -58,17 +58,20 @@ export function MatchBattleRail({
 
       {matches.length ? (
         <div className="battle-rail-track" ref={railRef}>
-          {matches.slice(0, 8).map((m) => {
+          {matches.slice(0, 5).map((m) => {
             const cap = m.totalPlayer || 0;
             const filled = m.participantsCount || 0;
             const pct = cap > 0 ? Math.min(100, Math.round((filled / Math.max(cap, 1)) * 100)) : 0;
             const full = isFull(m);
+            const finished = m.status === 'complete';
             const href = matchJoinHref(m.id, signedIn);
             const status = full
               ? t('pulse.matchFull')
-              : variant === 'ongoing'
-                ? t('pulse.live')
-                : t('pulse.open');
+              : finished
+                ? t('pulse.complete')
+                : m.status === 'active' || variant !== 'ongoing'
+                  ? t('pulse.open')
+                  : t('pulse.live');
 
             return (
               <article key={m.id} className="battle-card" data-match-card>
@@ -102,20 +105,20 @@ export function MatchBattleRail({
                     </b>
                   </div>
                 </div>
-                {href ? (
-                  full ? (
-                    <span className="battle-play is-full">{t('pulse.matchFull')}</span>
-                  ) : (
-                    <Link
-                      className="battle-play"
-                      to={href}
-                      aria-label={signedIn ? t('pulse.playNow') : t('pulse.signInToJoin')}
-                    >
-                      {t('pulse.playNow')} <span aria-hidden>→</span>
-                    </Link>
-                  )
+                {href && !full && !finished ? (
+                  <Link
+                    className="battle-play"
+                    to={href}
+                    aria-label={signedIn ? t('pulse.playNow') : t('pulse.signInToJoin')}
+                  >
+                    {t('pulse.playNow')} <span aria-hidden>→</span>
+                  </Link>
+                ) : href && finished ? (
+                  <Link className="battle-play" to={href} aria-label={t('pulse.viewMatch')}>
+                    {t('pulse.viewMatch')} <span aria-hidden>→</span>
+                  </Link>
                 ) : (
-                  <span className="battle-play is-full">—</span>
+                  <span className="battle-play is-full">{full ? t('pulse.matchFull') : '—'}</span>
                 )}
               </article>
             );
