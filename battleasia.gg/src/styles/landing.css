@@ -737,16 +737,18 @@
   flex-direction: column;
   gap: 0;
   min-height: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  box-shadow: none;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--ba-text) 12%, transparent);
+  border-radius: 18px;
+  background:
+    linear-gradient(150deg, color-mix(in srgb, var(--ba-text) 4%, transparent), transparent 48%),
+    color-mix(in srgb, var(--ba-card) 92%, transparent);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.14);
 }
 
 .pulse-board--profit,
 .pulse-board--kills {
-  border: 0;
-  background: transparent;
+  border-color: color-mix(in srgb, var(--ba-text) 12%, transparent);
 }
 
 .pulse-board--profit .pulse-board-eyebrow {
