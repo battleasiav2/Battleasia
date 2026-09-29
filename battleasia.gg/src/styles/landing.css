@@ -1040,7 +1040,7 @@
 }
 
 .battle-card {
-  flex: 0 0 calc((100% - 48px) / 5);
+  flex: 1 0 calc((100% - 48px) / 5);
   min-width: 0;
   scroll-snap-align: start;
   position: relative;
@@ -1240,13 +1240,13 @@
 
 @media (max-width: 1200px) {
   .battle-card {
-    flex: 0 0 calc((100% - 36px) / 4);
+    flex: 1 0 calc((100% - 36px) / 4);
   }
 }
 
 @media (max-width: 980px) {
   .battle-card {
-    flex: 0 0 calc((100% - 24px) / 3);
+    flex: 1 0 calc((100% - 24px) / 3);
   }
 }
 
@@ -1260,7 +1260,7 @@
   }
 
   .battle-card {
-    flex: 0 0 calc((100% - 10px) / 2.15);
+    flex: 1 0 calc((100% - 10px) / 2);
     padding: 12px 10px 10px;
     gap: 8px;
   }
