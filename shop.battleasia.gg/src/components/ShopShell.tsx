@@ -172,7 +172,7 @@ function ShopChrome() {
         <div className="play-hud-right">
           <LocaleSelect />
           <ThemeDock />
-          <a className="btn btn-ghost" href={getMainAppUrl()}>
+          <a className="btn btn-ghost" href={getMainAppUrl('/user/play')}>
             {t('auth.arena')}
           </a>
           <button
@@ -236,7 +236,7 @@ function ShopChrome() {
               window.location.assign(getMainAppUrl());
             },
           },
-          primary: { label: t('auth.arena'), href: getMainAppUrl(), arrow: true },
+          primary: { label: t('auth.arena'), href: getMainAppUrl('/user/play'), arrow: true },
         }}
       />
       <Outlet context={{ toast, setBalance }} />

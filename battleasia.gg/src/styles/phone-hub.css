@@ -55,15 +55,27 @@
     grid-template-columns: 1fr;
     min-height: 100dvh;
     align-content: start;
-    background:
-      linear-gradient(180deg, rgba(7, 8, 13, 0.82) 0%, rgba(7, 8, 13, 0.9) 45%, rgba(7, 8, 13, 0.94) 100%),
-      radial-gradient(80% 50% at 50% 0%, rgba(0, 0, 0, 0.35), transparent 70%),
-      #07080d
-      url('/assets/hero/auth-login.png?v=4') center 28% / cover no-repeat;
+    background: var(--ba-page-ink);
   }
 
   .auth-hero {
-    display: none;
+    display: grid;
+    order: -1;
+    position: relative;
+    overflow: hidden;
+    min-height: 0;
+    height: 34vh;
+    max-height: 280px;
+    background: none;
+  }
+
+  .auth-hero .hero-media,
+  .auth-hero .hero-poster,
+  .auth-hero .hero-vignette,
+  .auth-hero .auth-hero-shade {
+    display: block;
+    position: absolute;
+    inset: 0;
   }
 
   .auth-form-pane {
@@ -72,7 +84,9 @@
     border-bottom: 0;
     padding: 16px 16px 28px;
     justify-content: flex-start;
-    background: transparent;
+    background:
+      radial-gradient(70% 42% at 0% 0%, color-mix(in srgb, var(--ba-accent) 12%, transparent), transparent 58%),
+      var(--ba-page-ink);
   }
 
   .auth-toolbar {

@@ -177,6 +177,10 @@
   flex-shrink: 0;
 }
 
+.hud-signout {
+  display: none;
+}
+
 .hud-menu {
   position: absolute;
   top: calc(100% + 10px);

@@ -23,7 +23,11 @@ export function mediaUrl(src?: string | null) {
     return raw;
   }
   if (raw.startsWith('/api/uploads/')) return raw.replace(/^\/api/, '');
-  return raw.startsWith('/') ? raw : `/${raw}`;
+  const path = raw.startsWith('/') ? raw : `/${raw}`;
+  if (path.includes('/assets/images/mock/avatar/') && path.endsWith('.webp')) {
+    return path.replace(/\.webp$/, '.jpg');
+  }
+  return path;
 }
 
 export function UserAvatar({

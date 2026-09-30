@@ -636,16 +636,15 @@ a.auth-link:hover {
     grid-template-columns: 1fr;
     min-height: 100dvh;
     align-content: start;
-    background:
-      linear-gradient(180deg, rgba(7, 8, 13, 0.82) 0%, rgba(7, 8, 13, 0.9) 45%, rgba(7, 8, 13, 0.94) 100%),
-      radial-gradient(80% 50% at 50% 0%, rgba(0, 0, 0, 0.35), transparent 70%),
-      #07080d
-      url('/assets/hero/auth-login.png?v=4') center 28% / cover no-repeat;
+    background: var(--ba-page-ink);
   }
 
-  /* Hide cinematic hero panel on mobile; keep it on PC */
   .auth-hero {
-    display: none;
+    display: grid;
+    order: -1;
+    min-height: 0;
+    height: 34vh;
+    max-height: 280px;
   }
 
   .auth-form-pane {
@@ -654,13 +653,15 @@ a.auth-link:hover {
     padding: 16px 16px 28px;
     border-right: 0;
     justify-content: flex-start;
-    background: transparent;
+    background:
+      radial-gradient(70% 42% at 0% 0%, color-mix(in srgb, var(--ba-accent) 12%, transparent), transparent 58%),
+      var(--ba-page-ink);
   }
 
   .auth-card {
     padding: 16px 14px 14px;
     border-radius: 16px;
-    background: color-mix(in srgb, var(--ba-page-ink) 88%, transparent);
+    background: color-mix(in srgb, var(--ba-text) 4%, var(--ba-card));
   }
 
   .auth-toolbar {
@@ -726,9 +727,14 @@ a.auth-link:hover {
     font-size: 11px;
   }
 
+  .auth-hero .hero-vignette {
+    background:
+      linear-gradient(180deg, rgba(7, 8, 13, 0.08) 0%, rgba(7, 8, 13, 0.28) 100%);
+  }
+
   .auth-hero-shade {
     background:
-      linear-gradient(180deg, rgba(7, 8, 13, 0.15) 0%, rgba(7, 8, 13, 0.45) 55%, rgba(7, 8, 13, 0.92) 100%);
+      linear-gradient(180deg, rgba(7, 8, 13, 0.08) 0%, rgba(7, 8, 13, 0.22) 46%, rgba(7, 8, 13, 0.62) 100%);
   }
 
   .auth-hero-copy {

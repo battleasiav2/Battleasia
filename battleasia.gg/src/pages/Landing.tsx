@@ -8,7 +8,7 @@ import { useI18n } from '../lib/i18n';
 import { LocaleSelect } from '../components/LocaleSelect';
 import { DrawerIcons, MobileDrawer, type DrawerCard } from '../components/MobileDrawer';
 import { UserAvatar } from '../components/UserAvatar';
-import { fetchMe, isSignedIn, readSessionUser, clearSignedIn } from '../lib/auth';
+import { fetchMe, isSignedIn, readSessionUser, clearSignedIn, logout } from '../lib/auth';
 import { ThemeDock } from '../components/ThemeDock';
 import { coverForGame, fetchGames, gameKey, webpSrcSet } from '../lib/games';
 import { fetchAppDownload, formatApkSize, type AppDownloadInfo } from '../lib/app-download';
@@ -204,9 +204,7 @@ export function Landing({ openChat }: { openChat?: boolean }) {
         <header className="topbar">
           <a className="brand" href="#home">
             <img src={ASSETS.logo} width={40} height={40} alt="BattleAsia" />
-            <div className="brand-name">
-              BATTLE ASIA <span>2.0</span>
-            </div>
+            <div className="brand-name">BATTLE ASIA</div>
           </a>
           <button
             className="nav-burger"
@@ -244,9 +242,18 @@ export function Landing({ openChat }: { openChat?: boolean }) {
             ) : null}
             <ThemeDock />
             {inArena ? (
-              <Link className="btn btn-ghost" to="/user/play">
-                {t('nav.play')}
-              </Link>
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => {
+                  void logout().then(() => {
+                    setMe(null);
+                    setInArena(false);
+                  });
+                }}
+              >
+                {t('cta.signout')}
+              </button>
             ) : (
               <Link className="btn btn-ghost" to="/auth/sign-in">
                 {t('cta.signin')}
@@ -262,7 +269,7 @@ export function Landing({ openChat }: { openChat?: boolean }) {
           open={navOpen}
           onClose={closeNav}
           logo={ASSETS.logo}
-          title="BATTLE ASIA 2.0"
+          title="BATTLE ASIA"
           subtitle={t('drawer.tagline')}
           links={[
             { key: 'home', label: t('nav.home'), href: '#home', active: hash === '#home' || hash === '' },
@@ -330,7 +337,16 @@ export function Landing({ openChat }: { openChat?: boolean }) {
           }}
           footer={{
             icon: inArena
-              ? { label: t('nav.account'), icon: DrawerIcons.user, to: '/user/account/profile' }
+              ? {
+                  label: t('cta.signout'),
+                  icon: DrawerIcons.logout,
+                  onClick: () => {
+                    void logout().then(() => {
+                      setMe(null);
+                      setInArena(false);
+                    });
+                  },
+                }
               : { label: t('cta.signin'), icon: DrawerIcons.login, to: '/auth/sign-in' },
             primary: { label: t('cta.signup'), to: arenaTo },
           }}
@@ -340,9 +356,7 @@ export function Landing({ openChat }: { openChat?: boolean }) {
           <HeroVideo className="hero-media" priority />
           <div className="hero-grid">
             <div className="hero-copy">
-              <h1>
-                BATTLE ASIA <span>2.0</span>
-              </h1>
+              <h1><span>BATTLE ASIA</span></h1>
               <div className="eyebrow">{t('hero.eyebrow')}</div>
               <div className="hero-ctas">
                 <Link className="btn btn-primary" to={arenaTo}>
@@ -508,9 +522,7 @@ export function Landing({ openChat }: { openChat?: boolean }) {
             <p className="eyebrow">{t('about.eyebrow')}</p>
             <div className="about-brand">
               <img src={ASSETS.logo} width={56} height={56} alt="" />
-              <div className="brand-name">
-                BATTLE ASIA <span>2.0</span>
-              </div>
+              <div className="brand-name">BATTLE ASIA</div>
             </div>
             <h2>{t('about.title')}</h2>
             <p className="about-lead">{t('about.body')}</p>

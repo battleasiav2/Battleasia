@@ -280,8 +280,8 @@ export async function getPublicDashboardStats() {
       Match.countDocuments({ status: 'complete' }),
       Match.countDocuments({ status: 'start' }),
       countTodayJoinedUsers(),
-      aggregatePlayerStats('totalWinnings', 5),
-      aggregatePlayerStats('totalKills', 5),
+      aggregatePlayerStats('totalWinnings', 11),
+      aggregatePlayerStats('totalKills', 11),
       getOngoingMatchList(5),
       getTopMatchPerGame(['active', 'start'], 5),
     ]);

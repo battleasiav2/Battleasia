@@ -29,9 +29,7 @@ export function SiteFooter() {
         <div className="footer-brand">
           <img src={ASSETS.logoLg} width={36} height={36} alt="BattleAsia" />
           <div>
-            <div className="brand-name">
-              BATTLE ASIA <span>2.0</span>
-            </div>
+            <div className="brand-name">BATTLE ASIA</div>
             <p>{t('footer.tag')}</p>
           </div>
         </div>

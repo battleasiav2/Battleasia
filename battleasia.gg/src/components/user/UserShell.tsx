@@ -258,9 +258,15 @@ function UserChrome() {
           <Link className={location.pathname.startsWith('/user/play') ? 'active' : ''} to="/user/play">
             {t('nav.play')}
           </Link>
-          <Link className={location.pathname === '/user/shop' ? 'active' : ''} to="/user/shop">
+          <a
+            href="#shop"
+            onClick={(e) => {
+              e.preventDefault();
+              openBacShop('shop');
+            }}
+          >
             {t('nav.shop')}
-          </Link>
+          </a>
           <Link className={location.pathname.startsWith('/user/earn') ? 'active' : ''} to="/user/earn">
             {t('nav.earn')}
           </Link>
@@ -325,6 +331,17 @@ function UserChrome() {
             {alerts > 0 ? <span className="hud-dot">{alerts > 9 ? '9+' : alerts}</span> : null}
           </Link>
           <LocaleSelect />
+          <button
+            type="button"
+            className="hud-signout"
+            onClick={async () => {
+              disconnectSocket();
+              await logout();
+              navigate('/dashboard');
+            }}
+          >
+            {t('cta.signout')}
+          </button>
         </div>
         <button
           type="button"
@@ -389,7 +406,7 @@ function UserChrome() {
           { key: 'play', label: t('nav.play'), to: '/user/play', active: path.startsWith('/user/play') },
           { key: 'earn', label: t('nav.earn'), to: '/user/earn', active: path.startsWith('/user/earn') },
           { key: 'feed', label: t('nav.feed'), to: '/user/feed', active: path.startsWith('/user/feed') },
-          { key: 'shop', label: t('nav.shop'), to: '/user/shop', active: path === '/user/shop' },
+          { key: 'shop', label: t('nav.shop'), onClick: () => openBacShop('shop'), external: true },
           { key: 'transfer', label: t('nav.transfer'), onClick: () => openBacShop('transfer'), external: true },
         ]}
         section={{
