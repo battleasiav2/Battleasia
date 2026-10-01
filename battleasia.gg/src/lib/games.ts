@@ -148,6 +148,76 @@ function isMissingArt(src: string) {
   return /\/assets\/(images\/games\/art|games)\//.test(src);
 }
 
+const KNOWN_MAPS = [
+  'Erangel',
+  'Miramar',
+  'Sanhok',
+  'Vikendi',
+  'Livik',
+  'Rondo',
+  'Nusa',
+  'Karakin',
+  'Hanger',
+  'Gun',
+  'Warehouse',
+] as const;
+
+export type MapCoverKey = (typeof KNOWN_MAPS)[number];
+
+/** Slug for CSS `data-map` (lowercase file stem). */
+export function mapCoverKey(map?: string): MapCoverKey | '' {
+  const raw = (map || '').trim();
+  if (!raw) return '';
+  const hit = KNOWN_MAPS.find((m) => m.toLowerCase() === raw.toLowerCase());
+  return hit || '';
+}
+
+function localMapCover(map?: string) {
+  const key = mapCoverKey(map);
+  return key ? `/covers/maps/${key}.webp` : '';
+}
+
+function arenaCoverFromName(name?: string) {
+  const n = (name || '').toLowerCase();
+  if (n.includes('warehouse')) return '/covers/maps/Warehouse.webp';
+  if (n.includes('hanger') || n.includes('hangar')) return '/covers/maps/Hanger.webp';
+  if (n.includes('gun game') || /\bgun\b/.test(n)) return '/covers/maps/Gun.webp';
+  return '';
+}
+
+function modeCover(teamType?: string, gameMode?: string) {
+  const blob = `${teamType || ''} ${gameMode || ''}`.toLowerCase();
+  if (blob.includes('tdm') || blob.includes('deathmatch')) return '/covers/modes/tdm.webp';
+  if (blob.includes('solo')) return '/covers/modes/solo.webp';
+  if (blob.includes('duo')) return '/covers/modes/duo.webp';
+  if (blob.includes('squad')) return '/covers/modes/squad.webp';
+  return '';
+}
+
+function rewriteRemoteMapAsset(src: string) {
+  const hit = src.match(/\/assets\/images\/map\/([^/?#]+)/i);
+  if (!hit) return '';
+  const key = mapCoverKey(hit[1]);
+  return key ? `/covers/maps/${key}.webp` : '';
+}
+
+/** Per-room art: API banner → map → arena name → mode → game default. */
+export function coverForMatch(match: Pick<MatchItem, 'banner' | 'map' | 'matchName' | 'gameName' | 'teamType' | 'gameMode'>) {
+  const remote = (match.banner || '').trim();
+  if (remote) {
+    const localMap = rewriteRemoteMapAsset(remote);
+    if (localMap) return localMap;
+    if (!isMissingArt(remote) && !remote.startsWith('/covers/')) return remote;
+  }
+  const fromMap = localMapCover(match.map);
+  if (fromMap) return fromMap;
+  const fromArena = arenaCoverFromName(match.matchName);
+  if (fromArena) return fromArena;
+  const fromMode = modeCover(match.teamType, match.gameMode);
+  if (fromMode) return fromMode;
+  return coverForGame({ name: match.gameName, banner: match.banner });
+}
+
 /** Dark branded local art per game (always ships in /public/covers). */
 export function localCoverForGame(game: {
   name?: string;

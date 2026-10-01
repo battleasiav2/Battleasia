@@ -43,8 +43,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
   List<ReferralItemModel> _network = [];
   List<_CommissionItem> _commissions = [];
 
-  static const Color _panelBg = Color(0x61161618); // ~rgba(22,22,24,0.38)
-
   @override
   void initState() {
     super.initState();
@@ -157,18 +155,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
     }
   }
 
-  BoxDecoration get _panelDecoration => BoxDecoration(
-        color: _panelBg,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x70000000),
-            blurRadius: 40,
-            offset: Offset(0, 24),
-          ),
-        ],
-      );
+  BoxDecoration get _panelDecoration => AppTheme.surfaceCard(radius: 18);
 
   @override
   Widget build(BuildContext context) {
@@ -427,10 +414,13 @@ class _ReferralScreenState extends State<ReferralScreen> {
           Expanded(
             child: Text(
               value,
+              maxLines: large ? 2 : 4,
+              overflow: TextOverflow.ellipsis,
               style: AppTheme.bodyMedium.copyWith(
                 color: AppColors.textPrimary,
                 fontWeight: large ? FontWeight.w800 : FontWeight.w500,
                 fontSize: large ? 20 : 12,
+                height: 1.35,
               ),
             ),
           ),
@@ -469,46 +459,89 @@ class _ReferralScreenState extends State<ReferralScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              for (var i = 0; i < steps.length; i++) ...[
-                if (i > 0)
-                  Container(
-                    width: 1,
-                    height: 40,
-                    margin: const EdgeInsets.symmetric(horizontal: 6),
-                    color: Colors.white.withValues(alpha: 0.08),
-                  ),
-                Expanded(
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: AppColors.gold.withValues(alpha: 0.12),
-                          border: Border.all(
-                            color: AppColors.gold.withValues(alpha: 0.45),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final stacked = constraints.maxWidth < 520;
+              if (stacked) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (var i = 0; i < steps.length; i++) ...[
+                      if (i > 0)
+                        Divider(height: 20, color: Colors.white.withValues(alpha: 0.08)),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: AppColors.gold.withValues(alpha: 0.12),
+                              border: Border.all(
+                                color: AppColors.gold.withValues(alpha: 0.45),
+                              ),
+                            ),
+                            child: Icon(steps[i].$1, color: AppColors.gold, size: 16),
                           ),
-                        ),
-                        child: Icon(steps[i].$1, color: AppColors.gold, size: 16),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          steps[i].$2,
-                          style: AppTheme.bodySmall.copyWith(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 11,
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              steps[i].$2,
+                              style: AppTheme.bodySmall.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 12,
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
-                  ),
-                ),
-              ],
-            ],
+                  ],
+                );
+              }
+              return Row(
+                children: [
+                  for (var i = 0; i < steps.length; i++) ...[
+                    if (i > 0)
+                      Container(
+                        width: 1,
+                        height: 40,
+                        margin: const EdgeInsets.symmetric(horizontal: 6),
+                        color: Colors.white.withValues(alpha: 0.08),
+                      ),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: AppColors.gold.withValues(alpha: 0.12),
+                              border: Border.all(
+                                color: AppColors.gold.withValues(alpha: 0.45),
+                              ),
+                            ),
+                            child: Icon(steps[i].$1, color: AppColors.gold, size: 16),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              steps[i].$2,
+                              style: AppTheme.bodySmall.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ],
+              );
+            },
           ),
         ],
       ),

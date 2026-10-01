@@ -248,7 +248,7 @@ export function SupportChat({ forceOpen }: Props) {
                 <span className="online-dot" /> {settings.agentTitle}
               </small>
             </div>
-            <button type="button" onClick={() => setOpen(false)} aria-label={t('chat.close')}>
+            <button type="button" className="chat-close-btn" onClick={() => setOpen(false)} aria-label={t('chat.close')}>
               <IconClose size={16} />
             </button>
           </header>

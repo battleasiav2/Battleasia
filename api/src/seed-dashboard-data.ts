@@ -308,7 +308,7 @@ export async function seedDashboardData() {
       map: 'Erangel',
       banner: '',
       prizeDescription: 'Live premium squad — 5000 coin pool',
-      matchSponsor: 'Battle Asia 2.0',
+      matchSponsor: 'BattleAsia',
       matchDescription: 'Ongoing live match for public dashboard',
       status: 'start',
       results: [],

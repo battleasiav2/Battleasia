@@ -48,10 +48,7 @@
 
 .play-app {
   min-height: 100svh;
-  background:
-    radial-gradient(70% 42% at 10% 0%, color-mix(in srgb, var(--ba-accent) 18%, transparent), transparent 52%),
-    radial-gradient(50% 32% at 92% 8%, color-mix(in srgb, var(--ba-accent-b) 10%, transparent), transparent 58%),
-    var(--ba-page);
+  background: var(--ba-page);
   color: var(--ba-text);
 }
 
@@ -580,12 +577,9 @@
   margin-top: 22px;
   padding: 18px;
   border-radius: 28px;
-  border: 1px solid color-mix(in srgb, var(--ba-accent) 16%, rgba(255, 255, 255, 0.1));
-  background:
-    radial-gradient(80% 60% at 0% 0%, color-mix(in srgb, var(--ba-accent) 10%, transparent), transparent 55%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 36%),
-    rgba(14, 16, 24, 0.78);
-  box-shadow: 0 24px 50px -32px rgba(0, 0, 0, 0.85);
+  border: 1px solid var(--ba-card-border);
+  background: color-mix(in srgb, var(--ba-accent) 3%, var(--ba-page));
+  box-shadow: none;
 }
 
 /* Flat stages: no outer card chrome */
@@ -655,6 +649,11 @@
   grid-template-columns: minmax(140px, 1.2fr) minmax(120px, 0.9fr) 120px 120px;
 }
 
+.wallet-table.cols-3 .result-head,
+.wallet-table.cols-3 .result-row {
+  grid-template-columns: minmax(0, 1.35fr) minmax(88px, 0.85fr) minmax(96px, 0.95fr);
+}
+
 .hub-stage .room-card h2 {
   margin-top: 0;
 }
@@ -712,13 +711,7 @@
   flex-direction: column;
   text-decoration: none;
   color: inherit;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 22px;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 36%),
-    rgba(255, 255, 255, 0.035);
-  box-shadow: 0 22px 48px -26px rgba(0, 0, 0, 0.9);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 
@@ -1086,20 +1079,14 @@
   grid-template-areas:
     'art copy join'
     'art meta join';
-  gap: 10px 16px;
+  gap: 8px 14px;
   align-items: center;
   width: 100%;
   text-align: left;
-  padding: 12px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background:
-    linear-gradient(105deg, rgba(255, 255, 255, 0.06) 0%, transparent 42%),
-    rgba(16, 18, 26, 0.92);
+  padding: 10px 12px;
   color: inherit;
   cursor: pointer;
-  box-shadow: 0 14px 36px -28px rgba(0, 0, 0, 0.9);
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
 .match-banner {
@@ -1146,27 +1133,15 @@
 }
 
 .match-row.is-selected {
-  border-color: color-mix(in srgb, var(--ba-accent) 78%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--ba-accent) 42%, transparent),
-    0 0 32px -10px var(--ba-accent-glow),
-    inset 0 0 0 1px color-mix(in srgb, var(--ba-accent) 16%, transparent);
+  border-color: color-mix(in srgb, var(--ba-accent) 22%, var(--ba-card-border));
 }
 
 .match-row.is-mine-joined {
   order: -1;
-  border-color: color-mix(in srgb, #3dd68c 55%, transparent);
-  background:
-    linear-gradient(105deg, color-mix(in srgb, #3dd68c 14%, transparent) 0%, transparent 48%),
-    rgba(16, 18, 26, 0.96);
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, #3dd68c 28%, transparent),
-    0 0 36px -12px rgba(61, 214, 140, 0.55);
-  animation: ba-joined-pulse 1.6s ease-out 1;
 }
 
 .match-row.is-mine-joined.is-selected {
-  border-color: color-mix(in srgb, #3dd68c 80%, var(--ba-accent));
+  border-color: color-mix(in srgb, #3dd68c 28%, var(--ba-card-border));
 }
 
 .match-row.is-mine-joined .match-status.is-joined {
@@ -1225,6 +1200,18 @@
 .match-banner[data-game='valorant'] { background-image: url('/covers/valorant.webp?v=5'); }
 .match-banner[data-game='mlbb'] { background-image: url('/covers/mlbb.webp?v=5'); }
 
+.match-banner[data-map='erangel'] { background-image: url('/covers/maps/Erangel.webp'); }
+.match-banner[data-map='miramar'] { background-image: url('/covers/maps/Miramar.webp'); }
+.match-banner[data-map='sanhok'] { background-image: url('/covers/maps/Sanhok.webp'); }
+.match-banner[data-map='vikendi'] { background-image: url('/covers/maps/Vikendi.webp'); }
+.match-banner[data-map='livik'] { background-image: url('/covers/maps/Livik.webp'); }
+.match-banner[data-map='rondo'] { background-image: url('/covers/maps/Rondo.webp'); }
+.match-banner[data-map='nusa'] { background-image: url('/covers/maps/Nusa.webp'); }
+.match-banner[data-map='karakin'] { background-image: url('/covers/maps/Karakin.webp'); }
+.match-banner[data-map='warehouse'] { background-image: url('/covers/maps/Warehouse.webp'); }
+.match-banner[data-map='hanger'] { background-image: url('/covers/maps/Hanger.webp'); }
+.match-banner[data-map='gun'] { background-image: url('/covers/maps/Gun.webp'); }
+
 .match-copy {
   display: flex;
   flex-direction: column;
@@ -1245,8 +1232,15 @@
 .match-meta {
   display: flex;
   align-items: center;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 12px 16px;
   min-width: 0;
+}
+
+.match-table .match-status.is-active,
+.match-table .match-status.is-start,
+.match-table .match-status.is-upcoming {
+  display: none;
 }
 
 .match-stat {
@@ -1367,12 +1361,6 @@
 .match-facts article {
   min-height: 108px;
   padding: 16px 14px 14px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 42%),
-    #12141c;
-  box-shadow: 0 18px 40px -28px rgba(0, 0, 0, 0.9);
 }
 
 .match-facts small {
@@ -4018,17 +4006,10 @@ a.hist-item-link {
 .room-card,
 .lobby-grid > * {
   padding: 22px;
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 40%),
-    rgba(14, 16, 24, 0.92);
 }
 
 .match-row:hover {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--ba-accent) 45%, transparent);
-  box-shadow: 0 12px 28px -22px var(--ba-accent-glow);
+  border-color: color-mix(in srgb, var(--ba-accent) 14%, var(--ba-card-border));
 }
 
 .play-empty {
@@ -4312,10 +4293,13 @@ a.hist-item-link {
 }
 
 .play-card:hover::before,
-.match-row:hover::after,
 .result-row:hover::after,
 .room-card:hover::before {
   opacity: 1;
+}
+
+.match-row:hover::after {
+  opacity: 0;
 }
 
 .spot-bar {
@@ -4902,10 +4886,16 @@ a.hist-item-link {
     -webkit-overflow-scrolling: touch;
   }
 
-  .wallet-table .result-head,
-  .wallet-table .result-row {
+  .wallet-table:not(.cols-3) .result-head,
+  .wallet-table:not(.cols-3) .result-row {
     grid-template-columns: minmax(110px, 1.2fr) minmax(90px, 0.9fr) minmax(88px, 100px) minmax(88px, 110px);
     min-width: 420px;
+  }
+
+  .wallet-table.cols-3 .result-head,
+  .wallet-table.cols-3 .result-row {
+    min-width: 0;
+    grid-template-columns: minmax(0, 1.2fr) minmax(72px, 0.8fr) minmax(88px, 0.95fr);
   }
 }
 

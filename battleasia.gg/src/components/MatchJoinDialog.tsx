@@ -1,7 +1,7 @@
 import { CoinValue } from './CoinValue';
 import { SpotBar } from './SpotBar';
 import { isDemoMatchId } from '../lib/demoMatches';
-import { coverForGame, formatWhen, localCoverForGame, spotsLeft, type MatchItem } from '../lib/games';
+import { coverForMatch, formatWhen, localCoverForGame, spotsLeft, type MatchItem } from '../lib/games';
 import { useI18n } from '../lib/i18n';
 
 type Props = {
@@ -23,6 +23,7 @@ export function MatchJoinDialog({ match, balance, joining, error, onClose, onCon
   const isFull = left <= 0;
   const used = match.participantsCount || 0;
   const cap = match.totalPlayer || 0;
+  const joinCover = coverForMatch(match);
   const gameRef = { name: match.gameName, banner: match.banner };
   const localCover = localCoverForGame(gameRef);
   const demo = isDemoMatchId(match.id);
@@ -69,15 +70,14 @@ export function MatchJoinDialog({ match, balance, joining, error, onClose, onCon
 
           <div className="join-map-card">
             <img
-              src={localCover}
+              src={joinCover}
               alt=""
               width={480}
               height={200}
               onError={(e) => {
                 const img = e.currentTarget;
-                const webp = coverForGame({ name: match.gameName });
-                if (img.src.includes('.svg') && webp !== img.getAttribute('src')) {
-                  img.src = webp;
+                if (img.getAttribute('src') !== localCover) {
+                  img.src = localCover;
                   return;
                 }
                 img.src = '/covers/arena.svg';

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
+import 'package:battleasia_app/core/utils/match_cover_utils.dart';
 import 'package:battleasia_app/core/utils/match_capacity_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/utils/date_utils.dart' as date_utils;
@@ -41,18 +42,28 @@ class MatchCard extends StatefulWidget {
 
 class _MatchCardState extends State<MatchCard> {
   Widget _buildMaskedBanner(String bannerUrl) {
+    final fallback = Image.asset(
+      'assets/images/game.webp',
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+    );
+    if (bannerUrl.startsWith('assets/')) {
+      return Image.asset(
+        bannerUrl,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        errorBuilder: (_, __, ___) => fallback,
+      );
+    }
     return ImageUtils.networkImage(
       bannerUrl,
       fit: BoxFit.cover,
       width: double.infinity,
       height: double.infinity,
       memCacheWidth: 900,
-      errorWidget: Image.asset(
-        'assets/images/game.webp',
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: double.infinity,
-      ),
+      errorWidget: fallback,
     );
   }
 
@@ -62,8 +73,7 @@ class _MatchCardState extends State<MatchCard> {
   }
 
   Widget _buildCard() {
-    final bannerUrl =
-        ImageUtils.getImageUrl(widget.match.banner) ?? 'assets/images/game.webp';
+    final bannerUrl = MatchCoverUtils.resolve(widget.match);
     final buttonDisabled = widget.joining || widget.isJoined || !widget.canJoin;
 
     final cardHeight = ResponsiveUtils.getResponsiveSpacing(
@@ -80,20 +90,7 @@ class _MatchCardState extends State<MatchCard> {
         children: [
           Container(
             height: cardHeight,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-              color: const Color(0xB8161618),
-              border: Border.all(
-                color: Colors.white.withValues(alpha: 0.09),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.45),
-                  blurRadius: 24,
-                  offset: const Offset(0, 12),
-                ),
-              ],
-            ),
+            decoration: AppTheme.surfaceCard(radius: 18),
             child: Stack(
               children: [
                 Row(
@@ -104,12 +101,6 @@ class _MatchCardState extends State<MatchCard> {
                       child: _buildMatchInfoSection(buttonDisabled),
                     ),
                   ],
-                ),
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(height: 2, color: AppColors.gold),
                 ),
               ],
             ),

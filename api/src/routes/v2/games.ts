@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, type Response } from 'express';
 import { Game } from '../../models/Game.js';
 import { Match } from '../../models/Match.js';
 import { MatchParticipant } from '../../models/MatchParticipant.js';
@@ -16,6 +16,7 @@ import { bumpSeasonPassXp } from '../../utils/engagement-season-pass.js';
 import { touchWelcomeEligibility } from '../../utils/engagement-welcome.js';
 import { recordFingerprint } from '../../utils/fingerprint.js';
 import { MatchReport } from '../../models/MatchReport.js';
+import { MatchChat } from '../../models/MatchChat.js';
 import mongoose from 'mongoose';
 
 const router = Router();
@@ -380,7 +381,7 @@ router.post('/matches/:id/leave', requireAuth, async (req: AuthedRequest, res) =
   }
 });
 
-router.patch('/matches/:id/ready', requireAuth, async (req: AuthedRequest, res) => {
+async function setMatchReady(req: AuthedRequest, res: Response) {
   try {
     const match = await Match.findById(req.params.id);
     if (!match) return res.status(404).json({ status: false, message: 'Match not found' });
@@ -398,6 +399,61 @@ router.patch('/matches/:id/ready', requireAuth, async (req: AuthedRequest, res) 
   } catch (error) {
     console.error('v2 ready error:', error);
     return res.status(500).json({ status: false, message: 'Failed to update ready' });
+  }
+}
+
+router.patch('/matches/:id/ready', requireAuth, setMatchReady);
+router.post('/matches/:id/ready', requireAuth, setMatchReady);
+
+router.get('/matches/:id/chat', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const match = await Match.findById(req.params.id).select('_id');
+    if (!match) return res.status(404).json({ status: false, message: 'Match not found' });
+    const part = await MatchParticipant.findOne({ matchId: match._id, userId: req.userId }).select('_id');
+    if (!part) return res.status(403).json({ status: false, message: 'Join the match first' });
+    const rows = await MatchChat.find({ matchId: match._id }).sort({ createdAt: 1 }).limit(200).lean();
+    return res.json({
+      status: true,
+      data: rows.map((row) => ({
+        id: String(row._id),
+        username: row.username || 'Player',
+        message: row.message,
+        createdAt: row.createdAt,
+      })),
+    });
+  } catch (error) {
+    console.error('v2 match chat list error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to load chat' });
+  }
+});
+
+router.post('/matches/:id/chat', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const message = String(req.body?.message || '').trim();
+    if (!message) return res.status(400).json({ status: false, message: 'Message required' });
+    const match = await Match.findById(req.params.id).select('_id');
+    if (!match) return res.status(404).json({ status: false, message: 'Match not found' });
+    const part = await MatchParticipant.findOne({ matchId: match._id, userId: req.userId }).select('_id');
+    if (!part) return res.status(403).json({ status: false, message: 'Join the match first' });
+    const user = await User.findById(req.userId).select('username').lean();
+    const saved = await MatchChat.create({
+      matchId: match._id,
+      userId: req.userId,
+      username: String(user?.username || 'Player').slice(0, 40),
+      message: message.slice(0, 500),
+    });
+    return res.json({
+      status: true,
+      data: {
+        id: saved._id.toString(),
+        username: saved.username,
+        message: saved.message,
+        createdAt: saved.createdAt,
+      },
+    });
+  } catch (error) {
+    console.error('v2 match chat send error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to send chat' });
   }
 });
 

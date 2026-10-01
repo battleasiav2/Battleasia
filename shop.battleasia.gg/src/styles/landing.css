@@ -359,11 +359,7 @@
 }
 
 .glass-card {
-  background: rgba(18, 20, 28, 0.72);
-  border: 1px solid var(--ba-hair);
-  border-radius: 16px;
   padding: 14px 16px;
-  backdrop-filter: blur(12px);
 }
 
 .glass-card small {

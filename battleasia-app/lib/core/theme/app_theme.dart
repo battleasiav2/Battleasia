@@ -80,6 +80,25 @@ class AppTheme {
     fontFamily: 'Poppins',
   );
 
+  /// Framed panel cards — flat #161618 + ~5% accent tint (web `cards.css`).
+  static BoxDecoration surfaceCard({double radius = 20}) {
+    return BoxDecoration(
+      borderRadius: BorderRadius.circular(radius),
+      color: Color.alphaBlend(
+        AppColors.gold.withValues(alpha: 0.05),
+        AppColors.panel,
+      ),
+      border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+      boxShadow: const [
+        BoxShadow(
+          color: Color(0x70000000),
+          blurRadius: 40,
+          offset: Offset(0, 22),
+        ),
+      ],
+    );
+  }
+
   static ThemeData get darkTheme {
     return ThemeData(
       useMaterial3: true,

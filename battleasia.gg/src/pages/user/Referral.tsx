@@ -72,7 +72,7 @@ export function ReferralPage() {
   }
 
   return (
-    <main className="play-main">
+    <main className="play-main refer-page">
       <header className="play-head">
         <div>
           <p className="eyebrow">{t('ref.eyebrow')}</p>
@@ -181,7 +181,7 @@ export function ReferralPage() {
             <p>{t('ref.emptyLead')}</p>
           </div>
         ) : (
-          <div className="wallet-table result-table">
+          <div className="wallet-table result-table cols-3">
             <div className="result-head">
               <span>{t('ref.player')}</span>
               <span>{t('ref.status')}</span>
@@ -189,9 +189,11 @@ export function ReferralPage() {
             </div>
             {people.map((row) => (
               <div className="result-row" key={row.id}>
-                <span>{row.username}</span>
-                <span className={`xfer-dir ${statusTone(row.status)}`}>{statusLabel(row.status)}</span>
-                <span>
+                <span data-label={t('ref.player')}>{row.username}</span>
+                <span className={`xfer-dir ${statusTone(row.status)}`} data-label={t('ref.status')}>
+                  {statusLabel(row.status)}
+                </span>
+                <span data-label={t('ref.earned')}>
                   <CoinValue value={row.totalEarnings ?? 0} />
                 </span>
               </div>
@@ -205,19 +207,19 @@ export function ReferralPage() {
         {history.length === 0 ? (
           <p className="play-muted">{t('ref.noHist')}</p>
         ) : (
-          <div className="wallet-table result-table">
+          <div className="wallet-table result-table cols-3">
             <div className="result-head">
               <span>{t('ref.player')}</span>
               <span>{t('ref.earned')}</span>
-              <span>{t('xfer.when') || 'When'}</span>
+              <span>{t('xfer.when')}</span>
             </div>
             {history.map((row) => (
               <div className="result-row" key={row.id}>
-                <span>{row.referredUsername || '—'}</span>
-                <span>
+                <span data-label={t('ref.player')}>{row.referredUsername || '—'}</span>
+                <span data-label={t('ref.earned')}>
                   <CoinValue value={row.commissionAmount ?? 0} />
                 </span>
-                <span>{whenLabel(row.createdAt)}</span>
+                <span data-label={t('xfer.when')}>{whenLabel(row.createdAt)}</span>
               </div>
             ))}
           </div>

@@ -30,9 +30,7 @@
 
 .play-app {
   min-height: 100svh;
-  background:
-    radial-gradient(70% 40% at 12% 0%, rgba(124, 92, 255, 0.16), transparent 50%),
-    var(--ba-page);
+  background: var(--ba-page);
   color: var(--ba-text);
 }
 
@@ -191,10 +189,7 @@
   flex-direction: column;
   text-decoration: none;
   color: inherit;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.03);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -775,11 +770,6 @@ a.result-row {
 
 .room-card {
   padding: 22px;
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 40%),
-    rgba(14, 16, 24, 0.92);
 }
 
 .hub-stage {

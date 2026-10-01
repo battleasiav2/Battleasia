@@ -19,7 +19,6 @@ import { openBacShop } from '../../lib/wallet';
 const DeferredSupportChat = lazy(() =>
   import('../SupportChat').then((m) => ({ default: m.DeferredSupportChat })),
 );
-const SocialFab = lazy(() => import('../SocialFab').then((m) => ({ default: m.SocialFab })));
 
 function inEditable(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false;
@@ -242,7 +241,7 @@ function UserChrome() {
         <Link className="brand" to="/dashboard">
           <img src={ASSETS.logo} width={44} height={44} alt="BattleAsia" />
           <div className="brand-name">
-            BATTLE ASIA <span>2.0</span>
+            BATTLE ASIA
           </div>
         </Link>
         <button
@@ -400,7 +399,7 @@ function UserChrome() {
         open={navOpen}
         onClose={closeNav}
         logo={ASSETS.logo}
-        title="BATTLE ASIA 2.0"
+        title="BATTLE ASIA"
         subtitle={t('drawer.tagline')}
         links={[
           { key: 'play', label: t('nav.play'), to: '/user/play', active: path.startsWith('/user/play') },
@@ -477,7 +476,6 @@ function UserChrome() {
         <Outlet context={{ toast, setBalance, balance, muted }} />
       </ErrorBoundary>
       <Suspense fallback={null}>
-        <SocialFab />
         <DeferredSupportChat />
       </Suspense>
       {toastText ? <div className="play-toast" role="status">{toastText}</div> : null}

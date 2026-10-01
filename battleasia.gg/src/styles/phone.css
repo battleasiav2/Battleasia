@@ -587,8 +587,18 @@ svg {
     right: 12px;
     left: 12px;
     width: auto;
-    bottom: 88px;
-    height: min(420px, 70svh);
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    height: min(520px, 72svh);
+    border-radius: 20px;
+  }
+
+  .chat-panel.origin-tr {
+    top: calc(72px + env(safe-area-inset-top, 0px));
+  }
+
+  .chat-log {
+    margin-left: 12px;
+    margin-right: 12px;
   }
 
   .chat-fab {

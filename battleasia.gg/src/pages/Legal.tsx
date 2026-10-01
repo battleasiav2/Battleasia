@@ -20,7 +20,7 @@ export function LegalPage({ kind }: { kind: 'privacy' | 'terms' | 'notFound' }) 
           <Link className="brand" to="/dashboard">
             <img src={ASSETS.logo} width={40} height={40} alt="BattleAsia" />
             <div className="brand-name">
-              BATTLE ASIA <span>2.0</span>
+              BATTLE ASIA
             </div>
           </Link>
           <div className="top-actions" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

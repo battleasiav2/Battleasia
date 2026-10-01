@@ -147,13 +147,57 @@ class _AuthHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Image.asset(
-        'assets/images/hero/auth-login.webp',
-        width: double.infinity,
-        fit: BoxFit.contain,
-        alignment: Alignment.center,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.gold.withValues(alpha: 0.22)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gold.withValues(alpha: 0.14),
+            blurRadius: 48,
+            spreadRadius: -8,
+          ),
+        ],
+        gradient: RadialGradient(
+          center: const Alignment(0, -0.45),
+          radius: 1.05,
+          colors: [
+            AppColors.gold.withValues(alpha: 0.2),
+            const Color(0xFF07080d),
+          ],
+          stops: const [0.0, 0.72],
+        ),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Image.asset(
+              'assets/images/hero/auth-login.webp',
+              width: double.infinity,
+              fit: BoxFit.contain,
+              alignment: Alignment.center,
+            ),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: Alignment.center,
+                      radius: 0.95,
+                      colors: [
+                        Colors.transparent,
+                        const Color(0xFF07080d).withValues(alpha: 0.55),
+                      ],
+                      stops: const [0.42, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -440,7 +484,7 @@ class AuthPrimaryButton extends StatelessWidget {
         onPressed: loading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          foregroundColor: AppColors.goldInk,
+          foregroundColor: Colors.white,
           disabledForegroundColor: Colors.white.withValues(alpha: 0.32),
           backgroundColor: AppTheme.accentColor,
           disabledBackgroundColor: Colors.white.withValues(alpha: 0.08),
@@ -458,9 +502,9 @@ class AuthPrimaryButton extends StatelessWidget {
             ? SizedBox(
                 width: 18,
                 height: 18,
-                child: CircularProgressIndicator(
+                child: const CircularProgressIndicator(
                   strokeWidth: 2,
-                  color: AppColors.goldInk,
+                  color: Colors.white,
                 ),
               )
             : Text(

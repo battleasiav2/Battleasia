@@ -138,6 +138,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     return AuthFormShell(
       wide: true,
+      showTrustRow: true,
       progress: progress,
       title: 'auth.createAccountTitle'.tr(),
       description: 'auth.signUpStepsDescription'.tr(),

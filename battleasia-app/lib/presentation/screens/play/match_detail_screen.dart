@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
-import 'package:battleasia_app/core/utils/image_utils.dart';
+import 'package:battleasia_app/core/utils/match_cover_utils.dart';
 import 'package:battleasia_app/core/utils/match_capacity_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/utils/date_utils.dart' as date_utils;
@@ -243,9 +243,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       );
     }
 
-    final bannerUrl =
-        ImageUtils.getImageUrl(_matchDetail!.banner) ??
-        'assets/images/game.webp';
+    final bannerUrl = MatchCoverUtils.resolve(_matchDetail!);
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,

@@ -10,8 +10,9 @@ import { isDemoMatchId } from '../../lib/demoMatches';
 import { httpCopy } from '../../lib/form';
 import {
   checkJoin,
-  coverForGame,
+  coverForMatch,
   estimateMatchWinningPool,
+  mapCoverKey,
   fetchGames,
   fetchMatches,
   formatWhen,
@@ -337,6 +338,8 @@ export function MatchListPage() {
                 const used = match.participantsCount || 0;
                 const cap = match.totalPlayer || 0;
                 const prize = estimateMatchWinningPool(match);
+                const cover = coverForMatch(match);
+                const mapKey = mapCoverKey(match.map);
                 return (
                   <div
                     key={match.id}
@@ -352,14 +355,20 @@ export function MatchListPage() {
                       }
                     }}
                   >
-                    <span className="match-banner" data-game={gameKey({ name: match.gameName, banner: match.banner })}>
+                    <span
+                      className="match-banner"
+                      data-map={mapKey ? mapKey.toLowerCase() : undefined}
+                      data-game={mapKey ? undefined : gameKey({ name: match.gameName, banner: match.banner })}
+                    >
                       <img
-                        src={coverForGame({ name: match.gameName, banner: match.banner })}
-                        srcSet={webpSrcSet(coverForGame({ name: match.gameName, banner: match.banner }), 220, 440)}
-                        sizes="128px"
+                        src={cover}
+                        srcSet={webpSrcSet(cover, 220, 440)}
+                        sizes="(max-width: 820px) 88px, 128px"
                         alt=""
                         width={220}
                         height={124}
+                        loading="lazy"
+                        decoding="async"
                         onError={(e) => {
                           const img = e.currentTarget;
                           const local = localCoverForGame({ name: match.gameName });

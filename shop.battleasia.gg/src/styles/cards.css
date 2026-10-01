@@ -1,0 +1,104 @@
+/* Shared card shell — flat panel + ~5% accent tint (see tokens --ba-card-bg) */
+
+.room-card,
+.lobby-grid > *,
+.play-card,
+.match-facts article,
+.glass-card,
+.battle-card,
+.match-row,
+.match-card,
+.legal-stack section,
+.play-sheet-card,
+.signin-panel,
+.roster li,
+.m-drawer-card,
+.earn-mod,
+.play-sheet-card.join-dialog,
+.board-podium-card {
+  background: var(--ba-card-bg);
+  border: 1px solid var(--ba-card-border);
+  box-shadow: var(--ba-card-shadow);
+}
+
+.room-card,
+.lobby-grid > *,
+.signin-panel,
+.legal-stack section,
+.play-sheet-card,
+.play-sheet-card.join-dialog {
+  border-radius: var(--ba-card-radius);
+}
+
+.play-card {
+  border-radius: calc(var(--ba-card-radius) + 2px);
+}
+
+.match-facts article,
+.battle-card,
+.roster li,
+.m-drawer-card,
+.earn-mod {
+  border-radius: calc(var(--ba-card-radius) - 2px);
+}
+
+.glass-card {
+  border-radius: var(--ba-card-radius);
+  background: var(--ba-card-bg);
+  backdrop-filter: blur(10px);
+}
+
+.match-row,
+.match-card {
+  border-radius: calc(var(--ba-card-radius) - 2px);
+}
+
+.play-card:hover,
+.room-card:hover,
+.battle-card:hover,
+.glass-card:hover,
+.match-card:hover,
+.m-drawer-card:hover {
+  border-color: color-mix(in srgb, var(--ba-accent) 14%, var(--ba-card-border));
+}
+
+.match-row.is-mine-joined {
+  background: color-mix(in srgb, #3dd68c 5%, var(--ba-panel));
+  border-color: color-mix(in srgb, #3dd68c 18%, var(--ba-card-border));
+}
+
+/* Landing game tiles — portrait frame (layout stays per section) */
+.hex-frame {
+  clip-path: none;
+  aspect-ratio: 3 / 4.35;
+  border-radius: 8px;
+  border: 1px solid var(--ba-card-frame);
+  box-shadow: var(--ba-card-shadow);
+  background: var(--ba-panel);
+}
+
+.hex h3 {
+  font-family: var(--ba-font-display);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--ba-accent) 78%, var(--ba-text));
+}
+
+.hex span {
+  color: color-mix(in srgb, var(--ba-accent) 55%, var(--ba-muted));
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mode-card-media {
+  border: 1px solid var(--ba-card-border);
+  box-shadow: none;
+  border-radius: 8px;
+}
+
+.mode-card h3 {
+  color: color-mix(in srgb, var(--ba-accent) 72%, var(--ba-text));
+}

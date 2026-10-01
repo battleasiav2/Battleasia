@@ -8,7 +8,7 @@ import { isApiError } from '../../lib/api';
 import { createLab, fetchP2Flags } from '../../lib/p2';
 import {
   checkJoin,
-  coverForGame,
+  coverForMatch,
   estimateMatchWinningPool,
   fetchChat,
   fetchMatch,
@@ -389,7 +389,7 @@ export function MatchDetailPage() {
       <div className="play-stage">
         <div className={`match-hero${match.banner || match.gameName ? '' : ' is-empty'}`}>
           <img
-            src={coverForGame({ name: match.gameName, banner: match.banner })}
+            src={coverForMatch(match)}
             alt=""
             width={1260}
             height={420}

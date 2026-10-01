@@ -201,6 +201,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
     return AuthFormShell(
       heroAfter: true,
+      showTrustRow: true,
       title: widget.titleKey.tr(),
       description: 'auth.signInDescription'.tr(),
       child: AutofillGroup(

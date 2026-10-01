@@ -10,6 +10,7 @@ import { focusFirstError, httpCopy, readRememberedEmail, sanitizeLine, writeReme
 import { registerPushToken } from '../../lib/push';
 import { captureReferral } from '../../lib/ref';
 import { useI18n } from '../../lib/i18n';
+import { AuthTrustRow } from '../../components/auth/AuthTrustRow';
 
 export function SignInPage() {
   const { t } = useI18n();
@@ -90,7 +91,9 @@ export function SignInPage() {
           <p className="signin-tagline">
             {t('auth.promo.line1')} {t('auth.promo.line2')}
           </p>
-          <img className="signin-art" src="/assets/hero/auth-login.webp?v=5" alt="" width={853} height={634} />
+          <div className="signin-art-wrap">
+            <img className="signin-art" src="/assets/hero/auth-login.webp?v=5" alt="" width={853} height={634} />
+          </div>
           <p className="signin-foot">{t('auth.promo.lead')}</p>
         </section>
 
@@ -138,6 +141,7 @@ export function SignInPage() {
           <Link className="signin-alt" to="/auth/sign-up">
             {t('auth.create')}
           </Link>
+          <AuthTrustRow />
         </form>
       </div>
     </div>

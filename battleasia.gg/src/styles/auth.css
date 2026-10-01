@@ -879,18 +879,46 @@ a.auth-link:hover {
   color: var(--ba-accent);
 }
 
-.signin-art {
+.signin-art-wrap {
+  position: relative;
   width: min(100%, 460px);
+  margin: 0 auto;
+  border-radius: 16px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid color-mix(in srgb, var(--ba-accent) 22%, transparent);
+  background:
+    radial-gradient(ellipse 90% 65% at 50% 18%, color-mix(in srgb, var(--ba-accent) 26%, transparent), transparent 62%),
+    var(--ba-page-ink);
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.35),
+    0 0 48px color-mix(in srgb, var(--ba-accent) 14%, transparent);
+}
+
+.signin-art-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 88% 72% at 50% 48%, transparent 40%, color-mix(in srgb, var(--ba-page-ink) 82%, transparent) 100%),
+    linear-gradient(180deg, transparent 58%, color-mix(in srgb, var(--ba-page-ink) 70%, transparent));
+}
+
+.signin-art {
+  position: relative;
+  z-index: 1;
+  width: 100%;
   height: auto;
   aspect-ratio: 853 / 634;
   object-fit: contain;
   object-position: center;
-  background: #000;
-  border-radius: 16px;
-  margin: 0 auto;
+  background: transparent;
+  margin: 0;
   display: block;
-  border: 1px solid color-mix(in srgb, var(--ba-text) 12%, transparent);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
 }
 
 .signin-foot {
@@ -902,11 +930,7 @@ a.auth-link:hover {
 }
 
 .signin-panel {
-  background: var(--ba-card);
-  border-radius: 20px;
   padding: 36px 40px 32px;
-  border: 1px solid color-mix(in srgb, var(--ba-text) 10%, transparent);
-  box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.6);
 }
 
 .signin-panel h1 {
@@ -984,16 +1008,16 @@ form.signin-panel,
   min-height: 48px;
   border: 0;
   border-radius: 9px;
-  background: var(--ba-accent);
-  color: var(--ba-gold-ink);
+  background: linear-gradient(90deg, var(--ba-accent), var(--ba-accent-b));
+  color: #fff;
   font-size: 15.5px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 8px 18px -6px var(--ba-accent-glow);
+  box-shadow: 0 8px 24px -10px var(--ba-accent-glow);
 }
 
 .signin-submit:hover {
-  background: var(--ba-accent-hover);
+  filter: brightness(1.06);
 }
 
 .signin-submit:disabled {
@@ -1184,13 +1208,19 @@ form.signin-panel,
 
 .signin-panel .btn-primary {
   border: 0;
-  color: var(--ba-gold-ink);
-  background: var(--ba-accent);
-  box-shadow: 0 8px 18px -6px var(--ba-accent-glow);
+  color: #fff;
+  background: linear-gradient(90deg, var(--ba-accent), var(--ba-accent-b));
+  box-shadow: 0 8px 24px -10px var(--ba-accent-glow);
 }
 
 .signin-panel .btn-primary:hover {
-  background: var(--ba-accent-hover);
+  filter: brightness(1.06);
+}
+
+.signin-panel .auth-trust {
+  margin-top: 18px;
+  padding-top: 14px;
+  justify-content: center;
 }
 
 .signin-panel .btn-ghost {

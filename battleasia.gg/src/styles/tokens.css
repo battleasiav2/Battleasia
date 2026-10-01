@@ -2,7 +2,13 @@
   --ba-page: #0e0f14;
   --ba-page-ink: #07080d;
   --ba-surface: #171922;
-  --ba-card: #12141c;
+  --ba-card: #161618;
+  --ba-panel: #161618;
+  --ba-card-border: rgba(255, 255, 255, 0.08);
+  --ba-card-frame: color-mix(in srgb, var(--ba-accent) 8%, rgba(255, 255, 255, 0.1));
+  --ba-card-radius: 20px;
+  --ba-card-shadow: 0 18px 44px -32px rgba(0, 0, 0, 0.82);
+  --ba-card-bg: color-mix(in srgb, var(--ba-accent) 5%, var(--ba-panel));
   --ba-text: #f4f5f7;
   --ba-muted: #9aa0b4;
   --ba-hair: rgba(255, 255, 255, 0.1);
@@ -95,6 +101,11 @@ html[data-theme='light'] {
   --ba-page-ink: #f7f8fb;
   --ba-surface: #ffffff;
   --ba-card: #ffffff;
+  --ba-panel: #ffffff;
+  --ba-card-border: rgba(18, 19, 26, 0.1);
+  --ba-card-frame: color-mix(in srgb, var(--ba-accent) 8%, rgba(18, 19, 26, 0.12));
+  --ba-card-shadow: 0 18px 40px -28px rgba(18, 19, 26, 0.14);
+  --ba-card-bg: color-mix(in srgb, var(--ba-accent) 4%, var(--ba-panel));
   --ba-text: #12131a;
   --ba-muted: #5b6070;
   --ba-hair: rgba(18, 19, 26, 0.1);

@@ -19,7 +19,7 @@ type FeedPostSeed = {
 const FEED_POSTS: FeedPostSeed[] = [
   {
     marker: 'FEED-DEMO-001',
-    title: 'BattleAsia 2.0 Is Live — Play & Win BAC Coins',
+    title: 'BattleAsia Is Live — Play & Win BAC Coins',
     categorySlug: 'news',
     description:
       '<p>Welcome to the new <strong>BattleAsia</strong> platform! Join PUBG Mobile tournaments, climb the leaderboard, and earn <strong>BAC coins</strong> from every match.</p><p>Deposit via bKash/Nagad and start competing today.</p>',
