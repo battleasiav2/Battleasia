@@ -1,4 +1,5 @@
 .auth-shell {
+  --auth-display: "Big Shoulders Display", "Sora", sans-serif;
   display: grid;
   grid-template-columns: minmax(420px, 480px) 1fr;
   min-height: 100svh;
@@ -50,9 +51,12 @@
 }
 
 .auth-form-pane h1 {
-  font-family: var(--ba-font-display);
-  font-size: clamp(30px, 3.4vw, 34px);
-  letter-spacing: -0.04em;
+  font-family: var(--auth-display);
+  font-size: clamp(40px, 4.2vw, 48px);
+  font-weight: 800;
+  line-height: 0.88;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   margin: 10px 0 4px;
 }
 
@@ -409,15 +413,17 @@ a.auth-link:hover {
 .auth-promo-title {
   margin: 0;
   display: grid;
-  gap: 2px;
-  font-family: var(--ba-font-display);
-  font-size: clamp(34px, 4.2vw, 54px);
+  gap: 0;
+  font-family: var(--auth-display);
+  font-size: clamp(56px, 6.4vw, 88px);
   font-weight: 800;
-  line-height: 0.98;
-  letter-spacing: -0.04em;
+  line-height: 0.78;
+  letter-spacing: 0.01em;
   text-transform: uppercase;
-  color: var(--ba-text);
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.45);
+  color: #fff;
+  text-shadow:
+    0 2px 0 rgba(0, 0, 0, 0.35),
+    0 18px 40px rgba(0, 0, 0, 0.65);
 }
 
 .auth-promo-accent {
@@ -503,8 +509,8 @@ a.auth-link:hover {
   height: 100%;
   object-fit: cover;
   max-width: none;
-  object-position: 62% center;
-  filter: saturate(0.85) contrast(1.05);
+  object-position: center 8%;
+  filter: saturate(1.08) contrast(1.06);
 }
 
 .otp-row {
@@ -620,15 +626,19 @@ a.auth-link:hover {
     grid-template-columns: 1fr;
     min-height: 100dvh;
     align-content: start;
-    background:
-      linear-gradient(180deg, rgba(7, 8, 13, 0.82) 0%, rgba(7, 8, 13, 0.9) 45%, rgba(7, 8, 13, 0.94) 100%),
-      radial-gradient(80% 50% at 50% 0%, rgba(0, 0, 0, 0.35), transparent 70%),
-      #07080d
-      url('/assets/hero/auth-login.png?v=4') center 28% / cover no-repeat;
+    background: var(--ba-page-ink);
   }
 
   .auth-hero {
-    display: none;
+    display: grid;
+    order: -1;
+    min-height: 280px;
+    height: 52svh;
+    max-height: 460px;
+  }
+
+  .auth-hero .hero-poster {
+    object-position: center 6%;
   }
 
   .auth-form-pane {
@@ -637,7 +647,7 @@ a.auth-link:hover {
     padding: 16px 16px 28px;
     border-right: 0;
     justify-content: flex-start;
-    background: transparent;
+    background: var(--ba-page-ink);
   }
 
   .auth-card {
@@ -670,7 +680,7 @@ a.auth-link:hover {
   }
 
   .auth-form-pane h1 {
-    font-size: 28px;
+    font-size: 40px;
     margin: 8px 0 2px;
   }
 
@@ -695,10 +705,10 @@ a.auth-link:hover {
   }
 
   .auth-promo-title {
-    font-family: var(--ba-font-display);
-    font-size: clamp(22px, 6.5vw, 30px);
-    letter-spacing: -0.045em;
-    line-height: 0.96;
+    font-family: var(--auth-display);
+    font-size: clamp(42px, 12vw, 64px);
+    letter-spacing: 0.01em;
+    line-height: 0.78;
   }
 
   .auth-promo-lead {
@@ -720,4 +730,447 @@ a.auth-link:hover {
     flex-wrap: wrap;
     justify-content: center;
   }
+}
+
+.signin-page {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: safe center;
+  padding: 56px 20px 40px;
+  color: var(--ba-text);
+  font-family: var(--ba-font-body);
+  background:
+    radial-gradient(ellipse 900px 600px at 18% 12%, color-mix(in srgb, var(--ba-accent) 22%, transparent), transparent 58%),
+    var(--ba-page-ink);
+}
+
+.signin-back {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px 0 10px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ba-text) 14%, transparent);
+  background: color-mix(in srgb, var(--ba-card) 78%, transparent);
+  color: var(--ba-text);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+}
+
+.signin-back:hover {
+  border-color: var(--ba-accent);
+  color: var(--ba-accent);
+  background: color-mix(in srgb, var(--ba-accent) 12%, var(--ba-card));
+}
+
+.signin-layout {
+  width: 100%;
+  max-width: 1040px;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.signin-brand {
+  text-align: center;
+  padding: 12px;
+}
+
+.signin-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 22px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.signin-logo img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.signin-logo span {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.signin-tagline {
+  margin: 0 0 20px;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: var(--ba-accent);
+}
+
+.signin-art {
+  width: min(100%, 460px);
+  height: auto;
+  aspect-ratio: 853 / 634;
+  object-fit: contain;
+  object-position: center;
+  background: #000;
+  border-radius: 16px;
+  margin: 0 auto;
+  display: block;
+  border: 1px solid color-mix(in srgb, var(--ba-text) 12%, transparent);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+}
+
+.signin-foot {
+  margin: 18px auto 0;
+  max-width: 34ch;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ba-muted);
+}
+
+.signin-panel {
+  background: var(--ba-card);
+  border-radius: 20px;
+  padding: 36px 40px 32px;
+  border: 1px solid color-mix(in srgb, var(--ba-text) 10%, transparent);
+  box-shadow: 0 24px 48px -24px rgba(0, 0, 0, 0.6);
+}
+
+.signin-panel h1 {
+  margin: 0 0 18px;
+  font-family: var(--ba-font-body);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+  line-height: 1.25;
+  text-transform: none;
+}
+
+.signin-panel > h1:has(+ .signin-sub) {
+  margin-bottom: 6px;
+}
+
+form.signin-panel,
+.signin-panel .auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 0;
+}
+
+.signin-page .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  color: var(--ba-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.signin-page .field-ico {
+  display: none;
+}
+
+.signin-page .field-control input,
+.signin-page .password-wrap input {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 0;
+  padding: 12px 14px;
+  border-radius: 9px;
+  border: 1.5px solid color-mix(in srgb, var(--ba-text) 16%, transparent);
+  background: color-mix(in srgb, var(--ba-accent) 8%, var(--ba-input));
+  color: var(--ba-text);
+  font-size: 15px;
+}
+
+.signin-page .password-wrap input {
+  padding-right: 44px;
+}
+
+.signin-page .field-control input:focus,
+.signin-page .password-wrap input:focus {
+  border-color: var(--ba-accent);
+  background: var(--ba-card);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ba-accent) 22%, transparent);
+}
+
+.signin-remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--ba-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.signin-submit {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--ba-accent);
+  color: var(--ba-gold-ink);
+  font-size: 15.5px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 18px -6px var(--ba-accent-glow);
+}
+
+.signin-submit:hover {
+  background: var(--ba-accent-hover);
+}
+
+.signin-submit:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.signin-forgot {
+  text-align: center;
+  margin: 18px 0 22px;
+  font-size: 14px;
+  color: var(--ba-muted);
+}
+
+.signin-forgot a {
+  color: var(--ba-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.signin-divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 22px;
+  color: var(--ba-muted);
+  font-size: 13px;
+}
+
+.signin-divider::before,
+.signin-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: color-mix(in srgb, var(--ba-text) 12%, transparent);
+}
+
+.signin-alt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  border-radius: 9px;
+  border: 1.5px solid color-mix(in srgb, var(--ba-text) 16%, transparent);
+  background: transparent;
+  color: var(--ba-text);
+  font-size: 14.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.signin-alt:hover {
+  border-color: var(--ba-accent);
+  background: color-mix(in srgb, var(--ba-accent) 8%, transparent);
+}
+
+.signin-social {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 12px;
+}
+
+.signin-social .signin-alt {
+  gap: 10px;
+}
+
+.signin-social svg {
+  flex: none;
+}
+
+.signin-note {
+  margin: 0 0 14px;
+  color: var(--ba-muted);
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .signin-layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .signin-panel {
+    order: -1;
+    padding: 32px 22px;
+    border-radius: 16px;
+  }
+
+  .signin-tagline {
+    font-size: 21px;
+    margin-bottom: 18px;
+  }
+
+  .signin-art {
+    height: auto;
+  }
+
+  .signin-foot {
+    font-size: 16px;
+    margin-top: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .signin-page {
+    padding: 64px 14px 24px;
+    align-items: flex-start;
+  }
+
+  .signin-back {
+    top: 14px;
+    left: 14px;
+  }
+
+  .signin-panel {
+    padding: 26px 18px;
+  }
+
+  .signin-panel h1 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .signin-tagline {
+    font-size: 19px;
+  }
+
+  .signin-art {
+    height: auto;
+  }
+
+  .signin-page .field-control input,
+  .signin-page .password-wrap input,
+  .signin-page .field > input,
+  .signin-page .field select {
+    font-size: 16px;
+  }
+}
+
+.signin-sub {
+  margin: 0 0 18px;
+  color: var(--ba-muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.signin-page .field > input,
+.signin-page .field select,
+.signin-page .phone-row input,
+.signin-page .phone-row select {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 0;
+  padding: 12px 14px;
+  border-radius: 9px;
+  border: 1.5px solid color-mix(in srgb, var(--ba-text) 16%, transparent);
+  background: color-mix(in srgb, var(--ba-accent) 8%, var(--ba-input));
+  color: var(--ba-text);
+  font: inherit;
+  font-size: 15px;
+}
+
+.signin-panel .btn:hover,
+.signin-submit:hover {
+  transform: none;
+}
+
+.signin-remember input,
+.signin-panel .check input {
+  accent-color: var(--ba-accent);
+}
+
+.signin-panel .btn,
+.signin-panel a.btn {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 9px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.signin-panel .btn-primary {
+  border: 0;
+  color: var(--ba-gold-ink);
+  background: var(--ba-accent);
+  box-shadow: 0 8px 18px -6px var(--ba-accent-glow);
+}
+
+.signin-panel .btn-primary:hover {
+  background: var(--ba-accent-hover);
+}
+
+.signin-panel .btn-ghost {
+  background: transparent;
+  color: var(--ba-text);
+  border: 1.5px solid color-mix(in srgb, var(--ba-text) 16%, transparent);
+}
+
+.signin-panel .auth-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.signin-panel .auth-switch {
+  text-align: center;
+  margin: 4px 0 0;
+  color: var(--ba-muted);
+}
+
+.signin-panel .auth-switch a {
+  color: var(--ba-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.signin-panel .check a {
+  color: var(--ba-accent);
+}
+
+.signin-panel .form-error {
+  margin: 0;
+}
+
+.signin-panel .step-bar {
+  margin-bottom: 2px;
+}
+
+.signin-panel .pw-hints {
+  margin-top: 4px;
+  gap: 2px;
 }

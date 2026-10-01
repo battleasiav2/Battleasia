@@ -76,9 +76,15 @@
     "continueWithGoogle": "Google",
     "continueWithDiscord": "Discord",
     "socialComingSoon": "শীঘ্রই আসছে",
+    "socialFinish": "ব্রাউজারে সাইন-ইন শেষ করে অ্যাপে ফিরে আসুন।",
+    "oauthFailed": "Google বা Discord সাইন-ইন হয়নি। আবার চেষ্টা করুন।",
     "featureSecure": "১০০% নিরাপদ",
     "featureFairPlay": "ফেয়ার প্লে",
-    "featureCashPrizes": "আসল ক্যাশ প্রাইজ"
+    "featureCashPrizes": "আসল ক্যাশ প্রাইজ",
+    "heroBadge": "PUBG Mobile Arena",
+    "promoLine1": "Drop. Fight.",
+    "promoLine2": "Cash out.",
+    "promoLead": "ভেরিফাইড রুম। লাইভ রেজাল্ট। আসল ক্যাশ প্রাইজ।"
   },
   "support": {
     "title": "কাস্টমার সাপোর্ট",

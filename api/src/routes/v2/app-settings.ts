@@ -8,12 +8,17 @@ import {
   getAppSettings,
   normalizeAppDownloadSettings,
   normalizeMailSettings,
+  normalizeOAuthSettings,
   normalizeSiteNoticeSettings,
   serializeMailSettingsForAdmin,
+  serializeOAuthSettingsForAdmin,
   type AppDownloadSettings,
   type MailSettings,
+  type OAuthSettings,
   type SiteNoticeSettings,
 } from '../../models/AppSettings.js';
+import { callbackUrl, providerReady } from '../../utils/social-login.js';
+import { env } from '../../config/env.js';
 import { sendTestMail, broadcastSiteNoticeEmail } from '../../utils/mail.js';
 import { normalizeP1Flags } from '../../utils/p1-flags.js';
 import { normalizeP2Flags } from '../../utils/p2-flags.js';
@@ -136,6 +141,81 @@ router.post('/mail-settings/test', requireAuth, requireAdmin, async (req, res) =
   } catch (error) {
     console.error('test mail error:', error);
     return res.status(500).json({ status: false, message: 'Failed to send test email' });
+  }
+});
+
+function keepSecret(next: unknown, current: string) {
+  const value = String(next || '');
+  if (!value || value === '********') return current;
+  return value;
+}
+
+router.get('/oauth-public', async (_req, res) => {
+  try {
+    const settings = await getAppSettings();
+    const oauth = normalizeOAuthSettings(settings.oauth);
+    return res.json({
+      status: true,
+      data: {
+        google: providerReady(oauth, 'google'),
+        discord: providerReady(oauth, 'discord'),
+      },
+    });
+  } catch (error) {
+    console.error('oauth public error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to load login providers' });
+  }
+});
+
+router.get('/oauth-settings', requireAuth, requireAdmin, async (_req, res) => {
+  try {
+    const settings = await getAppSettings();
+    const oauth = serializeOAuthSettingsForAdmin(settings.oauth);
+    const origin = oauth.redirectBase || env.appUrl.replace(/\/$/, '');
+    return res.json({
+      status: true,
+      data: {
+        ...oauth,
+        googleCallback: origin ? callbackUrl(origin, 'google') : '',
+        discordCallback: origin ? callbackUrl(origin, 'discord') : '',
+      },
+    });
+  } catch (error) {
+    console.error('get oauth settings error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to load login settings' });
+  }
+});
+
+router.put('/oauth-settings', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const settings = await getAppSettings();
+    const current = normalizeOAuthSettings(settings.oauth);
+    const body = req.body as Partial<OAuthSettings>;
+    settings.oauth = normalizeOAuthSettings({
+      redirectBase: body.redirectBase,
+      googleEnabled: body.googleEnabled,
+      googleClientId: body.googleClientId,
+      googleClientSecret: keepSecret(body.googleClientSecret, current.googleClientSecret),
+      discordEnabled: body.discordEnabled,
+      discordClientId: body.discordClientId,
+      discordClientSecret: keepSecret(body.discordClientSecret, current.discordClientSecret),
+    });
+    settings.markModified('oauth');
+    await settings.save();
+    const oauth = serializeOAuthSettingsForAdmin(settings.oauth);
+    const origin = oauth.redirectBase || env.appUrl.replace(/\/$/, '');
+    return res.json({
+      status: true,
+      message: 'Login settings updated',
+      data: {
+        ...oauth,
+        googleCallback: origin ? callbackUrl(origin, 'google') : '',
+        discordCallback: origin ? callbackUrl(origin, 'discord') : '',
+      },
+    });
+  } catch (error) {
+    console.error('update oauth settings error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to update login settings' });
   }
 });
 

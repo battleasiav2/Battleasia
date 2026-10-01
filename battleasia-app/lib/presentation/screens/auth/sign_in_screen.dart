@@ -2,8 +2,11 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/data/models/session_model.dart';
+import 'package:battleasia_app/data/models/user_model.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/screens/auth/email_verification_screen.dart';
@@ -41,6 +44,8 @@ class _SignInScreenState extends State<SignInScreen> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _rememberMe = true;
+  bool _socialBusy = false;
+  int _socialGen = 0;
   String? _errorMessage;
 
   @override
@@ -66,6 +71,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   void dispose() {
+    _socialGen++;
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -126,11 +132,75 @@ class _SignInScreenState extends State<SignInScreen> {
     setState(() => _errorMessage = result['message'] ?? 'Sign in failed');
   }
 
+  Future<void> _handleSocial(String provider) async {
+    if (_socialBusy) return;
+    setState(() {
+      _socialBusy = true;
+      _errorMessage = null;
+    });
+    final gen = ++_socialGen;
+    final authProvider = context.read<AuthProvider>();
+    final start = await authProvider.startSocial(provider);
+    if (!mounted || gen != _socialGen) return;
+    final url = start['url'] as String?;
+    final handoff = start['handoff'] as String?;
+    if (start['success'] != true || url == null || handoff == null) {
+      setState(() {
+        _socialBusy = false;
+        _errorMessage = start['message'] as String? ?? 'auth.oauthFailed'.tr();
+      });
+      return;
+    }
+    final opened = await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    if (!opened) {
+      if (!mounted || gen != _socialGen) return;
+      setState(() {
+        _socialBusy = false;
+        _errorMessage = 'auth.oauthFailed'.tr();
+      });
+      return;
+    }
+    if (mounted) {
+      setState(() => _errorMessage = 'auth.socialFinish'.tr());
+    }
+    for (var i = 0; i < 90; i++) {
+      await Future<void>.delayed(const Duration(seconds: 2));
+      if (!mounted || gen != _socialGen) return;
+      final poll = await authProvider.pollSocial(handoff);
+      if (!mounted || gen != _socialGen) return;
+      if (poll['pending'] == true) continue;
+      setState(() => _socialBusy = false);
+      if (poll['success'] == true && poll['session'] != null) {
+        authProvider.adoptSocialSession(
+          poll['user'] as UserModel?,
+          poll['session'] as SessionModel,
+        );
+        if (widget.afterLoginScreen != null) {
+          ShopAuthGate.markShopSessionActive();
+        }
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => widget.afterLoginScreen ?? const PlayScreen(),
+          ),
+        );
+        return;
+      }
+      setState(() => _errorMessage = poll['message'] as String? ?? 'auth.oauthFailed'.tr());
+      return;
+    }
+    if (!mounted || gen != _socialGen) return;
+    setState(() {
+      _socialBusy = false;
+      _errorMessage = 'auth.oauthFailed'.tr();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
 
     return AuthFormShell(
+      heroAfter: true,
       title: widget.titleKey.tr(),
       description: 'auth.signInDescription'.tr(),
       child: AutofillGroup(
@@ -247,6 +317,34 @@ class _SignInScreenState extends State<SignInScreen> {
               loading: authProvider.isLoading,
               onPressed: authProvider.isLoading ? null : _handleSignIn,
             ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.16))),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Text(
+                    'auth.orContinueWith'.tr(),
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12),
+                  ),
+                ),
+                Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.16))),
+              ],
+            ),
+            const SizedBox(height: 12),
+            _SocialButton(
+              label: 'auth.continueWithGoogle'.tr(),
+              icon: const _GoogleMark(),
+              busy: _socialBusy,
+              onPressed: () => _handleSocial('google'),
+            ),
+            const SizedBox(height: 10),
+            _SocialButton(
+              label: 'auth.continueWithDiscord'.tr(),
+              icon: const _DiscordMark(),
+              busy: _socialBusy,
+              onPressed: () => _handleSocial('discord'),
+            ),
             const SizedBox(height: 14),
             Text.rich(
               TextSpan(
@@ -283,5 +381,94 @@ class _SignInScreenState extends State<SignInScreen> {
         ),
       ),
     );
+  }
+}
+
+class _SocialButton extends StatelessWidget {
+  const _SocialButton({
+    required this.label,
+    required this.icon,
+    required this.busy,
+    required this.onPressed,
+  });
+
+  final String label;
+  final Widget icon;
+  final bool busy;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 46,
+      child: OutlinedButton(
+        onPressed: busy ? null : onPressed,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.white,
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.18)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            icon,
+            const SizedBox(width: 10),
+            Text(label, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _GoogleMark extends StatelessWidget {
+  const _GoogleMark();
+
+  @override
+  Widget build(BuildContext context) {
+    return const CustomPaint(size: Size(18, 18), painter: _GooglePainter());
+  }
+}
+
+class _GooglePainter extends CustomPainter {
+  const _GooglePainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final stroke = size.width * 0.2;
+    final rect = Rect.fromLTWH(stroke / 2, stroke / 2, size.width - stroke, size.height - stroke);
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = stroke
+      ..strokeCap = StrokeCap.butt;
+    paint.color = const Color(0xFFEA4335);
+    canvas.drawArc(rect, -2.6, 1.7, false, paint);
+    paint.color = const Color(0xFFFBBC05);
+    canvas.drawArc(rect, 1.6, 1.15, false, paint);
+    paint.color = const Color(0xFF34A853);
+    canvas.drawArc(rect, 0.35, 1.25, false, paint);
+    paint.color = const Color(0xFF4285F4);
+    canvas.drawArc(rect, -1.15, 1.5, false, paint);
+    paint.style = PaintingStyle.fill;
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(
+        Rect.fromLTWH(size.width * 0.48, size.height * 0.4, size.width * 0.5, stroke),
+        Radius.circular(stroke / 2),
+      ),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _DiscordMark extends StatelessWidget {
+  const _DiscordMark();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Icon(Icons.discord, color: Color(0xFF5865F2), size: 20);
   }
 }

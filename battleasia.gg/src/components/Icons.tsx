@@ -4,9 +4,12 @@ export function IconChat({ size = 22 }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden>
       <path
-        d="M12 3.5c-4.7 0-8.5 3.1-8.5 7 0 2.2 1.2 4.2 3.1 5.5-.2.9-.7 2.1-1.6 3.2 1.8-.3 3.3-1.1 4.3-1.8.8.2 1.7.3 2.7.3 4.7 0 8.5-3.1 8.5-7s-3.8-7-8.5-7Z"
-        fill="currentColor"
+        d="M12 4.4a6.8 6.8 0 0 0-5.9 10.2l-.9 3.1 3.2-1.2A6.8 6.8 0 1 0 12 4.4Z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
       />
+      <path d="M8.4 10.2h7.2M8.4 13h4.6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }

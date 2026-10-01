@@ -15,6 +15,7 @@ class AuthFormShell extends StatelessWidget {
   final Widget? steps;
   final Widget? belowCard;
   final bool showTrustRow;
+  final bool heroAfter;
 
   const AuthFormShell({
     super.key,
@@ -26,6 +27,7 @@ class AuthFormShell extends StatelessWidget {
     this.steps,
     this.belowCard,
     this.showTrustRow = false,
+    this.heroAfter = true,
   });
 
   @override
@@ -64,6 +66,17 @@ class AuthFormShell extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      if (Navigator.of(context).canPop()) ...[
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: _AuthBackButton(),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                      if (!heroAfter) ...[
+                        const _AuthHero(),
+                        const SizedBox(height: 14),
+                      ],
                       _AuthPanel(
                         title: title,
                         description: description,
@@ -72,6 +85,10 @@ class AuthFormShell extends StatelessWidget {
                         showTrustRow: showTrustRow,
                         child: child,
                       ),
+                      if (heroAfter) ...[
+                        const SizedBox(height: 16),
+                        const _AuthHero(),
+                      ],
                       if (belowCard != null) ...[
                         const SizedBox(height: 12),
                         belowCard!,
@@ -83,6 +100,60 @@ class AuthFormShell extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _AuthBackButton extends StatelessWidget {
+  const _AuthBackButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white.withValues(alpha: 0.06),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(999),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.14)),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: () => Navigator.of(context).pop(),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.arrow_back_rounded, size: 18, color: AppColors.gold),
+              const SizedBox(width: 6),
+              Text(
+                'auth.back'.tr(),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 13.5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AuthHero extends StatelessWidget {
+  const _AuthHero();
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(16),
+      child: Image.asset(
+        'assets/images/hero/auth-login.webp',
+        width: double.infinity,
+        fit: BoxFit.contain,
+        alignment: Alignment.center,
       ),
     );
   }

@@ -55,9 +55,15 @@
     "continueWithGoogle": "Google",
     "continueWithDiscord": "Discord",
     "socialComingSoon": "Coming soon",
+    "socialFinish": "Complete sign-in in the browser, then return to the app.",
+    "oauthFailed": "Google or Discord sign-in failed. Try again.",
     "featureSecure": "100% Secure",
     "featureFairPlay": "Fair Play",
-    "featureCashPrizes": "Real Cash Prizes"
+    "featureCashPrizes": "Real Cash Prizes",
+    "heroBadge": "PUBG Mobile Arena",
+    "promoLine1": "Drop. Fight.",
+    "promoLine2": "Cash out.",
+    "promoLead": "Verified rooms. Live results. Real cash prizes."
   },
   "support": {
     "title": "客户支持",

@@ -175,6 +175,7 @@ export function createApp() {
 
   app.use('/api/v2/users/auth', authLimiter);
   app.use('/api/v2/users/signin', authLimiter);
+  app.use('/api/v2/users/oauth', authLimiter);
   app.use('/api/v2/users/refresh', authLimiter);
   app.use('/api/v3/users/auth', authLimiter);
   app.use('/api/v3/users/auth/refresh', authLimiter);

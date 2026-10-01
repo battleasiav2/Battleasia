@@ -226,9 +226,11 @@ svg {
   }
 
   .auth-hero {
-    order: 2;
-    min-height: min(420px, 58svh);
-    max-height: none;
+    display: grid;
+    order: -1;
+    min-height: 280px;
+    height: 52svh;
+    max-height: 460px;
   }
 
   .auth-hero-copy {

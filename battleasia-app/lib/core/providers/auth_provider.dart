@@ -117,6 +117,26 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
     return result;
   }
 
+  Future<Map<String, dynamic>> loadSocialProviders() {
+    return _authService.socialProviders();
+  }
+
+  Future<Map<String, dynamic>> startSocial(String provider) {
+    return _authService.startSocial(provider);
+  }
+
+  Future<Map<String, dynamic>> pollSocial(String handoff) {
+    return _authService.pollSocial(handoff);
+  }
+
+  void adoptSocialSession(UserModel? user, SessionModel session) {
+    _user = user;
+    _session = session;
+    _isAuthenticated = true;
+    _connectSocket(session.accessToken);
+    notifyListeners();
+  }
+
   // Sign up
   Future<Map<String, dynamic>> signUp({
     required String email,

@@ -40,6 +40,8 @@ export interface IUser extends Document {
   instagramLink?: string;
   privacy?: IUserPrivacy;
   emailVerified: boolean;
+  googleId?: string;
+  discordId?: string;
   kycStatus?: string;
   dateOfBirth?: Date;
   fcm?: { web?: string; android?: string };
@@ -109,6 +111,8 @@ const userSchema = new Schema<IUser>(
     referredBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
     usernameChangedAt: { type: Date },
     emailVerified: { type: Boolean, default: false },
+    googleId: { type: String, unique: true, sparse: true },
+    discordId: { type: String, unique: true, sparse: true },
     kycStatus: { type: String, default: 'none' },
     dateOfBirth: { type: Date },
     fcm: {

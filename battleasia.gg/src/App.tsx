@@ -33,6 +33,7 @@ const SignUpPage = lazy(() => import('./pages/auth/SignUp').then((m) => ({ defau
 const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPassword').then((m) => ({ default: m.ForgotPasswordPage })))
 const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPassword').then((m) => ({ default: m.ResetPasswordPage })))
 const EmailVerificationPage = lazy(() => import('./pages/auth/EmailVerification').then((m) => ({ default: m.EmailVerificationPage })))
+const OAuthFinishPage = lazy(() => import('./pages/auth/OAuthFinish').then((m) => ({ default: m.OAuthFinishPage })))
 const PlayPage = lazy(() => import('./pages/user/Play').then((m) => ({ default: m.PlayPage })))
 const MatchListPage = lazy(() => import('./pages/user/MatchList').then((m) => ({ default: m.MatchListPage })))
 const MatchDetailPage = lazy(() => import('./pages/user/MatchDetail').then((m) => ({ default: m.MatchDetailPage })))
@@ -80,6 +81,7 @@ export default function App() {
           <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
           <Route path="/auth/email-verification" element={<EmailVerificationPage />} />
+          <Route path="/auth/oauth" element={<OAuthFinishPage />} />
           <Route
             element={
               <RequireAuth>

@@ -75,6 +75,16 @@ export type MailSettings = {
   fromEmail: string;
 };
 
+export type OAuthSettings = {
+  redirectBase: string;
+  googleEnabled: boolean;
+  googleClientId: string;
+  googleClientSecret: string;
+  discordEnabled: boolean;
+  discordClientId: string;
+  discordClientSecret: string;
+};
+
 export type AppDownloadSettings = {
   enabled: boolean;
   downloadUrl: string;
@@ -535,6 +545,16 @@ export const DEFAULT_MAIL_SETTINGS: MailSettings = {
   fromEmail: '',
 };
 
+export const DEFAULT_OAUTH_SETTINGS: OAuthSettings = {
+  redirectBase: '',
+  googleEnabled: false,
+  googleClientId: '',
+  googleClientSecret: '',
+  discordEnabled: false,
+  discordClientId: '',
+  discordClientSecret: '',
+};
+
 export const DEFAULT_APP_DOWNLOAD_SETTINGS: AppDownloadSettings = {
   enabled: true,
   downloadUrl: '/api/uploads/app/BattleAsia.apk',
@@ -670,6 +690,7 @@ export interface IAppSettings extends Document {
   messaging: MessagingSettings;
   profileSocial: ProfileSocialSettings;
   mail: MailSettings;
+  oauth?: OAuthSettings;
   appDownload: AppDownloadSettings;
   siteNotice: SiteNoticeSettings;
   engagement: EngagementSettings;
@@ -711,6 +732,10 @@ const appSettingsSchema = new Schema<IAppSettings>(
     mail: {
       type: Schema.Types.Mixed,
       default: () => ({ ...DEFAULT_MAIL_SETTINGS }),
+    },
+    oauth: {
+      type: Schema.Types.Mixed,
+      default: () => ({ ...DEFAULT_OAUTH_SETTINGS }),
     },
     appDownload: {
       type: Schema.Types.Mixed,
@@ -870,6 +895,43 @@ export function serializeMailSettingsForAdmin(raw?: Partial<MailSettings> | null
   return {
     ...normalized,
     smtpPass: normalized.smtpPass ? '********' : '',
+  };
+}
+
+function cleanOAuthBase(value: unknown) {
+  const raw = String(value || '').trim().replace(/\/$/, '');
+  if (!raw) return '';
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
+    return url.origin;
+  } catch {
+    return '';
+  }
+}
+
+function cleanOAuthSecret(value: unknown, max = 200) {
+  return String(value || '').trim().slice(0, max);
+}
+
+export function normalizeOAuthSettings(raw?: Partial<OAuthSettings> | null): OAuthSettings {
+  return {
+    redirectBase: cleanOAuthBase(raw?.redirectBase),
+    googleEnabled: raw?.googleEnabled === true,
+    googleClientId: cleanOAuthSecret(raw?.googleClientId),
+    googleClientSecret: cleanOAuthSecret(raw?.googleClientSecret),
+    discordEnabled: raw?.discordEnabled === true,
+    discordClientId: cleanOAuthSecret(raw?.discordClientId),
+    discordClientSecret: cleanOAuthSecret(raw?.discordClientSecret),
+  };
+}
+
+export function serializeOAuthSettingsForAdmin(raw?: Partial<OAuthSettings> | null): OAuthSettings {
+  const normalized = normalizeOAuthSettings(raw);
+  return {
+    ...normalized,
+    googleClientSecret: normalized.googleClientSecret ? '********' : '',
+    discordClientSecret: normalized.discordClientSecret ? '********' : '',
   };
 }
 
@@ -1266,6 +1328,7 @@ export async function getAppSettings() {
       messaging: normalizeMessagingSettings(DEFAULT_MESSAGING_SETTINGS),
       profileSocial: normalizeProfileSocialSettings(DEFAULT_PROFILE_SOCIAL_SETTINGS),
       mail: { ...DEFAULT_MAIL_SETTINGS },
+      oauth: { ...DEFAULT_OAUTH_SETTINGS },
       appDownload: { ...DEFAULT_APP_DOWNLOAD_SETTINGS },
       siteNotice: { ...DEFAULT_SITE_NOTICE_SETTINGS },
       engagement: normalizeEngagementSettings(DEFAULT_ENGAGEMENT_SETTINGS),
@@ -1316,6 +1379,11 @@ export async function getAppSettings() {
 
   if (!settings.siteNotice) {
     settings.siteNotice = { ...DEFAULT_SITE_NOTICE_SETTINGS };
+    dirty = true;
+  }
+
+  if (!settings.oauth) {
+    settings.oauth = { ...DEFAULT_OAUTH_SETTINGS };
     dirty = true;
   }
 

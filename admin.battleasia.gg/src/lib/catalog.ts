@@ -90,6 +90,7 @@ export const NAV: NavGroup[] = [
     label: 'nav.system',
     items: [
       { to: '/system/mail-settings', label: 'nav.mail', perm: null, icon: 'mail' },
+      { to: '/system/oauth-login', label: 'nav.oauth', perm: null, icon: 'social' },
       { to: '/system/app-download', label: 'nav.appDownload', perm: null, icon: 'download' },
       { to: '/integrity/ledger', label: 'nav.integrityLedger', perm: 'payments.view', icon: 'scale' },
       { to: '/integrity/fraud-holds', label: 'nav.fraudHolds', perm: 'payments.view', icon: 'hold' },

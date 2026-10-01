@@ -13,6 +13,9 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage').then((m) => ({ de
 const MailSettingsPage = lazy(() =>
   import('./pages/MailSettingsPage').then((m) => ({ default: m.MailSettingsPage }))
 );
+const OAuthSettingsPage = lazy(() =>
+  import('./pages/OAuthSettingsPage').then((m) => ({ default: m.OAuthSettingsPage }))
+);
 const AppDownloadPage = lazy(() =>
   import('./pages/AppDownloadPage').then((m) => ({ default: m.AppDownloadPage }))
 );
@@ -71,6 +74,7 @@ export default function App() {
               <Route key={path} path={path} element={<IntegrityPage />} />
             ))}
             <Route path="/system/mail-settings" element={<MailSettingsPage />} />
+            <Route path="/system/oauth-login" element={<OAuthSettingsPage />} />
             <Route path="/system/app-download" element={<AppDownloadPage />} />
             <Route path="/shop/coinrate" element={<CoinRatesPage />} />
             <Route path="/feature-flags" element={<FlagsPage />} />

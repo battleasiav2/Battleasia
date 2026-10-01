@@ -11,6 +11,7 @@ const SignUpPage = lazy(() => import('./pages/auth/SignUp').then((m) => ({ defau
 const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPassword').then((m) => ({ default: m.ForgotPasswordPage })));
 const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPassword').then((m) => ({ default: m.ResetPasswordPage })));
 const EmailVerificationPage = lazy(() => import('./pages/auth/EmailVerification').then((m) => ({ default: m.EmailVerificationPage })));
+const OAuthFinishPage = lazy(() => import('./pages/auth/OAuthFinish').then((m) => ({ default: m.OAuthFinishPage })));
 const LegalPage = lazy(() => import('./pages/Legal').then((m) => ({ default: m.LegalPage })));
 const ShopPage = lazy(() => import('./pages/user/Shop').then((m) => ({ default: m.ShopPage })));
 const WalletPage = lazy(() => import('./pages/user/Wallet').then((m) => ({ default: m.WalletPage })));
@@ -31,6 +32,7 @@ export default function App() {
           <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
           <Route path="/auth/email-verification" element={<EmailVerificationPage />} />
+          <Route path="/auth/oauth" element={<OAuthFinishPage />} />
           <Route path="/privacy-policy" element={<LegalPage kind="privacy" />} />
           <Route path="/terms-and-conditions" element={<LegalPage kind="terms" />} />
           <Route

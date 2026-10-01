@@ -69,6 +69,10 @@ export function PulseLeaderboards({
           </button>
         </div>
       </div>
+      <div className="arena-climb">
+        <p className="arena-climb-kicker">{t('pulse.climb')}</p>
+        <p>{metric === 'winnings' ? t('pulse.topProfit') : t('pulse.topKillers')}</p>
+      </div>
 
       {players.length ? (
         <>
@@ -76,11 +80,6 @@ export function PulseLeaderboards({
             <PodiumSpot player={players[1]} rank={2} metric={metric} />
             <PodiumSpot player={players[0]} rank={1} metric={metric} />
             <PodiumSpot player={players[2]} rank={3} metric={metric} />
-          </div>
-
-          <div className="arena-climb">
-            <h3>{t('pulse.climb')}</h3>
-            <p>{metric === 'winnings' ? t('pulse.topProfit') : t('pulse.topKillers')}</p>
           </div>
 
           {rest.length ? (
@@ -108,10 +107,6 @@ export function PulseLeaderboards({
       ) : (
         <p className="arena-board-empty">{t('pulse.empty')}</p>
       )}
-
-      <Link className="arena-board-more" to="/user/account/leader-board">
-        {t('pulse.viewLeaderboard')} →
-      </Link>
     </section>
   );
 }

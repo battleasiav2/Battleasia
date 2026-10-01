@@ -316,4 +316,66 @@ class AuthService {
       };
     }
   }
+
+  Future<Map<String, dynamic>> socialProviders() async {
+    try {
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/app-settings/oauth-public'),
+      );
+      final parsed = await _parseJsonResponse(response);
+      final data = parsed['data'];
+      if (data is Map) {
+        return {
+          'google': data['google'] == true,
+          'discord': data['discord'] == true,
+        };
+      }
+      return {'google': false, 'discord': false};
+    } catch (_) {
+      return {'google': false, 'discord': false};
+    }
+  }
+
+  Future<Map<String, dynamic>> startSocial(String provider) async {
+    try {
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/users/oauth/$provider/app'),
+      );
+      return _parseJsonResponse(response);
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
+  Future<Map<String, dynamic>> pollSocial(String handoff) async {
+    try {
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/users/oauth/handoff/$handoff'),
+      );
+      final parsed = await _parseJsonResponse(response);
+      if (parsed['pending'] == true || parsed['success'] != true) return parsed;
+      final sessionData = parsed['session'];
+      final userData = parsed['user'];
+      if (sessionData is Map && sessionData['accessToken'] is String) {
+        final session = SessionModel.fromJson(Map<String, dynamic>.from(sessionData));
+        final user = userData is Map
+            ? UserModel.fromJson(Map<String, dynamic>.from(userData))
+            : null;
+        await saveToken(session.accessToken);
+        if (user != null) await saveUser(user);
+        parsed['session'] = session;
+        parsed['user'] = user;
+      }
+      return parsed;
+    } catch (e) {
+      return {
+        'success': false,
+        'pending': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
 }

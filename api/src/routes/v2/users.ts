@@ -44,6 +44,25 @@ import { logAuthCode } from '../../utils/auth-log.js';
 import { sendVerificationCodeEmail } from '../../utils/mail.js';
 import { clearAllAuthCookies } from '../../utils/auth-cookie.js';
 import { recordFingerprint } from '../../utils/fingerprint.js';
+import {
+  authorizeUrl,
+  beginOAuth,
+  clearOAuthCookies,
+  completeHandoff,
+  createOAuthTicket,
+  failHandoff,
+  fetchSocialProfile,
+  findOrCreateSocialUser,
+  isSocialProvider,
+  loadOAuthSettings,
+  providerReady,
+  publicOrigin,
+  readHandoff,
+  readOAuthCookies,
+  safeNextPath,
+  sameSecret,
+  takeOAuthState,
+} from '../../utils/social-login.js';
 import { KycRecord } from '../../models/KycRecord.js';
 import { DevicePushToken } from '../../models/DevicePushToken.js';
 import mongoose from 'mongoose';
@@ -354,6 +373,145 @@ router.post('/signin', async (req, res) => {
   } catch (error) {
     console.error('signin error:', error);
     return res.status(500).json({ status: false, message: 'Login failed' });
+  }
+});
+
+function oauthErrorCode(error: unknown) {
+  const message = error instanceof Error ? error.message : '';
+  if (message === 'disabled' || message === 'email' || message === 'denied') return message;
+  return 'failed';
+}
+
+router.get('/oauth/handoff/:code', async (req, res) => {
+  try {
+    const row = await readHandoff(String(req.params.code || ''));
+    if (!row) return res.status(404).json({ status: false, pending: false, message: 'Sign-in expired' });
+    if (row.pending) return res.json({ status: true, pending: true });
+    if (row.error || !row.accessToken) {
+      return res.status(400).json({ status: false, pending: false, message: row.error || 'Sign-in failed' });
+    }
+    let user: unknown = null;
+    try {
+      user = row.userJson ? JSON.parse(row.userJson) : null;
+    } catch {
+      user = null;
+    }
+    return res.json({
+      status: true,
+      pending: false,
+      token: row.accessToken,
+      refreshToken: row.refreshToken,
+      session: { accessToken: row.accessToken, refreshToken: row.refreshToken },
+      user,
+    });
+  } catch (error) {
+    console.error('oauth handoff error:', error);
+    return res.status(500).json({ status: false, message: 'Sign-in failed' });
+  }
+});
+
+router.get('/oauth/:provider/app', async (req, res) => {
+  try {
+    const provider = String(req.params.provider || '');
+    if (!isSocialProvider(provider)) {
+      return res.status(404).json({ status: false, message: 'Unknown provider' });
+    }
+    const settings = await loadOAuthSettings();
+    if (!providerReady(settings, provider)) {
+      return res.status(403).json({ status: false, message: 'Provider is disabled' });
+    }
+    const origin = publicOrigin(req, settings);
+    if (!origin) {
+      return res.status(400).json({ status: false, message: 'Set the public site URL in admin login settings' });
+    }
+    const ticket = await createOAuthTicket({
+      provider,
+      returnTo: '/user/play',
+      origin,
+      handoff: true,
+    });
+    return res.json({
+      status: true,
+      url: authorizeUrl(settings, provider, origin, ticket.state),
+      handoff: ticket.handoffKey,
+    });
+  } catch (error) {
+    console.error('oauth app start error:', error);
+    return res.status(500).json({ status: false, message: 'Could not start sign-in' });
+  }
+});
+
+router.get('/oauth/:provider/callback', async (req, res) => {
+  const providerParam = String(req.params.provider || '');
+  const settings = await loadOAuthSettings().catch(() => null);
+  const fallbackOrigin = settings ? publicOrigin(req, settings) : '';
+  const queryState = String(req.query.state || '');
+  const ticket = queryState ? await takeOAuthState(queryState) : null;
+  const origin = (ticket?.origin || fallbackOrigin || '').replace(/\/$/, '');
+  const handoffKey = ticket?.handoffKey || '';
+  const fail = async (code: string) => {
+    clearOAuthCookies(res);
+    if (handoffKey) await failHandoff(handoffKey, code);
+    const target = origin ? `${origin}/auth/sign-in?oauth=${encodeURIComponent(code)}` : `/auth/sign-in?oauth=${encodeURIComponent(code)}`;
+    return res.redirect(target);
+  };
+
+  try {
+    if (!isSocialProvider(providerParam) || !settings || !ticket || ticket.provider !== providerParam) {
+      return fail('failed');
+    }
+    if (!providerReady(settings, providerParam)) return fail('failed');
+    const cookie = readOAuthCookies(req);
+    const cookieOk = cookie.provider === providerParam && sameSecret(cookie.state, queryState);
+    if (!handoffKey && !cookieOk) return fail('failed');
+
+    const providerError = String(req.query.error || '');
+    if (providerError) return fail(providerError === 'access_denied' ? 'denied' : 'failed');
+    const code = String(req.query.code || '');
+    if (!code) return fail('failed');
+
+    const profile = await fetchSocialProfile(settings, providerParam, origin, code);
+    const user = await findOrCreateSocialUser(providerParam, profile);
+    if (user.emailVerified && !user.status) return fail('disabled');
+    const pair = await createLoginSession(user, req, res);
+    void recordFingerprint(req, user._id.toString());
+    clearOAuthCookies(res);
+    const serialized = serializeUser(user);
+    if (handoffKey) {
+      await completeHandoff(handoffKey, pair.accessToken, pair.refreshToken, JSON.stringify(serialized));
+      return res.redirect(`${origin}/auth/sign-in?oauth=app`);
+    }
+    const next = safeNextPath(ticket.returnTo || cookie.next);
+    const hash = new URLSearchParams({
+      access: pair.accessToken,
+      refresh: pair.refreshToken,
+      returnTo: next,
+    });
+    return res.redirect(`${origin}/auth/oauth#${hash.toString()}`);
+  } catch (error) {
+    console.error('oauth callback error:', error);
+    return fail(oauthErrorCode(error));
+  }
+});
+
+router.get('/oauth/:provider', async (req, res) => {
+  try {
+    const provider = String(req.params.provider || '');
+    if (!isSocialProvider(provider)) {
+      return res.redirect('/auth/sign-in?oauth=failed');
+    }
+    const settings = await loadOAuthSettings();
+    const origin = publicOrigin(req, settings);
+    if (!providerReady(settings, provider) || !origin) {
+      return res.redirect(`${origin || ''}/auth/sign-in?oauth=failed`);
+    }
+    const returnTo = safeNextPath(String(req.query.returnTo || ''));
+    const ticket = await createOAuthTicket({ provider, returnTo, origin, handoff: false });
+    beginOAuth(res, provider, ticket.state, returnTo);
+    return res.redirect(authorizeUrl(settings, provider, origin, ticket.state));
+  } catch (error) {
+    console.error('oauth start error:', error);
+    return res.redirect('/auth/sign-in?oauth=failed');
   }
 });
 

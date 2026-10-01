@@ -493,6 +493,16 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: Image.asset(
+                          'assets/images/hero/auth-login.webp',
+                          width: double.infinity,
+                          fit: BoxFit.contain,
+                          alignment: Alignment.center,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
 
                       // Back to Sign Up
                       Center(

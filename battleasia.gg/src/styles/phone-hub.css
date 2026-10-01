@@ -63,9 +63,9 @@
     order: -1;
     position: relative;
     overflow: hidden;
-    min-height: 0;
-    height: 34vh;
-    max-height: 280px;
+    min-height: 280px;
+    height: 52svh;
+    max-height: 460px;
     background: none;
   }
 
@@ -113,7 +113,8 @@
   }
 
   .auth-form-pane h1 {
-    font-size: 28px;
+    font-family: var(--auth-display);
+    font-size: 40px;
     margin: 8px 0 2px;
   }
 
@@ -133,7 +134,9 @@
   }
 
   .auth-promo-title {
-    font-size: clamp(22px, 6.5vw, 30px);
+    font-family: var(--auth-display);
+    font-size: clamp(42px, 12vw, 64px);
+    line-height: 0.78;
   }
 
   .auth-promo-lead {
