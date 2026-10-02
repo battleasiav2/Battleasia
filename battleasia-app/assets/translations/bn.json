@@ -8,6 +8,17 @@
     "home": "হোম",
     "siteColor": "সাইট কালার"
   },
+  "feed": {
+    "comments": "কমেন্ট",
+    "noComments": "এখনো কমেন্ট নেই। প্রথম কমেন্ট করুন।",
+    "replyingTo": "রিপ্লাই",
+    "cancelReply": "রিপ্লাই বাতিল",
+    "replyPh": "@ইউজারনেমে রিপ্লাই…",
+    "commentPh": "কমেন্ট লিখুন…",
+    "send": "পোস্ট",
+    "reply": "রিপ্লাই",
+    "commentFail": "কমেন্ট হয়নি"
+  },
   "feedHub": {
     "feed": "ফিড",
     "explore": "এক্সপ্লোর",

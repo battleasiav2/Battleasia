@@ -230,6 +230,9 @@ class FeedComment {
   final String feedId;
   final String createdAt;
   final FeedCommentUser user;
+  final List<FeedComment> replies;
+  final int totalLikes;
+  final bool isLiked;
 
   FeedComment({
     required this.id,
@@ -237,9 +240,18 @@ class FeedComment {
     required this.feedId,
     required this.createdAt,
     required this.user,
+    this.replies = const [],
+    this.totalLikes = 0,
+    this.isLiked = false,
   });
 
   factory FeedComment.fromJson(Map<String, dynamic> json) {
+    final rawReplies = json['replies'];
+    final replies = rawReplies is List
+        ? rawReplies
+            .map((e) => FeedComment.fromJson(e as Map<String, dynamic>))
+            .toList()
+        : <FeedComment>[];
     return FeedComment(
       id: json['id']?.toString() ?? '',
       content: json['content']?.toString() ?? '',
@@ -252,6 +264,9 @@ class FeedComment {
                   : {},
             )
           : FeedCommentUser(id: '', username: 'Unknown', avatar: ''),
+      replies: replies,
+      totalLikes: json['totalLikes'] as int? ?? 0,
+      isLiked: json['isLiked'] as bool? ?? false,
     );
   }
 

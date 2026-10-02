@@ -172,7 +172,7 @@ export function mapCoverKey(map?: string): MapCoverKey | '' {
   return hit || '';
 }
 
-function localMapCover(map?: string) {
+export function localMapCover(map?: string) {
   const key = mapCoverKey(map);
   return key ? `/covers/maps/${key}.webp` : '';
 }
@@ -201,18 +201,29 @@ function rewriteRemoteMapAsset(src: string) {
   return key ? `/covers/maps/${key}.webp` : '';
 }
 
-/** Per-room art: API banner → map → arena name → mode → game default. */
+/** Game-wide placeholders — must not beat per-room map art. */
+function isGenericGameBanner(src: string) {
+  const s = src.split('?')[0].toLowerCase();
+  if (/^\/covers\/(pubg|freefire|cod|valorant|mlbb)\.(webp|svg|png)$/.test(s)) return true;
+  if (s.includes('hero-banner') || s.includes('/assets/images/games')) return true;
+  return isMissingArt(src);
+}
+
+/** Per-room art: map → arena name → map banner URL → mode → game default. */
 export function coverForMatch(match: Pick<MatchItem, 'banner' | 'map' | 'matchName' | 'gameName' | 'teamType' | 'gameMode'>) {
+  const fromMap = localMapCover(match.map);
+  if (fromMap) return fromMap;
+
+  const fromArena = arenaCoverFromName(match.matchName);
+  if (fromArena) return fromArena;
+
   const remote = (match.banner || '').trim();
   if (remote) {
     const localMap = rewriteRemoteMapAsset(remote);
     if (localMap) return localMap;
-    if (!isMissingArt(remote) && !remote.startsWith('/covers/')) return remote;
+    if (!isGenericGameBanner(remote) && !remote.startsWith('/covers/')) return remote;
   }
-  const fromMap = localMapCover(match.map);
-  if (fromMap) return fromMap;
-  const fromArena = arenaCoverFromName(match.matchName);
-  if (fromArena) return fromArena;
+
   const fromMode = modeCover(match.teamType, match.gameMode);
   if (fromMode) return fromMode;
   return coverForGame({ name: match.gameName, banner: match.banner });
@@ -245,6 +256,7 @@ export function coverForGame(game: {
 
 export function webpSrcSet(src: string, smW: number, fullW: number) {
   if (!src.includes('.webp')) return undefined;
+  if (src.includes('/covers/maps/') || src.includes('/covers/modes/')) return undefined;
   const bare = src.split('?')[0];
   const q = src.includes('?') ? `?${src.split('?')[1]}` : '';
   return `${bare.replace(/\.webp$/, '-sm.webp')}${q} ${smW}w, ${bare}${q} ${fullW}w`;

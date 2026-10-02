@@ -20,6 +20,7 @@ import {
   isJoinable,
   joinMatch,
   localCoverForGame,
+  localMapCover,
   spotsLeft,
   webpSrcSet,
   type MatchItem,
@@ -371,6 +372,12 @@ export function MatchListPage() {
                         decoding="async"
                         onError={(e) => {
                           const img = e.currentTarget;
+                          const mapArt = localMapCover(match.map);
+                          if (mapArt && img.getAttribute('src') !== mapArt && !img.src.endsWith(mapArt)) {
+                            img.removeAttribute('srcset');
+                            img.src = mapArt;
+                            return;
+                          }
                           const local = localCoverForGame({ name: match.gameName });
                           if (img.getAttribute('src') === local || img.src.endsWith(local)) {
                             img.style.display = 'none';

@@ -149,23 +149,9 @@ html[data-theme='light'] {
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--ba-text) 22%, transparent);
 }
 
+/* Light/dark toggle temporarily removed from ThemeDock */
 .theme-dock .theme-mode {
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  border: 1px solid var(--ba-hair);
-  background: color-mix(in srgb, var(--ba-text) 4%, transparent);
-  color: var(--ba-text);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  padding: 0;
-}
-
-.theme-dock .theme-mode:hover {
-  border-color: color-mix(in srgb, var(--ba-accent) 45%, var(--ba-hair));
-  color: var(--ba-accent);
+  display: none !important;
 }
 
 .theme-dock .theme-pop {

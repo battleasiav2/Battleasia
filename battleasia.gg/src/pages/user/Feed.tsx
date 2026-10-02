@@ -45,6 +45,7 @@ import { fetchP2Flags, type P2Flags } from '../../lib/p2';
 import { readSessionUser } from '../../lib/auth';
 import { getAuthedSocket } from '../../lib/socket';
 import { useI18n } from '../../lib/i18n';
+import { feedPreviewSrc } from '../../lib/feedMedia';
 
 const TABS = [
   { id: 'home', label: 'feed.home', to: '/user/feed' },
@@ -324,7 +325,18 @@ export function FeedPage() {
           </label>
           {stories.map((g, i) => (
             <button key={g.userId} className="story-dot" type="button" onClick={() => setStory({ gi: i, ii: 0 })}>
-              {g.avatar ? <img src={g.avatar} alt="" width={56} height={56} /> : <span className="ph">{(g.username || '?')[0]}</span>}
+              {g.avatar ? (
+                <img
+                  src={feedPreviewSrc(g.avatar)}
+                  alt=""
+                  width={56}
+                  height={56}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ) : (
+                <span className="ph">{(g.username || '?')[0]}</span>
+              )}
               <small>{g.username}</small>
             </button>
           ))}
@@ -411,7 +423,7 @@ export function FeedPage() {
               <article key={c.id} className="ig-suggest-card">
                 <Link to={`/profile/${c.id}`} className="ig-suggest-avatar">
                   {c.avatar ? (
-                    <img src={c.avatar} alt="" width={56} height={56} />
+                    <img src={feedPreviewSrc(c.avatar)} alt="" width={56} height={56} loading="lazy" decoding="async" />
                   ) : (
                     <span aria-hidden>{(c.username || '?').slice(0, 1).toUpperCase()}</span>
                   )}
@@ -533,7 +545,18 @@ export function FeedPage() {
             <div className="explore-grid">
               {hits.posts.map((p) => (
                 <Link key={p.id} className="explore-tile" to={`/user/feed/${p.id}`}>
-                  {p.coverUrl ? <img src={p.coverUrl} alt="" /> : <span>{p.title || p.description}</span>}
+                  {p.coverUrl ? (
+                    <img
+                      src={feedPreviewSrc(p.coverUrl)}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      width={240}
+                      height={240}
+                    />
+                  ) : (
+                    <span>{p.title || p.description}</span>
+                  )}
                 </Link>
               ))}
             </div>
@@ -712,6 +735,17 @@ export function FeedPage() {
           <section className="room-card dm-pane">
             {openChat ? (
               <>
+                <button
+                  type="button"
+                  className="btn btn-ghost dm-back"
+                  onClick={() => {
+                    setOpenChat(null);
+                    setDms([]);
+                    setDmReply(null);
+                  }}
+                >
+                  ← {t('feed.inbox')}
+                </button>
                 <div className="dm-thread-head">
                   <h2>
                     {openChat.participant?.isOnline ? <span className="online-dot" aria-hidden /> : null}{' '}
@@ -957,7 +991,18 @@ export function FeedPage() {
             {(active === 'saved' && folder ? posts.filter((p) => (p.collectionName || t('feed.saved')) === folder) : posts).map((p) =>
               active === 'explore' ? (
                 <Link key={p.id} className="explore-tile" to={`/user/feed/${p.id}`}>
-                  {p.coverUrl ? <img src={p.coverUrl} alt="" /> : <span>{p.description || p.title}</span>}
+                  {p.coverUrl ? (
+                    <img
+                      src={feedPreviewSrc(p.coverUrl)}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      width={240}
+                      height={240}
+                    />
+                  ) : (
+                    <span>{p.description || p.title}</span>
+                  )}
                 </Link>
               ) : (
                 <PostCard

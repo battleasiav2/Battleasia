@@ -12,26 +12,43 @@ import { ensureFakePlayers } from './seed-dashboard-data.js';
 
 const DEMO_MARKER = 'SOCIAL-DEMO';
 
+/** Same paths as battleasia.gg/public (WebP, small map art where possible). */
 const POST_IMAGES = [
-  '/assets/images/shop/1.webp',
-  '/assets/images/shop/2.webp',
-  '/assets/images/shop/3.webp',
-  '/assets/images/shop/4.webp',
-  '/assets/images/shop/5.webp',
-  '/assets/images/shop/6.webp',
-  '/assets/images/shop/7.webp',
-  '/assets/images/shop/8.webp',
-  '/assets/images/shop/9.webp',
-  '/assets/images/games/art/pubg-mobile.png',
-  '/assets/images/games/art/free-fire.png',
-  '/assets/images/games/art/mobile-legends.png',
-  '/assets/images/games/art/valorant.png',
-  '/assets/images/hero-banner-pubg.png',
-  '/assets/images/home/modes/mode-solo.png',
-  '/assets/images/home/modes/mode-squad.png',
-  '/assets/images/home/modes/mode-duo.png',
-  '/assets/images/home/modes/mode-tdm.png',
+  '/covers/maps/Erangel.webp',
+  '/covers/maps/Miramar.webp',
+  '/covers/maps/Sanhok.webp',
+  '/covers/maps/Livik.webp',
+  '/covers/maps/Vikendi.webp',
+  '/covers/maps/Nusa.webp',
+  '/covers/maps/Karakin.webp',
+  '/covers/maps/Rondo.webp',
+  '/covers/maps/Warehouse.webp',
+  '/covers/maps/Hanger.webp',
+  '/covers/maps/Gun.webp',
+  '/covers/pubg.webp',
+  '/covers/freefire.webp',
+  '/covers/mlbb.webp',
+  '/covers/valorant.webp',
+  '/covers/modes/solo.webp',
+  '/covers/modes/duo.webp',
+  '/covers/modes/squad.webp',
+  '/covers/modes/tdm.webp',
 ];
+
+const LEGACY_MEDIA = /\/assets\/images\/(shop|games|home|map)\/|\.png(\?|$)/i;
+
+function stockFromString(seed: string) {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i += 1) hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  return POST_IMAGES[hash % POST_IMAGES.length];
+}
+
+function normalizeMediaUrl(url: string | undefined) {
+  const raw = (url || '').trim();
+  if (!raw) return '';
+  if (LEGACY_MEDIA.test(raw.split('?')[0])) return stockFromString(raw);
+  return raw;
+}
 
 const DEMO_REEL_VIDEOS = [
   'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
@@ -155,9 +172,9 @@ const BOT_POSTS: BotPostSeed[] = [
     playerIndex: 7,
     description: 'Bangladesh server ping finally stable — time to push leaderboard.',
     hashtags: ['bangladesh', 'leaderboard', 'battleasia'],
-    postType: 'text',
+    postType: 'image',
     coverUrl: POST_IMAGES[13],
-    mediaUrls: [],
+    mediaUrls: [POST_IMAGES[13]],
     totalViews: 890,
     totalLikes: 71,
     totalComments: 11,
@@ -214,6 +231,110 @@ const BOT_POSTS: BotPostSeed[] = [
     totalLikes: 64,
     totalComments: 10,
     daysAgo: 6,
+  },
+  {
+    marker: 'POST-013',
+    playerIndex: 0,
+    description: 'Erangel hot drop survival — third win this week.',
+    hashtags: ['erangel', 'pubgmobile', 'battleasia'],
+    postType: 'image',
+    coverUrl: POST_IMAGES[0],
+    mediaUrls: [POST_IMAGES[0]],
+    totalViews: 640,
+    totalLikes: 42,
+    totalComments: 6,
+    daysAgo: 0,
+  },
+  {
+    marker: 'POST-014',
+    playerIndex: 2,
+    description: 'Sanhok rotation meta — where are you landing?',
+    hashtags: ['sanhok', 'drops', 'battleasia'],
+    postType: 'image',
+    coverUrl: POST_IMAGES[2],
+    mediaUrls: [POST_IMAGES[2]],
+    totalViews: 520,
+    totalLikes: 35,
+    totalComments: 8,
+    daysAgo: 1,
+  },
+  {
+    marker: 'POST-015',
+    playerIndex: 4,
+    description: 'Solo vs Squad — which mode pays more BAC for you?',
+    hashtags: ['solo', 'squad', 'earn'],
+    postType: 'gallery',
+    coverUrl: POST_IMAGES[15],
+    mediaUrls: [POST_IMAGES[15], POST_IMAGES[17], POST_IMAGES[16]],
+    totalViews: 780,
+    totalLikes: 51,
+    totalComments: 12,
+    daysAgo: 2,
+  },
+  {
+    marker: 'POST-016',
+    playerIndex: 6,
+    description: 'Livik fast pace rooms — join link in bio.',
+    hashtags: ['livik', 'rooms', 'battleasia'],
+    postType: 'image',
+    coverUrl: POST_IMAGES[3],
+    mediaUrls: [POST_IMAGES[3]],
+    totalViews: 430,
+    totalLikes: 29,
+    totalComments: 4,
+    daysAgo: 3,
+  },
+  {
+    marker: 'POST-017',
+    playerIndex: 8,
+    description: 'Warehouse TDM ace — replay uploaded.',
+    hashtags: ['tdm', 'warehouse', 'clutch'],
+    postType: 'image',
+    coverUrl: POST_IMAGES[8],
+    mediaUrls: [POST_IMAGES[8]],
+    totalViews: 590,
+    totalLikes: 38,
+    totalComments: 7,
+    daysAgo: 4,
+  },
+  {
+    marker: 'POST-018',
+    playerIndex: 10,
+    description: 'Cross-game grind: PUBG rooms then MLBB ranked.',
+    hashtags: ['mlbb', 'pubgmobile', 'grind'],
+    postType: 'gallery',
+    coverUrl: POST_IMAGES[12],
+    mediaUrls: [POST_IMAGES[12], POST_IMAGES[11], POST_IMAGES[14]],
+    totalViews: 710,
+    totalLikes: 46,
+    totalComments: 9,
+    daysAgo: 5,
+  },
+  {
+    marker: 'POST-019',
+    playerIndex: 12,
+    description: 'Vikendi snowball fight turned into a win.',
+    hashtags: ['vikendi', 'winter', 'battleasia'],
+    postType: 'image',
+    coverUrl: POST_IMAGES[4],
+    mediaUrls: [POST_IMAGES[4]],
+    totalViews: 480,
+    totalLikes: 31,
+    totalComments: 5,
+    daysAgo: 6,
+  },
+  {
+    marker: 'POST-020',
+    playerIndex: 14,
+    description: 'Nusa island rush — shortest match of the night.',
+    hashtags: ['nusa', 'fastgame', 'battleasia'],
+    postType: 'image',
+    coverUrl: POST_IMAGES[5],
+    mediaUrls: [POST_IMAGES[5]],
+    totalViews: 550,
+    totalLikes: 36,
+    totalComments: 6,
+    daysAgo: 7,
   },
 ];
 
@@ -337,6 +458,33 @@ const BOT_REELS: BotReelSeed[] = [
   },
 ];
 
+async function backfillBrokenFeedMedia() {
+  const rows = await Feed.find({
+    $or: [
+      { coverUrl: LEGACY_MEDIA },
+      { mediaUrls: { $elemMatch: { $regex: LEGACY_MEDIA } } },
+      { postType: { $in: ['image', 'gallery'] }, coverUrl: { $in: ['', null] } },
+    ],
+  }).limit(300);
+
+  let updated = 0;
+  for (const row of rows) {
+    const cover = normalizeMediaUrl(row.coverUrl);
+    const media = (row.mediaUrls || []).map((u) => normalizeMediaUrl(u)).filter(Boolean);
+    const nextMedia = media.length ? media : cover ? [cover] : [];
+    const nextCover = cover || nextMedia[0] || stockFromString(String(row._id));
+    if (nextCover !== row.coverUrl || JSON.stringify(nextMedia) !== JSON.stringify(row.mediaUrls || [])) {
+      row.coverUrl = nextCover;
+      row.mediaUrls = nextMedia.length ? nextMedia : [nextCover];
+      if (row.postType === 'text' && nextCover) row.postType = nextMedia.length > 1 ? 'gallery' : 'image';
+      await row.save();
+      updated += 1;
+    }
+  }
+  if (updated > 0) console.log(`  Patched ${updated} feed posts with local WebP media`);
+  return updated;
+}
+
 async function ensureCommunityCategory() {
   let category = await FeedCategory.findOne({ slug: 'community' });
   if (!category) {
@@ -371,13 +519,17 @@ async function seedBotPosts(players: InstanceType<typeof User>[], categoryId: In
 
     const createdAt = new Date(Date.now() - post.daysAgo * 86_400_000);
 
+    const coverUrl = normalizeMediaUrl(post.coverUrl || post.mediaUrls?.[0]);
+    const mediaUrls = (post.mediaUrls || []).map((u) => normalizeMediaUrl(u)).filter(Boolean);
+    const resolvedMedia = mediaUrls.length ? mediaUrls : coverUrl ? [coverUrl] : [];
+
     await Feed.create({
       categoryId,
       title: displayTitle,
       description: `<p>${post.description}</p>`,
-      coverUrl: post.coverUrl || post.mediaUrls?.[0] || '',
+      coverUrl: coverUrl || resolvedMedia[0] || '',
       postType: post.postType,
-      mediaUrls: post.mediaUrls || [],
+      mediaUrls: resolvedMedia,
       hashtags: post.hashtags,
       visibility: 'public',
       status: 'published',
@@ -406,7 +558,7 @@ async function seedBotStories(players: InstanceType<typeof User>[]) {
     const player = players[story.playerIndex % players.length];
     if (!player) continue;
 
-    const mediaUrl = POST_IMAGES[story.imageIndex % POST_IMAGES.length];
+    const mediaUrl = normalizeMediaUrl(POST_IMAGES[story.imageIndex % POST_IMAGES.length]);
     const markerCaption = `${DEMO_MARKER}-${story.marker}`;
     const legacy = await Story.findOne({ caption: markerCaption });
     if (legacy) {
@@ -515,7 +667,7 @@ async function seedBotFollows(players: InstanceType<typeof User>[]) {
 }
 
 async function seedBotLikes(players: InstanceType<typeof User>[]) {
-  const demoPosts = await Feed.find({ title: new RegExp(`^${DEMO_MARKER}-POST-`) }).select('_id');
+  const demoPosts = await Feed.find({ hashtags: 'battleasia' }).select('_id').limit(80);
   if (demoPosts.length === 0) return 0;
 
   let created = 0;
@@ -567,6 +719,8 @@ export async function seedSocialContent() {
   }
 
   console.log('Seeding bot social content (posts, stories, reels)...');
+
+  await backfillBrokenFeedMedia();
 
   const category = await ensureCommunityCategory();
   const postsCreated = await seedBotPosts(players, category._id);

@@ -364,27 +364,88 @@ svg {
 }
 
 @media (max-width: 820px) {
+  .play-app {
+    padding-left: 0;
+  }
+
   .play-hud {
-    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 25;
+    flex-wrap: nowrap;
     align-items: center;
-    align-content: flex-start;
-    row-gap: 0;
-    column-gap: 12px;
+    gap: 6px;
+    min-height: 56px;
+    padding: 8px 10px;
   }
 
   .play-hud .brand {
     order: 1;
     min-width: 0;
     flex: 1 1 auto;
+    gap: 8px;
+  }
+
+  .play-hud .brand img {
+    width: 36px;
+    height: 36px;
+  }
+
+  .play-hud .brand-name {
+    display: none;
+  }
+
+  .play-hud .nav-burger {
+    display: grid;
+    order: 2;
+    flex-shrink: 0;
+    margin: 0;
+  }
+
+  .play-hud-rail-foot {
+    display: contents;
+  }
+
+  .play-hud-rail-foot .hud-more-rail,
+  .play-hud-rail-foot .hud-signout,
+  .play-hud-rail-foot .locale-select,
+  .play-hud-rail-foot .theme-dock {
+    display: none;
+  }
+
+  .play-hud-rail-foot .play-hud-rail-tools {
+    display: flex;
+    order: 3;
+    flex-shrink: 0;
+    width: auto;
+    margin: 0;
+    gap: 0;
+  }
+
+  .play-hud .hud-bell {
+    display: inline-grid;
+    order: 3;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    min-height: 38px;
+  }
+
+  .play-hud .hud-bell svg {
+    width: 20px;
+    height: 20px;
   }
 
   .play-hud .hud-balance {
-    order: 2;
+    order: 4;
     display: inline-flex;
-    margin-left: auto;
-    max-width: 42vw;
+    margin-left: 0;
+    max-width: 34vw;
     min-width: 0;
     overflow: hidden;
+    flex-shrink: 1;
+    min-height: 38px;
+    padding: 6px 8px;
   }
 
   .play-hud .hud-balance .coin {
@@ -394,7 +455,7 @@ svg {
 
   .play-hud .hud-balance .coin b,
   .play-hud .hud-balance .coin {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .play-hud .hud-balance .coin b {
@@ -404,26 +465,20 @@ svg {
     white-space: nowrap;
   }
 
-  .play-hud .brand-name {
-    max-width: 34vw;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
   .play-hud .hud-account {
-    order: 3;
+    order: 5;
     margin-left: 0;
+    flex-shrink: 0;
   }
 
-  .play-hud .nav-burger {
-    display: grid;
-    order: 4;
-    margin-left: 0;
+  .play-hud .hud-account .user-avatar,
+  .play-hud .hud-account .user-avatar img,
+  .play-hud .hud-account .user-avatar svg {
+    width: 36px;
+    height: 36px;
   }
 
-  .play-hud .play-nav,
-  .play-hud .play-hud-right {
+  .play-hud .play-nav {
     display: none;
     flex: 0 0 100%;
     width: 100%;
@@ -484,19 +539,9 @@ svg {
     box-shadow: none;
   }
 
-  .play-hud.is-open .play-hud-right {
-    display: flex;
-    order: 6;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 10px;
-    padding: 8px 0 10px;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-  }
-
-  .play-hud.is-open .play-hud-right .locale-select {
-    margin-left: auto;
+  /* Mobile menu = MobileDrawer; keep top bar icons visible */
+  .play-hud.is-open .play-nav {
+    display: none !important;
   }
 
   .play-hud.is-open .locale-select .accent-pop,
@@ -634,6 +679,16 @@ svg {
     padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
   }
 
+  .play-main.ig-feed,
+  .play-main-tight.ig-feed {
+    overflow-x: clip;
+  }
+
+  body:has(.ig-comments-sheet) .play-main,
+  body:has(.ig-comments-sheet) .play-main-tight {
+    padding-bottom: 0;
+  }
+
   .legal-body {
     padding: 16px;
   }
@@ -646,6 +701,16 @@ svg {
 
   .topbar .brand-name {
     max-width: 42vw;
+  }
+}
+
+.play-hud-rail-foot {
+  display: contents;
+}
+
+@media (max-width: 980px) {
+  .play-hud-rail-foot .hud-more-rail {
+    display: none;
   }
 }
 
@@ -710,9 +775,80 @@ svg {
     gap: 4px;
     width: 100%;
     margin: 12px 0 0;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     min-height: 0;
     overflow: visible;
+  }
+
+  .play-app > .play-hud .play-hud-rail-foot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid var(--ba-hair);
+    flex-shrink: 0;
+  }
+
+  .play-app > .play-hud .play-hud-rail-tools {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .play-app > .play-hud .hud-more-rail {
+    width: 100%;
+  }
+
+  .play-app > .play-hud .hud-more-rail > button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    min-height: 44px;
+    margin: 0;
+    padding: 6px 4px;
+    border-radius: 14px;
+    border: 0;
+    background: transparent;
+    color: var(--ba-muted);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .play-app > .play-hud .hud-more-rail > button::before {
+    content: '';
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7'%3E%3Ccircle cx='6' cy='12' r='1.2'/%3E%3Ccircle cx='12' cy='12' r='1.2'/%3E%3Ccircle cx='18' cy='12' r='1.2'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7'%3E%3Ccircle cx='6' cy='12' r='1.2'/%3E%3Ccircle cx='12' cy='12' r='1.2'/%3E%3Ccircle cx='18' cy='12' r='1.2'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+
+  .play-app > .play-hud .hud-more-rail > button:hover {
+    background: color-mix(in srgb, var(--ba-text) 6%, transparent);
+    color: var(--ba-text);
+  }
+
+  .play-app > .play-hud .hud-more-rail > button.active {
+    background: color-mix(in srgb, var(--ba-accent) 18%, transparent);
+    color: var(--ba-text);
+  }
+
+  .play-app > .play-hud .hud-account {
+    width: 100%;
+    display: flex;
+    justify-content: center;
   }
 
   .play-app > .play-hud .play-nav a,
@@ -798,53 +934,33 @@ svg {
     display: none;
   }
 
-  .play-app > .play-hud .play-hud-right {
-    display: contents;
-  }
-
-  .play-app > .play-hud .hud-account {
-    order: 1;
-    margin-top: auto;
-  }
-
-  .play-app > .play-hud .theme-dock {
-    order: 2;
-  }
-
-  .play-app > .play-hud .hud-bell {
-    order: 3;
-  }
-
-  .play-app > .play-hud .hud-balance {
-    order: 4;
-  }
-
-  .play-app > .play-hud .locale-select {
-    order: 5;
-  }
-
   .play-app > .play-hud .hud-signout {
     display: flex;
-    order: 6;
     align-items: center;
     justify-content: center;
     width: 100%;
-    min-height: 34px;
+    min-height: 36px;
     margin: 0;
-    padding: 6px 8px;
+    padding: 8px 10px;
     border-radius: 12px;
-    border: 1px solid var(--ba-hair);
-    background: transparent;
-    color: var(--ba-text);
+    border: 1px solid color-mix(in srgb, var(--ba-danger) 38%, transparent);
+    background: color-mix(in srgb, var(--ba-danger) 11%, transparent);
+    color: color-mix(in srgb, var(--ba-danger) 82%, #fff);
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1.15;
     cursor: pointer;
   }
 
   .play-app > .play-hud .hud-signout:hover {
-    border-color: color-mix(in srgb, var(--ba-accent) 55%, transparent);
-    color: var(--ba-accent);
+    border-color: color-mix(in srgb, var(--ba-danger) 52%, transparent);
+    background: color-mix(in srgb, var(--ba-danger) 18%, transparent);
+    color: color-mix(in srgb, var(--ba-danger) 92%, #fff);
+  }
+
+  .play-app > .play-hud .hud-bell {
+    position: relative;
+    flex-shrink: 0;
   }
 
   .play-app > .play-hud .hud-account .hud-user .user-avatar,

@@ -11,6 +11,7 @@ import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_hub_panels.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_hub_tabs.dart';
+import 'package:battleasia_app/presentation/widgets/feed/feed_comments_sheet.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_item.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_composer.dart';
 import 'package:battleasia_app/presentation/widgets/feed/stories_bar.dart';
@@ -374,6 +375,22 @@ class _FeedScreenState extends State<FeedScreen> {
                             SnackBar(
                               content: Text('feedHub.shareSoon'.tr()),
                             ),
+                          );
+                        },
+                        onComment: () {
+                          FeedCommentsSheet.show(
+                            context,
+                            feedId: feed.id,
+                            onCommentAdded: () {
+                              setState(() {
+                                final i = _feeds.indexWhere((f) => f.id == feed.id);
+                                if (i >= 0) {
+                                  _feeds[i] = _feeds[i].copyWith(
+                                    totalComments: _feeds[i].totalComments + 1,
+                                  );
+                                }
+                              });
+                            },
                           );
                         },
                       ),

@@ -21,6 +21,7 @@ import {
 import { fetchP1Flags } from '../../lib/p1';
 import { readSessionUser } from '../../lib/auth';
 import { useI18n } from '../../lib/i18n';
+import { feedImageSrcSet, feedMediaUrl, feedPreviewSrc, isFeedVideo } from '../../lib/feedMedia';
 
 function mentionText(text: string) {
   return text.split(/(@[\w.]+)/g).map((part, i) =>
@@ -129,10 +130,19 @@ export function FeedPostPage() {
             lastTap.current = now;
           }}
         >
-          {/\.(mp4|webm)(\?|$)/i.test(post.coverUrl) ? (
-            <video src={post.coverUrl} controls playsInline width={960} height={540} />
+          {isFeedVideo(post.coverUrl) ? (
+            <video src={feedMediaUrl(post.coverUrl)} controls playsInline preload="metadata" width={960} height={540} />
           ) : (
-            <img src={post.coverUrl} alt="" width={960} height={540} />
+            <img
+              src={feedPreviewSrc(post.coverUrl)}
+              srcSet={feedImageSrcSet(post.coverUrl)}
+              sizes="(max-width: 820px) 100vw, 720px"
+              alt=""
+              width={720}
+              height={720}
+              loading="lazy"
+              decoding="async"
+            />
           )}
         </div>
       ) : null}

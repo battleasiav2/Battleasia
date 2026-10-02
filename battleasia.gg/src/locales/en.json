@@ -549,6 +549,8 @@
   "feed.replyPh": "Reply with @username…",
   "feed.comment": "Comment",
   "feed.cancelReply": "Cancel reply",
+  "feed.noComments": "No comments yet. Start the conversation.",
+  "feed.replyingTo": "Replying to",
   "feed.followLikeFail": "Could not follow/like",
   "feed.notFound": "Post not found",
   "feed.post": "Post",

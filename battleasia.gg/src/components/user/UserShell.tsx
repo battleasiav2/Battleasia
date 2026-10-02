@@ -237,7 +237,7 @@ function UserChrome() {
 
   return (
     <div className="play-app">
-      <header className="play-hud">
+      <header className={`play-hud${navOpen ? ' is-open' : ''}`}>
         <Link className="brand" to="/dashboard">
           <img src={ASSETS.logo} width={44} height={44} alt="BattleAsia" />
           <div className="brand-name">
@@ -281,7 +281,9 @@ function UserChrome() {
           <Link className={location.pathname.startsWith('/user/feed') ? 'active' : ''} to="/user/feed">
             {t('nav.feed')}
           </Link>
-          <div className="hud-more" onPointerDown={(e) => e.stopPropagation()}>
+        </nav>
+        <div className="play-hud-rail-foot">
+          <div className="hud-more hud-more-rail" onPointerDown={(e) => e.stopPropagation()}>
             <button
               type="button"
               className={
@@ -312,23 +314,72 @@ function UserChrome() {
               </div>
             ) : null}
           </div>
-        </nav>
-        <div className="play-hud-right">
-          <ThemeDock />
-          <Link
-            className={`hud-bell ${location.pathname.startsWith('/user/account/notifications') ? 'active' : ''}`}
-            to="/user/account/notifications"
-            aria-label={t('hud.alerts')}
-            title={t('hud.alerts')}
+          <div className="hud-account" onPointerDown={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="hud-user"
+              title={me?.username || t('nav.account')}
+              aria-label={t('nav.account')}
+              aria-expanded={pop === 'user'}
+              onClick={() => setPop((v) => (v === 'user' ? null : 'user'))}
+            >
+              <UserAvatar className={`frame-${me?.cosmeticId || 'none'}`} src={me?.avatar} name={me?.username} size={36} />
+            </button>
+            {pop === 'user' ? (
+              <div className="hud-menu is-end">
+                <Link to="/user/account/profile">{t('nav.account')}</Link>
+                <Link to="/dashboard">{t('nav.home')}</Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPop(null);
+                    setSheet(true);
+                  }}
+                >
+                  {t('hud.shortcuts')}
+                </button>
+                <button type="button" className="hud-menu-signout" onClick={async () => {
+                  setPop(null);
+                  disconnectSocket();
+                  await logout();
+                  navigate('/dashboard');
+                }}>
+                  {t('cta.signout')}
+                </button>
+              </div>
+            ) : null}
+          </div>
+          <div className="play-hud-rail-tools">
+            <ThemeDock />
+            <Link
+              className={`hud-bell ${location.pathname.startsWith('/user/account/notifications') ? 'active' : ''}`}
+              to="/user/account/notifications"
+              aria-label={t('hud.alerts')}
+              title={t('hud.alerts')}
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+                <path
+                  d="M6 17h12l-1.4-2.1V11a4.6 4.6 0 0 0-3.1-4.3V6a1.5 1.5 0 1 0-3 0v.7A4.6 4.6 0 0 0 7.4 11v3.9L6 17Zm6 3a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2Z"
+                  fill="currentColor"
+                />
+              </svg>
+              {alerts > 0 ? <span className="hud-dot">{alerts > 9 ? '9+' : alerts}</span> : null}
+            </Link>
+          </div>
+          <button
+            type="button"
+            className="balance-pill hud-balance"
+            onClick={() => {
+              setHide((v) => {
+                const next = !v;
+                localStorage.setItem('ba-hide-balance', next ? '1' : '0');
+                return next;
+              });
+            }}
+            title={t('hud.balanceHint')}
           >
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-              <path
-                d="M6 17h12l-1.4-2.1V11a4.6 4.6 0 0 0-3.1-4.3V6a1.5 1.5 0 1 0-3 0v.7A4.6 4.6 0 0 0 7.4 11v3.9L6 17Zm6 3a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2Z"
-                fill="currentColor"
-              />
-            </svg>
-            {alerts > 0 ? <span className="hud-dot">{alerts > 9 ? '9+' : alerts}</span> : null}
-          </Link>
+            {hide ? <span className="coin"><b>**** BAC</b></span> : <CoinValue value={balance} />}
+          </button>
           <LocaleSelect />
           <button
             type="button"
@@ -341,58 +392,6 @@ function UserChrome() {
           >
             {t('cta.signout')}
           </button>
-        </div>
-        <button
-          type="button"
-          className="balance-pill hud-balance"
-          onClick={() => {
-            setHide((v) => {
-              const next = !v;
-              localStorage.setItem('ba-hide-balance', next ? '1' : '0');
-              return next;
-            });
-          }}
-          title={t('hud.balanceHint')}
-        >
-          {hide ? <span className="coin"><b>**** BAC</b></span> : <CoinValue value={balance} />}
-        </button>
-        <div className="hud-account" onPointerDown={(e) => e.stopPropagation()}>
-          <button
-            type="button"
-            className="hud-user"
-            title={me?.username || t('nav.account')}
-            aria-label={t('nav.account')}
-            aria-expanded={pop === 'user'}
-            onClick={() => setPop((v) => (v === 'user' ? null : 'user'))}
-          >
-            <UserAvatar className={`frame-${me?.cosmeticId || 'none'}`} src={me?.avatar} name={me?.username} size={36} />
-          </button>
-          {pop === 'user' ? (
-            <div className="hud-menu is-end">
-              <Link to="/user/account/profile">{t('nav.account')}</Link>
-              <Link to="/dashboard">{t('nav.home')}</Link>
-              <button
-                type="button"
-                onClick={() => {
-                  setPop(null);
-                  setSheet(true);
-                }}
-              >
-                {t('hud.shortcuts')}
-              </button>
-              <button
-                type="button"
-                onClick={async () => {
-                  setPop(null);
-                  disconnectSocket();
-                  await logout();
-                  navigate('/dashboard');
-                }}
-              >
-                {t('cta.signout')}
-              </button>
-            </div>
-          ) : null}
         </div>
       </header>
       <MobileDrawer

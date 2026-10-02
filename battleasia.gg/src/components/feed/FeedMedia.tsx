@@ -15,24 +15,46 @@ import {
   type StoryGroup,
 } from '../../lib/social';
 import { useI18n } from '../../lib/i18n';
+import {
+  FEED_LIST_IMG_W,
+  feedImageSrcSet,
+  feedMediaUrl,
+  feedPreviewSrc,
+  isFeedVideo,
+} from '../../lib/feedMedia';
+import { FeedCommentsSheet } from './FeedCommentsSheet';
 
 type Toast = (msg: string) => void;
 
-function isVid(url: string) {
-  return /\.(mp4|webm)(\?|$)/i.test(url);
+function FeedPicture({ src, eager }: { src: string; eager?: boolean }) {
+  const safe = feedMediaUrl(src);
+  if (!safe) return null;
+  return (
+    <img
+      src={feedPreviewSrc(safe)}
+      srcSet={feedImageSrcSet(safe)}
+      sizes="(max-width: 820px) 100vw, 470px"
+      alt=""
+      width={FEED_LIST_IMG_W}
+      height={FEED_LIST_IMG_W}
+      loading={eager ? 'eager' : 'lazy'}
+      decoding="async"
+    />
+  );
 }
 
 function Carousel({ slides }: { slides: string[] }) {
   const { t } = useI18n();
   const [i, setI] = useState(0);
   const src = slides[i];
+  const safe = src ? feedMediaUrl(src) : '';
   return (
     <>
-      {src && isVid(src) ? (
-        <video src={src} controls playsInline width={720} height={405} />
-      ) : (
-        <img src={src} alt="" width={720} height={405} />
-      )}
+      {safe && isFeedVideo(safe) ? (
+        <video src={safe} controls playsInline preload="metadata" width={720} height={405} />
+      ) : safe ? (
+        <FeedPicture src={safe} eager={i === 0} />
+      ) : null}
       {slides.length > 1 ? (
         <>
           <button
@@ -81,6 +103,7 @@ export function PostCard({
 }) {
   const { t } = useI18n();
   const [heart, setHeart] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
   const lastTap = useRef(0);
   const authorName = post.author?.name || t('feed.player');
   const avatar = post.author?.avatarUrl;
@@ -113,7 +136,15 @@ export function PostCard({
       <header className="feed-card-head ig-post-head">
         <Link className="ig-post-user" to={post.author?.id ? `/profile/${post.author.id}` : `/user/feed/${post.id}`}>
           {avatar ? (
-            <img className="ig-post-avatar" src={avatar} alt="" width={36} height={36} />
+            <img
+              className="ig-post-avatar"
+              src={feedPreviewSrc(avatar)}
+              alt=""
+              width={36}
+              height={36}
+              loading="lazy"
+              decoding="async"
+            />
           ) : (
             <span className="ig-post-avatar ph" aria-hidden>
               {initial}
@@ -158,10 +189,15 @@ export function PostCard({
           <span aria-hidden>{post.isLiked ? '♥' : '♡'}</span>
           <b>{post.totalLikes || 0}</b>
         </button>
-        <Link className="ig-act" to={`/user/feed/${post.id}`}>
+        <button
+          className="ig-act"
+          type="button"
+          aria-label={t('feed.comments')}
+          onClick={() => setCommentsOpen(true)}
+        >
           <span aria-hidden>💬</span>
           <b>{post.totalComments || 0}</b>
-        </Link>
+        </button>
         <button
           className={`ig-act ig-act-save ${post.isSaved ? 'is-on' : ''}`}
           type="button"
@@ -195,6 +231,13 @@ export function PostCard({
           <CaptionText text={post.description} />
         </div>
       ) : null}
+      <FeedCommentsSheet
+        post={post}
+        open={commentsOpen}
+        onClose={() => setCommentsOpen(false)}
+        toast={toast}
+        onCommentCount={(total) => onChange({ ...post, totalComments: total })}
+      />
     </article>
   );
 }
@@ -300,7 +343,7 @@ export function StoryViewer({
             onEnded={() => go(gi, ii + 1)}
           />
         ) : (
-          <img src={item.mediaUrl} alt="" />
+          <FeedPicture src={item.mediaUrl} />
         )}
         {item.overlayText ? <p className="story-overlay-text">{item.overlayText}</p> : null}
         {(item.stickers || []).map((s, n) => (

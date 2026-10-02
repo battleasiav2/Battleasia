@@ -527,6 +527,8 @@
   "feed.replyPh": "@ইউজারনেমে রিপ্লাই…",
   "feed.comment": "কমেন্ট",
   "feed.cancelReply": "রিপ্লাই বাতিল",
+  "feed.noComments": "এখনো কমেন্ট নেই। প্রথম কমেন্ট করুন।",
+  "feed.replyingTo": "রিপ্লাই",
   "feed.followLikeFail": "ফলো/লাইক হয়নি",
   "feed.notFound": "পোস্ট পাওয়া যায়নি",
   "feed.post": "পোস্ট",

@@ -339,14 +339,19 @@ class FeedService {
   /// Add comment to feed
   Future<Map<String, dynamic>> addFeedComment(
     String feedId,
-    String content,
-  ) async {
+    String content, {
+    String? parentId,
+  }) async {
     try {
       final headers = await _getHeaders();
+      final body = <String, dynamic>{'content': content};
+      if (parentId != null && parentId.isNotEmpty) {
+        body['parentId'] = parentId;
+      }
       final response = await ApiClient.post(
         Uri.parse('$_baseUrl/api/v2/feed/$feedId/comments'),
         headers: headers,
-        body: jsonEncode({'content': content}),
+        body: jsonEncode(body),
       );
 
       final responseBody = response.body;

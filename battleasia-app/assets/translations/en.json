@@ -8,6 +8,17 @@
     "home": "Home",
     "siteColor": "Site color"
   },
+  "feed": {
+    "comments": "Comments",
+    "noComments": "No comments yet. Start the conversation.",
+    "replyingTo": "Replying to",
+    "cancelReply": "Cancel reply",
+    "replyPh": "Reply with @username…",
+    "commentPh": "Add a comment…",
+    "send": "Post",
+    "reply": "Reply",
+    "commentFail": "Could not comment"
+  },
   "feedHub": {
     "feed": "Feed",
     "explore": "Explore",
@@ -365,7 +376,24 @@
     "matchFullHint": "All spots are taken — you can spectate if already joined.",
     "matchFull": "Match full",
     "matchFullToast": "This match is full — no more spots available.",
-    "yourBalance": "Your Balance"
+    "yourBalance": "Your Balance",
+    "spots": "Spots",
+    "secureEntry": "Secure entry",
+    "joinMatchFor": "Review entry details for \"{name}\".",
+    "game": "Game",
+    "schedule": "Schedule",
+    "teamType": "Team Type",
+    "map": "Map",
+    "mapTbd": "TBD",
+    "typeLabel": "Type",
+    "entryFee": "Entry Fee",
+    "perKill": "Per kill",
+    "prize": "Prize",
+    "insufficient": "Insufficient",
+    "joinMatch": "Join Match",
+    "joining": "Joining…",
+    "cancel": "Cancel",
+    "free": "Free"
   },
   "common": {
     "retry": "Retry",

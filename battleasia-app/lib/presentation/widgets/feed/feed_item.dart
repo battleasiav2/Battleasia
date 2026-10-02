@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/core/utils/feed_media_utils.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/utils/time_utils.dart';
@@ -26,6 +27,7 @@ class FeedItem extends StatelessWidget {
   final VoidCallback? onLike;
   final VoidCallback? onSave;
   final VoidCallback? onShare;
+  final VoidCallback? onComment;
 
   const FeedItem({
     super.key,
@@ -34,6 +36,7 @@ class FeedItem extends StatelessWidget {
     this.onLike,
     this.onSave,
     this.onShare,
+    this.onComment,
   });
 
   @override
@@ -177,11 +180,11 @@ class FeedItem extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(2),
                         child: ImageUtils.networkImage(
-                          feed.coverUrl,
+                          FeedMediaUtils.resolveListUrl(feed.coverUrl),
                           height: coverImageHeight,
                           width: double.infinity,
                           fit: BoxFit.cover,
-                          memCacheWidth: 900,
+                          memCacheWidth: FeedMediaUtils.feedListMemCacheWidth,
                           errorWidget: Container(
                             height: coverImageHeight,
                             color: AppColors.surface,
@@ -260,11 +263,15 @@ class FeedItem extends StatelessWidget {
                       fontSize: captionFontSize,
                     ),
                     SizedBox(width: spacing16),
-                    _buildStatItem(
-                      icon: Icons.comment_outlined,
-                      count: feed.totalComments,
-                      iconSize: iconSize,
-                      fontSize: captionFontSize,
+                    InkWell(
+                      onTap: onComment,
+                      borderRadius: BorderRadius.circular(2),
+                      child: _buildStatItem(
+                        icon: Icons.comment_outlined,
+                        count: feed.totalComments,
+                        iconSize: iconSize,
+                        fontSize: captionFontSize,
+                      ),
                     ),
                     SizedBox(width: spacing16),
                     InkWell(

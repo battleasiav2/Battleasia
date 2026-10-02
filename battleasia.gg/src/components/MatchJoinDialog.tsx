@@ -28,12 +28,29 @@ export function MatchJoinDialog({ match, balance, joining, error, onClose, onCon
   const localCover = localCoverForGame(gameRef);
   const demo = isDemoMatchId(match.id);
 
-  const rows = [
+  const grid = [
     { label: t('match.game'), value: match.gameName || '—' },
     { label: t('match.schedule'), value: formatWhen(match.matchSchedule) },
     { label: t('match.teamType'), value: match.teamType || '—' },
     { label: t('match.map'), value: match.map || t('match.mapTbd') },
     { label: t('match.typeLabel'), value: match.matchType || '—' },
+    {
+      label: t('match.entryFee'),
+      value: fee <= 0 ? t('match.free') : <CoinValue value={fee} size={16} />,
+    },
+    {
+      label: t('match.perKill'),
+      value: <CoinValue value={match.perKill || 0} size={16} />,
+    },
+    {
+      label: t('match.yourBalance'),
+      value: (
+        <>
+          <CoinValue value={balance} size={16} />
+          {insufficient ? <em className="join-balance-warn">{t('match.insufficient')}</em> : null}
+        </>
+      ),
+    },
   ];
 
   const signal =
@@ -49,17 +66,35 @@ export function MatchJoinDialog({ match, balance, joining, error, onClose, onCon
   return (
     <div className="play-sheet join-sheet" role="dialog" aria-labelledby="join-title">
       <button className="play-sheet-bg" type="button" aria-label={t('match.close')} onClick={onClose} />
-      <div className="play-sheet-card join-dialog">
-        <header className="join-dialog-head">
-          <div>
-            <p className="eyebrow">{t('match.secureEntry')}</p>
-            <h2 id="join-title">{t('match.confirmEntry')}</h2>
-            <p className="play-muted">{t('match.joinMatchFor').replace('{{name}}', match.matchName)}</p>
-          </div>
+      <div className="play-sheet-card join-dialog join-dialog-room">
+        <div className="join-hero">
+          <img
+            src={joinCover}
+            alt=""
+            width={480}
+            height={220}
+            decoding="async"
+            onError={(e) => {
+              const img = e.currentTarget;
+              if (img.getAttribute('src') !== localCover) {
+                img.src = localCover;
+                return;
+              }
+              img.src = '/covers/arena.svg';
+            }}
+          />
+          <div className="join-hero-scrim" aria-hidden />
           <button type="button" className="join-dialog-x" onClick={onClose} aria-label={t('match.close')}>
             ×
           </button>
-        </header>
+          <div className="join-hero-copy">
+            <p className="join-hero-eyebrow">{t('match.secureEntry')}</p>
+            <h2 id="join-title">{match.matchName}</h2>
+            <span className="join-hero-pill">
+              {used}/{cap} {t('match.spots')}
+            </span>
+          </div>
+        </div>
 
         <div className="join-dialog-body">
           {signal ? (
@@ -68,96 +103,47 @@ export function MatchJoinDialog({ match, balance, joining, error, onClose, onCon
             </p>
           ) : null}
 
-          <div className="join-map-card">
-            <img
-              src={joinCover}
-              alt=""
-              width={480}
-              height={200}
-              onError={(e) => {
-                const img = e.currentTarget;
-                if (img.getAttribute('src') !== localCover) {
-                  img.src = localCover;
-                  return;
-                }
-                img.src = '/covers/arena.svg';
-              }}
-            />
-            <div className="join-map-overlay">
-              <small>{t('match.map')}</small>
-              <strong>{match.map || t('match.mapTbd')}</strong>
-            </div>
+          <p className="join-lead play-muted">{t('match.joinMatchFor').replace('{{name}}', match.matchName)}</p>
+
+          <div className="join-spec-grid">
+            {grid.map((cell) => (
+              <div key={cell.label} className="join-spec-cell">
+                <small>{cell.label}</small>
+                <strong>{cell.value}</strong>
+              </div>
+            ))}
           </div>
 
-          <div className="join-panel">
-            <div className="join-detail-grid">
-              {rows.map((row) => (
-                <div key={row.label}>
-                  <small>{row.label}</small>
-                  <b>{row.value}</b>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="join-panel join-spots">
-            <div className="join-spots-top">
-              <small>{t('match.spots')}</small>
-              <strong>
-                {used}/{cap}
-              </strong>
-            </div>
+          <div className="join-spots-row">
             <SpotBar used={used} total={cap} />
           </div>
 
-          <div className="join-metrics">
-            <div className="join-panel">
-              <small>{t('match.entryFee')}</small>
-              <strong>{fee <= 0 ? t('match.free') : <CoinValue value={fee} size={16} />}</strong>
-            </div>
-            <div className="join-panel">
-              <small>{t('match.perKill')}</small>
-              <strong>
-                <CoinValue value={match.perKill || 0} size={16} />
-              </strong>
-            </div>
-          </div>
-
           {match.prizeDescription ? (
-            <div className="join-panel">
+            <div className="join-prize-block">
               <small>{t('match.prize')}</small>
               <p>{match.prizeDescription}</p>
             </div>
           ) : null}
         </div>
 
-        <footer className="join-dialog-foot">
-          <div className={`join-panel join-balance ${insufficient ? 'is-bad' : 'is-ok'}`}>
-            <small>{t('match.yourBalance')}</small>
-            <span>
-              <CoinValue value={balance} size={16} />
-              {insufficient ? <em>{t('match.insufficient')}</em> : null}
-            </span>
-          </div>
-          <div className="join-actions">
-            <button type="button" className="btn btn-ghost" onClick={onClose} disabled={joining}>
-              {t('match.cancel')}
-            </button>
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={onConfirm}
-              disabled={joining || insufficient || isFull || demo}
-            >
-              {joining
-                ? t('match.joining')
-                : isFull
-                  ? t('match.matchFull')
-                  : demo
-                    ? t('match.demoShort')
-                    : t('match.joinMatch')}
-            </button>
-          </div>
+        <footer className="join-dialog-foot join-dialog-foot-stack">
+          <button
+            type="button"
+            className="btn btn-primary join-cta"
+            onClick={onConfirm}
+            disabled={joining || insufficient || isFull || demo}
+          >
+            {joining
+              ? t('match.joining')
+              : isFull
+                ? t('match.matchFull')
+                : demo
+                  ? t('match.demoShort')
+                  : t('match.joinMatch')}
+          </button>
+          <button type="button" className="btn btn-ghost join-cta-secondary" onClick={onClose} disabled={joining}>
+            {t('match.cancel')}
+          </button>
         </footer>
       </div>
     </div>

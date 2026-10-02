@@ -10,6 +10,7 @@ import 'package:battleasia_app/data/models/feed_model.dart';
 import 'package:battleasia_app/data/models/reel_model.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/reel_player_screen.dart';
+import 'package:battleasia_app/presentation/widgets/feed/feed_comments_sheet.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_item.dart';
 import 'package:battleasia_app/presentation/widgets/social/external_messaging_panel.dart';
 import 'package:battleasia_app/presentation/widgets/social/new_chat_sheet.dart';
@@ -170,6 +171,9 @@ class _FeedExplorePanelState extends State<FeedExplorePanel> {
                       builder: (_) => FeedDetailScreen(feedId: feed.id),
                     ),
                   );
+                },
+                onComment: () {
+                  FeedCommentsSheet.show(context, feedId: feed.id);
                 },
               );
             },
@@ -407,6 +411,9 @@ class _FeedSavedPanelState extends State<FeedSavedPanel> {
                 builder: (_) => FeedDetailScreen(feedId: feed.id),
               ),
             );
+          },
+          onComment: () {
+            FeedCommentsSheet.show(context, feedId: feed.id);
           },
         );
       },

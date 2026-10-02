@@ -39,7 +39,22 @@ class MatchCoverUtils {
     return null;
   }
 
+  static bool _isGenericGameBanner(String banner) {
+    final s = banner.split('?').first.toLowerCase();
+    if (RegExp(r'/covers/(pubg|freefire|cod|valorant|mlbb)\.(webp|svg|png)$').hasMatch(s)) {
+      return true;
+    }
+    if (s.contains('hero-banner') || s.contains('/assets/images/games')) return true;
+    return false;
+  }
+
   static String resolve(MatchModel match) {
+    final fromMap = _mapAsset(match.map);
+    if (fromMap != null) return fromMap;
+
+    final fromArena = _arenaFromName(match.matchName);
+    if (fromArena != null) return fromArena;
+
     final banner = match.banner?.trim() ?? '';
     if (banner.isNotEmpty) {
       final mapHit = RegExp(r'/assets/images/map/([^/?#]+)', caseSensitive: false)
@@ -48,15 +63,11 @@ class MatchCoverUtils {
         final asset = _mapAsset(mapHit.group(1));
         if (asset != null) return asset;
       }
-      final remote = ImageUtils.getImageUrl(banner);
-      if (remote != null && remote.isNotEmpty) return remote;
+      if (!_isGenericGameBanner(banner)) {
+        final remote = ImageUtils.getImageUrl(banner);
+        if (remote != null && remote.isNotEmpty) return remote;
+      }
     }
-
-    final fromMap = _mapAsset(match.map);
-    if (fromMap != null) return fromMap;
-
-    final fromArena = _arenaFromName(match.matchName);
-    if (fromArena != null) return fromArena;
 
     return 'assets/images/game.webp';
   }
