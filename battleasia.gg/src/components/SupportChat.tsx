@@ -204,7 +204,7 @@ export function SupportChat({ forceOpen }: Props) {
   async function onSend(e: FormEvent) {
     e.preventDefault();
     if (!authed) {
-      window.location.href = '/auth/sign-in';
+      window.location.href = `/dashboard?auth=signin&returnTo=${encodeURIComponent(window.location.pathname + window.location.search)}`;
       return;
     }
     if (busy || (!draft.trim() && !pending.length) || !cid) return;
@@ -274,7 +274,10 @@ export function SupportChat({ forceOpen }: Props) {
           ) : (
             <>
               <p className="chat-guest">{t('chat.guest')}</p>
-              <Link className="btn btn-primary" to="/auth/sign-in">
+              <Link
+                className="btn btn-primary"
+                to={`/dashboard?auth=signin&returnTo=${encodeURIComponent(window.location.pathname + window.location.search)}`}
+              >
                 {t('cta.signin')}
               </Link>
             </>

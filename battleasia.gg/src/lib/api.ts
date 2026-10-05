@@ -63,7 +63,8 @@ function kickToSignIn() {
   clearLocalSession();
   const path = window.location.pathname + window.location.search;
   if (path.startsWith('/user') || path.startsWith('/profile')) {
-    window.location.assign(`/auth/sign-in?returnTo=${encodeURIComponent(path)}`);
+    const q = new URLSearchParams({ auth: 'signin', returnTo: path });
+    window.location.assign(`/dashboard?${q.toString()}`);
   }
 }
 

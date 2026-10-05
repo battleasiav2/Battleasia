@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { SiteFooter } from '../components/SiteFooter';
 import { LocaleSelect } from '../components/LocaleSelect';
-import { ASSETS } from '../lib/assets';
 import { useI18n } from '../lib/i18n';
 
 const SECTIONS: Record<'privacy' | 'terms' | 'notFound', string[]> = {
@@ -14,22 +13,22 @@ export function LegalPage({ kind }: { kind: 'privacy' | 'terms' | 'notFound' }) 
   const { t } = useI18n();
   const sections = SECTIONS[kind];
   return (
-    <div className="landing legal-page">
-      <div className="landing-shell">
-        <header className="topbar">
-          <Link className="brand" to="/dashboard">
-            <img src={ASSETS.logo} width={40} height={40} alt="BattleAsia" />
-            <div className="brand-name">
-              BATTLE ASIA
-            </div>
+    <div className="landing-fw grain legal-page">
+        <header className="site-header">
+          <div className="header-inner">
+          <Link className="logo" to="/dashboard">
+            <img src="/assets/fw/logo-battleasia.png" width={88} height={88} alt="BattleAsia" className="logo-img" />
+            <span className="logo-text">Battle Asia</span>
           </Link>
-          <div className="top-actions" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <LocaleSelect />
+          <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <LocaleSelect className="locale-select" />
             <Link className="btn btn-ghost" to="/dashboard">
               {t('legal.back')}
             </Link>
           </div>
+          </div>
         </header>
+        <main className="container" style={{ paddingBlock: '48px 80px' }}>
         <article className="legal-body">
           <header className="play-head">
             <div>
@@ -58,8 +57,8 @@ export function LegalPage({ kind }: { kind: 'privacy' | 'terms' | 'notFound' }) 
             </div>
           )}
         </article>
+        </main>
         <SiteFooter />
-      </div>
     </div>
   );
 }

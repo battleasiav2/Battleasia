@@ -59,7 +59,7 @@ function UserChrome() {
       .catch((err) => {
         if (!live) return;
         if (isApiError(err) && err.status === 401) {
-          navigate(`/auth/sign-in?returnTo=${encodeURIComponent(location.pathname)}`, { replace: true });
+          navigate(`/dashboard?auth=signin&returnTo=${encodeURIComponent(location.pathname)}`, { replace: true });
         }
       });
     return () => {

@@ -1,18 +1,22 @@
 import { Link } from 'react-router-dom';
 import { useI18n } from '../lib/i18n';
 
-/** Support CTA — taken from footer relay, placed above footer like live Rules band. */
 export function SupportRelayCta() {
   const { t } = useI18n();
   return (
-    <aside className="support-relay" aria-label={t('footer.support')}>
-      <div className="support-relay-copy">
-        <h3>{t('footer.questions')}</h3>
-        <p>{t('footer.questionsLead')}</p>
+    <div className="support-block reveal glass">
+      <div>
+        <strong>{t('footer.questions')}</strong>
+        <p className="text-muted text-muted--sm">support@battleasia.gg</p>
       </div>
-      <Link className="support-relay-btn" to="/support">
-        {t('footer.contactSupport')} <span aria-hidden>→</span>
-      </Link>
-    </aside>
+      <div className="btn-row">
+        <a href="mailto:support@battleasia.gg" className="btn btn-ghost">
+          Email support
+        </a>
+        <Link className="btn btn-primary" to="/support">
+          {t('footer.contactSupport')}
+        </Link>
+      </div>
+    </div>
   );
 }

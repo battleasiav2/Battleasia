@@ -1,12 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 
-type Props = { className?: string; priority?: boolean };
+type Props = {
+  className?: string;
+  priority?: boolean;
+  videoSrc?: string;
+  posterSrc?: string;
+};
 
 /** Live site hero loop — behavior from HeroVideoBanner; Aurora layout/vignette stays in CSS. */
 const HERO_VIDEO = '/assets/hero/hero-loop.mp4';
 const HERO_POSTER = '/assets/hero/hero-live-poster.webp';
 
-export function HeroVideo({ className, priority = false }: Props) {
+export function HeroVideo({ className, priority = false, videoSrc, posterSrc }: Props) {
+  const video = videoSrc || HERO_VIDEO;
+  const poster = posterSrc || HERO_POSTER;
   const videoRef = useRef<HTMLVideoElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const [play, setPlay] = useState(false);
@@ -125,7 +132,7 @@ export function HeroVideo({ className, priority = false }: Props) {
     <div className={className} ref={wrapRef}>
       <img
         className="hero-poster"
-        src={HERO_POSTER}
+        src={poster}
         width={1920}
         height={1080}
         alt=""
@@ -137,8 +144,8 @@ export function HeroVideo({ className, priority = false }: Props) {
         <video
           ref={videoRef}
           className={play ? 'hero-video is-on' : 'hero-video'}
-          src={HERO_VIDEO}
-          poster={HERO_POSTER}
+          src={video}
+          poster={poster}
           autoPlay
           muted
           loop

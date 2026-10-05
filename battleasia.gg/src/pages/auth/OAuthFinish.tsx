@@ -16,7 +16,7 @@ export function OAuthFinishPage() {
     const returnTo = hash.get('returnTo');
     window.history.replaceState(null, '', '/auth/oauth');
     if (!access) {
-      navigate('/auth/sign-in?oauth=failed', { replace: true });
+      navigate('/dashboard?auth=signin&oauth=failed', { replace: true });
       return;
     }
     captureAuthPayload({

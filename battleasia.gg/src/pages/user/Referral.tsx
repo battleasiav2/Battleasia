@@ -39,7 +39,7 @@ export function ReferralPage() {
       .catch((err) => setError(isApiError(err) ? err.message : t('ref.offline')));
   }, [t]);
 
-  const link = `${window.location.origin}/auth/sign-up?ref=${encodeURIComponent(username || code || '')}`;
+  const link = `${window.location.origin}/dashboard?auth=signup&ref=${encodeURIComponent(username || code || '')}`;
 
   function statusLabel(status?: string) {
     const s = (status || '').toLowerCase();

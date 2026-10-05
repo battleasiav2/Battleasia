@@ -1,23 +1,32 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
-import { CountUpCoin, CountUpNumber } from '../components/CountUp';
-import { HeroVideo } from '../components/HeroVideo';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { CountUpNumber } from '../components/CountUp';
+import { ZipHeroBg } from '../components/landing/ZipHeroBg';
 import { EMPTY_PULSE, fetchPublicDashboard, mapPulse, openMatchesForGame, type PulseStats } from '../lib/dashboard';
-import { ASSETS } from '../lib/assets';
 import { useI18n } from '../lib/i18n';
-import { LocaleSelect } from '../components/LocaleSelect';
-import { DrawerIcons, MobileDrawer, type DrawerCard } from '../components/MobileDrawer';
-import { UserAvatar } from '../components/UserAvatar';
-import { fetchMe, isSignedIn, readSessionUser, clearSignedIn, logout } from '../lib/auth';
-import { ThemeDock } from '../components/ThemeDock';
-import { coverForGame, fetchGames, gameKey, webpSrcSet } from '../lib/games';
+import { ZipLocaleSelect } from '../components/landing/ZipLocaleSelect';
+import { mediaUrl } from '../components/UserAvatar';
+import { ZipAccentChips } from '../components/landing/ZipAccentChips';
+import { ZipMobileDrawer } from '../components/landing/ZipMobileDrawer';
+import { ZipSocialFab } from '../components/landing/ZipSocialFab';
+import { ZipAmount, ZipAvatar } from '../components/landing/ZipMedia';
+import { clearSignedIn, fetchMe, isSignedIn, readSessionUser, logout, safeReturnTo } from '../lib/auth';
+import { captureReferral } from '../lib/ref';
+import { guestPlayHref, landingAuthHref, parseLandingAuthView, type LandingAuthView } from '../lib/landingAuth';
+import { LandingAuthModals } from '../components/landing/LandingAuthModals';
+import { ArenaSeatsRing } from '../components/landing/ArenaSeatsRing';
+import { useLandingZipEffects } from '../components/landing/useLandingZipEffects';
+import type { PulsePlayer } from '../lib/dashboard';
+import { fetchGames, gameKey } from '../lib/games';
 import { fetchAppDownload, formatApkSize, type AppDownloadInfo } from '../lib/app-download';
+
+const FW_LOGO = '/assets/fw/logo-battleasia.png';
+const FW_COIN = '/assets/fw/bac-coin.webp';
 
 const SiteFooter = lazy(() => import('../components/SiteFooter').then((m) => ({ default: m.SiteFooter })));
 const DeferredSupportChat = lazy(() =>
   import('../components/SupportChat').then((m) => ({ default: m.DeferredSupportChat })),
 );
-const SocialFab = lazy(() => import('../components/SocialFab').then((m) => ({ default: m.SocialFab })));
 const MatchBattleRail = lazy(() => import('../components/MatchBattleRail').then((m) => ({ default: m.MatchBattleRail })));
 const PulseLeaderboards = lazy(() =>
   import('../components/PulseLeaderboards').then((m) => ({ default: m.PulseLeaderboards })),
@@ -33,12 +42,20 @@ type LandingGame = {
   matchName: string;
 };
 
+const FW_GAME_COVERS: Record<string, string> = {
+  pubg: '/assets/fw/game-pubg.jpg',
+  freefire: '/assets/fw/game-freefire.jpg',
+  cod: '/assets/fw/game-cod.jpg',
+  mlbb: '/assets/fw/game-mlbb.jpg',
+  valorant: '',
+};
+
 const FALLBACK_GAMES: LandingGame[] = [
-  { slug: 'pubg', id: 'pubg', src: '/covers/pubg.webp?v=5', popular: true, soon: false, matchName: 'PUBG Mobile' },
-  { slug: 'freefire', id: 'freefire', src: '/covers/freefire.webp?v=5', popular: false, soon: false, matchName: 'Free Fire' },
-  { slug: 'cod', id: 'cod', src: '/covers/cod.webp?v=5', popular: false, soon: false, matchName: 'Call of Duty Mobile' },
-  { slug: 'mlbb', id: 'mlbb', src: '/covers/mlbb.webp?v=5', popular: false, soon: false, matchName: 'Mobile Legends' },
-  { slug: 'valorant', id: 'valorant', src: '/covers/valorant.webp?v=5', popular: false, soon: true, matchName: 'Valorant Mobile' },
+  { slug: 'pubg', id: 'pubg', src: FW_GAME_COVERS.pubg, popular: true, soon: false, matchName: 'PUBG Mobile' },
+  { slug: 'freefire', id: 'freefire', src: FW_GAME_COVERS.freefire, popular: false, soon: false, matchName: 'Free Fire' },
+  { slug: 'cod', id: 'cod', src: FW_GAME_COVERS.cod, popular: false, soon: false, matchName: 'Call of Duty Mobile' },
+  { slug: 'mlbb', id: 'mlbb', src: FW_GAME_COVERS.mlbb, popular: false, soon: false, matchName: 'Mobile Legends' },
+  { slug: 'valorant', id: 'valorant', src: FW_GAME_COVERS.valorant, popular: false, soon: true, matchName: 'Valorant Mobile' },
 ];
 
 const MODES = [
@@ -48,40 +65,106 @@ const MODES = [
   { id: 'tdm', src: '/covers/modes/tdm.webp' },
 ] as const;
 
-const RULES = [
-  { q: 'faq.fair.q', a: 'faq.fair.a' },
-  { q: 'faq.ops.q', a: 'faq.ops.a' },
-  { q: 'faq.room.q', a: 'faq.room.a' },
-  { q: 'faq.prizes.q', a: 'faq.prizes.a' },
-  { q: 'faq.pay.q', a: 'faq.pay.a' },
-  { q: 'faq.withdraw.q', a: 'faq.withdraw.a' },
-  { q: 'faq.referral.q', a: 'faq.referral.a' },
-  { q: 'faq.account.q', a: 'faq.account.a' },
-  { q: 'faq.support.q', a: 'faq.support.a' },
-  { q: 'faq.age.q', a: 'faq.age.a' },
-] as const;
+type FaqTopic = 'all' | 'payments' | 'fairplay' | 'rooms' | 'account';
+
+const RULES: { q: string; a: string; topic: FaqTopic }[] = [
+  { q: 'faq.fair.q', a: 'faq.fair.a', topic: 'fairplay' },
+  { q: 'faq.ops.q', a: 'faq.ops.a', topic: 'rooms' },
+  { q: 'faq.room.q', a: 'faq.room.a', topic: 'rooms' },
+  { q: 'faq.prizes.q', a: 'faq.prizes.a', topic: 'payments' },
+  { q: 'faq.pay.q', a: 'faq.pay.a', topic: 'payments' },
+  { q: 'faq.withdraw.q', a: 'faq.withdraw.a', topic: 'payments' },
+  { q: 'faq.referral.q', a: 'faq.referral.a', topic: 'account' },
+  { q: 'faq.account.q', a: 'faq.account.a', topic: 'account' },
+  { q: 'faq.support.q', a: 'faq.support.a', topic: 'account' },
+  { q: 'faq.age.q', a: 'faq.age.a', topic: 'account' },
+];
+
+const CHAMPION_FALLBACK: PulsePlayer = {
+  userId: '',
+  username: 'ShadowNova',
+  avatar: null,
+  totalWinnings: 0,
+  totalKills: 0,
+  winRate: null,
+};
 
 function gameHref(id: string) {
   const play = `/user/play/${id}`;
   if (isSignedIn()) return play;
-  return `/auth/sign-in?returnTo=${encodeURIComponent(play)}`;
+  return guestPlayHref(play);
 }
 
 export function Landing({ openChat }: { openChat?: boolean }) {
   const { t } = useI18n();
   const location = useLocation();
+  const navigate = useNavigate();
   const [params] = useSearchParams();
   const mock = params.get('mock') === '1';
   const [stats, setStats] = useState<PulseStats>(EMPTY_PULSE);
   const [navOpen, setNavOpen] = useState(false);
   const [faq, setFaq] = useState<string>(RULES[0].q);
+  const [faqTopic, setFaqTopic] = useState<FaqTopic>('all');
+  const rootRef = useRef<HTMLDivElement>(null);
+  useLandingZipEffects(rootRef);
   const hash = location.hash || '#home';
   const [me, setMe] = useState(readSessionUser());
   const [inArena, setInArena] = useState(isSignedIn());
   const [arenaGames, setArenaGames] = useState<LandingGame[]>(FALLBACK_GAMES);
   const [apk, setApk] = useState<AppDownloadInfo | null>(null);
-  const arenaTo = inArena ? '/user/play' : '/auth/sign-up';
+  const arenaTo = inArena ? '/user/play' : landingAuthHref('signup', { returnTo: '/user/play' }, location.pathname);
+  const authView = parseLandingAuthView(params.get('auth'));
+  const authReturnTo = safeReturnTo(params.get('returnTo'));
+  const authEmail = (params.get('email') || '').trim();
+  const authOauth = params.get('oauth');
   const closeNav = useCallback(() => setNavOpen(false), []);
+
+  useEffect(() => {
+    captureReferral();
+  }, []);
+
+  const clearAuthModal = useCallback(() => {
+    const q = new URLSearchParams(params);
+    q.delete('auth');
+    q.delete('email');
+    q.delete('oauth');
+    q.delete('returnTo');
+    const search = q.toString();
+    navigate({ pathname: location.pathname, hash: location.hash, search: search ? `?${search}` : '' }, { replace: true });
+  }, [navigate, params, location.pathname, location.hash]);
+
+  const setAuthModal = useCallback(
+    (view: LandingAuthView, patch?: { email?: string; returnTo?: string }) => {
+      const q = new URLSearchParams(params);
+      q.set('auth', view);
+      if (patch?.email) q.set('email', patch.email);
+      else if (view !== 'reset' && view !== 'otp') q.delete('email');
+      if (patch?.returnTo) q.set('returnTo', safeReturnTo(patch.returnTo));
+      q.delete('oauth');
+      navigate({ pathname: location.pathname, hash: location.hash, search: `?${q.toString()}` }, { replace: true });
+    },
+    [navigate, params, location.pathname, location.hash],
+  );
+
+  const seatCap = stats.inSeats || 1200;
+  const seatLive = stats.stadiumLive || stats.playersOnline || 0;
+  const champion = stats.topProfit[0] ?? CHAMPION_FALLBACK;
+  const faqItems = useMemo(
+    () => (faqTopic === 'all' ? RULES : RULES.filter((r) => r.topic === faqTopic)),
+    [faqTopic],
+  );
+
+  const onAuthSignedIn = useCallback(
+    (to: string) => {
+      setMe(readSessionUser());
+      setInArena(true);
+      void fetchMe()
+        .then((u) => setMe(u))
+        .catch(() => {});
+      navigate(to, { replace: true });
+    },
+    [navigate],
+  );
 
   useEffect(() => {
     let live = true;
@@ -112,7 +195,7 @@ export function Landing({ openChat }: { openChat?: boolean }) {
                 id: hit.id,
                 soon: Boolean(hit.comingSoon),
                 matchName: hit.name || fg.matchName,
-                src: coverForGame(hit) || fg.src,
+                src: FW_GAME_COVERS[fg.slug] || fg.src,
               };
             }),
           );
@@ -179,9 +262,26 @@ export function Landing({ openChat }: { openChat?: boolean }) {
     }
   }, [location.hash]);
 
+  useEffect(() => {
+    const bar = document.querySelector<HTMLElement>('.landing-fw .scroll-progress');
+    if (!bar) return;
+    const onScroll = () => {
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - doc.clientHeight;
+      const pct = max > 0 ? (doc.scrollTop / max) * 100 : 0;
+      bar.style.width = `${pct}%`;
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
-    <div className={`landing${mock ? ' is-mock' : ''}`}>
-      <div className="landing-shell">
+    <div ref={rootRef} className={`landing-fw grain${mock ? ' is-mock' : ''}`}>
+      <div className="scroll-progress" aria-hidden="true" />
+      <div className="blob blob-1" aria-hidden="true" />
+      <div className="blob blob-2" aria-hidden="true" />
+      <div className="blob blob-3" aria-hidden="true" />
         {mock ? (
           <div className="mock-overlay" aria-hidden>
             <img src="/assets/hero/hero-poster.webp" alt="" width={1600} height={900} loading="lazy" decoding="async" />
@@ -201,26 +301,13 @@ export function Landing({ openChat }: { openChat?: boolean }) {
             />
           </label>
         ) : null}
-        <header className="topbar">
-          <a className="brand" href="#home">
-            <img src={ASSETS.logo} width={40} height={40} alt="BattleAsia" />
-            <div className="brand-name">BATTLE ASIA</div>
+        <header className="site-header">
+          <div className="header-inner">
+          <a className="logo" href="#home">
+            <img src={FW_LOGO} width={88} height={88} alt="BattleAsia" className="logo-img" />
+            <span className="logo-text">{t('site.name')}</span>
           </a>
-          <button
-            className="nav-burger"
-            type="button"
-            aria-expanded={navOpen}
-            aria-label={navOpen ? t('hud.closeMenu') : t('hud.openMenu')}
-            onClick={() => setNavOpen((v) => !v)}
-          >
-            <span />
-          </button>
-          {inArena ? (
-            <Link className="hud-user hud-user-pin" to="/user/account/profile" title={me?.username || t('nav.account')} aria-label={t('nav.account')}>
-              <UserAvatar src={me?.avatar} name={me?.username} size={36} />
-            </Link>
-          ) : null}
-          <nav className="nav-center" aria-label={t('nav.primary')} onClick={() => setNavOpen(false)}>
+          <nav className="nav-desktop" aria-label={t('nav.primary')} onClick={() => setNavOpen(false)}>
             <a className={hash === '#home' || hash === '' ? 'active' : ''} href="#home">
               {t('nav.home')}
             </a>
@@ -234,133 +321,117 @@ export function Landing({ openChat }: { openChat?: boolean }) {
               {t('nav.rules')}
             </a>
           </nav>
-          <div className="top-actions" onPointerDown={(e) => e.stopPropagation()}>
+          <div className="header-actions" onPointerDown={(e) => e.stopPropagation()}>
+            <div className="settings-row">
+              <ZipAccentChips />
+              <ZipLocaleSelect />
+            </div>
             {inArena ? (
-              <Link className="hud-user" to="/user/account/profile" title={me?.username || t('nav.account')} aria-label={t('nav.account')}>
-                <UserAvatar src={me?.avatar} name={me?.username} size={40} />
-              </Link>
-            ) : null}
-            <ThemeDock />
-            {inArena ? (
-              <button
-                className="btn btn-ghost"
-                type="button"
-                onClick={() => {
-                  void logout().then(() => {
-                    setMe(null);
-                    setInArena(false);
-                  });
-                }}
-              >
-                {t('cta.signout')}
-              </button>
-            ) : (
-              <Link className="btn btn-ghost" to="/auth/sign-in">
-                {t('cta.signin')}
-              </Link>
-            )}
-            <Link className="btn btn-primary" to={arenaTo}>
-              {t('cta.signup')}
-            </Link>
-            <LocaleSelect />
-          </div>
-        </header>
-        <MobileDrawer
-          open={navOpen}
-          onClose={closeNav}
-          logo={ASSETS.logo}
-          title="BATTLE ASIA"
-          subtitle={t('drawer.tagline')}
-          links={[
-            { key: 'home', label: t('nav.home'), href: '#home', active: hash === '#home' || hash === '' },
-            { key: 'about', label: t('nav.about'), href: '#about-us', active: hash === '#about-us' },
-            { key: 'play', label: t('nav.play'), href: '#play', active: hash === '#play' },
-            { key: 'rules', label: t('nav.rules'), href: '#rules', active: hash === '#rules' },
-          ]}
-          section={{
-            title: t('drawer.quick'),
-            cards: [
-              ...(inArena
-                ? [
-                    {
-                      key: 'arena',
-                      label: t('drawer.arena'),
-                      desc: t('drawer.arenaDesc'),
-                      icon: DrawerIcons.gamepad,
-                      to: '/user/play',
-                    },
-                    {
-                      key: 'account',
-                      label: t('nav.account'),
-                      desc: t('drawer.accountDesc'),
-                      icon: DrawerIcons.user,
-                      to: '/user/account/profile',
-                    },
-                  ]
-                : [
-                    {
-                      key: 'signin',
-                      label: t('cta.signin'),
-                      desc: t('drawer.signinDesc'),
-                      icon: DrawerIcons.login,
-                      to: '/auth/sign-in',
-                    },
-                  ]),
-              ...(apk && !apk.enabled
-                ? []
-                : [
-                    {
-                      key: 'apk',
-                      label: t('drawer.apk'),
-                      desc: [
-                        t('drawer.apkDesc'),
-                        apk?.version ? `v${apk.version}` : '',
-                        apk?.fileSize ? formatApkSize(apk.fileSize) : '',
-                      ]
-                        .filter(Boolean)
-                        .join(' · '),
-                      icon: DrawerIcons.download,
-                      href: apk?.downloadUrl || '/api/uploads/app/BattleAsia.apk',
-                      download: apk?.fileName || 'BattleAsia.apk',
-                    },
-                  ]),
-            ] satisfies DrawerCard[],
-          }}
-          tools={{
-            label: t('drawer.settings'),
-            content: (
-              <>
-                <ThemeDock />
-                <LocaleSelect />
-              </>
-            ),
-          }}
-          footer={{
-            icon: inArena
-              ? {
-                  label: t('cta.signout'),
-                  icon: DrawerIcons.logout,
-                  onClick: () => {
+              <div className="user-btns">
+                <div className="user-chip">
+                  <ZipAvatar src={me?.avatar} size={32} />
+                  <span className="user-name">{me?.username || t('nav.account')}</span>
+                </div>
+                <button
+                  className="btn btn-ghost"
+                  type="button"
+                  onClick={() => {
                     void logout().then(() => {
                       setMe(null);
                       setInArena(false);
                     });
-                  },
-                }
-              : { label: t('cta.signin'), icon: DrawerIcons.login, to: '/auth/sign-in' },
-            primary: { label: t('cta.signup'), to: arenaTo },
+                  }}
+                >
+                  {t('cta.signout')}
+                </button>
+                <Link className="btn btn-primary" to="/user/play">
+                  {t('cta.enterArena')}
+                </Link>
+              </div>
+            ) : (
+              <div className="guest-btns">
+                <Link className="btn btn-ghost" to={landingAuthHref('signin', {}, location.pathname)}>
+                  {t('cta.signin')}
+                </Link>
+                <Link className="btn btn-primary" to={arenaTo}>
+                  {t('cta.signupJoin')}
+                </Link>
+              </div>
+            )}
+            <button
+              className="burger"
+              type="button"
+              aria-expanded={navOpen}
+              aria-label={navOpen ? t('hud.closeMenu') : t('hud.openMenu')}
+              onClick={() => setNavOpen((v) => !v)}
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          </div>
+          </div>
+        </header>
+        <ZipMobileDrawer
+          open={navOpen}
+          onClose={closeNav}
+          logo={FW_LOGO}
+          siteName={t('site.name')}
+          links={[
+            { href: '#home', label: t('nav.home') },
+            { href: '#about-us', label: t('nav.about') },
+            { href: '#play', label: t('nav.play') },
+            { href: '#rules', label: t('nav.rules') },
+          ]}
+          inArena={inArena}
+          arenaTo={arenaTo}
+          signInTo={landingAuthHref('signin', {}, location.pathname)}
+          apk={apk}
+          onSignOut={() => {
+            void logout().then(() => {
+              setMe(null);
+              setInArena(false);
+            });
           }}
         />
 
+        <main>
         <section className="hero" id="home">
-          <HeroVideo className="hero-media" priority />
-          <div className="hero-grid">
-            <div className="hero-copy">
-              <h1><span>BATTLE ASIA</span></h1>
-              <div className="eyebrow">{t('hero.eyebrow')}</div>
-              <div className="hero-ctas">
-                <Link className="btn btn-primary" to={arenaTo}>
-                  {t('cta.signup')}
+          <ZipHeroBg />
+          <div className="hero-video-shine" aria-hidden="true" />
+          <div className="hero-mesh" aria-hidden="true" />
+          <img
+            className="hero-float hero-float-1"
+            src="/assets/fw/game-pubg.jpg"
+            alt=""
+            width={280}
+            height={175}
+            loading="lazy"
+            decoding="async"
+          />
+          <img
+            className="hero-float hero-float-2"
+            src="/assets/fw/game-cod.jpg"
+            alt=""
+            width={240}
+            height={150}
+            loading="lazy"
+            decoding="async"
+          />
+          <div className="container hero-grid">
+            <div className="hero-content">
+              <span className="eyebrow hero-seq">
+                <img src={FW_COIN} alt="" className="bac-coin bac-coin--xs" width={18} height={18} />
+                <span>{t('hero.eyebrow')}</span>
+              </span>
+              <h1 className="hero-title" aria-label="Battle Asia">
+                <span className="word"><span className="word-inner">Battle</span></span>
+                <span className="word"><span className="word-inner">Asia</span></span>
+              </h1>
+              <p className="lead hero-seq">{t('hero.lead')}</p>
+              <div className="hero-cta hero-seq">
+                <Link className="btn btn-primary btn-magnetic" to={arenaTo}>
+                  {t('cta.signupJoin')}
                 </Link>
                 {apk && !apk.enabled ? (
                   <span className="btn btn-ghost" aria-disabled="true">
@@ -381,85 +452,127 @@ export function Landing({ openChat }: { openChat?: boolean }) {
                   </a>
                 )}
               </div>
-              <div className="live-row">
-                <span className="live-pill">
-                  <span className="live-dot" /> {t('hero.live')}
-                </span>
-                <span>
-                  <CountUpNumber value={stats.playersOnline} /> {t('hero.players')}
-                </span>
-                <span>
-                  <CountUpNumber value={stats.matchesToday} /> {t('hero.matches')}
-                </span>
+              <div className="live-row hero-seq">
+                <span className="live-pill">{t('hero.live')}</span>
+                <div className="stat-pill">
+                  <strong>
+                    <CountUpNumber value={stats.playersOnline} />
+                  </strong>
+                  <span>{t('hero.players')}</span>
+                </div>
+                <div className="stat-pill">
+                  <strong>
+                    <CountUpNumber value={stats.matchesToday} />
+                  </strong>
+                  <span>{t('hero.matches')}</span>
+                </div>
               </div>
             </div>
-            <aside className="hero-side">
-              <div className="hero-live">
-                <small>{t('hero.arena')}</small>
-                <strong>{t('hero.stadium')}</strong>
-                <div className="hero-live-stats">
+            <aside className="hero-side hero-seq">
+              <div className="arena-card glass card">
+                <h3>{t('hero.arenaSeats')}</h3>
+                <div className="ring-wrap">
+                  <ArenaSeatsRing live={seatLive} cap={seatCap} />
                   <div>
-                    <small>{t('hero.seats')}</small>
-                    <b>
-                      <CountUpNumber value={stats.stadiumLive} />
-                    </b>
-                  </div>
-                  <div>
-                    <small>{t('hero.capacity')}</small>
-                    <b>
-                      <CountUpNumber value={stats.inSeats || stats.stadiumLive} />
-                    </b>
+                    <strong id="arena-count" className="arena-stat">
+                      <CountUpNumber value={seatLive} /> / <CountUpNumber value={seatCap} />
+                    </strong>
+                    <p className="text-muted text-muted--sm">{t('hero.arenaSeats')}</p>
                   </div>
                 </div>
-                <Link className="btn btn-primary" to={arenaTo}>
-                  {t('cta.signup')}
+                <Link className="btn btn-primary btn-block" to={arenaTo}>
+                  {t('hero.signUpFree')}
                 </Link>
               </div>
             </aside>
           </div>
         </section>
 
-        <div className="arena-board">
-          <header className="arena-head">
-            <div className="arena-brand">
-              Battle<span>Arena</span>
+        <section className="section section--alt" id="pulse" aria-labelledby="pulse-title">
+          <div className="container">
+            <div className="section-head reveal-group reveal-group-direct">
+              <div className="pulse-title-row reveal">
+                <span className="pulse-live-dot" aria-hidden="true" />
+                <h2 id="pulse-title">{t('pulse.title')}</h2>
+              </div>
+              <p className="lead reveal">{t('pulse.lead')}</p>
             </div>
-            <div className="arena-live">
-              <i />
-              {t('pulse.live')}
-            </div>
-          </header>
-          <div className="arena-stats" aria-label={t('pulse.liveLabel')}>
-            <div className="arena-stat">
-              <span className="arena-stat-k">{t('pulse.joins')}</span>
-              <div className="arena-stat-v">
-                <CountUpNumber value={stats.todayJoins} />
+            <div className="kpi-grid reveal-group reveal-group-direct">
+              <div className="kpi-tile card reveal">
+                <div className="label">{t('pulse.joins')}</div>
+                <div className="value">
+                  <CountUpNumber value={stats.todayJoins} />
+                </div>
+              </div>
+              <div className="kpi-tile card reveal">
+                <div className="label">{t('pulse.matches')}</div>
+                <div className="value">
+                  <CountUpNumber value={stats.matches} />
+                </div>
+              </div>
+              <div className="kpi-tile card reveal">
+                <div className="label">{t('pulse.ongoing')}</div>
+                <div className="value">
+                  <CountUpNumber value={stats.ongoing} />
+                  <span className="dot-live" aria-hidden />
+                </div>
+              </div>
+              <div className="kpi-tile card reveal">
+                <div className="label">{t('pulse.winnings')}</div>
+                <div className="value">
+                  <ZipAmount value={stats.winnings} size="md" />
+                </div>
               </div>
             </div>
-            <div className="arena-stat">
-              <span className="arena-stat-k">{t('pulse.matches')}</span>
-              <div className="arena-stat-v">
-                <CountUpNumber value={stats.matches} />
-              </div>
-            </div>
-            <div className="arena-stat">
-              <span className="arena-stat-k">{t('pulse.ongoing')}</span>
-              <div className="arena-stat-v">
-                <i className="arena-stat-dot" />
-                <CountUpNumber value={stats.ongoing} />
-              </div>
-            </div>
-            <div className="arena-stat">
-              <span className="arena-stat-k">{t('pulse.winnings')}</span>
-              <div className="arena-stat-v">
-                <CountUpCoin value={stats.winnings} size={22} />
-              </div>
-            </div>
+            <Suspense fallback={null}>
+              <PulseLeaderboards profit={stats.topProfit} killers={stats.topKillers} />
+            </Suspense>
           </div>
-          <Suspense fallback={null}>
-            <PulseLeaderboards profit={stats.topProfit} killers={stats.topKillers} />
-          </Suspense>
-        </div>
+        </section>
+
+        <section className="section" id="champion" aria-labelledby="champion-title">
+          <div className="container">
+            <article className="champion-card card glass reveal">
+              <div className="champion-visual">
+                <img
+                  className="champion-photo"
+                  src={mediaUrl(champion.avatar) || '/assets/fw/players/player-shadownova.jpg'}
+                  alt=""
+                  width={320}
+                  height={320}
+                  loading="lazy"
+                  decoding="async"
+                />
+                <img src={FW_COIN} alt="" className="champion-coin" width={56} height={56} />
+              </div>
+              <div className="champion-copy">
+                <span className="eyebrow">{t('champion.eyebrow')}</span>
+                <h2 id="champion-title">{t('champion.title')}</h2>
+                <p className="champion-name">{champion.username}</p>
+                <blockquote className="text-muted">{t('champion.quote')}</blockquote>
+                <dl className="champion-stats">
+                  <div>
+                    <dt>{t('champion.mainGame')}</dt>
+                    <dd className="champion-game">{t('champion.gameDefault')}</dd>
+                  </div>
+                  <div>
+                    <dt>{t('champion.wins')}</dt>
+                    <dd className="champion-wins">{champion.totalKills || '—'}</dd>
+                  </div>
+                  <div>
+                    <dt>{t('champion.payout')}</dt>
+                    <dd className="champion-payout">
+                      <ZipAmount value={champion.totalWinnings} />
+                    </dd>
+                  </div>
+                </dl>
+                <Link className="btn btn-primary" to={arenaTo}>
+                  {t('cta.signupJoin')}
+                </Link>
+              </div>
+            </article>
+          </div>
+        </section>
 
         <Suspense fallback={null}>
           <MatchBattleRail
@@ -468,164 +581,179 @@ export function Landing({ openChat }: { openChat?: boolean }) {
             signedIn={inArena}
           />
         </Suspense>
-        <section className="games" id="play">
-          <div className="section-head">
-            <h2>{t('games.title')}</h2>
-            <p>{t('games.lead')}</p>
-          </div>
-          <div className="hex-row">
-            {arenaGames.map((game) =>
-              game.soon ? (
-                <div key={game.slug} className="hex disabled">
-                  <div className="hex-frame">
-                    <img
-                      src={game.src}
-                      srcSet={webpSrcSet(game.src, 360, 720)}
-                      sizes="(max-width: 900px) 140px, 200px"
-                      width={280}
-                      height={280}
-                      alt={t(`games.${game.slug}.title`)}
-                      loading="lazy"
-                      decoding="async"
-                    />
+        <section id="play" className="section section--alt">
+          <div className="container">
+            <div className="section-head reveal-group reveal-group-direct">
+              <h2 className="reveal">{t('games.title')}</h2>
+              <p className="lead reveal">{t('games.lead')}</p>
+            </div>
+            <div className="games-grid reveal-group reveal-group-direct">
+              {arenaGames.map((game) => {
+                const open = openMatchesForGame(game.matchName, stats.openByGame);
+                const badge = game.popular ? (
+                  <span className="badge">{t('games.popular')}</span>
+                ) : game.soon ? (
+                  <span className="badge badge-soon">{t('games.soon')}</span>
+                ) : null;
+                const overlay = (
+                  <div className="game-overlay">
+                    <h3>{t(`games.${game.slug}.title`)}</h3>
+                    <p>{game.soon ? t('games.soon') : `${open} ${t('play.openMatches')}`}</p>
                   </div>
-                  <h3>{t(`games.${game.slug}.title`)}</h3>
-                  <span>{t('games.soon')}</span>
-                </div>
-              ) : (
-                <Link key={game.slug} className="hex" to={gameHref(game.id)}>
-                  <div className="hex-frame">
-                    <img
-                      src={game.src}
-                      srcSet={webpSrcSet(game.src, 360, 720)}
-                      sizes="(max-width: 900px) 140px, 200px"
-                      width={280}
-                      height={280}
-                      alt={t(`games.${game.slug}.title`)}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </div>
-                  <h3>{t(`games.${game.slug}.title`)}</h3>
-                  <span>
-                    {`${openMatchesForGame(game.matchName, stats.openByGame)} ${t('play.openMatches')}`}
-                  </span>
-                  {game.popular ? <div className="popular">{t('games.popular')}</div> : null}
-                </Link>
-              ),
-            )}
-          </div>
-        </section>
-
-        <section className="about" id="about-us">
-          <div className="about-copy">
-            <p className="eyebrow">{t('about.eyebrow')}</p>
-            <div className="about-brand">
-              <img src={ASSETS.logo} width={56} height={56} alt="" />
-              <div className="brand-name">BATTLE ASIA</div>
-            </div>
-            <h2>{t('about.title')}</h2>
-            <p className="about-lead">{t('about.body')}</p>
-            <p className="about-more">{t('about.body2')}</p>
-            <div className="about-ctas">
-              <Link className="btn btn-primary" to={arenaTo}>
-                {t('cta.signup')}
-              </Link>
-              <a className="btn btn-ghost" href="#play">
-                {t('nav.play')}
-              </a>
-            </div>
-          </div>
-          <ul className="about-points">
-            <li>{t('about.p1')}</li>
-            <li>{t('about.p2')}</li>
-            <li>{t('about.p3')}</li>
-            <li>{t('about.p4')}</li>
-            <li>{t('about.p5')}</li>
-          </ul>
-        </section>
-
-        <section className="modes" id="how-to-play">
-          <div className="section-head">
-            <h2>{t('modes.title')}</h2>
-            <p>{t('modes.lead')}</p>
-          </div>
-          <div className="mode-grid">
-            {MODES.map((mode, i) => (
-              <article key={mode.id} className="mode-card" data-mode={mode.id}>
-                <div className="mode-card-media">
-                  <img
-                    src={mode.src}
-                    srcSet={webpSrcSet(mode.src, 480, 960)}
-                    sizes="(max-width: 900px) 46vw, 22vw"
-                    width={320}
-                    height={200}
-                    alt={t(`modes.${mode.id}.title`)}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <span className="mode-card-index" aria-hidden>
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                </div>
-                <div className="mode-card-copy">
-                  <h3>{t(`modes.${mode.id}.title`)}</h3>
-                  <p>{t(`modes.${mode.id}.copy`)}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="rules" id="rules">
-          <div className="rules-layout">
-            <div className="rules-intro">
-              <p className="eyebrow">{t('faq.eyebrow')}</p>
-              <h2>{t('faq.title')}</h2>
-              <p className="rules-lead">{t('faq.lead')}</p>
-              <p className="rules-note">{t('faq.note')}</p>
-              <ul className="rules-chips" aria-label={t('faq.chipsLabel')}>
-                <li>{t('faq.chip1')}</li>
-                <li>{t('faq.chip2')}</li>
-                <li>{t('faq.chip3')}</li>
-                <li>{t('faq.chip4')}</li>
-              </ul>
-            </div>
-            <div className="faq">
-              {RULES.map((item) => {
-                const open = faq === item.q;
+                );
+                const img = game.src ? (
+                  <img src={game.src} width={400} height={275} alt="" loading="lazy" decoding="async" />
+                ) : (
+                  <div className="game-placeholder" />
+                );
+                if (game.soon) {
+                  return (
+                    <article key={game.slug} className="game-tile reveal is-disabled" aria-disabled>
+                      {badge}
+                      {img}
+                      {overlay}
+                    </article>
+                  );
+                }
                 return (
-                  <details key={item.q} name="ba-faq" open={open}>
-                    <summary
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setFaq(open ? '' : item.q);
-                      }}
-                    >
-                      <span>{t(item.q)}</span>
-                      <span className="faq-mark" aria-hidden>
-                        {open ? '−' : '+'}
-                      </span>
-                    </summary>
-                    <p>{t(item.a)}</p>
-                  </details>
+                  <Link key={game.slug} className="game-tile reveal" to={gameHref(game.id)}>
+                    {badge}
+                    {img}
+                    {overlay}
+                  </Link>
                 );
               })}
             </div>
           </div>
-          <Suspense fallback={null}>
-            <SupportRelayCta />
-          </Suspense>
         </section>
+
+        <section id="about-us" className="section">
+          <div className="container about-grid">
+            <div className="reveal">
+              <span className="eyebrow">{t('about.eyebrow')}</span>
+              <img src={FW_LOGO} alt="" className="logo-img logo-img--lg mb-md" width={160} height={160} />
+              <h2>{t('about.title')}</h2>
+              <p className="lead">{t('about.body')}</p>
+              <p className="text-muted mb-md">{t('about.body2')}</p>
+              <div className="btn-row">
+                <Link className="btn btn-primary" to={arenaTo}>
+                  {t('cta.signupJoin')}
+                </Link>
+                <a href="#play" className="btn btn-ghost">
+                  {t('nav.play')}
+                </a>
+              </div>
+            </div>
+            <div className="about-bullets reveal-group reveal-group-direct">
+              {[t('about.p1'), t('about.p2'), t('about.p3'), t('about.p4'), t('about.p5')].map((line) => (
+                <div key={line} className="about-bullet reveal">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 13l4 4L19 7" fill="none" stroke="currentColor" strokeWidth="2" />
+                  </svg>
+                  <span>{line}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="how-to-play" className="section">
+          <div className="container">
+            <div className="section-head reveal-group reveal-group-direct">
+              <h2 className="reveal">{t('modes.title')}</h2>
+              <p className="lead reveal">{t('modes.lead')}</p>
+            </div>
+            <div className="modes-grid reveal-group reveal-group-direct">
+              {MODES.map((mode, i) => (
+                <article key={mode.id} className="mode-card card reveal">
+                  <div className="mode-num">{String(i + 1).padStart(2, '0')}</div>
+                  <div className={`mode-img mode-img--${i + 1}`} role="img" aria-label={t(`modes.${mode.id}.title`)} />
+                  <div className="mode-body">
+                    <h3>{t(`modes.${mode.id}.title`)}</h3>
+                    <p>{t(`modes.${mode.id}.copy`)}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="rules" className="section section--alt">
+          <div className="container">
+            <div className="section-head reveal-group reveal-group-direct">
+              <span className="eyebrow reveal">{t('faq.eyebrow')}</span>
+              <h2 className="reveal">{t('faq.title')}</h2>
+              <p className="lead reveal">{t('faq.lead')}</p>
+            </div>
+            <div className="faq-stack reveal-group">
+              <p className="reveal text-muted mb-md">{t('faq.note')}</p>
+              <div className="faq-chips reveal">
+                {(
+                  [
+                    ['all', 'faq.topicAll'],
+                    ['payments', 'faq.topicPayments'],
+                    ['fairplay', 'faq.topicFair'],
+                    ['rooms', 'faq.topicRooms'],
+                    ['account', 'faq.topicAccount'],
+                  ] as const
+                ).map(([id, key]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    className={`faq-chip${faqTopic === id ? ' is-active' : ''}`}
+                    onClick={() => setFaqTopic(id)}
+                  >
+                    {t(key)}
+                  </button>
+                ))}
+              </div>
+              <div className="faq-list reveal">
+                {faqItems.map((item) => {
+                  const open = faq === item.q;
+                  return (
+                    <div key={item.q} className={`faq-item${open ? ' is-open' : ''}`}>
+                      <button
+                        type="button"
+                        className="faq-q"
+                        aria-expanded={open}
+                        onClick={() => setFaq(open ? '' : item.q)}
+                      >
+                        <span>{t(item.q)}</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      </button>
+                      <div className="faq-a">
+                        <div className="faq-a-inner">{t(item.a)}</div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <Suspense fallback={null}>
+                <SupportRelayCta />
+              </Suspense>
+            </div>
+          </div>
+        </section>
+        </main>
 
         <Suspense fallback={null}>
           <SiteFooter />
         </Suspense>
-      </div>
+      <ZipSocialFab />
       <Suspense fallback={null}>
-        <SocialFab />
         <DeferredSupportChat forceOpen={openChat} />
       </Suspense>
+      <LandingAuthModals
+        view={authView}
+        returnTo={authReturnTo}
+        email={authEmail}
+        oauth={authOauth}
+        onClose={clearAuthModal}
+        onViewChange={setAuthModal}
+        onSignedIn={onAuthSignedIn}
+      />
     </div>
   );
 }

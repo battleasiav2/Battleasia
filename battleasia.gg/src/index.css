@@ -1,11 +1,12 @@
 @import './styles/tokens.css';
-@import './styles/landing.css';
 @import './styles/play.css';
 @import './styles/auth.css';
 @import './styles/cards.css';
 @import './styles/phone.css';
 @import './styles/phone-hub.css';
 @import './styles/drawer.css';
+@import './styles/landing-fw-scoped.css';
+@import './styles/landing-fw-bridge.css';
 
 *,
 *::before,
@@ -27,6 +28,13 @@ body {
   background: var(--ba-page);
   color: var(--ba-text);
   -webkit-font-smoothing: antialiased;
+}
+
+body:has(.landing-fw),
+body:has(.auth-page-fw) {
+  background: #0a0b0f;
+  color: #f3f4f8;
+  font-family: 'Inter', system-ui, sans-serif;
 }
 
 body::before {

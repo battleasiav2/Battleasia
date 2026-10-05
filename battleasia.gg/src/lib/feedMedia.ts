@@ -79,7 +79,7 @@ export function feedImageSrcSet(raw: unknown): string | undefined {
   return webpSrcSet(url, 360, FEED_LIST_IMG_W);
 }
 
-export function feedAvatarSrc(raw: unknown, size = 56): string {
+export function feedAvatarSrc(raw: unknown, _size = 56): string {
   const url = feedMediaUrl(raw);
   if (!url || isFeedVideo(url)) return url;
   if (/mock\/avatar\//.test(url) && url.endsWith('.webp')) return url;

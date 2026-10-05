@@ -5,6 +5,7 @@ import { Seo } from './components/Seo'
 import { OfflineBanner } from './components/OfflineBanner'
 import { useI18n } from './lib/i18n'
 import { getBacShopWalletUrl } from './lib/wallet'
+import { AuthRouteRedirect } from './components/landing/AuthRouteRedirect'
 
 function ShopWalletRedirect() {
   const { t } = useI18n()
@@ -24,15 +25,10 @@ const SiteNoticeModal = lazy(() =>
 )
 const RequireAuth = lazy(() => import('./components/user/RequireAuth').then((m) => ({ default: m.RequireAuth })))
 
-import { Landing } from './pages/Landing'
+const Landing5173 = lazy(() => import('./pages/Landing5173').then((m) => ({ default: m.Landing5173 })))
 const LegalPage = lazy(() => import('./pages/Legal').then((m) => ({ default: m.LegalPage })))
 const UserShell = lazy(() => import('./components/user/UserShell').then((m) => ({ default: m.UserShell })))
 
-const SignInPage = lazy(() => import('./pages/auth/SignIn').then((m) => ({ default: m.SignInPage })))
-const SignUpPage = lazy(() => import('./pages/auth/SignUp').then((m) => ({ default: m.SignUpPage })))
-const ForgotPasswordPage = lazy(() => import('./pages/auth/ForgotPassword').then((m) => ({ default: m.ForgotPasswordPage })))
-const ResetPasswordPage = lazy(() => import('./pages/auth/ResetPassword').then((m) => ({ default: m.ResetPasswordPage })))
-const EmailVerificationPage = lazy(() => import('./pages/auth/EmailVerification').then((m) => ({ default: m.EmailVerificationPage })))
 const OAuthFinishPage = lazy(() => import('./pages/auth/OAuthFinish').then((m) => ({ default: m.OAuthFinishPage })))
 const PlayPage = lazy(() => import('./pages/user/Play').then((m) => ({ default: m.PlayPage })))
 const MatchListPage = lazy(() => import('./pages/user/MatchList').then((m) => ({ default: m.MatchListPage })))
@@ -71,16 +67,16 @@ export default function App() {
       <RouteProgress />
       <Suspense fallback={<div className="landing" style={{ minHeight: '100svh', background: 'var(--ba-page)' }} />}>
         <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/dashboard" element={<Landing />} />
-          <Route path="/support" element={<Landing openChat />} />
+          <Route path="/" element={<Landing5173 />} />
+          <Route path="/dashboard" element={<Landing5173 />} />
+          <Route path="/support" element={<Landing5173 chat />} />
           <Route path="/privacy-policy" element={<LegalPage kind="privacy" />} />
           <Route path="/terms-and-conditions" element={<LegalPage kind="terms" />} />
-          <Route path="/auth/sign-in" element={<SignInPage />} />
-          <Route path="/auth/sign-up" element={<SignUpPage />} />
-          <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/auth/email-verification" element={<EmailVerificationPage />} />
+          <Route path="/auth/sign-in" element={<AuthRouteRedirect auth="signin" />} />
+          <Route path="/auth/sign-up" element={<AuthRouteRedirect auth="signup" />} />
+          <Route path="/auth/forgot-password" element={<AuthRouteRedirect auth="forgot" />} />
+          <Route path="/auth/reset-password" element={<AuthRouteRedirect auth="reset" />} />
+          <Route path="/auth/email-verification" element={<AuthRouteRedirect auth="otp" />} />
           <Route path="/auth/oauth" element={<OAuthFinishPage />} />
           <Route
             element={

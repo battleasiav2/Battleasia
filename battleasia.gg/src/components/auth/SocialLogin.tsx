@@ -22,9 +22,24 @@ function DiscordIcon() {
   );
 }
 
-export function SocialLogin({ returnTo }: { returnTo: string }) {
+export function SocialLogin({ returnTo, variant = 'page' }: { returnTo: string; variant?: 'page' | 'modal' }) {
   const { t } = useI18n();
   const next = encodeURIComponent(returnTo);
+
+  if (variant === 'modal') {
+    return (
+      <div className="oauth-row">
+        <a className="oauth-btn" href={`/api/v2/users/oauth/google?returnTo=${next}`}>
+          <GoogleIcon />
+          <span>{t('auth.google')}</span>
+        </a>
+        <a className="oauth-btn" href={`/api/v2/users/oauth/discord?returnTo=${next}`}>
+          <DiscordIcon />
+          <span>{t('auth.discord')}</span>
+        </a>
+      </div>
+    );
+  }
 
   return (
     <div className="signin-social">
