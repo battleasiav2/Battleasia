@@ -178,15 +178,26 @@ export function mapPulse(raw: unknown): PulseStats {
   };
 }
 
+async function fetchPublicDashboardOnce(timeoutMs: number): Promise<PulseStats> {
+  const signal =
+    typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function'
+      ? AbortSignal.timeout(timeoutMs)
+      : undefined;
+  const res = await fetch('/api/v3/public/dashboard', {
+    credentials: 'include',
+    signal,
+  });
+  if (!res.ok) throw new Error(`dashboard ${res.status}`);
+  return mapPulse(await res.json());
+}
+
 export async function fetchPublicDashboard(): Promise<PulseStats> {
-  try {
-    const res = await fetch('/api/v3/public/dashboard', {
-      credentials: 'include',
-      signal: AbortSignal.timeout(2500),
-    });
-    if (!res.ok) return EMPTY_PULSE;
-    return mapPulse(await res.json());
-  } catch {
-    return EMPTY_PULSE;
+  for (const timeoutMs of [12000, 20000]) {
+    try {
+      return await fetchPublicDashboardOnce(timeoutMs);
+    } catch {
+      /* cold dashboard queries can miss a short timeout; try once more */
+    }
   }
+  return EMPTY_PULSE;
 }

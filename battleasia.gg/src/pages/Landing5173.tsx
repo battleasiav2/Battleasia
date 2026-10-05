@@ -758,7 +758,10 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
 
   useEffect(() => {
     let cancel = false;
-    void (async () => {
+    let timer = 0;
+    let tries = 0;
+    const load = async () => {
+      tries += 1;
       try {
         const pulse = await fetchPublicDashboard();
         if (cancel) return;
@@ -804,7 +807,22 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
           open[cls] = hit ? hit[1] : 0;
         }
         setGameOpen(open);
-      } catch { /* leave zeros if the dashboard request fails */ }
+        const missing =
+          pulse.topProfit.length === 0 &&
+          pulse.ongoingMatches.length === 0 &&
+          pulse.highPrizeMatches.length === 0;
+        if (missing && tries < 3) {
+          timer = window.setTimeout(() => {
+            if (!cancel) void load();
+          }, 1500);
+        }
+      } catch {
+        if (tries < 3) {
+          timer = window.setTimeout(() => {
+            if (!cancel) void load();
+          }, 1500);
+        }
+      }
       try {
         const apk = await fetchAppDownload();
         if (cancel || !apk.downloadUrl) return;
@@ -813,8 +831,12 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
         const label = [apk.version ? `v${apk.version}` : '', size].filter(Boolean).join(' · ');
         if (label) setApkLabel(label);
       } catch { /* keep the zip APK label */ }
-    })();
-    return () => { cancel = true; };
+    };
+    void load();
+    return () => {
+      cancel = true;
+      window.clearTimeout(timer);
+    };
   }, []);
 
   useEffect(() => {
