@@ -152,6 +152,8 @@ const createWinLoseEntry = (): WinLoseEntry => {
 };
 
 const WIN_BOARD_VISIBLE = 10;
+/** Flip to true to bring the sample win/loss ticker back. */
+const SHOW_WIN_LOSE_BOARD = false;
 
 function WinLoseBoard() {
   const [rows, setRows] = useState<WinLoseEntry[]>(() =>
@@ -1247,6 +1249,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
           </div>
         </section>
 
+        {SHOW_WIN_LOSE_BOARD ? (
         <section className="win-lose-section" aria-labelledby="win-lose-heading">
           <div className="wrap">
             <div className="win-lose-section-head reveal">
@@ -1257,6 +1260,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
             <WinLoseBoard />
           </div>
         </section>
+        ) : null}
 
         <section id="play" className="section">
           <div className="wrap">
