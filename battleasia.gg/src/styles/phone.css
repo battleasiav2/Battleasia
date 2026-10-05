@@ -382,7 +382,7 @@ svg {
   .play-hud .brand {
     order: 1;
     min-width: 0;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     gap: 8px;
   }
 
@@ -392,12 +392,15 @@ svg {
   }
 
   .play-hud .brand-name {
-    display: none;
+    display: inline;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0;
   }
 
   .play-hud .nav-burger {
     display: grid;
-    order: 2;
+    order: 5;
     flex-shrink: 0;
     margin: 0;
   }
@@ -413,13 +416,9 @@ svg {
     display: none;
   }
 
-  .play-hud-rail-foot .play-hud-rail-tools {
-    display: flex;
-    order: 3;
-    flex-shrink: 0;
-    width: auto;
-    margin: 0;
-    gap: 0;
+  .play-hud-rail-foot .play-hud-rail-tools,
+  .play-hud .hud-balance {
+    display: none;
   }
 
   .play-hud .hud-bell {
@@ -437,15 +436,7 @@ svg {
   }
 
   .play-hud .hud-balance {
-    order: 4;
-    display: inline-flex;
-    margin-left: 0;
-    max-width: 34vw;
-    min-width: 0;
-    overflow: hidden;
-    flex-shrink: 1;
-    min-height: 38px;
-    padding: 6px 8px;
+    display: none;
   }
 
   .play-hud .hud-balance .coin {
@@ -466,8 +457,8 @@ svg {
   }
 
   .play-hud .hud-account {
-    order: 5;
-    margin-left: 0;
+    order: 4;
+    margin-left: auto;
     flex-shrink: 0;
   }
 

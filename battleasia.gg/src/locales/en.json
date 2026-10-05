@@ -1257,5 +1257,7 @@
   "drawer.arenaDesc": "Join live rooms and tournaments",
   "drawer.signinDesc": "Already have an account? Continue here",
   "drawer.apk": "Android app",
-  "drawer.apkDesc": "Download the BattleAsia APK"
+  "drawer.apkDesc": "Download the BattleAsia APK",
+  "drawer.joinLive": "Join a live tournament",
+  "drawer.downloadApk": "Download the APK"
 }

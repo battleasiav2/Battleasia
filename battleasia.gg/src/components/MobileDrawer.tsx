@@ -1,7 +1,12 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { fetchAppDownload, formatApkSize } from '../lib/app-download';
 import { useI18n } from '../lib/i18n';
+import { applyAccent, readAccent, type AccentId } from '../lib/theme';
+import { openBacShop } from '../lib/wallet';
+import { LocaleSelect } from './LocaleSelect';
+import { UserAvatar } from './UserAvatar';
 
 export type DrawerTarget = {
   to?: string;
@@ -23,19 +28,19 @@ export type DrawerCard = DrawerLink & {
   badge?: number;
 };
 
+const MENU_ACCENTS: { id: AccentId; color: string }[] = [
+  { id: 'lime', color: '#d4e82a' },
+  { id: 'jade', color: '#61d7bd' },
+  { id: 'ember', color: '#f08c63' },
+];
+
 type Props = {
   open: boolean;
   onClose: () => void;
   logo: string;
-  title: string;
-  subtitle: string;
-  links: DrawerLink[];
-  section?: { title: string; cards: DrawerCard[] };
-  tools?: { label: string; content: ReactNode };
-  footer: {
-    icon?: DrawerTarget & { label: string; icon: ReactNode };
-    primary: DrawerTarget & { label: string; arrow?: boolean };
-  };
+  playerName: string;
+  avatar?: string | null;
+  onSignOut: () => void;
 };
 
 function Svg({ children, size = 20 }: { children: ReactNode; size?: number }) {
@@ -170,9 +175,45 @@ function Target({
   );
 }
 
-export function MobileDrawer({ open, onClose, logo, title, subtitle, links, section, tools, footer }: Props) {
+export function MobileDrawer({ open, onClose, logo, playerName, avatar, onSignOut }: Props) {
   const { t } = useI18n();
+  const location = useLocation();
   const closeRef = useRef<HTMLButtonElement>(null);
+  const [accentId, setAccentId] = useState<AccentId>(readAccent);
+  const [apkHref, setApkHref] = useState('/api/uploads/app/BattleAsia.apk');
+  const [apkNote, setApkNote] = useState('');
+
+  useEffect(() => {
+    if (!open) return;
+    setAccentId(readAccent());
+    let live = true;
+    void fetchAppDownload().then((apk) => {
+      if (!live || !apk.enabled) return;
+      setApkHref(apk.downloadUrl || '/api/uploads/app/BattleAsia.apk');
+      const size = formatApkSize(apk.fileSize);
+      setApkNote([apk.version ? `v${apk.version}` : '', size].filter(Boolean).join(' · '));
+    });
+    return () => {
+      live = false;
+    };
+  }, [open]);
+
+  const pickAccent = (id: AccentId) => {
+    applyAccent(id);
+    setAccentId(id);
+    window.dispatchEvent(new Event('ba-theme-change'));
+  };
+
+  const links: DrawerLink[] = [
+    { key: 'home', label: t('nav.home'), to: '/dashboard' },
+    { key: 'about', label: t('nav.about'), to: '/dashboard#about-us' },
+    { key: 'play', label: t('nav.play'), to: '/user/play', active: location.pathname.startsWith('/user/play') },
+    { key: 'rules', label: t('nav.rules'), to: '/dashboard#rules' },
+    { key: 'shop', label: t('nav.shop'), onClick: () => openBacShop('shop') },
+    { key: 'earn', label: t('nav.earn'), to: '/user/earn', active: location.pathname.startsWith('/user/earn') },
+    { key: 'transfer', label: t('nav.transfer'), onClick: () => openBacShop('transfer') },
+    { key: 'feed', label: t('nav.feed'), to: '/user/feed', active: location.pathname.startsWith('/user/feed') },
+  ];
 
   useEffect(() => {
     if (!open) return;
@@ -192,79 +233,75 @@ export function MobileDrawer({ open, onClose, logo, title, subtitle, links, sect
   if (!open || typeof document === 'undefined') return null;
 
   return createPortal(
-    <div className="m-drawer" role="dialog" aria-modal="true" aria-label={title}>
-      <button className="m-drawer-bg" type="button" tabIndex={-1} aria-label={t('hud.closeMenu')} onClick={onClose} />
-      <aside className="m-drawer-panel">
-        <header className="m-drawer-head">
-          <span className="m-drawer-logo">
-            <img src={logo} width={40} height={40} alt="" />
-          </span>
-          <span className="m-drawer-title">
-            <strong>{title}</strong>
-            <small>{subtitle}</small>
-          </span>
-          <button ref={closeRef} className="m-drawer-close" type="button" aria-label={t('hud.closeMenu')} onClick={onClose}>
+    <div className="m-drawer m-drawer--landing" role="dialog" aria-modal="true" aria-label="Battle Asia">
+      <aside className="ld-panel">
+        <header className="ld-head">
+          <button ref={closeRef} className="ld-close" type="button" aria-label={t('hud.closeMenu')} onClick={onClose}>
             {DrawerIcons.close}
           </button>
+          <Link className="ld-brand" to="/dashboard" onClick={onClose}>
+            <img src={logo} width={36} height={36} alt="" />
+            <span>Battle Asia</span>
+          </Link>
         </header>
 
-        <div className="m-drawer-body">
-          <nav className="m-drawer-links">
-            {links.map((link) => (
-              <Target
-                key={link.key}
-                target={link}
-                onClose={onClose}
-                className={`m-drawer-link${link.active ? ' is-active' : ''}`}
-              >
-                <span>{link.label}</span>
-                {link.external ? DrawerIcons.external : DrawerIcons.chevron}
-              </Target>
-            ))}
-          </nav>
+        <nav className="ld-nav" aria-label={t('hud.arena')}>
+          {links.map((link) => (
+            <Target key={link.key} target={link} onClose={onClose} className={link.active ? 'is-active' : ''}>
+              {link.label}
+            </Target>
+          ))}
+        </nav>
 
-          {section && section.cards.length ? (
-            <>
-              <div className="m-drawer-label">{section.title}</div>
-              <div className="m-drawer-cards">
-                {section.cards.map((card) => (
-                  <Target
-                    key={card.key}
-                    target={card}
-                    onClose={onClose}
-                    className={`m-drawer-card${card.active ? ' is-active' : ''}`}
-                  >
-                    <span className="m-drawer-card-icon">{card.icon}</span>
-                    <strong>
-                      {card.label}
-                      {card.badge ? <em className="m-drawer-badge">{card.badge > 9 ? '9+' : card.badge}</em> : null}
-                      {card.external ? <span className="m-drawer-card-ext">{DrawerIcons.external}</span> : null}
-                    </strong>
-                    <span className="m-drawer-card-desc">{card.desc}</span>
-                  </Target>
-                ))}
-              </div>
-            </>
-          ) : null}
-
-          {tools ? (
-            <div className="m-drawer-tools">
-              <span className="m-drawer-tools-label">{tools.label}</span>
-              <div className="m-drawer-tools-row">{tools.content}</div>
-            </div>
-          ) : null}
+        <div className="ld-cards">
+          <Link className="ld-card ld-profile" to="/user/play" onClick={onClose}>
+            <UserAvatar src={avatar} name={playerName} size={36} />
+            <span>
+              {playerName}
+              <small>{t('cta.enterArena')}</small>
+            </span>
+          </Link>
+          <Link className="ld-card" to="/user/play" onClick={onClose}>
+            {t('cta.enterArena')}
+            <small>{t('drawer.joinLive')}</small>
+          </Link>
         </div>
 
-        <footer className="m-drawer-foot">
-          {footer.icon ? (
-            <Target target={footer.icon} onClose={onClose} className="m-drawer-icon-btn" label={footer.icon.label}>
-              {footer.icon.icon}
-            </Target>
-          ) : null}
-          <Target target={footer.primary} onClose={onClose} className="m-drawer-cta">
-            <span>{footer.primary.label}</span>
-            {footer.primary.arrow ? DrawerIcons.arrow : null}
-          </Target>
+        <a className="ld-card ld-apk" href={apkHref} onClick={onClose}>
+          {t('drawer.downloadApk')}
+          {apkNote ? <small>{apkNote}</small> : null}
+        </a>
+
+        <div className="ld-tools">
+          <div className="ld-accents" aria-label={t('theme.accent')}>
+            {MENU_ACCENTS.map((chip) => (
+              <button
+                key={chip.id}
+                type="button"
+                aria-label={chip.id}
+                className={accentId === chip.id ? 'is-on' : undefined}
+                style={{ background: chip.color }}
+                onClick={() => pickAccent(chip.id)}
+              />
+            ))}
+          </div>
+          <LocaleSelect />
+        </div>
+
+        <footer className="ld-foot">
+          <button
+            type="button"
+            className="ld-signout"
+            onClick={() => {
+              onSignOut();
+              onClose();
+            }}
+          >
+            {t('cta.signout')}
+          </button>
+          <Link className="ld-enter" to="/user/play" onClick={onClose}>
+            {t('cta.enterArena')}
+          </Link>
         </footer>
       </aside>
     </div>,
