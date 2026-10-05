@@ -38,41 +38,6 @@ html[lang="bn"] .ba5173{
 @keyframes click-fx-core{0%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.4)}}
 @keyframes click-fx-ring{0%{opacity:.95;transform:scale(.35)}100%{opacity:0;transform:scale(2.6)}}
 @keyframes click-fx-bracket{0%{opacity:.9;transform:scale(.7)}100%{opacity:0;transform:scale(1.65)}}
-html.has-gaming-cursor,html.has-gaming-cursor .site-shell,html.has-gaming-cursor .site-shell *{
-  cursor:none!important;
-}
-html.has-gaming-cursor .site-shell input,html.has-gaming-cursor .site-shell textarea,html.has-gaming-cursor .site-shell select{
-  cursor:text!important;
-}
-.ba5173 .gaming-cursor{
-  position:fixed;left:0;top:0;z-index:122;pointer-events:none;width:36px;height:36px;
-  transform:translate(-50%,-50%);opacity:0;transition:opacity .2s ease;will-change:left,top;
-}
-.ba5173 .gaming-cursor.is-visible{opacity:1}
-.ba5173 .gaming-cursor-glow{position:absolute;inset:4px;border-radius:50%;background:radial-gradient(circle,rgba(212,232,42,.2),transparent 70%);opacity:.85}
-.ba5173 .gaming-cursor-ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(212,232,42,.55);transition:transform .18s ease,border-color .18s ease,opacity .18s ease}
-.ba5173 .gaming-cursor-ring--inner{inset:9px;border-color:rgba(212,232,42,.35);opacity:.75}
-.ba5173 .gaming-cursor-dot{position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:var(--accent-color);box-shadow:0 0 8px rgba(212,232,42,.8)}
-.ba5173 .gaming-cursor-tick{position:absolute;background:rgba(212,232,42,.75);border-radius:1px}
-.ba5173 .gaming-cursor-tick--n,.ba5173 .gaming-cursor-tick--s{width:2px;height:6px;left:50%;margin-left:-1px}
-.ba5173 .gaming-cursor-tick--n{top:2px}
-.ba5173 .gaming-cursor-tick--s{bottom:2px}
-.ba5173 .gaming-cursor-tick--e,.ba5173 .gaming-cursor-tick--w{width:6px;height:2px;top:50%;margin-top:-1px}
-.ba5173 .gaming-cursor-tick--e{right:2px}
-.ba5173 .gaming-cursor-tick--w{left:2px}
-.ba5173 .gaming-cursor-beam{position:absolute;left:50%;top:50%;width:2px;height:14px;margin:-7px 0 0 -1px;background:linear-gradient(180deg,transparent,rgba(212,232,42,.35),transparent);opacity:0;transform:rotate(45deg);transition:opacity .2s ease}
-.ba5173 .gaming-cursor.is-hover .gaming-cursor-ring{transform:scale(1.14);border-color:rgba(212,232,42,.95)}
-.ba5173 .gaming-cursor.is-hover .gaming-cursor-ring--inner{transform:scale(1.08);opacity:1}
-.ba5173 .gaming-cursor.is-hover .gaming-cursor-beam{opacity:.65}
-.ba5173 .gaming-cursor.is-pressed .gaming-cursor-ring{transform:scale(.88)}
-.ba5173 .gaming-cursor.is-pressed .gaming-cursor-dot{transform:scale(1.35)}
-.ba5173 .gaming-cursor.is-text{width:20px;height:24px}
-.ba5173 .gaming-cursor.is-text .gaming-cursor-ring,.ba5173 .gaming-cursor.is-text .gaming-cursor-ring--inner,.ba5173 .gaming-cursor.is-text .gaming-cursor-tick,.ba5173 .gaming-cursor.is-text .gaming-cursor-beam,.ba5173 .gaming-cursor.is-text .gaming-cursor-glow{display:none}
-.ba5173 .gaming-cursor.is-text .gaming-cursor-dot{width:2px;height:14px;margin:-7px 0 0 -1px;border-radius:1px;box-shadow:0 0 6px rgba(212,232,42,.45)}
-@media (hover:none),(pointer:coarse){
-  html.has-gaming-cursor,html.has-gaming-cursor .site-shell,html.has-gaming-cursor .site-shell *{cursor:auto!important}
-  .ba5173 .gaming-cursor{display:none!important}
-}
 .ba5173 .site-shell:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.12;z-index:99;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E")}
 .ba5173 .progress-line{position:fixed;z-index:120;left:0;top:0;height:2px;width:var(--scroll-progress,0%);background:var(--accent-color)}
 .ba5173 .wrap{width:min(1180px,calc(100% - 64px));margin:auto}
@@ -502,8 +467,13 @@ html.has-gaming-cursor .site-shell input,html.has-gaming-cursor .site-shell text
 .ba5173 .site-shell .game-card:hover .game-card-art{
   transform: scale(1.03);
 }
-.ba5173 .site-shell .game-card:before{
+.ba5173 .site-shell .game-card:before,
+.ba5173 .site-shell .game-card:hover:before{
+  content: none !important;
   opacity: 0 !important;
+}
+.ba5173 .site-shell .game-card:hover{
+  transform: translateY(-3px);
 }
 .ba5173 .site-shell .game-card.disabled .game-card-art{
   filter: saturate(0.5) brightness(0.85);
@@ -1975,12 +1945,6 @@ html.has-gaming-cursor .site-shell input,html.has-gaming-cursor .site-shell text
   .ba5173 .click-fx-hit,.ba5173 .click-fx-hit *{
     animation: none !important;
     opacity: 0 !important;
-  }
-  html.has-gaming-cursor,html.has-gaming-cursor .site-shell,html.has-gaming-cursor .site-shell *{
-    cursor: auto !important;
-  }
-  .ba5173 .gaming-cursor{
-    display: none !important;
   }
 }
 html[lang="zh"] .ba5173 { --app-font-sans: 'Noto Sans SC', 'Inter', system-ui, sans-serif; }

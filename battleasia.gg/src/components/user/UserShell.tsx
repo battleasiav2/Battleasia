@@ -9,6 +9,7 @@ import { fetchP2Flags } from '../../lib/p2';
 import { disconnectSocket, getAuthedSocket } from '../../lib/socket';
 import { fetchNotifications, pingPresence } from '../../lib/social';
 import { CoinValue } from '../CoinValue';
+import { GamingCursor } from '../GamingCursor';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { LocaleSelect } from '../LocaleSelect';
 import { MobileDrawer } from '../MobileDrawer';
@@ -230,6 +231,7 @@ function UserChrome() {
 
   return (
     <div className="play-app">
+      <GamingCursor />
       <header className={`play-hud${navOpen ? ' is-open' : ''}`}>
         <Link className="brand" to="/dashboard">
           <img src={ASSETS.logo} width={44} height={44} alt="BattleAsia" />

@@ -4540,15 +4540,7 @@ a.hist-item-link {
 .match-row::after,
 .result-row::after,
 .room-card::before {
-  content: '';
-  pointer-events: none;
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  border-radius: inherit;
-  background: radial-gradient(180px circle at var(--spot-x) var(--spot-y), rgba(255, 255, 255, 0.14), transparent 58%);
-  opacity: 0;
-  transition: opacity 0.18s ease;
+  content: none;
 }
 
 .play-card,
@@ -4560,11 +4552,9 @@ a.hist-item-link {
 
 .play-card:hover::before,
 .result-row:hover::after,
-.room-card:hover::before {
-  opacity: 1;
-}
-
+.room-card:hover::before,
 .match-row:hover::after {
+  content: none;
   opacity: 0;
 }
 

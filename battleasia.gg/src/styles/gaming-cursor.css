@@ -1,0 +1,168 @@
+html.has-gaming-cursor,
+html.has-gaming-cursor * {
+  cursor: none !important;
+}
+
+html.has-gaming-cursor input,
+html.has-gaming-cursor textarea,
+html.has-gaming-cursor select,
+html.has-gaming-cursor [contenteditable='true'] {
+  cursor: text !important;
+}
+
+.gaming-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 122;
+  pointer-events: none;
+  width: 36px;
+  height: 36px;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  will-change: left, top;
+}
+
+.gaming-cursor.is-visible {
+  opacity: 1;
+}
+
+.gaming-cursor-glow {
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 232, 42, 0.2), transparent 70%);
+  opacity: 0.85;
+}
+
+.gaming-cursor-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 232, 42, 0.55);
+  transition: transform 0.18s ease, border-color 0.18s ease, opacity 0.18s ease;
+}
+
+.gaming-cursor-ring--inner {
+  inset: 9px;
+  border-color: rgba(212, 232, 42, 0.35);
+  opacity: 0.75;
+}
+
+.gaming-cursor-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: var(--accent-color, #d4e82a);
+  box-shadow: 0 0 8px rgba(212, 232, 42, 0.8);
+}
+
+.gaming-cursor-tick {
+  position: absolute;
+  background: rgba(212, 232, 42, 0.75);
+  border-radius: 1px;
+}
+
+.gaming-cursor-tick--n,
+.gaming-cursor-tick--s {
+  width: 2px;
+  height: 6px;
+  left: 50%;
+  margin-left: -1px;
+}
+
+.gaming-cursor-tick--n {
+  top: 2px;
+}
+
+.gaming-cursor-tick--s {
+  bottom: 2px;
+}
+
+.gaming-cursor-tick--e,
+.gaming-cursor-tick--w {
+  width: 6px;
+  height: 2px;
+  top: 50%;
+  margin-top: -1px;
+}
+
+.gaming-cursor-tick--e {
+  right: 2px;
+}
+
+.gaming-cursor-tick--w {
+  left: 2px;
+}
+
+.gaming-cursor-beam {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 14px;
+  margin: -7px 0 0 -1px;
+  background: linear-gradient(180deg, transparent, rgba(212, 232, 42, 0.35), transparent);
+  opacity: 0;
+  transform: rotate(45deg);
+  transition: opacity 0.2s ease;
+}
+
+.gaming-cursor.is-hover .gaming-cursor-ring {
+  transform: scale(1.14);
+  border-color: rgba(212, 232, 42, 0.95);
+}
+
+.gaming-cursor.is-hover .gaming-cursor-ring--inner {
+  transform: scale(1.08);
+  opacity: 1;
+}
+
+.gaming-cursor.is-hover .gaming-cursor-beam {
+  opacity: 0.65;
+}
+
+.gaming-cursor.is-pressed .gaming-cursor-ring {
+  transform: scale(0.88);
+}
+
+.gaming-cursor.is-pressed .gaming-cursor-dot {
+  transform: scale(1.35);
+}
+
+.gaming-cursor.is-text {
+  width: 20px;
+  height: 24px;
+}
+
+.gaming-cursor.is-text .gaming-cursor-ring,
+.gaming-cursor.is-text .gaming-cursor-ring--inner,
+.gaming-cursor.is-text .gaming-cursor-tick,
+.gaming-cursor.is-text .gaming-cursor-beam,
+.gaming-cursor.is-text .gaming-cursor-glow {
+  display: none;
+}
+
+.gaming-cursor.is-text .gaming-cursor-dot {
+  width: 2px;
+  height: 14px;
+  margin: -7px 0 0 -1px;
+  border-radius: 1px;
+  box-shadow: 0 0 6px rgba(212, 232, 42, 0.45);
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  html.has-gaming-cursor,
+  html.has-gaming-cursor * {
+    cursor: auto !important;
+  }
+
+  .gaming-cursor {
+    display: none !important;
+  }
+}
