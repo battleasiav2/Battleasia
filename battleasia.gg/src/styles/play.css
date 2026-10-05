@@ -2138,6 +2138,56 @@ a.hist-item-link {
   padding-top: 0;
 }
 
+/* Account pages use the same flat card as the landing page. */
+.account-wrap .account-nav,
+.account-wrap .room-card,
+.account-wrap .hist-item,
+.account-wrap a.hist-item-link,
+.account-wrap .match-facts article,
+.account-wrap .note-item,
+.account-wrap .play-stage,
+.account-wrap .profile-stage,
+.account-wrap .play-empty,
+.account-wrap .support-channel,
+.account-wrap .board-table-wrap,
+.account-wrap .board-podium-card,
+.account-wrap .result-row {
+  background: #14171a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+.account-wrap .account-nav {
+  background: #14171a;
+  padding: 10px;
+}
+
+.account-wrap .profile-stage {
+  overflow: hidden;
+  padding: 0 0 8px;
+}
+
+.account-wrap .note-item.is-unread {
+  border-color: color-mix(in srgb, var(--ba-accent) 45%, transparent);
+  background: #14171a;
+}
+
+.account-wrap .hist-item:hover,
+.account-wrap a.hist-item-link:hover,
+.account-wrap .note-item:hover,
+.account-wrap .support-channel:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--ba-accent) 40%, transparent);
+  box-shadow: none;
+}
+
+.account-wrap .board-podium {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+
 .tab-link {
   display: inline-flex;
   align-items: center;
