@@ -129,9 +129,7 @@ function ShopChrome() {
       <header className="play-hud">
         <Link className="brand" to="/user/shop">
           <img src={ASSETS.logo} width={44} height={44} alt="BattleAsia Shop" />
-          <div className="brand-name">
-            BATTLE ASIA <span>SHOP</span>
-          </div>
+          <span className="brand-name">Battle Asia</span>
         </Link>
         <button
           className="nav-burger"

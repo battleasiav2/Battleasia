@@ -240,9 +240,7 @@ function UserChrome() {
       <header className={`play-hud${navOpen ? ' is-open' : ''}`}>
         <Link className="brand" to="/dashboard">
           <img src={ASSETS.logo} width={44} height={44} alt="BattleAsia" />
-          <div className="brand-name">
-            BATTLE ASIA
-          </div>
+          <span className="brand-name">Battle Asia</span>
         </Link>
         <button
           className="nav-burger"
