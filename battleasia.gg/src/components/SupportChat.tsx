@@ -94,6 +94,10 @@ export function SupportChat({ forceOpen }: Props) {
       const raw = localStorage.getItem(POS_KEY);
       if (!raw || !fabRef.current) return;
       const pos = JSON.parse(raw) as { x: number; y: number };
+      if (pos.x < window.innerWidth * 0.5 || pos.y > window.innerHeight - 80) {
+        localStorage.removeItem(POS_KEY);
+        return;
+      }
       fabRef.current.style.left = `${pos.x}px`;
       fabRef.current.style.top = `${pos.y}px`;
       fabRef.current.style.right = 'auto';

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { HudProvider, useHud } from '../../contexts/HudContext';
 import { ASSETS } from '../../lib/assets';
@@ -15,10 +15,6 @@ import { DrawerIcons, MobileDrawer } from '../MobileDrawer';
 import { ThemeDock } from '../ThemeDock';
 import { UserAvatar } from '../UserAvatar';
 import { openBacShop } from '../../lib/wallet';
-
-const DeferredSupportChat = lazy(() =>
-  import('../SupportChat').then((m) => ({ default: m.DeferredSupportChat })),
-);
 
 function inEditable(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false;
@@ -472,9 +468,6 @@ function UserChrome() {
       <ErrorBoundary>
         <Outlet context={{ toast, setBalance, balance, muted }} />
       </ErrorBoundary>
-      <Suspense fallback={null}>
-        <DeferredSupportChat />
-      </Suspense>
       {toastText ? <div className="play-toast" role="status">{toastText}</div> : null}
       {sheet ? (
         <div className="play-sheet" role="dialog" aria-labelledby="cheat-title">
