@@ -1181,6 +1181,10 @@ svg {
   }
 
   .play-app > .play-hud .locale-btn {
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
     width: auto;
     height: 36px;
     min-height: 36px;
@@ -1194,6 +1198,7 @@ svg {
     flex-shrink: 0;
     min-width: 78px;
     justify-content: center;
+    white-space: nowrap;
   }
 
   .play-app > .play-hud .locale-btn .locale-flag {

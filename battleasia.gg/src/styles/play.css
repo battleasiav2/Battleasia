@@ -140,6 +140,27 @@
   flex-shrink: 0;
 }
 
+.locale-btn {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.locale-btn .locale-flag {
+  display: block;
+  width: 18px;
+  height: 12px;
+  flex: 0 0 18px;
+  object-fit: cover;
+}
+
 .play-hud .locale-select .accent-pop,
 .play-hud .lang-pop,
 .accent-pop.lang-pop {
