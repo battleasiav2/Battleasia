@@ -3852,19 +3852,34 @@ a.hist-item-link {
 }
 
 .earn-board {
-  width: min(720px, calc(100% - 32px));
+  width: min(1080px, calc(100% - 48px));
 }
 
 .earn-ranks {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 8px;
   margin: 0;
+  padding: 6px 0 2px;
+}
+
+.earn-ranks::before {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 28px;
+  height: 2px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .earn-rank {
+  position: relative;
+  z-index: 1;
   display: grid;
-  gap: 6px;
+  gap: 8px;
   justify-items: center;
   text-align: center;
   opacity: 0.45;
@@ -3914,15 +3929,15 @@ a.hist-item-link {
 
 .earn-hero {
   display: grid;
-  grid-template-columns: 120px minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: 128px minmax(0, 1fr);
+  gap: 20px;
   align-items: center;
-  padding: 14px;
-  border-radius: 18px;
+  padding: 18px 20px;
+  border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background:
-    radial-gradient(80% 120% at 0% 0%, color-mix(in srgb, var(--ba-accent) 22%, transparent), transparent 55%),
-    rgba(14, 16, 24, 0.85);
+    radial-gradient(70% 120% at 0% 0%, color-mix(in srgb, var(--ba-accent) 24%, transparent), transparent 58%),
+    #161618;
 }
 
 .earn-ring {
@@ -3989,12 +4004,10 @@ a.hist-item-link {
   grid-template-columns: 44px minmax(0, 1fr) auto auto;
   gap: 10px 12px;
   align-items: center;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%),
-    rgba(12, 14, 20, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #161618;
 }
 
 .earn-task.is-ready {
@@ -4084,10 +4097,55 @@ a.hist-item-link {
   }
 }
 
+@media (min-width: 900px) {
+  .earn-hub .earn-tabs {
+    display: flex;
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+
+  .earn-hub .earn-tabs button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+  }
+
+  .earn-task-list {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .earn-rank-orb {
+    width: 52px;
+    height: 52px;
+  }
+
+  .earn-ranks::before {
+    top: 32px;
+  }
+}
+
 @media (max-width: 700px) {
   .earn-ranks {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 12px 8px;
+    display: flex;
+    grid-template-columns: none;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 4px 2px 8px;
+    scrollbar-width: none;
+  }
+
+  .earn-ranks::-webkit-scrollbar {
+    display: none;
+  }
+
+  .earn-ranks::before {
+    display: none;
+  }
+
+  .earn-rank {
+    flex: 0 0 76px;
   }
 
   .earn-hero {
@@ -4112,7 +4170,7 @@ a.hist-item-link {
   }
 
   .earn-board {
-    width: min(720px, calc(100% - 24px));
+    width: 100%;
   }
 
   .streak-cal span {
