@@ -297,7 +297,7 @@ class _AccountDrawerContent extends StatelessWidget {
           child: SizedBox(
             width: double.infinity,
             height: 36,
-            child: OutlinedButton.icon(
+            child: FilledButton.icon(
               onPressed: () async {
                 await authProvider.signOut();
                 if (context.mounted) {
@@ -316,10 +316,9 @@ class _AccountDrawerContent extends StatelessWidget {
                   letterSpacing: 0.8,
                 ),
               ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFFFECACA),
-                backgroundColor: const Color(0x24EF4444),
-                side: BorderSide(color: Colors.red.withValues(alpha: 0.55)),
+              style: FilledButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: AppColors.error,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

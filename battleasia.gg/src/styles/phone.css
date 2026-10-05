@@ -1224,14 +1224,20 @@ svg {
     height: 36px;
     min-height: 36px;
     width: auto;
-    padding: 0 12px;
+    padding: 0 14px;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    background: rgba(255, 255, 255, 0.03);
-    color: #f4f4f1;
+    border: 1px solid #e11d48;
+    background: #e11d48;
+    color: #fff;
     font-size: 13px;
     font-weight: 700;
     flex-shrink: 0;
+  }
+
+  .play-app > .play-hud .hud-signout:hover {
+    border-color: #be123c;
+    background: #be123c;
+    color: #fff;
   }
 
   .play-app > .play-hud .theme-pop,
