@@ -3063,9 +3063,9 @@ a.hist-item-link {
 
 @media (min-width: 1100px) {
   .ig-feed.ig-feed--home {
-    width: min(980px, calc(100% - 64px));
-    grid-template-columns: minmax(0, 470px) 300px;
-    column-gap: 40px;
+    width: min(900px, calc(100% - 32px));
+    grid-template-columns: minmax(0, 560px) 280px;
+    column-gap: 28px;
     row-gap: 14px;
     justify-content: center;
     align-items: start;
@@ -3121,27 +3121,46 @@ a.hist-item-link {
     width: 100%;
     box-sizing: border-box;
     grid-template-columns: 44px minmax(0, 1fr);
+    align-items: center;
     justify-items: start;
     text-align: left;
-    gap: 2px 12px;
+    gap: 0 12px;
     padding: 10px 12px;
-    border-radius: 14px;
+    border-radius: 12px;
+    background: #14171a;
   }
 
   .ig-feed.ig-feed--home .ig-suggest-avatar {
-    grid-row: 1 / span 2;
+    grid-row: auto;
     width: 44px;
     height: 44px;
   }
 
   .ig-feed.ig-feed--home .ig-suggest-meta {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     justify-items: start;
-    gap: 6px;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .ig-feed.ig-feed--home .ig-suggest-name {
+    flex: 1 1 auto;
+    text-align: left;
   }
 
   .ig-feed.ig-feed--home .ig-suggest-follow {
     width: auto;
-    min-width: 84px;
+    flex: 0 0 auto;
+    min-width: 72px;
+    min-height: 32px;
+  }
+
+  .ig-feed.ig-feed--home .ig-suggest-follow:hover,
+  .ig-feed.ig-feed--home .ig-composer-go:hover {
+    transform: none;
   }
 
   .ig-feed.ig-feed--home .ig-composer {
@@ -3536,6 +3555,59 @@ a.hist-item-link {
   border-radius: 12px;
   object-fit: cover;
   aspect-ratio: 16 / 9;
+}
+
+/* Feed posts: one landing card, full-bleed media, on PC and phone. */
+.ig-feed .feed-card.ig-post {
+  gap: 0;
+  padding: 0 0 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #14171a;
+  box-shadow: none;
+  overflow: hidden;
+}
+
+.ig-feed .feed-card.ig-post:hover {
+  transform: none;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.ig-feed .ig-post-head {
+  padding: 10px 12px;
+}
+
+.ig-feed .ig-post-media {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-radius: 0;
+}
+
+.ig-feed .feed-card.ig-post img,
+.ig-feed .ig-post-media img,
+.ig-feed .ig-post-media video {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-radius: 0;
+  aspect-ratio: 1;
+  object-fit: cover;
+}
+
+.ig-feed .ig-post-text-only {
+  margin: 0;
+  border-radius: 0;
+}
+
+.ig-feed .feed-actions.ig-post-actions {
+  padding: 8px 8px 2px;
+  gap: 2px;
+}
+
+.ig-feed .ig-post-likes,
+.ig-feed .ig-post-caption {
+  padding-inline: 12px;
 }
 
 .feed-heart {
@@ -5383,7 +5455,9 @@ a.hist-item-link {
   .ig-feed {
     width: 100%;
     max-width: 100%;
-    gap: 10px;
+    gap: 12px;
+    padding-inline: 14px;
+    box-sizing: border-box;
   }
 
   .ig-feed .feed-list {
@@ -5395,8 +5469,8 @@ a.hist-item-link {
     position: sticky;
     top: 0;
     z-index: 12;
-    margin-inline: calc(-1 * max(12px, env(safe-area-inset-left, 0px)));
-    padding: 4px max(12px, env(safe-area-inset-right, 0px)) 10px max(12px, env(safe-area-inset-left, 0px));
+    margin-inline: 0;
+    padding: 4px 0 10px;
     background: color-mix(in srgb, var(--ba-page, #0a0b0f) 94%, transparent);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -5458,9 +5532,8 @@ a.hist-item-link {
 
   .ig-post-media {
     min-height: 0;
-    margin-left: -4px;
-    margin-right: -4px;
-    width: calc(100% + 8px);
+    margin: 0;
+    width: 100%;
   }
 
   .ig-post-actions {
@@ -5585,8 +5658,8 @@ a.hist-item-link {
   }
 
   .ig-feed.ig-feed--home > .ig-suggest {
-    margin-inline: calc(-1 * max(12px, env(safe-area-inset-left, 0px)));
-    padding-inline: max(12px, env(safe-area-inset-left, 0px));
+    margin-inline: 0;
+    padding-inline: 0;
   }
 
   .ig-feed.ig-feed--home .ig-suggest-row {
@@ -5665,16 +5738,21 @@ a.hist-item-link {
 
 @media (max-width: 480px) {
   .ig-composer-row {
-    grid-template-columns: 36px minmax(0, 1fr);
-    grid-template-areas:
-      'av field'
-      'go go';
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    grid-template-areas: none;
+    align-items: center;
+  }
+
+  .ig-composer-avatar {
+    width: 36px;
+    height: 36px;
   }
 
   .ig-composer-go {
-    grid-column: 1 / -1;
-    width: 100%;
-    min-height: 44px;
+    grid-column: auto;
+    width: auto;
+    min-height: 40px;
+    padding: 0 14px;
   }
 
   .explore-grid {

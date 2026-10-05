@@ -101,14 +101,14 @@ class FeedItem extends StatelessWidget {
       margin: EdgeInsets.only(bottom: spacing16),
       decoration: BoxDecoration(
         color: AppColors.surfaceElevated.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.border(0.12)),
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(2),
+          borderRadius: BorderRadius.circular(12),
           child: Padding(
             padding: EdgeInsets.all(cardPadding),
             child: Column(
