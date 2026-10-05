@@ -52,6 +52,65 @@
   color: var(--ba-text);
 }
 
+/* Same action buttons as the landing page. */
+.btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #f4f4f1;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: var(--ba-accent);
+  color: var(--ba-gold-ink, #12140a);
+}
+
+.btn-primary:hover {
+  background: var(--ba-accent-hover, #e3f64a);
+  box-shadow: 0 8px 24px -10px var(--ba-accent-glow);
+}
+
+.btn-ghost {
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #f4f4f1;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.btn-ghost:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.07);
+}
+
 .play-hud {
   display: flex;
   align-items: center;
@@ -4166,9 +4225,10 @@ a.hist-item-link {
 }
 
 .earn-task-go {
-  min-height: 34px;
+  min-height: 36px;
   padding: 0 14px;
-  font-size: 12px;
+  border-radius: 7px;
+  font-size: 13px;
   white-space: nowrap;
 }
 
