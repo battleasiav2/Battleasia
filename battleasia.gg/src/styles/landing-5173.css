@@ -9,7 +9,7 @@
   --accent: 67 79% 54%; --accent-foreground: 225 15% 5%; --destructive: 0 68% 54%;
   --border: 0 0% 100% / .1; --input: 0 0% 100% / .12; --ring: 67 79% 54%;
   --radius: 1.25rem; --app-font-sans: 'Inter', system-ui, sans-serif; --app-font-display: 'Inter', system-ui, sans-serif; --app-font-serif: Georgia, serif; --app-font-mono: 'Inter', system-ui, sans-serif;
-  --ink:#0a0b0f; --panel:#121419; --line:rgba(255,255,255,.10); --accent-color:#d4e82a; --muted-text:#999da7;
+  --ink:#0a0b0f; --panel:#121419; --line:rgba(255,255,255,.10); --accent-color:var(--ba-accent); --muted-text:#999da7;
   --hero-bg-image:url('/images/battle-hero-pubg.jpg');
 }
 html[lang="bn"] .ba5173{
@@ -103,9 +103,19 @@ html[lang="bn"] .ba5173{
 .ba5173 .header-tools{display:flex;align-items:center;gap:10px;margin-left:7px}
 .ba5173 .locale-select{appearance:none;background:transparent;color:#b8bbc1;border:1px solid var(--line);border-radius:5px;padding:8px 24px 8px 9px;font:10px var(--app-font-mono),monospace}
 .ba5173 .locale-select option{background:#111;color:#fff}
-.ba5173 .accent-picker{display:flex;gap:5px}
-.ba5173 .accent-chip{height:14px;width:14px;border-radius:50%;border:1px solid rgba(255,255,255,.3);padding:0}
-.ba5173 .accent-chip.selected{outline:1px solid #fff;outline-offset:2px}
+.ba5173 .header-tools .theme-dock .theme-pop{
+  left: auto;
+  right: 0;
+}
+.ba5173 .theme-dock.is-drop-up .theme-pop{
+  top: auto;
+  bottom: calc(100% + 8px);
+}
+.ba5173 .theme-dock .theme-chip,
+.ba5173 .theme-dock .theme-pop button{
+  min-height: 0;
+  font: inherit;
+}
 .ba5173 .mobile-trigger{display:none;background:none;color:#fff;border:0}
 .ba5173 .hero{min-height:780px;height:min(900px,100svh);padding-top:78px;position:relative;display:flex;align-items:center;overflow:hidden}
 .ba5173 .hero-bg{position:absolute;inset:0;background:linear-gradient(90deg,#0a0b0f 0%,rgba(10,11,15,.94) 34%,rgba(10,11,15,.52) 58%,rgba(10,11,15,.28) 100%),linear-gradient(0deg,#0a0b0f 0%,transparent 42%,rgba(10,11,15,.32)),var(--hero-bg-image) center 52%/cover no-repeat;animation:heroEnter 1.4s ease both}

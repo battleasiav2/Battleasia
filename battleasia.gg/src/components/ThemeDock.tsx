@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { ACCENTS, applyAccent, applyTheme, readAccent, readTheme } from '../lib/theme';
 import { useI18n } from '../lib/i18n';
 
-export function ThemeDock() {
+export function ThemeDock({ dropUp = false }: { dropUp?: boolean }) {
   const { t } = useI18n();
   const [accentId, setAccentId] = useState(readAccent);
   const [open, setOpen] = useState(false);
@@ -36,7 +36,7 @@ export function ThemeDock() {
   }, [open]);
 
   return (
-    <div className={`theme-dock${open ? ' is-open' : ''}`} onPointerDown={(e) => e.stopPropagation()}>
+    <div className={`theme-dock${open ? ' is-open' : ''}${dropUp ? ' is-drop-up' : ''}`} onPointerDown={(e) => e.stopPropagation()}>
       <button
         className="theme-chip"
         type="button"

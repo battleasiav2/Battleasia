@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowDownRight, ArrowLeft, ArrowRight, ChevronDown, Crosshair, Crown, Eye, EyeOff, Headphones, Menu, MessageCircle, ShieldCheck, Sparkles, Users, X, Zap } from 'lucide-react';
 import '../styles/landing-5173.css';
 import { GamingCursor } from '../components/GamingCursor';
+import { ThemeDock } from '../components/ThemeDock';
 import { UserAvatar } from '../components/UserAvatar';
 import { isApiError } from '../lib/api';
 import { fetchAppDownload, formatApkSize } from '../lib/app-download';
@@ -618,7 +619,6 @@ function useFlipRows(containerRef: React.RefObject<HTMLElement | null>, orderKey
 export function Landing5173({ chat = false }: { chat?: boolean }) {
   const [locale, setLocale] = useState<Locale>(readLandingLocale);
   const navigate = useNavigate();
-  const [accent, setAccent] = useState('#d4e82a');
   const [modal, setModal] = useState<ModalName>(null);
   const [logged, setLogged] = useState(isSignedIn);
   const [me, setMe] = useState<AuthUser | null>(() => readSessionUser());
@@ -1038,7 +1038,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
   const passwordStrength = password.length < 5 ? 0 : password.length < 8 ? 1 : password.length < 12 ? 2 : 3;
 
   return (
-    <div className="ba5173"><div className="site-shell" style={{ '--accent-color': accent } as CSSProperties}>
+    <div className="ba5173"><div className="site-shell">
       <GamingCursor />
       <GamingClickFx />
       <div className="progress-line" />
@@ -1053,7 +1053,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
             {logged ? <><button className="btn btn-ghost" onClick={signOut}>{appT('cta.signout')}</button><Link className="btn btn-primary" to="/user/play">{t.arena} <ArrowRight size={14}/></Link></> : <><button className="btn btn-ghost" onClick={() => openAuth('signin')}>{t.signin}</button><button className="btn btn-primary" onClick={onJoin}>{t.signup} <ArrowRight size={14}/></button></>}
           </div>
           <div className="header-tools">
-            <div className="accent-picker" aria-label="Choose accent color">{['#d4e82a','#61d7bd','#f08c63'].map((color) => <button aria-label={`Set accent ${color}`} key={color} className={`accent-chip ${accent === color ? 'selected' : ''}`} style={{ background:color }} onClick={() => setAccent(color)} />)}</div>
+            <ThemeDock />
             <LangMenu locale={locale} onPick={chooseLocale} />
           </div>
           </div>
@@ -1301,7 +1301,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
         <nav className="drawer-nav">{[['home',t.home],['about-us',t.about],['play',t.play],['rules',t.rules]].map(([id,label])=><a href={`#${id}`} key={id} onClick={(e)=>{e.preventDefault();anchor(id)}}>{label}</a>)}</nav>
         <div className="drawer-cards">{logged ? <Link className="drawer-card drawer-profile" to="/user/play" onClick={() => setMobileOpen(false)}><UserAvatar src={me?.avatar} name={playerName} size={36} /><span>{playerName}<small>{appT('cta.enterArena')}</small></span></Link> : <button className="drawer-card" onClick={()=>openAuth('signin')}>{t.signin}<small>Access your player profile</small></button>}<button className="drawer-card" onClick={()=>logged?navigate('/user/play'):onJoin()}>{t.arena}<small>Join a live tournament</small></button></div>
         <button className="drawer-card drawer-apk" onClick={() => { if (apkUrl) window.location.href = apkUrl; }}>Download the APK <small>{apkLabel}</small></button>
-        <div className="drawer-tools"><div className="accent-picker">{['#d4e82a','#61d7bd','#f08c63'].map((color)=><button key={color} aria-label={`Set accent ${color}`} className={`accent-chip ${accent===color?'selected':''}`} style={{background:color}} onClick={()=>setAccent(color)}/>)}</div><LangMenu locale={locale} onPick={chooseLocale} dropUp /></div>
+        <div className="drawer-tools"><ThemeDock dropUp /><LangMenu locale={locale} onPick={chooseLocale} dropUp /></div>
         <div className="drawer-foot">{logged ? <><button className="btn btn-ghost" onClick={signOut}>{appT('cta.signout')}</button><Link className="btn btn-primary" to="/user/play" onClick={() => setMobileOpen(false)}>{t.arena}</Link></> : <><button className="btn btn-ghost" onClick={()=>openAuth('signin')}>{t.signin}</button><button className="btn btn-primary" onClick={onJoin}>{t.signup}</button></>}</div>
       </div>
 

@@ -154,6 +154,11 @@ html[data-theme='light'] {
   display: none !important;
 }
 
+.theme-dock.is-drop-up .theme-pop {
+  top: auto;
+  bottom: calc(100% + 8px);
+}
+
 .theme-dock .theme-pop {
   position: absolute;
   top: calc(100% + 8px);
