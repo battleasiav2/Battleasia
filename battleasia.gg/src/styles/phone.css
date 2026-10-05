@@ -924,8 +924,8 @@ svg {
 
   .play-app > .play-hud .play-nav a.active,
   .play-app > .play-hud .play-nav > .hud-more > button.active {
-    background: color-mix(in srgb, var(--ba-accent) 18%, transparent);
-    color: var(--ba-text);
+    background: none;
+    color: #fff;
     box-shadow: none;
   }
 

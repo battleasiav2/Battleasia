@@ -516,8 +516,8 @@ svg {
   }
 
   .play-app > .play-hud .play-nav a.active {
-    background: color-mix(in srgb, var(--ba-accent) 18%, transparent);
-    color: var(--ba-text);
+    background: none;
+    color: #fff;
   }
 
   .play-app > .play-hud .hud-balance {

@@ -1,8 +1,8 @@
 export const ACCENTS = [
+  { id: 'lime', color: '#D4E82A' },
   { id: 'violet', color: '#7C5CFF' },
   { id: 'cyan', color: '#21D4FD' },
   { id: 'sky', color: '#38BDF8' },
-  { id: 'lime', color: '#CBFB24' },
   { id: 'ember', color: '#FF8A1A' },
   { id: 'jade', color: '#34D399' },
   { id: 'rose', color: '#FB7185' },
@@ -49,15 +49,24 @@ function isTheme(id: string | null | undefined): id is ThemeId {
 }
 
 function readStoredAccent(): AccentId {
+  let stored = '';
   try {
-    const fromLs = localStorage.getItem(ACCENT_KEY);
-    if (isAccent(fromLs)) return fromLs;
+    stored = localStorage.getItem(ACCENT_KEY) || '';
+  } catch {
+    stored = '';
+  }
+  if (!stored) stored = readCookie(ACCENT_KEY);
+  // Old default was violet. Move that once so dashboard/shop match the landing lime.
+  try {
+    if ((!stored || stored === 'violet') && localStorage.getItem('ba-landing-accent') !== '1') {
+      localStorage.setItem('ba-landing-accent', '1');
+      return 'lime';
+    }
   } catch {
     /* ignore */
   }
-  const fromCookie = readCookie(ACCENT_KEY);
-  if (isAccent(fromCookie)) return fromCookie;
-  return 'violet';
+  if (isAccent(stored)) return stored;
+  return 'lime';
 }
 
 function readStoredTheme(): ThemeId {
@@ -120,8 +129,8 @@ export function readTheme(): ThemeId {
 }
 
 export function applyAccent(id: string) {
-  // Drop legacy gold accent — BAC brand uses violet/cyan family only.
-  const next = id === 'gold' ? 'violet' : isAccent(id) ? id : 'violet';
+  const picked = id === 'gold' ? 'lime' : id;
+  const next = isAccent(picked) ? picked : 'lime';
   document.documentElement.dataset.accent = next;
   try {
     localStorage.setItem(ACCENT_KEY, next);

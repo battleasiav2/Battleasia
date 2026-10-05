@@ -100,46 +100,26 @@
 .text-link {
   background: none;
   border: 0;
-  color: var(--ba-muted);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  color: #a5a7ae;
+  font: 600 14px/1.2 var(--ba-font-body), sans-serif;
+  letter-spacing: 0;
   cursor: pointer;
   text-decoration: none;
   padding: 8px 12px;
   white-space: nowrap;
-  border-radius: 999px;
+  border-radius: 0;
   position: relative;
-  transition: color 0.16s ease, background 0.16s ease;
+  transition: color 0.16s ease;
 }
 
 .play-nav a:hover,
 .play-nav > .hud-more > button:hover,
-.text-link:hover {
-  color: var(--ba-text);
-  background: rgba(255, 255, 255, 0.05);
-}
-
+.text-link:hover,
 .play-nav a.active,
 .play-nav > .hud-more > button.active {
-  color: var(--ba-text);
-  background: color-mix(in srgb, var(--ba-accent) 14%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ba-accent) 28%, transparent);
-}
-
-.play-nav a.active::after,
-.play-nav > .hud-more > button.active::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: 4px;
-  width: 4px;
-  height: 4px;
-  border-radius: 999px;
-  transform: translateX(-50%);
-  background: linear-gradient(90deg, var(--ba-accent), var(--ba-accent-b));
-  box-shadow: 0 0 8px color-mix(in srgb, var(--ba-accent) 55%, transparent);
+  color: #fff;
+  background: none;
+  box-shadow: none;
 }
 
 .play-hud-right {
@@ -6232,9 +6212,9 @@ a.hist-item-link {
 
 .shop-hub-card p {
   margin: 0;
-  color: var(--ba-muted);
-  font-size: 13px;
-  line-height: 1.45;
+  color: #c5c8ce;
+  font-size: 16px;
+  line-height: 1.7;
 }
 
 .shop-hub-links {

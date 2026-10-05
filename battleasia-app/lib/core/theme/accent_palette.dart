@@ -30,10 +30,10 @@ const accentPalettes = <AccentId, AccentPalette>{
   AccentId.lime: AccentPalette(
     id: AccentId.lime,
     label: 'Lime',
-    gold: Color(0xFFCBFB24),
-    goldLight: Color(0xFFE2FF58),
-    goldDark: Color(0xFF9DE006),
-    ink: Color(0xFF081401),
+    gold: Color(0xFFD4E82A),
+    goldLight: Color(0xFFE3F64A),
+    goldDark: Color(0xFFB6CC1E),
+    ink: Color(0xFF12140A),
   ),
   AccentId.gold: AccentPalette(
     id: AccentId.gold,

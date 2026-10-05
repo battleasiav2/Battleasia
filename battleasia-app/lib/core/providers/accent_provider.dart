@@ -18,6 +18,15 @@ class AccentProvider extends ChangeNotifier {
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_storageKey);
+    final migrated = prefs.getBool('ba-landing-accent') ?? false;
+    if (!migrated && (raw == null || raw == 'violet')) {
+      _id = AccentId.lime;
+      AppColors.bind(palette);
+      await prefs.setBool('ba-landing-accent', true);
+      await prefs.setString(_storageKey, AccentId.lime.name);
+      notifyListeners();
+      return;
+    }
     final match = AccentId.values.where((value) => value.name == raw);
     if (match.isNotEmpty) {
       _id = match.first;

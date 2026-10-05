@@ -236,8 +236,8 @@
 }
 
 .btn-primary {
-  color: #fff;
-  background: linear-gradient(90deg, var(--ba-accent), var(--ba-accent-b));
+  color: var(--ba-gold-ink);
+  background: var(--ba-accent);
   box-shadow: 0 8px 24px -10px var(--ba-accent-glow);
 }
 

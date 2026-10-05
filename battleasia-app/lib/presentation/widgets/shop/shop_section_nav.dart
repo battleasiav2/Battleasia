@@ -67,17 +67,16 @@ class ShopSectionNav extends StatelessWidget {
                       Icon(
                         item.icon,
                         size: 20,
-                        color: isActive ? AppColors.gold : AppColors.textMuted,
+                        color: isActive ? const Color(0xFFFFFFFF) : const Color(0xFFA5A7AE),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         item.label,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: AppTheme.bodySmall.copyWith(
-                          color: isActive ? AppColors.gold : AppColors.textMuted,
-                          fontWeight:
-                              isActive ? FontWeight.w800 : FontWeight.w600,
+                        style: AppTheme.bodyMedium.copyWith(
+                          color: isActive ? const Color(0xFFFFFFFF) : const Color(0xFFA5A7AE),
+                          fontWeight: FontWeight.w600,
                           fontSize: 10,
                           letterSpacing: 0.3,
                           decoration: TextDecoration.none,

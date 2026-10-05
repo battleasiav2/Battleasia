@@ -15,10 +15,12 @@
 .m-drawer-card,
 .earn-mod,
 .play-sheet-card.join-dialog,
-.board-podium-card {
-  background: var(--ba-card-bg);
-  border: 1px solid var(--ba-card-border);
-  box-shadow: var(--ba-card-shadow);
+.board-podium-card,
+.shop-hub-card {
+  background: #161618;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 3px 0 0 var(--ba-accent), var(--ba-card-shadow);
+  color: #f2f3f0;
 }
 
 .room-card,

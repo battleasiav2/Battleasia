@@ -81,12 +81,11 @@
 .text-link {
   background: none;
   border: 0;
-  color: var(--ba-muted);
-  font: inherit;
-  font-weight: 600;
+  color: #a5a7ae;
+  font: 600 14px/1.2 var(--ba-font-body), sans-serif;
   cursor: pointer;
   text-decoration: none;
-  padding: 0;
+  padding: 8px 12px;
   white-space: nowrap;
 }
 
@@ -868,45 +867,31 @@ a.result-row {
   align-content: start;
 }
 
-/* Premium gold pack cards (reference: dark + gold + red) */
 .shop-pack {
   position: relative;
   display: block;
   width: 100%;
   margin: 0;
   padding: 0;
-  border: 1.5px solid #c9a227;
-  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
   text-align: left;
-  color: inherit;
-  background:
-    radial-gradient(120% 90% at 100% 20%, rgba(201, 162, 39, 0.22), transparent 55%),
-    radial-gradient(80% 70% at 0% 100%, rgba(180, 40, 40, 0.12), transparent 50%),
-    linear-gradient(145deg, #141820 0%, #0a0c12 55%, #12151e 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 220, 120, 0.18),
-    0 0 0 1px rgba(201, 162, 39, 0.15),
-    0 12px 28px -18px rgba(0, 0, 0, 0.8);
-  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+  color: #f2f3f0;
+  background: #161618;
+  box-shadow: inset 3px 0 0 var(--ba-accent);
+  transition: border-color 0.15s ease, transform 0.15s ease;
 }
 
 .shop-pack:hover {
-  border-color: #e4c65a;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 220, 120, 0.25),
-    0 0 20px -6px rgba(201, 162, 39, 0.45),
-    0 16px 32px -16px rgba(0, 0, 0, 0.85);
-  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--ba-accent) 45%, rgba(255, 255, 255, 0.08));
+  transform: translateY(-2px);
 }
 
 .shop-pack.is-selected {
-  border-color: #f0d56a;
-  box-shadow:
-    0 0 0 1px rgba(240, 213, 106, 0.35),
-    0 0 28px -8px rgba(201, 162, 39, 0.55),
-    0 16px 32px -16px rgba(0, 0, 0, 0.85);
+  border-color: var(--ba-accent);
+  box-shadow: inset 3px 0 0 var(--ba-accent), 0 0 0 1px color-mix(in srgb, var(--ba-accent) 40%, transparent);
 }
 
 .shop-pack-off {
@@ -955,11 +940,7 @@ a.result-row {
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1;
-  background: linear-gradient(180deg, #ffe9a0 0%, #f0c43a 42%, #c99212 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  filter: drop-shadow(0 1px 0 rgba(80, 50, 0, 0.35));
+  color: #f4f5f2;
 }
 
 .shop-pack-amt-coin {
@@ -971,9 +952,9 @@ a.result-row {
 
 .shop-pack-price {
   margin: 0;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
-  color: #f4f5f7;
+  color: #c5c8ce;
   letter-spacing: -0.02em;
 }
 
@@ -982,14 +963,13 @@ a.result-row {
   align-items: center;
   gap: 4px;
   margin-top: 2px;
-  min-height: 34px;
-  padding: 0 14px 0 16px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
-  color: #fff;
-  background: linear-gradient(180deg, #ff4f4f, #d61f1f);
-  box-shadow: 0 6px 14px -6px rgba(200, 30, 30, 0.7);
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ba-gold-ink);
+  background: var(--ba-accent);
 }
 
 .shop-pack-cta i {

@@ -41,8 +41,8 @@ class ShopItemCard extends StatelessWidget {
         final compact = constraints.maxWidth < 160;
         final pad = compact ? 10.0 : 14.0;
         final coinSize = compact ? 52.0 : 64.0;
-        final amountSize = compact ? 14.0 : 16.0;
-        final priceSize = compact ? 12.0 : 13.5;
+        final amountSize = compact ? 16.0 : 18.0;
+        final priceSize = compact ? 14.0 : 16.0;
         final badgeSize = compact ? 8.0 : 10.0;
 
         return Material(
@@ -54,9 +54,14 @@ class ShopItemCard extends StatelessWidget {
               children: [
                 Ink(
                   decoration: BoxDecoration(
-                    color: AppColors.panelFill(0.55),
-                    borderRadius: BorderRadius.circular(compact ? 12 : 14),
-                    border: Border.all(color: AppColors.hair()),
+                    color: const Color(0xFF161618),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border(
+                      left: BorderSide(color: AppColors.gold, width: 3),
+                      top: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                      right: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                      bottom: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                    ),
                   ),
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(

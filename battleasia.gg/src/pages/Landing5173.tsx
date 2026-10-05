@@ -1,14 +1,17 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowDownRight, ArrowLeft, ArrowRight, ChevronDown, Crosshair, Crown, Eye, EyeOff, Headphones, Menu, MessageCircle, ShieldCheck, Sparkles, Users, X, Zap } from 'lucide-react';
 import '../styles/landing-5173.css';
+import { UserAvatar } from '../components/UserAvatar';
 import { isApiError } from '../lib/api';
 import { fetchAppDownload, formatApkSize } from '../lib/app-download';
 import {
   checkEmailAvailable,
   clearSignedIn,
+  fetchMe,
   forgotPassword,
   isSignedIn,
+  logout,
   markSignedIn,
   readSessionUser,
   resendVerification,
@@ -17,8 +20,10 @@ import {
   signIn,
   signUp,
   verifyEmailSignup,
+  type AuthUser,
 } from '../lib/auth';
 import { fetchPublicDashboard } from '../lib/dashboard';
+import { useI18n } from '../lib/i18n';
 import { captureReferral } from '../lib/ref';
 import { LANDING_LANG, landingText, readLandingLocale, type LandingLocale } from './landing5173-text';
 
@@ -697,6 +702,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
   const [accent, setAccent] = useState('#d4e82a');
   const [modal, setModal] = useState<ModalName>(null);
   const [logged, setLogged] = useState(isSignedIn);
+  const [me, setMe] = useState<AuthUser | null>(() => readSessionUser());
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeLink, setActiveLink] = useState('home');
@@ -737,7 +743,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
   const [apkUrl, setApkUrl] = useState('');
   const [apkLabel, setApkLabel] = useState('');
   const [returnPath, setReturnPath] = useState('/user/play');
-  const playerName = readSessionUser()?.username || 'Player';
+  const playerName = me?.username || 'Player';
   const [arenaSeatsFilled, setArenaSeatsFilled] = useState(0);
   const arenaSeatPct = Math.min(100, Math.round((arenaSeatsFilled / ARENA_SEAT_CAPACITY) * 100));
   const arenaSeatStatus = getArenaSeatStatus(arenaSeatPct);
@@ -753,6 +759,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
     joinedToday: 0,
   });
   const t = text[locale];
+  const { t: appT } = useI18n();
   const activeMatches = useMemo(
     () => (matchTab === 'high' ? highMatches : liveMatches),
     [matchTab, highMatches, liveMatches],
@@ -983,11 +990,46 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
     return () => { cancelAnimationFrame(frame); observer.disconnect(); };
   }, []);
 
+  useEffect(() => {
+    if (!logged) {
+      setMe(null);
+      return;
+    }
+    let alive = true;
+    fetchMe()
+      .then((user) => {
+        if (alive) setMe(user);
+      })
+      .catch(() => {
+        if (!alive) return;
+        clearSignedIn();
+        setLogged(false);
+        setMe(null);
+      });
+    const onAvatar = (ev: Event) => {
+      const avatar = (ev as CustomEvent<{ avatar?: string }>).detail?.avatar;
+      if (avatar) setMe((prev) => (prev ? { ...prev, avatar } : { avatar }));
+    };
+    window.addEventListener('ba:avatar-updated', onAvatar);
+    return () => {
+      alive = false;
+      window.removeEventListener('ba:avatar-updated', onAvatar);
+    };
+  }, [logged]);
+
   const goArena = (path = '/user/play') => {
     if (!logged) { setReturnPath(path); openAuth('signin'); return; }
     navigate(path);
   };
   const onJoin = () => (logged ? navigate('/user/play') : openAuth('signup'));
+  const signOut = () => {
+    void logout().finally(() => {
+      setMe(null);
+      setLogged(false);
+      setMobileOpen(false);
+      notify('Signed out.');
+    });
+  };
   const onMatch = (id?: string) => goArena(id ? `/user/play/${id}/detail` : '/user/play');
   const onGame = (closed: boolean) => (closed ? notify(t.soon) : goArena('/user/play'));
   const anchor = (id: string) => {
@@ -1002,6 +1044,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
     if (password.length < 6) { setError('Enter your password to continue.'); return; }
     void signIn(email.trim(), password).then((user) => {
       markSignedIn(user);
+      setMe(user);
       setLogged(true);
       closeModal();
       navigate(returnPath);
@@ -1038,6 +1081,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
     if (otp.some((digit) => !digit)) { setError('Enter all six digits to verify.'); return; }
     void verifyEmailSignup(email.trim(), otp.join('')).then((user) => {
       markSignedIn(user);
+      setMe(user);
       setLogged(true);
       closeModal();
       navigate(returnPath);
@@ -1087,13 +1131,18 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
             {[['home',t.home],['about',t.about],['play',t.play],['rules',t.rules]].map(([id,label]) => <a key={id} href={`#${id}`} className={activeLink === id ? 'active' : ''} onClick={(e) => { e.preventDefault(); anchor(id === 'about' ? 'about-us' : id); }}>{label}</a>)}
           </nav>
           <div className="nav-actions">
-            {logged ? <><button className="btn btn-ghost" onClick={() => { clearSignedIn(); setLogged(false); notify('Signed out.'); }}>Sign out</button><button className="btn btn-primary" onClick={() => navigate('/user/play')}>{t.arena} <ArrowRight size={14}/></button><PlayerAvatar name={playerName} className="leader-avatar player-avatar" /></> : <><button className="btn btn-ghost" onClick={() => openAuth('signin')}>{t.signin}</button><button className="btn btn-primary" onClick={onJoin}>{t.signup} <ArrowRight size={14}/></button></>}
+            {logged ? <><button className="btn btn-ghost" onClick={signOut}>{appT('cta.signout')}</button><Link className="btn btn-primary" to="/user/play">{t.arena} <ArrowRight size={14}/></Link></> : <><button className="btn btn-ghost" onClick={() => openAuth('signin')}>{t.signin}</button><button className="btn btn-primary" onClick={onJoin}>{t.signup} <ArrowRight size={14}/></button></>}
           </div>
           <div className="header-tools">
             <div className="accent-picker" aria-label="Choose accent color">{['#d4e82a','#61d7bd','#f08c63'].map((color) => <button aria-label={`Set accent ${color}`} key={color} className={`accent-chip ${accent === color ? 'selected' : ''}`} style={{ background:color }} onClick={() => setAccent(color)} />)}</div>
             <LangMenu locale={locale} onPick={chooseLocale} />
           </div>
           </div>
+          {logged ? (
+            <Link className="nav-profile" to="/user/play" aria-label={playerName}>
+              <UserAvatar src={me?.avatar} name={playerName} size={34} priority />
+            </Link>
+          ) : null}
           <button className="mobile-trigger" aria-label="Open menu" onClick={() => setMobileOpen(true)}><Menu size={22}/></button>
         </div>
       </header>
@@ -1311,7 +1360,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
           <div className="footer-main">
             <div className="footer-brand"><a href="#home" className="brand" onClick={(e)=>{e.preventDefault();anchor('home')}}><BrandLogo /><span>Battle Asia</span></a><p>Mobile tournaments for the players who show up. Bangladesh and across Asia.</p><div className="social-links"><button aria-label="Facebook" onClick={() => notify('Facebook community link is coming soon.')}><span>f</span></button><button aria-label="Discord" onClick={() => notify('Discord invite is coming soon.')}><MessageCircle size={14}/></button><button aria-label="YouTube" onClick={() => notify('YouTube channel is coming soon.')}><span>▶</span></button></div></div>
             <div className="footer-col"><h4>Support</h4><div className="footer-links"><a href="mailto:support@battleasia.gg">Contact support</a><a href="#rules" onClick={(e)=>{e.preventDefault();anchor('rules')}}>FAQ</a><a href="#rules" onClick={(e)=>{e.preventDefault();anchor('rules')}}>Fair play policy</a></div></div>
-            <div className="footer-col"><h4>Legal</h4><div className="footer-links"><a href="#terms" onClick={(e)=>{e.preventDefault();notify('Terms will be available with the full launch.')}}>Terms of service</a><a href="#privacy" onClick={(e)=>{e.preventDefault();notify('Privacy policy will be available with the full launch.')}}>Privacy policy</a></div></div>
+            <div className="footer-col"><h4>Legal</h4><div className="footer-links"><Link to="/terms-and-conditions">Terms of service</Link><Link to="/privacy-policy">Privacy policy</Link></div></div>
             <div className="footer-col"><h4>Explore</h4><div className="footer-links"><a href="#play" onClick={(e)=>{e.preventDefault();anchor('play')}}>Games</a><a href="#how-to-play" onClick={(e)=>{e.preventDefault();anchor('how-to-play')}}>Tournament modes</a><a href="#home" onClick={(e)=>{e.preventDefault();anchor('home')}}>Back to top ↑</a></div></div>
           </div>
           <div className="payment-strip"><span>Payment methods</span><span className="pay-badge">bKash</span><span className="pay-badge">Nagad</span><span className="pay-badge">USDT</span></div>
@@ -1331,10 +1380,10 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
       <div className={`mobile-drawer ${mobileOpen?'open':''}`} aria-hidden={!mobileOpen}>
         <div className="drawer-head"><a className="brand" href="#home" onClick={(e)=>{e.preventDefault();anchor('home')}}><BrandLogo compact /><span>Battle Asia</span></a><button className="drawer-close" aria-label="Close menu" onClick={()=>setMobileOpen(false)}><X size={18}/></button></div>
         <nav className="drawer-nav">{[['home',t.home],['about-us',t.about],['play',t.play],['rules',t.rules]].map(([id,label])=><a href={`#${id}`} key={id} onClick={(e)=>{e.preventDefault();anchor(id)}}>{label}</a>)}</nav>
-        <div className="drawer-cards"><button className="drawer-card" onClick={()=>openAuth('signin')}>{t.signin}<small>Access your player profile</small></button><button className="drawer-card" onClick={()=>logged?navigate('/user/play'):onJoin()}>{t.arena}<small>Join a live tournament</small></button></div>
+        <div className="drawer-cards">{logged ? <Link className="drawer-card drawer-profile" to="/user/play" onClick={() => setMobileOpen(false)}><UserAvatar src={me?.avatar} name={playerName} size={36} /><span>{playerName}<small>{appT('cta.enterArena')}</small></span></Link> : <button className="drawer-card" onClick={()=>openAuth('signin')}>{t.signin}<small>Access your player profile</small></button>}<button className="drawer-card" onClick={()=>logged?navigate('/user/play'):onJoin()}>{t.arena}<small>Join a live tournament</small></button></div>
         <button className="drawer-card drawer-apk" onClick={() => { if (apkUrl) window.location.href = apkUrl; }}>Download the APK <small>{apkLabel}</small></button>
         <div className="drawer-tools"><div className="accent-picker">{['#d4e82a','#61d7bd','#f08c63'].map((color)=><button key={color} aria-label={`Set accent ${color}`} className={`accent-chip ${accent===color?'selected':''}`} style={{background:color}} onClick={()=>setAccent(color)}/>)}</div><LangMenu locale={locale} onPick={chooseLocale} dropUp /></div>
-        <div className="drawer-foot"><button className="btn btn-ghost" onClick={()=>openAuth('signin')}>{t.signin}</button><button className="btn btn-primary" onClick={onJoin}>{t.signup}</button></div>
+        <div className="drawer-foot">{logged ? <><button className="btn btn-ghost" onClick={signOut}>{appT('cta.signout')}</button><Link className="btn btn-primary" to="/user/play" onClick={() => setMobileOpen(false)}>{t.arena}</Link></> : <><button className="btn btn-ghost" onClick={()=>openAuth('signin')}>{t.signin}</button><button className="btn btn-primary" onClick={onJoin}>{t.signup}</button></>}</div>
       </div>
 
       {modal&&<div className="modal-backdrop" onMouseDown={(e)=>{if(e.target===e.currentTarget)closeModal()}}><section className="auth-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
@@ -1342,7 +1391,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
         <div className="modal-form"><button className="modal-close" aria-label="Close dialog" onClick={closeModal}><X size={17}/></button>
           {modal==='signin'&&<><h2 id="modal-title" className="modal-heading">Welcome back</h2><p className="modal-sub">Enter the arena where every match matters.</p><form className="form-fields" onSubmit={handleSignin}>{error&&<div className="form-error" role="alert">{error}</div>}<div className="field"><label>{t.email}</label><input autoFocus type="email" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="you@example.com"/></div><div className="field"><label>{t.password}</label><div className="password-wrap"><input type={showPassword?'text':'password'} value={password} onChange={(e)=>setPassword(e.target.value)} placeholder="Your password"/><button type="button" aria-label={showPassword?'Hide password':'Show password'} onClick={()=>setShowPassword(!showPassword)}>{showPassword?<EyeOff size={15}/>:<Eye size={15}/>}</button></div></div><div className="form-meta"><label className="checkline"><input type="checkbox" checked={remember} onChange={(e)=>setRemember(e.target.checked)}/>{t.remember}</label><button type="button" className="inline-link" onClick={()=>{setError('');setModal('forgot')}}>{t.forgot}</button></div><button className="btn btn-primary form-submit auth-cta-btn"><span>{t.signin}</span><AuthCtaArrow /></button><div className="oauth-row"><button type="button" className="oauth-btn oauth-btn--google" onClick={() => { window.location.href = `/api/v2/users/oauth/google?returnTo=${encodeURIComponent(returnPath)}` }}><span className="oauth-icon-wrap oauth-icon-wrap--google"><GoogleIcon /></span><span className="oauth-btn-label">Continue with Google</span></button><button type="button" className="oauth-btn oauth-btn--discord" onClick={() => { window.location.href = `/api/v2/users/oauth/discord?returnTo=${encodeURIComponent(returnPath)}` }}><span className="oauth-icon-wrap oauth-icon-wrap--discord"><DiscordIcon /></span><span className="oauth-btn-label">Continue with Discord</span></button></div></form><p className="auth-switch">New to the arena? <button className="inline-link" onClick={()=>{setSignupStep(1);setModal('signup')}}>{t.createAccount}</button></p></>}
           {modal==='signup'&&<><h2 id="modal-title" className="modal-heading">{t.createAccount}</h2><p className="modal-sub">A few details, then you’re on the roster.</p><div className="stepper"><i className="active"/><i className={signupStep===2?'active':''}/></div><form className="form-fields" onSubmit={handleSignupStep}>{error&&<div className="form-error" role="alert">{error}</div>}
-            {signupStep===1?<><div className="field"><label>{t.email}</label><input autoFocus type="email" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="you@example.com"/><small style={{color:email.includes('@')?(email.includes('taken')?'#ef9b88':'#b7cf62'):'#777',fontSize:9,display:'block',marginTop:5}}>{email.includes('@')?(email.includes('taken')?'This email is already in use.':'✓ Email available'):'Availability checked as you type'}</small></div><div className="field"><label>{t.password}</label><div className="password-wrap"><input type={showPassword?'text':'password'} value={password} onChange={(e)=>setPassword(e.target.value)} placeholder="At least 8 characters"/><button type="button" aria-label={showPassword?'Hide password':'Show password'} onClick={()=>setShowPassword(!showPassword)}>{showPassword?<EyeOff size={15}/>:<Eye size={15}/>}</button></div><div className="strength">{[0,1,2].map((v)=><i key={v} className={v<passwordStrength?'on':''}/>)}</div><small style={{color:'#787b83',fontSize:9}}>Use 8+ characters with a mix of letters and numbers.</small></div><div className="field"><label>Confirm password</label><input type="password" value={confirm} onChange={(e)=>setConfirm(e.target.value)} placeholder="Repeat password"/>{confirm&&<small style={{color:confirm===password?'#b7cf62':'#e09382',fontSize:9}}>{confirm===password?'Passwords match':'Passwords do not match'}</small>}</div><button className="btn btn-primary form-submit auth-cta-btn"><span>{t.continue}</span><AuthCtaArrow /></button></>:<><div className="field"><label>{t.username}</label><input autoFocus value={username} onChange={(e)=>setUsername(e.target.value)} placeholder="Your player name"/></div><div className="field-row"><div className="field"><label>{t.gameId}</label><input value={gameId} onChange={(e)=>setGameId(e.target.value)} placeholder="Player ID"/></div><div className="field"><label>{t.phone}</label><input value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder="+880 1XXX"/></div></div><div className="field"><label>{t.server}</label><select value={server} onChange={(e)=>setServer(e.target.value)}>{['Asia','Europe','South America','Middle East','KR / JP'].map((s)=><option key={s}>{s}</option>)}</select></div>{new URLSearchParams(window.location.search).get('ref')&&<div className="form-error" style={{background:'rgba(212,232,42,.08)',color:'#c6d17e',borderColor:'rgba(212,232,42,.2)'}}>Referral code {new URLSearchParams(window.location.search).get('ref')} applied.</div>}<label className="checkline"><input type="checkbox" checked={terms} onChange={(e)=>setTerms(e.target.checked)}/>{t.terms}</label><div className="field-row"><button type="button" className="btn btn-ghost" onClick={()=>{setSignupStep(1);setError('')}}><ArrowLeft size={14}/> Back</button><button className="btn btn-primary auth-cta-btn"><span>{t.createAccount}</span><AuthCtaArrow /></button></div></>}</form><p className="auth-switch">Already on the roster? <button type="button" className="inline-link" onClick={()=>openAuth('signin')}>{t.signin}</button></p></>}
+            {signupStep===1?<><div className="field"><label>{t.email}</label><input autoFocus type="email" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="you@example.com"/><small style={{color:email.includes('@')?(email.includes('taken')?'#ef9b88':'#b7cf62'):'#777',fontSize:9,display:'block',marginTop:5}}>{email.includes('@')?(email.includes('taken')?'This email is already in use.':'✓ Email available'):'Availability checked as you type'}</small></div><div className="field"><label>{t.password}</label><div className="password-wrap"><input type={showPassword?'text':'password'} value={password} onChange={(e)=>setPassword(e.target.value)} placeholder="At least 8 characters"/><button type="button" aria-label={showPassword?'Hide password':'Show password'} onClick={()=>setShowPassword(!showPassword)}>{showPassword?<EyeOff size={15}/>:<Eye size={15}/>}</button></div><div className="strength">{[0,1,2].map((v)=><i key={v} className={v<passwordStrength?'on':''}/>)}</div><small style={{color:'#787b83',fontSize:9}}>Use 8+ characters with a mix of letters and numbers.</small></div><div className="field"><label>Confirm password</label><input type="password" value={confirm} onChange={(e)=>setConfirm(e.target.value)} placeholder="Repeat password"/>{confirm&&<small style={{color:confirm===password?'#b7cf62':'#e09382',fontSize:9}}>{confirm===password?'Passwords match':'Passwords do not match'}</small>}</div><button className="btn btn-primary form-submit auth-cta-btn"><span>{t.continue}</span><AuthCtaArrow /></button></>:<><div className="field"><label>{t.username}</label><input autoFocus value={username} onChange={(e)=>setUsername(e.target.value)} placeholder="Your player name"/></div><div className="field-row"><div className="field"><label>{t.gameId}</label><input value={gameId} onChange={(e)=>setGameId(e.target.value)} placeholder="Player ID"/></div><div className="field"><label>{t.phone}</label><input value={phone} onChange={(e)=>setPhone(e.target.value)} placeholder="+880 1XXX"/></div></div><div className="field"><label>{t.server}</label><select value={server} onChange={(e)=>setServer(e.target.value)}>{['Asia','Europe','South America','Middle East','KR / JP'].map((s)=><option key={s}>{s}</option>)}</select></div>{new URLSearchParams(window.location.search).get('ref')&&<div className="form-error" style={{background:'rgba(212,232,42,.08)',color:'#c6d17e',borderColor:'rgba(212,232,42,.2)'}}>Referral code {new URLSearchParams(window.location.search).get('ref')} applied.</div>}<label className="checkline"><input type="checkbox" checked={terms} onChange={(e)=>setTerms(e.target.checked)}/>{appT('auth.agreeLead')} <Link to="/terms-and-conditions" onClick={(e)=>e.stopPropagation()}>{appT('footer.terms')}</Link> {appT('auth.agreeAnd')} <Link to="/privacy-policy" onClick={(e)=>e.stopPropagation()}>{appT('footer.privacy')}</Link></label><div className="field-row"><button type="button" className="btn btn-ghost" onClick={()=>{setSignupStep(1);setError('')}}><ArrowLeft size={14}/> Back</button><button className="btn btn-primary auth-cta-btn"><span>{t.createAccount}</span><AuthCtaArrow /></button></div></>}</form><p className="auth-switch">Already on the roster? <button type="button" className="inline-link" onClick={()=>openAuth('signin')}>{t.signin}</button></p></>}
           {modal==='otp'&&<><h2 id="modal-title" className="modal-heading">{t.verify}</h2><p className="modal-sub">{t.otpHelp} <strong style={{color:'#e1e2dd'}}>{email.replace(/^(.).+(@.+)$/,'$1***$2')||'j***@battleasia.gg'}</strong></p><form className="form-fields" onSubmit={handleOtp}>{error&&<div className="form-error" role="alert">{error}</div>}<div className="otp-row">{otp.map((digit,i)=><input key={i} aria-label={`Verification digit ${i+1}`} inputMode="numeric" maxLength={6} value={digit} onChange={(e)=>onOtpInput(i,e.target.value,e.target)} onKeyDown={(e)=>onOtpKey(e,i)}/>)}</div><button className="btn btn-primary form-submit">{t.verify} <ArrowRight size={14}/></button><div className="form-meta"><span /><button type="button" disabled={cooldown>0} className="inline-link" onClick={()=>{ setCooldown(60); void resendVerification(email.trim()).then(() => notify('A new code has been sent.')).catch(fail); }}>{cooldown>0?`Resend in ${cooldown}s`:t.resend}</button></div></form></>}
           {modal==='forgot'&&<><h2 id="modal-title" className="modal-heading">Reset your password</h2><p className="modal-sub">We’ll send a reset code to your email address.</p><form className="form-fields" onSubmit={handleForgot}>{error&&<div className="form-error" role="alert">{error}</div>}<div className="field"><label>{t.email}</label><input autoFocus type="email" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="you@example.com"/></div><button className="btn btn-primary form-submit">{t.send} <ArrowRight size={14}/></button><button type="button" className="inline-link" onClick={()=>setModal('signin')}>Back to sign in</button></form></>}
           {modal==='reset'&&<><h2 id="modal-title" className="modal-heading">Choose a new password</h2><p className="modal-sub">Enter the code sent to {email.replace(/^(.).+(@.+)$/,'$1***$2')} and set a new password.</p><form className="form-fields" onSubmit={handleReset}>{error&&<div className="form-error" role="alert">{error}</div>}<div className="otp-row">{otp.map((digit,i)=><input key={i} aria-label={`Reset code digit ${i+1}`} inputMode="numeric" maxLength={6} value={digit} onChange={(e)=>onOtpInput(i,e.target.value,e.target)} onKeyDown={(e)=>onOtpKey(e,i)}/>)}</div><div className="field"><label>New password</label><input type="password" value={password} onChange={(e)=>setPassword(e.target.value)} placeholder="At least 8 characters"/></div><div className="field"><label>Confirm password</label><input type="password" value={confirm} onChange={(e)=>setConfirm(e.target.value)} placeholder="Repeat new password"/></div><button className="btn btn-primary form-submit">Reset password</button><div className="form-meta"><span/><button type="button" disabled={cooldown>0} className="inline-link" onClick={()=>{ setCooldown(60); void forgotPassword(email.trim()).catch(fail); }}>{cooldown>0?`Resend in ${cooldown}s`:t.resend}</button></div></form></>}
