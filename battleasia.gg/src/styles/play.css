@@ -779,14 +779,20 @@
   }
 
   .play-grid.play-grid-rail .play-card-meta {
-    padding: 10px 10px 12px;
+    padding: 10px 12px 12px;
+  }
+
+  .play-grid.play-grid-rail .play-card-meta strong,
+  .play-grid.play-grid-rail .play-card-meta small,
+  .play-grid.play-grid-rail .play-card-go {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
   }
 
   .play-grid.play-grid-rail .play-card-meta strong {
     font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    line-height: 1.25;
   }
 
   .play-grid.play-grid-rail .play-card-go {
@@ -999,15 +1005,20 @@
   padding: 16px 18px 18px;
   display: grid;
   gap: 4px;
+  min-width: 0;
 }
 
 .play-card-meta strong {
   font-size: 16px;
   letter-spacing: -0.02em;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .play-card-meta small {
   color: var(--ba-muted);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .play-card-go {
@@ -1015,7 +1026,9 @@
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.04em;
+  line-height: 1.3;
   color: var(--ba-accent);
+  overflow-wrap: anywhere;
 }
 
 .play-empty {
