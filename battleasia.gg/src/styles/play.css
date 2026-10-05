@@ -2188,6 +2188,54 @@ a.hist-item-link {
   box-shadow: none;
 }
 
+/* Account leaderboard uses the home champion board inside the account column. */
+.account-wrap .ba5173,
+.account-wrap .ba5173 .site-shell {
+  min-height: 0;
+  background: transparent;
+  overflow: visible;
+  color: #f2f3f0;
+}
+
+.account-wrap .ba5173 .site-shell:before {
+  content: none;
+}
+
+.account-wrap .ba5173 .leaderboard-feature {
+  margin-top: 0;
+  width: 100%;
+}
+
+.account-wrap .ba5173 a.podium-place,
+.account-wrap .ba5173 a.compact-rank-row {
+  color: inherit;
+  text-decoration: none;
+}
+
+.account-wrap .ba5173 a.compact-rank-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.account-wrap .ba5173 .podium-medallion .user-avatar,
+.account-wrap .ba5173 .compact-avatar.user-avatar {
+  width: 100% !important;
+  height: 100% !important;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+.account-wrap .ba5173 .leader-switch button {
+  text-transform: capitalize;
+}
+
+.account-wrap .ba5173 .podium-score,
+.account-wrap .ba5173 .compact-score {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .tab-link {
   display: inline-flex;
   align-items: center;

@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import { CoinValue } from '../../components/CoinValue';
+import { Crown } from 'lucide-react';
 import { UserAvatar } from '../../components/UserAvatar';
 import { useHudPage } from '../../hooks/useHudPage';
 import { isApiError } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
 import { fetchLeaderboard } from '../../lib/social';
+import '../../styles/landing-5173.css';
 
 type BoardRow = {
   id: string;
@@ -35,29 +36,26 @@ function mapRow(row: Record<string, unknown>, i: number): BoardRow {
   };
 }
 
-function CrownIcon() {
+function BacMark({ size }: { size: number }) {
   return (
-    <svg className="board-crown" width="28" height="22" viewBox="0 0 28 22" aria-hidden>
-      <path
-        d="M3 18.5h22l-1.2-9.2-5.3 4.1L14 3.5l-4.5 9.9-5.3-4.1L3 18.5Z"
-        fill="url(#ba-crown)"
-        stroke="#9dff4a"
-        strokeWidth="1.2"
-      />
-      <defs>
-        <linearGradient id="ba-crown" x1="3" y1="3" x2="25" y2="20">
-          <stop stopColor="#c8ff6a" />
-          <stop offset="1" stopColor="#7cff2a" />
-        </linearGradient>
-      </defs>
-    </svg>
+    <img
+      src="/assets/bac-coin.webp"
+      alt=""
+      className="bac-coin-icon score-coin"
+      width={size}
+      height={size}
+      loading="lazy"
+      decoding="async"
+    />
   );
 }
+
+const PERIODS = ['all', 'weekly', 'monthly'] as const;
 
 export function LeaderboardPage() {
   const { t } = useI18n();
   useHudPage();
-  const [period, setPeriod] = useState('all');
+  const [period, setPeriod] = useState<(typeof PERIODS)[number]>('all');
   const [rows, setRows] = useState<BoardRow[] | null>(null);
   const [error, setError] = useState('');
 
@@ -77,126 +75,134 @@ export function LeaderboardPage() {
     return () => window.removeEventListener('ba:avatar-updated', onAvatar);
   }, [period, t]);
 
-  const top3 = useMemo(() => (rows || []).slice(0, 3), [rows]);
-  const rest = useMemo(() => (rows || []).slice(3), [rows]);
-  const podiumOrder = useMemo(() => {
-    const first = top3.find((r) => r.rank === 1) || top3[0];
-    const second = top3.find((r) => r.rank === 2) || top3[1];
-    const third = top3.find((r) => r.rank === 3) || top3[2];
-    return [
-      { place: 2 as const, row: second },
-      { place: 1 as const, row: first },
-      { place: 3 as const, row: third },
-    ].filter((x) => x.row);
-  }, [top3]);
+  const ranked = useMemo(
+    () =>
+      (rows || []).map((row) => ({
+        ...row,
+        code: String(row.rank).padStart(2, '0'),
+      })),
+    [rows],
+  );
+  const podium = useMemo(() => {
+    const first = ranked.find((r) => r.rank === 1) || ranked[0];
+    const second = ranked.find((r) => r.rank === 2) || ranked[1];
+    const third = ranked.find((r) => r.rank === 3) || ranked[2];
+    return [second, first, third].filter((row): row is (typeof ranked)[number] => Boolean(row));
+  }, [ranked]);
+  const rest = ranked.slice(3);
 
   return (
     <main className="play-main board-page" id="result-table">
-      <header className="play-head">
-        <div>
-          <p className="eyebrow">{t('board.eyebrow')}</p>
-          <h1>{t('board.title')}</h1>
-          <p className="play-lead">{t('board.emptyLead')}</p>
-        </div>
-        <p className="play-count">
-          <strong>{rows?.length ?? '—'}</strong>
-          <small>{t('board.count')}</small>
-        </p>
-      </header>
-
-      <div className="money-tabs">
-        {(['all', 'weekly', 'monthly'] as const).map((p) => (
-          <button key={p} type="button" className={period === p ? 'active' : ''} onClick={() => setPeriod(p)}>
-            {t(`board.${p}`)}
-          </button>
-        ))}
-      </div>
-
-      {error ? <p className="form-error">{error}</p> : null}
-
-      {rows === null ? (
-        <div className="match-row skeleton" />
-      ) : rows.length === 0 ? (
-        <div className="play-empty">
-          <h2>{t('board.empty')}</h2>
-          <p>{t('board.emptyLead')}</p>
-          <Link className="btn btn-primary" to="/user/play">
-            {t('nav.play')}
-          </Link>
-        </div>
-      ) : (
-        <>
-          {podiumOrder.length > 0 ? (
-            <div className="board-podium" aria-label={t('board.top3')}>
-              {podiumOrder.map(({ place, row }) => (
-                <Link
-                  key={row!.id}
-                  className={`board-podium-card is-${place}`}
-                  to={`/profile/${row!.id}`}
-                >
-                  <div className="board-podium-avatar-wrap">
-                    {place === 1 ? <CrownIcon /> : null}
-                    <UserAvatar className="board-podium-avatar" src={row!.avatar} name={row!.username} size={place === 1 ? 88 : 72} />
-                    <span className="board-podium-chip">#{place}</span>
-                  </div>
-                  <strong className="board-podium-name">{row!.username}</strong>
-                  <span className="board-podium-score">
-                    <CoinValue value={row!.totalScore} size={18} />
-                  </span>
-                  <small className="board-podium-label">{t('board.points')}</small>
-                  <div className="board-podium-block" aria-hidden>
-                    <span>{place}</span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : null}
-
-          {rest.length > 0 ? (
-            <div className="board-table-wrap play-stage">
-              <div className="board-table" role="table" aria-label={t('board.title')}>
-                <div className="board-table-head" role="row">
-                  <span role="columnheader">{t('board.rank')}</span>
-                  <span role="columnheader">{t('board.player')}</span>
-                  <span role="columnheader">{t('board.wins')}</span>
-                  <span role="columnheader">{t('board.kills')}</span>
-                  <span role="columnheader">{t('board.matches')}</span>
-                </div>
-                {rest.map((row) => (
-                  <Link
-                    key={row.id}
-                    className="board-table-row"
-                    role="row"
-                    to={`/profile/${row.id}`}
+      <div className="ba5173">
+        <div className="site-shell">
+          <article className="leaderboard-feature reveal in-view" aria-labelledby="account-board-title">
+            <div className="leader-feature-head">
+              <div>
+                <div className="section-kicker">Season board</div>
+                <h1 id="account-board-title" className="leader-feature-title">
+                  The ones to beat
+                </h1>
+              </div>
+              <div className="leader-switch" role="tablist" aria-label={t('board.title')}>
+                {PERIODS.map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    role="tab"
+                    aria-selected={period === p}
+                    className={period === p ? 'active' : ''}
+                    onClick={() => setPeriod(p)}
                   >
-                    <span className="board-rank" role="cell">
-                      {String(row.rank).padStart(2, '0')}
-                    </span>
-                    <span className="board-player" role="cell">
-                      <UserAvatar src={row.avatar} name={row.username} size={40} />
-                      <span>
-                        <strong>{row.username}</strong>
-                        <small>
-                          {t('board.level')} {row.level} · {row.badge}
-                        </small>
-                      </span>
-                    </span>
-                    <span className="board-stat" role="cell">
-                      {row.wins}
-                    </span>
-                    <span className="board-stat" role="cell">
-                      {row.kills}
-                    </span>
-                    <span className="board-stat" role="cell">
-                      {row.matches}
-                    </span>
-                  </Link>
+                    {t(`board.${p}`)}
+                  </button>
                 ))}
               </div>
             </div>
-          ) : null}
-        </>
-      )}
+            <div className="leader-data-note">Live results from completed matches</div>
+
+            {error ? <p className="form-error">{error}</p> : null}
+
+            {rows === null ? (
+              <div className="match-row skeleton" />
+            ) : rows.length === 0 ? (
+              <p className="section-copy">No ranked players yet.</p>
+            ) : (
+              <>
+                <div className="podium-stage" aria-hidden="true">
+                  <div className="podium-aurora" />
+                  <div className="podium-beam" />
+                </div>
+                <div className="podium podium-is-live" aria-label={t('board.top3')}>
+                  {podium.map((row) => {
+                    const isChampion = row.code === '01';
+                    return (
+                      <Link
+                        key={row.id}
+                        className={`podium-place place-${row.code}`}
+                        to={`/profile/${row.id}`}
+                      >
+                        <div className="podium-avatar-stack">
+                          {isChampion ? (
+                            <span className="podium-crown">
+                              <Crown size={15} strokeWidth={2.2} />
+                            </span>
+                          ) : null}
+                          {isChampion ? <span className="podium-orbit" /> : null}
+                          <div className={`podium-medallion medallion-${row.code}`}>
+                            <UserAvatar
+                              className="podium-avatar"
+                              src={row.avatar}
+                              name={row.username}
+                              size={isChampion ? 94 : 76}
+                            />
+                          </div>
+                        </div>
+                        <span className="podium-rank">{isChampion ? 'Champion' : `Rank ${row.rank}`}</span>
+                        <strong className="podium-name">{row.username}</strong>
+                        <span className="podium-score">
+                          <BacMark size={14} />
+                          {row.totalScore.toLocaleString()} <small>BAC</small>
+                        </span>
+                        <div className={`podium-block ${isChampion ? 'podium-block-live' : ''}`}>
+                          {isChampion ? (
+                            <>
+                              <span className="podium-block-shimmer" />
+                              <span className="podium-spark" style={{ '--spark-i': 0 } as CSSProperties} />
+                              <span className="podium-spark" style={{ '--spark-i': 1 } as CSSProperties} />
+                              <span className="podium-spark" style={{ '--spark-i': 2 } as CSSProperties} />
+                              <span className="podium-spark" style={{ '--spark-i': 3 } as CSSProperties} />
+                            </>
+                          ) : null}
+                          <span className="podium-block-num">{row.code}</span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+                {rest.length > 0 ? (
+                  <div className="ranked-rest">
+                    <div className="ranked-rest-label">
+                      <span>The chasing pack</span>
+                      <span>Rank / player / BAC</span>
+                    </div>
+                    {rest.map((row) => (
+                      <Link key={row.id} className="compact-rank-row" to={`/profile/${row.id}`}>
+                        <span className="compact-rank">{row.code}</span>
+                        <UserAvatar className="compact-avatar player-avatar" src={row.avatar} name={row.username} size={28} />
+                        <strong>{row.username}</strong>
+                        <span className="compact-score">
+                          <BacMark size={12} />
+                          {row.totalScore.toLocaleString()}
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                ) : null}
+              </>
+            )}
+          </article>
+        </div>
+      </div>
     </main>
   );
 }

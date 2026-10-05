@@ -229,32 +229,31 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                     children: [
                       SizedBox(height: spacing16),
                       Text(
-                        'HALL OF CHAMPIONS',
+                        'Season board',
                         style: TextStyle(
-                          color: AppColors.gold,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.6,
+                          color: Colors.white.withValues(alpha: 0.62),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Leaderboard',
+                        'The ones to beat',
                         style: TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: isMobile ? 28 : 34,
+                          color: const Color(0xFFE7E9DE),
+                          fontSize: isMobile ? 28 : 36,
                           fontWeight: FontWeight.w800,
-                          letterSpacing: -0.4,
-                          height: 1.1,
+                          letterSpacing: -0.8,
+                          height: 1,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Rankings are based on verified match results, win rate and tournament performance.',
+                        'Live results from completed matches',
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.55),
-                          fontSize: 13,
-                          height: 1.45,
+                          color: const Color(0xFF777D7B),
+                          fontSize: 12,
+                          height: 1.4,
                         ),
                       ),
                       SizedBox(height: spacing16),
@@ -439,7 +438,17 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        player.username.toUpperCase(),
+                        isChamp ? 'CHAMPION' : 'RANK $rank',
+                        style: TextStyle(
+                          color: const Color(0xFF858B83),
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.1,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        player.username,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         textAlign: TextAlign.center,
@@ -451,12 +460,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        _formatScore(player.totalScore),
+                        '${_formatScore(player.totalScore)} BAC',
                         style: TextStyle(
-                          color:
-                              isChamp ? AppColors.gold : AppColors.textPrimary,
-                          fontWeight: FontWeight.w800,
-                          fontSize: isChamp ? 15 : 12,
+                          color: const Color(0xFFCBD481),
+                          fontWeight: FontWeight.w700,
+                          fontSize: isChamp ? 13 : 11,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -531,203 +539,86 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       );
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 2, bottom: 10),
-          child: Row(
-            children: [
-              Icon(Icons.leaderboard, size: 16, color: AppColors.gold),
-              const SizedBox(width: 6),
-              Text(
-                'FULL RANKINGS',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.55),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.8,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(8, 0, 8, 10),
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 44,
-                    child: Text(
-                      'RANK',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.2,
-                        color: Colors.white.withValues(alpha: 0.42),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(
-                      'PLAYER',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.2,
-                        color: Colors.white.withValues(alpha: 0.42),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 48,
-                    child: Text(
-                      'WINS',
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.2,
-                        color: Colors.white.withValues(alpha: 0.42),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 52,
-                    child: Text(
-                      'KILLS',
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.2,
-                        color: Colors.white.withValues(alpha: 0.42),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 64,
-                    child: Text(
-                      'MATCHES',
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 1.2,
-                        color: Colors.white.withValues(alpha: 0.42),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        ...rest.map((player) {
-          final meta = 'Lvl ${player.level} · ${player.badge}';
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.08),
-                ),
-              ),
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0x6E07090A),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 10),
             child: Row(
               children: [
-                SizedBox(width: 44, child: Center(child: rankMark(player.rank))),
                 Expanded(
-                  child: Row(
-                    children: [
-                      _buildPlayerAvatar(
-                        avatar: player.avatar,
-                        username: player.username,
-                        radius: 20,
-                        borderColor: Colors.white.withValues(alpha: 0.12),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              player.username,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTheme.bodyMedium.copyWith(
-                                color: AppColors.textPrimary,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 14,
-                              ),
-                            ),
-                            const SizedBox(height: 3),
-                            Text(
-                              meta,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTheme.bodySmall.copyWith(
-                                color: Colors.white.withValues(alpha: 0.48),
-                                fontSize: 11,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  width: 48,
                   child: Text(
-                    '${player.wins}',
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
+                    'THE CHASING PACK',
+                    style: TextStyle(
+                      color: const Color(0xFF7B8179),
+                      fontSize: 10,
                       fontWeight: FontWeight.w700,
-                      fontSize: 14,
+                      letterSpacing: 0.8,
                     ),
                   ),
                 ),
-                SizedBox(
-                  width: 52,
-                  child: Text(
-                    '${player.totalKills ?? 0}',
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  width: 64,
-                  child: Text(
-                    '${player.gamesPlayed}',
-                    textAlign: TextAlign.right,
-                    style: const TextStyle(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                    ),
+                Text(
+                  'RANK / PLAYER / BAC',
+                  style: TextStyle(
+                    color: const Color(0xFF7B8179),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.6,
                   ),
                 ),
               ],
             ),
-          );
-        }),
-      ],
+          ),
+          ...rest.map((player) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Colors.white.withValues(alpha: 0.055)),
+                ),
+              ),
+              child: Row(
+                children: [
+                  SizedBox(width: 28, child: rankMark(player.rank)),
+                  _buildPlayerAvatar(
+                    avatar: player.avatar,
+                    username: player.username,
+                    radius: 14,
+                    borderColor: const Color(0x2BD4E82A),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      player.username,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Color(0xFFC9CCC3),
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    _formatScore(player.totalScore),
+                    style: const TextStyle(
+                      color: Color(0xFFCBD481),
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
     );
   }
 
