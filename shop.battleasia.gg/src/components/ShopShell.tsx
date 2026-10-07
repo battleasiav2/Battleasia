@@ -181,15 +181,15 @@ function ShopChrome() {
         </button>
         <div className="hud-menu-bar">
           <nav className="play-nav" aria-label={t('nav.shop')} onClick={closeNav}>
+            <a href={getMainAppUrl('/user/play')}>{t('nav.play')}</a>
             <Link className={path.startsWith('/user/shop') || path === '/user' ? 'active' : ''} to="/user/shop">
               {t('nav.shop')}
             </Link>
-            <Link className={path.startsWith('/user/wallet') ? 'active' : ''} to="/user/wallet">
-              {t('nav.wallet')}
-            </Link>
+            <a href={getMainAppUrl('/user/earn')}>{t('nav.earn')}</a>
             <Link className={path.startsWith('/user/transfer') ? 'active' : ''} to="/user/transfer">
               {t('nav.transfer')}
             </Link>
+            <a href={getMainAppUrl('/user/feed')}>{t('nav.feed')}</a>
           </nav>
         </div>
         <div className="play-hud-right">
@@ -245,18 +245,26 @@ function ShopChrome() {
                   </Link>
                 </header>
                 <nav className="ld-nav" onClick={closeNav}>
+                  <a href={getMainAppUrl('/user/play')}>
+                    <span className="ld-nav-ico">{DrawerIcons.gamepad}</span>
+                    <span>{t('nav.play')}</span>
+                  </a>
                   <Link className={path.startsWith('/user/shop') || path === '/user' ? 'is-active' : ''} to="/user/shop">
                     <span className="ld-nav-ico">{DrawerIcons.bag}</span>
                     <span>{t('nav.shop')}</span>
                   </Link>
-                  <Link className={path.startsWith('/user/wallet') ? 'is-active' : ''} to="/user/wallet">
-                    <span className="ld-nav-ico">{DrawerIcons.wallet}</span>
-                    <span>{t('nav.wallet')}</span>
-                  </Link>
+                  <a href={getMainAppUrl('/user/earn')}>
+                    <span className="ld-nav-ico">{DrawerIcons.gift}</span>
+                    <span>{t('nav.earn')}</span>
+                  </a>
                   <Link className={path.startsWith('/user/transfer') ? 'is-active' : ''} to="/user/transfer">
                     <span className="ld-nav-ico">{DrawerIcons.send}</span>
                     <span>{t('nav.transfer')}</span>
                   </Link>
+                  <a href={getMainAppUrl('/user/feed')}>
+                    <span className="ld-nav-ico">{DrawerIcons.feed}</span>
+                    <span>{t('nav.feed')}</span>
+                  </a>
                 </nav>
                 <button className="ld-card" type="button" onClick={toggleBalance}>
                   <small>{t('shop.balance')}</small>

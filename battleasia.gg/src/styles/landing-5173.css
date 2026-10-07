@@ -90,8 +90,8 @@ html[lang="bn"] .ba5173{
 @keyframes auth-arrow-nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
 @keyframes auth-arrow-trail{0%,100%{opacity:.35;transform:scaleX(.7)}50%{opacity:1;transform:scaleX(1)}}
 .ba5173 .nav-links{display:flex;gap:32px;align-items:center}
-.ba5173 .nav-links a,.ba5173 .footer-links a{color:#a5a7ae;text-decoration:none;font-size:13px;transition:color .2s}
-.ba5173 .nav-links a:hover,.ba5173 .nav-links a.active{color:#fff}
+.ba5173 .nav-links a,.ba5173 .nav-links button,.ba5173 .footer-links a{color:#a5a7ae;text-decoration:none;font-size:13px;transition:color .2s;background:none;border:0;padding:0;cursor:pointer;font-family:inherit}
+.ba5173 .nav-links a:hover,.ba5173 .nav-links button:hover,.ba5173 .nav-links a.active{color:#fff}
 .ba5173 .nav-actions{display:flex;gap:10px;align-items:center}
 .ba5173 .btn{min-height:46px;padding:0 18px;border-radius:7px;border:1px solid transparent;display:inline-flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.015em;transition:transform .2s,background .2s,color .2s,border-color .2s}
 .ba5173 .btn:hover{transform:translateY(-2px)}
@@ -662,8 +662,9 @@ html[lang="bn"] .ba5173{
 .ba5173 .mobile-drawer.open{transform:translateX(0)}
 .ba5173 .drawer-head{display:flex;justify-content:space-between;align-items:center}
 .ba5173 .drawer-close{background:transparent;border:1px solid var(--line);border-radius:50%;width:40px;height:40px;color:#fff}
-.ba5173 .drawer-nav{display:flex;flex-direction:column;margin:48px 0 25px}
-.ba5173 .drawer-nav a{font:700 38px var(--app-font-display),sans-serif;text-transform:uppercase;text-decoration:none;color:#eee;padding:11px 0;border-bottom:1px solid var(--line)}
+.ba5173 .drawer-nav{display:flex;flex-direction:column;gap:10px;margin:28px 0 25px}
+.ba5173 .drawer-nav a,.ba5173 .drawer-nav button{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:8px 18px 8px 8px;border:1px solid #232634;border-radius:999px;background:#16181f;color:#fff;font:800 16px/1.2 var(--app-font-body),sans-serif;text-align:left;text-decoration:none;text-transform:none;cursor:pointer}
+.ba5173 .drawer-nav-ico{display:grid;place-items:center;width:40px;height:40px;flex:none;border:1px solid #232634;border-radius:999px;background:#0b0c10;color:#fff}
 .ba5173 .drawer-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ba5173 .drawer-card{border:1px solid var(--line);border-radius:8px;padding:16px;background:#14171a;color:#eee;text-align:left}
 .ba5173 .drawer-card small{display:block;color:#8e929a;margin-top:6px;font-size:10px}
@@ -924,9 +925,12 @@ html[lang="bn"] .ba5173{
   font-size: 1rem !important;
   font-weight: 600 !important;
 }
-.ba5173 .site-shell .drawer-nav a{
-  font-size: 1.125rem !important;
-  font-weight: 600 !important;
+.ba5173 .site-shell .mobile-drawer .drawer-nav a,
+.ba5173 .site-shell .mobile-drawer .drawer-nav button{
+  font-size:16px !important;
+  font-weight:800 !important;
+  letter-spacing:0.01em !important;
+  text-transform:none !important;
 }
 .ba5173 .site-shell :is(.section-kicker,.ba5173 .eyebrow,.ba5173 .kpi-label,.ba5173 .live-tag,.ba5173 .side-top,.ba5173 .side-foot){
   font-size: 0.8125rem !important;
