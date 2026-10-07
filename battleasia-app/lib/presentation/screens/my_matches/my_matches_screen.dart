@@ -67,11 +67,11 @@ class _MyMatchesScreenState extends State<MyMatchesScreen> {
           _matches = [];
         });
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to load match history: ${e.toString()}'),
+            content: Text('matches.offline'.tr()),
             backgroundColor: Colors.red,
           ),
         );

@@ -118,7 +118,7 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  result['message'] as String? ?? 'Failed to load feed',
+                  result['message'] as String? ?? 'feed.offline'.tr(),
                 ),
                 backgroundColor: Colors.red,
               ),
@@ -126,11 +126,11 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
           }
         }
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to load feed: ${e.toString()}'),
+            content: Text('feed.offline'.tr()),
             backgroundColor: Colors.red,
           ),
         );

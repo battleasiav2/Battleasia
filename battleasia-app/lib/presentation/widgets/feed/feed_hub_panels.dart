@@ -1139,11 +1139,11 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
             children: [
               TextButton(
                 onPressed: () => setState(() => _msgTab = 'inbox'),
-                child: Text('Inbox', style: TextStyle(color: _msgTab == 'inbox' ? AppColors.gold : Colors.white70)),
+                child: Text('feed.inbox'.tr(), style: TextStyle(color: _msgTab == 'inbox' ? AppColors.gold : Colors.white70)),
               ),
               TextButton(
                 onPressed: () => setState(() => _msgTab = 'requests'),
-                child: Text('Requests (${_requests.length})', style: TextStyle(color: _msgTab == 'requests' ? AppColors.gold : Colors.white70)),
+                child: Text('${'feed.requests'.tr()} (${_requests.length})', style: TextStyle(color: _msgTab == 'requests' ? AppColors.gold : Colors.white70)),
               ),
             ],
           ),

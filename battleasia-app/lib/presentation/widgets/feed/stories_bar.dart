@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:battleasia_app/core/services/auth_service.dart';
@@ -539,7 +540,7 @@ class _StoryCreateSheetState extends State<_StoryCreateSheet> {
                     height: 18,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
-                : const Text('Share story'),
+                : Text('feed.shareStory'.tr()),
           ),
         ],
         ),
@@ -759,11 +760,17 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                               if (!context.mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(result['success'] == true ? 'Saved to highlights' : (result['message']?.toString() ?? 'Could not save highlight')),
+                                  content: Text(
+                                    result['success'] == true
+                                        ? 'feed.highlight'.tr()
+                                        : (result['message']?.toString().trim().isNotEmpty == true
+                                            ? result['message'].toString()
+                                            : 'feed.highlight'.tr()),
+                                  ),
                                 ),
                               );
                             },
-                            child: const Text('Highlight'),
+                            child: Text('feed.highlight'.tr()),
                           ),
                         IconButton(
                           onPressed: () => Navigator.pop(context),
@@ -830,14 +837,22 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
     if (!mounted) return;
     if (conv['success'] != true || convId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(conv['message']?.toString() ?? 'Could not open chat')),
+        SnackBar(content: Text(conv['message']?.toString() ?? 'feed.replyFail'.tr())),
       );
       return;
     }
     final sent = await SocialService().sendDirectMessage(convId, 'Re: your story $storyId');
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(sent['success'] == true ? 'Replied to $username' : (sent['message']?.toString() ?? 'Could not reply'))),
+      SnackBar(
+        content: Text(
+          sent['success'] == true
+              ? '${'feed.replied'.tr()} $username'
+              : (sent['message']?.toString().trim().isNotEmpty == true
+                  ? sent['message'].toString()
+                  : 'feed.replyFail'.tr()),
+        ),
+      ),
     );
     if (sent['success'] == true) Navigator.pop(context);
   }
@@ -847,7 +862,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
     if (!mounted) return;
     if (result['success'] != true) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message']?.toString() ?? 'Viewers are hidden')),
+        SnackBar(content: Text(result['message']?.toString() ?? 'feed.viewersHidden'.tr())),
       );
       return;
     }
@@ -859,23 +874,23 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Viewers'),
+          title: Text('feed.viewers'.tr()),
           content: SizedBox(
             width: 280,
             child: rows.isEmpty
-                ? const Text('No viewers yet')
+                ? const SizedBox.shrink()
                 : ConstrainedBox(
                     constraints: const BoxConstraints(maxHeight: 240),
                     child: ListView(
                       shrinkWrap: true,
                       children: rows
-                          .map((viewer) => ListTile(title: Text('${viewer['username'] ?? 'Player'} viewed')))
+                          .map((viewer) => ListTile(title: Text('${viewer['username'] ?? 'feed.player'.tr()} ${'feed.viewed'.tr()}')))
                           .toList(),
                     ),
                   ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Close')),
+            TextButton(onPressed: () => Navigator.pop(dialogContext), child: Text('feed.close'.tr())),
           ],
         );
       },

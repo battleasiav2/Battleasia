@@ -71,6 +71,18 @@
     "saveMutes": "Save mutes",
     "allGames": "All games",
     "shareDm": "Share to DM",
+    "offline": "Feed is offline",
+    "requests": "Requests",
+    "inbox": "Inbox",
+    "shareStory": "Share story",
+    "highlight": "Highlight",
+    "player": "Player",
+    "viewers": "Viewers",
+    "viewersHidden": "Viewers hidden",
+    "replied": "Replied to",
+    "replyFail": "Could not reply",
+    "viewed": "viewed",
+    "close": "Close",
     "back": "← Feed",
     "exploreSearch": "Search players, posts, #tags",
     "noSearch": "No matches"
@@ -784,6 +796,7 @@
     "serverTbd": "server TBD",
     "unsaved": "Discard unsaved profile changes?",
     "unfollowed": "Unfollowed",
+    "followFail": "Follow failed",
     "saved": "Profile saved",
     "saveFail": "Could not save",
     "photoOk": "Photo updated",
@@ -807,7 +820,11 @@
   },
   "matches": {
     "empty": "No completed matches",
-    "emptyLead": "Join a room. Results land here after admin posts."
+    "emptyLead": "Join a room. Results land here after admin posts.",
+    "offline": "History offline"
+  },
+  "http": {
+    "404": "Not found."
   },
   "footer": {
     "home": "Home"

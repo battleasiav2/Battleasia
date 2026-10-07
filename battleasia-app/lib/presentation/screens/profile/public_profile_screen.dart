@@ -108,7 +108,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                userResult['message'] as String? ?? 'Failed to load user profile',
+                userResult['message'] as String? ?? 'http.404'.tr(),
               ),
               backgroundColor: Colors.red,
             ),
@@ -116,11 +116,11 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
           Navigator.of(context).pop();
         }
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text('http.404'.tr()),
             backgroundColor: Colors.red,
           ),
         );
@@ -288,8 +288,8 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
             SnackBar(
               content: Text(
                 _isFollowing
-                    ? 'Successfully followed ${_viewingUser!.name}'
-                    : 'Successfully unfollowed ${_viewingUser!.name}',
+                    ? 'profile.following'.tr()
+                    : 'profile.unfollowed'.tr(),
               ),
               backgroundColor: Colors.green,
             ),
@@ -300,18 +300,18 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                result['message'] as String? ?? 'Failed to follow/unfollow user',
+                result['message'] as String? ?? 'profile.followFail'.tr(),
               ),
               backgroundColor: Colors.red,
             ),
           );
         }
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text('profile.followFail'.tr()),
             backgroundColor: Colors.red,
           ),
         );
@@ -444,7 +444,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
           if (_loading)
             const Center(child: CircularProgressIndicator())
           else if (_viewingUser == null)
-            const Center(child: Text('User not found'))
+            Center(child: Text('http.404'.tr()))
           else
             CustomScrollView(
               controller: _scrollController,

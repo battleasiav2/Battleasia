@@ -930,7 +930,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
             border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: _chat.isEmpty
-              ? Text('No messages yet', style: TextStyle(color: Colors.white.withValues(alpha: 0.5)))
+              ? const SizedBox.shrink()
               : ListView(
                   shrinkWrap: true,
                   children: _chat.map((row) {

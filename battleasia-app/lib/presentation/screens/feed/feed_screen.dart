@@ -169,11 +169,11 @@ class _FeedScreenState extends State<FeedScreen> {
           });
         }
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to load feeds: ${e.toString()}'),
+            content: Text('feed.offline'.tr()),
             backgroundColor: Colors.red,
           ),
         );
