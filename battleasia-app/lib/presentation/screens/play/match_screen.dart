@@ -16,6 +16,7 @@ import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/play/match_card.dart';
 import 'package:battleasia_app/presentation/widgets/play/join_arena_card.dart';
 import 'package:battleasia_app/presentation/widgets/play/match_join_sheet.dart';
+import 'package:battleasia_app/presentation/widgets/play/room_seats_dialog.dart';
 import 'package:battleasia_app/core/utils/link_utils.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/match_detail_screen.dart';
@@ -319,6 +320,14 @@ class _MatchScreenState extends State<MatchScreen> {
       onWatchLive: isResult ? null : _handleWatchLive,
       onJoin: isResult ? () {} : () => _handleJoinMatch(match),
       onShowRoomDetails: isResult ? null : () => _handleShowRoomDetails(match),
+      onOpenSeats: isResult
+          ? null
+          : () {
+              showDialog<void>(
+                context: context,
+                builder: (context) => RoomSeatsDialog(match: match, gamesService: _gamesService),
+              );
+            },
       onMatchNameTap: isResult
           ? goToResult
           : () {

@@ -7094,6 +7094,111 @@ a.hist-item-link {
   color: #fff;
   font-size: 20px;
   cursor: pointer;
+  flex: none;
+}
+
+.play-sheet-card.ba-seats-card {
+  width: min(760px, calc(100% - 28px));
+  max-height: min(86vh, 860px);
+  overflow: auto;
+  padding: 22px 20px 18px;
+  border-radius: 16px;
+  background: #0e1014;
+}
+
+.ba-seats-card h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.ba-seats-lead {
+  margin: 4px 0 0;
+  color: var(--ba-muted, #9ca3af);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ba-seats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.ba-seat {
+  position: relative;
+  min-height: 112px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 8px 10px;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.ba-seat.is-filled {
+  background: #16181e;
+  border: 1px solid color-mix(in srgb, var(--ba-accent) 45%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ba-accent) 12%, transparent);
+}
+
+.ba-seat.is-open {
+  background: transparent;
+  border: 1px dashed rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.ba-seat-mark {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.ba-seat-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.ba-seat.is-open .ba-seat-name {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.42);
+}
+
+.ba-seat-report {
+  margin-top: -2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ba-seat .user-avatar {
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+@media (max-width: 520px) {
+  .ba-seats {
+    grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+    gap: 8px;
+  }
 }
 
 .ba-join-eye {

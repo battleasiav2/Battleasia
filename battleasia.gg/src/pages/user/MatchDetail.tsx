@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useOutletContext, useParams, useSearchParams } from 'react-router-dom';
 import { CoinValue } from '../../components/CoinValue';
 import { MatchJoinDialog } from '../../components/MatchJoinDialog';
+import { RoomSeats } from '../../components/RoomSeats';
 import { SpotBar } from '../../components/SpotBar';
 import { useHud } from '../../contexts/HudContext';
 import { isApiError } from '../../lib/api';
@@ -526,34 +527,31 @@ export function MatchDetailPage() {
       <div className="hub-stage">
         <section className="room-card">
           <h2>{t('match.roster')}</h2>
-          <ul className="roster">
-            {(match.participants || []).map((p) => (
-              <li key={p.id}>
-                <span>
-                  <b>{p.username}</b>
-                  {p.pubgId ? <small>{p.pubgId}</small> : null}
-                </span>
-                {p.ready ? <i className="ready-tick" title={t('match.ready')} /> : null}
-                {joined && p.userId && p.userId !== meId ? (
-                  <button
-                    type="button"
-                    className="btn btn-ghost"
-                    onClick={async () => {
-                      try {
-                        await reportMatch(matchId, p.userId as string);
-                        toast(t('match.reported'));
-                      } catch (err) {
-                        toast(isApiError(err) ? err.message : t('match.reportFail'));
-                      }
-                    }}
-                  >
-                    {t('match.report')}
-                  </button>
-                ) : null}
-              </li>
-            ))}
-            {!match.participants?.length ? <li className="play-muted">{t('match.noPlayers')}</li> : null}
-          </ul>
+          <p className="ba-seats-lead">
+            {t('match.seatsLead')
+              .replace('{used}', String(match.participantsCount || match.participants?.length || 0))
+              .replace('{total}', String(match.totalPlayer || match.participants?.length || 0))}
+          </p>
+          <RoomSeats
+            total={match.totalPlayer || 0}
+            players={match.participants || []}
+            openLabel={t('match.seatOpen')}
+            selfId={meId}
+            reportLabel={joined ? t('match.report') : undefined}
+            onReport={
+              joined
+                ? async (userId) => {
+                    try {
+                      await reportMatch(matchId, userId);
+                      toast(t('match.reported'));
+                    } catch (err) {
+                      toast(isApiError(err) ? err.message : t('match.reportFail'));
+                    }
+                  }
+                : undefined
+            }
+          />
+          {!match.totalPlayer && !match.participants?.length ? <p className="play-muted">{t('match.noPlayers')}</p> : null}
         </section>
         {joined ? (
           <section className="room-card">

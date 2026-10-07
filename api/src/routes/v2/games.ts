@@ -469,8 +469,9 @@ router.get('/matches/:id', requireAuth, async (req: AuthedRequest, res) => {
     }
 
     const game = await Game.findById(match.gameId);
+    const rosterLimit = Math.min(Math.max(Number(match.totalPlayer) || 100, 1), 200);
     const [participants, userParticipant, participantsCount] = await Promise.all([
-      MatchParticipant.find({ matchId: match._id }).sort({ joinedAt: -1 }).limit(50),
+      MatchParticipant.find({ matchId: match._id }).sort({ joinedAt: 1 }).limit(rosterLimit),
       MatchParticipant.findOne({ matchId: match._id, userId: req.userId }),
       MatchParticipant.countDocuments({ matchId: match._id }),
     ]);

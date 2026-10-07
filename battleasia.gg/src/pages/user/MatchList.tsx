@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { CoinValue } from '../../components/CoinValue';
 import { MatchJoinDialog } from '../../components/MatchJoinDialog';
+import { RoomSeatsDialog } from '../../components/RoomSeatsDialog';
 import { useHud } from '../../contexts/HudContext';
 import { isApiError } from '../../lib/api';
 import { readSessionUser, isPremiumUser } from '../../lib/auth';
@@ -81,6 +82,7 @@ export function MatchListPage() {
   const [selected, setSelected] = useState('');
   const [filter, setFilter] = useState<MatchFilter>('all');
   const [confirmMatch, setConfirmMatch] = useState<MatchItem | null>(null);
+  const [seatsMatch, setSeatsMatch] = useState<MatchItem | null>(null);
   const [joining, setJoining] = useState(false);
   const [joinError, setJoinError] = useState('');
   const selectedRef = useRef('');
@@ -383,12 +385,15 @@ export function MatchListPage() {
                     role="listitem"
                     tabIndex={0}
                     className={`ba-room${selected === match.id ? ' is-selected' : ''}${match.isJoined ? ' is-joined' : ''}`}
-                    onClick={() => setSelected(match.id)}
-                    onDoubleClick={() => navigate(`/user/play/${match.id}/detail?from=${gameId}`)}
+                    onClick={() => {
+                      setSelected(match.id);
+                      setSeatsMatch(match);
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
-                        navigate(`/user/play/${match.id}/detail?from=${gameId}`);
+                        setSelected(match.id);
+                        setSeatsMatch(match);
                       }
                     }}
                   >
@@ -487,6 +492,7 @@ export function MatchListPage() {
         }}
         onConfirm={() => void confirmJoin()}
       />
+      <RoomSeatsDialog match={seatsMatch} onClose={() => setSeatsMatch(null)} />
     </main>
   );
 }

@@ -16,6 +16,7 @@ class MatchCard extends StatefulWidget {
   final VoidCallback onJoin;
   final VoidCallback? onShowRoomDetails;
   final VoidCallback? onMatchNameTap;
+  final VoidCallback? onOpenSeats;
   final bool joining;
   final bool canJoin;
   final bool isJoined;
@@ -29,6 +30,7 @@ class MatchCard extends StatefulWidget {
     required this.onJoin,
     this.onShowRoomDetails,
     this.onMatchNameTap,
+    this.onOpenSeats,
     this.joining = false,
     this.canJoin = true,
     this.isJoined = false,
@@ -81,7 +83,10 @@ class _MatchCardState extends State<MatchCard> {
       totalPlayer: widget.match.totalPlayer,
     );
 
-    return Card(
+    return GestureDetector(
+      onTap: widget.onOpenSeats,
+      behavior: HitTestBehavior.opaque,
+      child: Card(
       color: Colors.transparent,
       elevation: 0,
       clipBehavior: Clip.antiAlias,
@@ -166,6 +171,7 @@ class _MatchCardState extends State<MatchCard> {
             _buildMatchInfoSection(buttonDisabled),
           ],
         ),
+      ),
       ),
     );
   }

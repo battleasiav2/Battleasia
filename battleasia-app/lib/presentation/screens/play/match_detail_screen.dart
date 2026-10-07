@@ -14,6 +14,7 @@ import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/play/match_spots_progress.dart';
+import 'package:battleasia_app/presentation/widgets/play/room_seats.dart';
 
 class MatchDetailScreen extends StatefulWidget {
   final String matchId;
@@ -643,7 +644,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
               tabs: [
                 {'label': 'Description', 'value': 'description'},
                 {
-                  'label': 'Joined Members (${_participants.length})',
+                  'label': 'Seats (${_participants.length}/${_matchDetail?.totalPlayer ?? 0})',
                   'value': 'joined',
                 },
               ],
@@ -780,170 +781,24 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
   }
 
   Widget _buildJoinedTab() {
-    final tabPadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(12.0, 16.0);
-    
-    final tablePadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 12.0,
-    ).clamp(8.0, 12.0);
-    
-    final tableFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 14.0,
-      min: 12.0,
-      max: 16.0,
-    );
-    
-    final headerFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 14.0,
-      min: 12.0,
-      max: 16.0,
-    );
-    
+    final total = _matchDetail?.totalPlayer ?? _participants.length;
+    final used = _matchDetail?.participantsCount ?? _participants.length;
     return Padding(
-      padding: EdgeInsets.all(tabPadding),
-      child: _participants.isEmpty
-          ? Center(
-              child: Text(
-                'No joined members available.',
-                style: AppTheme.bodyMedium.copyWith(
-                  color: Colors.white,
-                  fontSize: ResponsiveUtils.getResponsiveFontSize(
-                    context,
-                    baseSize: 16.0,
-                  ),
-                ),
-              ),
-            )
-          : Table(
-              border: TableBorder.all(color: Colors.white.withOpacity(0.1)),
-              children: [
-                // Header row
-                TableRow(
-                  decoration: const BoxDecoration(color: Color(0xFF1E1E1E)),
-                  children: [
-                    TableCell(
-                      child: Padding(
-                        padding: EdgeInsets.all(tablePadding),
-                        child: Text(
-                          'Team',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: headerFontSize,
-                          ),
-                        ),
-                      ),
-                    ),
-                    TableCell(
-                      child: Padding(
-                        padding: EdgeInsets.all(tablePadding),
-                        child: Text(
-                          'Position',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: headerFontSize,
-                          ),
-                        ),
-                      ),
-                    ),
-                    TableCell(
-                      child: Padding(
-                        padding: EdgeInsets.all(tablePadding),
-                        child: Text(
-                          'Player Name',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: headerFontSize,
-                          ),
-                        ),
-                      ),
-                    ),
-                    TableCell(
-                      child: Padding(
-                        padding: EdgeInsets.all(tablePadding),
-                        child: Text(
-                          'Joined At',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                            fontSize: headerFontSize,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                // Data rows
-                ..._participants.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final participant = entry.value;
-                  return TableRow(
-                    decoration: const BoxDecoration(color: Color(0xFF1E1E1E)),
-                    children: [
-                      TableCell(
-                        child: Padding(
-                          padding: EdgeInsets.all(tablePadding),
-                          child: Text(
-                            participant.team ?? 'Team ${index + 1}',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: tableFontSize,
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Padding(
-                          padding: EdgeInsets.all(tablePadding),
-                          child: Text(
-                            participant.pubgId ?? '-',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: tableFontSize,
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Padding(
-                          padding: EdgeInsets.all(tablePadding),
-                          child: Text(
-                            participant.username,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: tableFontSize,
-                            ),
-                          ),
-                        ),
-                      ),
-                      TableCell(
-                        child: Padding(
-                          padding: EdgeInsets.all(tablePadding),
-                          child: Text(
-                            participant.joinedAt != null
-                                ? date_utils.DateUtils.formatDateTime(
-                                    participant.joinedAt,
-                                  )
-                                : '-',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: tableFontSize,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ],
+      padding: const EdgeInsets.fromLTRB(14, 4, 14, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$used of $total joined',
+            style: AppTheme.bodySmall.copyWith(
+              color: Colors.white.withValues(alpha: 0.62),
+              fontWeight: FontWeight.w600,
             ),
+          ),
+          const SizedBox(height: 12),
+          RoomSeats(total: total, players: _participants),
+        ],
+      ),
     );
   }
 }
