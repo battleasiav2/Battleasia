@@ -248,30 +248,30 @@ function UserChrome() {
         >
           <span />
         </button>
-        <nav className="play-nav" aria-label={t('hud.arena')} onClick={() => setNavOpen(false)}>
-          <Link className={location.pathname.startsWith('/user/play') ? 'active' : ''} to="/user/play">
-            {t('nav.play')}
-          </Link>
-          <Link className={location.pathname.startsWith('/user/shop') ? 'active' : ''} to="/user/shop">
-            {t('nav.shop')}
-          </Link>
-          <Link className={location.pathname.startsWith('/user/earn') ? 'active' : ''} to="/user/earn">
-            {t('nav.earn')}
-          </Link>
-          <a
-            href="#transfer"
-            onClick={(e) => {
-              e.preventDefault();
-              openBacShop('transfer');
-            }}
-          >
-            {t('nav.transfer')}
-          </a>
-          <Link className={location.pathname.startsWith('/user/feed') ? 'active' : ''} to="/user/feed">
-            {t('nav.feed')}
-          </Link>
-        </nav>
-        <div className="play-hud-rail-foot">
+        <div className="hud-menu-bar">
+          <nav className="play-nav" aria-label={t('hud.arena')} onClick={() => setNavOpen(false)}>
+            <Link className={location.pathname.startsWith('/user/play') ? 'active' : ''} to="/user/play">
+              {t('nav.play')}
+            </Link>
+            <Link className={location.pathname.startsWith('/user/shop') ? 'active' : ''} to="/user/shop">
+              {t('nav.shop')}
+            </Link>
+            <Link className={location.pathname.startsWith('/user/earn') ? 'active' : ''} to="/user/earn">
+              {t('nav.earn')}
+            </Link>
+            <a
+              href="#transfer"
+              onClick={(e) => {
+                e.preventDefault();
+                openBacShop('transfer');
+              }}
+            >
+              {t('nav.transfer')}
+            </a>
+            <Link className={location.pathname.startsWith('/user/feed') ? 'active' : ''} to="/user/feed">
+              {t('nav.feed')}
+            </Link>
+          </nav>
           <div className="hud-more hud-more-rail" onPointerDown={(e) => e.stopPropagation()}>
             <button
               type="button"
@@ -303,6 +303,8 @@ function UserChrome() {
               </div>
             ) : null}
           </div>
+        </div>
+        <div className="play-hud-rail-foot">
           <div className="hud-account" onPointerDown={(e) => e.stopPropagation()}>
             <button
               type="button"

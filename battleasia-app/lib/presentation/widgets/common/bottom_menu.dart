@@ -228,28 +228,46 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => _handleNavigation(context, item.route),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            item.icon,
-            size: 20,
-            color: isActive ? AppColors.gold : AppColors.textMuted,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            item.label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: AppTheme.bodySmall.copyWith(
-              color: isActive ? AppColors.gold : AppColors.textMuted,
-              fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
-              fontSize: 10,
-              letterSpacing: 0.3,
-              decoration: TextDecoration.none,
+      child: AnimatedScale(
+        scale: isActive ? 1 : 0.96,
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeOutCubic,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 280),
+          curve: Curves.easeOutCubic,
+          margin: const EdgeInsets.symmetric(horizontal: 3),
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          decoration: BoxDecoration(
+            color: isActive ? AppColors.gold.withValues(alpha: 0.16) : Colors.transparent,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isActive ? AppColors.gold.withValues(alpha: 0.55) : Colors.transparent,
             ),
           ),
-        ],
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                item.icon,
+                size: 20,
+                color: isActive ? AppColors.gold : AppColors.textMuted,
+              ),
+              const SizedBox(height: 4),
+              Text(
+                item.label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTheme.bodySmall.copyWith(
+                  color: isActive ? AppColors.gold : AppColors.textMuted,
+                  fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                  fontSize: 10,
+                  letterSpacing: 0.3,
+                  decoration: TextDecoration.none,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
