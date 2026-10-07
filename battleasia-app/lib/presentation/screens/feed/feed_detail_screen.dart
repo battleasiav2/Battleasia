@@ -193,7 +193,7 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
         return StatefulBuilder(
           builder: (dialogContext, setLocal) {
             return AlertDialog(
-              title: const Text('Share in chat'),
+              title: Text('feed.shareDm'.tr()),
               content: SizedBox(
                 width: 320,
                 child: Column(
@@ -201,7 +201,7 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                   children: [
                     TextField(
                       controller: controller,
-                      decoration: const InputDecoration(hintText: 'Search player'),
+                      decoration: InputDecoration(hintText: 'feed.searchPlayer'.tr()),
                       onChanged: (value) async {
                         final query = value.trim();
                         if (query.length < 2) {

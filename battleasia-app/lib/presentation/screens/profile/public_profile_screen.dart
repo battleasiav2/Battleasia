@@ -219,7 +219,15 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     if (!mounted) return;
     setState(() => _tipping = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result['success'] == true ? 'Tipped $amount BAC' : (result['message']?.toString() ?? 'Tip failed'))),
+      SnackBar(
+        content: Text(
+          result['success'] == true
+              ? 'profile.tipped'.tr(namedArgs: {'n': '$amount'})
+              : ((result['message']?.toString().trim().isNotEmpty == true)
+                  ? result['message'].toString()
+                  : 'profile.tipFail'.tr()),
+        ),
+      ),
     );
   }
 
@@ -326,7 +334,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     if (!mounted) return;
     if (conv['success'] != true || convId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(conv['message']?.toString() ?? 'Could not open chat')),
+        SnackBar(content: Text(conv['message']?.toString() ?? 'profile.shareFail'.tr())),
       );
       return;
     }
@@ -336,7 +344,15 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     );
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(sent['success'] == true ? 'Profile shared to DM' : (sent['message']?.toString() ?? 'Could not share profile'))),
+      SnackBar(
+        content: Text(
+          sent['success'] == true
+              ? 'profile.shared'.tr()
+              : ((sent['message']?.toString().trim().isNotEmpty == true)
+                  ? sent['message'].toString()
+                  : 'profile.shareFail'.tr()),
+        ),
+      ),
     );
   }
 
@@ -728,7 +744,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
         OutlinedButton.icon(
           onPressed: _shareProfile,
           icon: const Icon(Icons.ios_share, size: 18),
-          label: const Text('Share'),
+          label: Text('profile.share'.tr()),
         ),
         OutlinedButton.icon(
           onPressed: _blockLoading ? null : _handleBlockToggle,
@@ -739,7 +755,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
           ...[10, 25, 50].map(
             (amount) => OutlinedButton(
               onPressed: _tipping ? null : () => _sendTip(amount),
-              child: Text('Tip $amount'),
+              child: Text('profile.tip'.tr(namedArgs: {'n': '$amount'})),
             ),
           ),
         OutlinedButton.icon(

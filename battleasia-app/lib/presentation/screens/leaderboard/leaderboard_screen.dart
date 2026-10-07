@@ -1,6 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
@@ -70,11 +70,11 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
           _leaderboard = [];
         });
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to load leaderboard: ${e.toString()}'),
+            content: Text('board.offline'.tr()),
             backgroundColor: Colors.red,
           ),
         );
@@ -269,10 +269,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                         )
                       else ...[
                         PlayTabs(
-                          tabs: const [
-                            {'label': 'ALL TIME', 'value': 'all'},
-                            {'label': 'WEEKLY', 'value': 'weekly'},
-                            {'label': 'MONTHLY', 'value': 'monthly'},
+                          tabs: [
+                            {'label': 'board.all'.tr(), 'value': 'all'},
+                            {'label': 'board.weekly'.tr(), 'value': 'weekly'},
+                            {'label': 'board.monthly'.tr(), 'value': 'monthly'},
                           ],
                           activeTab: _selectedPeriod,
                           onTabChanged: (period) {
@@ -650,13 +650,8 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No Leaderboard Data',
+              'board.none'.tr(),
               style: AppTheme.heading3.copyWith(color: AppColors.textMuted),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'No players found for the selected period',
-              style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
               textAlign: TextAlign.center,
             ),
           ],

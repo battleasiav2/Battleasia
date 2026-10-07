@@ -253,38 +253,65 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(height: spacing16),
+                      Text(
+                        'note.eyebrow'.tr(),
+                        style: AppTheme.bodySmall.copyWith(
+                          color: AppColors.textMuted,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'note.title'.tr(),
+                        style: AppTheme.heading2.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w800,
+                          fontSize: titleFontSize,
+                          letterSpacing: 1,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'note.lead'.tr(),
+                        style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
+                      ),
+                      const SizedBox(height: 10),
                       Row(
                         children: [
-                          Expanded(
+                          Text(
+                            '$_unreadCount',
+                            style: AppTheme.heading3.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'note.unread'.tr(),
+                            style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
+                          ),
+                          const Spacer(),
+                          TextButton(
+                            onPressed: _unreadCount == 0 ? null : _handleMarkAllAsRead,
+                            style: TextButton.styleFrom(
+                              foregroundColor: AppColors.gold,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                            ),
                             child: Text(
-                              'NOTIFICATIONS',
-                              style: AppTheme.heading2.copyWith(
-                                color: AppColors.textPrimary,
-                                fontWeight: FontWeight.w800,
-                                fontSize: titleFontSize,
-                                letterSpacing: 1,
+                              'note.markAll'.tr(),
+                              style: TextStyle(
+                                color: _unreadCount == 0
+                                    ? AppColors.textMuted
+                                    : AppColors.gold,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
                               ),
                             ),
                           ),
-                          if (_unreadCount > 0)
-                            TextButton(
-                              onPressed: _handleMarkAllAsRead,
-                              style: TextButton.styleFrom(
-                                foregroundColor: AppColors.gold,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 6,
-                                ),
-                              ),
-                              child: Text(
-                                'Mark all read',
-                                style: TextStyle(
-                                  color: AppColors.gold,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ),
                         ],
                       ),
                       SizedBox(height: spacing24),
@@ -432,8 +459,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'No notifications found',
+              'note.empty'.tr(),
               style: AppTheme.heading3.copyWith(color: AppColors.textMuted),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'note.emptyLead'.tr(),
+              style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

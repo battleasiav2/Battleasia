@@ -64,6 +64,13 @@
     "share": "Share",
     "shareFail": "Could not share",
     "sentTo": "Sent to {name}",
+    "mutes": "Mute words (comma)",
+    "mutesSaved": "Mute words saved",
+    "mutesFail": "Could not save mutes",
+    "mutePh": "spam, giveaway",
+    "saveMutes": "Save mutes",
+    "allGames": "All games",
+    "shareDm": "Share to DM",
     "back": "← Feed",
     "exploreSearch": "Search players, posts, #tags",
     "noSearch": "No matches"
@@ -681,9 +688,23 @@
     "goWithdraw": "Open withdraw"
   },
   "note": {
+    "eyebrow": "ALERTS",
+    "title": "Notifications",
+    "lead": "Match, wallet, and social alerts land here.",
+    "unread": "Unread",
+    "empty": "Inbox is clear",
+    "emptyLead": "Match, deposit, and social alerts land here as they happen.",
+    "markAll": "Mark all read",
     "offline": "Alerts offline",
     "allRead": "All read",
     "markFail": "Could not mark read"
+  },
+  "board": {
+    "offline": "Board offline",
+    "all": "all",
+    "weekly": "weekly",
+    "monthly": "monthly",
+    "none": "No ranked players yet."
   },
   "common": {
     "retry": "Retry",
@@ -766,7 +787,13 @@
     "saved": "Profile saved",
     "saveFail": "Could not save",
     "photoOk": "Photo updated",
-    "photoFail": "Could not update photo"
+    "photoFail": "Could not update photo",
+    "tip": "Tip {n} BAC",
+    "tipped": "Tipped {n} BAC",
+    "tipFail": "Tip failed",
+    "share": "Share",
+    "shared": "Profile shared to DM",
+    "shareFail": "Could not share"
   },
   "stats": {
     "eyebrow": "STATS",

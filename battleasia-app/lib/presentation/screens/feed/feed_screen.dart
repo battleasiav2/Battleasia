@@ -304,8 +304,15 @@ class _FeedScreenState extends State<FeedScreen> {
         .toList();
     final result = await _users.updateMuteWords(words);
     if (!mounted) return;
+    final fail = result['message']?.toString() ?? '';
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result['success'] == true ? 'Mute words saved' : (result['message']?.toString() ?? 'Could not save mute words'))),
+      SnackBar(
+        content: Text(
+          result['success'] == true
+              ? 'feed.mutesSaved'.tr()
+              : (fail.isEmpty ? 'feed.mutesFail'.tr() : fail),
+        ),
+      ),
     );
     if (result['success'] == true) _fetchFeeds();
   }
@@ -553,8 +560,8 @@ class _FeedScreenState extends State<FeedScreen> {
   }
 
   Widget _buildFeedTools(BuildContext context) {
-    const games = [
-      ('', 'All games'),
+    final games = [
+      ('', 'feed.allGames'.tr()),
       ('pubg', 'PUBG'),
       ('freefire', 'Free Fire'),
       ('cod', 'COD'),
@@ -564,14 +571,15 @@ class _FeedScreenState extends State<FeedScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Mutes · Filters', style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.w700)),
+        Text('${'feed.mutes'.tr()} · Filters', style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.w700)),
         if (_muteOn) ...[
           const SizedBox(height: 8),
           TextField(
             controller: _muteDraft,
             style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
             decoration: InputDecoration(
-              hintText: 'word1, word2',
+              labelText: 'feed.mutes'.tr(),
+              hintText: 'feed.mutePh'.tr(),
               hintStyle: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
             ),
           ),
@@ -579,7 +587,7 @@ class _FeedScreenState extends State<FeedScreen> {
             alignment: Alignment.centerLeft,
             child: TextButton(
               onPressed: _saveMuteWords,
-              child: Text('Save mutes', style: TextStyle(color: AppColors.gold)),
+              child: Text('feed.saveMutes'.tr(), style: TextStyle(color: AppColors.gold)),
             ),
           ),
         ],
