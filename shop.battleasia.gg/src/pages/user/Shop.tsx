@@ -441,7 +441,9 @@ export function ShopPage() {
                   </div>
                   <p className="shop-pack-price">
                     <span>{usd(item.price)}</span>
-                    {item.originalPrice > item.price ? <s>{usd(item.originalPrice)}</s> : null}
+                    {item.originalPrice != null && item.originalPrice > item.price ? (
+                      <s>{usd(item.originalPrice)}</s>
+                    ) : null}
                   </p>
                   <span className="shop-pack-cta">
                     {t('shop.select')}
