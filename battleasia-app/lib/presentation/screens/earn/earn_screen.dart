@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/engagement_service.dart';
+import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
@@ -15,18 +16,22 @@ class EarnScreen extends StatefulWidget {
 
 class _EarnScreenState extends State<EarnScreen> {
   final EngagementService _api = EngagementService();
+  final UserService _users = UserService();
+  final TextEditingController _squadChat = TextEditingController();
   final ScrollController _scroll = ScrollController();
   final TextEditingController _squadName = TextEditingController();
   final TextEditingController _invite = TextEditingController();
 
   Map<String, dynamic>? _home;
   List<Map<String, dynamic>> _badges = [];
+  List<Map<String, dynamic>> _claims = [];
+  List<Map<String, dynamic>> _squadMessages = [];
   String _tab = 'overview';
   String? _error;
   String _busy = '';
   bool _loading = true;
 
-  static const _tabs = ['overview', 'missions', 'streak', 'spin', 'squad', 'season', 'badges'];
+  static const _tabs = ['overview', 'missions', 'streak', 'spin', 'squad', 'season', 'badges', 'claims'];
 
   @override
   void initState() {
@@ -39,6 +44,7 @@ class _EarnScreenState extends State<EarnScreen> {
     _scroll.dispose();
     _squadName.dispose();
     _invite.dispose();
+    _squadChat.dispose();
     super.dispose();
   }
 
@@ -49,6 +55,8 @@ class _EarnScreenState extends State<EarnScreen> {
     });
     final home = await _api.getHome();
     final badges = await _api.getBadges();
+    final history = await _users.getBalanceHistory(page: 1, limit: 80);
+    final chat = await _api.getSquadChat();
     if (!mounted) return;
     setState(() {
       _loading = false;
@@ -64,6 +72,15 @@ class _EarnScreenState extends State<EarnScreen> {
             .map((row) => Map<String, dynamic>.from(row))
             .toList();
       }
+      final historyPayload = history['data'];
+      final historyRows = historyPayload is Map ? historyPayload['results'] : historyPayload;
+      _claims = historyRows is List
+          ? historyRows.whereType<Map>().map((row) => Map<String, dynamic>.from(row)).where(_isClaim).toList()
+          : [];
+      final chatRows = chat['data'];
+      _squadMessages = chatRows is List
+          ? chatRows.whereType<Map>().map((row) => Map<String, dynamic>.from(row)).toList()
+          : [];
     });
   }
 
@@ -89,7 +106,7 @@ class _EarnScreenState extends State<EarnScreen> {
         fit: StackFit.expand,
         children: [
           if (_loading)
-            const Center(child: CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2))
+            Center(child: CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2))
           else if (_error != null && _home == null)
             Center(
               child: Column(
@@ -220,6 +237,8 @@ class _EarnScreenState extends State<EarnScreen> {
         return _season(_map(home['seasonPass']));
       case 'badges':
         return _badgeList();
+      case 'claims':
+        return _claimsList();
       default:
         return _overview(home);
     }
@@ -231,6 +250,7 @@ class _EarnScreenState extends State<EarnScreen> {
     final spin = _map(home['luckySpin']);
     final squad = _map(home['squadChallenge']);
     final season = _map(home['seasonPass']);
+    final weekly = _map(home['weeklyArena']);
     final missions = _list(home['missions']);
     final ready = missions.where((m) => m['status'] == 'completed').length;
     final milestones = _list(welcome['milestones']);
@@ -285,6 +305,15 @@ class _EarnScreenState extends State<EarnScreen> {
           enabled: true,
           onTap: () => setState(() => _tab = 'season'),
         ),
+        if (weekly['enabled'] == true)
+          _task(
+            title: 'Weekly arena',
+            detail: 'Your rank ${weekly['viewerRank'] ?? '—'}',
+            reward: 'BAC',
+            action: _busy == 'weekly' ? '…' : 'Claim',
+            enabled: _busy != 'weekly',
+            onTap: () => _run('weekly', _api.claimWeeklyArena),
+          ),
       ],
     );
   }
@@ -391,8 +420,9 @@ class _EarnScreenState extends State<EarnScreen> {
             onTap: () => squad['canClaim'] == true
                 ? _run('squad', _api.claimSquad)
                 : _run('squad', _api.leaveSquad),
-          )
-        else ...[
+          ),
+        if (hasSquad) ..._squadChatBox(),
+        if (!hasSquad) ...[
           _field(_squadName, 'Squad name'),
           const SizedBox(height: 8),
           _task(
@@ -416,6 +446,58 @@ class _EarnScreenState extends State<EarnScreen> {
         ],
       ],
     );
+  }
+
+  List<Widget> _squadChatBox() {
+    return [
+      const SizedBox(height: 8),
+      const Align(
+        alignment: Alignment.centerLeft,
+        child: Text('Squad chat', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+      ),
+      const SizedBox(height: 8),
+      ..._squadMessages.map(
+        (row) => Padding(
+          padding: const EdgeInsets.only(bottom: 6),
+          child: Text(
+            '${row['username'] ?? 'Player'}: ${row['body'] ?? ''}',
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
+      Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _squadChat,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(hintText: 'Message the squad'),
+            ),
+          ),
+          TextButton(
+            onPressed: _busy == 'squad-chat'
+                ? null
+                : () async {
+                    final text = _squadChat.text.trim();
+                    if (text.isEmpty) return;
+                    setState(() => _busy = 'squad-chat');
+                    final result = await _api.sendSquadChat(text);
+                    if (!mounted) return;
+                    setState(() => _busy = '');
+                    if (result['success'] == true) {
+                      _squadChat.clear();
+                      await _load();
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text(result['message']?.toString() ?? 'Could not send')),
+                      );
+                    }
+                  },
+            child: const Text('Send'),
+          ),
+        ],
+      ),
+    ];
   }
 
   Widget _season(Map<String, dynamic> season) {
@@ -447,6 +529,39 @@ class _EarnScreenState extends State<EarnScreen> {
           ),
       ],
     );
+  }
+
+  Widget _claimsList() {
+    if (_claims.isEmpty) return _empty('No earn claims yet.');
+    return Column(
+      children: _claims.map((row) {
+        final detail = row['detail'] is Map ? Map<String, dynamic>.from(row['detail'] as Map) : <String, dynamic>{};
+        final label = detail['missionTitle']?.toString().isNotEmpty == true
+            ? detail['missionTitle'].toString()
+            : (row['type'] ?? row['reason'] ?? 'claim').toString().replaceAll('_', ' ');
+        return _task(
+          title: label,
+          detail: row['createdAt']?.toString() ?? '',
+          reward: '+${row['amount'] ?? 0}',
+          action: 'Claimed',
+          enabled: false,
+          onTap: null,
+        );
+      }).toList(),
+    );
+  }
+
+  bool _isClaim(Map<String, dynamic> row) {
+    final detail = row['detail'] is Map ? Map<String, dynamic>.from(row['detail'] as Map) : <String, dynamic>{};
+    final cat = (row['category'] ?? detail['category'] ?? '').toString();
+    final type = (row['type'] ?? '').toString();
+    final reason = (detail['reason'] ?? row['reason'] ?? '').toString();
+    return cat == 'claim' ||
+        type.startsWith('engagement_') ||
+        reason.startsWith('engagement_') ||
+        reason == 'referral_commission' ||
+        reason == 'watch_to_earn' ||
+        type == 'earning';
   }
 
   Widget _badgeList() {
@@ -502,7 +617,7 @@ class _EarnScreenState extends State<EarnScreen> {
                 ),
               ),
               if (reward.isNotEmpty)
-                Text(reward, style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.w800)),
+                Text(reward, style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.w800)),
             ],
           ),
           if (progress != null) ...[
@@ -554,7 +669,7 @@ class _EarnScreenState extends State<EarnScreen> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(9),
-          borderSide: const BorderSide(color: AppColors.gold),
+          borderSide: BorderSide(color: AppColors.gold),
         ),
       ),
     );

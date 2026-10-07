@@ -9,6 +9,7 @@ import 'package:battleasia_app/data/models/conversation_model.dart';
 import 'package:battleasia_app/data/models/feed_model.dart';
 import 'package:battleasia_app/data/models/reel_model.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
+import 'package:battleasia_app/presentation/screens/feed/hashtag_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/reel_player_screen.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_comments_sheet.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_item.dart';
@@ -86,11 +87,21 @@ class _FeedExplorePanelState extends State<FeedExplorePanel> {
             spacing: 8,
             runSpacing: 8,
             children: _hashtags.map((h) {
-              return Chip(
-                label: Text('#${h['tag']} (${h['count']})'),
-                backgroundColor: AppColors.surfaceElevated,
-                labelStyle: TextStyle(color: AppColors.gold),
-                side: BorderSide(color: AppColors.border(0.2)),
+              return GestureDetector(
+                onTap: () {
+                  final tag = (h['tag'] ?? h['name'] ?? h['hashtag'] ?? '').toString();
+                  if (tag.isEmpty) return;
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => HashtagScreen(tag: tag)),
+                  );
+                },
+                child: Chip(
+                  label: Text('#${h['tag'] ?? h['name'] ?? h['hashtag']} (${h['count'] ?? 0})'),
+                  backgroundColor: AppColors.surfaceElevated,
+                  labelStyle: TextStyle(color: AppColors.gold),
+                  side: BorderSide(color: AppColors.border(0.2)),
+                ),
               );
             }).toList(),
           ),

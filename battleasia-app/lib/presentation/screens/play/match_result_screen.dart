@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
+import 'package:battleasia_app/core/services/engagement_service.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/utils/date_utils.dart' as date_utils;
 import 'package:battleasia_app/data/models/match_model.dart';
@@ -20,10 +21,13 @@ class MatchResultScreen extends StatefulWidget {
 class _MatchResultScreenState extends State<MatchResultScreen> {
   final ScrollController _scrollController = ScrollController();
   final GamesService _gamesService = GamesService();
+  final EngagementService _earn = EngagementService();
   MatchModel? _match;
   List<MatchResultParticipantModel> _participants = [];
   bool _isLoading = true;
   String? _errorMessage;
+  Map<String, dynamic>? _share;
+  bool _shareBusy = false;
 
   @override
   void initState() {
@@ -80,7 +84,52 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
               result['message'] as String? ?? 'Failed to load match result';
         }
       });
+      if (_match != null) {
+        final share = await _earn.getShareStatus(widget.matchId);
+        if (!mounted) return;
+        final data = share['data'];
+        if (share['success'] == true && data is Map) {
+          setState(() => _share = Map<String, dynamic>.from(data));
+        }
+      }
     }
+  }
+
+  Future<void> _claimShare() async {
+    setState(() => _shareBusy = true);
+    final result = await _earn.claimShare(widget.matchId);
+    if (!mounted) return;
+    setState(() {
+      _shareBusy = false;
+      if (result['success'] == true) {
+        _share = {...?_share, 'claimedForMatch': true};
+      }
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          result['success'] == true
+              ? 'Share reward claimed'
+              : (result['message']?.toString() ?? 'Could not claim share reward'),
+        ),
+      ),
+    );
+  }
+
+  Widget _shareEarnButton() {
+    final share = _share;
+    if (share == null || share['enabled'] != true) return const SizedBox.shrink();
+    final claimed = share['claimedForMatch'] == true;
+    final amount = share['bacAmount'] ?? 0;
+    return Padding(
+      padding: const EdgeInsets.only(top: 12),
+      child: OutlinedButton(
+        onPressed: _shareBusy || claimed ? null : _claimShare,
+        child: Text(
+          claimed ? 'Share reward claimed' : (_shareBusy ? 'Claiming…' : 'Share reward (+$amount BAC)'),
+        ),
+      ),
+    );
   }
 
   @override
@@ -192,6 +241,7 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildHeroAndInfo(mapImagePath),
+                      _shareEarnButton(),
                       const SizedBox(height: 24),
                       _buildResultsTable(),
                       SizedBox(height: bottomPadding),

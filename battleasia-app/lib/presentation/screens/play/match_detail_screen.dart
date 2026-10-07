@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
+import 'package:battleasia_app/core/services/engagement_service.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/utils/match_cover_utils.dart';
 import 'package:battleasia_app/core/utils/match_capacity_utils.dart';
@@ -29,6 +30,7 @@ class MatchDetailScreen extends StatefulWidget {
 class _MatchDetailScreenState extends State<MatchDetailScreen> {
   final ScrollController _scrollController = ScrollController();
   final GamesService _gamesService = GamesService();
+  final EngagementService _earn = EngagementService();
   MatchModel? _matchDetail;
   List<MatchParticipantModel> _participants = [];
   bool _isLoading = true;
@@ -38,6 +40,8 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
   bool _ready = false;
   bool _readyBusy = false;
   bool _chatBusy = false;
+  Map<String, dynamic>? _share;
+  bool _shareBusy = false;
   List<Map<String, dynamic>> _chat = [];
   final TextEditingController _chatCtrl = TextEditingController();
   String _activeTab = 'description';
@@ -97,8 +101,41 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       });
       if (_matchDetail?.isJoined == true) {
         await _loadChat();
+        await _loadShare();
+      } else if (mounted) {
+        setState(() => _share = null);
       }
     }
+  }
+
+  Future<void> _loadShare() async {
+    final result = await _earn.getShareStatus(widget.matchId);
+    if (!mounted || result['success'] != true) return;
+    final data = result['data'];
+    setState(() {
+      _share = data is Map ? Map<String, dynamic>.from(data) : null;
+    });
+  }
+
+  Future<void> _claimShare() async {
+    setState(() => _shareBusy = true);
+    final result = await _earn.claimShare(widget.matchId);
+    if (!mounted) return;
+    setState(() {
+      _shareBusy = false;
+      if (result['success'] == true) {
+        _share = {...?_share, 'claimedForMatch': true};
+      }
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          result['success'] == true
+              ? 'Share reward claimed'
+              : (result['message']?.toString() ?? 'Could not claim share reward'),
+        ),
+      ),
+    );
   }
 
   Future<void> _loadChat() async {
@@ -620,7 +657,6 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
   }
 
   Widget _buildLobby() {
-    final me = context.read<AuthProvider>().user?.id;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -639,6 +675,17 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
           onPressed: _leaving ? null : _leaveMatch,
           child: Text(_leaving ? 'Leaving…' : 'Leave match'),
         ),
+        if (_share?['enabled'] == true) ...[
+          const SizedBox(height: 8),
+          OutlinedButton(
+            onPressed: _shareBusy || _share?['claimedForMatch'] == true ? null : _claimShare,
+            child: Text(
+              _share?['claimedForMatch'] == true
+                  ? 'Share reward claimed'
+                  : (_shareBusy ? 'Claiming…' : 'Share reward (+${_share?['bacAmount'] ?? 0} BAC)'),
+            ),
+          ),
+        ],
         const SizedBox(height: 16),
         const Text('Lobby chat', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
@@ -695,7 +742,6 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
           'Joined players can be reported from the Seats tab.',
           style: TextStyle(color: Colors.white.withValues(alpha: 0.45), fontSize: 12),
         ),
-        if (me == null) const SizedBox.shrink(),
       ],
     );
   }

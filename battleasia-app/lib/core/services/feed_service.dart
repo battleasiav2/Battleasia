@@ -27,6 +27,7 @@ class FeedService {
     String? search,
     String? feedMode,
     String? sortBy,
+    String? hashtag,
   }) async {
     try {
       final headers = await _getHeaders();
@@ -45,6 +46,9 @@ class FeedService {
       }
       if (sortBy != null && sortBy.isNotEmpty) {
         queryParams['sortBy'] = sortBy;
+      }
+      if (hashtag != null && hashtag.isNotEmpty) {
+        queryParams['hashtag'] = hashtag;
       }
 
       final uri = Uri.parse('$_baseUrl/api/v2/feed').replace(queryParameters: queryParams);

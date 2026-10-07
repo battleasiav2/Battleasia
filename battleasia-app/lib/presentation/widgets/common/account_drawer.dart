@@ -15,6 +15,7 @@ import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth.dart';
 import 'package:battleasia_app/presentation/screens/earn/earn_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
+import 'package:battleasia_app/presentation/screens/labs/labs_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_wallet_screen.dart';
 import 'package:battleasia_app/presentation/screens/wallet/wallet_screen.dart';
 import 'package:battleasia_app/presentation/screens/my_matches/my_matches_screen.dart';
@@ -299,6 +300,16 @@ class _AccountDrawerContent extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => const FeedScreen()),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'nav.labs'.tr(),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LabsScreen()),
                     );
                   },
                 ),

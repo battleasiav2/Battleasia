@@ -26,7 +26,7 @@ class EngagementService {
       return {'success': false, 'message': 'Empty response from server'};
     }
     final data = jsonDecode(responseBody) as Map<String, dynamic>;
-    if (response.statusCode == 200 && data['status'] == true) {
+    if ((response.statusCode == 200 || response.statusCode == 201) && data['status'] == true) {
       return {'success': true, 'data': data['data']};
     }
     return {
@@ -42,6 +42,56 @@ class EngagementService {
         headers: await _headers(),
       );
       return _parseResponse(response, fallbackMessage: 'Failed to load badges');
+    } catch (e) {
+      return {'success': false, 'message': e.toString().replaceAll('Exception: ', '')};
+    }
+  }
+
+  Future<Map<String, dynamic>> getSquadChat() async {
+    try {
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/engagement/squad/chat'),
+        headers: await _headers(),
+      );
+      return _parseResponse(response, fallbackMessage: 'Failed to load squad chat');
+    } catch (e) {
+      return {'success': false, 'message': e.toString().replaceAll('Exception: ', '')};
+    }
+  }
+
+  Future<Map<String, dynamic>> sendSquadChat(String body) async {
+    try {
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/engagement/squad/chat'),
+        headers: await _headers(),
+        body: jsonEncode({'body': body}),
+      );
+      return _parseResponse(response, fallbackMessage: 'Failed to send squad chat');
+    } catch (e) {
+      return {'success': false, 'message': e.toString().replaceAll('Exception: ', '')};
+    }
+  }
+
+  Future<Map<String, dynamic>> getShareStatus(String matchId) async {
+    try {
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/engagement/share/$matchId'),
+        headers: await _headers(),
+      );
+      return _parseResponse(response, fallbackMessage: 'Failed to load share reward');
+    } catch (e) {
+      return {'success': false, 'message': e.toString().replaceAll('Exception: ', '')};
+    }
+  }
+
+  Future<Map<String, dynamic>> claimShare(String matchId) async {
+    try {
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/engagement/share/claim'),
+        headers: await _headers(),
+        body: jsonEncode({'matchId': matchId, 'platform': 'android'}),
+      );
+      return _parseResponse(response, fallbackMessage: 'Failed to claim share reward');
     } catch (e) {
       return {'success': false, 'message': e.toString().replaceAll('Exception: ', '')};
     }
