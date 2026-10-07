@@ -149,6 +149,36 @@ class _FeedCommentsSheetState extends State<FeedCommentsSheet> {
     });
   }
 
+  Future<void> _like(String commentId, {String? parentId}) async {
+    final result = await _feedService.likeComment(widget.feedId, commentId);
+    if (!mounted) return;
+    if (result['success'] != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(result['message']?.toString() ?? 'feed.likeFail'.tr()),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+    final data = result['data'] as Map<String, dynamic>? ?? {};
+    final liked = data['isLiked'] == true;
+    final total = (data['totalLikes'] as num?)?.toInt() ?? 0;
+    setState(() {
+      _comments = _comments.map((row) {
+        if (parentId == null) {
+          return row.id == commentId ? row.copyWith(isLiked: liked, totalLikes: total) : row;
+        }
+        if (row.id != parentId) return row;
+        return row.copyWith(
+          replies: row.replies
+              .map((reply) => reply.id == commentId ? reply.copyWith(isLiked: liked, totalLikes: total) : reply)
+              .toList(),
+        );
+      }).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final listController = widget.scrollController;
@@ -221,6 +251,8 @@ class _FeedCommentsSheetState extends State<FeedCommentsSheet> {
                             comment: c,
                             onReply: () => _startReply(c),
                             onReplyToReply: (r) => _startReply(c, replyToUser: r),
+                            onLike: () => _like(c.id),
+                            onLikeReply: (r) => _like(r.id, parentId: c.id),
                           );
                         },
                       ),
@@ -313,11 +345,15 @@ class _CommentTile extends StatelessWidget {
     required this.comment,
     required this.onReply,
     required this.onReplyToReply,
+    required this.onLike,
+    required this.onLikeReply,
   });
 
   final FeedComment comment;
   final VoidCallback onReply;
   final void Function(FeedComment reply) onReplyToReply;
+  final VoidCallback onLike;
+  final void Function(FeedComment reply) onLikeReply;
 
   @override
   Widget build(BuildContext context) {
@@ -370,20 +406,16 @@ class _CommentTile extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    TextButton(
-                      onPressed: onReply,
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text(
-                        'feed.reply'.tr(),
-                        style: AppTheme.bodySmall.copyWith(
-                          color: AppColors.textMuted,
-                          fontWeight: FontWeight.w600,
+                    Row(
+                      children: [
+                        _CommentAction(
+                          label: comment.isLiked ? 'feed.unlike'.tr() : 'feed.like'.tr(),
+                          count: comment.totalLikes,
+                          onPressed: onLike,
                         ),
-                      ),
+                        const SizedBox(width: 12),
+                        _CommentAction(label: 'feed.reply'.tr(), onPressed: onReply),
+                      ],
                     ),
                   ],
                 ),
@@ -428,6 +460,11 @@ class _CommentTile extends StatelessWidget {
                                 ),
                               ),
                             ),
+                            _CommentAction(
+                              label: r.isLiked ? '♥' : '♡',
+                              count: r.totalLikes,
+                              onPressed: () => onLikeReply(r),
+                            ),
                             TextButton(
                               onPressed: () => onReplyToReply(r),
                               child: Text(
@@ -447,6 +484,34 @@ class _CommentTile extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+class _CommentAction extends StatelessWidget {
+  const _CommentAction({required this.label, required this.onPressed, this.count = 0});
+
+  final String label;
+  final VoidCallback onPressed;
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = count > 0 ? '$label · $count' : label;
+    return TextButton(
+      onPressed: onPressed,
+      style: TextButton.styleFrom(
+        padding: EdgeInsets.zero,
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      ),
+      child: Text(
+        text,
+        style: AppTheme.bodySmall.copyWith(
+          color: AppColors.textMuted,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }

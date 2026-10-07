@@ -105,6 +105,7 @@ class UserService {
     String? twitterLink,
     String? facebookLink,
     String? instagramLink,
+    String? bio,
   }) async {
     try {
       final headers = await _getHeaders();
@@ -123,6 +124,7 @@ class UserService {
           if (twitterLink != null) 'twitterLink': twitterLink,
           if (facebookLink != null) 'facebookLink': facebookLink,
           if (instagramLink != null) 'instagramLink': instagramLink,
+          if (bio != null) 'bio': bio,
         }),
       );
 
@@ -157,6 +159,17 @@ class UserService {
         'message': e.toString().replaceAll('Exception: ', ''),
       };
     }
+  }
+
+  Future<void> pingPresence() async {
+    try {
+      final headers = await _getHeaders();
+      if (!headers.containsKey('Authorization')) return;
+      await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/users/me/presence'),
+        headers: headers,
+      );
+    } catch (_) {}
   }
 
   /// Get referrals for current user

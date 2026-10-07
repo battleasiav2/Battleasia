@@ -702,6 +702,7 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
       otherUserId: participant?['id']?.toString() ?? participantId,
       otherUsername: participant?['username']?.toString() ?? 'User',
       otherAvatar: participant?['avatar']?.toString() ?? '',
+      otherOnline: participant?['isOnline'] == true,
       lastMessagePreview: '',
     );
 
@@ -958,9 +959,20 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
                 icon: Icon(Icons.arrow_back, color: AppColors.gold),
               ),
               Expanded(
-                child: Text(
-                  _active!.otherUsername,
-                  style: AppTheme.heading3.copyWith(color: AppColors.textPrimary),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        _active!.otherUsername,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTheme.heading3.copyWith(color: AppColors.textPrimary),
+                      ),
+                    ),
+                    if (_active!.otherOnline) ...[
+                      const SizedBox(width: 8),
+                      const _OnlineDot(),
+                    ],
+                  ],
                 ),
               ),
               if (_active!.otherUserId.isNotEmpty) ...[
@@ -1142,14 +1154,21 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
         else
           ...(_msgTab == 'requests' ? _requests : _conversations).map(
             (c) => ListTile(
-              leading: CircleAvatar(
-                backgroundColor: AppColors.gold,
-                child: Text(
-                  c.otherUsername.isNotEmpty
-                      ? c.otherUsername[0].toUpperCase()
-                      : 'U',
-                  style: const TextStyle(color: Colors.black),
-                ),
+              leading: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  CircleAvatar(
+                    backgroundColor: AppColors.gold,
+                    child: Text(
+                      c.otherUsername.isNotEmpty
+                          ? c.otherUsername[0].toUpperCase()
+                          : 'U',
+                      style: const TextStyle(color: Colors.black),
+                    ),
+                  ),
+                  if (c.otherOnline)
+                    const Positioned(right: -1, bottom: -1, child: _OnlineDot()),
+                ],
               ),
               title: Text(c.otherUsername, style: const TextStyle(color: Colors.white)),
               subtitle: Text(c.lastMessagePreview, style: TextStyle(color: Colors.white.withValues(alpha: 0.6))),
@@ -1338,6 +1357,23 @@ class _DmAttachmentState extends State<_DmAttachment> {
         fit: BoxFit.cover,
         memCacheWidth: 600,
         errorWidget: const Icon(Icons.broken_image),
+      ),
+    );
+  }
+}
+
+class _OnlineDot extends StatelessWidget {
+  const _OnlineDot();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 10,
+      height: 10,
+      decoration: BoxDecoration(
+        color: const Color(0xFF34D399),
+        shape: BoxShape.circle,
+        border: Border.all(color: const Color(0xFF0B0C10), width: 2),
       ),
     );
   }

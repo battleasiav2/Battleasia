@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
@@ -1130,6 +1131,10 @@ class _CommentsDialog extends StatelessWidget {
                                         children: mentionSpans(comment.content),
                                       ),
                                     ),
+                                    _CommentLikeButton(
+                                      feedId: feed.id,
+                                      comment: comment,
+                                    ),
                                   ],
                                 ),
                               ),
@@ -1287,6 +1292,62 @@ class _HtmlContentWidget extends StatelessWidget {
           },
         ),
       ],
+    );
+  }
+}
+
+class _CommentLikeButton extends StatefulWidget {
+  const _CommentLikeButton({required this.feedId, required this.comment});
+
+  final String feedId;
+  final FeedComment comment;
+
+  @override
+  State<_CommentLikeButton> createState() => _CommentLikeButtonState();
+}
+
+class _CommentLikeButtonState extends State<_CommentLikeButton> {
+  final _feed = FeedService();
+  late bool _liked = widget.comment.isLiked;
+  late int _count = widget.comment.totalLikes;
+  bool _busy = false;
+
+  Future<void> _toggle() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    final result = await _feed.likeComment(widget.feedId, widget.comment.id);
+    if (!mounted) return;
+    setState(() => _busy = false);
+    if (result['success'] != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message']?.toString() ?? 'feed.likeFail'.tr())),
+      );
+      return;
+    }
+    final data = result['data'] as Map<String, dynamic>? ?? {};
+    setState(() {
+      _liked = data['isLiked'] == true;
+      _count = (data['totalLikes'] as num?)?.toInt() ?? _count;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final label = _liked ? 'feed.unlike'.tr() : 'feed.like'.tr();
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton(
+        onPressed: _busy ? null : _toggle,
+        style: TextButton.styleFrom(
+          padding: EdgeInsets.zero,
+          minimumSize: Size.zero,
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
+        child: Text(
+          _count > 0 ? '$label · $_count' : label,
+          style: AppTheme.bodySmall.copyWith(color: AppTheme.textSecondary),
+        ),
+      ),
     );
   }
 }

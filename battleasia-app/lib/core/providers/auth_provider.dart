@@ -277,6 +277,7 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
       twitterLink: _user!.twitterLink,
       facebookLink: _user!.facebookLink,
       instagramLink: _user!.instagramLink,
+      bio: _user!.bio,
       status: _user!.status,
       avatar: _user!.avatar,
       followers: _user!.followers,

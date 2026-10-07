@@ -9,6 +9,7 @@ import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/providers/accent_provider.dart';
 import 'package:battleasia_app/presentation/screens/splash/splash_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/gaming_backdrop.dart';
+import 'package:battleasia_app/presentation/widgets/common/presence_pinger.dart';
 import 'package:battleasia_app/presentation/widgets/common/site_notice_host.dart';
 
 void main() async {
@@ -85,6 +86,7 @@ class BattleAsiaApp extends StatelessWidget {
                 children: [
                   const GamingBackdrop(),
                   child ?? const SizedBox.shrink(),
+                  const PresencePinger(),
                   const SiteNoticeHost(),
                 ],
               );

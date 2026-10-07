@@ -246,6 +246,23 @@ class FeedComment {
   final int totalLikes;
   final bool isLiked;
 
+  FeedComment copyWith({
+    int? totalLikes,
+    bool? isLiked,
+    List<FeedComment>? replies,
+  }) {
+    return FeedComment(
+      id: id,
+      content: content,
+      feedId: feedId,
+      createdAt: createdAt,
+      user: user,
+      replies: replies ?? this.replies,
+      totalLikes: totalLikes ?? this.totalLikes,
+      isLiked: isLiked ?? this.isLiked,
+    );
+  }
+
   FeedComment({
     required this.id,
     required this.content,

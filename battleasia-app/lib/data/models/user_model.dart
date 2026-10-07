@@ -13,6 +13,7 @@ class UserModel {
   final String? twitterLink;
   final String? facebookLink;
   final String? instagramLink;
+  final String? bio;
   final bool? status;
   final String? avatar;
   final int? followers;
@@ -39,6 +40,7 @@ class UserModel {
     this.twitterLink,
     this.facebookLink,
     this.instagramLink,
+    this.bio,
     this.status,
     this.avatar,
     this.followers,
@@ -81,6 +83,7 @@ class UserModel {
       twitterLink: json['twitterLink'],
       facebookLink: json['facebookLink'],
       instagramLink: json['instagramLink'],
+      bio: json['bio']?.toString(),
       status: json['status'] is bool
           ? json['status'] as bool?
           : json['status'] != null
@@ -132,6 +135,7 @@ class UserModel {
       'twitterLink': twitterLink,
       'facebookLink': facebookLink,
       'instagramLink': instagramLink,
+      'bio': bio,
       'status': status,
       'avatar': avatar,
       'followers': followers,

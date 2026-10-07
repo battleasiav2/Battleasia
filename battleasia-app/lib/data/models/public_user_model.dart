@@ -8,6 +8,8 @@ class PublicUserModel {
   final String? pubgId;
   final String? gameServer;
   final String? role;
+  final String bio;
+  final bool isOnline;
   final DateTime? createdAt;
 
   PublicUserModel({
@@ -20,6 +22,8 @@ class PublicUserModel {
     this.pubgId,
     this.gameServer,
     this.role,
+    this.bio = '',
+    this.isOnline = false,
     this.createdAt,
   });
 
@@ -34,6 +38,8 @@ class PublicUserModel {
       pubgId: json['pubgId']?.toString() ?? json['pubgUserId']?.toString(),
       gameServer: json['gameServer']?.toString() ?? json['server']?.toString(),
       role: json['role']?['name']?.toString() ?? json['roleName']?.toString(),
+      bio: json['bio']?.toString() ?? '',
+      isOnline: json['isOnline'] == true,
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'].toString())
           : null,

@@ -476,6 +476,33 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            if (_viewingUser!.isOnline) ...[
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF34D399),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'profile.live'.tr(),
+                    style: AppTheme.bodySmall.copyWith(color: Colors.black54),
+                  ),
+                ],
+              ),
+            ],
+            const SizedBox(height: 8),
+            Text(
+              _viewingUser!.bio.trim().isEmpty ? 'profile.noBio'.tr() : _viewingUser!.bio,
+              textAlign: TextAlign.center,
+              style: AppTheme.bodyMedium.copyWith(color: Colors.black87),
+            ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,

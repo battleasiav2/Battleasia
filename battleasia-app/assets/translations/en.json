@@ -20,6 +20,9 @@
     "commentPh": "Add a comment…",
     "send": "Post",
     "reply": "Reply",
+    "like": "Like",
+    "unlike": "Unlike",
+    "likeFail": "Could not like",
     "commentFail": "Could not comment",
     "seen": "Seen",
     "sent": "Sent",
@@ -495,7 +498,10 @@
     "submitReport": "Submit report",
     "blocked": "User blocked",
     "unblocked": "User unblocked",
-    "reportSubmitted": "Report submitted"
+    "reportSubmitted": "Report submitted",
+    "bio": "Bio",
+    "noBio": "No bio yet.",
+    "live": "live"
   },
   "footer": {
     "home": "Home"

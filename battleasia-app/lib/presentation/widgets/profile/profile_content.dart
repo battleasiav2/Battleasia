@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -30,6 +31,7 @@ class _ProfileContentState extends State<ProfileContent> {
   final _twitterLinkController = TextEditingController();
   final _facebookLinkController = TextEditingController();
   final _instagramLinkController = TextEditingController();
+  final _bioController = TextEditingController();
 
   String? _countryCode;
   String? _phoneNumber;
@@ -204,6 +206,7 @@ class _ProfileContentState extends State<ProfileContent> {
       _twitterLinkController.text = user.twitterLink ?? '';
       _facebookLinkController.text = user.facebookLink ?? '';
       _instagramLinkController.text = user.instagramLink ?? '';
+      _bioController.text = user.bio ?? '';
       _selectedGameServer = user.gameServer;
       if (user.countryCode != null) {
         _countryCode = user.countryCode;
@@ -223,6 +226,7 @@ class _ProfileContentState extends State<ProfileContent> {
     _twitterLinkController.dispose();
     _facebookLinkController.dispose();
     _instagramLinkController.dispose();
+    _bioController.dispose();
     super.dispose();
   }
 
@@ -306,6 +310,10 @@ class _ProfileContentState extends State<ProfileContent> {
         instagramLink: _instagramLinkController.text.trim().isEmpty
             ? null
             : _instagramLinkController.text.trim(),
+        bio: _bioController.text
+            .replaceAll(RegExp(r'[\u0000-\u001F\u007F]'), '')
+            .replaceAll(RegExp(r'\s+'), ' ')
+            .trim(),
       );
 
       if (!result['success']) {
@@ -1087,6 +1095,31 @@ class _ProfileContentState extends State<ProfileContent> {
                     }
                     return null;
                   },
+                ),
+                const SizedBox(height: 16),
+
+                TextFormField(
+                  controller: _bioController,
+                  maxLength: 160,
+                  maxLines: 3,
+                  decoration: InputDecoration(
+                    labelText: 'profile.bio'.tr(),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Colors.blueGrey, width: 1),
+                    ),
+                    labelStyle: TextStyle(color: Colors.blueGrey, fontSize: labelFontSize),
+                    filled: true,
+                    fillColor: Colors.white.withOpacity(0.1),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Colors.blueGrey, width: 1),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: AppTheme.accentColor, width: 1),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
 

@@ -5,6 +5,7 @@ class ConversationModel {
   final String otherAvatar;
   final String lastMessagePreview;
   final String? lastMessageAt;
+  final bool otherOnline;
 
   ConversationModel({
     required this.id,
@@ -13,6 +14,7 @@ class ConversationModel {
     required this.otherAvatar,
     required this.lastMessagePreview,
     this.lastMessageAt,
+    this.otherOnline = false,
   });
 
   factory ConversationModel.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,7 @@ class ConversationModel {
           '',
       lastMessagePreview: json['lastMessagePreview']?.toString() ?? '',
       lastMessageAt: json['lastMessageAt']?.toString(),
+      otherOnline: participant?['isOnline'] == true || json['isOnline'] == true,
     );
   }
 }
