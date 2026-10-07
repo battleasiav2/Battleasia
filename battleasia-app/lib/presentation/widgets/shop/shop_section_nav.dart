@@ -5,11 +5,10 @@ import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_wallet_screen.dart';
-import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
 import 'package:battleasia_app/presentation/screens/wallet/wallet_screen.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth.dart';
 
-/// Shop-area footer — Shop / Wallet / Transfer / Withdraw (web shop parity).
+/// Shop-area footer — Shop / Wallet / Transfer. Withdraw lives inside Wallet.
 class ShopSectionNav extends StatelessWidget {
   const ShopSectionNav({super.key, this.active = ShopNavTab.shop});
 
@@ -33,11 +32,6 @@ class ShopSectionNav extends StatelessWidget {
         tab: ShopNavTab.transfer,
         label: 'shop.tabTransfer'.tr(),
         icon: Icons.swap_horiz,
-      ),
-      (
-        tab: ShopNavTab.withdraw,
-        label: 'shop.tabWithdraw'.tr(),
-        icon: Icons.payments_outlined,
       ),
     ];
 
@@ -117,8 +111,8 @@ class ShopSectionNav extends StatelessWidget {
       case ShopNavTab.withdraw:
         openShopRoute(
           context,
-          const ShopWithdrawalScreen(),
-          routeName: '/shop/withdraw',
+          const WalletScreen(fromShop: true),
+          routeName: '/shop/wallet',
         );
         break;
     }

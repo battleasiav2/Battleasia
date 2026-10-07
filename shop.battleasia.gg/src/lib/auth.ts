@@ -17,13 +17,7 @@ export function getMainAppUrl(path = '/') {
   if (typeof window !== 'undefined') {
     const host = window.location.hostname;
     if (host === 'localhost' || host === '127.0.0.1') {
-      try {
-        const url = new URL(configured);
-        url.hostname = host;
-        origin = url.origin;
-      } catch {
-        origin = configured;
-      }
+      origin = `${window.location.protocol}//${host}:8082`;
     }
   }
   const target = path.startsWith('/') ? path : `/${path}`;

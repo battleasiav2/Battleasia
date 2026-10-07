@@ -257,8 +257,16 @@ class _ShopScreenState extends State<ShopScreen> {
                       _buildHero(),
                       const SizedBox(height: 14),
                       _buildStats(balance),
-                      const SizedBox(height: 14),
-                      _buildFilters(),
+                      if (screenWidth < 900 || _loading) ...[
+                        const SizedBox(height: 14),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(maxWidth: 360),
+                            child: _buildFilters(),
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 12),
                       _buildCategories(),
                       const SizedBox(height: 16),
@@ -290,7 +298,57 @@ class _ShopScreenState extends State<ShopScreen> {
                   ),
                 )
               else if (_items.isEmpty)
-                SliverToBoxAdapter(child: _buildEmptyState())
+                SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  sliver: SliverToBoxAdapter(
+                    child: screenWidth >= 900
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(width: 220, child: _buildFilters()),
+                              const SizedBox(width: 14),
+                              Expanded(child: _buildEmptyState()),
+                            ],
+                          )
+                        : _buildEmptyState(),
+                  ),
+                )
+              else if (screenWidth >= 900)
+                SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  sliver: SliverToBoxAdapter(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(width: 220, child: _buildFilters()),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: GridView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: screenWidth >= 1240 ? 3 : 2,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                              mainAxisExtent: 248,
+                            ),
+                            itemCount: _items.length,
+                            itemBuilder: (context, index) {
+                              final item = _items[index];
+                              return ShopItemCard(
+                                item: item,
+                                bdtRate: _bdtRate,
+                                onTap: () => _handleBuy(item),
+                                onBuy: () => _handleBuy(item),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
               else
                 SliverPadding(
                   padding:
@@ -432,164 +490,150 @@ class _ShopScreenState extends State<ShopScreen> {
   }
 
   Widget _buildFilters() {
+    const ink = Color(0xFFF2F3F0);
+    const hint = Color(0xFF9CA3AF);
+    const line = Color(0x1AFFFFFF);
     final channelItems = <DropdownMenuItem<String>>[
-      DropdownMenuItem(value: '', child: Text('shop.allChannels'.tr())),
+      DropdownMenuItem(
+        value: '',
+        child: Text(
+          'shop.allChannels'.tr(),
+          style: const TextStyle(color: hint, fontSize: 14),
+        ),
+      ),
       ..._channels.map((c) {
         final id = c['_id']?.toString() ?? '';
         final name = c['channel_name']?.toString() ?? 'Channel';
-        return DropdownMenuItem(value: id, child: Text(name));
+        return DropdownMenuItem(
+          value: id,
+          child: Text(name, style: const TextStyle(color: ink, fontSize: 14)),
+        );
       }),
     ];
+    final picked = _selectedChannelId.isNotEmpty;
 
-    return GlassCard(
-      padding: const EdgeInsets.all(14),
-      showGoldBar: true,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            gradient: AppColors.dashCardGradient,
+            borderRadius: BorderRadius.circular(AppColors.dashCardRadius),
+            border: Border.all(color: line),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'shop.filters'.tr(),
-                style: AppTheme.bodySmall.copyWith(
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.8,
-                  fontSize: 10,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                width: 7,
-                height: 7,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF22C55E),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'shop.filterPayment'.tr(),
-            style: AppTheme.bodySmall.copyWith(
-              color: AppColors.gold,
-              fontWeight: FontWeight.w800,
-              fontSize: 10,
-              letterSpacing: 0.6,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.4),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: AppColors.border(0.2)),
-            ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: _selectedChannelId,
-                isExpanded: true,
-                dropdownColor: AppColors.surfaceElevated,
-                style: AppTheme.bodyMedium.copyWith(
-                  color: AppColors.textPrimary,
-                  fontSize: 13,
-                ),
-                items: channelItems,
-                onChanged: (v) => setState(() => _selectedChannelId = v ?? ''),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'shop.filterPriceRange'.tr(),
-            style: AppTheme.bodySmall.copyWith(
-              color: AppColors.gold,
-              fontWeight: FontWeight.w800,
-              fontSize: 10,
-              letterSpacing: 0.6,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: _minPriceController,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  onChanged: (_) => _refilter(),
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: AppColors.textPrimary,
-                    fontSize: 13,
-                  ),
-                  decoration: _priceDecoration('shop.minPrice'.tr()),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  controller: _maxPriceController,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  onChanged: (_) => _refilter(),
-                  style: AppTheme.bodyMedium.copyWith(
-                    color: AppColors.textPrimary,
-                    fontSize: 13,
-                  ),
-                  decoration: _priceDecoration('shop.maxPrice'.tr()),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            height: 40,
-            child: OutlinedButton(
-              onPressed: _clearPriceFilters,
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.gold,
-                side: BorderSide(color: AppColors.gold.withValues(alpha: 0.7)),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(
-                'shop.clearAllFilters'.tr(),
+                'shop.filterPayment'.tr(),
                 style: const TextStyle(
-                  fontWeight: FontWeight.w900,
-                  fontSize: 11,
-                  letterSpacing: 0.6,
+                  color: hint,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
                 ),
               ),
-            ),
+              const SizedBox(height: 10),
+              Container(
+                height: 40,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF0C0E12),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: line),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: _selectedChannelId,
+                    isExpanded: true,
+                    dropdownColor: const Color(0xFF171A1E),
+                    iconEnabledColor: hint,
+                    style: TextStyle(
+                      color: picked ? ink : hint,
+                      fontSize: 14,
+                    ),
+                    items: channelItems,
+                    onChanged: (v) =>
+                        setState(() => _selectedChannelId = v ?? ''),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'shop.filterPriceRange'.tr(),
+                style: const TextStyle(
+                  color: hint,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _minPriceController,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      onChanged: (_) => _refilter(),
+                      style: const TextStyle(color: ink, fontSize: 14),
+                      decoration: _priceDecoration('shop.minPrice'.tr()),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      controller: _maxPriceController,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      onChanged: (_) => _refilter(),
+                      style: const TextStyle(color: ink, fontSize: 14),
+                      decoration: _priceDecoration('shop.maxPrice'.tr()),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              OutlinedButton(
+                onPressed: _clearPriceFilters,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: ink,
+                  backgroundColor: Colors.transparent,
+                  minimumSize: const Size(0, 34),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  side: const BorderSide(color: Color(0x24FFFFFF)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  'shop.clear'.tr(),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   InputDecoration _priceDecoration(String hint) => InputDecoration(
         hintText: hint,
-        hintStyle: AppTheme.bodySmall.copyWith(
-          color: Colors.white.withValues(alpha: 0.4),
-        ),
+        hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 14),
         filled: true,
-        fillColor: Colors.black.withValues(alpha: 0.4),
+        fillColor: const Color(0xFF0C0E12),
         isDense: true,
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: AppColors.border(0.2)),
+          borderSide: const BorderSide(color: Color(0x1AFFFFFF)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: AppColors.gold),
+          borderSide: const BorderSide(color: Color(0xFFD4E82A)),
         ),
       );
 

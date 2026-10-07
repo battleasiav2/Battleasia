@@ -273,24 +273,28 @@ export async function approveDepositMoney(input: { depositId: string; adminId?: 
     const user = await User.findById(deposit.userId).session(session);
     if (!user) throw new MoneyError('User not found', 404);
     const amount = roundMoney(deposit.coin_amount);
+    const bonus = roundMoney(deposit.bonus_coins || 0);
+    const credit = roundMoney(amount + bonus);
     const balanceBefore = user.balance ?? 0;
-    const updated = await User.findByIdAndUpdate(user._id, { $inc: { balance: amount } }, { new: true, session });
-    user.balance = updated?.balance ?? balanceBefore + amount;
+    const updated = await User.findByIdAndUpdate(user._id, { $inc: { balance: credit } }, { new: true, session });
+    user.balance = updated?.balance ?? balanceBefore + credit;
     deposit.status = 'completed';
     deposit.processed_at = new Date();
     await deposit.save({ session });
     await postPair(session, {
       debitAccount: 'platform:reserve',
       creditAccount: walletAccount(user._id.toString()),
-      amount,
+      amount: credit,
       userId: user._id,
       refType: 'deposit_approve',
       refId: deposit._id.toString(),
       idempotencyKey: input.idempotencyKey,
     });
-    await writeHistory(session, user, amount, 'deposit', balanceBefore, user.balance ?? 0, {
-      reason: 'deposit_approved',
+    await writeHistory(session, user, credit, 'deposit', balanceBefore, user.balance ?? 0, {
+      reason: bonus > 0 ? 'deposit_approved_coupon' : 'deposit_approved',
       deposit_id: deposit._id.toString(),
+      coupon_code: deposit.coupon_code || '',
+      bonus_coins: bonus,
     });
     return { balance: user.balance ?? 0 };
   });

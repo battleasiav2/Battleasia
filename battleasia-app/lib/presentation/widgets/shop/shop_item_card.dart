@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/data/models/shop_item_model.dart';
@@ -9,6 +10,21 @@ const Map<String, Color> _kBadgeColor = {
   'hot': Color(0xFFEF4444),
   'best': Color(0xFF22C55E),
 };
+
+bool _isCustomArt(String image) {
+  final src = image.trim();
+  if (src.isEmpty) return false;
+  if (src.contains('currency.webp') || src.toLowerCase().contains('bac-coin')) {
+    return false;
+  }
+  return true;
+}
+
+String _artUrl(String image) {
+  if (image.startsWith('http')) return image;
+  final base = AppConfig.serverUrl.replaceAll(RegExp(r'/$'), '');
+  return '$base$image';
+}
 
 class ShopItemCard extends StatelessWidget {
   final ShopItemModel item;
@@ -32,9 +48,6 @@ class ShopItemCard extends StatelessWidget {
     final hasDiscount = item.discountPercent > 0;
     final badgeColor =
         _kBadgeColor[item.badge.toLowerCase()] ?? AppColors.gold;
-    final rate = bdtRate > 0 ? bdtRate : 1.0;
-    final priceBdt = item.price * rate;
-    final originalBdt = item.originalPrice * rate;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -49,19 +62,14 @@ class ShopItemCard extends StatelessWidget {
           color: Colors.transparent,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(compact ? 12 : 14),
+            borderRadius: BorderRadius.circular(AppColors.dashCardRadius),
             child: Stack(
               children: [
                 Ink(
                   decoration: BoxDecoration(
-                    color: const Color(0xFF161618),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border(
-                      left: BorderSide(color: AppColors.gold, width: 3),
-                      top: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
-                      right: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
-                      bottom: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
-                    ),
+                    gradient: AppColors.dashCardGradient,
+                    borderRadius: BorderRadius.circular(AppColors.dashCardRadius),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                   ),
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(
@@ -92,8 +100,10 @@ class ShopItemCard extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              Image.asset(
-                                'assets/images/currency.webp',
+                              Image(
+                                image: _isCustomArt(item.image)
+                                    ? NetworkImage(_artUrl(item.image))
+                                    : const AssetImage('assets/images/currency.webp') as ImageProvider,
                                 width: coinSize * 0.9,
                                 height: coinSize * 0.9,
                                 fit: BoxFit.contain,
@@ -121,7 +131,7 @@ class ShopItemCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '৳ ${_fmtMoney(priceBdt)} BDT',
+                          '\$${_fmtMoney(item.price)}',
                           textAlign: TextAlign.center,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -135,7 +145,7 @@ class ShopItemCard extends StatelessWidget {
                         if (hasDiscount && item.originalPrice > item.price) ...[
                           const SizedBox(height: 2),
                           Text(
-                            '৳ ${_fmtMoney(originalBdt)}',
+                            '\$${_fmtMoney(item.originalPrice)}',
                             style: AppTheme.bodySmall.copyWith(
                               fontSize: compact ? 8 : 9,
                               color: AppColors.textMuted,
@@ -226,7 +236,7 @@ class ShopItemCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        '-${item.discountPercent.toInt()}%',
+                        '-${item.discountPercent.toStringAsFixed(item.discountPercent == item.discountPercent.roundToDouble() ? 0 : 1)}%',
                         style: TextStyle(
                           fontSize: compact ? 7.5 : 9,
                           color: Colors.white,

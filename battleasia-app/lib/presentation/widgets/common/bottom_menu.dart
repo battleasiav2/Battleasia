@@ -5,9 +5,9 @@ import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_screen.dart';
+import 'package:battleasia_app/presentation/screens/shop/bac_gate_screen.dart';
 import 'package:battleasia_app/presentation/screens/referral/referral_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
-import 'package:battleasia_app/presentation/widgets/shop/shop_auth.dart';
 
 class FloatingBottomNav extends StatefulWidget {
   const FloatingBottomNav({super.key});
@@ -149,7 +149,12 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
         targetScreen = const PlayScreen();
         break;
       case '/shop':
-        openShopRoute(context, const ShopScreen(), routeName: '/shop');
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => const BacGateScreen(),
+            settings: const RouteSettings(name: '/shop'),
+          ),
+        );
         return;
       case '/referral':
         targetScreen = const ReferralScreen();

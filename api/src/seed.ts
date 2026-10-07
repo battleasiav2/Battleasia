@@ -161,6 +161,22 @@ async function seed() {
     await nagadChannel.save();
   }
 
+  let usdtChannel = await PaymentChannel.findOne({
+    channel_name: { $regex: /^(usdt|crypto)$/i },
+  });
+  if (!usdtChannel) {
+    usdtChannel = await PaymentChannel.create({
+      channel_name: 'USDT',
+      description: 'USDT (TRC20)',
+      icon: '/assets/pay/usdt.png',
+      enabled: true,
+    });
+    console.log('Payment channel created: USDT');
+  } else if (!usdtChannel.enabled) {
+    usdtChannel.enabled = true;
+    await usdtChannel.save();
+  }
+
   const existingWallet = await BusinessWallet.findOne({ wallet_address: '01700000000' });
   if (!existingWallet && bkashChannel) {
     await BusinessWallet.create({
@@ -170,6 +186,17 @@ async function seed() {
       enabled: true,
     });
     console.log('Business wallet created for bKash');
+  }
+
+  const existingUsdt = await BusinessWallet.findOne({ channel_id: usdtChannel._id, currency_type: 'USDT' });
+  if (!existingUsdt) {
+    await BusinessWallet.create({
+      channel_id: usdtChannel._id,
+      wallet_address: 'USDT-TRC20-SET-IN-ADMIN',
+      currency_type: 'USDT',
+      enabled: true,
+    });
+    console.log('Business wallet created for USDT');
   }
 
   // 1 BAC = 1 BDT base; other countries seeded from FX (admin-editable)
@@ -182,20 +209,14 @@ async function seed() {
     originalPrice: number;
     discountPercent: number;
   }> = [
-    { amount: 100, badge: 'Popular', price: 1, originalPrice: 1, discountPercent: 0 },
-    { amount: 300, badge: 'New', price: 2.7, originalPrice: 3, discountPercent: 10 },
-    { amount: 500, badge: 'Hot', price: 4, originalPrice: 5, discountPercent: 20 },
-    { amount: 1000, badge: 'Best', price: 7.5, originalPrice: 10, discountPercent: 25 },
-    { amount: 50, badge: 'New', price: 0.5, originalPrice: 0.5, discountPercent: 0 },
-    { amount: 150, badge: 'Popular', price: 1.35, originalPrice: 1.5, discountPercent: 10 },
-    { amount: 200, badge: 'Hot', price: 1.8, originalPrice: 2, discountPercent: 10 },
-    { amount: 250, badge: 'New', price: 2.25, originalPrice: 2.5, discountPercent: 10 },
-    { amount: 750, badge: 'Hot', price: 6, originalPrice: 7.5, discountPercent: 20 },
-    { amount: 1500, badge: 'Best', price: 10.5, originalPrice: 15, discountPercent: 30 },
-    { amount: 2000, badge: 'Popular', price: 14, originalPrice: 20, discountPercent: 30 },
-    { amount: 2500, badge: 'Hot', price: 17.5, originalPrice: 25, discountPercent: 30 },
-    { amount: 5000, badge: 'Best', price: 32.5, originalPrice: 50, discountPercent: 35 },
-    { amount: 10000, badge: 'Popular', price: 60, originalPrice: 100, discountPercent: 40 },
+    { amount: 20, badge: 'Popular', price: 0.9, originalPrice: 1, discountPercent: 9.7 },
+    { amount: 40, badge: 'Popular', price: 1.82, originalPrice: 2, discountPercent: 9 },
+    { amount: 50, badge: 'Popular', price: 2.37, originalPrice: 2.5, discountPercent: 5.1 },
+    { amount: 100, badge: 'Hot', price: 4.55, originalPrice: 5, discountPercent: 9 },
+    { amount: 200, badge: 'Popular', price: 9.1, originalPrice: 10, discountPercent: 9 },
+    { amount: 300, badge: 'Popular', price: 14.55, originalPrice: 15, discountPercent: 3 },
+    { amount: 500, badge: 'Hot', price: 20, originalPrice: 25, discountPercent: 20 },
+    { amount: 1000, badge: 'Best', price: 41, originalPrice: 50, discountPercent: 18 },
   ];
 
   for (const pack of demoCoinPacks) {
@@ -214,24 +235,8 @@ async function seed() {
         status: 'available',
       });
       console.log(`Shop item created: ${pack.amount} BAC pack`);
-    } else {
-      let dirty = false;
-      if (existing.image !== '/assets/images/currency.webp') {
-        existing.image = '/assets/images/currency.webp';
-        dirty = true;
-      }
-      if (!existing.isActive) {
-        existing.isActive = true;
-        dirty = true;
-      }
-      if (dirty) await existing.save();
     }
   }
-
-  await ShopItem.updateMany(
-    { image: { $regex: /bac-coin/i } },
-    { $set: { image: '/assets/images/currency.webp' } }
-  );
 
   if (player && bkashChannel) {
     const existingDeposit = await DepositHistory.findOne({ transaction_id: 'TXN-SEED-001' });

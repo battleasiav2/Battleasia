@@ -26,6 +26,10 @@ export function serializeDeposit(
     processed_by: deposit.processed_by?.toString(),
     rejection_reason: deposit.rejection_reason || '',
     notes: deposit.notes || '',
+    coupon_code: deposit.coupon_code || '',
+    coupon_kind: deposit.coupon_kind || '',
+    coupon_value: deposit.coupon_value || 0,
+    bonus_coins: deposit.bonus_coins || 0,
   };
 }
 

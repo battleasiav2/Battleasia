@@ -1,10 +1,20 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { RequireShopAuth } from './components/RequireShopAuth';
 import { ShopShell } from './components/ShopShell';
 import { RouteProgress } from './components/RouteProgress';
 import { OfflineBanner } from './components/OfflineBanner';
 import { Spotlight } from './components/Spotlight';
+import { getMainAppUrl, isShopAuthed } from './lib/auth';
+
+function ShopRoot() {
+  const authed = isShopAuthed();
+  useEffect(() => {
+    if (!authed) window.location.replace(getMainAppUrl('/user/shop'));
+  }, [authed]);
+  if (authed) return <Navigate to="/user/shop" replace />;
+  return null;
+}
 
 const SignInPage = lazy(() => import('./pages/auth/SignIn').then((m) => ({ default: m.SignInPage })));
 const SignUpPage = lazy(() => import('./pages/auth/SignUp').then((m) => ({ default: m.SignUpPage })));
@@ -16,7 +26,6 @@ const LegalPage = lazy(() => import('./pages/Legal').then((m) => ({ default: m.L
 const ShopPage = lazy(() => import('./pages/user/Shop').then((m) => ({ default: m.ShopPage })));
 const WalletPage = lazy(() => import('./pages/user/Wallet').then((m) => ({ default: m.WalletPage })));
 const TransferPage = lazy(() => import('./pages/user/Transfer').then((m) => ({ default: m.TransferPage })));
-const WithdrawalPage = lazy(() => import('./pages/user/Withdrawal').then((m) => ({ default: m.WithdrawalPage })));
 
 export default function App() {
   return (
@@ -26,7 +35,7 @@ export default function App() {
       <RouteProgress />
       <Suspense fallback={<div className="auth-shell" />}>
         <Routes>
-          <Route path="/" element={<Navigate to="/user/shop" replace />} />
+          <Route path="/" element={<ShopRoot />} />
           <Route path="/auth/sign-in" element={<SignInPage />} />
           <Route path="/auth/sign-up" element={<SignUpPage />} />
           <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
@@ -46,7 +55,7 @@ export default function App() {
             <Route path="/user/shop" element={<ShopPage />} />
             <Route path="/user/wallet" element={<WalletPage />} />
             <Route path="/user/transfer" element={<TransferPage />} />
-            <Route path="/user/withdrawal" element={<WithdrawalPage />} />
+            <Route path="/user/withdrawal" element={<Navigate to="/user/wallet?withdraw=1" replace />} />
           </Route>
           <Route path="*" element={<Navigate to="/auth/sign-in" replace />} />
         </Routes>

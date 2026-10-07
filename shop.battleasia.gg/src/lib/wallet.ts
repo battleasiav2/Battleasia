@@ -96,7 +96,7 @@ export async function fetchBalanceHistory(page = 1) {
 }
 
 export async function fetchShopPacks() {
-  const payload = await api('/api/v4/shop/items?limit=24');
+  const payload = await api('/api/v4/shop/items?limit=100');
   return unwrapList<ShopPack>(payload).map((row) => ({ ...row, id: nid(row) }));
 }
 
@@ -128,6 +128,20 @@ export function walletChannelId(wallet: BizWallet) {
 export function firstChannelWithWallet(channels: PayChannel[], wallets: BizWallet[]) {
   const ids = new Set(wallets.map(walletChannelId).filter(Boolean));
   return channels.find((channel) => ids.has(channel.id))?.id || channels[0]?.id || '';
+}
+
+export async function applyShopCoupon(code: string, coinAmount: number) {
+  const payload = await api('/api/v4/payments/coupons/apply', {
+    method: 'POST',
+    body: JSON.stringify({ code, coin_amount: coinAmount }),
+  });
+  return unwrapData<{
+    code: string;
+    kind: 'off' | 'bonus';
+    value: number;
+    label: string;
+    bonusCoins: number;
+  }>(payload);
 }
 
 export async function submitDeposit(body: Record<string, string | number>, key = newIdempotencyKey()) {

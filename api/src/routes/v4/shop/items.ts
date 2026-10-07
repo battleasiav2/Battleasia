@@ -7,10 +7,43 @@ import {
   paginatedResults,
   parsePagination,
 } from '../../../utils/pagination.js';
+import { sanitizeUploadAttachment } from '../../../utils/safe-url.js';
 import { serializeShopItem } from '../../../utils/payment-serialize.js';
 import { safeQueryString, safeQueryStatus, SHOP_ITEM_STATUSES } from '../../../utils/query-filter.js';
 
 const router = Router();
+
+const USD_PER_BAC = 0.05;
+
+function readAmount(raw: unknown) {
+  const amount = Number(raw);
+  if (!Number.isFinite(amount) || amount <= 0 || amount > 1_000_000) return null;
+  return Math.round(amount);
+}
+
+function readDiscount(raw: unknown) {
+  if (raw == null || raw === '') return 0;
+  const discount = Number(raw);
+  if (!Number.isFinite(discount) || discount < 0 || discount > 90) return null;
+  return Math.round(discount * 10) / 10;
+}
+
+function pricesFor(amount: number, discountPercent: number) {
+  const originalPrice = Math.round(amount * USD_PER_BAC * 100) / 100;
+  const price = Math.round(originalPrice * (1 - discountPercent / 100) * 100) / 100;
+  return { price, originalPrice, discountPercent };
+}
+
+function readImage(raw: unknown) {
+  const value = String(raw ?? '').trim();
+  if (!value) return '';
+  const upload = sanitizeUploadAttachment(value);
+  if (upload) return upload;
+  if (value.startsWith('/assets/') && !value.includes('..') && !value.includes('\\')) {
+    return value.slice(0, 500);
+  }
+  return null;
+}
 
 router.get('/', requireAuth, async (req, res) => {
   try {
@@ -59,32 +92,30 @@ router.get('/:id', requireAuth, async (req, res) => {
 
 router.post('/', requireAdmin, async (req, res) => {
   try {
-    const {
-      amount,
-      badge = 'None',
-      price,
-      originalPrice = 0,
-      discountPercent = 0,
-      symbol = 'BAC',
-      paymentOptions = ['bkash', 'nagad', 'crypto'],
-      image = '',
-      isActive = true,
-    } = req.body;
-
-    if (amount == null || price == null) {
-      return res.status(400).json({ status: false, message: 'Amount and price are required' });
+    const amount = readAmount(req.body?.amount);
+    const discountPercent = readDiscount(req.body?.discountPercent);
+    const image = readImage(req.body?.image);
+    if (amount == null || discountPercent == null) {
+      return res.status(400).json({ status: false, message: 'Enter a BAC amount and a discount from 0 to 90' });
+    }
+    if (image == null) {
+      return res.status(400).json({ status: false, message: 'Image must be an uploaded shop file' });
     }
 
+    const duplicate = await ShopItem.findOne({ symbol: 'BAC', amount });
+    if (duplicate) {
+      return res.status(409).json({ status: false, message: 'A pack with this BAC amount already exists' });
+    }
+
+    const prices = pricesFor(amount, discountPercent);
     const item = await ShopItem.create({
       amount,
-      badge,
-      price,
-      originalPrice,
-      discountPercent,
-      symbol,
-      paymentOptions,
+      badge: 'None',
+      ...prices,
+      symbol: 'BAC',
+      paymentOptions: ['bkash', 'nagad', 'crypto'],
       image,
-      isActive: Boolean(isActive),
+      isActive: req.body?.isActive !== false,
       status: 'available',
     });
 
@@ -102,16 +133,30 @@ router.put('/:id', requireAdmin, async (req, res) => {
       return res.status(404).json({ status: false, message: 'Shop item not found' });
     }
 
-    const fields = [
-      'amount', 'badge', 'price', 'originalPrice', 'discountPercent',
-      'symbol', 'paymentOptions', 'image', 'isActive', 'status',
-    ] as const;
-
-    for (const field of fields) {
-      if (req.body[field] !== undefined) {
-        (item as unknown as Record<string, unknown>)[field] = req.body[field];
-      }
+    const amount = req.body.amount !== undefined ? readAmount(req.body.amount) : item.amount;
+    const discountPercent =
+      req.body.discountPercent !== undefined ? readDiscount(req.body.discountPercent) : item.discountPercent;
+    if (amount == null || discountPercent == null) {
+      return res.status(400).json({ status: false, message: 'Enter a BAC amount and a discount from 0 to 90' });
     }
+    if (req.body.image !== undefined) {
+      const image = readImage(req.body.image);
+      if (image == null) {
+        return res.status(400).json({ status: false, message: 'Image must be an uploaded shop file' });
+      }
+      item.image = image;
+    }
+    const duplicate = await ShopItem.findOne({ symbol: 'BAC', amount, _id: { $ne: item._id } });
+    if (duplicate) {
+      return res.status(409).json({ status: false, message: 'A pack with this BAC amount already exists' });
+    }
+
+    const prices = pricesFor(amount, discountPercent);
+    item.amount = amount;
+    item.price = prices.price;
+    item.originalPrice = prices.originalPrice;
+    item.discountPercent = prices.discountPercent;
+    if (req.body.isActive !== undefined) item.isActive = Boolean(req.body.isActive);
 
     await item.save();
     return res.json({ status: true, data: serializeShopItem(item) });

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/data/models/shop_item_model.dart';
+import 'package:battleasia_app/presentation/widgets/shop/pay_brand_icon.dart';
 
 /// Opens web-parity Security Payment → Payment Details flow (dark glass).
 Future<void> showShopBuyFlow(
@@ -51,7 +53,16 @@ class _Channel {
         enabled: j['enabled'] == true,
       );
 
-  bool get isCrypto => name.toLowerCase().contains('crypto');
+  bool get isCrypto {
+    final n = name.toLowerCase();
+    return n.contains('crypto') || n.contains('usdt') || n.contains('tether');
+  }
+
+  String get payCode {
+    final n = name.toLowerCase();
+    if (n.contains('usdt') || n.contains('tether') || n.contains('crypto')) return 'usdt';
+    return '';
+  }
 }
 
 class _Rate {
@@ -118,6 +129,9 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
   final ShopService _shop = ShopService();
   final _fromCtrl = TextEditingController();
   final _txCtrl = TextEditingController();
+  Timer? _cryptoTimer;
+  bool _cryptoWindow = false;
+  int _cryptoLeft = 0;
 
   List<_Channel> _channels = [];
   List<_Rate> _rates = [];
@@ -139,9 +153,34 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
 
   @override
   void dispose() {
+    _cryptoTimer?.cancel();
     _fromCtrl.dispose();
     _txCtrl.dispose();
     super.dispose();
+  }
+
+  void _armCrypto(bool on) {
+    _cryptoTimer?.cancel();
+    if (!on) {
+      if (mounted) {
+        setState(() {
+          _cryptoWindow = false;
+          _cryptoLeft = 0;
+        });
+      }
+      return;
+    }
+    final until = DateTime.now().add(const Duration(minutes: 15));
+    setState(() {
+      _cryptoWindow = true;
+      _cryptoLeft = 15 * 60;
+    });
+    _cryptoTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      final left = until.difference(DateTime.now()).inSeconds;
+      setState(() => _cryptoLeft = left > 0 ? left : 0);
+      if (left <= 0) _cryptoTimer?.cancel();
+    });
   }
 
   Future<void> _bootstrap() async {
@@ -211,17 +250,22 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
     for (final r in _rates) {
       if (r.matches(code)) return r.rate;
     }
+    if (code.toLowerCase() == 'usdt') {
+      for (final r in _rates) {
+        if (r.matches('usd')) return r.rate;
+      }
+    }
     return 0;
   }
 
   double _totalFor(String code) {
-    final rate = _rateFor(code);
-    if (rate == 0) return 0;
-    var total = rate * widget.item.amount;
-    if (widget.item.isPremiumUser && widget.item.discountPercent > 0) {
-      total *= (1 - widget.item.discountPercent / 100);
-    }
-    return total;
+    final usd = widget.item.price;
+    final key = code.toLowerCase();
+    if (key == 'usd' || key == 'usdt') return usd;
+    final usdRate = _rateFor('usd');
+    final local = _rateFor(code);
+    if (usdRate <= 0 || local <= 0) return usd;
+    return usd * (local / usdRate);
   }
 
   Future<void> _confirmPay() async {
@@ -233,7 +277,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
 
     setState(() => _submitting = true);
     try {
-      final currency = channel.isCrypto ? 'usd' : _currency;
+      final currency = channel.payCode.isNotEmpty ? channel.payCode : _currency;
       final result = await _shop.getBusinessWallets(
         channelId: channel.id,
         currency: currency,
@@ -258,6 +302,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         _fromCtrl.clear();
         _txCtrl.clear();
       });
+      _armCrypto(channel.isCrypto);
     } catch (e) {
       _toast('Failed to get payment details: $e', Colors.red);
     } finally {
@@ -274,6 +319,10 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
       _toast('Please enter the transaction ID', Colors.red);
       return;
     }
+    if (_paidChannel?.isCrypto == true && _cryptoWindow && _cryptoLeft <= 0) {
+      _toast('Payment window expired. Go back and start again.', Colors.red);
+      return;
+    }
     final user = context.read<AuthProvider>().user;
     if (user == null) {
       _toast('Please log in to make a purchase', Colors.red);
@@ -285,7 +334,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
 
     setState(() => _submitting = true);
     try {
-      final currency = channel.isCrypto ? 'usd' : _currency;
+      final currency = channel.payCode.isNotEmpty ? channel.payCode : _currency;
       final result = await _shop.submitDeposit(
         userEmail: user.email,
         username: user.username,
@@ -328,23 +377,15 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Container(
-        constraints: BoxConstraints(maxWidth: 520, maxHeight: maxH),
+        constraints: BoxConstraints(maxWidth: 720, maxHeight: maxH),
         decoration: BoxDecoration(
-          color: const Color(0xFF0A0A0A),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.hair(0.12)),
+          gradient: AppColors.dashCardGradient,
+          borderRadius: BorderRadius.circular(AppColors.dashCardRadius),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(16),
-          child: Stack(
-            children: [
-              Positioned(
-                left: 0,
-                top: 0,
-                bottom: 0,
-                child: Container(width: 3, color: AppColors.gold),
-              ),
-              Column(
+          borderRadius: BorderRadius.circular(AppColors.dashCardRadius),
+          child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Padding(
@@ -412,7 +453,10 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                                 child: OutlinedButton(
                                   onPressed: _submitting
                                       ? null
-                                      : () => setState(() => _paymentStep = false),
+                                      : () {
+                                          _armCrypto(false);
+                                          setState(() => _paymentStep = false);
+                                        },
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: Colors.white70,
                                     side: BorderSide(
@@ -428,22 +472,40 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                                 flex: 2,
                                 child: _goldOutlineBtn(
                                   label: _submitting ? 'Submitting…' : 'Confirm',
-                                  onPressed: _submitting ? null : _submitDeposit,
+                                  onPressed: _submitting ||
+                                          (_paidChannel?.isCrypto == true &&
+                                              _cryptoWindow &&
+                                              _cryptoLeft <= 0)
+                                      ? null
+                                      : _submitDeposit,
                                 ),
                               ),
                             ],
                           )
-                        : _goldOutlineBtn(
-                            label: _submitting ? 'Loading…' : 'Confirm & Pay',
-                            onPressed: _submitting || _channels.isEmpty
-                                ? null
-                                : _confirmPay,
+                        : Row(
+                            children: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
+                                ),
+                              ),
+                              const Spacer(),
+                              SizedBox(
+                                width: 180,
+                                child: _goldOutlineBtn(
+                                  label: _submitting ? 'Loading…' : 'Confirm & Pay',
+                                  onPressed: _submitting || _channels.isEmpty
+                                      ? null
+                                      : _confirmPay,
+                                ),
+                              ),
+                            ],
                           ),
                   ),
                 ],
               ),
-            ],
-          ),
         ),
       ),
     );
@@ -478,9 +540,9 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.panelFill(0.45),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.hair()),
+        gradient: AppColors.dashCardGradient,
+        borderRadius: BorderRadius.circular(AppColors.dashCardRadius),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: child,
     );
@@ -490,7 +552,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
     final user = context.watch<AuthProvider>().user;
     final channel = _selectedChannel;
     final isCrypto = channel?.isCrypto == true;
-    final payCode = isCrypto ? 'usd' : _currency;
+    final payCode = (channel != null && channel.payCode.isNotEmpty) ? channel.payCode : _currency;
     final total = _totalFor(payCode);
 
     return Column(
@@ -541,78 +603,115 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         const SizedBox(height: 8),
         ..._channels.map((ch) {
           final selected = ch.id == _channelId;
+          final kind = payKindOf(ch.name);
+          final hint = ch.name.toLowerCase().contains('usdt') || ch.isCrypto
+              ? 'cryptocurrency'
+              : '${ch.name.toLowerCase()} wallet';
           return Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: InkWell(
               onTap: () => setState(() => _channelId = ch.id),
               borderRadius: BorderRadius.circular(12),
               child: Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 decoration: BoxDecoration(
-                  color: selected
-                      ? AppColors.gold.withValues(alpha: 0.08)
-                      : AppColors.panelFill(0.35),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: selected
-                        ? AppColors.gold.withValues(alpha: 0.55)
-                        : AppColors.hair(),
-                    width: selected ? 1.5 : 1,
+                    color: selected ? const Color(0xFFF0B429) : Colors.transparent,
+                    width: 1.5,
                   ),
                 ),
                 child: Row(
                   children: [
-                    _channelIcon(ch),
+                    if (kind != null)
+                      PayBrandIcon(kind: kind, size: 28)
+                    else
+                      const Icon(Icons.payment, color: Colors.white70, size: 22),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Text(
-                        ch.name,
-                        style: AppTheme.bodyMedium.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            ch.name,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          Text(
+                            hint,
+                            style: AppTheme.bodySmall.copyWith(
+                              color: AppColors.textMuted,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    if (selected)
-                      Icon(Icons.check_circle, color: AppColors.gold, size: 18),
                   ],
                 ),
               ),
             ),
           );
         }),
+        const SizedBox(height: 8),
+        Text(
+          'Rates',
+          style: AppTheme.bodyMedium.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 6),
+        ...['BDT', 'INR', 'PKR'].map((code) {
+          final rate = _rateFor(code);
+          if (rate <= 0) return const SizedBox.shrink();
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(code, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w700)),
+                Text(
+                  '${rate.toStringAsFixed(2)} per coin',
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
+          );
+        }),
         if (!isCrypto) ...[
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           Text(
-            'Currency',
+            'Select Currency',
             style: AppTheme.bodySmall.copyWith(
               color: AppColors.textMuted,
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 6),
-          Wrap(
-            spacing: 8,
-            children: ['bdt', 'inr', 'pkr'].map((code) {
-              final selected = _currency == code;
-              return ChoiceChip(
-                label: Text(code.toUpperCase()),
-                selected: selected,
-                onSelected: (_) => setState(() => _currency = code),
-                selectedColor: AppColors.gold.withValues(alpha: 0.25),
-                backgroundColor: AppColors.panelFill(0.5),
-                labelStyle: TextStyle(
-                  color: selected ? AppColors.gold : Colors.white70,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 12,
-                ),
-                side: BorderSide(
-                  color: selected
-                      ? AppColors.gold.withValues(alpha: 0.6)
-                      : AppColors.hair(),
-                ),
-              );
-            }).toList(),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: AppColors.panelFill(0.5),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.hair()),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _currency,
+                isExpanded: true,
+                dropdownColor: const Color(0xFF171A1E),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                items: ['bdt', 'inr', 'pkr']
+                    .map((code) => DropdownMenuItem(value: code, child: Text(code.toUpperCase())))
+                    .toList(),
+                onChanged: (v) {
+                  if (v != null) setState(() => _currency = v);
+                },
+              ),
+            ),
           ),
         ],
         const SizedBox(height: 14),
@@ -650,22 +749,14 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
   }
 
   Widget _channelIcon(_Channel ch) {
-    final name = ch.name.toLowerCase();
-    if (name.contains('bkash')) {
-      return Image.asset(
-        'assets/images/bkash.webp',
-        width: 40,
-        height: 28,
-        fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) => Icon(Icons.payment, color: AppColors.gold),
-      );
-    }
+    final kind = payKindOf(ch.name);
+    if (kind != null) return PayBrandIcon(kind: kind, size: 40);
     if (ch.icon.isNotEmpty) {
       final url = AppConfig.getImageUrl(ch.icon);
       return ImageUtils.networkImage(
         url,
-        width: 40,
-        height: 28,
+        width: 48,
+        height: 48,
         fit: BoxFit.contain,
         errorWidget: Icon(Icons.payment, color: AppColors.gold, size: 22),
       );
@@ -676,14 +767,18 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
   Widget _buildPaymentDetails() {
     final wallet = _wallet!;
     final channel = _paidChannel!;
-    final currency =
-        channel.isCrypto ? 'USD' : _currency.toUpperCase();
+    final currency = channel.payCode.isNotEmpty
+        ? channel.payCode.toUpperCase()
+        : _currency.toUpperCase();
     final qr = wallet.qrCode;
-    final qrUrl = (qr != null && qr.isNotEmpty)
+    final isCrypto = channel.isCrypto;
+    final qrUrl = isCrypto && qr != null && qr.isNotEmpty
         ? (qr.startsWith('http') || qr.startsWith('data:')
             ? qr
             : AppConfig.getImageUrl(qr))
         : null;
+    final clock =
+        '${(_cryptoLeft ~/ 60).toString().padLeft(2, '0')}:${(_cryptoLeft % 60).toString().padLeft(2, '0')}';
 
     return Column(
       children: [
@@ -696,6 +791,27 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
             fontWeight: FontWeight.w800,
           ),
         ),
+        if (isCrypto) ...[
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Text(
+                'Pay within',
+                style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
+              ),
+              const Spacer(),
+              Text(
+                clock,
+                style: TextStyle(
+                  color: _cryptoLeft <= 0 ? const Color(0xFFF87171) : AppColors.gold,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w800,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+            ],
+          ),
+        ],
         if (qrUrl != null) ...[
           const SizedBox(height: 14),
           Text(
@@ -800,13 +916,41 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColors.info.withValues(alpha: 0.25)),
           ),
-          child: Text(
-            'Send the amount to the wallet above, then enter your from-address and transaction ID.',
-            style: AppTheme.bodySmall.copyWith(
-              color: Colors.white.withValues(alpha: 0.75),
-              height: 1.35,
-            ),
-          ),
+          child: isCrypto
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    for (final line in const [
+                      'Send USDT on TRC20 only. Other networks or coins are not recovered.',
+                      'Send the exact amount shown.',
+                      'Network fee is yours. The amount that arrives must equal this order.',
+                      'One transfer for this order. Submit that TxID once.',
+                      'Submit the TxID before the timer ends.',
+                    ])
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: Text(
+                          '• $line',
+                          style: AppTheme.bodySmall.copyWith(
+                            color: Colors.white.withValues(alpha: 0.75),
+                            height: 1.35,
+                          ),
+                        ),
+                      ),
+                    if (_cryptoWindow && _cryptoLeft <= 0)
+                      Text(
+                        'This payment window expired. Go back and start again.',
+                        style: AppTheme.bodySmall.copyWith(color: const Color(0xFFF87171)),
+                      ),
+                  ],
+                )
+              : Text(
+                  'Send the amount to the wallet above, then enter your from-address and transaction ID.',
+                  style: AppTheme.bodySmall.copyWith(
+                    color: Colors.white.withValues(alpha: 0.75),
+                    height: 1.35,
+                  ),
+                ),
         ),
         const SizedBox(height: 14),
         TextField(

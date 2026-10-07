@@ -19,6 +19,7 @@ const OAuthSettingsPage = lazy(() =>
 const AppDownloadPage = lazy(() =>
   import('./pages/AppDownloadPage').then((m) => ({ default: m.AppDownloadPage }))
 );
+const BacShopPage = lazy(() => import('./pages/BacShopPage').then((m) => ({ default: m.BacShopPage })));
 const CoinRatesPage = lazy(() =>
   import('./pages/CoinRatesPage').then((m) => ({ default: m.CoinRatesPage }))
 );
@@ -76,6 +77,7 @@ export default function App() {
             <Route path="/system/mail-settings" element={<MailSettingsPage />} />
             <Route path="/system/oauth-login" element={<OAuthSettingsPage />} />
             <Route path="/system/app-download" element={<AppDownloadPage />} />
+            <Route path="/shop/bac" element={<BacShopPage />} />
             <Route path="/shop/coinrate" element={<CoinRatesPage />} />
             <Route path="/feature-flags" element={<FlagsPage />} />
             <Route path="/payments/wallet" element={<WalletOpsPage />} />

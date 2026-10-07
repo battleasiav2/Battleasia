@@ -34,7 +34,7 @@ type Props = {
   tools?: { label: string; content: ReactNode };
   footer: {
     icon?: DrawerTarget & { label: string; icon: ReactNode };
-    primary: DrawerTarget & { label: string; arrow?: boolean };
+    primary?: DrawerTarget & { label: string; arrow?: boolean };
   };
 };
 
@@ -261,10 +261,12 @@ export function MobileDrawer({ open, onClose, logo, title, subtitle, links, sect
               {footer.icon.icon}
             </Target>
           ) : null}
-          <Target target={footer.primary} onClose={onClose} className="m-drawer-cta">
-            <span>{footer.primary.label}</span>
-            {footer.primary.arrow ? DrawerIcons.arrow : null}
-          </Target>
+          {footer.primary ? (
+            <Target target={footer.primary} onClose={onClose} className="m-drawer-cta">
+              <span>{footer.primary.label}</span>
+              {footer.primary.arrow ? DrawerIcons.arrow : null}
+            </Target>
+          ) : null}
         </footer>
       </aside>
     </div>,

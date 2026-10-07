@@ -193,7 +193,7 @@ function UserChrome() {
         handlers.matchDetails();
       } else if (k === 'b') {
         e.preventDefault();
-        openBacShop('entry');
+        navigate('/user/shop');
       } else if (k === 't') {
         e.preventDefault();
         openBacShop('transfer');
@@ -227,7 +227,7 @@ function UserChrome() {
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [closeSheet, handlers, sheet, t, toast]);
+  }, [closeSheet, handlers, navigate, sheet, t, toast]);
 
   return (
     <div className="play-app">
@@ -250,15 +250,9 @@ function UserChrome() {
           <Link className={location.pathname.startsWith('/user/play') ? 'active' : ''} to="/user/play">
             {t('nav.play')}
           </Link>
-          <a
-            href="#shop"
-            onClick={(e) => {
-              e.preventDefault();
-              openBacShop('shop');
-            }}
-          >
+          <Link className={location.pathname.startsWith('/user/shop') ? 'active' : ''} to="/user/shop">
             {t('nav.shop')}
-          </a>
+          </Link>
           <Link className={location.pathname.startsWith('/user/earn') ? 'active' : ''} to="/user/earn">
             {t('nav.earn')}
           </Link>

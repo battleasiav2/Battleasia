@@ -1,0 +1,348 @@
+.shop-public {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.shop-public > .signin-page--landing,
+.shop-public > .bac-gate {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+}
+
+.bac-gate {
+  min-height: 0;
+  padding: 36px 20px 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+  color: var(--ba-text);
+}
+
+.bac-gate h1 {
+  margin: 8px 0 10px;
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-align: center;
+  color: var(--ba-text);
+}
+
+.bac-gate-lead {
+  max-width: 640px;
+  margin: 0 0 22px;
+  color: var(--ba-muted);
+  font-size: 14px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.bac-gate-card {
+  width: min(760px, 100%);
+  padding: 14px;
+  border-radius: 18px;
+  background: #161618;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 44px -32px rgba(0, 0, 0, 0.82);
+}
+
+.bac-gate-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #121418;
+}
+
+.bac-gate-stage > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bac-gate-badge {
+  position: absolute;
+  top: 0;
+  right: 18px;
+  width: 64px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  background: var(--ba-accent);
+  clip-path: polygon(0 0, 100% 0, 100% 78%, 50% 100%, 0 78%);
+}
+
+.bac-gate-badge img {
+  width: 34px;
+  height: 34px;
+}
+
+.bac-gate-copy {
+  position: absolute;
+  left: 22px;
+  bottom: 22px;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+}
+
+.bac-gate-copy p {
+  margin: 0 0 4px;
+  color: var(--ba-accent);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bac-gate-copy h2 {
+  margin: 0;
+  max-width: 16ch;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.bac-gate-pager {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 999px;
+  background: rgba(20, 22, 26, 0.72);
+  color: #fff;
+  font-size: 12px;
+}
+
+.bac-gate-pager button {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.bac-gate-thumbs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.bac-gate-thumbs button {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #121418;
+}
+
+.bac-gate-thumbs button.on {
+  border-color: var(--ba-accent);
+}
+
+.bac-gate-thumbs img {
+  width: 100%;
+  height: 58px;
+  object-fit: cover;
+}
+
+.bac-gate-note {
+  margin: 14px 0 0;
+  color: #9a3b32;
+  font-size: 13px;
+}
+
+.bac-gate-go {
+  margin-top: 22px;
+  min-width: 180px;
+  min-height: 44px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--ba-accent);
+  color: var(--ba-gold-ink);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bac-gate-go:hover {
+  background: var(--ba-accent-hover);
+}
+
+.shop-public .signin-back {
+  top: 16px;
+}
+
+.shop-public {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  background: var(--ba-page);
+  color: var(--ba-text);
+}
+
+.shop-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 72px;
+  padding: 10px 28px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: rgba(10, 11, 15, 0.92);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.shop-top-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #f4f5f2;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+
+.shop-top-brand img {
+  width: 40px;
+  height: 40px;
+}
+
+.shop-top-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+.shop-top-nav {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.shop-top-nav a,
+.shop-top-nav button {
+  background: none;
+  border: 0;
+  color: #a5a7ae;
+  font: 600 14px/1.2 Inter, system-ui, sans-serif;
+  text-decoration: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.shop-top-nav a.active,
+.shop-top-nav a:hover,
+.shop-top-nav button:hover {
+  color: #fff;
+}
+
+.shop-top-more {
+  position: relative;
+}
+
+.shop-top-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 30;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border-radius: 12px;
+  background: #161618;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.shop-top-user,
+.shop-top-bell {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--ba-accent);
+  background: #1c1e24;
+  color: #f4f5f2;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  padding: 0;
+  font-weight: 700;
+}
+
+.shop-top-bell {
+  border-color: transparent;
+  background: transparent;
+  color: #d5d7dc;
+}
+
+.shop-top-out {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: transparent;
+  color: #f4f5f2;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shop-top-out:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.shop-top .nav-burger {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .shop-top .nav-burger {
+    display: grid;
+    margin-left: auto;
+  }
+
+  .shop-top-nav,
+  .shop-top-tools {
+    display: none;
+  }
+
+  .shop-top.is-open {
+    flex-wrap: wrap;
+  }
+
+  .shop-top.is-open .shop-top-nav,
+  .shop-top.is-open .shop-top-tools {
+    display: flex;
+    flex: 1 0 100%;
+    margin-left: 0;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 640px) {
+  .bac-gate {
+    padding: 28px 14px 40px;
+  }
+
+  .bac-gate-thumbs img {
+    height: 46px;
+  }
+}

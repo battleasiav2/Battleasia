@@ -5,7 +5,6 @@ import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
-import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
 
 class ShopCoinTransferPanel extends StatefulWidget {
   const ShopCoinTransferPanel({super.key});
@@ -167,7 +166,7 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
           ],
         ),
         const SizedBox(height: 16),
-        GlassCard(
+        _DashCard(
           child: _settingsLoading
               ? const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
               : !_enabled
@@ -217,8 +216,9 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: AppColors.surface.withValues(alpha: 0.5),
-                              border: Border.all(color: AppColors.border(0.12)),
+                              gradient: AppColors.dashCardGradient,
+                              borderRadius: BorderRadius.circular(AppColors.dashCardRadius),
+                              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
                             ),
                             child: Column(
                               children: [
@@ -265,7 +265,7 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
         if (_historyLoading)
           const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator()))
         else if (_history.isEmpty)
-          GlassCard(
+          _DashCard(
             child: Text(
               'shop.transferHistoryEmpty'.tr(),
               style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
@@ -279,7 +279,7 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
             final counterparty = item['counterpartyUsername'] as String? ?? '';
             return Padding(
               padding: const EdgeInsets.only(bottom: 8),
-              child: GlassCard(
+              child: _DashCard(
                 child: Row(
                   children: [
                     Expanded(
@@ -329,8 +329,9 @@ class _StatChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.6),
-        border: Border.all(color: AppColors.border(0.12)),
+        gradient: AppColors.dashCardGradient,
+        borderRadius: BorderRadius.circular(AppColors.dashCardRadius),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -368,6 +369,26 @@ class _PreviewRow extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _DashCard extends StatelessWidget {
+  final Widget child;
+
+  const _DashCard({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: AppColors.dashCardGradient,
+        borderRadius: BorderRadius.circular(AppColors.dashCardRadius),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: child,
     );
   }
 }

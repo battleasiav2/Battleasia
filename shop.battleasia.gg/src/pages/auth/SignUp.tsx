@@ -17,6 +17,18 @@ const SERVERS = [
   { value: 'krjp', key: 'srv.krjp' },
 ] as const;
 
+const GAMES = [
+  { id: 'pubg', short: 'PUBG', name: 'PUBG Mobile' },
+  { id: 'ff', short: 'FF', name: 'Free Fire' },
+  { id: 'cod', short: 'COD', name: 'COD Mobile' },
+  { id: 'mlbb', short: 'MLBB', name: 'Mobile Legends' },
+  { id: 'val', short: 'VAL', name: 'Valorant' },
+] as const;
+
+type GameId = (typeof GAMES)[number]['id'];
+
+const GAME_ID_RE = /^[A-Za-z0-9_#.\-]{1,24}$/;
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function SignUpPage() {
@@ -31,7 +43,8 @@ export function SignUpPage() {
     password: '',
     confirm: '',
     inGameUserName: '',
-    pubgId: '',
+    game: '' as '' | GameId,
+    gameId: '',
     countryCode: 'BD',
     mobile: '',
     gameServer: '',
@@ -164,8 +177,10 @@ export function SignUpPage() {
     if (!/^[a-zA-Z0-9_]+$/.test(form.inGameUserName.trim())) {
       next.inGameUserName = t('errors.username');
     }
-    if (!/^[a-zA-Z0-9]{1,20}$/.test(form.pubgId.trim())) {
-      next.pubgId = t('errors.pubg');
+    if (!form.game) {
+      next.gameId = t('errors.pickGame');
+    } else if (!GAME_ID_RE.test(form.gameId.trim())) {
+      next.gameId = t('errors.gameId');
     }
     const mobile = form.mobile.replace(/\D/g, '');
     const dial = countryDial(form.countryCode);
@@ -203,7 +218,7 @@ export function SignUpPage() {
         email: form.email.trim(),
         username: form.inGameUserName.trim(),
         password: form.password,
-        pubgId: form.pubgId.trim(),
+        pubgId: form.gameId.trim(),
         countryCode: countryDial(form.countryCode),
         mobileNo,
         phone: form.mobile.trim(),
@@ -320,19 +335,38 @@ export function SignUpPage() {
               />
               {errors.inGameUserName ? <span className="field-error">{errors.inGameUserName}</span> : null}
             </label>
-            <label className="field" htmlFor="pubgId">
-              {t('auth.pubg')}
+            <div className="field">
+              <span id="game-id-label">{t('auth.gameId')}</span>
+              <div className="game-id-picks" role="radiogroup" aria-labelledby="game-id-label">
+                {GAMES.map((game) => (
+                  <button
+                    key={game.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={form.game === game.id}
+                    title={game.name}
+                    className={form.game === game.id ? 'on' : ''}
+                    disabled={busy}
+                    onClick={() => set('game', game.id)}
+                  >
+                    {game.short}
+                  </button>
+                ))}
+              </div>
               <input
-                id="pubgId"
+                id="gameId"
+                aria-labelledby="game-id-label"
                 inputMode="text"
-                maxLength={20}
-                value={form.pubgId}
+                maxLength={24}
+                placeholder={t('auth.gameIdPh')}
+                value={form.gameId}
                 disabled={busy}
-                onChange={(e) => set('pubgId', e.target.value)}
-                onBlur={(e) => set('pubgId', e.target.value.trim())}
+                onChange={(e) => set('gameId', e.target.value)}
+                onBlur={(e) => set('gameId', e.target.value.trim())}
               />
-              {errors.pubgId ? <span className="field-error">{errors.pubgId}</span> : null}
-            </label>
+              <span className="field-hint">{t('auth.gameIdHint')}</span>
+              {errors.gameId ? <span className="field-error">{errors.gameId}</span> : null}
+            </div>
             <label className="field" htmlFor="mobile">
               {t('auth.phone')}
               <span className="phone-row">

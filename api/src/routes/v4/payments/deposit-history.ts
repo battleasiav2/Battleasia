@@ -18,6 +18,7 @@ import {
 import { processReferralCommission } from '../../../utils/referral.js';
 import { touchWelcomeEligibility } from '../../../utils/engagement-welcome.js';
 import { applyDepositBonusOnApproval } from '../../../utils/engagement-deposit-bonus.js';
+import { discountedPay, releaseCoupon, reserveCoupon, CouponError } from '../../../utils/shop-coupon.js';
 import { safeQueryStatus, DEPOSIT_STATUSES } from '../../../utils/query-filter.js';
 
 const router = Router();
@@ -32,6 +33,7 @@ type DepositSubmitBody = {
   from_address?: string;
   payment_channel?: string;
   to_wallet_address?: string;
+  coupon_code?: string;
 };
 
 async function loadDeposits(filter: Record<string, unknown>, limit?: number) {
@@ -126,19 +128,44 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
       return res.status(409).json({ status: false, message: 'Transaction ID already submitted' });
     }
 
-    const deposit = await DepositHistory.create({
-      userId: user._id,
-      user_email: body.user_email?.trim() || user.email,
-      username: body.username?.trim() || user.username,
-      transaction_id: transactionId,
-      coin_amount: coinAmount,
-      payment_currency: body.payment_currency?.trim().toUpperCase() || 'USD',
-      payment_amount: Number(body.payment_amount) || 0,
-      from_address: body.from_address?.trim() || '',
-      payment_channel: channel._id,
-      to_wallet_address: body.to_wallet_address?.trim() || '',
-      status: 'pending',
-    });
+    const couponCode = body.coupon_code?.trim() || '';
+    let quote: Awaited<ReturnType<typeof reserveCoupon>> | null = null;
+    if (couponCode) {
+      try {
+        quote = await reserveCoupon(couponCode, coinAmount);
+      } catch (error) {
+        if (error instanceof CouponError) {
+          return res.status(error.status).json({ status: false, message: error.message });
+        }
+        throw error;
+      }
+    }
+
+    const paymentAmount = discountedPay(Number(body.payment_amount) || 0, quote);
+
+    let deposit;
+    try {
+      deposit = await DepositHistory.create({
+        userId: user._id,
+        user_email: body.user_email?.trim() || user.email,
+        username: body.username?.trim() || user.username,
+        transaction_id: transactionId,
+        coin_amount: coinAmount,
+        payment_currency: body.payment_currency?.trim().toUpperCase() || 'USD',
+        payment_amount: paymentAmount,
+        from_address: body.from_address?.trim() || '',
+        payment_channel: channel._id,
+        to_wallet_address: body.to_wallet_address?.trim() || '',
+        status: 'pending',
+        coupon_code: quote?.code || '',
+        coupon_kind: quote?.kind || '',
+        coupon_value: quote?.value || 0,
+        bonus_coins: quote?.bonusCoins || 0,
+      });
+    } catch (error) {
+      if (quote) await releaseCoupon(quote.code);
+      throw error;
+    }
 
     await emitPendingPaymentCounts();
     emitNewDeposit(serializeDeposit(deposit, channel));
@@ -216,10 +243,11 @@ router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
     if (!user) return res.status(404).json({ status: false, message: 'User not found' });
 
     await emitPendingPaymentCounts();
-    await notifyBalanceChange(user._id.toString(), user.balance ?? 0, (user.balance ?? 0) - deposit.coin_amount);
+    const credited = deposit.coin_amount + (deposit.bonus_coins || 0);
+    await notifyBalanceChange(user._id.toString(), user.balance ?? 0, (user.balance ?? 0) - credited);
     await notifyDepositApproved({
       userId: user._id.toString(),
-      amount: deposit.coin_amount,
+      amount: credited,
       depositId: deposit._id.toString(),
     });
 
@@ -261,6 +289,7 @@ router.patch('/:id/reject', requireAdmin, async (req: AuthedRequest, res) => {
     await rejectDepositMoney(String(req.params.id));
     const deposit = await DepositHistory.findById(req.params.id);
     if (!deposit) return res.status(404).json({ status: false, message: 'Deposit not found' });
+    if (deposit.coupon_code) await releaseCoupon(deposit.coupon_code);
     deposit.rejection_reason = req.body.rejection_reason || '';
     deposit.processed_by = req.userId as unknown as import('mongoose').Types.ObjectId;
     await deposit.save();

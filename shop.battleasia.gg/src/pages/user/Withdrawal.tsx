@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CoinValue } from '../../components/CoinValue';
+import { PayPicks } from '../../components/PayBrand';
 import { useHud } from '../../contexts/HudContext';
 import { isApiError } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
@@ -156,11 +157,7 @@ export function WithdrawalPage() {
               </label>
               <label className="field">
                 {t('wallet.channel')}
-                <select value={walletType} onChange={(e) => setWalletType(e.target.value)}>
-                  <option value="bkash">bKash</option>
-                  <option value="nagad">Nagad</option>
-                  <option value="crypto">Crypto</option>
-                </select>
+                <PayPicks value={walletType} onChange={setWalletType} />
               </label>
               <label className="field">
                 {t('wd.dest')}

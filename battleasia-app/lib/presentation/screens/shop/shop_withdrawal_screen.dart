@@ -12,6 +12,7 @@ import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
 import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
 import 'package:battleasia_app/presentation/widgets/common/glass_stat_tile.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
+import 'package:battleasia_app/presentation/widgets/shop/pay_brand_icon.dart';
 
 /// Native store withdrawal — mirrors web shop `/user/withdrawal`.
 class ShopWithdrawalScreen extends StatefulWidget {
@@ -282,11 +283,26 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                               const SizedBox(height: 14),
                               _label('shop.labelChannel'.tr()),
                               const SizedBox(height: 6),
-                              _dropdown(
-                                value: _channel,
-                                items: _channels,
-                                onChanged: (v) =>
-                                    setState(() => _channel = v!),
+                              Row(
+                                children: [
+                                  for (var i = 0; i < _channels.length; i++) ...[
+                                    if (i > 0) const SizedBox(width: 8),
+                                    Expanded(
+                                      child: PayBrandTile(
+                                        kind: _channels[i],
+                                        label: _channels[i] == 'bkash'
+                                            ? 'bKash'
+                                            : _channels[i] == 'nagad'
+                                                ? 'Nagad'
+                                                : 'Crypto',
+                                        selected: _channel == _channels[i],
+                                        onTap: () => setState(
+                                          () => _channel = _channels[i],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
                               const SizedBox(height: 14),
                               _label('shop.labelBacAmount'.tr()),

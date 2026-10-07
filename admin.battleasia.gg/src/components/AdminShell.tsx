@@ -17,7 +17,7 @@ const MODE_KEY = 'ba-admin-mode';
 type AdminMode = 'arena' | 'shop';
 
 const ARENA_HOME = '/dashboard';
-const SHOP_HOME = '/shop/coinlist';
+const SHOP_HOME = '/shop/bac';
 
 const GROUP_MODE: Record<string, AdminMode | 'both'> = {
   'nav.overview': 'both',

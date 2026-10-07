@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { CoinValue } from './CoinValue';
 import { HudProvider, useHud } from '../contexts/HudContext';
 import { ASSETS } from '../lib/assets';
 import { fetchMe, getMainAppUrl, isShopAuthed, leaveShop, patchSessionBalance, readSessionUser } from '../lib/auth';
@@ -8,8 +7,9 @@ import { isApiError } from '../lib/api';
 import { shopUntil } from '../lib/shopSession';
 import { useI18n } from '../lib/i18n';
 import { getAuthedSocket } from '../lib/socket';
+import { CoinValue } from './CoinValue';
+import { GamingCursor } from './GamingCursor';
 import { LocaleSelect } from './LocaleSelect';
-import { DrawerIcons, MobileDrawer } from './MobileDrawer';
 import { ThemeDock } from './ThemeDock';
 
 function inEditable(target: EventTarget | null) {
@@ -43,7 +43,7 @@ function ShopChrome() {
         navigate('/user/transfer');
       } else if (k === 'd') {
         e.preventDefault();
-        navigate('/user/withdrawal');
+        navigate('/user/wallet?withdraw=1');
       } else if (k === 'h') {
         e.preventDefault();
         setHide((v) => {
@@ -124,11 +124,20 @@ function ShopChrome() {
   const closeNav = useCallback(() => setNavOpen(false), []);
   const path = location.pathname;
 
+  function toggleBalance() {
+    setHide((v) => {
+      const next = !v;
+      sessionStorage.setItem('ba-shop-hide-balance', next ? '1' : '0');
+      return next;
+    });
+  }
+
   return (
     <div className="play-app">
-      <header className="play-hud">
-        <Link className="brand" to="/user/shop">
-          <img src={ASSETS.logo} width={44} height={44} alt="BattleAsia Shop" />
+      <GamingCursor />
+      <header className={`play-hud${navOpen ? ' is-open' : ''}`}>
+        <Link className="brand" to="/user/shop" onClick={closeNav}>
+          <img src={ASSETS.logo} width={44} height={44} alt="BattleAsia" />
           <span className="brand-name">Battle Asia</span>
         </Link>
         <button
@@ -140,103 +149,35 @@ function ShopChrome() {
         >
           <span />
         </button>
-        <nav className="play-nav" aria-label="Shop" onClick={() => setNavOpen(false)}>
-          <Link className={location.pathname.startsWith('/user/shop') || location.pathname === '/user' ? 'active' : ''} to="/user/shop">
+        <nav className="play-nav" aria-label={t('nav.shop')} onClick={closeNav}>
+          <Link className={path.startsWith('/user/shop') || path === '/user' ? 'active' : ''} to="/user/shop">
             {t('nav.shop')}
           </Link>
-          <Link className={location.pathname.startsWith('/user/wallet') ? 'active' : ''} to="/user/wallet">
+          <Link className={path.startsWith('/user/wallet') ? 'active' : ''} to="/user/wallet">
             {t('nav.wallet')}
           </Link>
-          <Link className={location.pathname.startsWith('/user/transfer') ? 'active' : ''} to="/user/transfer">
+          <Link className={path.startsWith('/user/transfer') ? 'active' : ''} to="/user/transfer">
             {t('nav.transfer')}
           </Link>
-          <Link className={location.pathname.startsWith('/user/withdrawal') ? 'active' : ''} to="/user/withdrawal">
-            {t('nav.withdraw')}
-          </Link>
         </nav>
-        <button
-          type="button"
-          className="balance-pill hud-balance"
-          onClick={() => {
-            setHide((v) => {
-              const next = !v;
-              sessionStorage.setItem('ba-shop-hide-balance', next ? '1' : '0');
-              return next;
-            });
-          }}
-        >
-          {hide ? <span className="coin"><b>**** BAC</b></span> : <CoinValue value={balance} />}
-        </button>
         <div className="play-hud-right">
-          <LocaleSelect />
           <ThemeDock />
-          <a className="btn btn-ghost" href={getMainAppUrl('/user/play')}>
-            {t('auth.arena')}
-          </a>
+          <button type="button" className="balance-pill hud-balance" onClick={toggleBalance}>
+            {hide ? <span className="coin"><b>**** BAC</b></span> : <CoinValue value={balance} />}
+          </button>
+          <LocaleSelect />
           <button
+            className="hud-signout"
             type="button"
-            className="btn btn-ghost"
             onClick={() => {
               leaveShop();
-              window.location.assign(getMainAppUrl());
+              window.location.assign(getMainAppUrl('/dashboard'));
             }}
           >
-            {t('auth.leaveShop')}
+            {t('cta.signout')}
           </button>
         </div>
       </header>
-      <MobileDrawer
-        open={navOpen}
-        onClose={closeNav}
-        logo={ASSETS.logo}
-        title="BATTLE ASIA SHOP"
-        subtitle={t('drawer.shopTagline')}
-        links={[
-          { key: 'shop', label: t('nav.shop'), to: '/user/shop', active: path.startsWith('/user/shop') || path === '/user' },
-          { key: 'wallet', label: t('nav.wallet'), to: '/user/wallet', active: path.startsWith('/user/wallet') },
-        ]}
-        section={{
-          title: t('drawer.money'),
-          cards: [
-            {
-              key: 'transfer',
-              label: t('nav.transfer'),
-              desc: t('drawer.transferDesc'),
-              icon: DrawerIcons.send,
-              to: '/user/transfer',
-              active: path.startsWith('/user/transfer'),
-            },
-            {
-              key: 'withdraw',
-              label: t('nav.withdraw'),
-              desc: t('drawer.withdrawDesc'),
-              icon: DrawerIcons.cash,
-              to: '/user/withdrawal',
-              active: path.startsWith('/user/withdrawal'),
-            },
-          ],
-        }}
-        tools={{
-          label: t('drawer.settings'),
-          content: (
-            <>
-              <ThemeDock />
-              <LocaleSelect />
-            </>
-          ),
-        }}
-        footer={{
-          icon: {
-            label: t('auth.leaveShop'),
-            icon: DrawerIcons.logout,
-            onClick: () => {
-              leaveShop();
-              window.location.assign(getMainAppUrl());
-            },
-          },
-          primary: { label: t('auth.arena'), href: getMainAppUrl('/user/play'), arrow: true },
-        }}
-      />
       <Outlet context={{ toast, setBalance }} />
       {toastText ? <div className="play-toast" role="status">{toastText}</div> : null}
     </div>

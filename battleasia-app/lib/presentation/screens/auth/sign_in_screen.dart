@@ -1,4 +1,4 @@
-﻿import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -346,37 +346,39 @@ class _SignInScreenState extends State<SignInScreen> {
               busy: _socialBusy,
               onPressed: () => _handleSocial('discord'),
             ),
-            const SizedBox(height: 14),
-            Text.rich(
-              TextSpan(
-                text: '${'auth.dontHaveAccount'.tr()} ',
-                style: AppTheme.bodyMedium.copyWith(
-                  color: Colors.white.withValues(alpha: 0.5),
-                  fontSize: 12.5,
-                ),
-                children: [
-                  TextSpan(
-                    text: 'auth.signUp'.tr(),
-                    style: AppTheme.bodyMedium.copyWith(
-                      color: AppColors.gold,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 12.5,
-                      decoration: TextDecoration.underline,
-                      decorationColor: AppColors.gold,
-                    ),
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const SignUpScreen(),
-                          ),
-                        );
-                      },
+            if (widget.afterLoginScreen == null) ...[
+              const SizedBox(height: 14),
+              Text.rich(
+                TextSpan(
+                  text: '${'auth.dontHaveAccount'.tr()} ',
+                  style: AppTheme.bodyMedium.copyWith(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    fontSize: 12.5,
                   ),
-                ],
+                  children: [
+                    TextSpan(
+                      text: 'auth.signUp'.tr(),
+                      style: AppTheme.bodyMedium.copyWith(
+                        color: AppColors.gold,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 12.5,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.gold,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => const SignUpScreen(),
+                            ),
+                          );
+                        },
+                    ),
+                  ],
+                ),
+                textAlign: TextAlign.center,
               ),
-              textAlign: TextAlign.center,
-            ),
+            ],
           ],
         ),
         ),

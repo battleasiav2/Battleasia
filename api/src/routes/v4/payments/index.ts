@@ -3,6 +3,7 @@ import balanceHistoriesRoutes from './balance-histories.js';
 import paymentChannelsRoutes from './payment-channels.js';
 import businessWalletsRoutes from './business-wallets.js';
 import depositHistoryRoutes from './deposit-history.js';
+import couponRoutes from './coupons.js';
 import withdrawalHistoryRoutes from './withdrawal-history.js';
 import coingoRoutes from './coingo.js';
 
@@ -12,6 +13,7 @@ router.use('/balance-histories', balanceHistoriesRoutes);
 router.use('/payment-channels', paymentChannelsRoutes);
 router.use('/business-wallets', businessWalletsRoutes);
 router.use('/deposit-history', depositHistoryRoutes);
+router.use('/coupons', couponRoutes);
 router.use('/withdrawal-history', withdrawalHistoryRoutes);
 router.use('/coingo', coingoRoutes);
 

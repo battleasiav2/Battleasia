@@ -18,6 +18,10 @@ export interface IDepositHistory extends Document {
   processed_by?: Types.ObjectId;
   rejection_reason?: string;
   notes?: string;
+  coupon_code?: string;
+  coupon_kind?: '' | 'off' | 'bonus';
+  coupon_value?: number;
+  bonus_coins?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,6 +43,10 @@ const depositHistorySchema = new Schema<IDepositHistory>(
     processed_by: { type: Schema.Types.ObjectId, ref: 'User' },
     rejection_reason: { type: String, default: '' },
     notes: { type: String, default: '' },
+    coupon_code: { type: String, default: '' },
+    coupon_kind: { type: String, enum: ['', 'off', 'bonus'], default: '' },
+    coupon_value: { type: Number, default: 0 },
+    bonus_coins: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

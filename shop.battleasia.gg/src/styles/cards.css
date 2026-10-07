@@ -1,4 +1,4 @@
-/* Shared card shell — flat panel + ~5% accent tint (see tokens --ba-card-bg) */
+/* Same shell as the dashboard match cards. */
 
 .room-card,
 .lobby-grid > *,
@@ -16,11 +16,26 @@
 .earn-mod,
 .play-sheet-card.join-dialog,
 .board-podium-card,
-.shop-hub-card {
-  background: #161618;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 3px 0 0 var(--ba-accent), var(--ba-card-shadow);
+.shop-hub-card,
+.shop-pack,
+.wal-card,
+.wal-history,
+.wal-pop,
+.sec-pay,
+.sec-card,
+.xfer-break,
+.xfer-preview {
+  background: linear-gradient(150deg, #171a1e, #101216);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: none;
   color: #f2f3f0;
+}
+
+.room-card::before,
+.play-card::before,
+.match-row::after {
+  content: none;
 }
 
 .room-card,
@@ -28,31 +43,29 @@
 .signin-panel,
 .legal-stack section,
 .play-sheet-card,
-.play-sheet-card.join-dialog {
-  border-radius: var(--ba-card-radius);
-}
-
-.play-card {
-  border-radius: calc(var(--ba-card-radius) + 2px);
-}
-
+.play-sheet-card.join-dialog,
+.play-card,
 .match-facts article,
 .battle-card,
 .roster li,
 .m-drawer-card,
-.earn-mod {
-  border-radius: calc(var(--ba-card-radius) - 2px);
+.earn-mod,
+.shop-pack,
+.wal-card,
+.wal-history,
+.sec-pay,
+.sec-card {
+  border-radius: 10px;
 }
 
 .glass-card {
-  border-radius: var(--ba-card-radius);
-  background: var(--ba-card-bg);
-  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  backdrop-filter: none;
 }
 
 .match-row,
 .match-card {
-  border-radius: calc(var(--ba-card-radius) - 2px);
+  border-radius: 10px;
 }
 
 .play-card:hover,

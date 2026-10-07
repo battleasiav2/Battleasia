@@ -10,7 +10,7 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 import 'package:battleasia_app/presentation/screens/account/account_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
-import 'package:battleasia_app/presentation/screens/shop/shop_screen.dart';
+import 'package:battleasia_app/presentation/screens/shop/bac_gate_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth.dart';
 import 'package:battleasia_app/presentation/screens/referral/referral_screen.dart';
@@ -260,7 +260,10 @@ class _AccountDrawerContent extends StatelessWidget {
                   label: 'nav.shop'.tr(),
                   onTap: () {
                     Navigator.pop(context);
-                    openShopRoute(context, const ShopScreen(), routeName: '/shop');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const BacGateScreen()),
+                    );
                   },
                 ),
                 AccountMenuTile(

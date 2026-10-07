@@ -209,7 +209,7 @@ export function MobileDrawer({ open, onClose, logo, playerName, avatar, onSignOu
     { key: 'about', label: t('nav.about'), to: '/dashboard#about-us' },
     { key: 'play', label: t('nav.play'), to: '/user/play', active: location.pathname.startsWith('/user/play') },
     { key: 'rules', label: t('nav.rules'), to: '/dashboard#rules' },
-    { key: 'shop', label: t('nav.shop'), onClick: () => openBacShop('shop') },
+    { key: 'shop', label: t('nav.shop'), to: '/user/shop', active: location.pathname.startsWith('/user/shop') },
     { key: 'earn', label: t('nav.earn'), to: '/user/earn', active: location.pathname.startsWith('/user/earn') },
     { key: 'transfer', label: t('nav.transfer'), onClick: () => openBacShop('transfer') },
     { key: 'feed', label: t('nav.feed'), to: '/user/feed', active: location.pathname.startsWith('/user/feed') },

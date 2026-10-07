@@ -1,4 +1,4 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:battleasia_app/core/utils/api_client.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
@@ -45,7 +45,7 @@ class ShopService {
   /// (All / Premium / Normal) is done in the UI layer.
   Future<Map<String, dynamic>> getShopItems({
     int page = 1,
-    int limit = 50,
+    int limit = 100,
     String? search,
   }) async {
     try {

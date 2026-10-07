@@ -12,6 +12,7 @@ import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_buy_flow.dart';
+import 'package:battleasia_app/presentation/widgets/shop/pay_brand_icon.dart';
 
 /// Deprecated: pack purchase uses [ShopBuyFlow] modal from the shop grid.
 /// Kept for deep-link/login resume safety; prefer not to navigate here from new UI.
@@ -250,7 +251,9 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     final ch = _channels.firstWhere((c) => c.id == _selectedChannelId,
         orElse: () =>
             _PaymentChannel(id: '', name: '', icon: '', enabled: false));
-    return ch.name.toLowerCase().contains('crypto');
+    return ch.name.toLowerCase().contains('crypto') ||
+        ch.name.toLowerCase().contains('usdt') ||
+        ch.name.toLowerCase().contains('tether');
   }
 
   double _totalForCurrency(String code) {
@@ -446,15 +449,19 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
   Widget _buildPurchaseDialog() {
     return StatefulBuilder(builder: (ctx, setDialogState) {
       final item = _item!;
-      final isCrypto = _channels
+      final channelName = _channels
           .firstWhere((c) => c.id == _selectedChannelId,
               orElse: () =>
                   _PaymentChannel(id: '', name: '', icon: '', enabled: false))
           .name
-          .toLowerCase()
-          .contains('crypto');
+          .toLowerCase();
+      final isCrypto = channelName.contains('crypto') ||
+          channelName.contains('usdt') ||
+          channelName.contains('tether');
 
-      final currency = isCrypto ? 'usd' : _selectedCurrency;
+      final currency = channelName.contains('usdt') || channelName.contains('tether') || channelName.contains('crypto')
+          ? 'usdt'
+          : _selectedCurrency;
       final subtotal = _totalForCurrency(currency);
 
       String totalLabel() {
@@ -519,13 +526,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                     ),
                     child: Row(
                       children: [
-                        if (ch.name.toLowerCase().contains('bkash'))
-                          Image.asset(
-                            'assets/images/bkash.webp',
-                            width: 48,
-                            height: 32,
-                            fit: BoxFit.contain,
-                          )
+                        if (payKindOf(ch.name) != null)
+                          PayBrandIcon(kind: payKindOf(ch.name)!, size: 44)
                         else if (ch.icon.isNotEmpty)
                           Image.network(ch.icon,
                               width: 48,
@@ -790,13 +792,8 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
-                if (channel.name.toLowerCase().contains('bkash'))
-                  Image.asset(
-                    'assets/images/bkash.webp',
-                    width: 40,
-                    height: 28,
-                    fit: BoxFit.contain,
-                  )
+                if (payKindOf(channel.name) != null)
+                  PayBrandIcon(kind: payKindOf(channel.name)!, size: 48)
                 else if (channel.icon.isNotEmpty)
                   Image.network(
                     channel.icon,

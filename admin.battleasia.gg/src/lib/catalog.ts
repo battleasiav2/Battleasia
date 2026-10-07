@@ -58,7 +58,7 @@ export const NAV: NavGroup[] = [
       { to: '/payments/wallet', label: 'nav.wallets', perm: 'payments.view', icon: 'wallet' },
       { to: '/payments/deposit', label: 'nav.deposits', perm: 'payments.manage', icon: 'deposit', badge: 'deposits' },
       { to: '/payments/withdrawal', label: 'nav.withdrawals', perm: 'payments.manage', icon: 'withdraw', badge: 'withdrawals' },
-      { to: '/shop/coinlist', label: 'nav.coinPacks', perm: 'shop.view', icon: 'pack' },
+      { to: '/shop/bac', label: 'nav.bacShop', perm: 'shop.view', icon: 'pack' },
       { to: '/shop/coinrate', label: 'nav.coinRates', perm: 'shop.view', icon: 'rate' },
     ],
   },

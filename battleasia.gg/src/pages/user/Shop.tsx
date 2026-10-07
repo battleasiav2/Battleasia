@@ -1,75 +1,80 @@
+import { useState } from 'react';
 import { useHudPage } from '../../hooks/useHudPage';
+import { ASSETS } from '../../lib/assets';
 import { useI18n } from '../../lib/i18n';
-import { openBacShop } from '../../lib/wallet';
+import { getBacShopEntryUrl } from '../../lib/wallet';
+import '../../styles/bac-gate.css';
 
-const FEATURES = [
-  { titleKey: 'shop.feat.buy', leadKey: 'shop.feat.buyLead' },
-  { titleKey: 'shop.feat.rewards', leadKey: 'shop.feat.rewardsLead' },
-  { titleKey: 'shop.feat.events', leadKey: 'shop.feat.eventsLead' },
-  { titleKey: 'shop.feat.secure', leadKey: 'shop.feat.secureLead' },
+const SLIDES = [
+  { src: '/assets/games/pubg.webp', title: 'PUBG Mobile' },
+  { src: '/assets/games/freefire.webp', title: 'Free Fire' },
+  { src: '/assets/games/cod.webp', title: 'COD Mobile' },
+  { src: '/assets/games/mlbb.webp', title: 'Mobile Legends' },
+  { src: '/assets/games/valorant.webp', title: 'Valorant' },
 ] as const;
 
 export function ShopPage() {
   const { t } = useI18n();
+  const [index, setIndex] = useState(0);
+  const [note, setNote] = useState('');
+  const slide = SLIDES[index];
 
   useHudPage();
 
+  function goShop() {
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      setNote(t('bac.needNet'));
+      return;
+    }
+    window.location.assign(getBacShopEntryUrl('/user/shop'));
+  }
+
   return (
-    <main className="play-main shop-hub">
-      <header className="play-head shop-hub-hero">
-        <div>
-          <p className="eyebrow">{t('shop.eyebrow')}</p>
-          <h1>{t('shop.hubTitle')}</h1>
-          <p className="play-lead">{t('shop.hubLead')}</p>
-          <div className="shop-hub-stats" aria-hidden>
-            <span>
-              <small>{t('shop.currency')}</small>
-              <b>BAC</b>
-            </span>
-            <span>
-              <small>{t('shop.settlement')}</small>
-              <b>{t('shop.instant')}</b>
-            </span>
-            <span>
-              <small>{t('shop.access')}</small>
-              <b>24/7</b>
-            </span>
+    <main className="bac-gate">
+      <h1>{t('bac.title')}</h1>
+      <p className="bac-gate-lead">{t('bac.lead')}</p>
+      <section className="bac-gate-card" aria-roledescription="carousel" aria-label={t('bac.title')}>
+        <div className="bac-gate-stage">
+          <img src={slide.src} alt="" width={960} height={540} />
+          <span className="bac-gate-badge" aria-hidden>
+            <img src={ASSETS.coin} alt="" width={36} height={36} />
+          </span>
+          <div className="bac-gate-copy">
+            <p>{t('bac.newSkins')}</p>
+            <h2>{slide.title}</h2>
           </div>
-          <div className="shop-hub-ctas">
-            <button type="button" className="btn btn-primary" onClick={() => openBacShop('entry')}>
-              {t('shop.goToBacShop')}
+          <div className="bac-gate-pager">
+            <button type="button" aria-label="Previous" onClick={() => setIndex((n) => (n + SLIDES.length - 1) % SLIDES.length)}>
+              ‹
             </button>
-            <button type="button" className="btn btn-ghost" onClick={() => openBacShop('wallet')}>
-              {t('shop.openWallet')}
+            <span>
+              {index + 1}/{SLIDES.length}
+            </span>
+            <button type="button" aria-label="Next" onClick={() => setIndex((n) => (n + 1) % SLIDES.length)}>
+              ›
             </button>
           </div>
         </div>
-        <div className="shop-hub-art" aria-hidden>
-          <img src="/assets/images/currency.webp" width={120} height={120} alt="" />
-        </div>
-      </header>
-
-      <section className="shop-hub-grid" aria-label={t('shop.features')}>
-        {FEATURES.map((f) => (
-          <article key={f.titleKey} className="room-card shop-hub-card">
-            <h2>{t(f.titleKey)}</h2>
-            <p>{t(f.leadKey)}</p>
-          </article>
-        ))}
-      </section>
-
-      <section className="room-card shop-hub-links">
-        <h2>{t('shop.onShopDomain')}</h2>
-        <p className="play-muted">{t('shop.onShopDomainLead')}</p>
-        <div className="shop-hub-link-row">
-          <button type="button" className="btn btn-primary" onClick={() => openBacShop('shop')}>
-            {t('shop.buyBac')}
-          </button>
-          <button type="button" className="btn btn-ghost" onClick={() => openBacShop('transfer')}>
-            {t('nav.transfer')}
-          </button>
+        <div className="bac-gate-thumbs" role="tablist">
+          {SLIDES.map((item, i) => (
+            <button
+              key={item.title}
+              type="button"
+              role="tab"
+              aria-selected={i === index}
+              aria-label={item.title}
+              className={i === index ? 'on' : ''}
+              onClick={() => setIndex(i)}
+            >
+              <img src={item.src} alt="" width={72} height={48} />
+            </button>
+          ))}
         </div>
       </section>
+      {note ? <p className="bac-gate-note">{note}</p> : null}
+      <button className="bac-gate-go" type="button" onClick={goShop}>
+        {t('bac.go')}
+      </button>
     </main>
   );
 }

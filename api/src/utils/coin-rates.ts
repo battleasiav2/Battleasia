@@ -19,7 +19,8 @@ export const DEFAULT_COIN_RATES: Array<{
   { region: 'thailand', currency: 'THB', rate: 0.29 },
   { region: 'uae', currency: 'AED', rate: 0.031 },
   { region: 'saudi', currency: 'SAR', rate: 0.031 },
-  { region: 'global', currency: 'USD', rate: 0.0083 },
+  { region: 'global', currency: 'USD', rate: 0.05 },
+  { region: 'global', currency: 'USDT', rate: 0.05 },
   { region: 'global', currency: 'EUR', rate: 0.0077 },
   { region: 'global', currency: 'GBP', rate: 0.0065 },
 ];
@@ -51,6 +52,12 @@ export async function ensureCoinRates() {
     // Base lock: 1 BAC = 1 BDT
     if (currency === 'BDT' && existing.rate !== 1) {
       existing.rate = 1;
+      existing.isActive = true;
+      await existing.save();
+      updated += 1;
+    }
+    if ((currency === 'USD' || currency === 'USDT') && existing.rate !== row.rate) {
+      existing.rate = row.rate;
       existing.isActive = true;
       await existing.save();
       updated += 1;

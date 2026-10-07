@@ -2,10 +2,10 @@ import { api, newIdempotencyKey, readAccessToken, readRefreshToken, unwrapData, 
 import { isSignedIn } from './auth';
 import { withThemeQuery } from './theme';
 
-/** Shop origin — local Vite/Docker on 8083, prod shop.battleasia.gg */
+/** Shop origin — local Vite on 8084, prod shop.battleasia.gg */
 export const SHOP_URL =
   (import.meta.env.VITE_BAC_SHOP_URL as string | undefined) ||
-  (import.meta.env.DEV ? 'http://localhost:8083' : 'https://shop.battleasia.gg');
+  (import.meta.env.DEV ? 'http://localhost:8084' : 'https://shop.battleasia.gg');
 
 function shopOrigin() {
   try {
@@ -29,6 +29,11 @@ function withSessionHandoff(url: string) {
   if (refresh) hash.set('ba_r', refresh);
   const base = url.split('#')[0];
   return `${base}#${hash.toString()}`;
+}
+
+/** Shop click lands on the BAC page. Login happens on "Go to BAC Shop". */
+export function getBacShopGateUrl() {
+  return withThemeQuery(`${shopOrigin()}/`);
 }
 
 /** Shop entry — hand off session when signed in; otherwise sign-in without forced reauth. */
@@ -61,9 +66,7 @@ export function openBacShop(path: 'entry' | 'shop' | 'transfer' | 'wallet' | 'wi
         ? getBacShopWalletUrl()
         : path === 'withdrawal'
           ? getBacShopWithdrawalUrl()
-          : path === 'shop'
-            ? withSessionHandoff(shopPath('/user/shop'))
-            : getBacShopEntryUrl();
+          : getBacShopGateUrl();
   window.open(href, '_blank', 'noopener,noreferrer');
 }
 
@@ -161,7 +164,7 @@ export async function fetchBalanceHistory(page = 1) {
 }
 
 export async function fetchShopPacks() {
-  const payload = await api('/api/v4/shop/items?limit=24');
+  const payload = await api('/api/v4/shop/items?limit=100');
   return unwrapList<ShopPack>(payload).map((row) => ({ ...row, id: nid(row) }));
 }
 

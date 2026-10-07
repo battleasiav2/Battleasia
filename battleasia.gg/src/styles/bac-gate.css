@@ -1,0 +1,256 @@
+.bac-gate {
+  width: min(760px, calc(100% - 40px));
+  margin: 28px auto 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--ba-text);
+}
+
+.bac-gate h1 {
+  margin: 8px 0 10px;
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-align: center;
+  color: var(--ba-text);
+}
+
+.bac-gate-lead {
+  max-width: 640px;
+  margin: 0 0 22px;
+  color: var(--ba-muted);
+  font-size: 14px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+.bac-gate-card {
+  width: 100%;
+  padding: 14px;
+  border-radius: 18px;
+  background: #161618;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 44px -32px rgba(0, 0, 0, 0.82);
+}
+
+.bac-gate-stage {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #121418;
+}
+
+.bac-gate-stage > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bac-gate-badge {
+  position: absolute;
+  top: 0;
+  right: 18px;
+  width: 64px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  background: var(--ba-accent);
+  clip-path: polygon(0 0, 100% 0, 100% 78%, 50% 100%, 0 78%);
+}
+
+.bac-gate-badge img {
+  width: 34px;
+  height: 34px;
+}
+
+.bac-gate-copy {
+  position: absolute;
+  left: 22px;
+  right: 92px;
+  bottom: 22px;
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+}
+
+.bac-gate-copy p {
+  margin: 0 0 4px;
+  color: var(--ba-accent);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bac-gate-copy h2 {
+  margin: 0;
+  max-width: 16ch;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.bac-gate-pager {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 999px;
+  background: rgba(20, 22, 26, 0.72);
+  color: #fff;
+  font-size: 12px;
+}
+
+.bac-gate-pager button {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.bac-gate-thumbs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.bac-gate-thumbs button {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #121418;
+  cursor: pointer;
+}
+
+.bac-gate-thumbs button.on {
+  border-color: var(--ba-accent);
+}
+
+.bac-gate-thumbs img {
+  width: 100%;
+  height: 58px;
+  object-fit: cover;
+  display: block;
+}
+
+.bac-gate-note {
+  margin: 14px 0 0;
+  color: #f0a8a2;
+  font-size: 13px;
+}
+
+.bac-gate-go {
+  margin-top: 22px;
+  min-width: 180px;
+  min-height: 44px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 7px;
+  background: var(--ba-accent);
+  color: var(--ba-gold-ink);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bac-gate-go:hover {
+  background: var(--ba-accent-hover);
+}
+
+@media (min-width: 1100px) {
+  .bac-gate {
+    width: min(800px, calc(100% - 64px));
+    margin-top: 36px;
+  }
+
+  .bac-gate-thumbs img {
+    height: 64px;
+  }
+}
+
+@media (max-width: 720px) {
+  .bac-gate {
+    width: calc(100% - 24px);
+    margin: 18px auto 36px;
+  }
+
+  .bac-gate h1 {
+    font-size: 26px;
+  }
+
+  .bac-gate-lead {
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .bac-gate-card {
+    padding: 10px;
+    border-radius: 16px;
+  }
+
+  .bac-gate-stage {
+    border-radius: 12px;
+  }
+
+  .bac-gate-badge {
+    right: 12px;
+    width: 46px;
+    height: 42px;
+  }
+
+  .bac-gate-badge img {
+    width: 24px;
+    height: 24px;
+  }
+
+  .bac-gate-copy {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .bac-gate-copy p {
+    font-size: 11px;
+  }
+
+  .bac-gate-copy h2 {
+    font-size: 24px;
+    max-width: 12ch;
+  }
+
+  .bac-gate-pager {
+    top: 10px;
+    right: auto;
+    bottom: auto;
+    left: 10px;
+  }
+
+  .bac-gate-pager button {
+    width: 28px;
+    height: 28px;
+  }
+
+  .bac-gate-thumbs {
+    gap: 6px;
+  }
+
+  .bac-gate-thumbs img {
+    height: 52px;
+  }
+
+  .bac-gate-go {
+    width: 100%;
+    max-width: 420px;
+  }
+}

@@ -16,7 +16,6 @@ import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/withdraw_sheet.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/wallet_section_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/wallet_earn_panel.dart';
-import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
 
 class WalletScreen extends StatefulWidget {
   /// When opened from the store section tabs (Shop / Wallet / Withdraw).
@@ -681,15 +680,6 @@ class _WalletScreenState extends State<WalletScreen> {
                     onPressed: _hasPendingWithdrawal
                         ? null
                         : () {
-                            if (widget.fromShop) {
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (_) =>
-                                      const ShopWithdrawalScreen(),
-                                ),
-                              );
-                              return;
-                            }
                             _showWithdrawalModal(
                               context,
                               walletData['totalBalance'] as double,

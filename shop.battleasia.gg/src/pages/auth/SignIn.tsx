@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { AuthTrustRow } from '../../components/auth/AuthTrustRow';
 import { PasswordField } from '../../components/auth/PasswordField';
 import { SocialLogin } from '../../components/auth/SocialLogin';
-import { AuthBack } from '../../components/auth/AuthBack';
+import { ShopPublicHeader } from '../../components/ShopPublicHeader';
 import { ASSETS } from '../../lib/assets';
 import { isApiError } from '../../lib/api';
-import { getMainAppUrl, markShopGate, clearShopGate, isShopAuthed, safeReturnTo, signIn } from '../../lib/auth';
+import { markShopGate, clearShopGate, isShopAuthed, safeReturnTo, signIn } from '../../lib/auth';
 import { focusFirstError, httpCopy, readRememberedEmail, sanitizeLine, writeRememberedEmail } from '../../lib/form';
 import { registerPushToken } from '../../lib/push';
 import { captureReferral } from '../../lib/ref';
@@ -86,33 +87,42 @@ export function SignInPage() {
   }
 
   return (
-    <div className="signin-page">
-      <AuthBack to={getMainAppUrl()} />
-      <div className="signin-layout">
-        <section className="signin-brand">
-          <div className="signin-logo">
-            <img src={ASSETS.logo} width={40} height={40} alt="" />
-            <span>BATTLEASIA</span>
+    <div className="shop-public">
+      <ShopPublicHeader />
+      <div className="signin-page signin-page--landing">
+      <section className="landing-auth" aria-labelledby="shop-signin-title">
+        <div className="landing-auth-art">
+          <img
+            className="landing-auth-photo"
+            src="/assets/hero/auth-bac-panel-clean.jpg"
+            alt=""
+            width={768}
+            height={1024}
+          />
+          <div>
+            <p className="landing-auth-bac">
+              <img src={ASSETS.coin} width={18} height={18} alt="" />
+              <span>{t('auth.bacLine')}</span>
+            </p>
+            <h2 className="landing-auth-promo">{t('auth.matchStarts')}</h2>
+            <p>{t('auth.matchCopy')}</p>
           </div>
-          <p className="signin-tagline">
-            {t('auth.promo.line1')} {t('auth.promo.line2')}
-          </p>
-          <img className="signin-art" src="/assets/hero/auth-login.webp?v=5" alt="" width={853} height={634} />
-          <p className="signin-foot">{t('auth.promo.lead')}</p>
-        </section>
+          <p className="landing-auth-region">{t('auth.region')}</p>
+        </div>
 
-        <form className="signin-panel" onSubmit={onSubmit}>
-          <h1>{t('auth.signinTitle')}</h1>
+        <form className="signin-panel landing-auth-form" onSubmit={onSubmit}>
+          <h1 id="shop-signin-title">{t('auth.welcome')}</h1>
+          <p className="signin-sub">{t('auth.welcomeLead')}</p>
           {params.get('oauth') === 'app' ? <p className="signin-note">{t('auth.oauthApp')}</p> : null}
           {errors.form ? <p className="form-error">{errors.form}</p> : null}
           <label className="field" htmlFor="email">
-            {t('auth.email')}
+            {t('auth.emailAddress')}
             <span className="field-control">
               <input
                 id="email"
                 type="email"
                 autoComplete="email"
-                placeholder={t('auth.emailPh') || 'you@email.com'}
+                placeholder="you@example.com"
                 value={email}
                 disabled={busy || wait > 0}
                 onChange={(e) => setEmail(e.target.value)}
@@ -130,22 +140,25 @@ export function SignInPage() {
             error={errors.password}
             onChange={setPassword}
           />
-          <label className="signin-remember">
-            <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
-            {t('auth.remember')}
-          </label>
+          <div className="landing-auth-meta">
+            <label className="signin-remember">
+              <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} />
+              {t('auth.remember')}
+            </label>
+            <Link to="/auth/forgot-password">{t('auth.forgotLink')}</Link>
+          </div>
           <button className="signin-submit" type="submit" disabled={busy || wait > 0}>
-            {wait > 0 ? t('http.429').replace('{n}', String(wait)) : busy ? t('auth.signing') : t('cta.signin')}
+            <span>
+              {wait > 0 ? t('http.429').replace('{n}', String(wait)) : busy ? t('auth.signing') : t('cta.signin')}
+            </span>
+            <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </button>
-          <p className="signin-forgot">
-            {t('auth.forgot')}? <Link to="/auth/forgot-password">{t('auth.resetHere')}</Link>
-          </p>
-          <div className="signin-divider">{t('auth.or')}</div>
           <SocialLogin returnTo={safeReturnTo(params.get('returnTo'))} />
-          <Link className="signin-alt" to="/auth/sign-up">
-            {t('auth.create')}
-          </Link>
+          <AuthTrustRow />
         </form>
+      </section>
       </div>
     </div>
   );

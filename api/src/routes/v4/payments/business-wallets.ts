@@ -4,6 +4,7 @@ import { PaymentChannel } from '../../../models/PaymentChannel.js';
 import { requireAuth } from '../../../middleware/auth.js';
 import { requireAdmin } from '../../../middleware/admin.js';
 import { paginatedResults, parsePagination } from '../../../utils/pagination.js';
+import { sanitizeUploadAttachment } from '../../../utils/safe-url.js';
 
 const router = Router();
 
@@ -122,6 +123,18 @@ router.put('/:id', requireAdmin, async (req, res) => {
     if (wallet_address) wallet.wallet_address = wallet_address;
     if (currency_type) wallet.currency_type = currency_type;
     if (typeof enabled === 'boolean') wallet.enabled = enabled;
+    if (req.body.qr_code !== undefined) {
+      const raw = String(req.body.qr_code || '').trim();
+      if (!raw) {
+        wallet.qr_code = '';
+      } else {
+        const qr = sanitizeUploadAttachment(raw);
+        if (!qr) {
+          return res.status(400).json({ status: false, message: 'QR must be an uploaded image' });
+        }
+        wallet.qr_code = qr;
+      }
+    }
 
     await wallet.save();
     await wallet.populate('channel_id');

@@ -16,6 +16,14 @@ class AppColors {
   static const Color surfaceElevated = Color(0xFF161618);
   static const Color panel = Color(0xFF161618);
 
+  /// Dashboard match-card shell (shop, transfer, wallet).
+  static const dashCardRadius = 10.0;
+  static const dashCardGradient = LinearGradient(
+    begin: Alignment(-0.55, -1),
+    end: Alignment(0.55, 1),
+    colors: [Color(0xFF171A1E), Color(0xFF101216)],
+  );
+
   static const Color textPrimary = Color(0xFFF4F4F1);
   static const Color textBody = Color(0xFFF4F4F1);
   static const Color textSecondary = Color(0x9EF4F4F1);
