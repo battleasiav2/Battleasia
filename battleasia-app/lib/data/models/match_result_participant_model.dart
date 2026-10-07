@@ -10,6 +10,7 @@ class MatchResultParticipantModel {
   final double points;
   final double winPrize;
   final double bonus;
+  final double placePoint;
   final double refund;
   final double entryFee;
 
@@ -25,6 +26,7 @@ class MatchResultParticipantModel {
     required this.points,
     required this.winPrize,
     required this.bonus,
+    this.placePoint = 0,
     required this.refund,
     required this.entryFee,
   });
@@ -64,6 +66,7 @@ class MatchResultParticipantModel {
       points: json['points'] != null ? (json['points'] as num).toDouble() : 0.0,
       winPrize: json['winPrize'] != null ? (json['winPrize'] as num).toDouble() : 0.0,
       bonus: json['bonus'] != null ? (json['bonus'] as num).toDouble() : 0.0,
+      placePoint: json['placePoint'] != null ? (json['placePoint'] as num).toDouble() : 0.0,
       refund: json['refund'] != null ? (json['refund'] as num).toDouble() : 0.0,
       entryFee: json['entryFee'] != null ? (json['entryFee'] as num).toDouble() : 0.0,
     );
@@ -71,5 +74,5 @@ class MatchResultParticipantModel {
 
   bool get isWinner => status == 'winner';
 
-  double get totalPrize => winPrize + bonus + refund;
+  double get totalPrize => winPrize + bonus + placePoint + refund;
 }

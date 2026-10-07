@@ -259,8 +259,8 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                                 SnackBar(
                                   content: Text(
                                     sent['success'] == true
-                                        ? 'Sent to $username'
-                                        : (sent['message']?.toString() ?? 'Could not share'),
+                                        ? 'feed.sentTo'.tr(namedArgs: {'name': username})
+                                        : (sent['message']?.toString() ?? 'feed.shareFail'.tr()),
                                   ),
                                 ),
                               );
@@ -335,6 +335,16 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
             updatedAt: _feed!.updatedAt,
           );
         });
+        if (mounted) {
+          final liked = data['isLiked'] == true;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(liked ? 'feed.liked'.tr() : 'feed.unliked'.tr())),
+          );
+        }
+      } else if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['message']?.toString() ?? 'feed.likeFail'.tr())),
+        );
       }
     } catch (e) {
       // Revert on error
@@ -814,17 +824,17 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                         SnackBar(
                           content: Text(
                             result['success'] == true
-                                ? (_pinned ? 'Pinned' : 'Unpinned')
-                                : (result['message']?.toString() ?? 'Could not pin'),
+                                ? (_pinned ? 'feed.pinned'.tr() : 'feed.unpinned'.tr())
+                                : (result['message']?.toString() ?? 'feed.pinFail'.tr()),
                           ),
                         ),
                       );
                     },
-              child: Text(_pinning ? '…' : (_pinned ? 'Unpin' : 'Pin')),
+              child: Text(_pinning ? '…' : (_pinned ? 'feed.unpin'.tr() : 'feed.pin'.tr())),
             ),
           TextButton(
             onPressed: _shareInChat,
-            child: const Text('Share'),
+            child: Text('feed.share'.tr()),
           ),
           TextButton(
             onPressed: _copyFeedLink,

@@ -1,5 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
@@ -10,6 +13,7 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/utils/date_utils.dart' as date_utils;
 import 'package:battleasia_app/data/models/match_model.dart';
 import 'package:battleasia_app/data/models/match_result_participant_model.dart';
+import 'package:battleasia_app/presentation/screens/play/match_detail_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 
@@ -113,20 +117,31 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
 
   Future<void> _claimShare() async {
     setState(() => _shareBusy = true);
+    await Clipboard.setData(
+      ClipboardData(text: '${AppConfig.siteUrl}/user/play/${widget.matchId}/result'),
+    );
     final result = await _earn.claimShare(widget.matchId);
     if (!mounted) return;
+    final data = result['data'];
+    if (result['success'] == true && data is Map && data['balanceAfter'] is num) {
+      context.read<AuthProvider>().updateBalance((data['balanceAfter'] as num).toDouble());
+    }
     setState(() {
       _shareBusy = false;
       if (result['success'] == true) {
         _share = {...?_share, 'claimedForMatch': true};
       }
     });
+    final amount = data is Map ? data['rewardAmount'] : null;
+    final ok = amount is num && amount > 0
+        ? '${'result.shareEarnOk'.tr()} +$amount BAC'
+        : 'result.shareEarnOk'.tr();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
           result['success'] == true
-              ? 'Share reward claimed'
-              : (result['message']?.toString() ?? 'Could not claim share reward'),
+              ? ok
+              : (result['message']?.toString() ?? 'result.shareEarnFail'.tr()),
         ),
       ),
     );
@@ -140,11 +155,11 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
     for (final row in _participants) {
       if (me != null && (row.username == me.username || row.id == me.id)) mine = row;
     }
-    final prize = mine == null ? 0 : mine.winPrize + mine.bonus + mine.refund;
+    final prize = mine?.totalPrize ?? 0;
     final prizeLabel = prize == prize.roundToDouble() ? prize.toStringAsFixed(0) : prize.toString();
     setState(() => _sharePostBusy = true);
     final result = await _feed.createFeedPost(
-      description: 'Won $prizeLabel BAC from “${match.matchName}”. #victory',
+      description: 'Won $prizeLabel BAC 🏆 from “${match.matchName}”. #victory',
       title: 'Won $prizeLabel BAC',
       postType: 'match_result',
       entityId: widget.matchId,
@@ -153,7 +168,13 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
     if (!mounted) return;
     setState(() => _sharePostBusy = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result['success'] == true ? 'Shared to feed' : (result['message']?.toString() ?? 'Could not share'))),
+      SnackBar(
+        content: Text(
+          result['success'] == true
+              ? 'result.shared'.tr()
+              : (result['message']?.toString() ?? 'result.shareFail'.tr()),
+        ),
+      ),
     );
   }
 
@@ -173,13 +194,15 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
           if (_canSharePost)
             FilledButton(
               onPressed: _sharePostBusy ? null : _shareResultPost,
-              child: Text(_sharePostBusy ? 'Sharing…' : 'Share'),
+              child: Text(_sharePostBusy ? '…' : 'result.share'.tr()),
             ),
           if (share?['enabled'] == true)
             OutlinedButton(
               onPressed: _shareBusy || claimed ? null : _claimShare,
               child: Text(
-                claimed ? 'Share reward claimed' : (_shareBusy ? 'Claiming…' : 'Share reward (+$amount BAC)'),
+                claimed
+                    ? 'result.shareEarnDone'.tr()
+                    : (_shareBusy ? 'result.shareEarnBusy'.tr() : '${'result.shareEarn'.tr()} (+$amount BAC)'),
               ),
             ),
         ],
@@ -222,15 +245,18 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                _errorMessage ?? 'Result not found',
+                _errorMessage ?? 'result.notPosted'.tr(),
                 style: AppTheme.bodyLarge.copyWith(
                   color: AppTheme.textSecondary,
                 ),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Go Back'),
+                onPressed: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (_) => MatchDetailScreen(matchId: widget.matchId)),
+                ),
+                child: Text('result.back'.tr()),
               ),
             ],
           ),

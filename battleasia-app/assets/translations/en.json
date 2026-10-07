@@ -53,7 +53,17 @@
     "newMsg": "New message",
     "searchPlayer": "Search a player (2+ chars)",
     "reqSent": "Request sent",
-    "chatOpen": "Chat opened"
+    "chatOpen": "Chat opened",
+    "liked": "Liked",
+    "unliked": "Unliked",
+    "pinned": "Pinned",
+    "unpinned": "Unpinned",
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "pinFail": "Could not pin",
+    "share": "Share",
+    "shareFail": "Could not share",
+    "sentTo": "Sent to {name}"
   },
   "feedHub": {
     "feed": "Feed",
@@ -514,7 +524,42 @@
     "leaveLead": "Entry fee refunds only if the match has not started.",
     "stay": "Stay",
     "leave": "Leave",
-    "results": "Results"
+    "results": "Results",
+    "join": "Join match",
+    "joining": "Joining…",
+    "alreadyJoined": "Already joined",
+    "joinFirst": "Join a lobby first.",
+    "ready": "Ready",
+    "unready": "Unready",
+    "notReady": "Not ready",
+    "readyFail": "Ready is not available",
+    "leftToast": "Left match",
+    "leaveFail": "Leave is not available",
+    "reported": "Report sent",
+    "reportFail": "Could not report",
+    "lobbyChat": "Lobby chat",
+    "message": "Message",
+    "send": "Send",
+    "chatHint": "Join a lobby to chat.",
+    "chatFail": "Chat is not available",
+    "notInMatch": "You are not in this match."
+  },
+  "result": {
+    "notPosted": "Result not posted",
+    "back": "Lobby",
+    "share": "Share victory",
+    "shared": "Shared to feed",
+    "shareFail": "Could not share",
+    "shareEarn": "Share & earn",
+    "shareEarnOk": "Share reward claimed",
+    "shareEarnFail": "Could not claim share reward",
+    "shareEarnDone": "Share reward claimed",
+    "shareEarnBusy": "Claiming…"
+  },
+  "note": {
+    "offline": "Alerts offline",
+    "allRead": "All read",
+    "markFail": "Could not mark read"
   },
   "common": {
     "retry": "Retry",

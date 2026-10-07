@@ -1,4 +1,6 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +54,16 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
   List<Map<String, dynamic>> _chat = [];
   final TextEditingController _chatCtrl = TextEditingController();
   String _activeTab = 'description';
+  Timer? _roomTimer;
+  bool _roomFromApi = false;
+  String _liveRoomId = '';
+  String _liveRoomPass = '';
+
+  String get _roomId =>
+      _roomFromApi ? _liveRoomId.trim() : (_matchDetail?.roomId?.trim() ?? '');
+
+  String get _roomPass =>
+      _roomFromApi ? _liveRoomPass.trim() : (_matchDetail?.password?.trim() ?? '');
 
   @override
   void initState() {
@@ -62,9 +74,36 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
 
   @override
   void dispose() {
+    _roomTimer?.cancel();
     _scrollController.dispose();
     _chatCtrl.dispose();
     super.dispose();
+  }
+
+  void _syncRoomWatch() {
+    _roomTimer?.cancel();
+    _roomTimer = null;
+    if (_matchDetail?.isJoined != true) {
+      _roomFromApi = false;
+      _liveRoomId = '';
+      _liveRoomPass = '';
+      return;
+    }
+    _pullRoom();
+    _roomTimer = Timer.periodic(const Duration(seconds: 8), (_) => _pullRoom());
+  }
+
+  Future<void> _pullRoom() async {
+    if (!mounted || _matchDetail?.isJoined != true) return;
+    final result = await _gamesService.getMatchRoomCredentials(widget.matchId);
+    if (!mounted || result['success'] != true) return;
+    final data = result['data'];
+    if (data is! Map) return;
+    setState(() {
+      _roomFromApi = true;
+      _liveRoomId = data['roomId']?.toString() ?? '';
+      _liveRoomPass = data['password']?.toString() ?? '';
+    });
   }
 
   Future<void> _loadWatchFlag() async {
@@ -77,14 +116,14 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
   }
 
   Future<void> _copyRoom() async {
-    final id = _matchDetail?.roomId?.trim() ?? '';
+    final id = _roomId;
     if (_matchDetail?.isJoined != true || id.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('match.roomSoon'.tr())),
       );
       return;
     }
-    final pass = _matchDetail?.password?.trim() ?? '';
+    final pass = _roomPass;
     final passBit = pass.isEmpty ? '' : '  ${'match.pass'.tr()}: $pass';
     final text = 'match.roomClip'.tr(namedArgs: {'id': id, 'pass': passBit});
     await Clipboard.setData(ClipboardData(text: text));
@@ -185,6 +224,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       } else if (mounted) {
         setState(() => _share = null);
       }
+      if (mounted) _syncRoomWatch();
     }
   }
 
@@ -211,8 +251,8 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       SnackBar(
         content: Text(
           result['success'] == true
-              ? 'Share reward claimed'
-              : (result['message']?.toString() ?? 'Could not claim share reward'),
+              ? _shareEarnLabel(result['data'])
+              : (result['message']?.toString() ?? 'result.shareEarnFail'.tr()),
         ),
       ),
     );
@@ -229,7 +269,21 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
     });
   }
 
+  String _shareEarnLabel(dynamic data) {
+    final amount = data is Map ? data['rewardAmount'] : null;
+    if (amount is num && amount > 0) {
+      return '${'result.shareEarnOk'.tr()} +$amount BAC';
+    }
+    return 'result.shareEarnOk'.tr();
+  }
+
   Future<void> _toggleReady(bool value) async {
+    if (_matchDetail?.isJoined != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('match.joinFirst'.tr())),
+      );
+      return;
+    }
     setState(() => _readyBusy = true);
     final result = await _gamesService.setReady(widget.matchId, value);
     if (!mounted) return;
@@ -237,11 +291,15 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       _readyBusy = false;
       if (result['success'] == true) _ready = value;
     });
-    if (result['success'] != true) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message']?.toString() ?? 'Could not update ready')),
-      );
-    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          result['success'] == true
+              ? (value ? 'match.ready'.tr() : 'match.notReady'.tr())
+              : (result['message']?.toString() ?? 'match.readyFail'.tr()),
+        ),
+      ),
+    );
   }
 
   bool get _matchStarted {
@@ -277,14 +335,31 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
     if (!mounted) return;
     setState(() => _leaving = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result['success'] == true ? 'Left the match' : (result['message']?.toString() ?? 'Could not leave'))),
+      SnackBar(
+        content: Text(
+          result['success'] == true
+              ? 'match.leftToast'.tr()
+              : (result['message']?.toString() ?? 'match.leaveFail'.tr()),
+        ),
+      ),
     );
     if (result['success'] == true) await _fetchMatchDetail();
   }
 
   Future<void> _sendChat() async {
+    if (_matchDetail?.isJoined != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('match.notInMatch'.tr())),
+      );
+      return;
+    }
     final text = _chatCtrl.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('match.chatHint'.tr())),
+      );
+      return;
+    }
     setState(() => _chatBusy = true);
     final result = await _gamesService.sendMatchChat(widget.matchId, text);
     if (!mounted) return;
@@ -294,7 +369,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       await _loadChat();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result['message']?.toString() ?? 'Could not send')),
+        SnackBar(content: Text(result['message']?.toString() ?? 'match.chatFail'.tr())),
       );
     }
   }
@@ -303,7 +378,13 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
     final result = await _gamesService.reportPlayer(widget.matchId, userId);
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result['success'] == true ? 'Report sent' : (result['message']?.toString() ?? 'Could not report'))),
+      SnackBar(
+        content: Text(
+          result['success'] == true
+              ? 'match.reported'.tr()
+              : (result['message']?.toString() ?? 'match.reportFail'.tr()),
+        ),
+      ),
     );
   }
 
@@ -766,10 +847,10 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
                       )
                     : Text(
                         _matchDetail!.isJoined
-                            ? 'Already Joined'
+                            ? 'match.alreadyJoined'.tr()
                             : isFull
                                 ? 'match.matchFull'.tr()
-                                : 'Join Match',
+                                : 'match.join'.tr(),
                         style: AppTheme.bodyMedium.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -794,9 +875,12 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       children: [
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
-          title: const Text('Ready', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+          title: Text(
+            _ready ? 'match.unready'.tr() : 'match.ready'.tr(),
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+          ),
           subtitle: Text(
-            _ready ? 'You are ready for this lobby' : 'Mark ready when you are in',
+            _ready ? 'match.ready'.tr() : 'match.notReady'.tr(),
             style: TextStyle(color: Colors.white.withValues(alpha: 0.55)),
           ),
           value: _ready,
@@ -824,13 +908,15 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
             onPressed: _shareBusy || _share?['claimedForMatch'] == true ? null : _claimShare,
             child: Text(
               _share?['claimedForMatch'] == true
-                  ? 'Share reward claimed'
-                  : (_shareBusy ? 'Claiming…' : 'Share reward (+${_share?['bacAmount'] ?? 0} BAC)'),
+                  ? 'result.shareEarnDone'.tr()
+                  : (_shareBusy
+                      ? 'result.shareEarnBusy'.tr()
+                      : '${'result.shareEarn'.tr()} (+${_share?['bacAmount'] ?? 0} BAC)'),
             ),
           ),
         ],
         const SizedBox(height: 16),
-        const Text('Lobby chat', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+        Text('match.lobbyChat'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
         const SizedBox(height: 8),
         Container(
           constraints: const BoxConstraints(maxHeight: 220),
@@ -863,7 +949,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
                 controller: _chatCtrl,
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
-                  hintText: 'Message',
+                  hintText: 'match.message'.tr(),
                   hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
                   filled: true,
                   fillColor: const Color(0xFF121318),
@@ -876,7 +962,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
             const SizedBox(width: 8),
             FilledButton(
               onPressed: _chatBusy ? null : _sendChat,
-              child: Text(_chatBusy ? '…' : 'Send'),
+              child: Text(_chatBusy ? '…' : 'match.send'.tr()),
             ),
           ],
         ),
@@ -971,27 +1057,27 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
               'match.roomHidden'.tr(),
               style: AppTheme.bodyMedium.copyWith(color: Colors.white70, fontSize: bodyFontSize),
             )
-          else if ((_matchDetail!.roomId ?? '').trim().isEmpty)
+          else if (_roomId.isEmpty)
             Text(
               'match.roomPending'.tr(),
               style: AppTheme.bodyMedium.copyWith(color: Colors.white70, fontSize: bodyFontSize),
             )
           else ...[
             Text(
-              '${'match.roomIdLabel'.tr()}: ${_matchDetail!.roomId}',
+              '${'match.roomIdLabel'.tr()}: $_roomId',
               style: AppTheme.bodyMedium.copyWith(color: Colors.white, fontSize: bodyFontSize),
             ),
             TextButton(
-              onPressed: () => _copyField(_matchDetail!.roomId ?? ''),
+              onPressed: () => _copyField(_roomId),
               child: Text('match.copyId'.tr()),
             ),
-            if ((_matchDetail!.password ?? '').trim().isNotEmpty) ...[
+            if (_roomPass.isNotEmpty) ...[
               Text(
-                '${'match.passLabel'.tr()}: ${_matchDetail!.password}',
+                '${'match.passLabel'.tr()}: $_roomPass',
                 style: AppTheme.bodyMedium.copyWith(color: Colors.white, fontSize: bodyFontSize),
               ),
               TextButton(
-                onPressed: () => _copyField(_matchDetail!.password ?? ''),
+                onPressed: () => _copyField(_roomPass),
                 child: Text('match.copyPass'.tr()),
               ),
             ],

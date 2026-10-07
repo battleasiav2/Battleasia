@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/socket_service.dart';
@@ -94,7 +95,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to load notifications: ${e.toString()}'),
+            content: Text('note.offline'.tr()),
             backgroundColor: Colors.red,
           ),
         );
@@ -133,7 +134,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
     try {
       await _userService.markAllNotificationsRead();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('note.allRead'.tr())),
+      );
     } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('note.markFail'.tr())),
+      );
       _fetchNotifications();
     }
   }
