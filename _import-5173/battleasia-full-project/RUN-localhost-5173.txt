@@ -1,0 +1,29 @@
+Battle Asia — same as http://localhost:5173/
+=============================================
+
+Requirements: Node.js 20+, pnpm
+
+1) Open terminal in this folder (battleasia-full-project)
+
+2) Install:
+   pnpm install
+
+3) Run dev server:
+   pnpm --filter @workspace/battleasia run dev
+
+   Or:
+   cd artifacts/battleasia
+   set BASE_PATH=/
+   set PORT=5173
+   npm run dev
+
+4) Open: http://localhost:5173/
+
+Production build (optional):
+   cd artifacts/battleasia
+   set BASE_PATH=/
+   set PORT=5173
+   npm run build
+   Static output: artifacts/battleasia/dist/public/
+
+Note: node_modules is not in the zip — pnpm install is required.

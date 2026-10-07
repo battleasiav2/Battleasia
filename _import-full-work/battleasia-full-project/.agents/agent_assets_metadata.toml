@@ -1,0 +1,16 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "BOSQwvs7XShGn2WWCgmZR"
+uri = "file://exports/battleasia-full-code.zip"
+type = "unspecified"
+title = "BattleAsia Full Source Code"
+description = "Complete BattleAsia app source, workspace build configuration, lockfile, shared API-client package, and public image assets. Excludes node_modules, generated dist files, and Git history."
+logical_id = "dc2b03f9-395e-4b97-9665-e5a5577555f6"
+content_hash = "sha256:eb6fa7c815f6ab1a76a6b9d993da8b55a521d4ac031a369d7dc94781be24be1a"
+size = 8173037
+mtime_ms = 1790979124541
+storage_uri = "gcs://replit-rams-assets-sisko/rams/assets/repl:6e064df5-7fc9-4c60-8053-1b35a04db8c2/dc2b03f9-395e-4b97-9665-e5a5577555f6/586092bf-38fe-487d-9ead-d4cc8b584622"
+storage_version_token = "1790979135195304"
+content_type = "application/octet-stream"

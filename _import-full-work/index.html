@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="BattleAsia — premium mobile esports tournament arena. PUBG-first rooms, BAC coins, fair play across Bangladesh & Asia.">
+  <meta name="theme-color" content="#0a0b0f">
+  <meta property="og:title" content="BattleAsia — Mobile Tournament Arena">
+  <meta property="og:description" content="Victory pays real. Fair PUBG-first rooms, BAC coins, Bangladesh & Asia.">
+  <meta property="og:image" content="assets/logo-battleasia.png">
+  <meta property="og:type" content="website">
+  <title>BattleAsia — Mobile Tournament Arena</title>
+  <link rel="icon" href="assets/bac-coin.webp" type="image/webp">
+  <link rel="apple-touch-icon" href="assets/logo-battleasia.png">
+  <link rel="preload" href="assets/logo-battleasia.png" as="image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="grain">
+  <div class="scroll-progress" aria-hidden="true"></div>
+  <div class="blob blob-1" aria-hidden="true"></div>
+  <div class="blob blob-2" aria-hidden="true"></div>
+  <div class="blob blob-3" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="#home" class="logo">
+        <img src="assets/logo-battleasia.png" alt="" class="logo-img" width="88" height="88">
+        <span class="logo-text" data-i18n="siteName">Battle Asia</span>
+      </a>
+      <nav class="nav-desktop" aria-label="Primary">
+        <a href="#home" data-i18n="navHome">Home</a>
+        <a href="#about-us" data-i18n="navAbout">About</a>
+        <a href="#play" data-i18n="navPlay">Play</a>
+        <a href="#rules" data-i18n="navRules">Rules</a>
+      </nav>
+      <div class="header-actions">
+        <div class="settings-row">
+          <div class="accent-chips" aria-label="Accent color">
+            <button type="button" class="accent-chip is-active" data-color="#E5C558" title="Gold"></button>
+            <button type="button" class="accent-chip" data-color="#D4E82A" title="Lime"></button>
+            <button type="button" class="accent-chip" data-color="#5EEAD4" title="Teal"></button>
+            <button type="button" class="accent-chip" data-color="#F472B6" title="Pink"></button>
+          </div>
+          <select id="locale-select" class="locale-select" aria-label="Language">
+            <option value="en">EN</option>
+            <option value="bn">BN</option>
+          </select>
+        </div>
+        <div class="guest-btns">
+          <button type="button" class="btn btn-ghost" data-open-modal="signin" data-i18n="signIn">Sign in</button>
+          <button type="button" class="btn btn-primary" data-open-modal="signup" data-i18n="join">Join</button>
+        </div>
+        <div class="user-btns" hidden>
+          <div class="user-chip">
+            <img class="avatar user-avatar avatar--photo" src="assets/players/player-shadownova.jpg" alt="" width="32" height="32">
+            <span class="user-name">NovaAce</span>
+          </div>
+          <button type="button" class="btn btn-ghost" id="btn-signout" data-i18n="signOut">Sign out</button>
+          <button type="button" class="btn btn-primary" id="btn-arena" data-i18n="enterArena">Enter arena</button>
+        </div>
+        <button type="button" class="burger" aria-label="Open menu"><span></span><span></span><span></span></button>
+      </div>
+    </div>
+  </header>
+
+  <div class="drawer-overlay" aria-hidden="true"></div>
+  <aside class="mobile-drawer" aria-label="Mobile menu">
+    <div class="logo">
+      <img src="assets/logo-battleasia.png" alt="" class="logo-img" width="88" height="88">
+      <span class="logo-text" data-i18n="siteName">Battle Asia</span>
+    </div>
+    <nav class="drawer-nav">
+      <a href="#home" data-i18n="navHome">Home</a>
+      <a href="#about-us" data-i18n="navAbout">About</a>
+      <a href="#play" data-i18n="navPlay">Play</a>
+      <a href="#rules" data-i18n="navRules">Rules</a>
+    </nav>
+    <div class="drawer-quick">
+      <button type="button" class="btn btn-ghost" data-open-modal="signin" data-i18n="signIn">Sign in</button>
+      <button type="button" class="btn btn-primary" data-arena data-i18n="enterArena">Enter arena</button>
+    </div>
+    <div class="apk-card glass">
+      <strong data-i18n="drawerApk">Get the app</strong>
+      <span data-apk-meta>v2.4.1 · 86 MB</span>
+      <a class="btn btn-primary btn-block" style="margin-top:12px" data-apk-download href="downloads/BattleAsia-v2.4.1.apk" data-i18n="downloadApk">Download APK</a>
+    </div>
+    <div class="settings-row">
+      <div class="accent-chips">
+        <button type="button" class="accent-chip is-active" data-color="#E5C558"></button>
+        <button type="button" class="accent-chip" data-color="#D4E82A"></button>
+        <button type="button" class="accent-chip" data-color="#5EEAD4"></button>
+        <button type="button" class="accent-chip" data-color="#F472B6"></button>
+      </div>
+      <select class="locale-select" onchange="document.getElementById('locale-select').value=this.value;document.getElementById('locale-select').dispatchEvent(new Event('change'))">
+        <option value="en">EN</option>
+        <option value="bn">BN</option>
+      </select>
+    </div>
+    <div class="drawer-footer-actions btn-row btn-row--stretch">
+      <button type="button" class="btn btn-ghost" data-open-modal="signin" data-i18n="signIn">Sign in</button>
+      <button type="button" class="btn btn-primary" data-open-modal="signup" data-i18n="signUp">Sign up</button>
+    </div>
+  </aside>
+
+  <main>
+    <section id="home" class="hero">
+      <div class="hero-bg" id="hero-bg">
+        <video
+          id="hero-video"
+          class="hero-media hero-video"
+          src="assets/hero-pubg.mp4"
+          muted
+          loop
+          playsinline
+          autoplay
+          preload="auto"
+          poster="assets/hero-poster.jpg"
+          aria-hidden="true"
+        ></video>
+        <img class="hero-media hero-poster" src="assets/hero-poster.jpg" alt="" width="1920" height="1080" fetchpriority="high">
+      </div>
+      <div class="hero-video-shine" aria-hidden="true"></div>
+      <div class="hero-mesh" aria-hidden="true"></div>
+      <img class="hero-float hero-float-1" src="assets/game-pubg.jpg" alt="" width="280" height="175" loading="lazy">
+      <img class="hero-float hero-float-2" src="assets/game-cod.jpg" alt="" width="240" height="150" loading="lazy">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <span class="eyebrow hero-seq">
+            <img src="assets/bac-coin.webp" alt="" class="bac-coin bac-coin--xs" width="18" height="18">
+            <span data-i18n="heroEyebrow">Mobile tournament arena · BAC coins · Bangladesh & Asia</span>
+          </span>
+          <h1 class="hero-title" aria-label="Battle Asia">
+            <span class="word"><span class="word-inner" data-i18n="heroTitle1">Battle</span></span>
+            <span class="word"><span class="word-inner" data-i18n="heroTitle2">Asia</span></span>
+          </h1>
+          <p class="lead hero-seq" data-i18n="heroLead">Compete in fair PUBG-first rooms, climb leaderboards, and cash out real prizes with BAC.</p>
+          <div class="hero-cta hero-seq">
+            <button type="button" class="btn btn-primary btn-magnetic" data-open-modal="signup" data-i18n="signUp">Sign up</button>
+            <a class="btn btn-ghost" data-apk-download data-i18n="downloadApk" href="downloads/BattleAsia-v2.4.1.apk">Download APK · <span id="apk-version">v2.4.1 · 86 MB</span></a>
+          </div>
+          <div class="live-row hero-seq">
+            <span class="live-pill" data-i18n="live">Live</span>
+            <div class="stat-pill"><strong id="stat-players">0</strong><span data-i18n="playersOnline">Players online</span></div>
+            <div class="stat-pill"><strong id="stat-matches">0</strong><span data-i18n="matchesToday">Matches today</span></div>
+          </div>
+        </div>
+        <div class="hero-side hero-seq">
+          <div class="arena-card glass card">
+            <h3 data-i18n="arenaSeats">Arena seats</h3>
+            <div class="ring-wrap">
+              <svg class="progress-ring" viewBox="0 0 100 100" aria-hidden="true">
+                <circle class="bg" cx="50" cy="50" r="45"></circle>
+                <circle class="fg" cx="50" cy="50" r="45"></circle>
+              </svg>
+              <div>
+                <strong id="arena-count" class="arena-stat">847 / 1200</strong>
+                <p class="text-muted text-muted--sm" data-i18n="arenaSeats">Arena seats</p>
+              </div>
+            </div>
+            <button type="button" class="btn btn-primary btn-block" data-open-modal="signup" data-i18n="signUpCta">Sign up free</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--alt" id="pulse" aria-labelledby="pulse-title">
+      <div class="container">
+        <div class="section-head reveal-group reveal-group-direct">
+          <div class="pulse-title-row reveal">
+            <span class="pulse-live-dot" aria-hidden="true"></span>
+            <h2 id="pulse-title" data-i18n="pulseTitle">Battle pulse</h2>
+          </div>
+          <p class="lead reveal" data-i18n="pulseLead">Live stats from the arena — updated in real time.</p>
+        </div>
+        <div class="kpi-grid reveal-group reveal-group-direct">
+          <div class="kpi-tile card reveal"><div class="label" data-i18n="todaysJoins">Today's joins</div><div class="value" data-count="1842">0</div></div>
+          <div class="kpi-tile card reveal"><div class="label" data-i18n="totalMatches">Total matches</div><div class="value" data-count="89420">0</div></div>
+          <div class="kpi-tile card reveal"><div class="label" data-i18n="ongoing">Ongoing</div><div class="value">28<span class="dot-live"></span></div></div>
+          <div class="kpi-tile card reveal">
+            <div class="label" data-i18n="totalWinnings">Total winnings</div>
+            <div class="value">
+              <span class="bac-unit">
+                <img src="assets/bac-coin.webp" alt="" class="bac-coin bac-coin--md" width="28" height="28">
+                <span><span data-count="2400000">0</span> BAC</span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="lb-grid reveal-group reveal-group-direct">
+          <div class="lb-card card reveal">
+            <h3 data-i18n="topProfit">Top profit</h3>
+            <div id="lb-profit" class="reveal-group"></div>
+          </div>
+          <div class="lb-card card reveal">
+            <h3 data-i18n="topKillers">Top killers</h3>
+            <div id="lb-killers" class="reveal-group"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="champion" aria-labelledby="champion-title">
+      <div class="container">
+        <article id="champion-card" class="champion-card card glass reveal">
+          <div class="champion-visual">
+            <img class="champion-photo" src="assets/players/player-shadownova.jpg" alt="" width="320" height="320" loading="lazy">
+            <img src="assets/bac-coin.webp" alt="" class="champion-coin" width="56" height="56">
+          </div>
+          <div class="champion-copy">
+            <span class="eyebrow" data-i18n="championEyebrow">Season champion</span>
+            <h2 id="champion-title" data-i18n="championTitle">Victory pays real</h2>
+            <p class="champion-name">ShadowNova</p>
+            <blockquote class="text-muted" data-i18n="championQuote">Every final circle taught me patience. BattleAsia turned that into real BAC.</blockquote>
+            <dl class="champion-stats">
+              <div><dt data-i18n="championGame">Main game</dt><dd class="champion-game">PUBG Mobile</dd></div>
+              <div><dt data-i18n="championWins">Verified wins</dt><dd class="champion-wins">128</dd></div>
+              <div><dt data-i18n="championPayout">Season profit</dt><dd class="champion-payout"></dd></div>
+            </dl>
+            <button type="button" class="btn btn-primary" data-open-modal="signup" data-i18n="join">Join</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="match-title">
+      <div class="container">
+        <div class="section-head reveal-group reveal-group-direct">
+          <h2 id="match-title" class="reveal" data-i18n="matchHigh">High prize matches</h2>
+          <p class="lead reveal" data-i18n="matchLead">Join open rooms or watch live brackets across top mobile titles.</p>
+        </div>
+        <div class="match-tabs reveal">
+          <button type="button" class="match-tab is-active" data-tab="high" data-i18n="matchHigh">High prize</button>
+          <button type="button" class="match-tab" data-tab="live" data-i18n="matchLive">Live / ongoing</button>
+          <span class="tab-underline"></span>
+        </div>
+        <div class="match-rail-wrap">
+          <button type="button" class="rail-nav rail-prev" aria-label="Previous">‹</button>
+          <div class="match-rail reveal-group reveal-group-direct" id="match-rail"></div>
+          <button type="button" class="rail-nav rail-next" aria-label="Next">›</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="play" class="section section--alt">
+      <div class="container">
+        <div class="section-head reveal-group reveal-group-direct">
+          <h2 class="reveal" data-i18n="gamesTitle">Pick your game</h2>
+          <p class="lead reveal" data-i18n="gamesLead">PUBG-first, expanding across Asia’s biggest mobile esports titles.</p>
+        </div>
+        <div class="games-grid reveal-group reveal-group-direct" id="games-grid"></div>
+      </div>
+    </section>
+
+    <section id="about-us" class="section">
+      <div class="container about-grid">
+        <div class="reveal">
+          <span class="eyebrow" data-i18n="aboutEyebrow">About us</span>
+          <img src="assets/logo-battleasia.png" alt="BattleAsia" class="logo-img logo-img--lg mb-md" width="160" height="160">
+          <h2 data-i18n="aboutTitle">Built for mobile competitors</h2>
+          <p class="lead" data-i18n="aboutP1">BattleAsia is a premium mobile esports arena focused on fair rooms, transparent payouts, and community-driven tournaments across Bangladesh and wider Asia.</p>
+          <p class="text-muted mb-md" data-i18n="aboutP2">Start with PUBG Mobile, expand across top titles, and grow your BAC balance through skill—not luck.</p>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary" data-open-modal="signup" data-i18n="signUp">Sign up</button>
+            <a href="#play" class="btn btn-ghost" data-i18n="aboutCtaPlay">Browse games</a>
+          </div>
+        </div>
+        <div class="about-bullets reveal-group reveal-group-direct">
+          <div class="about-bullet reveal"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><span data-i18n="trust1">Verified payouts</span></div>
+          <div class="about-bullet reveal"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><span data-i18n="trust2">Fair anti-cheat rooms</span></div>
+          <div class="about-bullet reveal"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><span data-i18n="trust3">Active community</span></div>
+          <div class="about-bullet reveal"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><span data-i18n="trust4">24/7 support</span></div>
+          <div class="about-bullet reveal"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg><span data-i18n="trust5">Regional servers</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-to-play" class="section">
+      <div class="container">
+        <div class="section-head reveal-group reveal-group-direct">
+          <h2 class="reveal" data-i18n="modesTitle">How to play</h2>
+          <p class="lead reveal" data-i18n="modesLead">Choose a mode, enter a room, and climb the leaderboard.</p>
+        </div>
+        <div class="modes-grid reveal-group reveal-group-direct">
+          <article class="mode-card card reveal"><div class="mode-num">01</div><div class="mode-img mode-img--1"></div><div class="mode-body"><h3 data-i18n="mode1t">Solo</h3><p data-i18n="mode1d">Drop in alone and outlast the lobby.</p></div></article>
+          <article class="mode-card card reveal"><div class="mode-num">02</div><div class="mode-img mode-img--2"></div><div class="mode-body"><h3 data-i18n="mode2t">Duo</h3><p data-i18n="mode2d">Pair up for coordinated wins.</p></div></article>
+          <article class="mode-card card reveal"><div class="mode-num">03</div><div class="mode-img mode-img--3"></div><div class="mode-body"><h3 data-i18n="mode3t">Squad</h3><p data-i18n="mode3d">Four-player tactical room battles.</p></div></article>
+          <article class="mode-card card reveal"><div class="mode-num">04</div><div class="mode-img mode-img--4"></div><div class="mode-body"><h3 data-i18n="mode4t">TDM</h3><p data-i18n="mode4d">Fast respawn team deathmatch scrims.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="rules" class="section section--alt">
+      <div class="container">
+        <div class="section-head reveal-group reveal-group-direct">
+          <span class="eyebrow reveal" data-i18n="rulesEyebrow">Rules & FAQ</span>
+          <h2 class="reveal" data-i18n="rulesTitle">Play fair, win real</h2>
+          <p class="lead reveal" data-i18n="rulesLead">Everything you need about rooms, prizes, and account safety.</p>
+        </div>
+        <div class="faq-stack reveal-group">
+        <p class="reveal text-muted mb-md" data-i18n="rulesNote">Staff may update rules; major changes are announced in-app.</p>
+        <div class="faq-chips reveal">
+          <button type="button" class="faq-chip is-active" data-topic="all">All</button>
+          <button type="button" class="faq-chip" data-topic="payments" data-i18n="topicPayments">Payments</button>
+          <button type="button" class="faq-chip" data-topic="fairplay" data-i18n="topicFair">Fair play</button>
+          <button type="button" class="faq-chip" data-topic="rooms" data-i18n="topicRooms">Rooms</button>
+          <button type="button" class="faq-chip" data-topic="account" data-i18n="topicAccount">Account</button>
+        </div>
+        <div class="faq-list reveal" id="faq-list"></div>
+        <div class="support-block reveal glass">
+          <div><strong data-i18n="supportCta">Need help?</strong><p class="text-muted text-muted--sm">support@battleasia.gg</p></div>
+          <div class="btn-row">
+            <a href="mailto:support@battleasia.gg" class="btn btn-ghost" data-i18n="supportEmail">Email support</a>
+            <button type="button" class="btn btn-primary" onclick="document.querySelector('.chat-panel').classList.add('is-open')" data-i18n="supportChat">Open chat</button>
+          </div>
+        </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid reveal">
+        <div>
+          <div class="footer-social">
+            <a href="https://facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13 10V7.5c0-.8.7-1.5 1.5-1.5H16V3h-2.2C11.7 3 10 4.8 10 7v3H7v3h3v7h3v-7h2.7l.3-3H13z"/></svg></a>
+            <a href="https://discord.com/" target="_blank" rel="noopener noreferrer" aria-label="Discord"><svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M18.9 5a16 16 0 0 0-4-1.4l-.2.4a14 14 0 0 0-3.4 0l-.2-.4A16 16 0 0 0 7 5 12 12 0 0 0 5 17.1c1.2.9 2.4 1.5 3.6 1.5.3-.4.6-.9.8-1.4-.9-.3-1.7-.7-2.5-1.2.2-.1.4-.3.6-.4 4.8 2.2 10 2.2 14.7 0 .2.1.4.3.6.4-.8.5-1.6.9-2.5 1.2.2.5.5 1 .8 1.4 1.2 0 2.4-.6 3.6-1.5A12 12 0 0 0 18.9 5zM9.7 14.6c-.9 0-1.7-.8-1.7-1.8s.7-1.8 1.7-1.8 1.8.8 1.7 1.8-.8 1.8-1.7 1.8zm4.6 0c-.9 0-1.7-.8-1.7-1.8s.7-1.8 1.7-1.8 1.8.8 1.7 1.8-.8 1.8-1.7 1.8z"/></svg></a>
+            <a href="https://youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg class="social-icon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18 5 12 5 12 5s-6 0-7.8.4a2.5 2.5 0 0 0-1.8 1.8C2 9 2 12 2 12s0 3 .4 4.8a2.5 2.5 0 0 0 1.8 1.8C6 19 12 19 12 19s6 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.8.4-4.8.4-4.8s0-3-.4-4.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg></a>
+          </div>
+          <img src="assets/logo-battleasia.png" alt="BattleAsia" class="logo-img logo-img--lg mb-md" width="120" height="120">
+          <p class="text-muted mb-md" data-i18n="footerTag">Mobile tournament arena for Bangladesh & Asia.</p>
+          <a href="mailto:support@battleasia.gg" class="text-link">support@battleasia.gg</a>
+          <p class="text-muted text-muted--sm" style="margin-top:16px">© <span id="year"></span> BattleAsia</p>
+        </div>
+        <div><h4 data-i18n="footerSupport">Support</h4><ul><li><a href="#rules">FAQ</a></li><li><a href="mailto:support@battleasia.gg">Email</a></li></ul></div>
+        <div><h4 data-i18n="footerLegal">Legal</h4><ul><li><button type="button" class="link-btn" data-open-modal="terms" data-i18n="terms">Terms</button></li><li><button type="button" class="link-btn" data-open-modal="privacy" data-i18n="privacy">Privacy</button></li></ul></div>
+        <div><h4 data-i18n="footerQuick">Quick links</h4><ul><li><a href="#play" data-i18n="navPlay">Play</a></li><li><a href="#about-us" data-i18n="navAbout">About</a></li></ul></div>
+      </div>
+      <div class="payment-strip reveal">
+        <span class="pay-badge pay-badge--bkash"><svg class="pay-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#e2136e"/><path fill="#fff" d="M8 7h3.2c2 0 3.3 1 3.3 2.6 0 1.1-.6 2-1.7 2.4l2.2 3.5h-2.4l-2-3.2H10v3.2H8V7zm2 4.2h1.1c.9 0 1.4-.4 1.4-1.1s-.5-1.1-1.4-1.1H10v2.2z"/></svg>bKash</span>
+        <span class="pay-badge pay-badge--nagad"><svg class="pay-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3" fill="#f69220"/><path fill="#fff" d="M7 9h10v2H7V9zm0 4h7v2H7v-2z"/></svg>Nagad</span>
+        <span class="pay-badge pay-badge--crypto"><svg class="pay-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f7931a"/><path fill="#fff" d="M13.8 10.2c0-.9-.6-1.4-1.7-1.5l.4-1.7-1-.2-.4 1.6c-.3 0-.5-.1-.8-.1l.4-1.6-1-.2-.4 1.6c-.2 0-.4-.1-.6-.1l-1.4-.3-.3 1.1s.7.2.7.2c.4.1.5.3.5.5l-.5 2.1c0 .1 0 .1.1.1h-.1l-.7 2.8c-.1.2-.2.3-.5.2 0 0-.7-.2-.7-.2l-.5 1.2 1.3.3c.2 0 .5.1.7.2l-.4 1.7 1 .2.4-1.6c.3 0 .5.1.8.1l-.4 1.6 1 .2.4-1.7c1.6.3 2.8.2 3.3-1.3.4-1-.1-1.6-.8-2 .6-.1 1-.5 1.1-1.2zm-2 2.7c-.3 1.1-2.2.5-2.8.4l.5-2c.6.2 2.5.5 2.3 1.6zm.3-2.7c-.3 1-.9.9-1.8.7l.5-1.9c.9.2 1.6.3 1.3 1.2z"/></svg>Crypto</span>
+      </div>
+    </div>
+  </footer>
+
+  <label class="demo-bar glass is-hidden">
+    <input type="checkbox" id="preview-toggle">
+    <span data-i18n="previewLoggedIn">Preview logged in</span>
+  </label>
+
+  <div class="fab-social">
+    <div class="fab-items">
+      <a href="https://facebook.com/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><svg class="social-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M13 10V7.5c0-.8.7-1.5 1.5-1.5H16V3h-2.2C11.7 3 10 4.8 10 7v3H7v3h3v7h3v-7h2.7l.3-3H13z"/></svg></a>
+      <a href="https://discord.com/" target="_blank" rel="noopener noreferrer" aria-label="Discord"><svg class="social-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M18.9 5a16 16 0 0 0-4-1.4l-.2.4a14 14 0 0 0-3.4 0l-.2-.4A16 16 0 0 0 7 5 12 12 0 0 0 5 17.1c1.2.9 2.4 1.5 3.6 1.5.3-.4.6-.9.8-1.4-.9-.3-1.7-.7-2.5-1.2.2-.1.4-.3.6-.4 4.8 2.2 10 2.2 14.7 0 .2.1.4.3.6.4-.8.5-1.6.9-2.5 1.2.2.5.5 1 .8 1.4 1.2 0 2.4-.6 3.6-1.5A12 12 0 0 0 18.9 5zM9.7 14.6c-.9 0-1.7-.8-1.7-1.8s.7-1.8 1.7-1.8 1.8.8 1.7 1.8-.8 1.8-1.7 1.8zm4.6 0c-.9 0-1.7-.8-1.7-1.8s.7-1.8 1.7-1.8 1.8.8 1.7 1.8-.8 1.8-1.7 1.8z"/></svg></a>
+      <a href="https://youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><svg class="social-icon" viewBox="0 0 24 24"><path fill="currentColor" d="M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C18 5 12 5 12 5s-6 0-7.8.4a2.5 2.5 0 0 0-1.8 1.8C2 9 2 12 2 12s0 3 .4 4.8a2.5 2.5 0 0 0 1.8 1.8C6 19 12 19 12 19s6 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-1.8.4-4.8.4-4.8s0-3-.4-4.8zM10 15.5v-7l6 3.5-6 3.5z"/></svg></a>
+    </div>
+    <button type="button" class="fab-main" aria-label="Social links">+</button>
+  </div>
+  <button type="button" class="chat-fab glass" aria-label="Support chat">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/></svg>
+  </button>
+  <div class="chat-panel glass card">
+    <div class="chat-head">BattleAsia Support</div>
+    <div class="chat-body">
+      <div class="chat-msg bot">Hi! Ask about rooms, payouts, or account help. This is a demo chat.</div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="chat-text" placeholder="Type a message…">
+      <button type="button" class="btn btn-primary" id="chat-send">Send</button>
+    </div>
+  </div>
+
+  <div id="toast-stack" class="toast-stack" aria-live="polite"></div>
+
+  <!-- Sign in -->
+  <div id="modal-signin" class="modal-root" aria-hidden="true" role="dialog" aria-labelledby="signin-title">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-panel">
+      <button type="button" class="modal-close" data-close-modal aria-label="Close">×</button>
+      <div class="modal-art modal-brand-panel">
+        <img src="assets/logo-battleasia.png" alt="BattleAsia" class="logo-img" width="200" height="200" loading="lazy">
+        <p class="modal-brand-tagline">Victory pays real</p>
+        <span class="bac-unit" style="margin-top:12px;font-size:0.8125rem;color:var(--muted)">
+          <img src="assets/bac-coin.webp" alt="" class="bac-coin bac-coin--sm" width="20" height="20">
+          <span>BAC · Fair rooms · Real payouts</span>
+        </span>
+      </div>
+      <div class="modal-form-wrap">
+        <div class="trust-row" data-i18n="trustRow">Secure login · Fair play · Real payouts</div>
+        <form id="form-signin" class="modal-form">
+          <h2 id="signin-title" data-i18n="signIn">Sign in</h2>
+          <div class="form-error-banner"></div>
+          <div class="field" id="field-signin-email"><label data-i18n="email">Email</label><input type="email" id="signin-email" autocomplete="email"></div>
+          <div class="field" id="field-signin-pass"><label data-i18n="password">Password</label><div class="pw-wrap"><input type="password" id="signin-password" autocomplete="current-password"><button type="button" class="pw-toggle">Show</button></div></div>
+          <label class="checkbox-row"><input type="checkbox"> <span data-i18n="remember">Remember me</span></label>
+          <button type="submit" class="btn btn-primary" style="width:100%;margin-top:12px" data-i18n="signIn">Sign in</button>
+          <p style="text-align:center;margin:12px 0 0"><button type="button" data-open-modal="forgot" data-i18n="forgot">Forgot password?</button></p>
+          <div class="oauth-row"><button type="button" class="oauth-btn" data-i18n="google">Google</button><button type="button" class="oauth-btn" data-i18n="discord">Discord</button></div>
+          <p class="form-links"><span data-i18n="haveAccount">Already have an account?</span> <button type="button" data-open-modal="signup" data-i18n="createLink">Create account</button></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sign up -->
+  <div id="modal-signup" class="modal-root" aria-hidden="true" role="dialog">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-panel">
+      <button type="button" class="modal-close" data-close-modal aria-label="Close">×</button>
+      <div class="modal-art modal-brand-panel">
+        <img src="assets/logo-battleasia.png" alt="BattleAsia" class="logo-img" width="200" height="200" loading="lazy">
+        <p class="modal-brand-tagline">Victory pays real</p>
+      </div>
+      <div class="modal-form-wrap">
+        <div class="trust-row" data-i18n="trustRow">Secure login · Fair play · Real payouts</div>
+        <div id="referral-banner" class="referral-banner" hidden>Referral bonus active!</div>
+        <h2 data-i18n="signUp">Sign up</h2>
+        <div class="step-indicator"><span class="step-dot is-active"></span><span class="step-dot"></span></div>
+        <form id="form-signup">
+          <div class="signup-steps">
+            <div id="signup-step-1" class="signup-step">
+              <div class="field" id="field-signup-email"><label data-i18n="email">Email</label><input type="email" id="signup-email"><div class="email-status" id="email-status"></div></div>
+              <div class="field" id="field-signup-pass"><label data-i18n="password">Password</label><div class="pw-wrap"><input type="password" id="signup-password"><button type="button" class="pw-toggle">Show</button></div><div class="strength"><span></span></div></div>
+              <div class="field" id="field-signup-confirm"><label data-i18n="confirmPassword">Confirm password</label><input type="password" id="signup-confirm"></div>
+              <button type="button" class="btn btn-primary" style="width:100%" id="btn-signup-continue" data-i18n="continue">Continue</button>
+            </div>
+            <div id="signup-step-2" class="signup-step is-hidden">
+              <div class="field"><label data-i18n="username">In-game username</label><input type="text" id="signup-username"></div>
+              <div class="field"><label data-i18n="gameId">PUBG / Game ID</label><input type="text"></div>
+              <div class="field"><label data-i18n="phone">Phone</label><input type="tel" placeholder="+880"></div>
+              <div class="field"><label data-i18n="server">Game server</label>
+                <select><option>Asia</option><option>Europe</option><option>South America</option><option>Middle East</option><option>KR/JP</option></select>
+              </div>
+              <label class="checkbox-row"><input type="checkbox" id="signup-terms"> <span data-i18n="termsAgree">I agree to Terms & Privacy</span></label>
+              <div class="form-actions">
+                <button type="button" class="btn btn-ghost" id="btn-signup-back">Back</button>
+                <button type="submit" class="btn btn-primary" data-i18n="createAccount">Create account</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- OTP -->
+  <div id="modal-otp" class="modal-root" aria-hidden="true" role="dialog">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-panel modal-panel--narrow">
+      <button type="button" class="modal-close" data-close-modal aria-label="Close">×</button>
+      <div class="modal-form-wrap">
+        <div class="trust-row" data-i18n="trustRow">Secure login · Fair play · Real payouts</div>
+        <h2 data-i18n="otpTitle">Verify your email</h2>
+        <p style="color:var(--muted);font-size:0.875rem"><span data-i18n="otpLead">Enter the 6-digit code sent to</span> <strong id="otp-email-mask">j***@domain.com</strong></p>
+        <div class="otp-inputs" id="otp-inputs">
+          <input inputmode="numeric" maxlength="1" aria-label="Digit 1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1"><input inputmode="numeric" maxlength="1">
+        </div>
+        <button type="button" class="btn btn-primary" style="width:100%" data-i18n="verify">Verify</button>
+        <button type="button" class="btn btn-ghost" style="width:100%;margin-top:10px" id="otp-resend" data-i18n="sendCode">Send code</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Forgot -->
+  <div id="modal-forgot" class="modal-root" aria-hidden="true" role="dialog">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-panel modal-panel--narrow">
+      <button type="button" class="modal-close" data-close-modal aria-label="Close">×</button>
+      <div class="modal-form-wrap">
+        <div class="trust-row" data-i18n="trustRow">Secure login · Fair play · Real payouts</div>
+        <h2 data-i18n="forgot">Forgot password?</h2>
+        <form id="form-forgot">
+          <div class="field"><label data-i18n="email">Email</label><input type="email" required></div>
+          <button type="submit" class="btn btn-primary" style="width:100%" data-i18n="sendCode">Send code</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset -->
+  <div id="modal-reset" class="modal-root" aria-hidden="true" role="dialog">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-panel modal-panel--narrow">
+      <button type="button" class="modal-close" data-close-modal aria-label="Close">×</button>
+      <div class="modal-form-wrap">
+        <div class="trust-row" data-i18n="trustRow">Secure login · Fair play · Real payouts</div>
+        <h2 data-i18n="resetTitle">Reset password</h2>
+        <form id="form-reset">
+          <div class="otp-inputs" style="margin-top:0"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"></div>
+          <div class="field"><label data-i18n="newPassword">New password</label><input type="password" id="reset-pass"></div>
+          <div class="field" id="field-reset-confirm"><label data-i18n="confirmPassword">Confirm password</label><input type="password" id="reset-confirm"></div>
+          <button type="submit" class="btn btn-primary" style="width:100%" data-i18n="verify">Verify</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-terms" class="modal-root" aria-hidden="true" role="dialog">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-panel modal-panel--narrow">
+      <button type="button" class="modal-close" data-close-modal aria-label="Close">×</button>
+      <div class="modal-form-wrap legal-doc">
+        <h2 data-i18n="termsTitle">Terms of Service</h2>
+        <p class="text-muted">By using BattleAsia you agree to fair play rules, verified identity for payouts, and compliance with local gaming laws. Tournament fees are non-refundable once a room locks. Staff decisions on match results are final after review.</p>
+        <p class="text-muted">Accounts may be suspended for cheating, multi-account abuse, or payment fraud. You must be 18+ or the age of majority in your region.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal-privacy" class="modal-root" aria-hidden="true" role="dialog">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-panel modal-panel--narrow">
+      <button type="button" class="modal-close" data-close-modal aria-label="Close">×</button>
+      <div class="modal-form-wrap legal-doc">
+        <h2 data-i18n="privacyTitle">Privacy Policy</h2>
+        <p class="text-muted">We collect email, game IDs, and phone numbers to run tournaments and process BAC payouts. Data is encrypted in transit and stored on secure servers. We do not sell personal data.</p>
+        <p class="text-muted">You may request account export or deletion via support@battleasia.gg. Payment partners (bKash, Nagad, crypto rails) receive only data required to complete transactions.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+  <script src="js/fixtures.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

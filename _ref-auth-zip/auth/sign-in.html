@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#060607" />
+<title>Sign In — BattleAsia 2.0</title>
+<link rel="icon" href="../favicon.ico" />
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@500,600,700&f[]=satoshi@400,500,700,900&display=swap" />
+<script>document.documentElement.classList.add("js")</script>
+<link rel="stylesheet" href="../styles.css?v=8" />
+<link rel="stylesheet" href="../auth.css?v=1" />
+</head>
+<body class="auth-body" data-auth-page="sign-in">
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site-header scrolled" id="siteHeader">
+  <div class="wrap header-inner">
+    <a class="brand-lockup" href="../index.html" aria-label="BattleAsia 2.0 home">
+      <img class="brand-crest" src="../assets/logo.png" alt="" width="40" height="40" />
+      <span class="brand-word">BATTLE<span class="gold">ASIA</span><sup>2.0</sup></span>
+    </a>
+    <div class="header-actions">
+      <div class="popover">
+        <button class="lang-pill" aria-haspopup="listbox" aria-expanded="false" aria-label="Change language">
+          <span id="langCode">EN</span>
+          <svg class="caret" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <div class="popover-menu" role="listbox" hidden>
+          <button class="is-active" data-lang="EN">English</button>
+          <button data-lang="BN">বাংলা</button>
+        </div>
+      </div>
+      <div class="popover">
+        <button class="accent-btn" aria-haspopup="true" aria-expanded="false" aria-label="Change accent color">
+          <span class="accent-swatch"></span>
+        </button>
+        <div class="popover-menu accent-menu" hidden>
+          <button data-accent="lime" class="is-active" aria-label="Lime"><i style="background:#cbfb24"></i></button>
+          <button data-accent="gold" aria-label="Gold"><i style="background:#f5c518"></i></button>
+          <button data-accent="ember" aria-label="Ember"><i style="background:#ff8a1a"></i></button>
+          <button data-accent="jade" aria-label="Jade"><i style="background:#3dff8a"></i></button>
+          <button data-accent="cyan" aria-label="Cyan"><i style="background:#22d3ee"></i></button>
+          <button data-accent="sky" aria-label="Sky"><i style="background:#60a5fa"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="header-hairline" aria-hidden="true"></div>
+</header>
+
+<main class="auth-split">
+  <section class="auth-form-col">
+    <div class="auth-form-wrap">
+      <div class="auth-card">
+        <div class="auth-progress" aria-hidden="true"><i style="width:100%"></i></div>
+        <div class="auth-card-inner">
+          <div class="auth-brand">
+            <img class="auth-logo" src="../assets/logo.png" alt="BattleAsia" width="104" height="104" />
+            <span class="auth-brand-rule" aria-hidden="true"></span>
+            <p class="auth-tagline" data-i18n="auth.brandTagline">PUBG MOBILE TOURNAMENTS</p>
+            <h1 class="auth-title" data-i18n="auth.signInToAccount">Sign in to your account</h1>
+            <p class="auth-desc" data-i18n="auth.signInDescription">Welcome back — sign in to continue</p>
+          </div>
+
+          <div id="authAlert" class="auth-alert" hidden role="alert"></div>
+
+          <form id="authForm" class="auth-fields" novalidate>
+            <div>
+              <label class="auth-label" for="email" data-i18n="auth.emailAddress">Email address</label>
+              <div class="auth-input-wrap" data-wrap="email">
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M4 6h16v12H4z"/><path fill="none" stroke="currentColor" stroke-width="1.7" d="m4 7 8 6 8-6"/></svg>
+                <input id="email" name="email" type="email" autocomplete="email" required data-i18n="auth.emailPlaceholder" data-i18n-placeholder placeholder="Example@domain.com" />
+              </div>
+              <span class="auth-field-error" data-error-for="email"></span>
+            </div>
+
+            <div>
+              <label class="auth-label" for="password" data-i18n="auth.password">Password</label>
+              <div class="auth-input-wrap" data-wrap="password">
+                <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.7" d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+                <input id="password" name="password" type="password" autocomplete="current-password" required data-i18n="auth.passwordPlaceholder" data-i18n-placeholder placeholder="8+ characters" />
+                <button class="auth-toggle-pass" type="button" data-toggle-pass="password" aria-label="Show password">
+                  <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>
+                </button>
+              </div>
+              <span class="auth-field-error" data-error-for="password"></span>
+            </div>
+
+            <div class="auth-row">
+              <label class="auth-check">
+                <input type="checkbox" id="rememberMe" />
+                <span data-i18n="auth.rememberMe">Remember Me</span>
+              </label>
+              <a class="auth-link" href="./forgot-password.html" data-i18n="auth.forgotPassword">Forgot password?</a>
+            </div>
+
+            <button class="btn btn-primary auth-submit" type="submit">
+              <span data-i18n="auth.signIn">Sign In</span>
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" d="M5 12h14m0 0-6-6m6 6-6 6"/></svg>
+            </button>
+
+            <p class="auth-cross">
+              <span data-i18n="auth.newToBattleAsia">New to BattleAsia?</span>
+              <a class="auth-link" href="./sign-up.html" data-i18n="auth.createYourAccount">Create your account.</a>
+            </p>
+            <p class="auth-legal">
+              <a href="../index.html#rules" data-i18n="auth.termsOfService">Terms of Service</a>
+              ·
+              <a href="../index.html#rules" data-i18n="auth.privacyPolicy">Privacy Policy</a>
+            </p>
+          </form>
+
+          <div class="auth-trust">
+            <span><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M12 3 4 6v6c0 5 3.4 8.4 8 10 4.6-1.6 8-5 8-10V6z"/></svg><span data-i18n="auth.featureSecure">Secure</span></span>
+            <span><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.7" d="M7 5h10v4a5 5 0 0 1-10 0V5zm10 1h2.5A2.5 2.5 0 0 1 17 8.5M7 6H4.5A2.5 2.5 0 0 0 7 8.5M8 20h8M12 14v6"/></svg><span data-i18n="auth.featureFairPlay">Fair Play</span></span>
+            <span><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><path fill="none" stroke="currentColor" stroke-width="1.7" d="M16 12h4v4h-4a2 2 0 0 1 0-4z"/></svg><span data-i18n="auth.featureCashPrizes">Cash Prizes</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-social">
+      <div class="auth-or" data-i18n="auth.orContinueWith">Or continue with</div>
+      <div class="auth-social-row">
+        <button type="button" class="auth-social-btn" data-social aria-label="Continue with Google">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#EA4335" d="M12 10.2v3.6h5.1c-.2 1.2-.9 2.3-1.9 3l3.1 2.4c1.8-1.7 2.8-4.1 2.8-7 0-.7-.1-1.3-.2-1.9H12z"/><path fill="#34A853" d="M6.6 14.3 5.5 15.1l-3.8 3C4 21.1 7.7 23 12 23c3 0 5.5-1 7.3-2.8l-3.1-2.4c-.9.6-2 1-3.2 1-2.5 0-4.6-1.7-5.4-4z"/><path fill="#FBBC05" d="M2.8 6.9A10.9 10.9 0 0 0 1 12c0 1.8.4 3.5 1.2 5l4.4-3.4A6.5 6.5 0 0 1 6.3 12c0-.7.1-1.4.3-2L2.8 6.9z"/><path fill="#4285F4" d="M12 5.1c1.6 0 3.1.6 4.2 1.6l3.1-3.1C17.5 1.8 15 1 12 1 7.7 1 4 2.9 2.2 6.9l4.4 3.4C7.4 6.8 9.5 5.1 12 5.1z"/></svg>
+          <span class="auth-soon" data-i18n="auth.soon">Soon</span>
+        </button>
+        <button type="button" class="auth-social-btn" data-social aria-label="Continue with Apple">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M16.7 12.6c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.2-2.8.9-3.5.9s-1.8-.8-3-.8c-1.5 0-3 .9-3.8 2.3-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.3 2.9 2.3 1.2 0 1.6-.7 3-.7s1.8.7 3 .7 2-1.1 2.8-2.2c.9-1.3 1.2-2.5 1.2-2.6-.1 0-2.4-.9-2.4-3.9zM14.6 6.3c.6-.8 1.1-1.9.9-3-0.9.1-2 .6-2.7 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>
+          <span class="auth-soon" data-i18n="auth.soon">Soon</span>
+        </button>
+        <button type="button" class="auth-social-btn" data-social aria-label="Continue with Discord">
+          <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#7289da" d="M19.5 6.5A16 16 0 0 0 15.6 5l-.2.4a12 12 0 0 1 3.4 1.7 11 11 0 0 0-9.6 0A12 12 0 0 1 12.6 5.4L12.4 5A16 16 0 0 0 8.5 6.5C6 10 5.4 13.4 5.7 16.7A16 16 0 0 0 10.4 19l.6-1a10 10 0 0 1-1.6-.8l.4-.3a11 11 0 0 0 9.4 0l.4.3a10 10 0 0 1-1.6.8l.6 1a16 16 0 0 0 4.7-2.3c.4-3.9-.6-7.3-3.8-10.2ZM9.9 14.9c-.8 0-1.4-.7-1.4-1.6s.6-1.6 1.4-1.6 1.4.7 1.4 1.6-.6 1.6-1.4 1.6Zm4.2 0c-.8 0-1.4-.7-1.4-1.6s.6-1.6 1.4-1.6 1.4.7 1.4 1.6-.6 1.6-1.4 1.6Z"/></svg>
+          <span class="auth-soon" data-i18n="auth.soon">Soon</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <aside id="authHero" class="auth-hero" hidden></aside>
+</main>
+
+<div id="authToast" class="auth-toast" role="status"></div>
+<script src="../auth.js?v=1"></script>
+</body>
+</html>

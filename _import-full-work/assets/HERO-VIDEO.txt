@@ -1,0 +1,13 @@
+Hero background video (real stock footage)
+==========================================
+
+File: assets/hero-pubg.mp4 (~5 MB, 720p, ~15s loop)
+
+Source: Mixkit #41551 — real aerial footage (battle-map / hills vibe).
+License: Mixkit Free License (personal use) — https://mixkit.co/
+
+Poster frame: public/images/hero-fire-poster.jpg (from video)
+
+No AI zoom / CSS shake — stable full-bleed object-fit cover.
+
+Replace with your own gameplay clip anytime (same paths), muted H.264 MP4.
