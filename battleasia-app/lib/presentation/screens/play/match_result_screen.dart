@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
 import 'package:battleasia_app/core/services/engagement_service.dart';
+import 'package:battleasia_app/core/services/feed_service.dart';
+import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/utils/date_utils.dart' as date_utils;
 import 'package:battleasia_app/data/models/match_model.dart';
@@ -22,12 +26,16 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
   final ScrollController _scrollController = ScrollController();
   final GamesService _gamesService = GamesService();
   final EngagementService _earn = EngagementService();
+  final FeedService _feed = FeedService();
+  final UserService _users = UserService();
   MatchModel? _match;
   List<MatchResultParticipantModel> _participants = [];
   bool _isLoading = true;
   String? _errorMessage;
   Map<String, dynamic>? _share;
   bool _shareBusy = false;
+  bool _canSharePost = false;
+  bool _sharePostBusy = false;
 
   @override
   void initState() {
@@ -92,6 +100,14 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
           setState(() => _share = Map<String, dynamic>.from(data));
         }
       }
+      final flags = await _users.getP1Flags();
+      if (!mounted) return;
+      final flagData = flags['data'];
+      if (flags['success'] == true && flagData is Map) {
+        setState(() {
+          _canSharePost = flagData['igHighlights'] == true || flagData['igVictoryAutoPost'] == true;
+        });
+      }
     }
   }
 
@@ -116,18 +132,57 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
     );
   }
 
+  Future<void> _shareResultPost() async {
+    final match = _match;
+    if (match == null) return;
+    final me = context.read<AuthProvider>().user;
+    MatchResultParticipantModel? mine;
+    for (final row in _participants) {
+      if (me != null && (row.username == me.username || row.id == me.id)) mine = row;
+    }
+    final prize = mine == null ? 0 : mine.winPrize + mine.bonus + mine.refund;
+    final prizeLabel = prize == prize.roundToDouble() ? prize.toStringAsFixed(0) : prize.toString();
+    setState(() => _sharePostBusy = true);
+    final result = await _feed.createFeedPost(
+      description: 'Won $prizeLabel BAC from “${match.matchName}”. #victory',
+      title: 'Won $prizeLabel BAC',
+      postType: 'match_result',
+      entityId: widget.matchId,
+      gameTag: match.gameName.toLowerCase().replaceAll(RegExp(r'\s+'), ''),
+    );
+    if (!mounted) return;
+    setState(() => _sharePostBusy = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result['success'] == true ? 'Shared to feed' : (result['message']?.toString() ?? 'Could not share'))),
+    );
+  }
+
   Widget _shareEarnButton() {
     final share = _share;
-    if (share == null || share['enabled'] != true) return const SizedBox.shrink();
-    final claimed = share['claimedForMatch'] == true;
-    final amount = share['bacAmount'] ?? 0;
+    if ((share == null || share['enabled'] != true) && !_canSharePost) {
+      return const SizedBox.shrink();
+    }
+    final claimed = share?['claimedForMatch'] == true;
+    final amount = share?['bacAmount'] ?? 0;
     return Padding(
       padding: const EdgeInsets.only(top: 12),
-      child: OutlinedButton(
-        onPressed: _shareBusy || claimed ? null : _claimShare,
-        child: Text(
-          claimed ? 'Share reward claimed' : (_shareBusy ? 'Claiming…' : 'Share reward (+$amount BAC)'),
-        ),
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: [
+          if (_canSharePost)
+            FilledButton(
+              onPressed: _sharePostBusy ? null : _shareResultPost,
+              child: Text(_sharePostBusy ? 'Sharing…' : 'Share'),
+            ),
+          if (share?['enabled'] == true)
+            OutlinedButton(
+              onPressed: _shareBusy || claimed ? null : _claimShare,
+              child: Text(
+                claimed ? 'Share reward claimed' : (_shareBusy ? 'Claiming…' : 'Share reward (+$amount BAC)'),
+              ),
+            ),
+        ],
       ),
     );
   }

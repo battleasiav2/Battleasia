@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
@@ -10,6 +12,7 @@ import 'package:battleasia_app/data/models/feed_model.dart';
 import 'package:battleasia_app/data/models/reel_model.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/hashtag_screen.dart';
+import 'package:battleasia_app/presentation/screens/profile/public_profile_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/reel_player_screen.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_comments_sheet.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_item.dart';
@@ -28,15 +31,61 @@ class FeedExplorePanel extends StatefulWidget {
 
 class _FeedExplorePanelState extends State<FeedExplorePanel> {
   final FeedService _feedService = FeedService();
+  final SocialService _social = SocialService();
+  final TextEditingController _search = TextEditingController();
+  Timer? _searchTimer;
   bool _loading = true;
+  bool _searching = false;
   List<FeedModel> _posts = [];
   List<Map<String, dynamic>> _hashtags = [];
   List<Map<String, dynamic>> _creators = [];
+  List<Map<String, dynamic>> _hitUsers = [];
+  List<Map<String, dynamic>> _hitPosts = [];
+  List<String> _hitTags = [];
+  String _query = '';
 
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void dispose() {
+    _searchTimer?.cancel();
+    _search.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    _searchTimer?.cancel();
+    _searchTimer = Timer(const Duration(milliseconds: 300), () => _searchNow(value));
+  }
+
+  Future<void> _searchNow(String raw) async {
+    final query = raw.trim();
+    if (!mounted) return;
+    setState(() => _query = query);
+    if (query.isEmpty) {
+      setState(() {
+        _searching = false;
+        _hitUsers = [];
+        _hitPosts = [];
+        _hitTags = [];
+      });
+      return;
+    }
+    setState(() => _searching = true);
+    final result = await _social.globalSearch(query);
+    if (!mounted || _query != query) return;
+    final data = result['data'];
+    final map = data is Map ? Map<String, dynamic>.from(data) : <String, dynamic>{};
+    setState(() {
+      _searching = false;
+      _hitUsers = (map['users'] as List? ?? []).whereType<Map>().map((row) => Map<String, dynamic>.from(row)).toList();
+      _hitPosts = (map['posts'] as List? ?? []).whereType<Map>().map((row) => Map<String, dynamic>.from(row)).toList();
+      _hitTags = (map['hashtags'] as List? ?? []).map((tag) => tag.toString()).where((tag) => tag.isNotEmpty).toList();
+    });
   }
 
   Future<void> _load() async {
@@ -77,6 +126,51 @@ class _FeedExplorePanelState extends State<FeedExplorePanel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        TextField(
+          controller: _search,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(hintText: 'Search players, posts, or #tags'),
+          onChanged: _onSearchChanged,
+        ),
+        if (_query.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          if (_searching)
+            Padding(padding: const EdgeInsets.all(12), child: CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2))
+          else if (_hitUsers.isEmpty && _hitPosts.isEmpty && _hitTags.isEmpty)
+            Text('No results for “$_query”.', style: TextStyle(color: Colors.white.withValues(alpha: 0.6)))
+          else ...[
+            ..._hitUsers.map((user) {
+              final id = (user['id'] ?? '').toString();
+              return ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text('@${user['username'] ?? 'Player'}', style: const TextStyle(color: Colors.white)),
+                onTap: id.isEmpty
+                    ? null
+                    : () => Navigator.push(context, MaterialPageRoute(builder: (_) => PublicProfileScreen(userId: id))),
+              );
+            }),
+            Wrap(
+              spacing: 8,
+              children: _hitTags.map((tag) {
+                return ActionChip(
+                  label: Text('#$tag'),
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => HashtagScreen(tag: tag))),
+                );
+              }).toList(),
+            ),
+            ..._hitPosts.map((post) {
+              final id = (post['id'] ?? '').toString();
+              return ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text((post['title'] ?? 'Post').toString(), style: const TextStyle(color: Colors.white)),
+                onTap: id.isEmpty
+                    ? null
+                    : () => Navigator.push(context, MaterialPageRoute(builder: (_) => FeedDetailScreen(feedId: id))),
+              );
+            }),
+          ],
+          const SizedBox(height: 16),
+        ],
         if (_hashtags.isNotEmpty) ...[
           Text(
             'feedHub.trendingHashtags'.tr(),

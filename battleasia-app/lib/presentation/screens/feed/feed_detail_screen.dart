@@ -13,6 +13,7 @@ import 'package:battleasia_app/data/models/feed_model.dart';
 import 'package:battleasia_app/presentation/screens/account/account_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/widgets/feed/caption_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FeedDetailScreen extends StatefulWidget {
@@ -746,6 +747,13 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
   Widget _buildDescription(BuildContext context) {
     final description = _feed?.description ?? '';
     if (description.isEmpty) return const SizedBox.shrink();
+    final hasMarkup = RegExp(r'<(?!br\b)[^>]+>', caseSensitive: false).hasMatch(description);
+    if (!hasMarkup) {
+      return CaptionText(
+        text: description,
+        style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary, height: 1.5),
+      );
+    }
     return _HtmlContentWidget(htmlContent: description);
   }
 

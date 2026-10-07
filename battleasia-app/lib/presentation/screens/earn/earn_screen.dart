@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/engagement_service.dart';
+import 'package:battleasia_app/core/services/feed_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
@@ -16,6 +17,7 @@ class EarnScreen extends StatefulWidget {
 
 class _EarnScreenState extends State<EarnScreen> {
   final EngagementService _api = EngagementService();
+  final FeedService _feed = FeedService();
   final UserService _users = UserService();
   final TextEditingController _squadChat = TextEditingController();
   final ScrollController _scroll = ScrollController();
@@ -82,6 +84,16 @@ class _EarnScreenState extends State<EarnScreen> {
           ? chatRows.whereType<Map>().map((row) => Map<String, dynamic>.from(row)).toList()
           : [];
     });
+  }
+
+  Future<void> _shareText(String description, String busyId) async {
+    setState(() => _busy = busyId);
+    final result = await _feed.createFeedPost(description: description);
+    if (!mounted) return;
+    setState(() => _busy = '');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result['success'] == true ? 'Shared to feed' : (result['message']?.toString() ?? 'Could not share'))),
+    );
   }
 
   Future<void> _run(String id, Future<Map<String, dynamic>> Function() action) async {
@@ -354,6 +366,11 @@ class _EarnScreenState extends State<EarnScreen> {
           onTap: streak['canClaim'] == true ? () => _run('streak', _api.claimStreak) : null,
         ),
         const SizedBox(height: 8),
+        OutlinedButton(
+          onPressed: _busy == 'share-streak' ? null : () => _shareText('Day ${streak['currentStreak'] ?? 0} streak on BattleAsia. #streak', 'share-streak'),
+          child: Text(_busy == 'share-streak' ? 'Sharing…' : 'Share streak'),
+        ),
+        const SizedBox(height: 8),
         Wrap(
           spacing: 8,
           runSpacing: 8,
@@ -573,9 +590,11 @@ class _EarnScreenState extends State<EarnScreen> {
           title: badge['title']?.toString() ?? 'Badge',
           detail: badge['description']?.toString() ?? '',
           reward: unlocked ? 'Unlocked' : 'Locked',
-          action: unlocked ? 'Got' : '—',
-          enabled: false,
-          onTap: null,
+          action: unlocked ? 'Share' : '—',
+          enabled: unlocked && _busy != 'share-badge',
+          onTap: unlocked
+              ? () => _shareText('Unlocked ${badge['title'] ?? 'a badge'} on BattleAsia. #badge', 'share-badge')
+              : null,
         );
       }).toList(),
     );

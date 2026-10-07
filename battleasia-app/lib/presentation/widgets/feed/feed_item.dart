@@ -7,19 +7,7 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/utils/time_utils.dart';
 import 'package:battleasia_app/data/models/feed_model.dart';
 import 'package:battleasia_app/presentation/screens/profile/public_profile_screen.dart';
-
-String _stripHtml(String html) {
-  return html
-      .replaceAll(RegExp(r'<[^>]*>'), ' ')
-      .replaceAll('&nbsp;', ' ')
-      .replaceAll('&amp;', '&')
-      .replaceAll('&lt;', '<')
-      .replaceAll('&gt;', '>')
-      .replaceAll('&quot;', '"')
-      .replaceAll('&#39;', "'")
-      .replaceAll(RegExp(r'\s{2,}'), ' ')
-      .trim();
-}
+import 'package:battleasia_app/presentation/widgets/feed/caption_text.dart';
 
 class FeedItem extends StatelessWidget {
   final FeedModel feed;
@@ -244,14 +232,13 @@ class FeedItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: spacing8),
-                Text(
-                  _stripHtml(feed.description),
+                CaptionText(
+                  text: feed.description,
+                  maxLines: 3,
                   style: AppTheme.bodyMedium.copyWith(
                     fontSize: bodyFontSize,
                     color: AppColors.textMuted,
                   ),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
                 ),
                 SizedBox(height: spacing16),
                 Row(

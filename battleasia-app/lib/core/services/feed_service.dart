@@ -389,6 +389,9 @@ class FeedService {
     String? coverUrl,
     List<String>? mediaUrls,
     String postType = 'post',
+    String? title,
+    String? entityId,
+    String? gameTag,
   }) async {
     try {
       final headers = await _getHeaders();
@@ -397,8 +400,11 @@ class FeedService {
         headers: headers,
         body: jsonEncode({
           'description': description,
+          if (title != null && title.isNotEmpty) 'title': title,
           if (coverUrl != null && coverUrl.isNotEmpty) 'coverUrl': coverUrl,
           if (mediaUrls != null && mediaUrls.isNotEmpty) 'mediaUrls': mediaUrls,
+          if (entityId != null && entityId.isNotEmpty) 'entityId': entityId,
+          if (gameTag != null && gameTag.isNotEmpty) 'gameTag': gameTag,
           'postType': postType,
         }),
       );

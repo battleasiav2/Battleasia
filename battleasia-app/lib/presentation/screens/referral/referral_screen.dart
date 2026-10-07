@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/core/services/engagement_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
@@ -27,6 +28,7 @@ class ReferralScreen extends StatefulWidget {
 class _ReferralScreenState extends State<ReferralScreen> {
   final ScrollController _scrollController = ScrollController();
   final UserService _userService = UserService();
+  final EngagementService _engagement = EngagementService();
 
   String _activeTab = 'network';
   bool _loading = true;
@@ -42,6 +44,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
   List<ReferralItemModel> _network = [];
   List<_CommissionItem> _commissions = [];
+  List<Map<String, dynamic>> _milestones = [];
+  String _claiming = '';
 
   @override
   void initState() {
@@ -82,6 +86,17 @@ class _ReferralScreenState extends State<ReferralScreen> {
             (d['totalCommissionEvents'] as num?)?.toInt() ?? 0;
         _commissionRate =
             (d['commissionRate'] as num?)?.toInt() ?? _commissionRate;
+        final rawMiles = d['referralMilestones'];
+        if (rawMiles is Map && rawMiles['tiers'] is List) {
+          _milestones = (rawMiles['tiers'] as List)
+              .whereType<Map>()
+              .map((row) => Map<String, dynamic>.from(row))
+              .toList();
+        } else if (rawMiles is List) {
+          _milestones = rawMiles.whereType<Map>().map((row) => Map<String, dynamic>.from(row)).toList();
+        } else {
+          _milestones = [];
+        }
       }
 
       final network = results[2];
@@ -222,6 +237,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
                               ),
                               const SizedBox(height: 16),
                               _buildStatsGrid(),
+                              const SizedBox(height: 16),
+                              _buildMilestones(),
                               if (widget.showInviteSection) ...[
                                 const SizedBox(height: 16),
                                 _buildInviteCard(code, referralUrl),
@@ -260,6 +277,64 @@ class _ReferralScreenState extends State<ReferralScreen> {
             child: AppHeader(scrollController: _scrollController),
           ),
           const FloatingBottomNav(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMilestones() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF121318),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Milestones', style: AppTheme.heading3.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 8),
+          if (_milestones.isEmpty)
+            Text('No referral milestones yet.', style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted))
+          else
+            ..._milestones.map((item) {
+              final key = item['key']?.toString() ?? '';
+              final claimed = item['claimedAt'] != null || item['status'] == 'claimed' || item['claimed'] == true;
+              final canClaim = item['canClaim'] == true && !claimed;
+              final title = item['title']?.toString().isNotEmpty == true ? item['title'].toString() : '$key invites';
+              final progress = '${item['progress'] ?? 0}/${item['threshold'] ?? 0}';
+              final label = claimed ? '$title · Claimed' : '$title · $progress';
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(label, style: const TextStyle(color: Colors.white)),
+                    ),
+                    if (canClaim)
+                      TextButton(
+                        onPressed: _claiming == key
+                            ? null
+                            : () async {
+                                setState(() => _claiming = key);
+                                final result = await _engagement.claimReferralMilestone(key);
+                                if (!mounted) return;
+                                setState(() => _claiming = '');
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(result['success'] == true ? 'Milestone claimed' : (result['message']?.toString() ?? 'Could not claim')),
+                                  ),
+                                );
+                                if (result['success'] == true) await _fetchAll();
+                              },
+                        child: Text(_claiming == key ? '…' : 'Claim'),
+                      ),
+                  ],
+                ),
+              );
+            }),
         ],
       ),
     );
