@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import 'package:battleasia_app/data/models/session_model.dart';
 import 'package:battleasia_app/data/models/user_model.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/core/utils/referral_store.dart';
 import 'package:battleasia_app/presentation/screens/auth/email_verification_screen.dart';
 import 'package:battleasia_app/presentation/screens/auth/forgot_password_screen.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_up_screen.dart';
@@ -47,11 +50,14 @@ class _SignInScreenState extends State<SignInScreen> {
   bool _socialBusy = false;
   int _socialGen = 0;
   String? _errorMessage;
+  int _wait = 0;
+  Timer? _waitTimer;
 
   @override
   void initState() {
     super.initState();
     _loadRememberedCredentials();
+    captureReferral();
   }
 
   Future<void> _loadRememberedCredentials() async {
@@ -71,6 +77,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   void dispose() {
+    _waitTimer?.cancel();
     _socialGen++;
     _emailController.dispose();
     _passwordController.dispose();
@@ -92,6 +99,7 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> _handleSignIn() async {
+    if (_wait > 0) return;
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _errorMessage = null);
@@ -129,7 +137,28 @@ class _SignInScreenState extends State<SignInScreen> {
       return;
     }
 
+    final retry = result['retryAfter'];
+    if (retry is num && retry > 0) {
+      _startWait(retry.toInt());
+    }
     setState(() => _errorMessage = result['message'] ?? 'Sign in failed');
+  }
+
+  void _startWait(int seconds) {
+    _waitTimer?.cancel();
+    setState(() => _wait = seconds);
+    _waitTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_wait <= 1) {
+        timer.cancel();
+        setState(() => _wait = 0);
+      } else {
+        setState(() => _wait -= 1);
+      }
+    });
   }
 
   Future<void> _handleSocial(String provider) async {
@@ -291,9 +320,9 @@ class _SignInScreenState extends State<SignInScreen> {
             ),
             const SizedBox(height: 16),
             AuthPrimaryButton(
-              label: 'auth.signIn'.tr(),
+              label: _wait > 0 ? 'auth.tooMany'.tr(namedArgs: {'n': '$_wait'}) : 'auth.signIn'.tr(),
               loading: authProvider.isLoading,
-              onPressed: authProvider.isLoading ? null : _handleSignIn,
+              onPressed: authProvider.isLoading || _wait > 0 ? null : _handleSignIn,
             ),
             const SizedBox(height: 16),
             Center(

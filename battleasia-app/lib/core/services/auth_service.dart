@@ -108,8 +108,17 @@ class AuthService {
 
         return {'success': true, 'user': user, 'session': session};
       } else {
+        if (response.statusCode == 429) {
+          final retry = int.tryParse(response.headers['retry-after'] ?? '') ?? 60;
+          return {
+            'success': false,
+            'retryAfter': retry,
+            'message': data['message'] as String? ?? 'Too many requests, please try again later',
+          };
+        }
         // Check for email verification pending
-        if (data['emailVerificationPending'] == true || 
+        if (data['emailVerificationPending'] == true ||
+            data['emailVerificationRequired'] == true ||
             (data['emailVerified'] == false && data['message']?.toString().contains('verify') == true)) {
           return {
             'success': true,
@@ -129,6 +138,27 @@ class AuthService {
         'success': false,
         'message': e.toString().replaceAll('Exception: ', ''),
       };
+    }
+  }
+
+  // Public signup email check. Same response as the website.
+  Future<Map<String, dynamic>> checkEmail(String email) async {
+    try {
+      final uri = Uri.parse('$_baseUrl/api/v2/users/check-email').replace(
+        queryParameters: {'email': email.trim().toLowerCase()},
+      );
+      final response = await ApiClient.get(uri);
+      final data = response.body.isEmpty
+          ? <String, dynamic>{}
+          : jsonDecode(response.body) as Map<String, dynamic>;
+      return {
+        'success': response.statusCode == 200 && data['status'] == true,
+        'available': data['available'] == true,
+        'pending': data['pending'] == true,
+        'message': data['message'] as String?,
+      };
+    } catch (e) {
+      return {'success': false, 'available': false, 'message': e.toString()};
     }
   }
 

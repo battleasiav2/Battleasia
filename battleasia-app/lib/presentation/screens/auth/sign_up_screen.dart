@@ -1,11 +1,15 @@
-﻿import 'package:easy_localization/easy_localization.dart';
+﻿import 'dart:async';
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/constants/app_constants.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/core/services/auth_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/core/utils/referral_store.dart';
 import 'package:battleasia_app/presentation/screens/auth/email_verification_screen.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 import 'package:battleasia_app/presentation/screens/legal/legal_screen.dart';
@@ -39,9 +43,106 @@ class _SignUpScreenState extends State<SignUpScreen> {
   String? _selectedGameServer;
   String? _countryCode = '+880';
   String? _phoneNumber;
+  String _referredBy = '';
+  String? _emailHint;
+  bool _emailOk = false;
+  bool _emailChecking = false;
+  Timer? _emailTimer;
+  int _emailReq = 0;
+
+  static final _emailRe = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+
+  @override
+  void initState() {
+    super.initState();
+    _emailController.addListener(_scheduleEmailCheck);
+    _passwordController.addListener(_rebuild);
+    _loadReferral();
+  }
+
+  void _rebuild() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _loadReferral() async {
+    await captureReferral();
+    final code = await readReferral();
+    if (!mounted) return;
+    setState(() => _referredBy = code);
+  }
+
+  void _scheduleEmailCheck() {
+    _emailTimer?.cancel();
+    final raw = _emailController.text.trim();
+    if (raw.isEmpty) {
+      setState(() {
+        _emailHint = null;
+        _emailOk = false;
+        _emailChecking = false;
+      });
+      return;
+    }
+    if (!_emailRe.hasMatch(raw)) {
+      setState(() {
+        _emailHint = 'auth.emailInvalid'.tr();
+        _emailOk = false;
+        _emailChecking = false;
+      });
+      return;
+    }
+    setState(() {
+      _emailHint = null;
+      _emailOk = false;
+      _emailChecking = true;
+    });
+    _emailTimer = Timer(const Duration(milliseconds: 450), () {
+      _runEmailCheck(raw);
+    });
+  }
+
+  Future<String> _runEmailCheck(String raw) async {
+    final email = raw.trim().toLowerCase();
+    if (!_emailRe.hasMatch(email)) {
+      final msg = 'auth.emailInvalid'.tr();
+      if (mounted) {
+        setState(() {
+          _emailHint = msg;
+          _emailOk = false;
+          _emailChecking = false;
+        });
+      }
+      return msg;
+    }
+    final req = ++_emailReq;
+    if (mounted) setState(() => _emailChecking = true);
+    final result = await AuthService().checkEmail(email);
+    if (!mounted || req != _emailReq) return '';
+    if (result['success'] != true) {
+      setState(() => _emailChecking = false);
+      return '';
+    }
+    if (result['available'] == true) {
+      setState(() {
+        _emailHint = null;
+        _emailOk = true;
+        _emailChecking = false;
+      });
+      return '';
+    }
+    final msg = result['pending'] == true ? 'auth.emailPending'.tr() : 'auth.emailTaken'.tr();
+    setState(() {
+      _emailHint = msg;
+      _emailOk = false;
+      _emailChecking = false;
+    });
+    return msg;
+  }
 
   @override
   void dispose() {
+    _emailTimer?.cancel();
+    _emailController.removeListener(_scheduleEmailCheck);
+    _passwordController.removeListener(_rebuild);
     _inGameUserNameController.dispose();
     _phoneController.dispose();
     _pubgIdController.dispose();
@@ -53,12 +154,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   bool _validateStep1() {
     final email = _emailController.text.trim();
-    if (email.isEmpty || !email.contains('@')) {
+    if (!_emailRe.hasMatch(email)) {
       setState(() => _errorMessage = 'auth.emailInvalid'.tr());
       return false;
     }
-    if (_passwordController.text.length < 8) {
-      setState(() => _errorMessage = 'auth.passwordMin8'.tr());
+    if (_emailHint != null && _emailHint!.isNotEmpty) {
+      setState(() => _errorMessage = _emailHint);
+      return false;
+    }
+    if (_scorePassword(_passwordController.text) < 3) {
+      setState(() => _errorMessage = 'auth.pwWeak'.tr());
       return false;
     }
     if (_passwordController.text != _confirmPasswordController.text) {
@@ -68,8 +173,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return true;
   }
 
-  void _goNext() {
+  String? _profileError() {
+    final name = _inGameUserNameController.text.trim();
+    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(name)) {
+      return 'auth.usernameRule'.tr();
+    }
+    final pubg = _pubgIdController.text.trim();
+    if (!RegExp(r'^[a-zA-Z0-9]{1,20}$').hasMatch(pubg)) {
+      return 'auth.pubgRule'.tr();
+    }
+    final mobile = (_phoneNumber ?? '').replaceAll(RegExp(r'\D'), '');
+    final dial = (_countryCode ?? '').replaceAll(RegExp(r'\D'), '');
+    if (dial == '880' && !RegExp(r'^01\d{9}$').hasMatch(mobile) && !RegExp(r'^1\d{9}$').hasMatch(mobile)) {
+      return 'auth.bdMobile'.tr();
+    }
+    if (mobile.length < 8) return 'auth.mobileShort'.tr();
+    if (_selectedGameServer == null || _selectedGameServer!.isEmpty) {
+      return 'auth.gameServerRequired'.tr();
+    }
+    return null;
+  }
+
+  Future<void> _goNext() async {
     setState(() => _errorMessage = null);
+    await _runEmailCheck(_emailController.text);
+    if (!mounted) return;
     if (_validateStep1()) {
       setState(() => _step = 2);
     }
@@ -85,30 +213,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     setState(() => _errorMessage = null);
 
-    if (_phoneController.text.trim().isNotEmpty) {
-      if (_countryCode == null || _countryCode!.isEmpty) {
-        setState(() => _errorMessage = 'auth.countryCodeRequired'.tr());
-        return;
-      }
-      if (_phoneNumber == null || _phoneNumber!.isEmpty) {
-        setState(() => _errorMessage = 'auth.phoneInvalid'.tr());
-        return;
-      }
+    final profileError = _profileError();
+    if (profileError != null) {
+      setState(() => _errorMessage = profileError);
+      return;
     }
 
+    final mobile = (_phoneNumber ?? '').replaceAll(RegExp(r'\D'), '').replaceFirst(RegExp(r'^0'), '');
     final authProvider = context.read<AuthProvider>();
     final result = await authProvider.signUp(
       email: _emailController.text.trim(),
       password: _passwordController.text,
       username: _inGameUserNameController.text.trim(),
       countryCode: _countryCode,
-      mobileNo: _phoneNumber,
-      pubgId: _pubgIdController.text.trim().isNotEmpty
-          ? _pubgIdController.text.trim()
-          : null,
-      gameServer: _selectedGameServer?.isNotEmpty == true
-          ? _selectedGameServer
-          : null,
+      mobileNo: mobile,
+      pubgId: _pubgIdController.text.trim(),
+      gameServer: _selectedGameServer,
+      referredBy: _referredBy.isEmpty ? null : _referredBy,
     );
 
     if (!mounted) return;
@@ -159,6 +280,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
               AuthAlert(message: _errorMessage!),
               const SizedBox(height: 14),
             ],
+            if (_referredBy.isNotEmpty) ...[
+              Text(
+                '${'auth.refApplied'.tr()}: $_referredBy',
+                style: AppTheme.bodySmall.copyWith(color: const Color(0xFFCCFF00)),
+              ),
+              const SizedBox(height: 12),
+            ],
             if (_step == 1) ...[
               AuthTextField(
                 controller: _emailController,
@@ -168,6 +296,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 prefixIcon: Icons.mail_outline,
                 textInputAction: TextInputAction.next,
               ),
+              if (_emailChecking)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text('auth.emailChecking'.tr(), style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted)),
+                ),
+              if (!_emailChecking && _emailHint != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(_emailHint!, style: AppTheme.bodySmall.copyWith(color: const Color(0xFFEF9B88))),
+                ),
+              if (!_emailChecking && _emailOk)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text('auth.emailOk'.tr(), style: AppTheme.bodySmall.copyWith(color: const Color(0xFFB7CF62))),
+                ),
               const SizedBox(height: 14),
               AuthTextField(
                 controller: _passwordController,
@@ -187,6 +330,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       setState(() => _obscurePassword = !_obscurePassword),
                 ),
               ),
+              if (_passwordController.text.isNotEmpty) _passwordMeter(),
               const SizedBox(height: 14),
               AuthTextField(
                 controller: _confirmPasswordController,
@@ -383,6 +527,80 @@ class _SignUpScreenState extends State<SignUpScreen> {
       ),
     );
   }
+
+  Widget _passwordMeter() {
+    final value = _passwordController.text;
+    final score = _scorePassword(value);
+    final rules = _passwordRules(value);
+    final labels = [
+      'auth.pwWeak'.tr(),
+      'auth.pwWeak'.tr(),
+      'auth.pwFair'.tr(),
+      'auth.pwGood'.tr(),
+      'auth.pwStrong'.tr(),
+    ];
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              for (var n = 1; n <= 4; n++)
+                Container(
+                  width: 28,
+                  height: 4,
+                  margin: const EdgeInsets.only(right: 4),
+                  color: n <= score ? const Color(0xFFCCFF00) : Colors.white24,
+                ),
+              Text(labels[score], style: AppTheme.bodySmall.copyWith(color: Colors.white70)),
+            ],
+          ),
+          const SizedBox(height: 6),
+          _hintLine(rules.length, 'auth.pwHint.length'.tr()),
+          _hintLine(rules.caseMix, 'auth.pwHint.case'.tr()),
+          _hintLine(rules.number, 'auth.pwHint.number'.tr()),
+          _hintLine(rules.special, 'auth.pwHint.special'.tr()),
+        ],
+      ),
+    );
+  }
+
+  Widget _hintLine(bool ok, String text) {
+    return Text(
+      text,
+      style: AppTheme.bodySmall.copyWith(
+        color: ok ? const Color(0xFFB7CF62) : const Color(0xFFEF9B88),
+        fontSize: 12,
+      ),
+    );
+  }
+}
+
+int _scorePassword(String value) {
+  if (value.isEmpty) return 0;
+  var score = 1;
+  if (value.length >= 8) score += 1;
+  if (RegExp(r'[A-Z]').hasMatch(value) && RegExp(r'[a-z]').hasMatch(value)) score += 1;
+  if (RegExp(r'\d').hasMatch(value) && RegExp(r'[^A-Za-z0-9]').hasMatch(value)) score += 1;
+  return score > 4 ? 4 : score;
+}
+
+class _PwRules {
+  final bool length;
+  final bool caseMix;
+  final bool number;
+  final bool special;
+  const _PwRules({required this.length, required this.caseMix, required this.number, required this.special});
+}
+
+_PwRules _passwordRules(String value) {
+  return _PwRules(
+    length: value.length >= 8,
+    caseMix: RegExp(r'[A-Z]').hasMatch(value) && RegExp(r'[a-z]').hasMatch(value),
+    number: RegExp(r'\d').hasMatch(value),
+    special: RegExp(r'[^A-Za-z0-9]').hasMatch(value),
+  );
 }
 
 class _GameServerDropdown extends StatelessWidget {
