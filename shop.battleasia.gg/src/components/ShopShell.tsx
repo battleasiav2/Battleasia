@@ -179,17 +179,19 @@ function ShopChrome() {
         >
           <span />
         </button>
-        <nav className="play-nav" aria-label={t('nav.shop')} onClick={closeNav}>
-          <Link className={path.startsWith('/user/shop') || path === '/user' ? 'active' : ''} to="/user/shop">
-            {t('nav.shop')}
-          </Link>
-          <Link className={path.startsWith('/user/wallet') ? 'active' : ''} to="/user/wallet">
-            {t('nav.wallet')}
-          </Link>
-          <Link className={path.startsWith('/user/transfer') ? 'active' : ''} to="/user/transfer">
-            {t('nav.transfer')}
-          </Link>
-        </nav>
+        <div className="hud-menu-bar">
+          <nav className="play-nav" aria-label={t('nav.shop')} onClick={closeNav}>
+            <Link className={path.startsWith('/user/shop') || path === '/user' ? 'active' : ''} to="/user/shop">
+              {t('nav.shop')}
+            </Link>
+            <Link className={path.startsWith('/user/wallet') ? 'active' : ''} to="/user/wallet">
+              {t('nav.wallet')}
+            </Link>
+            <Link className={path.startsWith('/user/transfer') ? 'active' : ''} to="/user/transfer">
+              {t('nav.transfer')}
+            </Link>
+          </nav>
+        </div>
         <div className="play-hud-right">
           <ThemeDock />
           <a
@@ -231,7 +233,7 @@ function ShopChrome() {
       <NoticeDrawer open={notesOpen} onClose={() => setNotesOpen(false)} onCount={setAlerts} />
       {navOpen
         ? createPortal(
-            <div className="m-drawer m-drawer--landing" role="dialog" aria-modal="true" aria-label={t('nav.shop')}>
+            <div className="m-drawer m-drawer--landing m-drawer--dash" role="dialog" aria-modal="true" aria-label={t('nav.shop')}>
               <aside className="ld-panel">
                 <header className="ld-head">
                   <button className="ld-close" type="button" aria-label={t('hud.closeMenu')} onClick={closeNav}>

@@ -905,3 +905,90 @@ svg {
 .note-drawer .note-item small {
   color: var(--ba-muted);
 }
+
+.hud-menu-bar {
+  display: contents;
+}
+
+@media (min-width: 981px) {
+  .play-app > .play-hud .hud-menu-bar {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    padding: 4px;
+    border-radius: 999px;
+    background: #121318;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .play-app > .play-hud .hud-menu-bar .play-nav {
+    margin: 0;
+    gap: 2px;
+    width: auto;
+  }
+
+  .play-app > .play-hud .play-hud-right {
+    margin-left: 12px;
+  }
+
+  .play-app > .play-hud .hud-menu-bar .play-nav a {
+    position: relative;
+    min-height: 36px;
+    padding: 0 14px;
+    border-radius: 999px;
+    color: #b7bac2;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    background: transparent;
+    transition: color 0.22s ease, background 0.22s ease, box-shadow 0.22s ease;
+  }
+
+  .play-app > .play-hud .hud-menu-bar .play-nav a::after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 6px;
+    height: 2px;
+    border-radius: 99px;
+    background: var(--ba-accent);
+    box-shadow: 0 0 10px var(--ba-accent-glow);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+  }
+
+  .play-app > .play-hud .hud-menu-bar .play-nav a:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .play-app > .play-hud .hud-menu-bar .play-nav a:hover::after,
+  .play-app > .play-hud .hud-menu-bar .play-nav a.active::after {
+    transform: scaleX(1);
+  }
+
+  .play-app > .play-hud .hud-menu-bar .play-nav a.active {
+    color: #fff;
+    background: color-mix(in srgb, var(--ba-accent) 18%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ba-accent) 55%, transparent);
+    animation: hud-nav-in 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+
+@keyframes hud-nav-in {
+  0% { transform: translateY(5px) scale(0.94); }
+  100% { transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .play-app > .play-hud .hud-menu-bar .play-nav a,
+  .play-app > .play-hud .hud-menu-bar .play-nav a::after {
+    animation: none;
+    transition: none;
+  }
+}
