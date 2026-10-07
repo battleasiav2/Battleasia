@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:battleasia_app/core/services/engagement_service.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
@@ -69,7 +70,7 @@ class _EarnScreenState extends State<EarnScreen> {
       if (home['success'] == true && home['data'] is Map) {
         _home = Map<String, dynamic>.from(home['data'] as Map);
       } else {
-        _error = home['message']?.toString() ?? 'Could not load Earn';
+        _error = home['message']?.toString() ?? 'earn.offline'.tr();
       }
       final badgeData = badges['data'];
       if (badgeData is Map && badgeData['badges'] is List) {
@@ -90,24 +91,42 @@ class _EarnScreenState extends State<EarnScreen> {
     });
   }
 
-  Future<void> _shareText(String description, String busyId) async {
+  Future<void> _shareText(String description, String busyId, {required bool badge}) async {
     setState(() => _busy = busyId);
     final result = await _feed.createFeedPost(description: description);
     if (!mounted) return;
     setState(() => _busy = '');
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(result['success'] == true ? 'Shared to feed' : (result['message']?.toString() ?? 'Could not share'))),
+      SnackBar(
+        content: Text(
+          result['success'] == true
+              ? (badge ? 'earn.sharedBadge'.tr() : 'earn.sharedStreak'.tr())
+              : (result['message']?.toString() ?? 'earn.shareFail'.tr()),
+        ),
+      ),
     );
   }
 
-  Future<void> _run(String id, Future<Map<String, dynamic>> Function() action) async {
+  Future<void> _run(
+    String id,
+    Future<Map<String, dynamic>> Function() action, {
+    String? ok,
+    String? fail,
+  }) async {
     setState(() => _busy = id);
     final result = await action();
     if (!mounted) return;
     final data = result['data'];
-    var message = result['success'] == true ? 'Claimed' : (result['message']?.toString() ?? 'Could not claim');
-    if (result['success'] == true && data is Map && data['prizeLabel'] != null) {
-      message = '${data['prizeLabel']} · +${data['bacAmount'] ?? 0} BAC';
+    String message;
+    if (id == 'spin') {
+      final label = data is Map ? data['prizeLabel']?.toString() : null;
+      message = result['success'] == true
+          ? (label != null && label.isNotEmpty ? '${'earn.youWon'.tr()} $label' : 'earn.spinOk'.tr())
+          : (result['message']?.toString() ?? 'earn.spinFail'.tr());
+    } else {
+      message = result['success'] == true
+          ? (ok ?? 'earn.claimedToast'.tr())
+          : (result['message']?.toString() ?? (fail ?? 'earn.fail'.tr()));
     }
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
     setState(() => _busy = '');
@@ -130,7 +149,7 @@ class _EarnScreenState extends State<EarnScreen> {
                 children: [
                   Text(_error!, style: const TextStyle(color: Colors.white)),
                   const SizedBox(height: 12),
-                  FilledButton(onPressed: _load, child: const Text('Reload')),
+                  FilledButton(onPressed: _load, child: Text('earn.reload'.tr())),
                 ],
               ),
             )
@@ -379,7 +398,7 @@ class _EarnScreenState extends State<EarnScreen> {
         ),
         const SizedBox(height: 8),
         OutlinedButton(
-          onPressed: _busy == 'share-streak' ? null : () => _shareText('Day ${streak['currentStreak'] ?? 0} streak on BattleAsia. #streak', 'share-streak'),
+          onPressed: _busy == 'share-streak' ? null : () => _shareText('Day ${streak['currentStreak'] ?? 0} streak on BattleAsia. #streak', 'share-streak', badge: false),
           child: Text(_busy == 'share-streak' ? 'Sharing…' : 'Share streak'),
         ),
         const SizedBox(height: 8),
@@ -409,7 +428,7 @@ class _EarnScreenState extends State<EarnScreen> {
   }
 
   Widget _spin(Map<String, dynamic> spin) {
-    if (spin['enabled'] == false) return _empty('Spin is off right now.');
+    if (spin['enabled'] == false) return _empty('earn.spinOff'.tr());
     final recent = _list(spin['recent']);
     return Column(
       children: [
@@ -444,11 +463,27 @@ class _EarnScreenState extends State<EarnScreen> {
             title: info['name']?.toString() ?? 'Squad',
             detail: 'Code ${info['inviteCode'] ?? '—'} · ${squad['winCount'] ?? 0}/${squad['targetWins'] ?? 0} wins',
             reward: '+${squad['bacAmount'] ?? 0}',
-            action: squad['canClaim'] == true ? 'Claim' : 'Leave',
-            enabled: _busy != 'squad',
+            action: squad['canClaim'] == true ? 'earn.claim'.tr() : 'earn.leave'.tr(),
+            enabled: _busy != 'squad' && _busy != 'leave',
             onTap: () => squad['canClaim'] == true
                 ? _run('squad', _api.claimSquad)
-                : _run('squad', _api.leaveSquad),
+                : _run('leave', _api.leaveSquad, ok: 'earn.leftSquad'.tr(), fail: 'earn.leaveFail'.tr()),
+          ),
+        if (hasSquad)
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () async {
+                final code = info['inviteCode']?.toString() ?? '';
+                if (code.isEmpty) return;
+                await Clipboard.setData(ClipboardData(text: code));
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('earn.inviteCopied'.tr())),
+                );
+              },
+              child: Text('earn.copyInvite'.tr()),
+            ),
           ),
         if (hasSquad) ..._squadChatBox(),
         if (!hasSquad) ...[
@@ -460,7 +495,12 @@ class _EarnScreenState extends State<EarnScreen> {
             reward: '',
             action: 'Create',
             enabled: _busy != 'create',
-            onTap: () => _run('create', () => _api.createSquad(_squadName.text.trim())),
+            onTap: () => _run(
+              'create',
+              () => _api.createSquad(_squadName.text.trim()),
+              ok: 'earn.squadCreated'.tr(),
+              fail: 'earn.squadFail'.tr(),
+            ),
           ),
           _field(_invite, 'Invite code'),
           const SizedBox(height: 8),
@@ -470,7 +510,12 @@ class _EarnScreenState extends State<EarnScreen> {
             reward: '',
             action: 'Join',
             enabled: _busy != 'join',
-            onTap: () => _run('join', () => _api.joinSquad(_invite.text.trim())),
+            onTap: () => _run(
+              'join',
+              () => _api.joinSquad(_invite.text.trim()),
+              ok: 'earn.joinedSquad'.tr(),
+              fail: 'earn.squadFail'.tr(),
+            ),
           ),
         ],
       ],
@@ -605,7 +650,7 @@ class _EarnScreenState extends State<EarnScreen> {
           action: unlocked ? 'Share' : '—',
           enabled: unlocked && _busy != 'share-badge',
           onTap: unlocked
-              ? () => _shareText('Unlocked ${badge['title'] ?? 'a badge'} on BattleAsia. #badge', 'share-badge')
+              ? () => _shareText('Unlocked ${badge['title'] ?? 'a badge'} on BattleAsia. #badge', 'share-badge', badge: true)
               : null,
         );
       }).toList(),

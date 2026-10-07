@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -86,7 +87,7 @@ class _LabsScreenState extends State<LabsScreen> {
                     MaterialPageRoute(builder: (_) => const LabsScreen()),
                   ),
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  label: const Text('Labs', style: TextStyle(color: Colors.white)),
+                  label: Text('labs.back'.tr(), style: const TextStyle(color: Colors.white)),
                 ),
               Text('Labs', style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.w800, letterSpacing: 1)),
               Text(
@@ -99,7 +100,14 @@ class _LabsScreenState extends State<LabsScreen> {
               else if (spec == null)
                 ..._labs.map((row) => _labTile(row))
               else if (!_on(spec.$1))
-                const Text('This lab is off.', style: TextStyle(color: Colors.white70))
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('labs.flagOff'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 20)),
+                    const SizedBox(height: 6),
+                    Text('labs.flagOffLead'.tr(), style: const TextStyle(color: Colors.white70)),
+                  ],
+                )
               else if (spec.$2 == 'creators')
                 const _CreatorsBoard()
               else
@@ -118,7 +126,7 @@ class _LabsScreenState extends State<LabsScreen> {
     return ListTile(
       contentPadding: EdgeInsets.zero,
       title: Text(row.$4, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-      subtitle: Text(on ? 'On' : 'Off', style: TextStyle(color: on ? AppColors.gold : Colors.white54)),
+      subtitle: Text(on ? 'labs.on'.tr() : 'labs.off'.tr(), style: TextStyle(color: on ? AppColors.gold : Colors.white54)),
       onTap: () {
         Navigator.pushReplacement(
           context,
@@ -158,13 +166,22 @@ class _CreatorsBoardState extends State<_CreatorsBoard> {
 
   @override
   Widget build(BuildContext context) {
-    if (_rows.isEmpty) return const Text('No creators yet.', style: TextStyle(color: Colors.white70));
+    if (_rows.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('labs.noCreators'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 6),
+          Text('labs.noCreatorsLead'.tr(), style: const TextStyle(color: Colors.white70)),
+        ],
+      );
+    }
     return Column(
       children: _rows.map((row) {
         return ListTile(
           contentPadding: EdgeInsets.zero,
           title: Text('#${row['rank']} ${row['username']}', style: const TextStyle(color: Colors.white)),
-          subtitle: Text('${row['likes'] ?? 0} likes · ${row['posts'] ?? 0} posts', style: const TextStyle(color: Colors.white54)),
+          subtitle: Text('${row['likes'] ?? 0} ${'labs.likes'.tr()} · ${row['posts'] ?? 0} ${'labs.posts'.tr()}', style: const TextStyle(color: Colors.white54)),
           onTap: () {
             final id = row['id']?.toString() ?? '';
             if (id.isEmpty) return;
@@ -220,7 +237,7 @@ class _LabBoardState extends State<_LabBoard> {
     final result = await _api.list(widget.kind);
     if (!mounted) return;
     if (result['success'] != true) {
-      _toast(result['message']?.toString() ?? 'Could not load this lab');
+      _toast(result['message']?.toString() ?? 'labs.offline'.tr());
       return;
     }
     final data = result['data'];
@@ -238,7 +255,7 @@ class _LabBoardState extends State<_LabBoard> {
   Future<void> _create({String? imageUrl}) async {
     setState(() => _busy = true);
     final result = await _api.create(widget.kind, {
-      'title': _title.text.trim().isEmpty ? 'Room' : _title.text.trim(),
+      'title': _title.text.trim().isEmpty ? 'labs.roomTitle'.tr() : _title.text.trim(),
       if (widget.mode != 'duel') 'tag': _tag.text.trim(),
       if (widget.mode == 'duel') 'stake': num.tryParse(_tag.text) ?? 10,
       'picks': _picks.text.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList(),
@@ -250,10 +267,10 @@ class _LabBoardState extends State<_LabBoard> {
       _title.clear();
       _tag.clear();
       _picks.clear();
-      _toast('Created');
+      _toast('labs.created'.tr());
       await _load();
     } else {
-      _toast(result['message']?.toString() ?? 'Could not create');
+      _toast(result['message']?.toString() ?? 'labs.createFail'.tr());
     }
   }
 
@@ -280,9 +297,9 @@ class _LabBoardState extends State<_LabBoard> {
                         _busy = false;
                         if (result['success'] == true) _equipped = tag;
                       });
-                      _toast(result['success'] == true ? (equipped ? 'Equipped' : 'Purchased') : (result['message']?.toString() ?? 'Could not buy'));
+                      _toast(result['success'] == true ? (equipped ? 'labs.equipped'.tr() : 'labs.purchased'.tr()) : (result['message']?.toString() ?? 'labs.buyFail'.tr()));
                     },
-              child: Text(equipped ? 'Equipped' : 'Buy'),
+              child: Text(equipped ? 'labs.equipped'.tr() : 'labs.buy'.tr()),
             ),
           );
         }).toList(),
@@ -312,7 +329,7 @@ class _LabBoardState extends State<_LabBoard> {
                     if (!mounted) return;
                     if (upload['success'] != true) {
                       setState(() => _busy = false);
-                      _toast(upload['message']?.toString() ?? 'Upload failed');
+                      _toast(upload['message']?.toString() ?? 'labs.uploadFail'.tr());
                       return;
                     }
                     final url = (upload['data'] as Map?)?['url']?.toString();
@@ -323,7 +340,15 @@ class _LabBoardState extends State<_LabBoard> {
         else
           FilledButton(onPressed: _busy ? null : () => _create(), child: Text(_busy ? '…' : 'Create')),
         const SizedBox(height: 12),
-        if (_rows.isEmpty) const Text('Nothing here yet.', style: TextStyle(color: Colors.white70)),
+        if (_rows.isEmpty)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('labs.empty'.tr(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
+              const SizedBox(height: 6),
+              Text('labs.emptyLead'.tr(), style: const TextStyle(color: Colors.white70)),
+            ],
+          ),
         ..._rows.map((row) {
           return ListTile(
             contentPadding: EdgeInsets.zero,
@@ -339,10 +364,10 @@ class _LabBoardState extends State<_LabBoard> {
                     _rows = _rows.map((item) => item['id'] == next['id'] ? next : item).toList();
                   });
                 } else {
-                  _toast(result['message']?.toString() ?? 'Could not join');
+                  _toast(result['message']?.toString() ?? 'labs.offline'.tr());
                 }
               },
-              child: Text(row['joined'] == true ? 'Joined' : 'Join'),
+              child: Text(row['joined'] == true ? 'labs.joined'.tr() : 'labs.join'.tr()),
             ),
             onTap: () => setState(() => _open = Map<String, dynamic>.from(row)),
           );
@@ -367,7 +392,7 @@ class _LabBoardState extends State<_LabBoard> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(open['title']?.toString() ?? '', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800)),
-          Text('Host ${open['hostName'] ?? ''} · ${open['members'] ?? 0} members', style: const TextStyle(color: Colors.white54)),
+          Text('${'labs.host'.tr()} ${open['hostName'] ?? ''} · ${open['members'] ?? 0} ${'labs.members'.tr()}', style: const TextStyle(color: Colors.white54)),
           if (widget.kind == 'live' || widget.kind == 'watch')
             Wrap(
               spacing: 8,
@@ -389,24 +414,25 @@ class _LabBoardState extends State<_LabBoard> {
                       final result = await _api.gift(widget.kind, open['id'].toString(), num.tryParse(_gift.text) ?? 10);
                       if (result['success'] == true && result['data'] is Map) {
                         setState(() => _open = Map<String, dynamic>.from(result['data'] as Map));
-                        _toast('Gift sent');
+                        _toast('labs.giftSent'.tr());
                       } else {
-                        _toast(result['message']?.toString() ?? 'Gift failed');
+                        _toast(result['message']?.toString() ?? 'labs.giftFail'.tr());
                       }
                     },
-                    child: const Text('Gift'),
+                    child: Text('labs.gift'.tr()),
                   ),
                 TextButton(
                   onPressed: () async {
                     final result = await _api.watchEarn(widget.kind, open['id'].toString());
                     final data = result['data'];
                     if (result['success'] == true && data is Map) {
-                      _toast((data['credited'] ?? 0) != 0 ? 'Watch reward added' : 'Already claimed');
+                      final credited = data['credited'] == true || data['credited'] == 1 || (data['credited'] is num && (data['credited'] as num) != 0);
+                      _toast(credited ? 'labs.watchGot'.tr() : 'labs.watchDup'.tr());
                     } else {
-                      _toast(result['message']?.toString() ?? 'Could not claim');
+                      _toast(result['message']?.toString() ?? 'labs.cap'.tr());
                     }
                   },
-                  child: const Text('Watch earn'),
+                  child: Text('labs.watchEarn'.tr()),
                 ),
               ],
             ),
@@ -419,12 +445,12 @@ class _LabBoardState extends State<_LabBoard> {
                     if (result['success'] == true && result['data'] is Map) {
                       setState(() => _open = Map<String, dynamic>.from(result['data'] as Map));
                       await _load();
-                      _toast('War started');
+                      _toast('labs.warred'.tr());
                     } else {
-                      _toast(result['message']?.toString() ?? 'War failed');
+                      _toast(result['message']?.toString() ?? 'labs.warFail'.tr());
                     }
                   },
-                  child: Text('War ${row['tag'] ?? row['title']}'),
+                  child: Text('${'labs.war'.tr()} ${row['tag'] ?? row['title']}'),
                 );
               }).toList(),
             ),
@@ -435,12 +461,12 @@ class _LabBoardState extends State<_LabBoard> {
                 if (result['success'] == true && result['data'] is Map) {
                   setState(() => _open = Map<String, dynamic>.from(result['data'] as Map));
                   await _load();
-                  _toast('Scored');
+                  _toast('labs.scored'.tr());
                 } else {
-                  _toast(result['message']?.toString() ?? 'Could not score');
+                  _toast(result['message']?.toString() ?? 'labs.scoreFail'.tr());
                 }
               },
-              child: const Text('Score'),
+              child: Text('labs.score'.tr()),
             ),
           if (widget.kind == 'duel' && open['hostId'] == me && open['status'] != 'complete')
             Wrap(
@@ -453,12 +479,12 @@ class _LabBoardState extends State<_LabBoard> {
                           if (result['success'] == true && result['data'] is Map) {
                             setState(() => _open = Map<String, dynamic>.from(result['data'] as Map));
                             await _load();
-                            _toast('Paid the host');
+                            _toast('labs.paidHost'.tr());
                           } else {
-                            _toast(result['message']?.toString() ?? 'Could not resolve');
+                            _toast(result['message']?.toString() ?? 'labs.resolveFail'.tr());
                           }
                         },
-                  child: const Text('Pay me'),
+                  child: Text('labs.payoutMe'.tr()),
                 ),
                 ...((open['memberIds'] as List?) ?? []).map((id) => id.toString()).where((id) => id != me).map(
                       (id) => TextButton(
@@ -467,12 +493,12 @@ class _LabBoardState extends State<_LabBoard> {
                           if (result['success'] == true && result['data'] is Map) {
                             setState(() => _open = Map<String, dynamic>.from(result['data'] as Map));
                             await _load();
-                            _toast('Paid the opponent');
+                            _toast('labs.paidOpp'.tr());
                           } else {
-                            _toast(result['message']?.toString() ?? 'Could not resolve');
+                            _toast(result['message']?.toString() ?? 'labs.resolveFail'.tr());
                           }
                         },
-                        child: const Text('Pay opponent'),
+                        child: Text('labs.payoutOpp'.tr()),
                       ),
                     ),
               ],
@@ -486,7 +512,7 @@ class _LabBoardState extends State<_LabBoard> {
                 child: TextField(
                   controller: _draft,
                   style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(hintText: 'Message'),
+                  decoration: InputDecoration(hintText: 'labs.chatAs'.tr()),
                 ),
               ),
               TextButton(
@@ -502,14 +528,14 @@ class _LabBoardState extends State<_LabBoard> {
                     });
                     _draft.clear();
                   } else {
-                    _toast(result['message']?.toString() ?? 'Could not send');
+                    _toast(result['message']?.toString() ?? 'labs.offline'.tr());
                   }
                 },
-                child: const Text('Send'),
+                child: Text('labs.send'.tr()),
               ),
             ],
           ),
-          TextButton(onPressed: () => setState(() => _open = null), child: const Text('Close')),
+          TextButton(onPressed: () => setState(() => _open = null), child: Text('labs.close'.tr())),
         ],
       ),
     );
