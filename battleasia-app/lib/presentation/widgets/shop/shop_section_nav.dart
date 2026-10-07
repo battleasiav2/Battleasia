@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
-import 'package:battleasia_app/presentation/screens/earn/earn_screen.dart';
-import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
-import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_wallet_screen.dart';
 import 'package:battleasia_app/presentation/screens/wallet/wallet_screen.dart';
@@ -21,11 +18,21 @@ class ShopSectionNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).padding.bottom;
     final items = <({ShopNavTab tab, String label, IconData icon})>[
-      (tab: ShopNavTab.play, label: 'nav.play'.tr(), icon: Icons.sports_esports_outlined),
-      (tab: ShopNavTab.shop, label: 'nav.shop'.tr(), icon: Icons.storefront_outlined),
-      (tab: ShopNavTab.earn, label: 'nav.earn'.tr(), icon: Icons.bolt_outlined),
-      (tab: ShopNavTab.transfer, label: 'nav.transfer'.tr(), icon: Icons.swap_horiz_rounded),
-      (tab: ShopNavTab.feed, label: 'nav.feed'.tr(), icon: Icons.dynamic_feed_outlined),
+      (
+        tab: ShopNavTab.shop,
+        label: 'shop.tabShop'.tr(),
+        icon: Icons.shopping_bag_outlined,
+      ),
+      (
+        tab: ShopNavTab.wallet,
+        label: 'shop.tabWallet'.tr(),
+        icon: Icons.account_balance_wallet_outlined,
+      ),
+      (
+        tab: ShopNavTab.transfer,
+        label: 'shop.tabTransfer'.tr(),
+        icon: Icons.swap_horiz,
+      ),
     ];
 
     return Positioned(
@@ -102,14 +109,8 @@ class ShopSectionNav extends StatelessWidget {
     if (tab == active) return;
     HapticFeedback.selectionClick();
     switch (tab) {
-      case ShopNavTab.play:
-        openShopRoute(context, const PlayScreen(), routeName: '/play');
-        break;
       case ShopNavTab.shop:
         openShopRoute(context, const ShopScreen(), routeName: '/shop');
-        break;
-      case ShopNavTab.earn:
-        openShopRoute(context, const EarnScreen(), routeName: '/earn');
         break;
       case ShopNavTab.wallet:
         openShopRoute(
@@ -125,9 +126,6 @@ class ShopSectionNav extends StatelessWidget {
           routeName: '/shop/transfer',
         );
         break;
-      case ShopNavTab.feed:
-        openShopRoute(context, const FeedScreen(), routeName: '/feed');
-        break;
       case ShopNavTab.withdraw:
         openShopRoute(
           context,
@@ -139,4 +137,4 @@ class ShopSectionNav extends StatelessWidget {
   }
 }
 
-enum ShopNavTab { play, shop, earn, transfer, feed, wallet, withdraw }
+enum ShopNavTab { shop, wallet, transfer, withdraw }

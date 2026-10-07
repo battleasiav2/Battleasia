@@ -27,7 +27,6 @@ import {
 import { fetchPublicDashboard } from '../lib/dashboard';
 import { useI18n } from '../lib/i18n';
 import { captureReferral } from '../lib/ref';
-import { openBacShop } from '../lib/wallet';
 import { LANDING_LANG, landingText, readLandingLocale, type LandingLocale } from './landing5173-text';
 
 type Locale = LandingLocale;
@@ -619,13 +618,12 @@ function useFlipRows(containerRef: React.RefObject<HTMLElement | null>, orderKey
   }, [containerRef, orderKey]);
 }
 
-function MenuGlyph({ kind }: { kind: 'play' | 'shop' | 'earn' | 'transfer' | 'feed' }) {
+function MenuGlyph({ kind }: { kind: 'home' | 'about' | 'play' | 'rules' }) {
   const paths: Record<typeof kind, string> = {
+    home: 'M4 11.5 12 4l8 7.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-8.5Z',
+    about: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 11v5M12 8h.01',
     play: 'M7 8h10a5 5 0 0 1 4.8 6.4l-.9 3a2.3 2.3 0 0 1-3.9.9L15 16H9l-2 2.3a2.3 2.3 0 0 1-3.9-.9l-.9-3A5 5 0 0 1 7 8ZM8 11v4M6 13h4',
-    shop: 'M6 8h12l-1 12H7L6 8ZM9 8V6a3 3 0 0 1 6 0v2',
-    earn: 'M4 11h16v9H4zM3 7h18v4H3zM12 7v13',
-    transfer: 'M21 3 10 14M21 3l-7 18-4-7-7-4 18-7Z',
-    feed: 'M4 6h16M4 12h16M4 18h10',
+    rules: 'M8 4h8l4 4v12a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1ZM16 4v4h4M9 13h6M9 17h4',
   };
   return (
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -642,6 +640,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
   const [me, setMe] = useState<AuthUser | null>(() => readSessionUser());
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeLink, setActiveLink] = useState('home');
   const [matchTab, setMatchTab] = useState<'high'|'live'>('high');
   const [leaderboardTab, setLeaderboardTab] = useState<'profit'|'kills'>('profit');
   const [faqOpen, setFaqOpen] = useState<number|null>(0);
@@ -860,6 +859,9 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
     const onScroll = () => {
       setScrolled(window.scrollY > 40);
       document.documentElement.style.setProperty('--scroll-progress', `${(window.scrollY / (document.documentElement.scrollHeight - innerHeight)) * 100}%`);
+      const sections = Array.from(document.querySelectorAll<HTMLElement>('main > section[id]'));
+      const current = sections.filter((el) => el.getBoundingClientRect().top <= 150).at(-1);
+      if (current?.id) setActiveLink(current.id === 'about-us' ? 'about' : current.id === 'how-to-play' ? 'play' : current.id);
     };
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -1083,11 +1085,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
           <a className="brand" href="#home" onClick={(e) => { e.preventDefault(); anchor('home'); }}><BrandLogo /><span>Battle Asia</span></a>
           <div className="nav-end">
           <nav className="nav-links" aria-label="Main navigation">
-            <Link to="/user/play">{appT('nav.play')}</Link>
-            <button type="button" onClick={() => openBacShop('shop')}>{appT('nav.shop')}</button>
-            <Link to="/user/earn">{appT('nav.earn')}</Link>
-            <button type="button" onClick={() => openBacShop('transfer')}>{appT('nav.transfer')}</button>
-            <Link to="/user/feed">{appT('nav.feed')}</Link>
+            {[['home',t.home],['about',t.about],['play',t.play],['rules',t.rules]].map(([id,label]) => <a key={id} href={`#${id}`} className={activeLink === id ? 'active' : ''} onClick={(e) => { e.preventDefault(); anchor(id === 'about' ? 'about-us' : id); }}>{label}</a>)}
           </nav>
           <div className="nav-actions">
             {logged ? <><button className="btn btn-ghost" onClick={signOut}>{appT('cta.signout')}</button><Link className="btn btn-primary" to="/user/play">{t.arena} <ArrowRight size={14}/></Link></> : <><button className="btn btn-ghost" onClick={() => openAuth('signin')}>{t.signin}</button><button className="btn btn-primary" onClick={onJoin}>{t.signup} <ArrowRight size={14}/></button></>}
@@ -1341,26 +1339,22 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
       <div className={`mobile-drawer ${mobileOpen?'open':''}`} aria-hidden={!mobileOpen}>
         <div className="drawer-head"><a className="brand" href="#home" onClick={(e)=>{e.preventDefault();anchor('home')}}><BrandLogo compact /><span>Battle Asia</span></a><button className="drawer-close" aria-label="Close menu" onClick={()=>setMobileOpen(false)}><X size={18}/></button></div>
         <nav className="drawer-nav">
-          <Link to="/user/play" onClick={() => setMobileOpen(false)}>
-            <span className="drawer-nav-ico"><MenuGlyph kind="play" /></span>
-            <span>{appT('nav.play')}</span>
-          </Link>
-          <button type="button" onClick={() => { setMobileOpen(false); openBacShop('shop'); }}>
-            <span className="drawer-nav-ico"><MenuGlyph kind="shop" /></span>
-            <span>{appT('nav.shop')}</span>
-          </button>
-          <Link to="/user/earn" onClick={() => setMobileOpen(false)}>
-            <span className="drawer-nav-ico"><MenuGlyph kind="earn" /></span>
-            <span>{appT('nav.earn')}</span>
-          </Link>
-          <button type="button" onClick={() => { setMobileOpen(false); openBacShop('transfer'); }}>
-            <span className="drawer-nav-ico"><MenuGlyph kind="transfer" /></span>
-            <span>{appT('nav.transfer')}</span>
-          </button>
-          <Link to="/user/feed" onClick={() => setMobileOpen(false)}>
-            <span className="drawer-nav-ico"><MenuGlyph kind="feed" /></span>
-            <span>{appT('nav.feed')}</span>
-          </Link>
+          {([
+            ['home', 'home', t.home, 'home'],
+            ['about-us', 'about', t.about, 'about'],
+            ['play', 'play', t.play, 'play'],
+            ['rules', 'rules', t.rules, 'rules'],
+          ] as const).map(([id, key, label, icon]) => (
+            <a
+              href={`#${id}`}
+              key={id}
+              className={activeLink === key ? 'is-active' : ''}
+              onClick={(e) => { e.preventDefault(); anchor(id); }}
+            >
+              <span className="drawer-nav-ico"><MenuGlyph kind={icon} /></span>
+              <span>{label}</span>
+            </a>
+          ))}
         </nav>
         <div className="drawer-cards">{logged ? <Link className="drawer-card drawer-profile" to="/user/play" onClick={() => setMobileOpen(false)}><UserAvatar src={me?.avatar} name={playerName} size={36} /><span>{playerName}<small>{appT('cta.enterArena')}</small></span></Link> : <button className="drawer-card" onClick={()=>openAuth('signin')}>{t.signin}<small>Access your player profile</small></button>}<button className="drawer-card" onClick={()=>logged?navigate('/user/play'):onJoin()}>{t.arena}<small>Join a live tournament</small></button></div>
         <button className="drawer-card drawer-apk" onClick={() => { if (apkUrl) window.location.href = apkUrl; }}>Download the APK <small>{apkLabel}</small></button>
