@@ -205,10 +205,7 @@ export function MobileDrawer({ open, onClose, logo, playerName, avatar, onSignOu
   };
 
   const links: DrawerLink[] = [
-    { key: 'home', label: t('nav.home'), to: '/dashboard' },
-    { key: 'about', label: t('nav.about'), to: '/dashboard#about-us' },
     { key: 'play', label: t('nav.play'), to: '/user/play', active: location.pathname.startsWith('/user/play') },
-    { key: 'rules', label: t('nav.rules'), to: '/dashboard#rules' },
     { key: 'shop', label: t('nav.shop'), to: '/user/shop', active: location.pathname.startsWith('/user/shop') },
     { key: 'earn', label: t('nav.earn'), to: '/user/earn', active: location.pathname.startsWith('/user/earn') },
     { key: 'transfer', label: t('nav.transfer'), onClick: () => openBacShop('transfer') },
@@ -233,7 +230,7 @@ export function MobileDrawer({ open, onClose, logo, playerName, avatar, onSignOu
   if (!open || typeof document === 'undefined') return null;
 
   return createPortal(
-    <div className="m-drawer m-drawer--landing" role="dialog" aria-modal="true" aria-label="Battle Asia">
+    <div className="m-drawer m-drawer--landing m-drawer--dash" role="dialog" aria-modal="true" aria-label="Battle Asia">
       <aside className="ld-panel">
         <header className="ld-head">
           <button ref={closeRef} className="ld-close" type="button" aria-label={t('hud.closeMenu')} onClick={onClose}>
