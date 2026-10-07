@@ -14,6 +14,7 @@ class FeedModel {
   final int totalLikes;
   final bool isLiked;
   final bool isSaved;
+  final String? pinnedAt;
   final String? createdAt;
   final String? updatedAt;
 
@@ -33,6 +34,7 @@ class FeedModel {
     required this.totalLikes,
     required this.isLiked,
     this.isSaved = false,
+    this.pinnedAt,
     this.createdAt,
     this.updatedAt,
   });
@@ -53,6 +55,7 @@ class FeedModel {
     int? totalLikes,
     bool? isLiked,
     bool? isSaved,
+    String? pinnedAt,
     String? createdAt,
     String? updatedAt,
   }) {
@@ -72,6 +75,7 @@ class FeedModel {
       totalLikes: totalLikes ?? this.totalLikes,
       isLiked: isLiked ?? this.isLiked,
       isSaved: isSaved ?? this.isSaved,
+      pinnedAt: pinnedAt ?? this.pinnedAt,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -106,6 +110,7 @@ class FeedModel {
       totalLikes: (json['totalLikes'] ?? json['total_likes'] ?? 0) as int,
       isLiked: json['isLiked'] == true || json['is_liked'] == true,
       isSaved: json['isSaved'] == true || json['is_saved'] == true,
+      pinnedAt: json['pinnedAt']?.toString(),
       createdAt: json['createdAt']?.toString() ?? json['created_at']?.toString(),
       updatedAt: json['updatedAt']?.toString() ?? json['updated_at']?.toString(),
     );
@@ -128,6 +133,7 @@ class FeedModel {
       'totalLikes': totalLikes,
       'isLiked': isLiked,
       'isSaved': isSaved,
+      'pinnedAt': pinnedAt,
       'createdAt': createdAt,
       'updatedAt': updatedAt,
     };

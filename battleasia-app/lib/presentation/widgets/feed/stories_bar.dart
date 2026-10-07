@@ -78,12 +78,13 @@ class _StoriesBarState extends State<StoriesBar> {
   }
 
   void _openViewer(int groupIndex) {
-    Navigator.of(context).push(
+        Navigator.of(context).push(
       PageRouteBuilder(
         opaque: false,
         pageBuilder: (_, __, ___) => StoryViewerScreen(
           groups: _groups,
           initialGroupIndex: groupIndex,
+          viewerUserId: _me?.id,
           onViewed: (storyId) {
             _socialService.viewStory(storyId);
             setState(() {
@@ -486,12 +487,14 @@ class _StoryCreateSheetState extends State<_StoryCreateSheet> {
 class StoryViewerScreen extends StatefulWidget {
   final List<StoryGroup> groups;
   final int initialGroupIndex;
+  final String? viewerUserId;
   final ValueChanged<String>? onViewed;
 
   const StoryViewerScreen({
     super.key,
     required this.groups,
     required this.initialGroupIndex,
+    this.viewerUserId,
     this.onViewed,
   });
 
@@ -659,6 +662,19 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                                 .copyWith(color: Colors.white),
                           ),
                         ),
+                        if (widget.viewerUserId != null && widget.viewerUserId == _group.userId)
+                          TextButton(
+                            onPressed: () async {
+                              final result = await SocialService().pinHighlight(_story.id);
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(result['success'] == true ? 'Saved to highlights' : (result['message']?.toString() ?? 'Could not save highlight')),
+                                ),
+                              );
+                            },
+                            child: const Text('Highlight'),
+                          ),
                         IconButton(
                           onPressed: () => Navigator.pop(context),
                           icon: const Icon(Icons.close, color: Colors.white),

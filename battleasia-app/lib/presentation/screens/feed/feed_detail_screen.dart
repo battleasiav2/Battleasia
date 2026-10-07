@@ -3,6 +3,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
+import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
@@ -28,6 +29,7 @@ class FeedDetailScreen extends StatefulWidget {
 class _FeedDetailScreenState extends State<FeedDetailScreen> {
   final ScrollController _scrollController = ScrollController();
   final FeedService _feedService = FeedService();
+  final UserService _users = UserService();
   final TextEditingController _commentController = TextEditingController();
 
   FeedModel? _feed;
@@ -36,6 +38,9 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
   bool _premiumRestricted = false;
   bool _commentLoading = false;
   bool _submittingComment = false;
+  bool _canPin = false;
+  bool _pinned = false;
+  bool _pinning = false;
 
   @override
   void initState() {
@@ -57,6 +62,7 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
     });
 
     try {
+      final me = context.read<AuthProvider>().user?.id;
       final result = await _feedService.getFeedById(widget.feedId);
 
       if (result['success'] == true && result['data'] != null) {
@@ -78,6 +84,14 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
 
         setState(() {
           _feed = feed;
+          _pinned = feed.pinnedAt != null && feed.pinnedAt!.isNotEmpty;
+        });
+        final flags = await _users.getP1Flags();
+        if (!mounted) return;
+        final flagData = flags['data'];
+        final pinOn = flagData is Map && flagData['igPinnedPosts'] == true;
+        setState(() {
+          _canPin = pinOn && me != null && me.isNotEmpty && feed.author?.id == me;
         });
 
         // Fetch comments
@@ -666,6 +680,35 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
               color: Colors.black,
             ),
           ),
+          if (_canPin)
+            TextButton(
+              onPressed: _pinning
+                  ? null
+                  : () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      setState(() => _pinning = true);
+                      final result = await _feedService.pinFeed(widget.feedId);
+                      if (!mounted) return;
+                      final data = result['data'];
+                      final next = data is Map ? data['pinnedAt'] : null;
+                      setState(() {
+                        _pinning = false;
+                        if (result['success'] == true) {
+                          _pinned = next != null && next.toString().isNotEmpty;
+                        }
+                      });
+                      messenger.showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            result['success'] == true
+                                ? (_pinned ? 'Pinned' : 'Unpinned')
+                                : (result['message']?.toString() ?? 'Could not pin'),
+                          ),
+                        ),
+                      );
+                    },
+              child: Text(_pinning ? '…' : (_pinned ? 'Unpin' : 'Pin')),
+            ),
           SizedBox(width: spacing16),
           IconButton(
             onPressed: _showCommentsDialog,

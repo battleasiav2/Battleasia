@@ -9,6 +9,7 @@ import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/providers/accent_provider.dart';
 import 'package:battleasia_app/presentation/screens/splash/splash_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/gaming_backdrop.dart';
+import 'package:battleasia_app/presentation/widgets/common/site_notice_host.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -75,6 +76,7 @@ class BattleAsiaApp extends StatelessWidget {
             locale: context.locale,
             supportedLocales: context.supportedLocales,
             localizationsDelegates: context.localizationDelegates,
+            navigatorKey: appNavigatorKey,
             home: const SplashScreen(),
             builder: (context, child) {
               return Stack(
@@ -82,6 +84,7 @@ class BattleAsiaApp extends StatelessWidget {
                 children: [
                   const GamingBackdrop(),
                   child ?? const SizedBox.shrink(),
+                  const SiteNoticeHost(),
                 ],
               );
             },

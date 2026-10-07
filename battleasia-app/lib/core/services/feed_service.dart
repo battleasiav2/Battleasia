@@ -242,6 +242,33 @@ class FeedService {
     }
   }
 
+  Future<Map<String, dynamic>> pinFeed(String feedId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/feed/$feedId/pin'),
+        headers: headers,
+      );
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to pin post',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
   /// Toggle save on a feed post
   Future<Map<String, dynamic>> toggleSaveFeed(String feedId) async {
     try {

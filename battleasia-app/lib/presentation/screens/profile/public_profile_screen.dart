@@ -6,6 +6,7 @@ import 'package:battleasia_app/core/services/social_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/public_user_model.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
@@ -41,6 +42,9 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
   int _totalKills = 0;
   double _amountWon = 0;
   List<ActivityCard> _activities = [];
+  List<Map<String, dynamic>> _highlights = [];
+  bool _playerTip = false;
+  bool _tipping = false;
 
   @override
   void initState() {
@@ -74,6 +78,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
         });
 
         await _fetchUserStats();
+        await _fetchExtras();
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -165,6 +170,32 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     } catch (e) {
       // Silently fail
     }
+  }
+
+  Future<void> _fetchExtras() async {
+    final flags = await _userService.getP1Flags();
+    final highlights = await _socialService.getHighlights(widget.userId);
+    if (!mounted) return;
+    final flagData = flags['data'];
+    final rows = highlights['data'];
+    setState(() {
+      _playerTip = flagData is Map && flagData['playerTip'] == true;
+      _highlights = rows is List
+          ? rows.whereType<Map>().map((row) => Map<String, dynamic>.from(row)).toList()
+          : [];
+    });
+  }
+
+  Future<void> _sendTip(int amount) async {
+    final name = _viewingUser?.name ?? '';
+    if (name.isEmpty || _tipping) return;
+    setState(() => _tipping = true);
+    final result = await _userService.sendTip(name, amount);
+    if (!mounted) return;
+    setState(() => _tipping = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result['success'] == true ? 'Tipped $amount BAC' : (result['message']?.toString() ?? 'Tip failed'))),
+    );
   }
 
   Future<void> _handleFollowToggle() async {
@@ -328,6 +359,10 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildProfileHeader(),
+                        if (_highlights.isNotEmpty) ...[
+                          SizedBox(height: spacing16),
+                          _buildHighlights(),
+                        ],
                         SizedBox(height: spacing24),
 
                         if (!isOwnProfile) ...[
@@ -473,6 +508,30 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     );
   }
 
+  Widget _buildHighlights() {
+    return SizedBox(
+      height: 84,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: _highlights.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final row = _highlights[index];
+          final image = ImageUtils.getImageUrl(row['mediaUrl']?.toString());
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: SizedBox(
+              width: 72,
+              child: image == null || image.isEmpty
+                  ? const ColoredBox(color: Color(0xFF121318))
+                  : Image.network(image, fit: BoxFit.cover),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildSocialActions({required bool isLoggedIn}) {
     if (!isLoggedIn) return const SizedBox.shrink();
 
@@ -494,6 +553,13 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
           icon: Icon(_isBlocked ? Icons.lock_open : Icons.block, size: 18),
           label: Text(_isBlocked ? 'profile.unblock'.tr() : 'profile.block'.tr()),
         ),
+        if (_playerTip)
+          ...[10, 25, 50].map(
+            (amount) => OutlinedButton(
+              onPressed: _tipping ? null : () => _sendTip(amount),
+              child: Text('Tip $amount'),
+            ),
+          ),
         OutlinedButton.icon(
           onPressed: _handleReport,
           icon: const Icon(Icons.flag_outlined, size: 18),

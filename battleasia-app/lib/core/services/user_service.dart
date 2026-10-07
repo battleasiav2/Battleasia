@@ -252,6 +252,53 @@ class UserService {
     }
   }
 
+  Future<Map<String, dynamic>> getSiteNotice() async {
+    try {
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/app-settings/site-notice'),
+      );
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to load notice',
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString().replaceAll('Exception: ', '')};
+    }
+  }
+
+  Future<Map<String, dynamic>> sendTip(String recipientUsername, num amount) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/users/tip'),
+        headers: headers,
+        body: jsonEncode({'recipientUsername': recipientUsername, 'amount': amount}),
+      );
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Tip failed',
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString().replaceAll('Exception: ', '')};
+    }
+  }
+
   /// Get referral dashboard stats
   Future<Map<String, dynamic>> getReferralStats() async {
     try {

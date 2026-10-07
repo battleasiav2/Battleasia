@@ -192,6 +192,32 @@ class SocialService {
     }
   }
 
+  Future<Map<String, dynamic>> pinHighlight(String storyId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/social/stories/$storyId/highlight'),
+        headers: headers,
+      );
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> getHighlights(String userId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/social/highlights/$userId'),
+        headers: headers,
+      );
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
   Future<Map<String, dynamic>> createReel({
     required String videoUrl,
     String? caption,
