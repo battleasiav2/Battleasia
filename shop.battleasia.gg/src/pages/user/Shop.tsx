@@ -627,6 +627,7 @@ export function ShopPage() {
                   </div>
                   <div className="sec-channels">
                     <h3>Select payment channels</h3>
+                    <div className="sec-channel-row">
                     {channels.map((c) => {
                       const kind = payKindFromName(c.channel_name);
                       const on = channelId === c.id;
@@ -646,6 +647,7 @@ export function ShopPage() {
                         </button>
                       );
                     })}
+                    </div>
                   </div>
                 </div>
                 <div className="sec-side">

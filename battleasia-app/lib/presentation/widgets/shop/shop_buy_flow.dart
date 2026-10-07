@@ -601,60 +601,57 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
           ),
         ),
         const SizedBox(height: 8),
-        ..._channels.map((ch) {
-          final selected = ch.id == _channelId;
-          final kind = payKindOf(ch.name);
-          final hint = ch.name.toLowerCase().contains('usdt') || ch.isCrypto
-              ? 'cryptocurrency'
-              : '${ch.name.toLowerCase()} wallet';
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: InkWell(
-              onTap: () => setState(() => _channelId = ch.id),
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: selected ? const Color(0xFFF0B429) : Colors.transparent,
-                    width: 1.5,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    if (kind != null)
-                      PayBrandIcon(kind: kind, size: 28)
-                    else
-                      const Icon(Icons.payment, color: Colors.white70, size: 22),
-                    const SizedBox(width: 10),
-                    Expanded(
+        LayoutBuilder(
+          builder: (context, constraints) {
+            const gap = 8.0;
+            final tileW = (constraints.maxWidth - gap * 2) / 3;
+            return Wrap(
+              spacing: gap,
+              runSpacing: gap,
+              children: _channels.map((ch) {
+                final selected = ch.id == _channelId;
+                final kind = payKindOf(ch.name);
+                return SizedBox(
+                  width: tileW,
+                  child: InkWell(
+                    onTap: () => setState(() => _channelId = ch.id),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      constraints: const BoxConstraints(minHeight: 92),
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: selected ? const Color(0xFFF0B429) : Colors.white.withValues(alpha: 0.1),
+                          width: 1.5,
+                        ),
+                      ),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if (kind != null)
+                            PayBrandIcon(kind: kind, size: 28)
+                          else
+                            const Icon(Icons.payment, color: Colors.white70, size: 22),
+                          const SizedBox(height: 6),
                           Text(
                             ch.name,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          Text(
-                            hint,
-                            style: AppTheme.bodySmall.copyWith(
-                              color: AppColors.textMuted,
-                              fontSize: 11,
+                              fontSize: 12,
                             ),
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-          );
-        }),
+                  ),
+                );
+              }).toList(),
+            );
+          },
+        ),
         const SizedBox(height: 8),
         Text(
           'Rates',

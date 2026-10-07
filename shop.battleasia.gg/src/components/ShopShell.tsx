@@ -121,6 +121,15 @@ function ShopChrome() {
     setNavOpen(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (!navOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [navOpen]);
+
   const closeNav = useCallback(() => setNavOpen(false), []);
   const path = location.pathname;
 
@@ -178,6 +187,42 @@ function ShopChrome() {
           </button>
         </div>
       </header>
+      <div
+        className={`shop-drawer-overlay${navOpen ? ' is-open' : ''}`}
+        onClick={closeNav}
+        aria-hidden={!navOpen}
+      />
+      <aside className={`shop-drawer${navOpen ? ' is-open' : ''}`} aria-label={t('nav.shop')} aria-hidden={!navOpen}>
+        <Link className="shop-drawer-brand" to="/user/shop" onClick={closeNav}>
+          <img src={ASSETS.logo} width={44} height={44} alt="" />
+          <span>Battle Asia</span>
+        </Link>
+        <nav className="shop-drawer-nav" onClick={closeNav}>
+          <Link className={path.startsWith('/user/shop') || path === '/user' ? 'active' : ''} to="/user/shop">
+            {t('nav.shop')}
+          </Link>
+          <Link className={path.startsWith('/user/wallet') ? 'active' : ''} to="/user/wallet">
+            {t('nav.wallet')}
+          </Link>
+          <Link className={path.startsWith('/user/transfer') ? 'active' : ''} to="/user/transfer">
+            {t('nav.transfer')}
+          </Link>
+        </nav>
+        <div className="shop-drawer-tools">
+          <ThemeDock />
+          <LocaleSelect />
+          <button
+            className="hud-signout"
+            type="button"
+            onClick={() => {
+              leaveShop();
+              window.location.assign(getMainAppUrl('/dashboard'));
+            }}
+          >
+            {t('cta.signout')}
+          </button>
+        </div>
+      </aside>
       <Outlet context={{ toast, setBalance }} />
       {toastText ? <div className="play-toast" role="status">{toastText}</div> : null}
     </div>
