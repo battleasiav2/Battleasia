@@ -6,7 +6,8 @@ import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/bac_gate_screen.dart';
-import 'package:battleasia_app/presentation/screens/referral/referral_screen.dart';
+import 'package:battleasia_app/presentation/screens/shop/shop_wallet_screen.dart';
+import 'package:battleasia_app/presentation/screens/earn/earn_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
 
 class FloatingBottomNav extends StatefulWidget {
@@ -20,7 +21,8 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
   static List<NavItem> navItems(BuildContext context) => [
     NavItem(label: 'nav.play'.tr(), route: '/play', icon: Icons.sports_esports),
     NavItem(label: 'nav.shop'.tr(), route: '/shop', icon: Icons.shopping_bag),
-    NavItem(label: 'nav.referral'.tr(), route: '/referral', icon: Icons.people),
+    NavItem(label: 'nav.earn'.tr(), route: '/earn', icon: Icons.bolt),
+    NavItem(label: 'nav.transfer'.tr(), route: '/transfer', icon: Icons.swap_horiz),
     NavItem(label: 'nav.feed'.tr(), route: '/feed', icon: Icons.article),
   ];
 
@@ -54,18 +56,21 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
           return '/play';
         } else if (routeName == '/shop') {
           return '/shop';
-        } else if (routeName == '/referral') {
-          return '/referral';
+        } else if (routeName == '/earn') {
+          return '/earn';
+        } else if (routeName == '/transfer') {
+          return '/transfer';
         } else if (routeName == '/feed') {
           return '/feed';
         }
-        // Contains match
         if (routeName.contains('/play') || routeName.contains('match')) {
           return '/play';
+        } else if (routeName.contains('/transfer')) {
+          return '/transfer';
         } else if (routeName.contains('/shop')) {
           return '/shop';
-        } else if (routeName.contains('/referral')) {
-          return '/referral';
+        } else if (routeName.contains('/earn')) {
+          return '/earn';
         } else if (routeName.contains('/feed')) {
           return '/feed';
         }
@@ -89,9 +94,15 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
     }
 
     try {
-      final referralScreen = context
-          .findAncestorWidgetOfExactType<ReferralScreen>();
-      if (referralScreen != null) return '/referral';
+      final earnScreen = context.findAncestorWidgetOfExactType<EarnScreen>();
+      if (earnScreen != null) return '/earn';
+    } catch (e) {
+      // Continue
+    }
+
+    try {
+      final transferScreen = context.findAncestorWidgetOfExactType<ShopWalletScreen>();
+      if (transferScreen != null) return '/transfer';
     } catch (e) {
       // Continue
     }
@@ -111,10 +122,12 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
           stateType.contains('MatchScreen') ||
           stateType.contains('MatchDetailScreen')) {
         return '/play';
+      } else if (stateType.contains('ShopWalletScreen')) {
+        return '/transfer';
       } else if (stateType.contains('ShopScreen')) {
         return '/shop';
-      } else if (stateType.contains('ReferralScreen')) {
-        return '/referral';
+      } else if (stateType.contains('EarnScreen')) {
+        return '/earn';
       } else if (stateType.contains('FeedScreen')) {
         return '/feed';
       }
@@ -156,9 +169,17 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
           ),
         );
         return;
-      case '/referral':
-        targetScreen = const ReferralScreen();
+      case '/earn':
+        targetScreen = const EarnScreen();
         break;
+      case '/transfer':
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (_) => const ShopWalletScreen(),
+            settings: const RouteSettings(name: '/transfer'),
+          ),
+        );
+        return;
       case '/feed':
         targetScreen = const FeedScreen();
         break;
@@ -235,8 +256,8 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 280),
           curve: Curves.easeOutCubic,
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          padding: const EdgeInsets.symmetric(vertical: 6),
+          margin: const EdgeInsets.symmetric(horizontal: 1),
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
           decoration: BoxDecoration(
             color: isActive ? AppColors.gold.withValues(alpha: 0.16) : Colors.transparent,
             borderRadius: BorderRadius.circular(14),
@@ -249,7 +270,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
             children: [
               Icon(
                 item.icon,
-                size: 20,
+                size: 18,
                 color: isActive ? AppColors.gold : AppColors.textMuted,
               ),
               const SizedBox(height: 4),
@@ -260,7 +281,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
                 style: AppTheme.bodySmall.copyWith(
                   color: isActive ? AppColors.gold : AppColors.textMuted,
                   fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
-                  fontSize: 10,
+                  fontSize: 9,
                   letterSpacing: 0.3,
                   decoration: TextDecoration.none,
                 ),

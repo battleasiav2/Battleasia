@@ -13,7 +13,7 @@ import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/bac_gate_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth.dart';
-import 'package:battleasia_app/presentation/screens/referral/referral_screen.dart';
+import 'package:battleasia_app/presentation/screens/earn/earn_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_wallet_screen.dart';
 import 'package:battleasia_app/presentation/screens/wallet/wallet_screen.dart';
@@ -267,12 +267,28 @@ class _AccountDrawerContent extends StatelessWidget {
                   },
                 ),
                 AccountMenuTile(
-                  label: 'nav.referral'.tr(),
+                  label: 'nav.earn'.tr(),
                   onTap: () {
                     Navigator.pop(context);
-                    Navigator.push(
+                    Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const ReferralScreen()),
+                      MaterialPageRoute(
+                        settings: const RouteSettings(name: '/earn'),
+                        builder: (context) => const EarnScreen(),
+                      ),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'nav.transfer'.tr(),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        settings: const RouteSettings(name: '/transfer'),
+                        builder: (context) => const ShopWalletScreen(),
+                      ),
                     );
                   },
                 ),

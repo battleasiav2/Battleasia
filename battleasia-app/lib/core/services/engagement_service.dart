@@ -35,6 +35,18 @@ class EngagementService {
     };
   }
 
+  Future<Map<String, dynamic>> getBadges() async {
+    try {
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/engagement/badges'),
+        headers: await _headers(),
+      );
+      return _parseResponse(response, fallbackMessage: 'Failed to load badges');
+    } catch (e) {
+      return {'success': false, 'message': e.toString().replaceAll('Exception: ', '')};
+    }
+  }
+
   Future<Map<String, dynamic>> getHome() async {
     try {
       final response = await ApiClient.get(
