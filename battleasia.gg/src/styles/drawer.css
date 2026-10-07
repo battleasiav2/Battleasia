@@ -234,7 +234,7 @@
 .ld-enter {
   border: 0;
   background: var(--ba-accent);
-  color: #14160b;
+  color: var(--ba-gold-ink);
 }
 
 .m-drawer-bg {
@@ -663,18 +663,18 @@ html[data-theme='light'] .m-drawer-panel {
 
 .m-drawer--dash .ld-nav a.is-active,
 .m-drawer--dash .ld-nav button.is-active {
-  color: #0b0c10;
-  background: #ccff00;
-  border-color: #ccff00;
-  box-shadow: 0 0 22px rgba(204, 255, 0, 0.45);
+  color: var(--ba-gold-ink);
+  background: var(--ba-accent);
+  border-color: var(--ba-accent);
+  box-shadow: 0 0 22px var(--ba-accent-glow);
 }
 
 .m-drawer--dash .ld-nav a.is-active .ld-nav-ico,
 .m-drawer--dash .ld-nav button.is-active .ld-nav-ico {
-  color: #ccff00;
+  color: var(--ba-accent);
   background: #0b0c10;
   border-color: #0b0c10;
-  box-shadow: 0 0 12px rgba(204, 255, 0, 0.7);
+  box-shadow: 0 0 12px var(--ba-accent-glow);
 }
 
 .m-drawer--dash .ld-nav a.is-active::after,

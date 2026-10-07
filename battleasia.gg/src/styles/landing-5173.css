@@ -96,8 +96,8 @@ html[lang="bn"] .ba5173{
 .ba5173 .btn{min-height:46px;padding:0 18px;border-radius:7px;border:1px solid transparent;display:inline-flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.015em;transition:transform .2s,background .2s,color .2s,border-color .2s}
 .ba5173 .btn:hover{transform:translateY(-2px)}
 .ba5173 .btn:active{transform:scale(.97)}
-.ba5173 .btn-primary{background:var(--accent-color);color:#12140a}
-.ba5173 .btn-primary:hover{background:#e3f64a;box-shadow:0 8px 32px rgba(212,232,42,.13)}
+.ba5173 .btn-primary{background:var(--ba-accent);color:var(--ba-gold-ink)}
+.ba5173 .btn-primary:hover{background:var(--ba-accent-hover);box-shadow:0 8px 32px var(--ba-accent-glow)}
 .ba5173 .btn-ghost{border-color:var(--line);color:#f4f4f1;background:rgba(255,255,255,.025)}
 .ba5173 .btn-ghost:hover{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.07)}
 .ba5173 .header-tools{display:flex;align-items:center;gap:10px;margin-left:7px}
@@ -665,8 +665,8 @@ html[lang="bn"] .ba5173{
 .ba5173 .drawer-nav{display:flex;flex-direction:column;gap:10px;margin:28px 0 25px}
 .ba5173 .drawer-nav a,.ba5173 .drawer-nav button{display:flex;align-items:center;gap:12px;width:100%;min-height:56px;padding:8px 18px 8px 8px;border:1px solid #232634;border-radius:999px;background:#16181f;color:#fff;font:800 16px/1.2 var(--app-font-body),sans-serif;text-align:left;text-decoration:none;text-transform:none;cursor:pointer}
 .ba5173 .drawer-nav-ico{display:grid;place-items:center;width:40px;height:40px;flex:none;border:1px solid #232634;border-radius:999px;background:#0b0c10;color:#fff}
-.ba5173 .drawer-nav a.is-active{color:#0b0c10;background:#ccff00;border-color:#ccff00;box-shadow:0 0 22px rgba(204,255,0,.45)}
-.ba5173 .drawer-nav a.is-active .drawer-nav-ico{color:#ccff00;background:#0b0c10;border-color:#0b0c10;box-shadow:0 0 12px rgba(204,255,0,.7)}
+.ba5173 .drawer-nav a.is-active{color:var(--ba-gold-ink);background:var(--ba-accent);border-color:var(--ba-accent);box-shadow:0 0 22px var(--ba-accent-glow)}
+.ba5173 .drawer-nav a.is-active .drawer-nav-ico{color:var(--ba-accent);background:#0b0c10;border-color:#0b0c10;box-shadow:0 0 12px var(--ba-accent-glow)}
 .ba5173 .drawer-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .ba5173 .drawer-card{border:1px solid var(--line);border-radius:8px;padding:16px;background:#14171a;color:#eee;text-align:left}
 .ba5173 .drawer-card small{display:block;color:#8e929a;margin-top:6px;font-size:10px}

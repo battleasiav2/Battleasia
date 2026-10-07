@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/providers/accent_provider.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 
 /// Aurora Edge profile drawer link — flat list row with optional icon.
 class AccountMenuTile extends StatelessWidget {
@@ -39,17 +42,18 @@ class AccountMenuTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<AccentProvider>();
     const card = Color(0xFF16181F);
     const line = Color(0xFF232634);
-    const lime = Color(0xFFCCFF00);
-    const ink = Color(0xFF0B0C10);
+    final accent = AppColors.gold;
+    final ink = AppColors.goldInk;
     return Padding(
       padding: EdgeInsets.only(left: nested ? 8 : 0, bottom: 10),
       child: Material(
-        color: active ? lime : card,
+        color: active ? accent : card,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(999),
-          side: BorderSide(color: active ? lime : line),
+          side: BorderSide(color: active ? accent : line),
         ),
         child: InkWell(
           onTap: onTap,
@@ -66,13 +70,13 @@ class AccountMenuTile extends StatelessWidget {
                     shape: BoxShape.circle,
                     border: Border.all(color: active ? ink : line),
                     boxShadow: active
-                        ? const [BoxShadow(color: Color(0xB3CCFF00), blurRadius: 12)]
+                        ? [BoxShadow(color: accent.withValues(alpha: 0.7), blurRadius: 12)]
                         : null,
                   ),
                   child: Icon(
                     icon ?? Icons.circle,
                     size: 18,
-                    color: active ? lime : Colors.white,
+                    color: active ? accent : Colors.white,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -93,7 +97,7 @@ class AccountMenuTile extends StatelessWidget {
                   Container(
                     width: 8,
                     height: 8,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: ink,
                       shape: BoxShape.circle,
                     ),

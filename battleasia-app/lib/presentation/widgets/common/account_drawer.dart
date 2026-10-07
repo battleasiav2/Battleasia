@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:typed_data';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/core/providers/accent_provider.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/presentation/widgets/common/account_menu_tile.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
@@ -212,6 +213,7 @@ class _AccountDrawerContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<AccentProvider>();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -398,7 +400,7 @@ class _AccountDrawerContent extends StatelessWidget {
               decoration: TextDecoration.none,
             ),
           ),
-          iconColor: const Color(0xFFCCFF00),
+          iconColor: AppColors.gold,
           collapsedIconColor: Colors.white,
           children: [
             Padding(
