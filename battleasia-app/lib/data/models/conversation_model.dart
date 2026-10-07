@@ -40,6 +40,7 @@ class DirectMessageModel {
   final String senderId;
   final String? createdAt;
   final List<String> attachments;
+  final List<String> reactions;
 
   DirectMessageModel({
     required this.id,
@@ -47,19 +48,35 @@ class DirectMessageModel {
     required this.senderId,
     this.createdAt,
     this.attachments = const [],
+    this.reactions = const [],
   });
+
+  DirectMessageModel copyWith({List<String>? reactions}) {
+    return DirectMessageModel(
+      id: id,
+      body: body,
+      senderId: senderId,
+      createdAt: createdAt,
+      attachments: attachments,
+      reactions: reactions ?? this.reactions,
+    );
+  }
 
   factory DirectMessageModel.fromJson(Map<String, dynamic> json) {
     final raw = json['attachments'];
     final urls = raw is List
         ? raw.map((e) => e.toString()).where((e) => e.isNotEmpty).toList()
         : <String>[];
+    final reactions = json['reactions'];
     return DirectMessageModel(
       id: json['id']?.toString() ?? '',
       body: json['body']?.toString() ?? '',
       senderId: json['senderId']?.toString() ?? '',
       createdAt: json['createdAt']?.toString(),
       attachments: urls,
+      reactions: reactions is List
+          ? reactions.map((row) => row is Map ? row['emoji']?.toString() ?? '' : row.toString()).where((e) => e.isNotEmpty).toList()
+          : const [],
     );
   }
 }

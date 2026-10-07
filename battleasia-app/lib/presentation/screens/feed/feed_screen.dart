@@ -199,14 +199,46 @@ class _FeedScreenState extends State<FeedScreen> {
   }
 
   Future<void> _handleSave(FeedModel feed) async {
+    String? folder;
+    if (!feed.isSaved) {
+      folder = await showDialog<String>(
+        context: context,
+        builder: (dialogContext) {
+          final controller = TextEditingController(text: 'Saved');
+          return AlertDialog(
+            title: const Text('Save to'),
+            content: TextField(
+              controller: controller,
+              autofocus: true,
+              decoration: const InputDecoration(hintText: 'Collection name'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: const Text('Cancel'),
+              ),
+              TextButton(
+                onPressed: () {
+                  final name = controller.text.trim();
+                  Navigator.pop(dialogContext, name.isEmpty ? 'Saved' : name);
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          );
+        },
+      );
+      if (folder == null || !mounted) return;
+    }
+
     setState(() {
       _feeds = _feeds
-          .map((f) => f.id == feed.id ? f.copyWith(isSaved: !f.isSaved) : f)
+          .map((f) => f.id == feed.id ? f.copyWith(isSaved: !f.isSaved, collectionName: folder) : f)
           .toList();
     });
 
     try {
-      final result = await _feedService.toggleSaveFeed(feed.id);
+      final result = await _feedService.toggleSaveFeed(feed.id, collectionName: folder);
       if (result['success'] == true && result['data'] is Map) {
         final saved = (result['data'] as Map)['isSaved'] == true;
         if (mounted) {

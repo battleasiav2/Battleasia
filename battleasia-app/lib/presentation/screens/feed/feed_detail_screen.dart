@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
+import 'package:battleasia_app/core/services/social_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
@@ -176,6 +178,109 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
         });
       }
     }
+  }
+
+  Future<void> _shareInChat() async {
+    final controller = TextEditingController();
+    var hits = <Map<String, dynamic>>[];
+    var searching = false;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return StatefulBuilder(
+          builder: (dialogContext, setLocal) {
+            return AlertDialog(
+              title: const Text('Share in chat'),
+              content: SizedBox(
+                width: 320,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: controller,
+                      decoration: const InputDecoration(hintText: 'Search player'),
+                      onChanged: (value) async {
+                        final query = value.trim();
+                        if (query.length < 2) {
+                          setLocal(() {
+                            searching = false;
+                            hits = [];
+                          });
+                          return;
+                        }
+                        setLocal(() => searching = true);
+                        final result = await SocialService().globalSearch(query);
+                        if (!dialogContext.mounted || controller.text.trim() != query) return;
+                        final data = result['data'];
+                        final users = data is Map ? (data['users'] as List? ?? []) : const [];
+                        setLocal(() {
+                          searching = false;
+                          hits = users.whereType<Map>().map((row) => Map<String, dynamic>.from(row)).toList();
+                        });
+                      },
+                    ),
+                    if (searching)
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: CircularProgressIndicator(color: AppColors.gold),
+                      ),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxHeight: 240),
+                      child: ListView(
+                        shrinkWrap: true,
+                        children: hits.map((user) {
+                          final username = user['username']?.toString() ?? 'Player';
+                          return ListTile(
+                            title: Text(username),
+                            onTap: () async {
+                              final id = user['id']?.toString() ?? '';
+                              if (id.isEmpty) return;
+                              final conv = await SocialService().createConversation(id);
+                              final convData = conv['data'];
+                              final convId = convData is Map ? convData['id']?.toString() ?? '' : '';
+                              if (conv['success'] != true || convId.isEmpty) {
+                                if (!dialogContext.mounted) return;
+                                ScaffoldMessenger.of(dialogContext).showSnackBar(
+                                  SnackBar(content: Text(conv['message']?.toString() ?? 'Could not open chat')),
+                                );
+                                return;
+                              }
+                              final sent = await SocialService().sendDirectMessage(
+                                convId,
+                                'Shared a post: ${AppConfig.siteUrl}/user/feed/${widget.feedId}',
+                              );
+                              if (!dialogContext.mounted) return;
+                              Navigator.pop(dialogContext);
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    sent['success'] == true
+                                        ? 'Sent to $username'
+                                        : (sent['message']?.toString() ?? 'Could not share'),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext),
+                  child: const Text('Close'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+    controller.dispose();
   }
 
   Future<void> _handleLike() async {
@@ -709,6 +814,10 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                     },
               child: Text(_pinning ? '…' : (_pinned ? 'Unpin' : 'Pin')),
             ),
+          TextButton(
+            onPressed: _shareInChat,
+            child: const Text('Share'),
+          ),
           SizedBox(width: spacing16),
           IconButton(
             onPressed: _showCommentsDialog,

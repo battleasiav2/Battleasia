@@ -133,11 +133,12 @@ class SocialService {
   Future<Map<String, dynamic>> getConversations({
     int page = 1,
     int limit = 30,
+    String tab = 'inbox',
   }) async {
     try {
       final headers = await _getHeaders();
       final uri = Uri.parse('$_baseUrl/api/v2/social/messages/conversations')
-          .replace(queryParameters: {'page': '$page', 'limit': '$limit'});
+          .replace(queryParameters: {'page': '$page', 'limit': '$limit', 'tab': tab});
       final response = await ApiClient.get(uri, headers: headers);
       return _parsePaginated(response);
     } catch (e) {
@@ -179,14 +180,7 @@ class SocialService {
             'attachments': attachments,
         }),
       );
-      final data = jsonDecode(response.body) as Map<String, dynamic>;
-      if (response.statusCode == 200 && data['status'] == true) {
-        return {'success': true, 'data': data['data']};
-      }
-      return {
-        'success': false,
-        'message': data['message'] as String? ?? 'Failed to send message',
-      };
+      return _parseBody(response);
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -234,6 +228,61 @@ class SocialService {
           if (musicTitle != null && musicTitle.isNotEmpty)
             'musicTitle': musicTitle,
         }),
+      );
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> acceptConversation(String id) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/social/messages/conversations/$id/accept'),
+        headers: headers,
+      );
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> reactDirectMessage(String conversationId, String messageId, String emoji) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/social/messages/$conversationId/$messageId/react'),
+        headers: headers,
+        body: jsonEncode({'emoji': emoji}),
+      );
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> reactStory(String id, String emoji) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/social/stories/$id/react'),
+        headers: headers,
+        body: jsonEncode({'emoji': emoji}),
+      );
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> voteStoryPoll(String id, int option) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/social/stories/$id/poll'),
+        headers: headers,
+        body: jsonEncode({'option': option}),
       );
       return _parseBody(response);
     } catch (e) {

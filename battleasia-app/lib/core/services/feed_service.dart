@@ -270,12 +270,15 @@ class FeedService {
   }
 
   /// Toggle save on a feed post
-  Future<Map<String, dynamic>> toggleSaveFeed(String feedId) async {
+  Future<Map<String, dynamic>> toggleSaveFeed(String feedId, {String? collectionName}) async {
     try {
       final headers = await _getHeaders();
       final response = await ApiClient.post(
         Uri.parse('$_baseUrl/api/v2/feed/$feedId/save'),
         headers: headers,
+        body: collectionName == null || collectionName.trim().isEmpty
+            ? null
+            : jsonEncode({'collectionName': collectionName.trim()}),
       );
       final responseBody = response.body;
       if (responseBody.isEmpty) {

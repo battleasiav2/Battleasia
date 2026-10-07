@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
 import 'package:battleasia_app/core/services/social_service.dart';
+import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
@@ -456,6 +457,7 @@ class FeedSavedPanel extends StatefulWidget {
 class _FeedSavedPanelState extends State<FeedSavedPanel> {
   final FeedService _feedService = FeedService();
   bool _loading = true;
+  String _folder = '';
   List<FeedModel> _feeds = [];
 
   @override
@@ -501,27 +503,52 @@ class _FeedSavedPanelState extends State<FeedSavedPanel> {
         ),
       );
     }
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: _feeds.length,
-      itemBuilder: (context, index) {
-        final feed = _feeds[index];
-        return FeedItem(
-          feed: feed,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => FeedDetailScreen(feedId: feed.id),
+    final folders = _feeds.map((f) => (f.collectionName == null || f.collectionName!.isEmpty) ? 'Saved' : f.collectionName!).toSet().toList();
+    final visible = _folder.isEmpty
+        ? _feeds
+        : _feeds.where((f) => ((f.collectionName == null || f.collectionName!.isEmpty) ? 'Saved' : f.collectionName) == _folder).toList();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (folders.isNotEmpty)
+          Wrap(
+            spacing: 8,
+            children: [
+              ActionChip(
+                label: const Text('All'),
+                onPressed: () => setState(() => _folder = ''),
               ),
+              ...folders.map(
+                (name) => ActionChip(
+                  label: Text(name),
+                  onPressed: () => setState(() => _folder = name),
+                ),
+              ),
+            ],
+          ),
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: visible.length,
+          itemBuilder: (context, index) {
+            final feed = visible[index];
+            return FeedItem(
+              feed: feed,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => FeedDetailScreen(feedId: feed.id),
+                  ),
+                );
+              },
+              onComment: () {
+                FeedCommentsSheet.show(context, feedId: feed.id);
+              },
             );
           },
-          onComment: () {
-            FeedCommentsSheet.show(context, feedId: feed.id);
-          },
-        );
-      },
+        ),
+      ],
     );
   }
 }
@@ -544,6 +571,9 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
   bool _settingsLoading = true;
   MessagingSettingsModel? _messagingSettings;
   List<ConversationModel> _conversations = [];
+  List<ConversationModel> _requests = [];
+  String _msgTab = 'inbox';
+  bool _requestsOn = false;
   ConversationModel? _active;
   List<DirectMessageModel> _messages = [];
   final TextEditingController _composer = TextEditingController();
@@ -566,6 +596,11 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
   Future<void> _bootstrap() async {
     await _loadMessagingSettings();
     if (!mounted) return;
+    final flags = await UserService().getP1Flags();
+    final flagData = flags['data'];
+    if (mounted) {
+      setState(() => _requestsOn = flagData is Map && flagData['igMessageRequests'] == true);
+    }
 
     final builtinEnabled = _messagingSettings?.builtinEnabled ?? true;
     if (!builtinEnabled) {
@@ -574,6 +609,7 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
     }
 
     await _loadConversations();
+    if (_requestsOn) await _loadConversations(tab: 'requests');
     final initialUserId = widget.initialUserId;
     if (initialUserId != null && initialUserId.isNotEmpty && !_initialUserHandled) {
       _initialUserHandled = true;
@@ -600,17 +636,20 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
     });
   }
 
-  Future<void> _loadConversations() async {
+  Future<void> _loadConversations({String tab = 'inbox'}) async {
     setState(() => _loading = true);
-    final result = await _socialService.getConversations();
+    final result = await _socialService.getConversations(tab: tab);
     if (!mounted) return;
     if (result['success'] == true) {
       final data = result['data'] as Map<String, dynamic>;
       final items = data['results'] as List? ?? [];
+      final rows = items.map((e) => ConversationModel.fromJson(e as Map<String, dynamic>)).toList();
       setState(() {
-        _conversations = items
-            .map((e) => ConversationModel.fromJson(e as Map<String, dynamic>))
-            .toList();
+        if (tab == 'requests') {
+          _requests = rows;
+        } else {
+          _conversations = rows;
+        }
         _loading = false;
       });
     } else {
@@ -858,7 +897,20 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
             ),
           ),
         ),
-        if (_conversations.isEmpty)
+        if (_requestsOn)
+          Row(
+            children: [
+              TextButton(
+                onPressed: () => setState(() => _msgTab = 'inbox'),
+                child: Text('Inbox', style: TextStyle(color: _msgTab == 'inbox' ? AppColors.gold : Colors.white70)),
+              ),
+              TextButton(
+                onPressed: () => setState(() => _msgTab = 'requests'),
+                child: Text('Requests (${_requests.length})', style: TextStyle(color: _msgTab == 'requests' ? AppColors.gold : Colors.white70)),
+              ),
+            ],
+          ),
+        if ((_msgTab == 'requests' ? _requests : _conversations).isEmpty)
           Padding(
             padding: const EdgeInsets.all(32),
             child: Center(
@@ -869,7 +921,7 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
             ),
           )
         else
-          ..._conversations.map(
+          ...(_msgTab == 'requests' ? _requests : _conversations).map(
             (c) => ListTile(
               leading: CircleAvatar(
                 backgroundColor: AppColors.gold,
@@ -880,20 +932,25 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
                   style: const TextStyle(color: Colors.black),
                 ),
               ),
-              title: Text(
-                c.otherUsername,
-                style: AppTheme.bodyMedium.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              subtitle: Text(
-                c.lastMessagePreview,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
-              ),
-              trailing: const Icon(Icons.chevron_right, color: AppColors.textMuted),
+              title: Text(c.otherUsername, style: const TextStyle(color: Colors.white)),
+              subtitle: Text(c.lastMessagePreview, style: TextStyle(color: Colors.white.withValues(alpha: 0.6))),
+              trailing: _msgTab == 'requests'
+                  ? TextButton(
+                      onPressed: () async {
+                        final messenger = ScaffoldMessenger.of(context);
+                        final result = await _socialService.acceptConversation(c.id);
+                        if (!mounted) return;
+                        messenger.showSnackBar(
+                          SnackBar(content: Text(result['success'] == true ? 'Accepted' : (result['message']?.toString() ?? 'Could not accept'))),
+                        );
+                        if (result['success'] == true) {
+                          await _loadConversations();
+                          await _loadConversations(tab: 'requests');
+                        }
+                      },
+                      child: const Text('Accept'),
+                    )
+                  : null,
               onTap: () => _openConversation(c),
             ),
           ),
@@ -940,10 +997,41 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
                   ),
                 ),
               ],
+              if (message.reactions.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text(message.reactions.join(' '), style: AppTheme.bodySmall),
+                ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: ['🔥', '👏', '❤'].map((emoji) {
+                  return InkWell(
+                    onTap: () => _reactToMessage(message, emoji),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8, top: 4),
+                      child: Text(emoji),
+                    ),
+                  );
+                }).toList(),
+              ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _reactToMessage(DirectMessageModel message, String emoji) async {
+    final active = _active;
+    if (active == null) return;
+    final result = await _socialService.reactDirectMessage(active.id, message.id, emoji);
+    if (!mounted || result['success'] != true) return;
+    final data = result['data'];
+    final reactions = data is List
+        ? data.map((row) => row is Map ? row['emoji']?.toString() ?? '' : row.toString()).where((e) => e.isNotEmpty).toList()
+        : message.reactions;
+    setState(() {
+      _messages = _messages.map((row) => row.id == message.id ? row.copyWith(reactions: reactions) : row).toList();
+    });
   }
 }

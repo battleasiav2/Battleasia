@@ -7,6 +7,7 @@ class StoryItem {
   final String? expiresAt;
   final String? createdAt;
   final bool viewed;
+  final Map<String, dynamic>? poll;
 
   StoryItem({
     required this.id,
@@ -17,6 +18,7 @@ class StoryItem {
     this.expiresAt,
     this.createdAt,
     this.viewed = false,
+    this.poll,
   });
 
   factory StoryItem.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class StoryItem {
       expiresAt: json['expiresAt']?.toString(),
       createdAt: json['createdAt']?.toString(),
       viewed: json['viewed'] == true,
+      poll: json['poll'] is Map ? Map<String, dynamic>.from(json['poll'] as Map) : null,
     );
   }
 
@@ -42,6 +45,7 @@ class StoryItem {
       expiresAt: expiresAt,
       createdAt: createdAt,
       viewed: viewed ?? this.viewed,
+      poll: poll,
     );
   }
 }

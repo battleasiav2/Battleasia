@@ -508,9 +508,11 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
   late int _storyIndex;
   AnimationController? _progress;
   Timer? _videoFallback;
+  final Map<String, Map<String, dynamic>> _polls = {};
 
   StoryGroup get _group => widget.groups[_groupIndex];
   StoryItem get _story => _group.stories[_storyIndex];
+  Map<String, dynamic>? get _poll => _polls[_story.id] ?? _story.poll;
 
   @override
   void initState() {
@@ -683,6 +685,29 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                     ),
                   ),
                   const Spacer(),
+                  if (_poll != null && (_poll!['question']?.toString().isNotEmpty ?? false))
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(
+                            '${_poll!['kind'] == 'quiz' ? 'Quiz' : 'Poll'} · ${_poll!['question']}',
+                            style: AppTheme.bodyMedium.copyWith(color: Colors.white),
+                          ),
+                          ..._pollOptions(),
+                        ],
+                      ),
+                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: ['🔥', '👏', '❤', 'GG'].map((emoji) {
+                      return TextButton(
+                        onPressed: () => SocialService().reactStory(_story.id, emoji),
+                        child: Text(emoji),
+                      );
+                    }).toList(),
+                  ),
                   if (_story.caption.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.all(16),
@@ -699,5 +724,30 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
         ),
       ),
     );
+  }
+
+  List<Widget> _pollOptions() {
+    final poll = _poll;
+    final raw = poll?['options'];
+    if (poll == null || raw is! List) return const [];
+    final correct = poll['correct'];
+    return [
+      for (var n = 0; n < raw.length; n++)
+        if (raw[n] is Map)
+          TextButton(
+            onPressed: () async {
+              final storyId = _story.id;
+              final result = await SocialService().voteStoryPoll(storyId, n);
+              if (!mounted || result['success'] != true || result['data'] is! Map) return;
+              setState(() {
+                _polls[storyId] = Map<String, dynamic>.from(result['data'] as Map);
+              });
+            },
+            child: Text(
+              '${(raw[n] as Map)['text'] ?? ''} · ${(raw[n] as Map)['votes'] ?? 0}${correct == n ? ' · Correct' : ''}',
+              style: TextStyle(color: (raw[n] as Map)['chosen'] == true ? AppColors.gold : Colors.white),
+            ),
+          ),
+    ];
   }
 }
