@@ -43,6 +43,8 @@
     "suggested": "Suggested",
     "follow": "Follow",
     "following": "Following",
+    "fyp": "For You",
+    "forEveryone": "For everyone",
     "followFail": "Could not follow",
     "clip": "Clip",
     "photo": "Photo",
@@ -487,7 +489,18 @@
     "roomSoon": "Room not available yet",
     "roomClip": "Room: {id}{pass}",
     "pass": "Pass",
-    "linkCopied": "Link copied"
+    "linkCopied": "Link copied",
+    "oneAtATime": "Only one live match at a time. Finish or leave “{name}” first.",
+    "pubgIdRequired": "Add your in-game ID (Profile → PUBG ID) before joining any match.",
+    "insufficientBalance": "Insufficient balance",
+    "premiumOnlyToast": "This match is available for premium members only",
+    "roomCreds": "Room details",
+    "roomIdLabel": "Room ID",
+    "passLabel": "Password",
+    "copyId": "Copy ID",
+    "copyPass": "Copy pass",
+    "roomHidden": "Join this match to unlock room ID and password.",
+    "roomPending": "Joined — room ID & password will appear here when the host posts them."
   },
   "common": {
     "retry": "Retry",
@@ -568,6 +581,10 @@
     "wins": "Wins",
     "kills": "Kills",
     "losses": "Losses"
+  },
+  "matches": {
+    "empty": "No completed matches",
+    "emptyLead": "Join a room. Results land here after admin posts."
   },
   "footer": {
     "home": "Home"

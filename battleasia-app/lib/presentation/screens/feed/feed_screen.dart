@@ -55,6 +55,7 @@ class _FeedScreenState extends State<FeedScreen> {
   bool _gameFeed = false;
   bool _highlightsOn = false;
   bool _muteOn = false;
+  bool _fypOn = false;
   FeedHubSection _hubSection = FeedHubSection.feed;
 
   @override
@@ -289,6 +290,7 @@ class _FeedScreenState extends State<FeedScreen> {
       _gameFeed = p1 is Map && p1['igGameFeed'] == true;
       _highlightsOn = p1 is Map && p1['igHighlights'] == true;
       _muteOn = p2Data is Map && (p2Data['igForYou'] == true || p2Data['voiceNotes'] == true);
+      _fypOn = p2Data is Map && p2Data['igForYou'] == true;
       if (_muteDraft.text.isEmpty && words.isNotEmpty) _muteDraft.text = words;
     });
   }
@@ -601,12 +603,13 @@ class _FeedScreenState extends State<FeedScreen> {
   }
 
   Widget _buildFeedModes(BuildContext context) {
-    const modes = [
-      ('all', 'All'),
-      ('following', 'Following'),
+    final modes = [
+      ('all', 'feed.forEveryone'.tr()),
+      ('following', 'feed.following'.tr()),
       ('trending', 'Trending'),
       ('latest', 'Latest'),
-      ('recommended', 'For you'),
+      ('recommended', 'Recommended'),
+      if (_fypOn) ('fyp', 'feed.fyp'.tr()),
     ];
 
     return SingleChildScrollView(

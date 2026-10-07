@@ -10,6 +10,7 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/leaderboard_entry_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
+import 'package:battleasia_app/presentation/screens/profile/public_profile_screen.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 
 class LeaderboardScreen extends StatefulWidget {
@@ -320,6 +321,14 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
     );
   }
 
+  void _openProfile(LeaderboardEntryModel player) {
+    if (player.id.isEmpty) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => PublicProfileScreen(userId: player.id)),
+    );
+  }
+
   Widget _buildPodium() {
     final byRank = {for (final p in _topThree) p.rank: p};
     // Stadium order: 2nd · 1st · 3rd
@@ -360,7 +369,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             flex: flex,
             child: player == null
                 ? SizedBox(height: _pedestalHeight(rank) + 120)
-                : Column(
+                : GestureDetector(
+                    onTap: () => _openProfile(player),
+                    child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       if (isChamp)
@@ -517,6 +528,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                       ),
                     ],
                   ),
+                ),
           );
         }).toList(),
       ),
@@ -576,7 +588,9 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
             ),
           ),
           ...rest.map((player) {
-            return Container(
+            return InkWell(
+              onTap: () => _openProfile(player),
+              child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
                 border: Border(
@@ -615,6 +629,7 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                   ),
                 ],
               ),
+            ),
             );
           }),
         ],

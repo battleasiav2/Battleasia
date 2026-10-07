@@ -93,6 +93,21 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
     );
   }
 
+  Future<void> _copyField(String value) async {
+    final text = value.trim();
+    if (text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('match.roomSoon'.tr())),
+      );
+      return;
+    }
+    await Clipboard.setData(ClipboardData(text: text));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('match.roomCopied'.tr())),
+    );
+  }
+
   Future<void> _copyMatchLink() async {
     final url = '${AppConfig.siteUrl}/user/play/${widget.matchId}/detail';
     await Clipboard.setData(ClipboardData(text: url));
@@ -286,14 +301,26 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
     }
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final balance = authProvider.user?.balance ?? 0.0;
+    final user = authProvider.user;
+    final balance = user?.balance ?? 0.0;
+
+    if (_matchDetail!.premiumOnly && user?.isPremiumActive != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('match.premiumOnlyToast'.tr())),
+      );
+      return;
+    }
 
     if (_matchDetail!.entryFee > balance) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Insufficient balance'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text('match.insufficientBalance'.tr())),
+      );
+      return;
+    }
+
+    if ((user?.pubgId ?? '').trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('match.pubgIdRequired'.tr())),
       );
       return;
     }
@@ -891,7 +918,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Room Details',
+            'match.roomCreds'.tr(),
             style: AppTheme.heading3.copyWith(
               color: const Color(0xFF10b981),
               fontWeight: FontWeight.w600,
@@ -899,33 +926,43 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
             ),
           ),
           SizedBox(height: spacing),
-          Text(
-            'Room ID: ${_matchDetail!.roomId ?? 'N/A'}',
-            style: AppTheme.bodyMedium.copyWith(
-              color: Colors.white,
-              fontSize: bodyFontSize,
+          if (_matchDetail!.isJoined != true)
+            Text(
+              'match.roomHidden'.tr(),
+              style: AppTheme.bodyMedium.copyWith(color: Colors.white70, fontSize: bodyFontSize),
+            )
+          else if ((_matchDetail!.roomId ?? '').trim().isEmpty)
+            Text(
+              'match.roomPending'.tr(),
+              style: AppTheme.bodyMedium.copyWith(color: Colors.white70, fontSize: bodyFontSize),
+            )
+          else ...[
+            Text(
+              '${'match.roomIdLabel'.tr()}: ${_matchDetail!.roomId}',
+              style: AppTheme.bodyMedium.copyWith(color: Colors.white, fontSize: bodyFontSize),
             ),
-          ),
-          SizedBox(height: spacing * 0.5),
-          Text(
-            'Password: ${_matchDetail!.password ?? 'N/A'}',
-            style: AppTheme.bodyMedium.copyWith(
-              color: Colors.white,
-              fontSize: bodyFontSize,
+            TextButton(
+              onPressed: () => _copyField(_matchDetail!.roomId ?? ''),
+              child: Text('match.copyId'.tr()),
             ),
-          ),
-          Wrap(
-            spacing: 8,
-            children: [
-              TextButton(
-                onPressed: _copyRoom,
-                child: Text('match.copyRoom'.tr()),
+            if ((_matchDetail!.password ?? '').trim().isNotEmpty) ...[
+              Text(
+                '${'match.passLabel'.tr()}: ${_matchDetail!.password}',
+                style: AppTheme.bodyMedium.copyWith(color: Colors.white, fontSize: bodyFontSize),
               ),
               TextButton(
-                onPressed: _copyMatchLink,
-                child: Text('feed.copyLink'.tr()),
+                onPressed: () => _copyField(_matchDetail!.password ?? ''),
+                child: Text('match.copyPass'.tr()),
               ),
             ],
+            TextButton(
+              onPressed: _copyRoom,
+              child: Text('match.copyRoom'.tr()),
+            ),
+          ],
+          TextButton(
+            onPressed: _copyMatchLink,
+            child: Text('feed.copyLink'.tr()),
           ),
         ],
       ),

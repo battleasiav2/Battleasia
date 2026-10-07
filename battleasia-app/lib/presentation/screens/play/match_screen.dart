@@ -104,12 +104,42 @@ class _MatchScreenState extends State<MatchScreen> {
     final isPremiumUser = user?.isPremiumActive ?? false;
 
     // Block non-premium users from joining premium-only matches
+    MatchModel? otherLive;
+    for (final candidate in _matches) {
+      if (candidate.isJoined && candidate.id != match.id && _isJoinable(candidate)) {
+        otherLive = candidate;
+        break;
+      }
+    }
+    if (otherLive != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'match.oneAtATime'.tr(namedArgs: {'name': otherLive.matchName}),
+          ),
+        ),
+      );
+      return;
+    }
+
     if (match.premiumOnly && !isPremiumUser) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('This match is available for premium members only'),
-          backgroundColor: Colors.orange,
-        ),
+        SnackBar(content: Text('match.premiumOnlyToast'.tr())),
+      );
+      return;
+    }
+
+    final pubgId = (user?.pubgId ?? '').trim();
+    if (pubgId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('match.pubgIdRequired'.tr())),
+      );
+      return;
+    }
+
+    if (match.entryFee > (user?.balance ?? 0)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('match.insufficientBalance'.tr())),
       );
       return;
     }

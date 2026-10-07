@@ -1,4 +1,5 @@
-﻿import 'package:flutter/cupertino.dart';
+﻿import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
@@ -11,8 +12,8 @@ import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 import 'package:battleasia_app/presentation/screens/play/match_detail_screen.dart';
+import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/match_result_screen.dart';
-import 'package:intl/intl.dart';
 
 class MyMatchesScreen extends StatefulWidget {
   const MyMatchesScreen({super.key});
@@ -341,11 +342,29 @@ class _MyMatchesScreenState extends State<MyMatchesScreen> {
             Icon(Icons.description, size: iconSize, color: Colors.grey[400]),
             SizedBox(height: spacing16),
             Text(
-              'No matches found',
+              'matches.empty'.tr(),
               style: AppTheme.heading3.copyWith(
                 color: Colors.grey,
                 fontSize: textFontSize,
               ),
+            ),
+            SizedBox(height: spacing16),
+            Text(
+              'matches.emptyLead'.tr(),
+              textAlign: TextAlign.center,
+              style: AppTheme.bodySmall.copyWith(color: Colors.white70),
+            ),
+            SizedBox(height: spacing16),
+            TextButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const PlayScreen()),
+              ),
+              style: TextButton.styleFrom(
+                backgroundColor: AppColors.gold,
+                foregroundColor: Colors.black,
+              ),
+              child: Text('nav.play'.tr()),
             ),
           ],
         ),
