@@ -414,3 +414,126 @@
     justify-content: center;
   }
 }
+
+.ops-gate {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 28px 16px;
+  background:
+    linear-gradient(180deg, #d7dde6 0%, #eef1f4 42%, #f7f8fa 100%);
+  color: #1b2430;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.ops-card {
+  width: min(420px, 100%);
+  padding: 28px 26px 22px;
+  border: 1px solid #c5ced8;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 18px 40px rgba(27, 36, 48, 0.08);
+}
+
+.ops-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.ops-id {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ops-id strong,
+.ops-id small {
+  display: block;
+}
+
+.ops-id strong {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ops-id small {
+  color: #667085;
+  font-size: 12px;
+}
+
+.ops-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 6px;
+  background: #1f3b5b;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.ops-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ops-card h1 {
+  margin: 0 0 6px;
+  font-family: "Segoe UI", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #172033;
+}
+
+.ops-lead,
+.ops-foot,
+.ops-card .auth-switch {
+  color: #5c6778;
+  font-size: 14px;
+}
+
+.ops-card .auth-form {
+  margin-top: 18px;
+}
+
+.ops-card .field input,
+.ops-card .otp-row input {
+  border-radius: 6px;
+  border-color: #c5ced8;
+  background: #f4f7fa;
+  color: #172033;
+}
+
+.ops-card .field input:focus,
+.ops-card .otp-row input:focus {
+  border-color: #1f3b5b;
+  box-shadow: 0 0 0 3px rgba(31, 59, 91, 0.16);
+}
+
+.ops-card .btn-primary {
+  border: 0;
+  border-radius: 6px;
+  color: #fff;
+  background: #1f3b5b;
+  box-shadow: none;
+}
+
+.ops-card .btn-primary:hover {
+  background: #173049;
+}
+
+.ops-foot {
+  margin: 18px 0 0;
+}
+
+.ops-foot a {
+  color: #1f3b5b;
+}

@@ -84,9 +84,6 @@ export function LoginPage() {
         <button className="btn btn-primary" type="submit" disabled={busy || wait > 0}>
           {wait > 0 ? t('http.429').replace('{n}', String(wait)) : busy ? t('login.signing') : t('login.continue')}
         </button>
-        <p className="auth-switch">
-          {t('login.arena')} <a href={(import.meta.env.VITE_PLAYER_URL as string) || 'https://battleasia.gg'}>battleasia.gg</a>
-        </p>
       </form>
     </AdminAuthShell>
   );
