@@ -63,7 +63,18 @@
     "pinFail": "Could not pin",
     "share": "Share",
     "shareFail": "Could not share",
-    "sentTo": "Sent to {name}"
+    "sentTo": "Sent to {name}",
+    "back": "← Feed",
+    "exploreSearch": "Search players, posts, #tags",
+    "noSearch": "No matches"
+  },
+  "tag": {
+    "title": "Hashtag",
+    "loadFail": "Could not load tag",
+    "empty": "No posts yet",
+    "emptyLead": "Be first to caption with",
+    "openFeed": "Open feed",
+    "posts": "Posts"
   },
   "feedHub": {
     "feed": "Feed",
@@ -751,9 +762,17 @@
     "followingN": "following",
     "serverTbd": "server TBD",
     "unsaved": "Discard unsaved profile changes?",
-    "unfollowed": "Unfollowed"
+    "unfollowed": "Unfollowed",
+    "saved": "Profile saved",
+    "saveFail": "Could not save",
+    "photoOk": "Photo updated",
+    "photoFail": "Could not update photo"
   },
   "stats": {
+    "eyebrow": "STATS",
+    "title": "My statistics",
+    "lead": "Career totals from finished rooms.",
+    "offline": "Stats offline",
     "matches": "Matches",
     "wins": "Wins",
     "kills": "Kills",

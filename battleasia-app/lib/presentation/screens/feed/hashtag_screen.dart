@@ -1,8 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/data/models/feed_model.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
+import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_comments_sheet.dart';
@@ -49,7 +51,7 @@ class _HashtagScreenState extends State<HashtagScreen> {
     if (result['success'] != true) {
       setState(() {
         _loading = false;
-        _error = result['message']?.toString() ?? 'Could not load this tag';
+        _error = result['message']?.toString() ?? 'tag.loadFail'.tr();
       });
       return;
     }
@@ -73,15 +75,26 @@ class _HashtagScreenState extends State<HashtagScreen> {
             controller: _scroll,
             padding: const EdgeInsets.fromLTRB(16, 108, 16, 120),
             children: [
-              TextButton.icon(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                label: const Text('Feed', style: TextStyle(color: Colors.white)),
+              TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const FeedScreen()),
+                ),
+                child: Text('feed.back'.tr(), style: const TextStyle(color: Colors.white)),
+              ),
+              Text(
+                'tag.title'.tr(),
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.55), fontSize: 12, letterSpacing: 1.2, fontWeight: FontWeight.w700),
               ),
               Text('#$_hash', style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800)),
               const SizedBox(height: 6),
               Text(
-                '${_loading ? '—' : _posts.length} posts',
+                '${'tag.emptyLead'.tr()} #$_hash.',
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${_loading ? '—' : _posts.length} ${'tag.posts'.tr()}',
                 style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
               ),
               const SizedBox(height: 16),
@@ -89,9 +102,22 @@ class _HashtagScreenState extends State<HashtagScreen> {
                 Center(child: Padding(padding: const EdgeInsets.all(24), child: CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2)))
               else if (_error != null)
                 Text(_error!, style: const TextStyle(color: AppColors.error))
-              else if (_posts.isEmpty)
-                Text('No posts for #$_hash yet.', style: TextStyle(color: Colors.white.withValues(alpha: 0.6)))
-              else
+              else if (_posts.isEmpty) ...[
+                Text('tag.empty'.tr(), style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 6),
+                Text(
+                  '${'tag.emptyLead'.tr()} #$_hash.',
+                  style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
+                ),
+                const SizedBox(height: 12),
+                FilledButton(
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const FeedScreen()),
+                  ),
+                  child: Text('tag.openFeed'.tr()),
+                ),
+              ] else
                 ..._posts.map(
                   (feed) => FeedItem(
                     feed: feed,

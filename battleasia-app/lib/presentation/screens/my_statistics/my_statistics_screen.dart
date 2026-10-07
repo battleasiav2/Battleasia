@@ -83,11 +83,11 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
           _statistics = [];
         });
       }
-    } catch (e) {
+    } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to load statistics: ${e.toString()}'),
+            content: Text('stats.offline'.tr()),
             backgroundColor: Colors.red,
           ),
         );
@@ -201,13 +201,27 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
                     children: [
                       SizedBox(height: spacing16),
                       Text(
-                        'MY STATISTICS',
+                        'stats.eyebrow'.tr(),
+                        style: AppTheme.bodySmall.copyWith(
+                          color: AppColors.textMuted,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.2,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'stats.title'.tr(),
                         style: AppTheme.heading2.copyWith(
                           color: AppColors.textPrimary,
                           fontWeight: FontWeight.w800,
                           fontSize: titleFontSize,
                           letterSpacing: 1,
                         ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'stats.lead'.tr(),
+                        style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
                       ),
                       SizedBox(height: spacing24),
                       if (_loading)
@@ -297,7 +311,7 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
     final net = totals['netProfit']!.toDouble();
     final isProfit = net >= 0;
     final display = [
-      ('Matches', '${totals['matches']}', AppColors.textPrimary),
+      ('stats.matches'.tr(), '${totals['matches']}', AppColors.textPrimary),
       ('Paid', totals['totalPaid']!.toDouble().toStringAsFixed(0), AppColors.gold),
       ('Won', totals['totalWon']!.toDouble().toStringAsFixed(0), AppColors.success),
       (
@@ -305,8 +319,8 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
         '${isProfit && net > 0 ? '+' : ''}${net.toStringAsFixed(0)}',
         isProfit ? AppColors.success : AppColors.error,
       ),
-      ('Wins', '${totals['wins']}', AppColors.success),
-      ('Losses', '${totals['losses']}', AppColors.error),
+      ('stats.wins'.tr(), '${totals['wins']}', AppColors.success),
+      ('stats.losses'.tr(), '${totals['losses']}', AppColors.error),
     ];
 
     return Container(

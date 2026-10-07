@@ -1,10 +1,11 @@
 import 'dart:io';
-import 'dart:convert';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/core/services/feed_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
@@ -337,33 +338,34 @@ class _ProfileContentState extends State<ProfileContent> {
 
     try {
       final userService = UserService();
-      String? avatarBase64;
+      String? avatarUrl;
       String? avatarUploadError;
 
-      // Convert selected avatar file to base64 data URI and send directly to the API.
-      // The backend stores the avatar as a base64 data URI string — no separate file
-      // upload endpoint is needed.
+      // Website uploads the file, then stores the public https URL.
+      // A data: URI is dropped by the API and would clear the photo.
       if (widget.pendingAvatarFile != null) {
         try {
           if (await widget.pendingAvatarFile!.exists()) {
-            final imageBytes = await widget.pendingAvatarFile!.readAsBytes();
-            final fileName = widget.pendingAvatarFile!.path.toLowerCase();
-            // Determine MIME type from file extension
-            String mimeType = 'image/jpeg';
-            if (fileName.endsWith('.png')) {
-              mimeType = 'image/png';
-            } else if (fileName.endsWith('.gif')) {
-              mimeType = 'image/gif';
-            } else if (fileName.endsWith('.webp')) {
-              mimeType = 'image/webp';
+            final uploaded = await FeedService().uploadMedia(
+              widget.pendingAvatarFile!.path,
+              folder: 'avatars',
+            );
+            final raw = uploaded['success'] == true
+                ? ((uploaded['data'] as Map?)?['url']?.toString() ?? '')
+                : '';
+            final absolute = AppConfig.getImageUrl(raw);
+            if (absolute != null &&
+                (absolute.startsWith('https://') || absolute.startsWith('http://'))) {
+              avatarUrl = absolute;
+            } else {
+              final message = uploaded['message']?.toString() ?? '';
+              avatarUploadError = message.isEmpty ? 'profile.photoFail'.tr() : message;
             }
-            final base64String = base64Encode(imageBytes);
-            avatarBase64 = 'data:$mimeType;base64,$base64String';
           } else {
-            avatarUploadError = 'Avatar file not found';
+            avatarUploadError = 'profile.photoFail'.tr();
           }
-        } catch (e) {
-          avatarUploadError = e.toString().replaceAll('Exception: ', '');
+        } catch (_) {
+          avatarUploadError = 'profile.photoFail'.tr();
         }
       }
 
@@ -378,7 +380,7 @@ class _ProfileContentState extends State<ProfileContent> {
         referralCode: _referralCodeController.text.trim().isEmpty
             ? null
             : _referralCodeController.text.trim(),
-        avatar: avatarBase64,
+        avatar: avatarUrl,
         twitterLink: _twitterLinkController.text.trim().isEmpty
             ? null
             : _twitterLinkController.text.trim(),
@@ -395,7 +397,7 @@ class _ProfileContentState extends State<ProfileContent> {
       );
 
       if (!result['success']) {
-        throw Exception(result['message'] ?? 'Failed to update profile');
+        throw Exception(result['message'] ?? 'profile.saveFail'.tr());
       }
 
       // Update user in auth provider
@@ -408,20 +410,18 @@ class _ProfileContentState extends State<ProfileContent> {
         await authProvider.refreshUser();
       }
 
-      if (widget.pendingAvatarFile != null && avatarBase64 != null) {
+      if (widget.pendingAvatarFile != null && avatarUrl != null) {
         widget.onAvatarSaved?.call();
       }
       _captureBaseline();
 
       if (mounted) {
-        String message =
-            result['message'] as String? ?? 'Profile updated successfully!';
-        if (avatarUploadError != null) {
-          message += ' (Note: Avatar upload failed: $avatarUploadError)';
-        }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(message),
+            content: Text(
+              avatarUploadError ??
+                  (avatarUrl != null ? 'profile.photoOk'.tr() : 'profile.saved'.tr()),
+            ),
             backgroundColor: avatarUploadError != null
                 ? Colors.orange
                 : AppTheme.accentColor,
@@ -430,13 +430,14 @@ class _ProfileContentState extends State<ProfileContent> {
         );
       }
     } catch (e) {
+      final raw = e.toString().replaceAll('Exception: ', '').trim();
       setState(() {
-        _errorMessage = e.toString().replaceAll('Exception: ', '');
+        _errorMessage = raw.isEmpty ? 'profile.saveFail'.tr() : raw;
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_errorMessage ?? 'Failed to update profile'),
+            content: Text(_errorMessage ?? 'profile.saveFail'.tr()),
             backgroundColor: Colors.red,
           ),
         );

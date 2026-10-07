@@ -73,7 +73,7 @@ class _FeedExplorePanelState extends State<FeedExplorePanel> {
     final query = raw.trim();
     if (!mounted) return;
     setState(() => _query = query);
-    if (query.isEmpty) {
+    if (query.length < 2) {
       setState(() {
         _searching = false;
         _hitUsers = [];
@@ -133,18 +133,20 @@ class _FeedExplorePanelState extends State<FeedExplorePanel> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text('feed.exploreSearch'.tr(), style: TextStyle(color: Colors.white.withValues(alpha: 0.7))),
+        const SizedBox(height: 6),
         TextField(
           controller: _search,
           style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(hintText: 'Search players, posts, or #tags'),
+          decoration: InputDecoration(hintText: 'feed.searchPlayer'.tr()),
           onChanged: _onSearchChanged,
         ),
-        if (_query.isNotEmpty) ...[
+        if (_query.trim().length >= 2) ...[
           const SizedBox(height: 12),
           if (_searching)
             Padding(padding: const EdgeInsets.all(12), child: CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2))
           else if (_hitUsers.isEmpty && _hitPosts.isEmpty && _hitTags.isEmpty)
-            Text('No results for “$_query”.', style: TextStyle(color: Colors.white.withValues(alpha: 0.6)))
+            Text('${'feed.noSearch'.tr()} “$_query”.', style: TextStyle(color: Colors.white.withValues(alpha: 0.6)))
           else ...[
             ..._hitUsers.map((user) {
               final id = (user['id'] ?? '').toString();
