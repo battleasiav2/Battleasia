@@ -105,8 +105,8 @@ class _RoomSeatsDialogState extends State<RoomSeatsDialog> {
                   child: Text(_error!, style: const TextStyle(color: AppColors.error)),
                 ),
               if (_loading)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 28),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 28),
                   child: Center(child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.gold)),
                 )
               else
