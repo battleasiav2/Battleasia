@@ -215,7 +215,10 @@
     "failedClose": "Failed to close",
     "failedSend": "Failed to send",
     "defaultSubject": "Support Ticket",
-    "seeAttached": "See attached"
+    "seeAttached": "See attached",
+    "needSubject": "Subject is required",
+    "needBody": "Add a description or image",
+    "created": "Ticket created"
   },
   "wallet": {
     "paymentChannel": "Payment Channel",
@@ -457,7 +460,30 @@
     "watchLive": "Watch Live",
     "comingSoon": "COMING SOON",
     "liveBadge": "LIVE",
-    "joinLabel": "JOIN"
+    "joinLabel": "JOIN",
+    "soon": "Coming soon",
+    "openMatches": "open matches",
+    "openMatchOne": "open match"
+  },
+  "ref": {
+    "milestones": "Invite milestones",
+    "noMilestones": "No invite milestones yet.",
+    "invites": "invites",
+    "claimed": "claimed",
+    "claim": "Claim",
+    "claimOk": "Milestone claimed",
+    "claimFail": "Cannot claim yet",
+    "copied": "Link copied",
+    "codeCopied": "Code copied",
+    "usernameCopied": "Username copied",
+    "copyUsername": "Copy username",
+    "empty": "No invites yet",
+    "emptyLead": "Share your link. Commission lands when they deposit and admin approves.",
+    "noHist": "No commissions yet.",
+    "noHistLead": "Earnings appear after referred deposits",
+    "active": "Active",
+    "pending": "Pending",
+    "inactive": "Inactive"
   },
   "match": {
     "spotsJoined": "Players joined",
@@ -608,6 +634,11 @@
     "followers": "Followers",
     "following": "Following",
     "noFollowList": "No users yet",
+    "noFollowers": "No followers yet",
+    "noFollowing": "Not following anyone yet",
+    "followListEmpty": "Explore the feed and follow players you like.",
+    "followListFail": "Could not load follow list",
+    "you": "You",
     "suggestedForYou": "Suggested for you",
     "follow": "Follow",
     "message": "Message",

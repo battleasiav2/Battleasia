@@ -6,6 +6,8 @@ import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/game_model.dart';
+import 'package:battleasia_app/data/models/match_model.dart';
+import 'package:battleasia_app/core/services/customer_support_service.dart';
 import 'package:battleasia_app/core/services/public_dashboard_service.dart';
 import 'package:battleasia_app/data/models/public_dashboard_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
@@ -31,8 +33,10 @@ class _PlayScreenState extends State<PlayScreen> {
   final ScrollController _scrollController = ScrollController();
   final GamesService _gamesService = GamesService();
   final PublicDashboardService _dashboardService = PublicDashboardService();
+  final CustomerSupportService _support = CustomerSupportService();
   String _activeTab = 'tournament';
   List<GameModel> _games = [];
+  Map<String, int> _openByGame = {};
   Map<String, int> _liveCountByGame = {};
   Map<String, int> _participantsByGame = {};
   bool _isLoading = true;
@@ -84,7 +88,47 @@ class _PlayScreenState extends State<PlayScreen> {
               result['message'] as String? ?? 'play.failedLoadGames'.tr();
         }
       });
+      if (result['success'] == true) _countOpenMatches();
     }
+  }
+
+  Future<void> _countOpenMatches() async {
+    final games = List<GameModel>.from(_games);
+    final counts = <String, int>{};
+    await Future.wait(games.map((game) async {
+      if (game.comingSoon) {
+        counts[game.id] = 0;
+        counts[game.name] = 0;
+        return;
+      }
+      final result = await _gamesService.getMatches(gameId: game.id);
+      final rows = result['data'];
+      if (result['success'] != true || rows is! List) return;
+      var open = 0;
+      for (final row in rows) {
+        if (row is! Map) continue;
+        final match = MatchModel.fromJson(Map<String, dynamic>.from(row));
+        final status = match.status.toLowerCase();
+        final spots = match.totalPlayer - (match.participantsCount ?? 0);
+        final left = spots < 0 ? 0 : spots;
+        if ((status == 'active' || status == 'start') && left > 0 && !match.isJoined) {
+          open++;
+        }
+      }
+      counts[game.id] = open;
+      counts[game.name] = open;
+    }));
+    if (!mounted) return;
+    setState(() => _openByGame = counts);
+  }
+
+  String _cardSubtitle(GameModel game) {
+    if (game.comingSoon) return 'play.soon'.tr();
+    final open = _openByGame[game.id] ?? _openByGame[game.name] ?? 0;
+    final unit = open == 1 ? 'play.openMatchOne'.tr() : 'play.openMatches'.tr();
+    final genre = game.genreLabel.trim();
+    final line = '$open $unit';
+    return genre.isEmpty ? line : '$line · $genre';
   }
 
   void _handleGameClick(String gameId) {
@@ -130,8 +174,13 @@ class _PlayScreenState extends State<PlayScreen> {
     );
   }
 
-  void _handleWatchLive() {
-    LinkUtils.openYoutubeLive();
+  Future<void> _handleWatchLive() async {
+    final href = await _support.youtubeHref();
+    if (href != null && href.isNotEmpty) {
+      await LinkUtils.openExternal(href);
+      return;
+    }
+    await LinkUtils.openYoutubeLive();
   }
 
   Widget _buildSkeletonCardWithSpinner() {
@@ -235,7 +284,9 @@ class _PlayScreenState extends State<PlayScreen> {
                         'imageUrl': 'assets/images/banner4.webp',
                       },
                     ],
-                    onWatchLive: _handleWatchLive,
+                    onWatchLive: () {
+                      _handleWatchLive();
+                    },
                   ),
                 ),
               ),
@@ -313,14 +364,22 @@ class _PlayScreenState extends State<PlayScreen> {
                       final game = _games[index];
                       return GameCard(
                         title: game.name,
-                        subTitle: game.genreLabel,
+                        subTitle: _cardSubtitle(game),
                         imageAsset: GameCoverArt.assetFor(game),
                         comingSoon: game.comingSoon,
                         liveCount: _liveCountByGame[game.name] ?? 0,
                         playerCount: _participantsByGame[game.name] ?? 0,
                         liveBadgeLabel: 'play.liveBadge'.tr(),
                         joinLabel: 'play.joinLabel'.tr(),
-                        onTap: () => _handleGameClick(game.id),
+                        onTap: () {
+                          if (game.comingSoon) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('play.soon'.tr())),
+                            );
+                            return;
+                          }
+                          _handleGameClick(game.id);
+                        },
                       );
                     }, childCount: _games.length),
                   ),

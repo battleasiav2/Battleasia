@@ -209,7 +209,19 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   Future<void> _createTicket() async {
     final subject = _subjectController.text.trim();
     final body = _bodyController.text.trim();
-    if ((body.isEmpty && _pendingUploadedUrls.isEmpty) || _creating) return;
+    if (_creating) return;
+    if (subject.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('support.needSubject'.tr())),
+      );
+      return;
+    }
+    if (body.isEmpty && _pendingUploadedUrls.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('support.needBody'.tr())),
+      );
+      return;
+    }
 
     setState(() => _creating = true);
     final result = await _service.createTicket(
@@ -227,6 +239,9 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
       _bodyController.clear();
       _pendingLocalPaths = [];
       _pendingUploadedUrls = [];
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('support.created'.tr())),
+      );
       await _openTicket(ticket);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -708,6 +723,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
         children: [
           TextField(
             controller: _subjectController,
+            maxLength: 120,
             decoration: InputDecoration(
               labelText: 'support.subject'.tr(),
               border: const OutlineInputBorder(),

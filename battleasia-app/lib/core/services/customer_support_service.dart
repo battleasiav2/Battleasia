@@ -20,6 +20,31 @@ class CustomerSupportService {
     };
   }
 
+  /// YouTube href from Admin live-chat social links. Null uses the app fallback.
+  Future<String?> youtubeHref() async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/customer-support/live-chat-settings'),
+        headers: headers,
+      );
+      if (response.body.isEmpty) return null;
+      final data = jsonDecode(response.body);
+      final payload = data is Map ? (data['data'] ?? data) : null;
+      final links = payload is Map ? payload['socialLinks'] : null;
+      if (links is! List) return null;
+      for (final row in links) {
+        if (row is! Map) continue;
+        final label = row['label']?.toString().toLowerCase() ?? '';
+        final href = row['href']?.toString().trim() ?? '';
+        if (label.contains('youtube') && (href.startsWith('http://') || href.startsWith('https://'))) {
+          return href;
+        }
+      }
+    } catch (_) {}
+    return null;
+  }
+
   // Get headers for multipart/form-data (file uploads)
   Future<Map<String, String>> _getMultipartHeaders() async {
     final token = await _authService.getToken();

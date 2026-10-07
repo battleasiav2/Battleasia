@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
 import 'package:battleasia_app/presentation/screens/profile/public_profile_screen.dart';
 
 enum FollowListType { followers, following }
@@ -61,6 +64,16 @@ class _FollowListSheetState extends State<FollowListSheet> {
         ? await _userService.getFollowers(widget.userId)
         : await _userService.getFollowing(widget.userId);
     if (!mounted) return;
+    if (result['success'] != true) {
+      setState(() {
+        _users = [];
+        _loading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message']?.toString() ?? 'profile.followListFail'.tr())),
+      );
+      return;
+    }
     final data = result['data'];
     final list = data is List
         ? data
@@ -89,7 +102,34 @@ class _FollowListSheetState extends State<FollowListSheet> {
           else if (_users.isEmpty)
             Expanded(
               child: Center(
-                child: Text('profile.noFollowList'.tr(), style: AppTheme.bodyMedium),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      widget.type == FollowListType.followers
+                          ? 'profile.noFollowers'.tr()
+                          : 'profile.noFollowing'.tr(),
+                      style: AppTheme.bodyMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'profile.followListEmpty'.tr(),
+                      style: AppTheme.bodySmall,
+                      textAlign: TextAlign.center,
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        final nav = Navigator.of(context);
+                        nav.pop();
+                        nav.push(
+                          MaterialPageRoute(builder: (_) => const FeedScreen()),
+                        );
+                      },
+                      child: Text('feedHub.explore'.tr()),
+                    ),
+                  ],
+                ),
               ),
             )
           else
@@ -101,8 +141,17 @@ class _FollowListSheetState extends State<FollowListSheet> {
                   final id = u['id']?.toString() ?? u['_id']?.toString() ?? '';
                   final name = u['username']?.toString() ?? u['name']?.toString() ?? 'User';
                   final following = u['isFollowing'] == true;
+                  final me = context.read<AuthProvider>().user?.id;
                   return ListTile(
-                    title: Text(name),
+                    title: Row(
+                      children: [
+                        Flexible(child: Text(name, overflow: TextOverflow.ellipsis)),
+                        if (id.isNotEmpty && id == me) ...[
+                          const SizedBox(width: 6),
+                          Text('profile.you'.tr(), style: TextStyle(color: AppColors.gold, fontSize: 12)),
+                        ],
+                      ],
+                    ),
                     trailing: TextButton(
                       onPressed: id.isEmpty
                           ? null

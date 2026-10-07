@@ -40,11 +40,13 @@ class ReferralItemModel {
         json['status']?.toString() ?? user?['status']?.toString();
 
     String referralStatus = 'active';
-    if (statusValue == 'inactive' ||
+    if (statusValue == 'pending' || statusValue == 'invited') {
+      referralStatus = 'pending';
+    } else if (statusValue == 'inactive' ||
         statusValue == 'deactive' ||
-        statusValue == 'banned') {
-      referralStatus = 'inactive';
-    } else if (isActive == false) {
+        statusValue == 'disabled' ||
+        statusValue == 'banned' ||
+        isActive == false) {
       referralStatus = 'inactive';
     }
 

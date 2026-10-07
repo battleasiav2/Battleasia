@@ -1,4 +1,5 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
@@ -150,22 +151,6 @@ class _PlayHeroBannerState extends State<PlayHeroBanner> {
       baseSize: 16.0,
     ).clamp(12.0, 20.0);
 
-    // Responsive button padding
-    final buttonPaddingH = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(12.0, 20.0);
-    final buttonPaddingV = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 12.0,
-    ).clamp(10.0, 16.0);
-
-    // Responsive icon size
-    final iconSize = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 20.0,
-    ).clamp(18.0, 24.0);
-
     // Responsive badge padding
     final badgePaddingH = ResponsiveUtils.getResponsiveSpacing(
       context,
@@ -241,7 +226,7 @@ class _PlayHeroBannerState extends State<PlayHeroBanner> {
               Row(
                 children: [
                   GoldButton(
-                    label: 'Watch Live',
+                    label: 'play.watchLive'.tr(),
                     expanded: false,
                     onPressed: widget.onWatchLive,
                   ),

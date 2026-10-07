@@ -1,6 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
@@ -139,9 +139,12 @@ class _ReferralScreenState extends State<ReferralScreen> {
     }
   }
 
-  void _copy(String value, {required bool isCode}) {
+  void _copy(String value, {required bool isCode, String? toastKey}) {
     if (value.isEmpty) return;
     Clipboard.setData(ClipboardData(text: value));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text((toastKey ?? (isCode ? 'ref.codeCopied' : 'ref.copied')).tr())),
+    );
     setState(() {
       if (isCode) {
         _copiedCode = true;
@@ -176,8 +179,10 @@ class _ReferralScreenState extends State<ReferralScreen> {
   Widget build(BuildContext context) {
     final user = context.watch<AuthProvider>().user;
     final code = user?.referralCode?.trim() ?? '';
-    final referralUrl = code.isNotEmpty
-        ? '${AppConfig.siteUrl}/auth/sign-up?ref=${Uri.encodeComponent(code)}'
+    final username = user?.username.trim() ?? '';
+    final ref = username.isNotEmpty ? username : code;
+    final referralUrl = ref.isNotEmpty
+        ? '${AppConfig.siteUrl}/dashboard?auth=signup&ref=${Uri.encodeComponent(ref)}'
         : '';
     final pad = ResponsiveUtils.isMobile(context) ? 16.0 : 24.0;
     final bottom = 80.0 + MediaQuery.of(context).padding.bottom;
@@ -241,7 +246,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                               _buildMilestones(),
                               if (widget.showInviteSection) ...[
                                 const SizedBox(height: 16),
-                                _buildInviteCard(code, referralUrl),
+                                _buildInviteCard(code, referralUrl, username),
                                 const SizedBox(height: 16),
                                 _buildHowItWorks(),
                               ],
@@ -294,18 +299,19 @@ class _ReferralScreenState extends State<ReferralScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Milestones', style: AppTheme.heading3.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
+          Text('ref.milestones'.tr(), style: AppTheme.heading3.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
           const SizedBox(height: 8),
           if (_milestones.isEmpty)
-            Text('No referral milestones yet.', style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted))
+            Text('ref.noMilestones'.tr(), style: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted))
           else
             ..._milestones.map((item) {
               final key = item['key']?.toString() ?? '';
               final claimed = item['claimedAt'] != null || item['status'] == 'claimed' || item['claimed'] == true;
               final canClaim = item['canClaim'] == true && !claimed;
-              final title = item['title']?.toString().isNotEmpty == true ? item['title'].toString() : '$key invites';
+              final target = item['target']?.toString() ?? item['threshold']?.toString() ?? key;
+              final title = '$target ${'ref.invites'.tr()}';
               final progress = '${item['progress'] ?? 0}/${item['threshold'] ?? 0}';
-              final label = claimed ? '$title · Claimed' : '$title · $progress';
+              final label = claimed ? '$title · ${'ref.claimed'.tr()}' : '$title · $progress';
               return Padding(
                 padding: const EdgeInsets.only(bottom: 8),
                 child: Row(
@@ -324,12 +330,16 @@ class _ReferralScreenState extends State<ReferralScreen> {
                                 setState(() => _claiming = '');
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text(result['success'] == true ? 'Milestone claimed' : (result['message']?.toString() ?? 'Could not claim')),
+                                    content: Text(
+                                      result['success'] == true
+                                          ? 'ref.claimOk'.tr()
+                                          : (result['message']?.toString() ?? 'ref.claimFail'.tr()),
+                                    ),
                                   ),
                                 );
                                 if (result['success'] == true) await _fetchAll();
                               },
-                        child: Text(_claiming == key ? '…' : 'Claim'),
+                        child: Text(_claiming == key ? '…' : 'ref.claim'.tr()),
                       ),
                   ],
                 ),
@@ -429,13 +439,29 @@ class _ReferralScreenState extends State<ReferralScreen> {
     );
   }
 
-  Widget _buildInviteCard(String code, String link) {
+  Widget _buildInviteCard(String code, String link, String username) {
     return Container(
       decoration: _panelDecoration,
       padding: const EdgeInsets.all(14),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Text(
+            'ref.copyUsername'.tr(),
+            style: AppTheme.bodySmall.copyWith(
+              color: AppColors.gold,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 8),
+          _copyRow(
+            value: username.isEmpty ? '—' : '@$username',
+            copied: false,
+            onCopy: () => _copy(username, isCode: false, toastKey: 'ref.usernameCopied'),
+            large: true,
+          ),
+          const SizedBox(height: 12),
           Text(
             'YOUR REFERRAL CODE',
             style: AppTheme.bodySmall.copyWith(
@@ -625,7 +651,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
   Widget _buildNetworkList() {
     if (_network.isEmpty) {
-      return _empty('No referrals yet', 'Share your code to grow your network');
+      return _empty('ref.empty'.tr(), 'ref.emptyLead'.tr());
     }
 
     return Container(
@@ -681,7 +707,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            active ? 'ACTIVE' : 'INACTIVE',
+                            _statusLabel(item.status),
                             style: TextStyle(
                               color: active
                                   ? AppColors.success
@@ -740,10 +766,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
   Widget _buildCommissionList() {
     if (_commissions.isEmpty) {
-      return _empty(
-        'No commission history',
-        'Earnings appear after referred deposits',
-      );
+      return _empty('ref.noHist'.tr(), 'ref.noHistLead'.tr());
     }
 
     return Container(
@@ -824,6 +847,13 @@ class _ReferralScreenState extends State<ReferralScreen> {
         }),
       ),
     );
+  }
+
+  String _statusLabel(String status) {
+    final value = status.toLowerCase();
+    if (value == 'active' || value == 'approved') return 'ref.active'.tr();
+    if (value == 'pending' || value == 'invited') return 'ref.pending'.tr();
+    return 'ref.inactive'.tr();
   }
 
   Widget _empty(String title, String subtitle) {

@@ -47,7 +47,7 @@ class GameCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDisabled = comingSoon || onTap == null;
+    final isDisabled = onTap == null;
     final showLive = liveCount > 0 && !comingSoon;
 
     return Material(
@@ -126,7 +126,7 @@ class GameCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                    if (isDisabled)
+                    if (comingSoon || isDisabled)
                       const Positioned.fill(
                         child: ColoredBox(color: Color(0x47000000)),
                       ),
