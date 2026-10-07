@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { HudProvider, useHud } from '../contexts/HudContext';
 import { ASSETS } from '../lib/assets';
@@ -10,6 +11,7 @@ import { getAuthedSocket } from '../lib/socket';
 import { CoinValue } from './CoinValue';
 import { GamingCursor } from './GamingCursor';
 import { LocaleSelect } from './LocaleSelect';
+import { DrawerIcons } from './MobileDrawer';
 import { ThemeDock } from './ThemeDock';
 
 function inEditable(target: EventTarget | null) {
@@ -187,42 +189,55 @@ function ShopChrome() {
           </button>
         </div>
       </header>
-      <div
-        className={`shop-drawer-overlay${navOpen ? ' is-open' : ''}`}
-        onClick={closeNav}
-        aria-hidden={!navOpen}
-      />
-      <aside className={`shop-drawer${navOpen ? ' is-open' : ''}`} aria-label={t('nav.shop')} aria-hidden={!navOpen}>
-        <Link className="shop-drawer-brand" to="/user/shop" onClick={closeNav}>
-          <img src={ASSETS.logo} width={44} height={44} alt="" />
-          <span>Battle Asia</span>
-        </Link>
-        <nav className="shop-drawer-nav" onClick={closeNav}>
-          <Link className={path.startsWith('/user/shop') || path === '/user' ? 'active' : ''} to="/user/shop">
-            {t('nav.shop')}
-          </Link>
-          <Link className={path.startsWith('/user/wallet') ? 'active' : ''} to="/user/wallet">
-            {t('nav.wallet')}
-          </Link>
-          <Link className={path.startsWith('/user/transfer') ? 'active' : ''} to="/user/transfer">
-            {t('nav.transfer')}
-          </Link>
-        </nav>
-        <div className="shop-drawer-tools">
-          <ThemeDock />
-          <LocaleSelect />
-          <button
-            className="hud-signout"
-            type="button"
-            onClick={() => {
-              leaveShop();
-              window.location.assign(getMainAppUrl('/dashboard'));
-            }}
-          >
-            {t('cta.signout')}
-          </button>
-        </div>
-      </aside>
+      {navOpen
+        ? createPortal(
+            <div className="m-drawer m-drawer--landing" role="dialog" aria-modal="true" aria-label={t('nav.shop')}>
+              <aside className="ld-panel">
+                <header className="ld-head">
+                  <button className="ld-close" type="button" aria-label={t('hud.closeMenu')} onClick={closeNav}>
+                    {DrawerIcons.close}
+                  </button>
+                  <Link className="ld-brand" to="/user/shop" onClick={closeNav}>
+                    <img src={ASSETS.logo} width={36} height={36} alt="" />
+                    <span>Battle Asia</span>
+                  </Link>
+                </header>
+                <nav className="ld-nav" onClick={closeNav}>
+                  <Link className={path.startsWith('/user/shop') || path === '/user' ? 'is-active' : ''} to="/user/shop">
+                    {t('nav.shop')}
+                  </Link>
+                  <Link className={path.startsWith('/user/wallet') ? 'is-active' : ''} to="/user/wallet">
+                    {t('nav.wallet')}
+                  </Link>
+                  <Link className={path.startsWith('/user/transfer') ? 'is-active' : ''} to="/user/transfer">
+                    {t('nav.transfer')}
+                  </Link>
+                </nav>
+                <button className="ld-card" type="button" onClick={toggleBalance}>
+                  <small>{t('shop.balance')}</small>
+                  {hide ? <b>**** BAC</b> : <CoinValue value={balance} />}
+                </button>
+                <div className="ld-tools">
+                  <ThemeDock />
+                  <LocaleSelect />
+                </div>
+                <footer className="ld-foot">
+                  <button
+                    className="ld-signout"
+                    type="button"
+                    onClick={() => {
+                      leaveShop();
+                      window.location.assign(getMainAppUrl('/dashboard'));
+                    }}
+                  >
+                    {t('cta.signout')}
+                  </button>
+                </footer>
+              </aside>
+            </div>,
+            document.body,
+          )
+        : null}
       <Outlet context={{ toast, setBalance }} />
       {toastText ? <div className="play-toast" role="status">{toastText}</div> : null}
     </div>
