@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:provider/provider.dart';
@@ -11,10 +12,10 @@ import 'package:battleasia_app/presentation/widgets/common/battleasia_logo.dart'
 import 'package:battleasia_app/presentation/screens/auth/sign_up_screen.dart';
 import 'package:battleasia_app/data/models/user_model.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
-import 'package:http/http.dart' as http;
 import 'package:battleasia_app/core/utils/api_client.dart';
 import 'dart:convert';
 import 'package:battleasia_app/core/config/app_config.dart';
+import 'package:battleasia_app/presentation/widgets/auth/otp_row.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
   final String email;
@@ -38,7 +39,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   bool _isSubmitting = false;
   bool _isResending = false;
   
-  int _timeLeft = 900; // 15 minutes in seconds
+  int _timeLeft = 60;
   bool _canResend = false;
   Timer? _timer;
 
@@ -62,6 +63,10 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         setState(() {
           if (_timeLeft > 0) {
             _timeLeft--;
+            if (_timeLeft == 0) {
+              _canResend = true;
+              timer.cancel();
+            }
           } else {
             _canResend = true;
             timer.cancel();
@@ -71,10 +76,11 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     });
   }
 
-  String _formatTime(int seconds) {
-    final minutes = seconds ~/ 60;
-    final secs = seconds % 60;
-    return '${minutes.toString()}:${secs.toString().padLeft(2, '0')}';
+
+  String _maskedEmail(String email) {
+    final parts = email.split('@');
+    if (parts.length != 2 || parts[0].isEmpty || parts[1].isEmpty) return email;
+    return '${parts[0][0]}***@${parts[1]}';
   }
 
   Future<void> _handleResendCode() async {
@@ -96,7 +102,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
       if (response.statusCode == 200 && data['status'] == true) {
         setState(() {
           _successMessage = 'Verification code has been resent to your email!';
-          _timeLeft = 900;
+          _timeLeft = 60;
           _canResend = false;
         });
         _startTimer();
@@ -116,10 +122,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
     }
   }
 
-  Future<void> _handleVerification() async {
-    if (!_formKey.currentState!.validate()) {
+  Future<void> _handleVerification([String? nextCode]) async {
+    final code = (nextCode ?? _codeController.text).trim();
+    if (_isSubmitting) return;
+    if (code.length != 6) {
+      setState(() => _errorMessage = 'auth.otpError'.tr());
       return;
     }
+    _isSubmitting = true;
 
     setState(() {
       _isSubmitting = true;
@@ -133,7 +143,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': widget.email,
-          'code': _codeController.text.trim(),
+          'code': code,
         }),
       );
 
@@ -249,7 +259,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
                       // Title
                       Text(
-                        'EMAIL VERIFICATION',
+                        'auth.verifyTitle'.tr(),
                         style: AppTheme.heading1.copyWith(
                           fontSize: titleFontSize,
                           color: AppTheme.accentColor,
@@ -261,7 +271,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
                       // Description
                       Text(
-                        'We\'ve sent a 6-digit verification code to',
+                        'auth.verifySub'.tr(),
                         style: AppTheme.bodyMedium.copyWith(
                           fontSize: bodyFontSize,
                           color: Colors.white70,
@@ -270,7 +280,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        widget.email,
+                        _maskedEmail(widget.email),
                         style: AppTheme.bodyMedium.copyWith(
                           fontSize: bodyFontSize,
                           color: AppTheme.accentColor,
@@ -317,97 +327,14 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                           ),
                         ),
 
-                      // Verification Code Input
-                      TextFormField(
-                        controller: _codeController,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 8,
-                        ),
-                        textAlign: TextAlign.center,
-                        keyboardType: TextInputType.number,
-                        maxLength: 6,
-                        decoration: InputDecoration(
-                          labelText: 'Verification Code',
-                          labelStyle: TextStyle(
-                            color: Colors.white70,
-                            fontSize: labelFontSize,
-                          ),
-                          hintText: '000000',
-                          hintStyle: TextStyle(
-                            color: Colors.white30,
-                            letterSpacing: 8,
-                          ),
-                          counterText: '',
-                          filled: true,
-                          fillColor: Colors.white.withOpacity(0.1),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: AppTheme.accentColor,
-                              width: 1,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.white30,
-                              width: 1,
-                            ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: AppTheme.accentColor,
-                              width: 2,
-                            ),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.red,
-                              width: 1,
-                            ),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(
-                              color: Colors.red,
-                              width: 2,
-                            ),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Verification code is required';
+                      OtpRow(
+                        disabled: _isSubmitting,
+                        onChanged: (next) {
+                          _codeController.text = next;
+                          if (next.length == 6) {
+                            _handleVerification(next);
                           }
-                          if (value.trim().length != 6) {
-                            return 'Code must be exactly 6 digits';
-                          }
-                          if (!RegExp(r'^[0-9]+$').hasMatch(value.trim())) {
-                            return 'Code must contain only numbers';
-                          }
-                          return null;
                         },
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Timer
-                      Center(
-                        child: Text(
-                          _timeLeft > 0
-                              ? 'Time remaining: ${_formatTime(_timeLeft)}'
-                              : 'Code expired',
-                          style: AppTheme.bodySmall.copyWith(
-                            fontSize: labelFontSize,
-                            color: _timeLeft > 0
-                                ? Colors.white70
-                                : Colors.red,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
                       ),
                       const SizedBox(height: 24),
 
@@ -447,7 +374,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                                   ),
                                 )
                               : Text(
-                                  'VERIFY EMAIL',
+                                  _isSubmitting ? 'auth.verifying'.tr() : 'auth.verifyBtn'.tr(),
                                   style: TextStyle(
                                     fontSize: buttonFontSize,
                                     fontWeight: FontWeight.w800,
@@ -470,9 +397,9 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                             ),
                             children: [
                               TextSpan(
-                                text: _canResend
-                                    ? 'Resend Code'
-                                    : 'Wait to resend',
+                                text: _timeLeft > 0
+                                    ? '${'auth.resend'.tr()} ${_timeLeft}s'
+                                    : 'auth.resend'.tr(),
                                 style: AppTheme.bodySmall.copyWith(
                                   fontSize: labelFontSize,
                                   color: _canResend

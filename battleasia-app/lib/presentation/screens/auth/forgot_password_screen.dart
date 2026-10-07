@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
@@ -26,35 +27,31 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
+    final email = _emailController.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
+      setState(() {
+        _errorMessage = email.isEmpty ? 'auth.emailRequired'.tr() : 'auth.emailInvalid'.tr();
+      });
+      return;
+    }
     setState(() {
       _errorMessage = null;
       _successMessage = null;
     });
 
-    final result = await context.read<AuthProvider>().forgotPassword(
-          _emailController.text.trim(),
-        );
+    final result = await context.read<AuthProvider>().forgotPassword(email);
 
     if (!mounted) return;
 
     if (result['success'] == true) {
-      setState(() {
-        _successMessage =
-            result['message'] as String? ?? 'Reset code sent to your email';
-      });
-      await Future<void>.delayed(const Duration(milliseconds: 600));
-      if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) => ResetPasswordScreen(
-            email: _emailController.text.trim(),
-          ),
+          builder: (_) => ResetPasswordScreen(email: email),
         ),
       );
     } else {
       setState(() {
-        _errorMessage = result['message'] as String? ?? 'Failed to send code';
+        _errorMessage = result['message'] as String? ?? 'auth.sendFail'.tr();
       });
     }
   }
@@ -64,8 +61,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final loading = context.watch<AuthProvider>().isLoading;
 
     return AuthFormShell(
-      title: 'Forgot password',
-      description: 'Enter your email and we will send a reset code.',
+      title: 'auth.forgotPassword'.tr(),
+      description: 'auth.forgotSub'.tr(),
       child: Form(
         key: _formKey,
         child: Column(
@@ -81,15 +78,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ],
             AuthTextField(
               controller: _emailController,
-              label: 'Email address',
-              hint: 'Enter your email',
+              label: 'auth.email'.tr(),
+              hint: 'auth.emailPlaceholder'.tr(),
               keyboardType: TextInputType.emailAddress,
-              validator: (v) =>
-                  v == null || !v.contains('@') ? 'Enter a valid email' : null,
             ),
             const SizedBox(height: 20),
             AuthPrimaryButton(
-              label: 'Send reset code',
+              label: loading ? 'auth.sending'.tr() : 'auth.sendCode'.tr(),
               loading: loading,
               onPressed: loading ? null : _submit,
             ),
