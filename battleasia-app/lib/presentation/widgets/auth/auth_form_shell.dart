@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
-import 'package:battleasia_app/presentation/widgets/common/battleasia_logo.dart';
 
 /// Clean auth card — logo, title, form. No trust chrome clutter.
 class AuthFormShell extends StatelessWidget {
@@ -15,6 +14,8 @@ class AuthFormShell extends StatelessWidget {
   final Widget? steps;
   final Widget? belowCard;
   final bool showTrustRow;
+  // Kept so existing screens can still pass it. The native page does not show the hero image.
+  // ignore: unused_field
   final bool heroAfter;
 
   const AuthFormShell({
@@ -35,67 +36,69 @@ class AuthFormShell extends StatelessWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: const Color(0xFF060607),
-        resizeToAvoidBottomInset: false,
+        backgroundColor: const Color(0xFF0A0B0F),
+        resizeToAvoidBottomInset: true,
         body: Stack(
           fit: StackFit.expand,
           children: [
-            const ColoredBox(color: Color(0xFF060607)),
+            const ColoredBox(color: Color(0xFF0A0B0F)),
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: RadialGradient(
-                  center: const Alignment(0, -1.05),
-                  radius: 1.05,
+                  center: const Alignment(-0.6, -0.85),
+                  radius: 1.15,
                   colors: [
-                    AppColors.gold.withValues(alpha: 0.05),
+                    AppColors.gold.withValues(alpha: 0.18),
                     Colors.transparent,
                   ],
-                  stops: const [0.0, 0.55],
+                  stops: const [0.0, 0.58],
                 ),
               ),
             ),
             SafeArea(
-              child: SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: wide ? 440 : 400,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (Navigator.of(context).canPop()) ...[
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: _AuthBackButton(),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    physics: const ClampingScrollPhysics(),
+                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minHeight: constraints.maxHeight - 46),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: wide ? 440 : 420),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              if (Navigator.of(context).canPop()) ...[
+                                const Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: _AuthBackButton(),
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+                              const _AuthWordmark(),
+                              const SizedBox(height: 22),
+                              _AuthPanel(
+                                title: title,
+                                description: description,
+                                progress: progress,
+                                steps: steps,
+                                showTrustRow: showTrustRow,
+                                child: child,
+                              ),
+                              if (belowCard != null) ...[
+                                const SizedBox(height: 12),
+                                belowCard!,
+                              ],
+                            ],
+                          ),
                         ),
-                        const SizedBox(height: 10),
-                      ],
-                      if (!heroAfter) ...[
-                        const _AuthHero(),
-                        const SizedBox(height: 14),
-                      ],
-                      _AuthPanel(
-                        title: title,
-                        description: description,
-                        progress: progress,
-                        steps: steps,
-                        showTrustRow: showTrustRow,
-                        child: child,
                       ),
-                      if (heroAfter) ...[
-                        const SizedBox(height: 16),
-                        const _AuthHero(),
-                      ],
-                      if (belowCard != null) ...[
-                        const SizedBox(height: 12),
-                        belowCard!,
-                      ],
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -142,63 +145,39 @@ class _AuthBackButton extends StatelessWidget {
   }
 }
 
-class _AuthHero extends StatelessWidget {
-  const _AuthHero();
+class _AuthWordmark extends StatelessWidget {
+  const _AuthWordmark();
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.gold.withValues(alpha: 0.22)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.gold.withValues(alpha: 0.14),
-            blurRadius: 48,
-            spreadRadius: -8,
-          ),
-        ],
-        gradient: RadialGradient(
-          center: const Alignment(0, -0.45),
-          radius: 1.05,
-          colors: [
-            AppColors.gold.withValues(alpha: 0.2),
-            const Color(0xFF07080d),
-          ],
-          stops: const [0.0, 0.72],
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Image.asset(
-              'assets/images/hero/auth-login.webp',
-              width: double.infinity,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ClipOval(
+          child: Image.asset(
+            'assets/icon/icon.png',
+            width: 40,
+            height: 40,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => Image.asset(
+              'assets/images/logo.webp',
+              width: 40,
+              height: 40,
               fit: BoxFit.contain,
-              alignment: Alignment.center,
             ),
-            Positioned.fill(
-              child: IgnorePointer(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: RadialGradient(
-                      center: Alignment.center,
-                      radius: 0.95,
-                      colors: [
-                        Colors.transparent,
-                        const Color(0xFF07080d).withValues(alpha: 0.55),
-                      ],
-                      stops: const [0.42, 1.0],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
-      ),
+        const SizedBox(width: 10),
+        const Text(
+          'BattleAsia',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.6,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -223,20 +202,13 @@ class _AuthPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(AppColors.radius),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: AppColors.panelFill(),
-            borderRadius: BorderRadius.circular(AppColors.radius),
-            border: Border.all(color: AppColors.hair()),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x70000000),
-                blurRadius: 40,
-                offset: Offset(0, 24),
-              ),
-            ],
+            color: const Color(0xFF121318),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -257,47 +229,29 @@ class _AuthPanel extends StatelessWidget {
                   ),
                 ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+                padding: const EdgeInsets.fromLTRB(22, 26, 22, 22),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Center(
-                      child: BattleAsiaLogo(
-                        logoSize: 64,
-                        showText: false,
-                        alignment: MainAxisAlignment.center,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Center(
-                      child: Container(
-                        width: 28,
-                        height: 2,
-                        color: AppColors.gold,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
                     Text(
                       title,
                       style: AppTheme.heading2.copyWith(
-                        fontSize: 17,
+                        fontSize: 24,
                         height: 1.25,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
                         letterSpacing: -0.3,
                       ),
-                      textAlign: TextAlign.center,
                     ),
-                    if (description != null) ...[
-                      const SizedBox(height: 6),
+                    if (description != null && description!.isNotEmpty) ...[
+                      const SizedBox(height: 8),
                       Text(
                         description!,
                         style: AppTheme.bodyMedium.copyWith(
                           color: AppColors.textMuted,
-                          height: 1.4,
-                          fontSize: 13,
+                          height: 1.45,
+                          fontSize: 14,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ],
                     if (steps != null) ...[
@@ -490,25 +444,24 @@ class AuthPrimaryButton extends StatelessWidget {
           disabledBackgroundColor: Colors.white.withValues(alpha: 0.08),
           side: BorderSide(color: AppTheme.accentColor),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppColors.radiusSm),
+            borderRadius: BorderRadius.circular(9),
           ),
           textStyle: const TextStyle(
-            fontSize: 13,
+            fontSize: 15.5,
             fontWeight: FontWeight.w700,
-            letterSpacing: 1.1,
           ),
         ),
         child: loading
-            ? SizedBox(
+            ? const SizedBox(
                 width: 18,
                 height: 18,
-                child: const CircularProgressIndicator(
+                child: CircularProgressIndicator(
                   strokeWidth: 2,
                   color: Colors.white,
                 ),
               )
             : Text(
-                label.toUpperCase(),
+                label,
                 textAlign: TextAlign.center,
               ),
       ),

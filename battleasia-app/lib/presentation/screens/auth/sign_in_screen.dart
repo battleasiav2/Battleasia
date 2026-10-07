@@ -203,7 +203,7 @@ class _SignInScreenState extends State<SignInScreen> {
       heroAfter: true,
       showTrustRow: true,
       title: widget.titleKey.tr(),
-      description: 'auth.signInDescription'.tr(),
+      description: null,
       child: AutofillGroup(
         child: Form(
         key: _formKey,
@@ -219,7 +219,6 @@ class _SignInScreenState extends State<SignInScreen> {
               label: 'auth.email'.tr(),
               hint: 'auth.emailPlaceholder'.tr(),
               keyboardType: TextInputType.emailAddress,
-              prefixIcon: Icons.mail_outline,
               textInputAction: TextInputAction.next,
               autofillHints: const [AutofillHints.email, AutofillHints.username],
               validator: (value) {
@@ -236,7 +235,6 @@ class _SignInScreenState extends State<SignInScreen> {
               label: 'auth.password'.tr(),
               hint: 'auth.passwordPlaceholder'.tr(),
               obscureText: _obscurePassword,
-              prefixIcon: Icons.lock_outline,
               autofillHints: const [AutofillHints.password],
               suffix: IconButton(
                 icon: Icon(
@@ -288,27 +286,6 @@ class _SignInScreenState extends State<SignInScreen> {
                       fontSize: 12,
                     ),
                   ),
-                  const Spacer(),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (_) => const ForgotPasswordScreen(),
-                        ),
-                      );
-                    },
-                    child: Text(
-                      'auth.forgotPassword'.tr(),
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: AppColors.gold,
-                        fontWeight: FontWeight.w700,
-                        fontSize: 12,
-                        height: 1,
-                        decoration: TextDecoration.underline,
-                        decorationColor: AppColors.gold,
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -319,6 +296,26 @@ class _SignInScreenState extends State<SignInScreen> {
               onPressed: authProvider.isLoading ? null : _handleSignIn,
             ),
             const SizedBox(height: 16),
+            Center(
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const ForgotPasswordScreen(),
+                    ),
+                  );
+                },
+                child: Text(
+                  'auth.forgotPassword'.tr(),
+                  style: AppTheme.bodyMedium.copyWith(
+                    color: AppColors.gold,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 18),
             Row(
               children: [
                 Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.16))),
@@ -404,13 +401,13 @@ class _SocialButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: 46,
-      child: OutlinedButton(
+          height: 48,
+          child: OutlinedButton(
         onPressed: busy ? null : onPressed,
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.white,
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.18)),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.16), width: 1.5),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
