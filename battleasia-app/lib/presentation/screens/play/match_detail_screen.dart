@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
@@ -33,6 +34,12 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
   bool _isLoading = true;
   String? _errorMessage;
   bool _joining = false;
+  bool _leaving = false;
+  bool _ready = false;
+  bool _readyBusy = false;
+  bool _chatBusy = false;
+  List<Map<String, dynamic>> _chat = [];
+  final TextEditingController _chatCtrl = TextEditingController();
   String _activeTab = 'description';
 
   @override
@@ -44,6 +51,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
   @override
   void dispose() {
     _scrollController.dispose();
+    _chatCtrl.dispose();
     super.dispose();
   }
 
@@ -76,6 +84,9 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
             } else {
               _participants = [];
             }
+            final me = context.read<AuthProvider>().user?.id;
+            _ready = _participants.any((p) => p.userId == me && p.ready);
+            if (_matchDetail?.isJoined != true) _chat = [];
           } else {
             _errorMessage = 'Match not found';
           }
@@ -84,7 +95,88 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
               result['message'] as String? ?? 'Failed to load match details';
         }
       });
+      if (_matchDetail?.isJoined == true) {
+        await _loadChat();
+      }
     }
+  }
+
+  Future<void> _loadChat() async {
+    final result = await _gamesService.getMatchChat(widget.matchId);
+    if (!mounted || result['success'] != true) return;
+    final rows = result['data'];
+    setState(() {
+      _chat = rows is List
+          ? rows.whereType<Map>().map((row) => Map<String, dynamic>.from(row)).toList()
+          : [];
+    });
+  }
+
+  Future<void> _toggleReady(bool value) async {
+    setState(() => _readyBusy = true);
+    final result = await _gamesService.setReady(widget.matchId, value);
+    if (!mounted) return;
+    setState(() {
+      _readyBusy = false;
+      if (result['success'] == true) _ready = value;
+    });
+    if (result['success'] != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message']?.toString() ?? 'Could not update ready')),
+      );
+    }
+  }
+
+  Future<void> _leaveMatch() async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF121318),
+        title: const Text('Leave match?', style: TextStyle(color: Colors.white)),
+        content: const Text(
+          'You will leave this room. Entry fee is refunded when the match allows it.',
+          style: TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Stay')),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Leave')),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    setState(() => _leaving = true);
+    final result = await _gamesService.leaveMatch(widget.matchId);
+    if (!mounted) return;
+    setState(() => _leaving = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result['success'] == true ? 'Left the match' : (result['message']?.toString() ?? 'Could not leave'))),
+    );
+    if (result['success'] == true) await _fetchMatchDetail();
+  }
+
+  Future<void> _sendChat() async {
+    final text = _chatCtrl.text.trim();
+    if (text.isEmpty) return;
+    setState(() => _chatBusy = true);
+    final result = await _gamesService.sendMatchChat(widget.matchId, text);
+    if (!mounted) return;
+    setState(() => _chatBusy = false);
+    if (result['success'] == true) {
+      _chatCtrl.clear();
+      await _loadChat();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message']?.toString() ?? 'Could not send')),
+      );
+    }
+  }
+
+  Future<void> _reportPlayer(String userId) async {
+    final result = await _gamesService.reportPlayer(widget.matchId, userId);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result['success'] == true ? 'Report sent' : (result['message']?.toString() ?? 'Could not report'))),
+    );
   }
 
   Future<void> _handleJoinMatch() async {
@@ -519,6 +611,91 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
             );
           },
         ),
+        if (_matchDetail!.isJoined) ...[
+          SizedBox(height: spacing),
+          _buildLobby(),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildLobby() {
+    final me = context.read<AuthProvider>().user?.id;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SwitchListTile(
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Ready', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+          subtitle: Text(
+            _ready ? 'You are ready for this lobby' : 'Mark ready when you are in',
+            style: TextStyle(color: Colors.white.withValues(alpha: 0.55)),
+          ),
+          value: _ready,
+          activeThumbColor: AppColors.gold,
+          onChanged: _readyBusy ? null : _toggleReady,
+        ),
+        OutlinedButton(
+          onPressed: _leaving ? null : _leaveMatch,
+          child: Text(_leaving ? 'Leaving…' : 'Leave match'),
+        ),
+        const SizedBox(height: 16),
+        const Text('Lobby chat', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 8),
+        Container(
+          constraints: const BoxConstraints(maxHeight: 220),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: const Color(0xFF121318),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          ),
+          child: _chat.isEmpty
+              ? Text('No messages yet', style: TextStyle(color: Colors.white.withValues(alpha: 0.5)))
+              : ListView(
+                  shrinkWrap: true,
+                  children: _chat.map((row) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 6),
+                      child: Text(
+                        '${row['username'] ?? 'Player'}: ${row['message'] ?? ''}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    );
+                  }).toList(),
+                ),
+        ),
+        const SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _chatCtrl,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Message',
+                  hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
+                  filled: true,
+                  fillColor: const Color(0xFF121318),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(9)),
+                ),
+                onSubmitted: (_) => _sendChat(),
+              ),
+            ),
+            const SizedBox(width: 8),
+            FilledButton(
+              onPressed: _chatBusy ? null : _sendChat,
+              child: Text(_chatBusy ? '…' : 'Send'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Joined players can be reported from the Seats tab.',
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.45), fontSize: 12),
+        ),
+        if (me == null) const SizedBox.shrink(),
       ],
     );
   }
@@ -796,7 +973,12 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
             ),
           ),
           const SizedBox(height: 12),
-          RoomSeats(total: total, players: _participants),
+          RoomSeats(
+            total: total,
+            players: _participants,
+            selfId: context.read<AuthProvider>().user?.id,
+            onReport: _matchDetail?.isJoined == true ? _reportPlayer : null,
+          ),
         ],
       ),
     );

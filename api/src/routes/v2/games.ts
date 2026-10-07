@@ -512,6 +512,7 @@ router.get('/matches/:id', requireAuth, async (req: AuthedRequest, res) => {
           pubgId: p.pubgId,
           avatar: p.avatar || '',
           joinedAt: p.joinedAt,
+          ready: Boolean(p.ready),
         })),
       },
     });

@@ -246,6 +246,46 @@ class GamesService {
     }
   }
 
+  Future<Map<String, dynamic>> _matchAction(
+    String matchId,
+    String action, {
+    String method = 'POST',
+    Map<String, dynamic>? body,
+  }) async {
+    try {
+      final headers = await _getHeaders();
+      final uri = Uri.parse('$_baseUrl/api/v2/games/matches/$matchId/$action');
+      final response = method == 'GET'
+          ? await ApiClient.get(uri, headers: headers)
+          : await ApiClient.post(uri, headers: headers, body: body == null ? null : jsonEncode(body));
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data'], 'message': data['message'] as String?};
+      }
+      return {'success': false, 'message': data['message'] as String? ?? 'Request failed'};
+    } catch (e) {
+      return {'success': false, 'message': e.toString().replaceAll('Exception: ', '')};
+    }
+  }
+
+  Future<Map<String, dynamic>> leaveMatch(String matchId) => _matchAction(matchId, 'leave');
+
+  Future<Map<String, dynamic>> setReady(String matchId, bool ready) =>
+      _matchAction(matchId, 'ready', body: {'ready': ready});
+
+  Future<Map<String, dynamic>> getMatchChat(String matchId) =>
+      _matchAction(matchId, 'chat', method: 'GET');
+
+  Future<Map<String, dynamic>> sendMatchChat(String matchId, String message) =>
+      _matchAction(matchId, 'chat', body: {'message': message});
+
+  Future<Map<String, dynamic>> reportPlayer(String matchId, String targetUserId, {String reason = 'collusion'}) =>
+      _matchAction(matchId, 'report', body: {'targetUserId': targetUserId, 'reason': reason});
+
   /// Join a match
   Future<Map<String, dynamic>> joinMatch(String matchId) async {
     try {

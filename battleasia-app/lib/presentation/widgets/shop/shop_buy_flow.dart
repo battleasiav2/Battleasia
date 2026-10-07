@@ -129,6 +129,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
   final ShopService _shop = ShopService();
   final _fromCtrl = TextEditingController();
   final _txCtrl = TextEditingController();
+  final _couponCtrl = TextEditingController();
   Timer? _cryptoTimer;
   bool _cryptoWindow = false;
   int _cryptoLeft = 0;
@@ -144,6 +145,12 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
   _Wallet? _wallet;
   _Channel? _paidChannel;
   double _amount = 0;
+  String? _couponCode;
+  String _couponLabel = '';
+  String _couponKind = '';
+  double _couponValue = 0;
+  String _couponErr = '';
+  bool _couponBusy = false;
 
   @override
   void initState() {
@@ -156,6 +163,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
     _cryptoTimer?.cancel();
     _fromCtrl.dispose();
     _txCtrl.dispose();
+    _couponCtrl.dispose();
     super.dispose();
   }
 
@@ -310,6 +318,37 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
     }
   }
 
+  Future<void> _applyCoupon() async {
+    final code = _couponCtrl.text.trim();
+    if (code.isEmpty) {
+      setState(() => _couponErr = 'Enter a coupon code');
+      return;
+    }
+    setState(() {
+      _couponBusy = true;
+      _couponErr = '';
+    });
+    final result = await _shop.applyCoupon(code: code, coinAmount: widget.item.amount);
+    if (!mounted) return;
+    final data = result['data'];
+    setState(() {
+      _couponBusy = false;
+      if (result['success'] == true && data is Map) {
+        _couponCode = data['code']?.toString() ?? code;
+        _couponLabel = data['label']?.toString() ?? '';
+        _couponKind = data['kind']?.toString() ?? '';
+        _couponValue = (data['value'] as num?)?.toDouble() ?? 0;
+        _couponCtrl.text = _couponCode!;
+      } else {
+        _couponCode = null;
+        _couponLabel = '';
+        _couponKind = '';
+        _couponValue = 0;
+        _couponErr = result['message']?.toString() ?? 'Could not apply coupon';
+      }
+    });
+  }
+
   Future<void> _submitDeposit() async {
     if (_fromCtrl.text.trim().isEmpty) {
       _toast('Please enter the address you sent from', Colors.red);
@@ -345,6 +384,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         fromAddress: _fromCtrl.text.trim(),
         paymentChannelId: channel.id,
         toWalletAddress: wallet.address,
+        couponCode: _couponCode,
       );
       if (!mounted) return;
       if (result['success'] == true) {
@@ -584,11 +624,77 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                   fontSize: 11,
                 ),
               ),
-              const SizedBox(height: 4),
-              Text(
-                'No available coupon',
-                style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
-              ),
+              const SizedBox(height: 8),
+              if (_couponCode != null)
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '$_couponCode · $_couponLabel',
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    TextButton(
+                      onPressed: _submitting
+                          ? null
+                          : () => setState(() {
+                                _couponCode = null;
+                                _couponLabel = '';
+                                _couponKind = '';
+                                _couponValue = 0;
+                                _couponErr = '';
+                                _couponCtrl.clear();
+                              }),
+                      child: const Text('Remove'),
+                    ),
+                  ],
+                )
+              else
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _couponCtrl,
+                        style: const TextStyle(color: Colors.white),
+                        decoration: InputDecoration(
+                          hintText: 'Coupon code',
+                          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
+                          isDense: true,
+                          filled: true,
+                          fillColor: const Color(0xFF0A0B0F),
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(9)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton(
+                      onPressed: _couponBusy ? null : _applyCoupon,
+                      child: Text(_couponBusy ? '…' : 'Apply'),
+                    ),
+                  ],
+                ),
+              if (_couponErr.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(_couponErr, style: const TextStyle(color: AppColors.error, fontSize: 12)),
+                ),
+              if (_couponKind == 'off' && _couponCode != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    'Due ${(total * (1 - (_couponValue.clamp(0, 90) / 100))).toStringAsFixed(2)}',
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12, fontWeight: FontWeight.w700),
+                  ),
+                )
+              else if (_couponKind == 'bonus' && _couponCode != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    'Extra BAC is added when this deposit is approved.',
+                    style: TextStyle(color: Colors.white.withValues(alpha: 0.55), fontSize: 12),
+                  ),
+                ),
             ],
           ),
         ),

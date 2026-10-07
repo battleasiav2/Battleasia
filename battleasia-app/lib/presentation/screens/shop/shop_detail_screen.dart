@@ -130,6 +130,11 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
 
   final TextEditingController _fromAddressCtrl = TextEditingController();
   final TextEditingController _transactionIdCtrl = TextEditingController();
+  final TextEditingController _couponCtrl = TextEditingController();
+  String? _couponCode;
+  String _couponLabel = '';
+  String _couponErr = '';
+  bool _couponBusy = false;
   bool _submitting = false;
 
   @override
@@ -143,6 +148,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
     _scrollController.dispose();
     _fromAddressCtrl.dispose();
     _transactionIdCtrl.dispose();
+    _couponCtrl.dispose();
     super.dispose();
   }
 
@@ -377,6 +383,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
         fromAddress: _fromAddressCtrl.text.trim(),
         paymentChannelId: _selectedChannelObj!.id,
         toWalletAddress: _selectedWallet!.address,
+        couponCode: _couponCode,
       );
 
       if (result['success'] == true) {
@@ -874,6 +881,53 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                     horizontal: 12, vertical: 12),
               ),
             ),
+
+            const SizedBox(height: 12),
+            TextField(
+              controller: _couponCtrl,
+              style: const TextStyle(color: Colors.black87),
+              decoration: InputDecoration(
+                labelText: _couponCode == null ? 'Coupon' : '$_couponCode · $_couponLabel',
+                hintText: 'Coupon code',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: _couponBusy
+                    ? null
+                    : () async {
+                        final code = _couponCtrl.text.trim();
+                        if (code.isEmpty || _item == null) {
+                          setState(() => _couponErr = 'Enter a coupon code');
+                          return;
+                        }
+                        setState(() {
+                          _couponBusy = true;
+                          _couponErr = '';
+                        });
+                        final result = await _shopService.applyCoupon(code: code, coinAmount: _item!.amount);
+                        if (!mounted) return;
+                        final data = result['data'];
+                        setState(() {
+                          _couponBusy = false;
+                          if (result['success'] == true && data is Map) {
+                            _couponCode = data['code']?.toString() ?? code;
+                            _couponLabel = data['label']?.toString() ?? '';
+                            _couponErr = '';
+                          } else {
+                            _couponCode = null;
+                            _couponLabel = '';
+                            _couponErr = result['message']?.toString() ?? 'Could not apply coupon';
+                          }
+                        });
+                      },
+                child: Text(_couponBusy ? '…' : (_couponCode == null ? 'Apply coupon' : 'Applied')),
+              ),
+            ),
+            if (_couponErr.isNotEmpty)
+              Text(_couponErr, style: const TextStyle(color: Colors.red, fontSize: 12)),
 
             const SizedBox(height: 12),
 

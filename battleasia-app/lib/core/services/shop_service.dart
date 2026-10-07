@@ -206,6 +206,27 @@ class ShopService {
   // Requires authentication.
   // ---------------------------------------------------------------------------
 
+  Future<Map<String, dynamic>> applyCoupon({
+    required String code,
+    required int coinAmount,
+  }) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v4/payments/coupons/apply'),
+        headers: headers,
+        body: jsonEncode({'code': code, 'coin_amount': coinAmount}),
+      );
+      final data = _parseResponse(response);
+      if (response.statusCode == 200 && data['status'] == true && data['data'] is Map) {
+        return {'success': true, 'data': Map<String, dynamic>.from(data['data'] as Map)};
+      }
+      return {'success': false, 'message': data['message'] as String? ?? 'Could not apply coupon'};
+    } catch (e) {
+      return {'success': false, 'message': e.toString().replaceAll('Exception: ', '')};
+    }
+  }
+
   Future<Map<String, dynamic>> submitDeposit({
     required String userEmail,
     required String username,
@@ -216,6 +237,7 @@ class ShopService {
     required String fromAddress,
     required String paymentChannelId,
     required String toWalletAddress,
+    String? couponCode,
   }) async {
     try {
       final headers = await _getHeaders();
@@ -232,6 +254,7 @@ class ShopService {
           'from_address': fromAddress,
           'payment_channel': paymentChannelId,
           'to_wallet_address': toWalletAddress,
+          if (couponCode != null && couponCode.trim().isNotEmpty) 'coupon_code': couponCode.trim(),
         }),
       );
       final data = _parseResponse(response);

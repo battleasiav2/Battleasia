@@ -7,8 +7,16 @@ import 'package:battleasia_app/data/models/match_participant_model.dart';
 class RoomSeats extends StatelessWidget {
   final int total;
   final List<MatchParticipantModel> players;
+  final String? selfId;
+  final void Function(String userId)? onReport;
 
-  const RoomSeats({super.key, required this.total, required this.players});
+  const RoomSeats({
+    super.key,
+    required this.total,
+    required this.players,
+    this.selfId,
+    this.onReport,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +43,14 @@ class RoomSeats extends StatelessWidget {
         if (player == null) {
           return _OpenSeat(number: index + 1);
         }
-        return _FilledSeat(player: player);
+        final canReport = onReport != null &&
+            player.userId != null &&
+            player.userId!.isNotEmpty &&
+            player.userId != selfId;
+        return _FilledSeat(
+          player: player,
+          onReport: canReport ? () => onReport!(player.userId!) : null,
+        );
       },
     );
   }
@@ -89,8 +104,9 @@ class _OpenSeat extends StatelessWidget {
 
 class _FilledSeat extends StatelessWidget {
   final MatchParticipantModel player;
+  final VoidCallback? onReport;
 
-  const _FilledSeat({required this.player});
+  const _FilledSeat({required this.player, this.onReport});
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +139,11 @@ class _FilledSeat extends StatelessWidget {
               textAlign: TextAlign.center,
               style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
             ),
+            if (onReport != null)
+              GestureDetector(
+                onTap: onReport,
+                child: const Text('Report', style: TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.w700)),
+              ),
           ],
         ),
       ),
