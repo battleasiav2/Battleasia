@@ -5,6 +5,7 @@ import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
 import 'package:battleasia_app/core/services/engagement_service.dart';
+import 'package:battleasia_app/core/services/labs_service.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/utils/match_cover_utils.dart';
 import 'package:battleasia_app/core/utils/match_capacity_utils.dart';
@@ -12,6 +13,7 @@ import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/core/utils/date_utils.dart' as date_utils;
 import 'package:battleasia_app/data/models/match_model.dart';
 import 'package:battleasia_app/data/models/match_participant_model.dart';
+import 'package:battleasia_app/presentation/screens/labs/labs_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
@@ -31,6 +33,8 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
   final ScrollController _scrollController = ScrollController();
   final GamesService _gamesService = GamesService();
   final EngagementService _earn = EngagementService();
+  final LabsService _labs = LabsService();
+  bool _watchOn = false;
   MatchModel? _matchDetail;
   List<MatchParticipantModel> _participants = [];
   bool _isLoading = true;
@@ -50,6 +54,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
   void initState() {
     super.initState();
     _fetchMatchDetail();
+    _loadWatchFlag();
   }
 
   @override
@@ -57,6 +62,36 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
     _scrollController.dispose();
     _chatCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadWatchFlag() async {
+    final result = await _labs.flags();
+    if (!mounted || result['success'] != true) return;
+    final data = result['data'];
+    setState(() {
+      _watchOn = data is Map && data['watchParty'] == true;
+    });
+  }
+
+  Future<void> _openWatch() async {
+    final name = _matchDetail?.matchName ?? 'Match';
+    final result = await _labs.create('watch', {
+      'title': 'Watch · $name',
+      'matchId': widget.matchId,
+    });
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          result['success'] == true ? 'match.watchOpened'.tr() : (result['message']?.toString() ?? 'match.watchFail'.tr()),
+        ),
+      ),
+    );
+    if (result['success'] == true) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const LabsScreen(path: 'watch')),
+      );
+    }
   }
 
   Future<void> _fetchMatchDetail() async {
@@ -580,6 +615,18 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
         ),
 
         SizedBox(height: spacing),
+
+        if (_watchOn) ...[
+          Text('match.watchOn'.tr(), style: AppTheme.bodySmall.copyWith(color: Colors.white70)),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: _openWatch,
+              child: Text('match.startWatch'.tr()),
+            ),
+          ),
+          SizedBox(height: spacing),
+        ],
 
         // Join Button
         Builder(

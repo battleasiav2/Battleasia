@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
@@ -11,6 +12,7 @@ import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/public_user_model.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
+import 'package:battleasia_app/presentation/screens/play/match_result_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/profile/public_profile_info.dart';
@@ -46,6 +48,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
   List<ActivityCard> _activities = [];
   List<Map<String, dynamic>> _highlights = [];
   List<Map<String, dynamic>> _posts = [];
+  List<Map<String, dynamic>> _history = [];
   String _gridTab = 'posts';
   bool _playerTip = false;
   bool _tipping = false;
@@ -121,6 +124,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
       final historyResult = await _userService.getUserMatchHistory(widget.userId);
       if (historyResult['success'] == true && historyResult['data'] != null) {
         final history = historyResult['data'] as List<dynamic>;
+        _history = history.whereType<Map>().map((row) => Map<String, dynamic>.from(row)).toList();
         _gamesPlayed = history.length;
 
         _totalKills = history.fold<int>(0, (sum, record) {
@@ -543,6 +547,17 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
               textAlign: TextAlign.center,
               style: AppTheme.bodyMedium.copyWith(color: Colors.black87),
             ),
+            if (context.read<AuthProvider>().user?.id == widget.userId)
+              TextButton(
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: _viewingUser!.name));
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('profile.usernameCopied'.tr())),
+                  );
+                },
+                child: Text('profile.copyUsername'.tr()),
+              ),
             const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -665,6 +680,51 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     );
   }
 
+  Widget _buildHistory() {
+    final rows = _history.take(24).toList();
+    if (rows.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        child: Column(
+          children: [
+            Text('profile.noHistory'.tr(), style: AppTheme.heading3.copyWith(color: Colors.white)),
+            const SizedBox(height: 6),
+            Text(
+              'profile.historyLead'.tr(),
+              style: AppTheme.bodySmall.copyWith(color: Colors.white70),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+    return Column(
+      children: rows.map((row) {
+        final id = (row['matchId'] ?? row['id'] ?? '').toString();
+        final name = (row['matchName'] ?? '—').toString();
+        final rank = (row['rank'] ?? '—').toString();
+        final kills = (row['kills'] ?? 0).toString();
+        final won = (row['winnings'] ?? row['amountWon'] ?? 0).toString();
+        return ListTile(
+          contentPadding: EdgeInsets.zero,
+          title: Text(name, style: const TextStyle(color: Colors.white)),
+          subtitle: Text(
+            '${'profile.rank'.tr()} $rank · ${'profile.kills'.tr()} $kills · ${'profile.won'.tr()} $won',
+            style: const TextStyle(color: Colors.white70),
+          ),
+          onTap: id.isEmpty
+              ? null
+              : () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => MatchResultScreen(matchId: id)),
+                  );
+                },
+        );
+      }).toList(),
+    );
+  }
+
   Widget _buildPostGrid() {
     final rows = _gridTab == 'reels' ? _posts.where(_isReel).toList() : _posts;
     final own = context.read<AuthProvider>().user?.id == widget.userId;
@@ -693,9 +753,21 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                 ),
               ),
             ),
+            TextButton(
+              onPressed: () => setState(() => _gridTab = 'history'),
+              child: Text(
+                'profile.history'.tr(),
+                style: TextStyle(
+                  color: _gridTab == 'history' ? AppColors.gold : Colors.white70,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
           ],
         ),
-        if (rows.isEmpty)
+        if (_gridTab == 'history')
+          _buildHistory()
+        else if (rows.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: Column(

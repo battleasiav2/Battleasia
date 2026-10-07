@@ -455,6 +455,10 @@
     "full": "Full",
     "openEntry": "Open for entry",
     "joining": "Joining…",
+    "watchOn": "Watch party is on.",
+    "startWatch": "Open watch lobby",
+    "watchOpened": "Watch lobby created",
+    "watchFail": "Could not open watch lobby",
     "cancel": "Cancel",
     "free": "Free"
   },
@@ -512,7 +516,15 @@
     "usernameCooldown": "Username locked. Try again in {n} days.",
     "linkInvalid": "Enter a valid http(s) URL",
     "unfollow": "Unfollow",
-    "unfollowConfirm": "Unfollow this player?"
+    "unfollowConfirm": "Unfollow this player?",
+    "history": "History",
+    "noHistory": "No results yet",
+    "historyLead": "Recent tournament results will show here.",
+    "copyUsername": "Copy username",
+    "usernameCopied": "Username copied",
+    "rank": "Rank",
+    "kills": "Kills",
+    "won": "Won"
   },
   "footer": {
     "home": "Home"
