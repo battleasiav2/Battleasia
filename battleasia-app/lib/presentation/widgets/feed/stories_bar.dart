@@ -701,12 +701,18 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                     ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: ['🔥', '👏', '❤', 'GG'].map((emoji) {
-                      return TextButton(
-                        onPressed: () => SocialService().reactStory(_story.id, emoji),
-                        child: Text(emoji),
-                      );
-                    }).toList(),
+                    children: [
+                      ...['🔥', '👏', '❤', 'GG'].map((emoji) {
+                        return TextButton(
+                          onPressed: () => SocialService().reactStory(_story.id, emoji),
+                          child: Text(emoji),
+                        );
+                      }),
+                      if (widget.viewerUserId != null && widget.viewerUserId == _group.userId)
+                        TextButton(onPressed: _showViewers, child: const Text('Viewers'))
+                      else if (widget.viewerUserId != null && widget.viewerUserId != _group.userId)
+                        TextButton(onPressed: _replyToStory, child: const Text('Reply')),
+                    ],
                   ),
                   if (_story.caption.isNotEmpty)
                     Padding(
@@ -723,6 +729,68 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _replyToStory() async {
+    final userId = _group.userId;
+    final username = _group.username;
+    final storyId = _story.id;
+    final conv = await SocialService().createConversation(userId);
+    final convData = conv['data'];
+    final convId = convData is Map ? convData['id']?.toString() ?? '' : '';
+    if (!mounted) return;
+    if (conv['success'] != true || convId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(conv['message']?.toString() ?? 'Could not open chat')),
+      );
+      return;
+    }
+    final sent = await SocialService().sendDirectMessage(convId, 'Re: your story $storyId');
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(sent['success'] == true ? 'Replied to $username' : (sent['message']?.toString() ?? 'Could not reply'))),
+    );
+    if (sent['success'] == true) Navigator.pop(context);
+  }
+
+  Future<void> _showViewers() async {
+    final result = await SocialService().getStoryViewers(_story.id);
+    if (!mounted) return;
+    if (result['success'] != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result['message']?.toString() ?? 'Viewers are hidden')),
+      );
+      return;
+    }
+    final data = result['data'];
+    final rows = data is List
+        ? data.whereType<Map>().map((row) => Map<String, dynamic>.from(row)).toList()
+        : <Map<String, dynamic>>[];
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Viewers'),
+          content: SizedBox(
+            width: 280,
+            child: rows.isEmpty
+                ? const Text('No viewers yet')
+                : ConstrainedBox(
+                    constraints: const BoxConstraints(maxHeight: 240),
+                    child: ListView(
+                      shrinkWrap: true,
+                      children: rows
+                          .map((viewer) => ListTile(title: Text('${viewer['username'] ?? 'Player'} viewed')))
+                          .toList(),
+                    ),
+                  ),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Close')),
+          ],
+        );
+      },
     );
   }
 

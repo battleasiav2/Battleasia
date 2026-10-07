@@ -228,6 +228,55 @@ class UserService {
     }
   }
 
+  Future<Map<String, dynamic>> updateMuteWords(List<String> muteWords) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.put(
+        Uri.parse('$_baseUrl/api/v2/users/me'),
+        headers: headers,
+        body: jsonEncode({'muteWords': muteWords}),
+      );
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data'] ?? data['user']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Could not save mute words',
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString().replaceAll('Exception: ', '')};
+    }
+  }
+
+  Future<Map<String, dynamic>> getP2Flags() async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/app-settings/p2'),
+        headers: headers,
+      );
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {'success': true, 'data': data['data']};
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to load flags',
+      };
+    } catch (e) {
+      return {'success': false, 'message': e.toString().replaceAll('Exception: ', '')};
+    }
+  }
+
   Future<Map<String, dynamic>> getP1Flags() async {
     try {
       final headers = await _getHeaders();

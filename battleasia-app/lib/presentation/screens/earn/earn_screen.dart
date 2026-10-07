@@ -29,6 +29,7 @@ class _EarnScreenState extends State<EarnScreen> {
   List<Map<String, dynamic>> _claims = [];
   List<Map<String, dynamic>> _squadMessages = [];
   String _tab = 'overview';
+  bool _cashbackDays = false;
   String? _error;
   String _busy = '';
   bool _loading = true;
@@ -59,9 +60,12 @@ class _EarnScreenState extends State<EarnScreen> {
     final badges = await _api.getBadges();
     final history = await _users.getBalanceHistory(page: 1, limit: 80);
     final chat = await _api.getSquadChat();
+    final flags = await _users.getP1Flags();
     if (!mounted) return;
+    final flagData = flags['data'];
     setState(() {
       _loading = false;
+      _cashbackDays = flagData is Map && flagData['cashbackDays'] == true;
       if (home['success'] == true && home['data'] is Map) {
         _home = Map<String, dynamic>.from(home['data'] as Map);
       } else {
@@ -268,6 +272,14 @@ class _EarnScreenState extends State<EarnScreen> {
     final milestones = _list(welcome['milestones']);
     return Column(
       children: [
+        if (_cashbackDays)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(
+              'Cashback days are on — deposit bonus windows follow Admin engagement.',
+              style: TextStyle(color: AppColors.gold),
+            ),
+          ),
         for (final w in milestones)
           _task(
             title: w['title']?.toString() ?? 'Welcome',

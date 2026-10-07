@@ -28,6 +28,8 @@ class FeedService {
     String? feedMode,
     String? sortBy,
     String? hashtag,
+    String? gameTag,
+    String? postType,
   }) async {
     try {
       final headers = await _getHeaders();
@@ -49,6 +51,12 @@ class FeedService {
       }
       if (hashtag != null && hashtag.isNotEmpty) {
         queryParams['hashtag'] = hashtag;
+      }
+      if (gameTag != null && gameTag.isNotEmpty) {
+        queryParams['gameTag'] = gameTag;
+      }
+      if (postType != null && postType.isNotEmpty) {
+        queryParams['postType'] = postType;
       }
 
       final uri = Uri.parse('$_baseUrl/api/v2/feed').replace(queryParameters: queryParams);

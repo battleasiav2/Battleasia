@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
+import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
@@ -34,7 +35,9 @@ class FeedScreen extends StatefulWidget {
 class _FeedScreenState extends State<FeedScreen> {
   final ScrollController _scrollController = ScrollController();
   final FeedService _feedService = FeedService();
+  final UserService _users = UserService();
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _muteDraft = TextEditingController();
 
   List<FeedModel> _feeds = [];
   List<FeedCategory> _categories = [];
@@ -45,6 +48,11 @@ class _FeedScreenState extends State<FeedScreen> {
   String? _selectedCategoryId;
   String? _searchQuery;
   String _feedMode = 'all';
+  String _gameTag = '';
+  String _postType = '';
+  bool _gameFeed = false;
+  bool _highlightsOn = false;
+  bool _muteOn = false;
   FeedHubSection _hubSection = FeedHubSection.feed;
 
   @override
@@ -58,12 +66,14 @@ class _FeedScreenState extends State<FeedScreen> {
     }
     _fetchCategories();
     _fetchFeeds();
+    _loadFeedTools();
   }
 
   @override
   void dispose() {
     _scrollController.dispose();
     _searchController.dispose();
+    _muteDraft.dispose();
     super.dispose();
   }
 
@@ -116,6 +126,8 @@ class _FeedScreenState extends State<FeedScreen> {
         categoryId: _selectedCategoryId,
         search: _searchQuery,
         feedMode: _feedMode,
+        gameTag: _gameTag,
+        postType: _postType,
       );
 
       if (result['success'] == true && result['data'] != null) {
@@ -260,6 +272,40 @@ class _FeedScreenState extends State<FeedScreen> {
     _fetchFeeds();
   }
 
+  Future<void> _loadFeedTools() async {
+    final flags = await _users.getP1Flags();
+    final p2 = await _users.getP2Flags();
+    final me = await _users.getMe();
+    if (!mounted) return;
+    final p1 = flags['data'];
+    final p2Data = p2['data'];
+    final meData = me['data'];
+    final words = meData is Map && meData['muteWords'] is List
+        ? (meData['muteWords'] as List).map((word) => word.toString()).where((word) => word.isNotEmpty).join(', ')
+        : '';
+    setState(() {
+      _gameFeed = p1 is Map && p1['igGameFeed'] == true;
+      _highlightsOn = p1 is Map && p1['igHighlights'] == true;
+      _muteOn = p2Data is Map && (p2Data['igForYou'] == true || p2Data['voiceNotes'] == true);
+      if (_muteDraft.text.isEmpty && words.isNotEmpty) _muteDraft.text = words;
+    });
+  }
+
+  Future<void> _saveMuteWords() async {
+    final words = _muteDraft.text
+        .split(',')
+        .map((word) => word.trim().toLowerCase())
+        .where((word) => word.isNotEmpty)
+        .take(24)
+        .toList();
+    final result = await _users.updateMuteWords(words);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result['success'] == true ? 'Mute words saved' : (result['message']?.toString() ?? 'Could not save mute words'))),
+    );
+    if (result['success'] == true) _fetchFeeds();
+  }
+
   void _handleCategorySelect(String? categoryId) {
     setState(() {
       _selectedCategoryId = categoryId;
@@ -341,6 +387,10 @@ class _FeedScreenState extends State<FeedScreen> {
                         FeedComposer(onPosted: () => _fetchFeeds()),
                         SizedBox(height: spacing16),
                         _buildFeedModes(context),
+                        if (_gameFeed || _muteOn) ...[
+                          SizedBox(height: spacing16),
+                          _buildFeedTools(context),
+                        ],
                         SizedBox(height: spacing16),
                         _buildSearchBar(context),
                         SizedBox(height: spacing16),
@@ -468,6 +518,81 @@ class _FeedScreenState extends State<FeedScreen> {
         fontSize: titleFontSize,
         letterSpacing: 1,
       ),
+    );
+  }
+
+  Widget _chip(String label, bool selected, VoidCallback onTap) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 8, bottom: 8),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(2),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.gold.withValues(alpha: 0.15) : Colors.transparent,
+            border: Border.all(color: selected ? AppColors.gold : AppColors.border(0.2)),
+            borderRadius: BorderRadius.circular(2),
+          ),
+          child: Text(
+            label,
+            style: AppTheme.bodySmall.copyWith(
+              color: selected ? AppColors.gold : AppColors.textMuted,
+              fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeedTools(BuildContext context) {
+    const games = [
+      ('', 'All games'),
+      ('pubg', 'PUBG'),
+      ('freefire', 'Free Fire'),
+      ('cod', 'COD'),
+      ('mlbb', 'MLBB'),
+      ('valorant', 'Valorant'),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Mutes · Filters', style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.w700)),
+        if (_muteOn) ...[
+          const SizedBox(height: 8),
+          TextField(
+            controller: _muteDraft,
+            style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
+            decoration: InputDecoration(
+              hintText: 'word1, word2',
+              hintStyle: AppTheme.bodyMedium.copyWith(color: AppColors.textMuted),
+            ),
+          ),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: _saveMuteWords,
+              child: Text('Save mutes', style: TextStyle(color: AppColors.gold)),
+            ),
+          ),
+        ],
+        if (_gameFeed)
+          Wrap(
+            children: [
+              for (final game in games)
+                _chip(game.$2, _gameTag == game.$1, () {
+                  setState(() => _gameTag = game.$1);
+                  _fetchFeeds();
+                }),
+              if (_highlightsOn)
+                _chip('Highlights', _postType == 'match_result', () {
+                  setState(() => _postType = _postType == 'match_result' ? '' : 'match_result');
+                  _fetchFeeds();
+                }),
+            ],
+          ),
+      ],
     );
   }
 
