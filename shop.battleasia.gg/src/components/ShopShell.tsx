@@ -246,13 +246,16 @@ function ShopChrome() {
                 </header>
                 <nav className="ld-nav" onClick={closeNav}>
                   <Link className={path.startsWith('/user/shop') || path === '/user' ? 'is-active' : ''} to="/user/shop">
-                    {t('nav.shop')}
+                    <span className="ld-nav-ico">{DrawerIcons.bag}</span>
+                    <span>{t('nav.shop')}</span>
                   </Link>
                   <Link className={path.startsWith('/user/wallet') ? 'is-active' : ''} to="/user/wallet">
-                    {t('nav.wallet')}
+                    <span className="ld-nav-ico">{DrawerIcons.wallet}</span>
+                    <span>{t('nav.wallet')}</span>
                   </Link>
                   <Link className={path.startsWith('/user/transfer') ? 'is-active' : ''} to="/user/transfer">
-                    {t('nav.transfer')}
+                    <span className="ld-nav-ico">{DrawerIcons.send}</span>
+                    <span>{t('nav.transfer')}</span>
                   </Link>
                 </nav>
                 <button className="ld-card" type="button" onClick={toggleBalance}>

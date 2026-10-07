@@ -600,18 +600,34 @@ html[data-theme='light'] .m-drawer-panel {
   }
 }
 
+.m-drawer--dash .ld-panel {
+  background: #0b0c10;
+}
+
+.m-drawer--dash .ld-close {
+  border-color: #232634;
+  background: #16181f;
+}
+
 .m-drawer--dash .ld-nav {
-  gap: 8px;
-  margin-top: 36px;
+  gap: 10px;
+  margin-top: 28px;
 }
 
 .m-drawer--dash .ld-nav a,
 .m-drawer--dash .ld-nav button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   position: relative;
-  padding: 14px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.03);
+  min-height: 56px;
+  padding: 8px 18px 8px 8px;
+  border: 1px solid #232634;
+  border-radius: 999px;
+  background: #16181f;
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.01em;
   overflow: hidden;
   animation: ld-row-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -621,33 +637,63 @@ html[data-theme='light'] .m-drawer-panel {
 .m-drawer--dash .ld-nav > :nth-child(3) { animation-delay: 0.12s; }
 .m-drawer--dash .ld-nav > :nth-child(4) { animation-delay: 0.16s; }
 .m-drawer--dash .ld-nav > :nth-child(5) { animation-delay: 0.2s; }
+.m-drawer--dash .ld-nav > :nth-child(6) { animation-delay: 0.24s; }
+
+.m-drawer--dash .ld-nav-ico {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border: 1px solid #232634;
+  border-radius: 999px;
+  background: #0b0c10;
+  color: #fff;
+}
+
+.m-drawer--dash .ld-nav-ico svg {
+  width: 18px;
+  height: 18px;
+}
 
 .m-drawer--dash .ld-nav a::before,
 .m-drawer--dash .ld-nav button::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 10px;
-  bottom: 10px;
-  width: 3px;
-  border-radius: 99px;
-  background: var(--ba-accent);
-  box-shadow: 0 0 10px var(--ba-accent-glow);
-  transform: scaleY(0);
-  transform-origin: center;
-  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  content: none;
 }
 
 .m-drawer--dash .ld-nav a.is-active,
 .m-drawer--dash .ld-nav button.is-active {
-  color: #fff;
-  background: color-mix(in srgb, var(--ba-accent) 14%, transparent);
-  border-color: color-mix(in srgb, var(--ba-accent) 42%, transparent);
+  color: #0b0c10;
+  background: #ccff00;
+  border-color: #ccff00;
+  box-shadow: 0 0 22px rgba(204, 255, 0, 0.45);
 }
 
-.m-drawer--dash .ld-nav a.is-active::before,
-.m-drawer--dash .ld-nav button.is-active::before {
-  transform: scaleY(1);
+.m-drawer--dash .ld-nav a.is-active .ld-nav-ico,
+.m-drawer--dash .ld-nav button.is-active .ld-nav-ico {
+  color: #ccff00;
+  background: #0b0c10;
+  border-color: #0b0c10;
+  box-shadow: 0 0 12px rgba(204, 255, 0, 0.7);
+}
+
+.m-drawer--dash .ld-nav a.is-active::after,
+.m-drawer--dash .ld-nav button.is-active::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  margin-left: auto;
+  border-radius: 99px;
+  background: #0b0c10;
+  box-shadow: 0 0 10px rgba(11, 12, 16, 0.45);
+}
+
+.m-drawer--dash .ld-card,
+.m-drawer--dash .ld-apk {
+  background: #16181f;
+  border: 1px solid #232634;
+  border-radius: 18px;
+  color: #fff;
 }
 
 @keyframes ld-row-in {
@@ -656,9 +702,7 @@ html[data-theme='light'] .m-drawer-panel {
 
 @media (prefers-reduced-motion: reduce) {
   .m-drawer--dash .ld-nav a,
-  .m-drawer--dash .ld-nav button,
-  .m-drawer--dash .ld-nav a::before,
-  .m-drawer--dash .ld-nav button::before {
+  .m-drawer--dash .ld-nav button {
     animation: none;
     transition: none;
   }

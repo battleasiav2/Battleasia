@@ -169,11 +169,9 @@ class AccountDrawer extends StatelessWidget {
             ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic)),
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: const Color(0xE8060607),
-                border: Border(
-                  left: BorderSide(
-                    color: Colors.white.withValues(alpha: 0.09),
-                  ),
+                color: const Color(0xFF0B0C10),
+                border: const Border(
+                  left: BorderSide(color: Color(0xFF232634)),
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -249,6 +247,7 @@ class _AccountDrawerContent extends StatelessWidget {
                 _buildExpandableAccountMenu(context),
                 AccountMenuTile(
                   label: 'nav.play'.tr(),
+                  icon: Icons.sports_esports_outlined,
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.push(
@@ -259,6 +258,7 @@ class _AccountDrawerContent extends StatelessWidget {
                 ),
                 AccountMenuTile(
                   label: 'nav.shop'.tr(),
+                  icon: Icons.storefront_outlined,
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.push(
@@ -269,6 +269,7 @@ class _AccountDrawerContent extends StatelessWidget {
                 ),
                 AccountMenuTile(
                   label: 'nav.earn'.tr(),
+                  icon: Icons.bolt_outlined,
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.pushReplacement(
@@ -282,6 +283,7 @@ class _AccountDrawerContent extends StatelessWidget {
                 ),
                 AccountMenuTile(
                   label: 'nav.transfer'.tr(),
+                  icon: Icons.swap_horiz_rounded,
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.pushReplacement(
@@ -295,6 +297,7 @@ class _AccountDrawerContent extends StatelessWidget {
                 ),
                 AccountMenuTile(
                   label: 'nav.feed'.tr(),
+                  icon: Icons.dynamic_feed_outlined,
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.push(
@@ -305,6 +308,7 @@ class _AccountDrawerContent extends StatelessWidget {
                 ),
                 AccountMenuTile(
                   label: 'nav.labs'.tr(),
+                  icon: Icons.science_outlined,
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.push(
@@ -370,52 +374,36 @@ class _AccountDrawerContent extends StatelessWidget {
           highlightColor: Colors.transparent,
         ),
         child: ExpansionTile(
-          tilePadding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-          childrenPadding: EdgeInsets.zero,
-          backgroundColor: Colors.transparent,
-          collapsedBackgroundColor: Colors.transparent,
-          shape: const Border(),
-          collapsedShape: const Border(),
-          title: Row(
-            children: [
-              Container(
-                width: 5,
-                height: 5,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.transparent,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  'account.menuAccount'.tr(),
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.55),
-                    fontWeight: FontWeight.w500,
-                    fontSize: 20,
-                    height: 1.25,
-                    decoration: TextDecoration.none,
-                  ),
-                ),
-              ),
-            ],
+          clipBehavior: Clip.antiAlias,
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          childrenPadding: const EdgeInsets.only(top: 8),
+          backgroundColor: const Color(0xFF16181F),
+          collapsedBackgroundColor: const Color(0xFF16181F),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+            side: const BorderSide(color: Color(0xFF232634)),
           ),
-        iconColor: Colors.white.withValues(alpha: 0.42),
-        collapsedIconColor: Colors.white.withValues(alpha: 0.42),
-        children: [
-          Container(
-            margin: const EdgeInsets.only(left: 14, bottom: 4),
-            decoration: BoxDecoration(
-              border: Border(
-                left: BorderSide(
-                  color: AppColors.gold.withValues(alpha: 0.85),
-                  width: 2,
-                ),
-              ),
+          collapsedShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(999),
+            side: const BorderSide(color: Color(0xFF232634)),
+          ),
+          title: Text(
+            'account.menuAccount'.tr(),
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w800,
+              fontSize: 16,
+              height: 1.2,
+              decoration: TextDecoration.none,
             ),
-            child: Column(
-              children: [
+          ),
+          iconColor: const Color(0xFFCCFF00),
+          collapsedIconColor: Colors.white,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+              child: Column(
+                children: [
                 AccountMenuTile(
                   label: 'account.profile'.tr(),
                   nested: true,

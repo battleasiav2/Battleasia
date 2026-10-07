@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:battleasia_app/core/theme/app_colors.dart';
 
 /// Aurora Edge profile drawer link — flat list row with optional icon.
 class AccountMenuTile extends StatelessWidget {
@@ -40,75 +39,68 @@ class AccountMenuTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (nested) {
-      return InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
-          child: Row(
-            children: [
-              if (icon != null) ...[
-                Icon(
-                  icon,
-                  size: 18,
-                  color: active
-                      ? AppColors.gold
-                      : Colors.white.withValues(alpha: 0.55),
-                ),
-                const SizedBox(width: 12),
-              ],
-              Expanded(
-                child: Text(
-                  label.toUpperCase(),
-                  style: TextStyle(
-                    color: active
-                        ? Colors.white
-                        : Colors.white.withValues(alpha: 0.72),
-                    fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                    fontSize: 13,
-                    letterSpacing: 0.6,
-                    height: 1.2,
-                    decoration: TextDecoration.none,
+    const card = Color(0xFF16181F);
+    const line = Color(0xFF232634);
+    const lime = Color(0xFFCCFF00);
+    const ink = Color(0xFF0B0C10);
+    return Padding(
+      padding: EdgeInsets.only(left: nested ? 8 : 0, bottom: 10),
+      child: Material(
+        color: active ? lime : card,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(999),
+          side: BorderSide(color: active ? lime : line),
+        ),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(999),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 8, 16, 8),
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: ink,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: active ? ink : line),
+                    boxShadow: active
+                        ? const [BoxShadow(color: Color(0xB3CCFF00), blurRadius: 12)]
+                        : null,
+                  ),
+                  child: Icon(
+                    icon ?? Icons.circle,
+                    size: 18,
+                    color: active ? lime : Colors.white,
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 10, 8, 10),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Container(
-              width: 5,
-              height: 5,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: active ? AppColors.gold : Colors.transparent,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: active
-                      ? Colors.white
-                      : Colors.white.withValues(alpha: 0.72),
-                  fontWeight: active ? FontWeight.w700 : FontWeight.w600,
-                  fontSize: 20,
-                  height: 1.25,
-                  decoration: TextDecoration.none,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    nested ? label.toUpperCase() : label,
+                    style: TextStyle(
+                      color: active ? ink : Colors.white,
+                      fontWeight: FontWeight.w800,
+                      fontSize: nested ? 13 : 16,
+                      letterSpacing: nested ? 0.4 : 0.1,
+                      height: 1.2,
+                      decoration: TextDecoration.none,
+                    ),
+                  ),
                 ),
-              ),
+                if (active)
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: ink,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

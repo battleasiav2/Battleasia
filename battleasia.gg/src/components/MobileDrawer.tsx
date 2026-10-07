@@ -128,11 +128,21 @@ export const DrawerIcons = {
       <path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7Z" />
     </Svg>
   ),
-  cash: (
+  feed: (
     <Svg>
-      <rect x="3" y="6" width="18" height="12" rx="2" />
-      <circle cx="12" cy="12" r="2.5" />
-      <path d="M7 9.5v.01M17 14.5v.01" />
+      <path d="M4 6h16M4 12h16M4 18h10" />
+    </Svg>
+  ),
+  bag: (
+    <Svg>
+      <path d="M6 8h12l-1 12H7L6 8Z" />
+      <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+    </Svg>
+  ),
+  wallet: (
+    <Svg>
+      <rect x="3" y="6" width="18" height="14" rx="2" />
+      <path d="M3 10h18M16 15h.01" />
     </Svg>
   ),
 };
@@ -173,6 +183,15 @@ function Target({
       {children}
     </button>
   );
+}
+
+function menuIcon(key: string) {
+  if (key === 'play') return DrawerIcons.gamepad;
+  if (key === 'shop') return DrawerIcons.bag;
+  if (key === 'earn') return DrawerIcons.gift;
+  if (key === 'transfer') return DrawerIcons.send;
+  if (key === 'feed') return DrawerIcons.feed;
+  return DrawerIcons.chevron;
 }
 
 export function MobileDrawer({ open, onClose, logo, playerName, avatar, onSignOut }: Props) {
@@ -245,7 +264,8 @@ export function MobileDrawer({ open, onClose, logo, playerName, avatar, onSignOu
         <nav className="ld-nav" aria-label={t('hud.arena')}>
           {links.map((link) => (
             <Target key={link.key} target={link} onClose={onClose} className={link.active ? 'is-active' : ''}>
-              {link.label}
+              <span className="ld-nav-ico">{menuIcon(link.key)}</span>
+              <span>{link.label}</span>
             </Target>
           ))}
         </nav>
