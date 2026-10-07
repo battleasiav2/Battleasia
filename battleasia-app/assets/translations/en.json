@@ -20,7 +20,19 @@
     "commentPh": "Add a comment…",
     "send": "Post",
     "reply": "Reply",
-    "commentFail": "Could not comment"
+    "commentFail": "Could not comment",
+    "seen": "Seen",
+    "sent": "Sent",
+    "block": "Block",
+    "report": "Report",
+    "blocked": "Blocked",
+    "blockFail": "Could not block",
+    "reported": "Reported",
+    "reportFail": "Could not report",
+    "micBlocked": "Mic blocked",
+    "voice": "Voice",
+    "stopVoice": "Stop",
+    "mediaLink": "media"
   },
   "feedHub": {
     "feed": "Feed",
@@ -78,6 +90,8 @@
     "gameServer": "Game server",
     "createAccount": "Create account",
     "termsAgreement": "By signing up, I agree to Terms of Service and Privacy Policy.",
+    "agreeLead": "By signing up, I agree to the ",
+    "agreeAnd": "and",
     "forgotPassword": "Forgot password?",
     "emailPlaceholder": "Example@domain.com",
     "passwordPlaceholder": "6+ characters",
@@ -449,5 +463,49 @@
   },
   "footer": {
     "home": "Home"
+  },
+  "legal": {
+    "back": "Back",
+    "eyebrow": "LEGAL",
+    "privacyTitle": "Privacy policy",
+    "privacyBody": "BattleAsia is a mobile esports tournament arena. This page explains what player data we keep so matches, wallets, and support can run.",
+    "privacyIntro": "We run paid rooms for PUBG Mobile, Free Fire, Call of Duty Mobile, and Mobile Legends. Live counts on the home page use the same database as Admin — we do not invent player numbers or sell your profile to advertisers.",
+    "termsTitle": "Terms and conditions",
+    "termsBody": "By creating a BattleAsia account you agree to these terms for fair play, paid entries, BAC, and how Admin decides match results.",
+    "termsIntro": "BattleAsia hosts competitive mobile tournaments. You play under each game publisher’s rules plus our arena rules. BAC is in-app credit for this platform — not a bank deposit or investment product.",
+    "privacy": {
+      "who": "Who BattleAsia is",
+      "whoBody": "BattleAsia is an online tournament platform: create an account, buy BAC, join paid matches, earn rewards, and request withdrawals. We are not a bank, casino, or the official publisher of any game title.",
+      "accounts": "Accounts",
+      "accountsBody": "We store email, username, in-game IDs (such as PUBG ID), phone/country when you provide them, password hashes, session tokens, and optional profile fields (avatar, bio, cover). This data lets you sign in, join rooms, and use feed or DMs.",
+      "matches": "Matches & lobby",
+      "matchesBody": "Join history, ready state, lobby chat, room credentials after start, placements, and reports are kept for integrity and payouts. Room IDs stay hidden until start so only paid participants see them.",
+      "payments": "Payments & BAC",
+      "paymentsBody": "BAC balances, deposits, withdrawals, transfers, shop orders, and TrxID proofs are ledger rows reviewed by admin. We do not store bank card numbers. Payment screenshots you upload are used only for approval.",
+      "social": "Feed, stories & support",
+      "socialBody": "Posts, likes, comments, stories, DMs, mute words, and support tickets stay on our servers so social and help features work. Support may keep screenshots you attach to a dispute.",
+      "sharing": "What we do not do",
+      "sharingBody": "We do not sell player lists. Staff and systems access data only to run tournaments, stop abuse, and pay out BAC. Public profiles show what you choose to publish.",
+      "requests": "Your requests",
+      "requestsBody": "Email support@battleasia.gg to export or delete an account. Match integrity and payment records may be kept after close when needed for fraud review or law."
+    },
+    "terms": {
+      "who": "About the service",
+      "whoBody": "BattleAsia provides match lobbies, wallets, shop packs, earn modules, referral (one level), feed, and support. Features can change when Admin updates settings. Official game IP stays with the publishers; our covers are original arena art.",
+      "play": "Fair play",
+      "playBody": "No cheats, banned emulators, teaming, account sharing, or multi-account abuse. Confirmed hits can void entries, ban accounts, and hold withdrawals. Report with screenshots via Support.",
+      "rooms": "Paid rooms",
+      "roomsBody": "Join before a lobby fills. Entry fees lock a seat. Leave before start may refund; after start the seat stays locked. Room ID and password appear only for joined players at start — do not leak them publicly.",
+      "bac": "BAC currency",
+      "bacBody": "BAC pays entries, shop, gifts, and transfers. Deposits need admin approval. Withdrawals use withdrawable balance (often after match-bet rules) and admin review. Fees and limits come from Admin settings.",
+      "earn": "Earn & engagement",
+      "earnBody": "Missions, streaks, spins, squads, and season rewards are optional. Admin can turn modules off. Claims must follow the rules shown in Earn — abuse can reverse rewards.",
+      "results": "Results & payouts",
+      "resultsBody": "Admin posts placements. Prize splits follow the match card. Client screenshots are evidence, not automatic payout truth. Disputes need match ID and proof in Support.",
+      "referral": "Referral",
+      "referralBody": "Referral is one level only: a share of invitee deposits (Admin rate) plus milestones. It is not MLM. Fake invites or self-referral can void commissions.",
+      "eligibility": "Eligibility",
+      "eligibilityBody": "You must be old enough and legally allowed to join paid tournaments where you live. Follow local law and each game’s terms. Underage or banned-region play is not allowed."
+    }
   }
 }

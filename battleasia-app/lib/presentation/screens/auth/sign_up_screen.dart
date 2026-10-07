@@ -8,6 +8,7 @@ import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/screens/auth/email_verification_screen.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
+import 'package:battleasia_app/presentation/screens/legal/legal_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_alert.dart';
 import 'package:battleasia_app/presentation/widgets/auth/auth_form_shell.dart';
@@ -269,13 +270,60 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    child: Text(
-                      'auth.termsAgreement'.tr(),
-                      style: AppTheme.bodyMedium.copyWith(
-                        color: Colors.white.withValues(alpha: 0.55),
-                        fontSize: 13,
-                        height: 1.5,
-                      ),
+                    child: Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Text(
+                          'auth.agreeLead'.tr(),
+                          style: AppTheme.bodyMedium.copyWith(
+                            color: Colors.white.withValues(alpha: 0.55),
+                            fontSize: 13,
+                            height: 1.5,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const LegalScreen.terms()),
+                            );
+                          },
+                          child: Text(
+                            'legal.termsTitle'.tr(),
+                            style: AppTheme.bodyMedium.copyWith(
+                              color: AppColors.gold,
+                              fontSize: 13,
+                              height: 1.5,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          ' ${'auth.agreeAnd'.tr()} ',
+                          style: AppTheme.bodyMedium.copyWith(
+                            color: Colors.white.withValues(alpha: 0.55),
+                            fontSize: 13,
+                            height: 1.5,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => const LegalScreen.privacy()),
+                            );
+                          },
+                          child: Text(
+                            'legal.privacyTitle'.tr(),
+                            style: AppTheme.bodyMedium.copyWith(
+                              color: AppColors.gold,
+                              fontSize: 13,
+                              height: 1.5,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

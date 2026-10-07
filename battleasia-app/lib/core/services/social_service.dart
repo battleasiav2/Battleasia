@@ -79,6 +79,8 @@ class SocialService {
     required String mediaUrl,
     String mediaType = 'image',
     String? caption,
+    String? overlayText,
+    List<Map<String, dynamic>>? stickers,
   }) async {
     try {
       final headers = await _getHeaders();
@@ -89,6 +91,8 @@ class SocialService {
           'mediaUrl': mediaUrl,
           'mediaType': mediaType,
           if (caption != null && caption.isNotEmpty) 'caption': caption,
+          if (overlayText != null && overlayText.isNotEmpty) 'overlayText': overlayText,
+          if (stickers != null && stickers.isNotEmpty) 'stickers': stickers,
         }),
       );
       final data = response.body.isEmpty
@@ -338,6 +342,20 @@ class SocialService {
       final response = await ApiClient.get(
         Uri.parse('$_baseUrl/api/v2/social/messaging-settings'),
         headers: headers,
+      );
+      return _parseBody(response);
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
+  Future<Map<String, dynamic>> markConversationRead(String conversationId) async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/social/messages/$conversationId/read'),
+        headers: headers,
+        body: '{}',
       );
       return _parseBody(response);
     } catch (e) {

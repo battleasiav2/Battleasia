@@ -16,6 +16,13 @@ const ALLOWED_MIME = new Set([
   'image/gif',
   'video/mp4',
   'video/webm',
+  'audio/webm',
+  'audio/mpeg',
+  'audio/mp3',
+  'audio/mp4',
+  'audio/aac',
+  'audio/x-m4a',
+  'audio/ogg',
   'application/pdf',
 ]);
 
@@ -43,7 +50,7 @@ function buildStorage(folder: string) {
     destination: (_req, _file, cb) => cb(null, dest),
     filename: (_req, file, cb) => {
       const ext = path.extname(file.originalname || '').slice(0, 10).toLowerCase();
-      const safeExt = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.mp4', '.webm', '.pdf'].includes(ext)
+      const safeExt = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.mp4', '.webm', '.pdf', '.mp3', '.m4a', '.aac', '.ogg'].includes(ext)
         ? ext
         : '.bin';
       cb(null, `${Date.now()}-${Math.random().toString(36).slice(2, 10)}${safeExt}`);
@@ -52,7 +59,8 @@ function buildStorage(folder: string) {
 }
 
 function fileFilter(_req: Express.Request, file: Express.Multer.File, cb: FileFilterCallback) {
-  if (ALLOWED_MIME.has(file.mimetype)) {
+  const mime = file.mimetype.split(';')[0].trim().toLowerCase();
+  if (ALLOWED_MIME.has(mime)) {
     cb(null, true);
     return;
   }
@@ -67,6 +75,15 @@ function detectMimeFromBuffer(buffer: Buffer): string | null {
     if (sig.bytes.every((byte, index) => buffer[index] === byte)) {
       return sig.mime;
     }
+  }
+  if (buffer.length >= 3 && buffer[0] === 0x49 && buffer[1] === 0x44 && buffer[2] === 0x33) {
+    return 'audio/mpeg';
+  }
+  if (buffer.length >= 2 && buffer[0] === 0xff && (buffer[1] === 0xfb || buffer[1] === 0xf3 || buffer[1] === 0xf2)) {
+    return 'audio/mpeg';
+  }
+  if (buffer.length >= 4 && buffer[0] === 0x4f && buffer[1] === 0x67 && buffer[2] === 0x67 && buffer[3] === 0x53) {
+    return 'audio/ogg';
   }
   if (buffer.length >= 8 && buffer[4] === 0x66 && buffer[5] === 0x74 && buffer[6] === 0x79 && buffer[7] === 0x70) {
     return 'video/mp4';
@@ -84,10 +101,15 @@ function validateUploadedFile(file: Express.Multer.File): string | null {
   fs.closeSync(fd);
 
   const detected = detectMimeFromBuffer(header);
+  const declared = file.mimetype.split(';')[0].trim().toLowerCase();
   if (!detected || !ALLOWED_MIME.has(detected)) {
     return 'File content does not match an allowed type';
   }
-  if (detected !== file.mimetype && !(detected === 'image/jpeg' && file.mimetype === 'image/jpg')) {
+  const audioContainer =
+    (detected === 'video/mp4' && ['audio/mp4', 'audio/aac', 'audio/x-m4a'].includes(declared)) ||
+    (detected === 'video/webm' && declared === 'audio/webm') ||
+    (detected === 'audio/mpeg' && declared === 'audio/mp3');
+  if (detected !== declared && !(detected === 'image/jpeg' && declared === 'image/jpg') && !audioContainer) {
     return 'File content does not match declared type';
   }
   return null;

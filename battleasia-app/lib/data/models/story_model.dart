@@ -1,8 +1,26 @@
+class StorySticker {
+  final String emoji;
+  final double x;
+  final double y;
+
+  const StorySticker({required this.emoji, required this.x, required this.y});
+
+  factory StorySticker.fromJson(Map<String, dynamic> json) {
+    return StorySticker(
+      emoji: json['emoji']?.toString() ?? '',
+      x: (json['x'] as num?)?.toDouble() ?? 50,
+      y: (json['y'] as num?)?.toDouble() ?? 50,
+    );
+  }
+}
+
 class StoryItem {
   final String id;
   final String mediaType;
   final String mediaUrl;
   final String caption;
+  final String overlayText;
+  final List<StorySticker> stickers;
   final int totalViews;
   final String? expiresAt;
   final String? createdAt;
@@ -14,6 +32,8 @@ class StoryItem {
     required this.mediaType,
     required this.mediaUrl,
     required this.caption,
+    this.overlayText = '',
+    this.stickers = const [],
     required this.totalViews,
     this.expiresAt,
     this.createdAt,
@@ -22,11 +42,20 @@ class StoryItem {
   });
 
   factory StoryItem.fromJson(Map<String, dynamic> json) {
+    final rawStickers = json['stickers'];
     return StoryItem(
       id: json['id']?.toString() ?? '',
       mediaType: json['mediaType']?.toString() == 'video' ? 'video' : 'image',
       mediaUrl: json['mediaUrl']?.toString() ?? '',
       caption: json['caption']?.toString() ?? '',
+      overlayText: json['overlayText']?.toString() ?? '',
+      stickers: rawStickers is List
+          ? rawStickers
+              .whereType<Map>()
+              .map((row) => StorySticker.fromJson(Map<String, dynamic>.from(row)))
+              .where((s) => s.emoji.isNotEmpty)
+              .toList()
+          : const [],
       totalViews: (json['totalViews'] as num?)?.toInt() ?? 0,
       expiresAt: json['expiresAt']?.toString(),
       createdAt: json['createdAt']?.toString(),
@@ -41,6 +70,8 @@ class StoryItem {
       mediaType: mediaType,
       mediaUrl: mediaUrl,
       caption: caption,
+      overlayText: overlayText,
+      stickers: stickers,
       totalViews: totalViews,
       expiresAt: expiresAt,
       createdAt: createdAt,

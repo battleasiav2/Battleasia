@@ -44,6 +44,7 @@ void main() async {
       ],
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
+      useFallbackTranslations: true,
       child: const BattleAsiaApp(),
     ),
   );

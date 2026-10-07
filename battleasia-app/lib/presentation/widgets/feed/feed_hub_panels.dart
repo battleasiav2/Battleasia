@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -16,14 +17,17 @@ import 'package:battleasia_app/data/models/feed_model.dart';
 import 'package:battleasia_app/data/models/reel_model.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/hashtag_screen.dart';
-import 'package:battleasia_app/presentation/screens/profile/public_profile_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/reel_player_screen.dart';
+import 'package:battleasia_app/presentation/screens/profile/public_profile_screen.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_comments_sheet.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_item.dart';
 import 'package:battleasia_app/presentation/widgets/social/external_messaging_panel.dart';
 import 'package:battleasia_app/presentation/widgets/social/new_chat_sheet.dart';
 import 'package:battleasia_app/presentation/widgets/social/reel_create_sheet.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:record/record.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:video_player/video_player.dart';
 
 class FeedExplorePanel extends StatefulWidget {
   const FeedExplorePanel({super.key});
@@ -585,6 +589,10 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
   bool _uploading = false;
   bool _initialUserHandled = false;
   bool _dmListening = false;
+  bool _voiceOn = false;
+  bool _recording = false;
+  final AudioRecorder _recorder = AudioRecorder();
+  Timer? _voiceLimit;
 
   @override
   void initState() {
@@ -594,6 +602,12 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
 
   @override
   void dispose() {
+    _voiceLimit?.cancel();
+    if (_recording) {
+      _recorder.stop().whenComplete(_recorder.dispose);
+    } else {
+      _recorder.dispose();
+    }
     _stopDmWatch();
     _composer.dispose();
     super.dispose();
@@ -604,8 +618,13 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
     if (!mounted) return;
     final flags = await UserService().getP1Flags();
     final flagData = flags['data'];
+    final p2 = await UserService().getP2Flags();
+    final p2Data = p2['data'];
     if (mounted) {
-      setState(() => _requestsOn = flagData is Map && flagData['igMessageRequests'] == true);
+      setState(() {
+        _requestsOn = flagData is Map && flagData['igMessageRequests'] == true;
+        _voiceOn = p2Data is Map && p2Data['voiceNotes'] == true;
+      });
     }
 
     final builtinEnabled = _messagingSettings?.builtinEnabled ?? true;
@@ -740,6 +759,7 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
       _typing = '';
     });
     await _watchDm(conversation.id);
+    await _socialService.markConversationRead(conversation.id);
     final result = await _socialService.getDirectMessages(conversation.id);
     if (!mounted) return;
     if (result['success'] == true) {
@@ -776,13 +796,96 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
         url = '${AppConfig.serverUrl}$url';
       }
       if (url.isNotEmpty) {
-        setState(() => _pendingAttachments = [..._pendingAttachments, url]);
+        setState(() {
+          if (_pendingAttachments.length < 4) {
+            _pendingAttachments = [..._pendingAttachments, url];
+          }
+        });
       }
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(upload['message']?.toString() ?? 'Upload failed')),
       );
     }
+  }
+
+  Future<void> _toggleVoice() async {
+    if (!_voiceOn || _active == null || _uploading) return;
+    if (_recording) {
+      await _finishVoice();
+      return;
+    }
+    if (_pendingAttachments.length >= 4) return;
+    final allowed = await _recorder.hasPermission();
+    if (!allowed) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('feed.micBlocked'.tr())),
+        );
+      }
+      return;
+    }
+    final path = '${Directory.systemTemp.path}/voice-${DateTime.now().millisecondsSinceEpoch}.m4a';
+    await _recorder.start(const RecordConfig(encoder: AudioEncoder.aacLc), path: path);
+    if (!mounted) {
+      await _recorder.stop();
+      return;
+    }
+    setState(() => _recording = true);
+    _voiceLimit?.cancel();
+    _voiceLimit = Timer(const Duration(seconds: 15), () {
+      if (_recording) _finishVoice();
+    });
+  }
+
+  Future<void> _finishVoice() async {
+    _voiceLimit?.cancel();
+    if (!_recording) return;
+    setState(() => _recording = false);
+    final path = await _recorder.stop();
+    if (path == null || path.isEmpty || _active == null) return;
+    if (_pendingAttachments.length >= 4) return;
+    setState(() => _uploading = true);
+    final upload = await _feedService.uploadMedia(path, folder: 'support');
+    if (!mounted) return;
+    setState(() => _uploading = false);
+    if (upload['success'] == true) {
+      var url = upload['data']?['url']?.toString() ?? '';
+      if (url.isNotEmpty && !url.startsWith('http')) {
+        url = '${AppConfig.serverUrl}$url';
+      }
+      if (url.isNotEmpty) {
+        setState(() => _pendingAttachments = [..._pendingAttachments, url]);
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(upload['message']?.toString() ?? 'Upload failed')),
+      );
+    }
+  }
+
+  Future<void> _blockChat() async {
+    final id = _active?.otherUserId ?? '';
+    if (id.isEmpty) return;
+    final result = await _socialService.blockUser(id);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result['success'] == true ? 'feed.blocked'.tr() : (result['message']?.toString() ?? 'feed.blockFail'.tr()))),
+    );
+  }
+
+  Future<void> _reportChat() async {
+    final id = _active?.otherUserId ?? '';
+    if (id.isEmpty) return;
+    final result = await _socialService.submitReport(
+      targetType: 'user',
+      targetId: id,
+      reason: 'spam',
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(result['success'] == true ? 'feed.reported'.tr() : (result['message']?.toString() ?? 'feed.reportFail'.tr()))),
+    );
   }
 
   Future<void> _sendMessage() async {
@@ -837,8 +940,14 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
           Row(
             children: [
               IconButton(
-                onPressed: () {
+                onPressed: () async {
+                  _voiceLimit?.cancel();
+                  if (_recording) {
+                    _recording = false;
+                    await _recorder.stop();
+                  }
                   _stopDmWatch();
+                  if (!mounted) return;
                   setState(() {
                     _active = null;
                     _pendingAttachments = [];
@@ -854,9 +963,40 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
                   style: AppTheme.heading3.copyWith(color: AppColors.textPrimary),
                 ),
               ),
+              if (_active!.otherUserId.isNotEmpty) ...[
+                TextButton(
+                  onPressed: _blockChat,
+                  child: Text('feed.block'.tr(), style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted)),
+                ),
+                TextButton(
+                  onPressed: _reportChat,
+                  child: Text('feed.report'.tr(), style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted)),
+                ),
+              ],
             ],
           ),
           const SizedBox(height: 8),
+          if (_voiceOn && _messages.any((m) => m.attachments.isNotEmpty))
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Wrap(
+                spacing: 8,
+                children: _messages
+                    .expand((m) => m.attachments)
+                    .take(12)
+                    .map(
+                      (url) => TextButton(
+                        onPressed: () {
+                          final href = ImageUtils.getImageUrl(url) ?? url;
+                          final uri = Uri.tryParse(href);
+                          if (uri != null) launchUrl(uri, mode: LaunchMode.externalApplication);
+                        },
+                        child: Text('feed.mediaLink'.tr()),
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
           if (_typing.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -873,17 +1013,25 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
                 separatorBuilder: (_, __) => const SizedBox(width: 8),
                 itemBuilder: (context, index) {
                   final url = _pendingAttachments[index];
+                  final audio = _isAudioUrl(url);
                   return Stack(
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(4),
-                        child: ImageUtils.networkImage(
-                          url,
-                          width: 72,
-                          height: 72,
-                          fit: BoxFit.cover,
-                          memCacheWidth: 216,
-                        ),
+                        child: audio
+                            ? Container(
+                                width: 72,
+                                height: 72,
+                                color: AppColors.surfaceElevated,
+                                child: Icon(Icons.mic, color: AppColors.gold),
+                              )
+                            : ImageUtils.networkImage(
+                                url,
+                                width: 72,
+                                height: 72,
+                                fit: BoxFit.cover,
+                                memCacheWidth: 216,
+                              ),
                       ),
                       Positioned(
                         top: 0,
@@ -920,6 +1068,11 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
                     : Icon(Icons.image_outlined, color: AppColors.gold),
                 tooltip: 'messages.attachImage'.tr(),
               ),
+              if (_voiceOn)
+                TextButton(
+                  onPressed: _uploading ? null : _toggleVoice,
+                  child: Text(_recording ? 'feed.stopVoice'.tr() : 'feed.voice'.tr()),
+                ),
               Expanded(
                 child: TextField(
                   controller: _composer,
@@ -1047,21 +1200,17 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
                   message.body,
                   style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
                 ),
+              if (message.isMine)
+                Text(
+                  message.readBy.length > 1 ? 'feed.seen'.tr() : 'feed.sent'.tr(),
+                  style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
+                ),
               if (message.attachments.isNotEmpty) ...[
                 if (message.body.isNotEmpty) const SizedBox(height: 8),
                 ...message.attachments.map(
                   (url) => Padding(
                     padding: const EdgeInsets.only(bottom: 4),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: ImageUtils.networkImage(
-                        url,
-                        width: 200,
-                        fit: BoxFit.cover,
-                        memCacheWidth: 600,
-                        errorWidget: const Icon(Icons.broken_image),
-                      ),
-                    ),
+                    child: _DmAttachment(url: url),
                   ),
                 ),
               ],
@@ -1110,5 +1259,86 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
     setState(() {
       _messages = _messages.map((row) => row.id == message.id ? row.copyWith(reactions: reactions) : row).toList();
     });
+  }
+}
+
+bool _isAudioUrl(String url) {
+  return RegExp(r'\.(mp3|m4a|ogg)(\?|$)', caseSensitive: false).hasMatch(url) ||
+      url.toLowerCase().contains('voice');
+}
+
+bool _isVideoUrl(String url) {
+  return RegExp(r'\.(mp4|webm)(\?|$)', caseSensitive: false).hasMatch(url);
+}
+
+class _DmAttachment extends StatefulWidget {
+  final String url;
+
+  const _DmAttachment({required this.url});
+
+  @override
+  State<_DmAttachment> createState() => _DmAttachmentState();
+}
+
+class _DmAttachmentState extends State<_DmAttachment> {
+  VideoPlayerController? _controller;
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  Future<void> _toggle() async {
+    final current = _controller;
+    if (current != null && current.value.isInitialized) {
+      if (current.value.isPlaying) {
+        await current.pause();
+      } else {
+        await current.play();
+      }
+      if (mounted) setState(() {});
+      return;
+    }
+    final href = ImageUtils.getImageUrl(widget.url) ?? widget.url;
+    final controller = VideoPlayerController.networkUrl(Uri.parse(href));
+    await controller.initialize();
+    if (!mounted) {
+      await controller.dispose();
+      return;
+    }
+    setState(() => _controller = controller);
+    await controller.play();
+    if (mounted) setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isAudioUrl(widget.url) || _isVideoUrl(widget.url)) {
+      final playing = _controller?.value.isPlaying ?? false;
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            onPressed: _toggle,
+            icon: Icon(playing ? Icons.pause : Icons.play_arrow, color: AppColors.gold),
+          ),
+          Text(
+            _isAudioUrl(widget.url) ? 'feed.voice'.tr() : 'feed.mediaLink'.tr(),
+            style: AppTheme.bodySmall.copyWith(color: AppColors.textPrimary),
+          ),
+        ],
+      );
+    }
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(4),
+      child: ImageUtils.networkImage(
+        widget.url,
+        width: 200,
+        fit: BoxFit.cover,
+        memCacheWidth: 600,
+        errorWidget: const Icon(Icons.broken_image),
+      ),
+    );
   }
 }

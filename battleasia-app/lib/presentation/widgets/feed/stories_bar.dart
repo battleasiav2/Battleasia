@@ -337,6 +337,8 @@ class _StoryCreateSheetState extends State<_StoryCreateSheet> {
   String? _path;
   String _mediaType = 'image';
   bool _submitting = false;
+  final List<StorySticker> _stickers = [];
+  static const _palette = ['🔥', '👑', '💀', '🏆', 'GG', '❤'];
 
   @override
   void dispose() {
@@ -379,10 +381,15 @@ class _StoryCreateSheetState extends State<_StoryCreateSheet> {
       final url = (upload['data'] as Map)['url']?.toString();
       if (url == null || url.isEmpty) throw Exception('Upload failed');
 
+      final text = _caption.text.trim();
       final result = await _socialService.createStory(
         mediaUrl: url,
         mediaType: _mediaType,
-        caption: _caption.text.trim(),
+        caption: text,
+        overlayText: text,
+        stickers: _stickers
+            .map((s) => {'emoji': s.emoji, 'x': s.x, 'y': s.y})
+            .toList(),
       );
       if (result['success'] == true) {
         if (mounted) Navigator.pop(context, true);
@@ -405,9 +412,11 @@ class _StoryCreateSheetState extends State<_StoryCreateSheet> {
   @override
   Widget build(BuildContext context) {
     final bottom = MediaQuery.of(context).viewInsets.bottom;
+    final overlay = _caption.text.trim();
     return Padding(
       padding: EdgeInsets.fromLTRB(16, 16, 16, 16 + bottom),
-      child: Column(
+      child: SingleChildScrollView(
+        child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -419,14 +428,44 @@ class _StoryCreateSheetState extends State<_StoryCreateSheet> {
           if (_path != null)
             ClipRRect(
               borderRadius: BorderRadius.circular(2),
-              child: _mediaType == 'image'
-                  ? Image.file(File(_path!), height: 180, fit: BoxFit.cover)
-                  : Container(
-                      height: 120,
-                      color: Colors.black26,
-                      alignment: Alignment.center,
-                      child: Icon(Icons.videocam, color: AppColors.gold),
+              child: SizedBox(
+                height: 180,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    _mediaType == 'image'
+                        ? Image.file(File(_path!), fit: BoxFit.cover)
+                        : ColoredBox(
+                            color: Colors.black26,
+                            child: Icon(Icons.videocam, color: AppColors.gold),
+                          ),
+                    if (overlay.isNotEmpty)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            overlay,
+                            textAlign: TextAlign.center,
+                            style: AppTheme.bodyMedium.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ..._stickers.map(
+                      (s) => Align(
+                        alignment: Alignment(
+                          (s.x / 50) - 1,
+                          (s.y / 50) - 1,
+                        ),
+                        child: Text(s.emoji, style: const TextStyle(fontSize: 28)),
+                      ),
                     ),
+                  ],
+                ),
+              ),
             )
           else
             Row(
@@ -451,14 +490,38 @@ class _StoryCreateSheetState extends State<_StoryCreateSheet> {
           const SizedBox(height: 12),
           TextField(
             controller: _caption,
+            maxLength: 80,
+            onChanged: (_) => setState(() {}),
             style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
             decoration: InputDecoration(
-              hintText: 'Caption (optional)',
+              hintText: 'Say something',
               hintStyle: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            children: _palette.map((emoji) {
+              return TextButton(
+                onPressed: () {
+                  setState(() {
+                    if (_stickers.length >= 8) return;
+                    final n = _stickers.length;
+                    _stickers.add(
+                      StorySticker(
+                        emoji: emoji,
+                        x: 20 + (n * 14) % 70,
+                        y: 28 + (n * 11) % 50,
+                      ),
+                    );
+                  });
+                },
+                child: Text(emoji),
+              );
+            }).toList(),
           ),
           const SizedBox(height: 12),
           FilledButton(
@@ -479,6 +542,7 @@ class _StoryCreateSheetState extends State<_StoryCreateSheet> {
                 : const Text('Share story'),
           ),
         ],
+        ),
       ),
     );
   }
@@ -610,6 +674,30 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
               mediaType: _story.mediaType,
               onVideoEnded: _next,
             ),
+            ..._story.stickers.map(
+              (s) => Align(
+                alignment: Alignment((s.x / 50) - 1, (s.y / 50) - 1),
+                child: IgnorePointer(
+                  child: Text(s.emoji, style: const TextStyle(fontSize: 36)),
+                ),
+              ),
+            ),
+            if (_story.overlayText.isNotEmpty)
+              IgnorePointer(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 28),
+                    child: Text(
+                      _story.overlayText,
+                      textAlign: TextAlign.center,
+                      style: AppTheme.heading3.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             SafeArea(
               child: Column(
                 children: [
@@ -714,7 +802,7 @@ class _StoryViewerScreenState extends State<StoryViewerScreen>
                         TextButton(onPressed: _replyToStory, child: const Text('Reply')),
                     ],
                   ),
-                  if (_story.caption.isNotEmpty)
+                  if (_story.caption.isNotEmpty && _story.caption != _story.overlayText)
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Text(

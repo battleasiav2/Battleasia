@@ -43,6 +43,8 @@ class DirectMessageModel {
   final List<String> reactions;
   final String? replyTo;
   final String senderName;
+  final bool isMine;
+  final List<String> readBy;
 
   DirectMessageModel({
     required this.id,
@@ -53,6 +55,8 @@ class DirectMessageModel {
     this.reactions = const [],
     this.replyTo,
     this.senderName = '',
+    this.isMine = false,
+    this.readBy = const [],
   });
 
   DirectMessageModel copyWith({List<String>? reactions}) {
@@ -65,6 +69,8 @@ class DirectMessageModel {
       reactions: reactions ?? this.reactions,
       replyTo: replyTo,
       senderName: senderName,
+      isMine: isMine,
+      readBy: readBy,
     );
   }
 
@@ -74,6 +80,7 @@ class DirectMessageModel {
         ? raw.map((e) => e.toString()).where((e) => e.isNotEmpty).toList()
         : <String>[];
     final reactions = json['reactions'];
+    final rawRead = json['readBy'];
     return DirectMessageModel(
       id: json['id']?.toString() ?? '',
       body: json['body']?.toString() ?? '',
@@ -85,6 +92,8 @@ class DirectMessageModel {
           : const [],
       replyTo: json['replyTo']?.toString(),
       senderName: json['senderName']?.toString() ?? '',
+      isMine: json['isMine'] == true,
+      readBy: rawRead is List ? rawRead.map((e) => e.toString()).where((e) => e.isNotEmpty).toList() : const [],
     );
   }
 }

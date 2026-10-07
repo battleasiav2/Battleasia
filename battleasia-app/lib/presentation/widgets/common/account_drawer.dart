@@ -24,6 +24,7 @@ import 'package:battleasia_app/presentation/screens/my_statistics/my_statistics_
 import 'package:battleasia_app/presentation/screens/my_referrals/my_referrals_screen.dart';
 import 'package:battleasia_app/presentation/screens/notifications/notifications_screen.dart';
 import 'package:battleasia_app/presentation/screens/leaderboard/leaderboard_screen.dart';
+import 'package:battleasia_app/presentation/screens/legal/legal_screen.dart';
 import 'package:battleasia_app/presentation/screens/customer_support/customer_support_screen.dart';
 
 class AccountDrawer extends StatelessWidget {
@@ -552,6 +553,30 @@ class _AccountDrawerContent extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (context) => const CustomerSupportScreen(),
                       ),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'legal.privacyTitle'.tr(),
+                  nested: true,
+                  icon: Icons.privacy_tip_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LegalScreen.privacy()),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'legal.termsTitle'.tr(),
+                  nested: true,
+                  icon: Icons.gavel_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const LegalScreen.terms()),
                     );
                   },
                 ),
