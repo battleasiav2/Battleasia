@@ -35,7 +35,10 @@
     "micBlocked": "Mic blocked",
     "voice": "Voice",
     "stopVoice": "Stop",
-    "mediaLink": "media"
+    "mediaLink": "media",
+    "copyLink": "Copy link",
+    "copied": "Link copied",
+    "progress": "Uploading {n}%"
   },
   "feedHub": {
     "feed": "Feed",
@@ -459,6 +462,15 @@
     "startWatch": "Open watch lobby",
     "watchOpened": "Watch lobby created",
     "watchFail": "Could not open watch lobby",
+    "filters": "Match filters",
+    "filterAll": "All",
+    "filterJoined": "Joined",
+    "filterOpen": "Open",
+    "filterHighPrize": "High prize",
+    "filterLowPrize": "Low prize",
+    "filterFree": "Free",
+    "filterEmpty": "No rooms in this filter",
+    "filterEmptyLead": "Try another filter or show all rooms.",
     "cancel": "Cancel",
     "free": "Free"
   },
@@ -524,7 +536,17 @@
     "usernameCopied": "Username copied",
     "rank": "Rank",
     "kills": "Kills",
-    "won": "Won"
+    "won": "Won",
+    "emailLocked": "Email can’t be changed",
+    "highlights": "Highlights",
+    "noHighlights": "No highlights",
+    "highlightsLead": "Pin a story from the viewer while Highlights is on in Admin P1."
+  },
+  "stats": {
+    "matches": "Matches",
+    "wins": "Wins",
+    "kills": "Kills",
+    "losses": "Losses"
   },
   "footer": {
     "home": "Home"

@@ -36,6 +36,7 @@ class _MatchScreenState extends State<MatchScreen> {
   final GamesService _gamesService = GamesService();
   String _activeTab = 'ongoing';
   List<MatchModel> _matches = [];
+  String _filter = 'all';
   bool _isLoading = false;
   String? _joiningMatchId;
   MatchModel? _selectedMatchForRoomDetails;
@@ -267,6 +268,60 @@ class _MatchScreenState extends State<MatchScreen> {
     );
   }
 
+  int _spotsLeft(MatchModel match) {
+    final left = match.totalPlayer - (match.participantsCount ?? 0);
+    return left < 0 ? 0 : left;
+  }
+
+  int _winningPool(MatchModel match) {
+    if (match.entryFee > 0 && match.totalPlayer > 0) {
+      return (match.entryFee * match.totalPlayer).round();
+    }
+    final raw = match.prizeDescription ?? '';
+    final hit = RegExp(r'(\d[\d,]*)').firstMatch(raw);
+    if (hit == null) return 0;
+    return int.tryParse(hit.group(1)!.replaceAll(',', '')) ?? 0;
+  }
+
+  bool _isJoinable(MatchModel match) {
+    final status = match.status.toLowerCase();
+    return (status == 'active' || status == 'start') &&
+        _spotsLeft(match) > 0 &&
+        !match.isJoined;
+  }
+
+  List<MatchModel> _pinJoinedFirst(List<MatchModel> list) {
+    final copy = [...list];
+    copy.sort((a, b) => (b.isJoined ? 1 : 0).compareTo(a.isJoined ? 1 : 0));
+    return copy;
+  }
+
+  List<MatchModel> _visibleMatches() {
+    if (_filter == 'joined') {
+      return _pinJoinedFirst(_matches.where((m) => m.isJoined).toList());
+    }
+    if (_filter == 'open') {
+      return _pinJoinedFirst(_matches.where(_isJoinable).toList());
+    }
+    if (_filter == 'free') {
+      return _pinJoinedFirst(
+        _matches.where((m) => m.matchType == 'free' || m.entryFee <= 0).toList(),
+      );
+    }
+    if (_filter == 'highPrize' || _filter == 'lowPrize') {
+      final priced = _matches.where((m) => _winningPool(m) > 0).toList();
+      priced.sort((a, b) {
+        final byPool = _filter == 'highPrize'
+            ? _winningPool(b).compareTo(_winningPool(a))
+            : _winningPool(a).compareTo(_winningPool(b));
+        if (byPool != 0) return byPool;
+        return _spotsLeft(b).compareTo(_spotsLeft(a));
+      });
+      return _pinJoinedFirst(priced);
+    }
+    return _pinJoinedFirst(_matches);
+  }
+
   Map<String, List<MatchModel>> _categorizeMatches() {
     final now = DateTime.now().millisecondsSinceEpoch;
     final groups = <String, List<MatchModel>>{
@@ -275,7 +330,7 @@ class _MatchScreenState extends State<MatchScreen> {
       'results': [],
     };
 
-    for (final match in _matches) {
+    for (final match in _visibleMatches()) {
       if (match.status == 'complete' || match.status == 'cancel') {
         groups['results']!.add(match);
         continue;
@@ -395,7 +450,9 @@ class _MatchScreenState extends State<MatchScreen> {
               ).clamp(24.0, 32.0),
             ),
             child: Text(
-              'No matches available',
+              _visibleMatches().isEmpty && _filter != 'all'
+                  ? 'match.filterEmpty'.tr()
+                  : 'No matches available',
               style: AppTheme.bodyLarge.copyWith(
                 color: AppTheme.textSecondary,
                 fontSize: ResponsiveUtils.getResponsiveFontSize(
@@ -522,6 +579,68 @@ class _MatchScreenState extends State<MatchScreen> {
                 ),
               ),
 
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(horizontalPadding, 0, horizontalPadding, 8),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        for (final item in const [
+                          ('all', 'match.filterAll'),
+                          ('joined', 'match.filterJoined'),
+                          ('open', 'match.filterOpen'),
+                          ('highPrize', 'match.filterHighPrize'),
+                          ('lowPrize', 'match.filterLowPrize'),
+                          ('free', 'match.filterFree'),
+                        ])
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: ChoiceChip(
+                              label: Text(item.$2.tr()),
+                              selected: _filter == item.$1,
+                              onSelected: (_) => setState(() => _filter = item.$1),
+                              labelStyle: TextStyle(
+                                color: _filter == item.$1 ? Colors.black : Colors.white70,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              selectedColor: AppColors.gold,
+                              backgroundColor: const Color(0xFF161618),
+                              side: BorderSide(
+                                color: _filter == item.$1
+                                    ? AppColors.gold
+                                    : Colors.white.withValues(alpha: 0.08),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              if (!_isLoading && _visibleMatches().isEmpty && _filter != 'all')
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 24),
+                    child: Column(
+                      children: [
+                        Text(
+                          'match.filterEmpty'.tr(),
+                          style: AppTheme.heading3.copyWith(color: Colors.white),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'match.filterEmptyLead'.tr(),
+                          style: AppTheme.bodySmall.copyWith(color: Colors.white70),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+              if (_isLoading || _filter == 'all' || _visibleMatches().isNotEmpty) ...[
               // Tabs
               SliverToBoxAdapter(
                 child: Padding(
@@ -555,6 +674,7 @@ class _MatchScreenState extends State<MatchScreen> {
                   : _activeTab == 'upcoming'
                   ? _buildMatchGrid(categorizedMatches['upcoming']!)
                   : _buildMatchGrid(categorizedMatches['results']!, isResult: true),
+              ],
 
               // Extra bottom padding so the last card's button is never hidden
               // behind the floating bottom navigation bar.

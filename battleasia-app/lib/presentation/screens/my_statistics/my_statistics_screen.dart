@@ -1,5 +1,7 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
+import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
@@ -7,7 +9,6 @@ import 'package:battleasia_app/data/models/match_history_model.dart';
 import 'package:battleasia_app/data/models/statistics_item_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
-import 'package:intl/intl.dart';
 
 class MyStatisticsScreen extends StatefulWidget {
   const MyStatisticsScreen({super.key});
@@ -22,6 +23,12 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
 
   List<StatisticsItemModel> _statistics = [];
   bool _loading = true;
+  Map<String, int> _career = const {
+    'matches': 0,
+    'wins': 0,
+    'kills': 0,
+    'losses': 0,
+  };
 
   static const Color _panelBg = Color(0xD906090E);
 
@@ -44,6 +51,7 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
 
     try {
       final result = await _gamesService.getMatchHistory();
+      await _loadCareer();
       if (result['success'] == true && result['data'] != null) {
         final data = result['data'] as List<dynamic>;
         final historyItems = data
@@ -94,6 +102,24 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
         });
       }
     }
+  }
+
+  Future<void> _loadCareer() async {
+    final me = await UserService().getMe();
+    if (!mounted || me['success'] != true) return;
+    final data = me['data'];
+    if (data is! Map) return;
+    final stats = data['gamingStats'];
+    if (stats is! Map) return;
+    int read(dynamic value) => value is num ? value.toInt() : int.tryParse('$value') ?? 0;
+    setState(() {
+      _career = {
+        'matches': read(stats['totalMatches']),
+        'wins': read(stats['totalWins']),
+        'kills': read(stats['totalKills']),
+        'losses': read(stats['totalLosses']),
+      };
+    });
   }
 
   Map<String, num> get _totals {
@@ -199,6 +225,8 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
                           ),
                         )
                       else ...[
+                        _buildCareerStats(),
+                        SizedBox(height: spacing16),
                         _buildMergedStatsPanel(),
                         SizedBox(height: spacing24),
                         if (_statistics.isEmpty)
@@ -223,6 +251,44 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
           const FloatingBottomNav(),
         ],
       ),
+    );
+  }
+
+  Widget _buildCareerStats() {
+    final items = [
+      ('stats.matches'.tr(), _career['matches'] ?? 0),
+      ('stats.wins'.tr(), _career['wins'] ?? 0),
+      ('stats.kills'.tr(), _career['kills'] ?? 0),
+      ('stats.losses'.tr(), _career['losses'] ?? 0),
+    ];
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      mainAxisSpacing: 8,
+      crossAxisSpacing: 8,
+      childAspectRatio: 2.4,
+      children: [
+        for (final item in items)
+          Container(
+            decoration: _panelDecoration,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  item.$1,
+                  style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
+                ),
+                Text(
+                  '${item.$2}',
+                  style: AppTheme.heading3.copyWith(color: AppColors.textPrimary),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 

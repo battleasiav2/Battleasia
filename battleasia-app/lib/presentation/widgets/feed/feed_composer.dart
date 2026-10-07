@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
@@ -22,6 +23,7 @@ class _FeedComposerState extends State<FeedComposer> {
 
   String? _imagePath;
   bool _submitting = false;
+  int? _uploadPct;
 
   @override
   void dispose() {
@@ -44,14 +46,23 @@ class _FeedComposerState extends State<FeedComposer> {
     final description = _controller.text.trim();
     if ((description.isEmpty && _imagePath == null) || _submitting) return;
 
-    setState(() => _submitting = true);
+    setState(() {
+      _submitting = true;
+      _uploadPct = _imagePath != null ? 0 : null;
+    });
     try {
       String? coverUrl;
       List<String>? mediaUrls;
       var postType = 'text';
 
       if (_imagePath != null) {
-        final upload = await _feedService.uploadMedia(_imagePath!, folder: 'feed');
+        final upload = await _feedService.uploadMedia(
+          _imagePath!,
+          folder: 'feed',
+          onProgress: (pct) {
+            if (mounted) setState(() => _uploadPct = pct);
+          },
+        );
         if (upload['success'] != true) {
           throw Exception(upload['message'] ?? 'Image upload failed');
         }
@@ -88,7 +99,12 @@ class _FeedComposerState extends State<FeedComposer> {
         );
       }
     } finally {
-      if (mounted) setState(() => _submitting = false);
+      if (mounted) {
+        setState(() {
+          _submitting = false;
+          _uploadPct = null;
+        });
+      }
     }
   }
 
@@ -143,6 +159,13 @@ class _FeedComposerState extends State<FeedComposer> {
                   ),
                 ),
               ],
+            ),
+          ],
+          if (_uploadPct != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              'feed.progress'.tr(namedArgs: {'n': '$_uploadPct'}),
+              style: AppTheme.bodySmall.copyWith(color: AppColors.gold),
             ),
           ],
           const SizedBox(height: 8),

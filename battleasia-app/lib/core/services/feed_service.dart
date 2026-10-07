@@ -1,4 +1,6 @@
-﻿import 'dart:convert';
+﻿import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:battleasia_app/core/utils/api_client.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
@@ -492,10 +494,32 @@ class FeedService {
     }
   }
 
+  http.MediaType? _contentTypeFor(String name) {
+    final ext = name.contains('.') ? name.split('.').last.toLowerCase() : '';
+    const types = {
+      'jpg': 'image/jpeg',
+      'jpeg': 'image/jpeg',
+      'png': 'image/png',
+      'webp': 'image/webp',
+      'gif': 'image/gif',
+      'mp4': 'video/mp4',
+      'webm': 'video/webm',
+      'm4a': 'audio/mp4',
+      'mp3': 'audio/mpeg',
+      'ogg': 'audio/ogg',
+      'aac': 'audio/aac',
+    };
+    final mime = types[ext];
+    if (mime == null) return null;
+    final parts = mime.split('/');
+    return http.MediaType(parts[0], parts[1]);
+  }
+
   /// Upload a single file into a feed-related folder (`feed`, `stories`, `reels`).
   Future<Map<String, dynamic>> uploadMedia(
     String filePath, {
     String folder = 'feed',
+    void Function(int percent)? onProgress,
   }) async {
     try {
       final token = await _authService.getToken();
@@ -506,7 +530,30 @@ class FeedService {
       if (token != null && token.isNotEmpty) {
         request.headers['Authorization'] = 'Bearer $token';
       }
-      request.files.add(await http.MultipartFile.fromPath('file', filePath));
+      final file = File(filePath);
+      final length = await file.length();
+      var sent = 0;
+      final stream = file.openRead().transform(
+        StreamTransformer<List<int>, List<int>>.fromHandlers(
+          handleData: (data, sink) {
+            sent += data.length;
+            if (length > 0) {
+              onProgress?.call(((sent / length) * 100).round().clamp(0, 100));
+            }
+            sink.add(data);
+          },
+        ),
+      );
+      final name = filePath.split(Platform.pathSeparator).last;
+      request.files.add(
+        http.MultipartFile(
+          'file',
+          stream,
+          length,
+          filename: name,
+          contentType: _contentTypeFor(name),
+        ),
+      );
 
       final streamed = await ApiClient.send(request);
       final response = await http.Response.fromStream(streamed);

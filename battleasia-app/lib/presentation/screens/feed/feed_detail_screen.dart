@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
@@ -400,13 +401,18 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
     }
   }
 
-  void _handleShare(String platform) {
-    if (_feed == null) return;
-
-    // Share functionality can be implemented with share_plus package
+  Future<void> _copyFeedLink() async {
+    final url = '${AppConfig.siteUrl}/user/feed/${widget.feedId}';
+    await Clipboard.setData(ClipboardData(text: url));
+    if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Share to $platform feature coming soon')),
+      SnackBar(content: Text('feed.copied'.tr())),
     );
+  }
+
+  void _handleShare(String platform) {
+    if (platform.isEmpty) return;
+    _copyFeedLink();
   }
 
   @override
@@ -819,6 +825,10 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
           TextButton(
             onPressed: _shareInChat,
             child: const Text('Share'),
+          ),
+          TextButton(
+            onPressed: _copyFeedLink,
+            child: Text('feed.copyLink'.tr()),
           ),
           SizedBox(width: spacing16),
           IconButton(

@@ -680,6 +680,47 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     );
   }
 
+  Widget _buildHighlightGrid() {
+    if (_highlights.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        child: Column(
+          children: [
+            Text(
+              'profile.noHighlights'.tr(),
+              style: AppTheme.heading3.copyWith(color: Colors.white),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'profile.highlightsLead'.tr(),
+              style: AppTheme.bodySmall.copyWith(color: Colors.white70),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: _highlights.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 4,
+        crossAxisSpacing: 4,
+      ),
+      itemBuilder: (context, index) {
+        final image = ImageUtils.getImageUrl(_highlights[index]['mediaUrl']?.toString());
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(4),
+          child: image == null || image.isEmpty
+              ? const ColoredBox(color: Color(0xFF121318))
+              : Image.network(image, fit: BoxFit.cover),
+        );
+      },
+    );
+  }
+
   Widget _buildHistory() {
     final rows = _history.take(24).toList();
     if (rows.isEmpty) {
@@ -763,10 +804,22 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                 ),
               ),
             ),
+            TextButton(
+              onPressed: () => setState(() => _gridTab = 'highlights'),
+              child: Text(
+                'profile.highlights'.tr(),
+                style: TextStyle(
+                  color: _gridTab == 'highlights' ? AppColors.gold : Colors.white70,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
           ],
         ),
         if (_gridTab == 'history')
           _buildHistory()
+        else if (_gridTab == 'highlights')
+          _buildHighlightGrid()
         else if (rows.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24),

@@ -1073,6 +1073,8 @@ class _ProfileContentState extends State<ProfileContent> {
                   controller: _emailController,
                   decoration: InputDecoration(
                     labelText: 'Email *',
+                    helperText: 'profile.emailLocked'.tr(),
+                    helperStyle: const TextStyle(color: Color(0xFF9CA3AF)),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: const BorderSide(
