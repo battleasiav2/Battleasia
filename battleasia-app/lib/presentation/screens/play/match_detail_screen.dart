@@ -748,7 +748,10 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
               'Entry Fee',
               '${_matchDetail!.entryFee.toStringAsFixed(0)}',
             ),
-            _buildInfoCard('MAP', _matchDetail!.map ?? 'N/A'),
+            _buildInfoCard(
+              'MAP',
+              (_matchDetail!.map ?? '').trim().isEmpty ? 'match.mapTbd'.tr() : _matchDetail!.map!.trim(),
+            ),
             _buildInfoCard(
               'Match Type',
               _matchDetail!.matchType?.toUpperCase() ?? 'N/A',
@@ -1264,7 +1267,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '$used of $total joined',
+            'match.seatsLead'.tr(namedArgs: {'used': '$used', 'total': '$total'}),
             style: AppTheme.bodySmall.copyWith(
               color: Colors.white.withValues(alpha: 0.62),
               fontWeight: FontWeight.w600,

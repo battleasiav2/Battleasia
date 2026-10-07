@@ -561,12 +561,17 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'MATCH RESULTS',
+          'result.eyebrow'.tr(),
           style: AppTheme.heading3.copyWith(
             color: AppTheme.textPrimary,
             fontWeight: FontWeight.bold,
             fontSize: headerFontSize,
           ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          '${'result.place'.tr()}: ${_myPlace()}',
+          style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
         ),
         const SizedBox(height: 12),
 
@@ -578,12 +583,20 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
               color: AppTheme.surfaceColor,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Text(
-              'No results available yet.',
-              textAlign: TextAlign.center,
-              style: AppTheme.bodyLarge.copyWith(
-                color: AppTheme.textSecondary,
-              ),
+            child: Column(
+              children: [
+                Text(
+                  'result.pending'.tr(),
+                  textAlign: TextAlign.center,
+                  style: AppTheme.bodyLarge.copyWith(color: AppTheme.textPrimary),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'result.pendingLead'.tr(),
+                  textAlign: TextAlign.center,
+                  style: AppTheme.bodyMedium.copyWith(color: AppTheme.textSecondary),
+                ),
+              ],
             ),
           )
         else
@@ -597,6 +610,24 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
           ),
       ],
     );
+  }
+
+  String _myPlace() {
+    final me = context.read<AuthProvider>().user;
+    if (me == null) return '—';
+    for (final row in _participants) {
+      if (row.username == me.username || row.id == me.id) {
+        return row.placement > 0 ? '${row.placement}' : '—';
+      }
+    }
+    return '—';
+  }
+
+  String _statusLabel(MatchResultParticipantModel p) {
+    final status = p.status.toLowerCase();
+    if (status == 'winner') return 'result.winner'.tr();
+    if (status == 'lose') return 'result.lose'.tr();
+    return p.status;
   }
 
   Widget _buildParticipantCard(MatchResultParticipantModel p) {
@@ -620,6 +651,8 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
       _StatItem('ENTRY FEE', p.entryFee > 0 ? p.entryFee.toStringAsFixed(0) : '-', isCoins: true),
       _StatItem('KILLS', '${p.kills}'),
       _StatItem('POINTS', p.points > 0 ? p.points.toStringAsFixed(1) : '-'),
+      _StatItem('result.prize'.tr(), p.totalPrize > 0 ? p.totalPrize.toStringAsFixed(0) : '-',
+          highlight: p.totalPrize > 0, isCoins: true),
       _StatItem('WIN PRIZE', p.winPrize > 0 ? p.winPrize.toStringAsFixed(0) : '-',
           highlight: p.winPrize > 0, isCoins: true),
       _StatItem('BONUS', p.bonus > 0 ? p.bonus.toStringAsFixed(0) : '-',
@@ -707,7 +740,7 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    p.isWinner ? 'WIN' : 'LOSS',
+                    _statusLabel(p),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 11,

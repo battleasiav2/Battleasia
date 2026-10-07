@@ -226,6 +226,7 @@
     "totalWithdrawal": "Total Withdrawal",
     "withdrawable": "Withdrawable",
     "withdrawButton": "WITHDRAW",
+    "buy": "Buy BAC",
     "withdrawableFormula": "* Min(Total match bets × 70% - Already withdrawn, Current balance)",
     "pendingWithdrawal": "Pending withdrawal: {amount} BAC",
     "history": "Wallet History",
@@ -542,7 +543,12 @@
     "send": "Send",
     "chatHint": "Join a lobby to chat.",
     "chatFail": "Chat is not available",
-    "notInMatch": "You are not in this match."
+    "notInMatch": "You are not in this match.",
+    "seatsLead": "{used} of {total} joined",
+    "seatOpen": "Open",
+    "noPlayers": "No players yet.",
+    "mapTbd": "Map TBD",
+    "report": "Report"
   },
   "result": {
     "notPosted": "Result not posted",
@@ -554,7 +560,19 @@
     "shareEarnOk": "Share reward claimed",
     "shareEarnFail": "Could not claim share reward",
     "shareEarnDone": "Share reward claimed",
-    "shareEarnBusy": "Claiming…"
+    "shareEarnBusy": "Claiming…",
+    "pending": "Results pending",
+    "pendingLead": "Admin has not posted placements yet.",
+    "place": "Your place",
+    "winner": "Winner",
+    "lose": "Lose",
+    "prize": "Prize",
+    "eyebrow": "RESULT"
+  },
+  "orders": {
+    "empty": "No deposits yet",
+    "emptyOut": "No withdrawals yet",
+    "goWithdraw": "Open withdraw"
   },
   "note": {
     "offline": "Alerts offline",

@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
@@ -23,7 +24,7 @@ class RoomSeats extends StatelessWidget {
     final cap = total > players.length ? total : players.length;
     if (cap <= 0) {
       return Text(
-        'No seats in this room yet.',
+        'match.noPlayers'.tr(),
         style: TextStyle(color: Colors.white.withValues(alpha: 0.55)),
       );
     }
@@ -89,7 +90,7 @@ class _OpenSeat extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Open',
+            'match.seatOpen'.tr(),
             style: TextStyle(
               color: Colors.white.withValues(alpha: 0.42),
               fontSize: 12,
@@ -142,7 +143,7 @@ class _FilledSeat extends StatelessWidget {
             if (onReport != null)
               GestureDetector(
                 onTap: onReport,
-                child: const Text('Report', style: TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.w700)),
+                child: Text('match.report'.tr(), style: const TextStyle(color: Colors.white54, fontSize: 10, fontWeight: FontWeight.w700)),
               ),
           ],
         ),

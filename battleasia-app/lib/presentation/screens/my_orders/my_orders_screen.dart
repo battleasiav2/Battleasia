@@ -1,9 +1,12 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/deposit_model.dart';
 import 'package:battleasia_app/data/models/withdrawal_model.dart';
+import 'package:battleasia_app/presentation/screens/shop/bac_gate_screen.dart';
+import 'package:battleasia_app/presentation/screens/shop/shop_withdrawal_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:intl/intl.dart';
@@ -164,7 +167,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
 
   String _shortAddress(String address) {
     if (address.length <= 16) return address;
-    return '${address.substring(0, 8)}…${address.substring(address.length - 8)}';
+    return '${address.substring(0, 8)}${address.substring(address.length - 8)}';
   }
 
   // ---------------------------------------------------------
@@ -800,12 +803,12 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     if (_typeFilter == 'deposit') {
       icon = Icons.arrow_downward_rounded;
       message = _statusFilter == 'all'
-          ? 'No deposit history found.'
+          ? 'orders.empty'.tr()
           : 'No $_statusFilter deposits found.';
     } else if (_typeFilter == 'withdrawal') {
       icon = Icons.arrow_upward_rounded;
       message = _statusFilter == 'all'
-          ? 'No withdrawal history found.'
+          ? 'orders.emptyOut'.tr()
           : 'No $_statusFilter withdrawals found.';
     } else {
       icon = Icons.swap_vert_rounded;
@@ -832,6 +835,26 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                   .copyWith(fontSize: 14, color: Colors.grey),
               textAlign: TextAlign.center,
             ),
+            if (_statusFilter == 'all' && _typeFilter == 'deposit') ...[
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const BacGateScreen()),
+                ),
+                child: Text('wallet.buy'.tr()),
+              ),
+            ],
+            if (_statusFilter == 'all' && _typeFilter == 'withdrawal') ...[
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ShopWithdrawalScreen()),
+                ),
+                child: Text('orders.goWithdraw'.tr()),
+              ),
+            ],
           ],
         ),
       ),
