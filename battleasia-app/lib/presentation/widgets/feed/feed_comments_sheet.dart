@@ -7,6 +7,22 @@ import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/time_utils.dart';
 import 'package:battleasia_app/data/models/feed_model.dart';
 
+List<InlineSpan> mentionSpans(String text) {
+  final pattern = RegExp(r'(@[\w.]+)');
+  final spans = <InlineSpan>[];
+  var start = 0;
+  for (final match in pattern.allMatches(text)) {
+    if (match.start > start) {
+      spans.add(TextSpan(text: text.substring(start, match.start)));
+    }
+    spans.add(TextSpan(text: match.group(0), style: const TextStyle(fontWeight: FontWeight.w800)));
+    start = match.end;
+  }
+  if (start < text.length) spans.add(TextSpan(text: text.substring(start)));
+  if (spans.isEmpty) spans.add(TextSpan(text: text));
+  return spans;
+}
+
 class FeedCommentsSheet extends StatefulWidget {
   const FeedCommentsSheet({
     super.key,
@@ -343,7 +359,7 @@ class _CommentTile extends StatelessWidget {
                             style: const TextStyle(fontWeight: FontWeight.w800),
                           ),
                           const TextSpan(text: ' '),
-                          TextSpan(text: comment.content),
+                          ...mentionSpans(comment.content),
                           TextSpan(
                             text: '  ${TimeUtils.timeAgo(comment.createdAt)}',
                             style: AppTheme.bodySmall.copyWith(
@@ -407,7 +423,7 @@ class _CommentTile extends StatelessWidget {
                                       ),
                                     ),
                                     const TextSpan(text: ' '),
-                                    TextSpan(text: r.content),
+                                    ...mentionSpans(r.content),
                                   ],
                                 ),
                               ),

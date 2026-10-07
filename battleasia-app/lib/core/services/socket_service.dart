@@ -13,6 +13,11 @@ typedef NewNotificationCallback = void Function(Map<String, dynamic> notificatio
 /// Callback type for the new-message (chat) event.
 typedef NewMessageCallback = void Function(Map<String, dynamic> message);
 
+typedef UserTypingCallback = void Function({
+  required String conversationId,
+  required bool isTyping,
+});
+
 /// Singleton Socket.IO service that mirrors the web SocketService.
 ///
 /// Usage:
@@ -37,6 +42,7 @@ class SocketService {
 
   /// All registered callbacks for the `new-message` (chat) event.
   final List<NewMessageCallback> _newMessageCallbacks = [];
+  final List<UserTypingCallback> _typingCallbacks = [];
 
   /// True once the socket-level listeners have been attached,
   /// so we never attach them twice on reconnect.
@@ -224,6 +230,49 @@ class SocketService {
     }
   }
 
+  /// Join a direct-message room. The server only accepts participants.
+  void joinDm(String conversationId) {
+    _emitWhenReady('join-dm', conversationId);
+  }
+
+  void leaveDm(String conversationId) {
+    if (_socket?.connected == true) {
+      _socket!.emit('leave-dm', conversationId);
+    }
+  }
+
+  void emitTyping(String conversationId, bool isTyping) {
+    _emitWhenReady('typing', {
+      'conversationId': conversationId,
+      'isTyping': isTyping,
+    });
+  }
+
+  void onUserTyping(UserTypingCallback callback) {
+    if (!_typingCallbacks.contains(callback)) {
+      _typingCallbacks.add(callback);
+    }
+  }
+
+  void offUserTyping([UserTypingCallback? callback]) {
+    if (callback != null) {
+      _typingCallbacks.remove(callback);
+    } else {
+      _typingCallbacks.clear();
+    }
+  }
+
+  void _emitWhenReady(String event, dynamic data) {
+    if (_socket == null) return;
+    if (_socket!.connected) {
+      _socket!.emit(event, data);
+      return;
+    }
+    _socket!.once('connect', (_) {
+      _socket?.emit(event, data);
+    });
+  }
+
   // ──────────────────────────────────────────────────────────────────────────
   // Internal helpers
   // ──────────────────────────────────────────────────────────────────────────
@@ -267,6 +316,15 @@ class SocketService {
       // Iterate over a copy so callbacks can safely remove themselves.
       for (final cb in List.of(_newMessageCallbacks)) {
         cb(message);
+      }
+    });
+
+    _socket!.on('user-typing', (data) {
+      if (data is! Map) return;
+      final conversationId = data['conversationId']?.toString() ?? '';
+      if (conversationId.isEmpty) return;
+      for (final cb in List.of(_typingCallbacks)) {
+        cb(conversationId: conversationId, isTyping: data['isTyping'] == true);
       }
     });
   }

@@ -181,6 +181,7 @@ class SocialService {
     String conversationId,
     String body, {
     List<String>? attachments,
+    String? replyTo,
   }) async {
     try {
       final headers = await _getHeaders();
@@ -191,6 +192,7 @@ class SocialService {
           'body': body,
           if (attachments != null && attachments.isNotEmpty)
             'attachments': attachments,
+          if (replyTo != null && replyTo.isNotEmpty) 'replyTo': replyTo,
         }),
       );
       return _parseBody(response);

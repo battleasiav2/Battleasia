@@ -2,8 +2,11 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:battleasia_app/core/config/app_config.dart';
+import 'package:battleasia_app/core/services/auth_service.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
 import 'package:battleasia_app/core/services/social_service.dart';
+import 'package:battleasia_app/core/services/socket_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
@@ -21,7 +24,6 @@ import 'package:battleasia_app/presentation/widgets/social/external_messaging_pa
 import 'package:battleasia_app/presentation/widgets/social/new_chat_sheet.dart';
 import 'package:battleasia_app/presentation/widgets/social/reel_create_sheet.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:battleasia_app/core/config/app_config.dart';
 
 class FeedExplorePanel extends StatefulWidget {
   const FeedExplorePanel({super.key});
@@ -576,10 +578,13 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
   bool _requestsOn = false;
   ConversationModel? _active;
   List<DirectMessageModel> _messages = [];
+  DirectMessageModel? _replyTo;
+  String _typing = '';
   final TextEditingController _composer = TextEditingController();
   List<String> _pendingAttachments = [];
   bool _uploading = false;
   bool _initialUserHandled = false;
+  bool _dmListening = false;
 
   @override
   void initState() {
@@ -589,6 +594,7 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
 
   @override
   void dispose() {
+    _stopDmWatch();
     _composer.dispose();
     super.dispose();
   }
@@ -689,12 +695,51 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
     await _openConversation(conversation);
   }
 
+  Future<void> _watchDm(String conversationId) async {
+    if (!SocketService.instance.isConnected) {
+      final token = await AuthService().getToken();
+      if (token != null && token.isNotEmpty) {
+        SocketService.instance.connect(AppConfig.serverUrl, token);
+      }
+    }
+    if (!_dmListening) {
+      SocketService.instance.onUserTyping(_onUserTyping);
+      _dmListening = true;
+    }
+    SocketService.instance.joinDm(conversationId);
+  }
+
+  void _stopDmWatch() {
+    final id = _active?.id;
+    if (id != null) {
+      SocketService.instance.emitTyping(id, false);
+      SocketService.instance.leaveDm(id);
+    }
+    if (_dmListening) {
+      SocketService.instance.offUserTyping(_onUserTyping);
+      _dmListening = false;
+    }
+  }
+
+  void _onUserTyping({required String conversationId, required bool isTyping}) {
+    if (!mounted || conversationId != _active?.id) return;
+    setState(() => _typing = isTyping ? 'Typing…' : '');
+  }
+
   Future<void> _openConversation(ConversationModel conversation) async {
+    final previous = _active?.id;
+    if (previous != null && previous != conversation.id) {
+      SocketService.instance.emitTyping(previous, false);
+      SocketService.instance.leaveDm(previous);
+    }
     setState(() {
       _active = conversation;
       _messages = [];
       _pendingAttachments = [];
+      _replyTo = null;
+      _typing = '';
     });
+    await _watchDm(conversation.id);
     final result = await _socialService.getDirectMessages(conversation.id);
     if (!mounted) return;
     if (result['success'] == true) {
@@ -747,13 +792,19 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
     if (text.isEmpty && _pendingAttachments.isEmpty) return;
 
     final attachments = List<String>.from(_pendingAttachments);
+    final replyId = _replyTo?.id;
     _composer.clear();
-    setState(() => _pendingAttachments = []);
+    setState(() {
+      _pendingAttachments = [];
+      _replyTo = null;
+    });
+    SocketService.instance.emitTyping(active.id, false);
 
     await _socialService.sendDirectMessage(
       active.id,
       text,
       attachments: attachments.isEmpty ? null : attachments,
+      replyTo: replyId,
     );
     await _openConversation(active);
     await _loadConversations();
@@ -786,10 +837,15 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
           Row(
             children: [
               IconButton(
-                onPressed: () => setState(() {
-                  _active = null;
-                  _pendingAttachments = [];
-                }),
+                onPressed: () {
+                  _stopDmWatch();
+                  setState(() {
+                    _active = null;
+                    _pendingAttachments = [];
+                    _replyTo = null;
+                    _typing = '';
+                  });
+                },
                 icon: Icon(Icons.arrow_back, color: AppColors.gold),
               ),
               Expanded(
@@ -801,6 +857,11 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
             ],
           ),
           const SizedBox(height: 8),
+          if (_typing.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(_typing, style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted)),
+            ),
           ..._messages.map(_buildMessageBubble),
           if (_pendingAttachments.isNotEmpty) ...[
             const SizedBox(height: 8),
@@ -863,8 +924,13 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
                 child: TextField(
                   controller: _composer,
                   style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
+                  onChanged: (value) {
+                    final id = _active?.id;
+                    if (id == null) return;
+                    SocketService.instance.emitTyping(id, value.trim().isNotEmpty);
+                  },
                   decoration: InputDecoration(
-                    hintText: 'Type a message...',
+                    hintText: _replyTo == null ? 'Type a message...' : 'Message ${_replyTo!.senderName}',
                     hintStyle: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
                   ),
                   onSubmitted: (_) => _sendMessage(),
@@ -974,6 +1040,8 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (message.replyTo != null && message.replyTo!.isNotEmpty)
+                Text('Reply', style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted)),
               if (message.body.isNotEmpty)
                 Text(
                   message.body,
@@ -1013,6 +1081,15 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
                     ),
                   );
                 }).toList(),
+              ),
+              TextButton(
+                onPressed: () => setState(() => _replyTo = message),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.only(top: 4),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text('Reply', style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted)),
               ),
             ],
           ),

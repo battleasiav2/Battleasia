@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/social_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
@@ -256,6 +257,29 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
         });
       }
     }
+  }
+
+  Future<void> _shareProfile() async {
+    final user = _viewingUser;
+    if (user == null) return;
+    final conv = await _socialService.createConversation(user.id);
+    final convData = conv['data'];
+    final convId = convData is Map ? convData['id']?.toString() ?? '' : '';
+    if (!mounted) return;
+    if (conv['success'] != true || convId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(conv['message']?.toString() ?? 'Could not open chat')),
+      );
+      return;
+    }
+    final sent = await _socialService.sendDirectMessage(
+      convId,
+      'Check this profile: ${AppConfig.siteUrl}/profile/${user.id}',
+    );
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(sent['success'] == true ? 'Profile shared to DM' : (sent['message']?.toString() ?? 'Could not share profile'))),
+    );
   }
 
   Future<void> _handleBlockToggle() async {
@@ -547,6 +571,11 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
             foregroundColor: AppColors.gold,
             side: BorderSide(color: AppColors.gold.withValues(alpha: 0.5)),
           ),
+        ),
+        OutlinedButton.icon(
+          onPressed: _shareProfile,
+          icon: const Icon(Icons.ios_share, size: 18),
+          label: const Text('Share'),
         ),
         OutlinedButton.icon(
           onPressed: _blockLoading ? null : _handleBlockToggle,

@@ -41,6 +41,8 @@ class DirectMessageModel {
   final String? createdAt;
   final List<String> attachments;
   final List<String> reactions;
+  final String? replyTo;
+  final String senderName;
 
   DirectMessageModel({
     required this.id,
@@ -49,6 +51,8 @@ class DirectMessageModel {
     this.createdAt,
     this.attachments = const [],
     this.reactions = const [],
+    this.replyTo,
+    this.senderName = '',
   });
 
   DirectMessageModel copyWith({List<String>? reactions}) {
@@ -59,6 +63,8 @@ class DirectMessageModel {
       createdAt: createdAt,
       attachments: attachments,
       reactions: reactions ?? this.reactions,
+      replyTo: replyTo,
+      senderName: senderName,
     );
   }
 
@@ -77,6 +83,8 @@ class DirectMessageModel {
       reactions: reactions is List
           ? reactions.map((row) => row is Map ? row['emoji']?.toString() ?? '' : row.toString()).where((e) => e.isNotEmpty).toList()
           : const [],
+      replyTo: json['replyTo']?.toString(),
+      senderName: json['senderName']?.toString() ?? '',
     );
   }
 }

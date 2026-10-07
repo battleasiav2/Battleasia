@@ -17,6 +17,7 @@ import 'package:battleasia_app/presentation/screens/account/account_screen.dart'
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/feed/caption_text.dart';
+import 'package:battleasia_app/presentation/widgets/feed/feed_comments_sheet.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class FeedDetailScreen extends StatefulWidget {
@@ -1120,11 +1121,13 @@ class _CommentsDialog extends StatelessWidget {
                                       ],
                                     ),
                                     SizedBox(height: spacing8 / 2),
-                                    Text(
-                                      comment.content,
-                                      style: AppTheme.bodyMedium.copyWith(
-                                        fontSize: fontSize,
-                                        color: Colors.black87,
+                                    RichText(
+                                      text: TextSpan(
+                                        style: AppTheme.bodyMedium.copyWith(
+                                          fontSize: fontSize,
+                                          color: Colors.black87,
+                                        ),
+                                        children: mentionSpans(comment.content),
                                       ),
                                     ),
                                   ],
