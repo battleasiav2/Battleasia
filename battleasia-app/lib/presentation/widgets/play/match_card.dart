@@ -76,111 +76,96 @@ class _MatchCardState extends State<MatchCard> {
     final bannerUrl = MatchCoverUtils.resolve(widget.match);
     final buttonDisabled = widget.joining || widget.isJoined || !widget.canJoin;
 
-    final cardHeight = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 220.0,
-    ).clamp(200.0, 230.0);
+    final capacity = getMatchCapacityState(
+      participantsCount: widget.match.participantsCount,
+      totalPlayer: widget.match.totalPlayer,
+    );
 
     return Card(
       color: Colors.transparent,
       elevation: 0,
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: Stack(
-        children: [
-          Container(
-            height: cardHeight,
-            decoration: AppTheme.surfaceCard(radius: 18),
-            child: Stack(
-              children: [
-                Row(
-                  children: [
-                    Expanded(flex: 10, child: _buildBannerSection(bannerUrl)),
-                    Expanded(
-                      flex: 14,
-                      child: _buildMatchInfoSection(buttonDisabled),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          if (widget.showLive)
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                height: 2,
-                color: AppColors.gold.withValues(alpha: 0.85),
-              ),
-            ),
-
-          if (widget.match.premiumOnly)
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
-                  vertical: 3,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.amber.shade700,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.workspace_premium,
-                      color: Colors.white,
-                      size: 12,
-                    ),
-                    SizedBox(width: 3),
-                    Text(
-                      'PREMIUM',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      child: DecoratedBox(
+        decoration: AppTheme.surfaceCard(radius: 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              height: 108,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  _buildMaskedBanner(bannerUrl),
+                  const DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Colors.transparent, Color(0xFF121318)],
+                        stops: [0.35, 1],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBannerSection(String bannerUrl) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(17),
-        bottomLeft: Radius.circular(17),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          _buildMaskedBanner(bannerUrl),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [
-                  Colors.transparent,
-                  const Color(0xFF161618).withValues(alpha: 0.85),
+                  ),
+                  if (widget.showLive)
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: Container(
+                        height: 2,
+                        color: AppColors.gold.withValues(alpha: 0.85),
+                      ),
+                    ),
+                  Positioned(
+                    top: 10,
+                    left: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF0A0B0F),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.12)),
+                      ),
+                      child: Text(
+                        widget.isJoined
+                            ? 'match.joined'.tr().toUpperCase()
+                            : capacity.isFull
+                                ? 'match.full'.tr().toUpperCase()
+                                : 'match.openEntry'.tr().toUpperCase(),
+                        style: TextStyle(
+                          color: widget.isJoined ? AppColors.gold : Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.4,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: 16,
+                    bottom: 8,
+                    child: Text(
+                      (widget.match.map ?? '').toUpperCase(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ),
+                  if (widget.match.premiumOnly)
+                    const Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Icon(Icons.workspace_premium, color: Colors.white, size: 16),
+                    ),
                 ],
-                stops: const [0.4, 1],
               ),
             ),
-          ),
-        ],
+            _buildMatchInfoSection(buttonDisabled),
+          ],
+        ),
       ),
     );
   }
@@ -332,7 +317,7 @@ class _MatchCardState extends State<MatchCard> {
                         Text(
                           'PRIZE POOL',
                           style: AppTheme.bodySmall.copyWith(
-                            color: Colors.green,
+                            color: AppColors.gold,
                             fontWeight: FontWeight.w600,
                             fontSize: labelFontSize,
                           ),
@@ -341,7 +326,7 @@ class _MatchCardState extends State<MatchCard> {
                         Text(
                           widget.match.prizeDescription ?? 'N/A',
                           style: AppTheme.bodySmall.copyWith(
-                            color: Colors.green,
+                            color: AppColors.gold,
                             fontSize: valueFontSize,
                           ),
                           maxLines: 1,

@@ -1,7 +1,6 @@
 import { CoinValue } from './CoinValue';
-import { SpotBar } from './SpotBar';
 import { isDemoMatchId } from '../lib/demoMatches';
-import { coverForMatch, formatWhen, localCoverForGame, spotsLeft, type MatchItem } from '../lib/games';
+import { formatWhen, spotsLeft, type MatchItem } from '../lib/games';
 import { useI18n } from '../lib/i18n';
 
 type Props = {
@@ -23,9 +22,6 @@ export function MatchJoinDialog({ match, balance, joining, error, onClose, onCon
   const isFull = left <= 0;
   const used = match.participantsCount || 0;
   const cap = match.totalPlayer || 0;
-  const joinCover = coverForMatch(match);
-  const gameRef = { name: match.gameName, banner: match.banner };
-  const localCover = localCoverForGame(gameRef);
   const demo = isDemoMatchId(match.id);
 
   const grid = [
@@ -63,88 +59,58 @@ export function MatchJoinDialog({ match, balance, joining, error, onClose, onCon
           ? t('match.matchFullToast')
           : '');
 
+  const rows = [
+    ...grid,
+    {
+      label: t('match.spots'),
+      value: `${used}/${cap}`,
+    },
+  ];
+
   return (
     <div className="play-sheet join-sheet" role="dialog" aria-labelledby="join-title">
       <button className="play-sheet-bg" type="button" aria-label={t('match.close')} onClick={onClose} />
-      <div className="play-sheet-card join-dialog join-dialog-room">
-        <div className="join-hero">
-          <img
-            src={joinCover}
-            alt=""
-            width={480}
-            height={220}
-            decoding="async"
-            onError={(e) => {
-              const img = e.currentTarget;
-              if (img.getAttribute('src') !== localCover) {
-                img.src = localCover;
-                return;
-              }
-              img.src = '/covers/arena.svg';
-            }}
-          />
-          <div className="join-hero-scrim" aria-hidden />
-          <button type="button" className="join-dialog-x" onClick={onClose} aria-label={t('match.close')}>
+      <div className="play-sheet-card ba-join">
+        <div className="ba-join-top">
+          <h2 id="join-title">{t('match.joinMatch')}</h2>
+          <button type="button" className="ba-join-x" onClick={onClose} aria-label={t('match.close')}>
             ×
           </button>
-          <div className="join-hero-copy">
-            <p className="join-hero-eyebrow">{t('match.secureEntry')}</p>
-            <h2 id="join-title">{match.matchName}</h2>
-            <span className="join-hero-pill">
-              {used}/{cap} {t('match.spots')}
-            </span>
-          </div>
         </div>
-
-        <div className="join-dialog-body">
-          {signal ? (
-            <p className="join-signal" role="alert">
-              {signal}
-            </p>
-          ) : null}
-
-          <p className="join-lead play-muted">{t('match.joinMatchFor').replace('{{name}}', match.matchName)}</p>
-
-          <div className="join-spec-grid">
-            {grid.map((cell) => (
-              <div key={cell.label} className="join-spec-cell">
-                <small>{cell.label}</small>
-                <strong>{cell.value}</strong>
-              </div>
-            ))}
+        <p className="ba-join-eye">
+          {match.map || t('match.mapTbd')} · {match.teamType || 'Solo'} · {match.gameName || t('nav.play')}
+        </p>
+        <h3>{match.matchName}</h3>
+        {signal ? (
+          <p className="join-signal" role="alert">
+            {signal}
+          </p>
+        ) : (
+          <p className="ba-join-lead">{t('match.joinMatchFor').replace('{{name}}', match.matchName)}</p>
+        )}
+        {rows.map((cell) => (
+          <div key={cell.label} className="ba-join-row">
+            <span>{cell.label}</span>
+            <strong>{cell.value}</strong>
           </div>
-
-          <div className="join-spots-row">
-            <SpotBar used={used} total={cap} />
-          </div>
-
-          {match.prizeDescription ? (
-            <div className="join-prize-block">
-              <small>{t('match.prize')}</small>
-              <p>{match.prizeDescription}</p>
-            </div>
-          ) : null}
-        </div>
-
-        <footer className="join-dialog-foot join-dialog-foot-stack">
-          <button
-            type="button"
-            className="btn btn-primary join-cta"
-            onClick={onConfirm}
-            disabled={joining || insufficient || isFull || demo}
-          >
-            {joining
-              ? t('match.joining')
-              : isFull
-                ? t('match.matchFull')
-                : demo
-                  ? t('match.demoShort')
-                  : t('match.joinMatch')}
-          </button>
-          <button type="button" className="btn btn-ghost join-cta-secondary" onClick={onClose} disabled={joining}>
-            {t('match.cancel')}
-          </button>
-        </footer>
+        ))}
+        <button
+          type="button"
+          className="btn btn-primary ba-room-action"
+          onClick={onConfirm}
+          disabled={joining || insufficient || isFull || demo}
+        >
+          {joining
+            ? t('match.joining')
+            : isFull
+              ? t('match.matchFull')
+              : demo
+                ? t('match.demoShort')
+                : t('match.joinMatch')}
+        </button>
+        <button type="button" className="btn btn-ghost ba-join-cancel" onClick={onClose} disabled={joining}>
+          {t('match.cancel')}
+        </button>
       </div>
     </div>
   );

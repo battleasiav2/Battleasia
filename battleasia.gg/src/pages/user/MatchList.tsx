@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { CoinValue } from '../../components/CoinValue';
 import { MatchJoinDialog } from '../../components/MatchJoinDialog';
-import { SpotBar } from '../../components/SpotBar';
 import { useHud } from '../../contexts/HudContext';
 import { isApiError } from '../../lib/api';
 import { readSessionUser, isPremiumUser } from '../../lib/auth';
@@ -332,7 +331,7 @@ export function MatchListPage() {
               </button>
             </div>
           ) : (
-            <div className="match-table" role="list">
+            <div className="ba-room-grid" role="list">
               {filtered.map((match) => {
                 const open = isJoinable(match);
                 const full = spotsLeft(match) === 0;
@@ -341,12 +340,49 @@ export function MatchListPage() {
                 const prize = estimateMatchWinningPool(match);
                 const cover = coverForMatch(match);
                 const mapKey = mapCoverKey(match.map);
+                const spotPct = cap > 0 ? Math.min(100, Math.round((used / cap) * 100)) : 0;
+                const action = (match.status || '').toLowerCase() === 'complete' ? (
+                  <Link
+                    className="btn btn-primary ba-room-action"
+                    to={`/user/play/${match.id}/result?from=${gameId}`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {t('match.view')}
+                  </Link>
+                ) : match.isJoined ? (
+                  <Link
+                    className="btn btn-primary ba-room-action"
+                    to={`/user/play/${match.id}/detail?from=${encodeURIComponent(gameId)}#match-room`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {t('match.lobby')}
+                  </Link>
+                ) : open ? (
+                  <button
+                    type="button"
+                    className="btn btn-primary ba-room-action"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      requestJoin(match);
+                    }}
+                  >
+                    {t('match.join')}
+                  </button>
+                ) : (
+                  <Link
+                    className="btn btn-primary ba-room-action"
+                    to={`/user/play/${match.id}/detail?from=${gameId}`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {t('match.view')}
+                  </Link>
+                );
                 return (
-                  <div
+                  <article
                     key={match.id}
                     role="listitem"
                     tabIndex={0}
-                    className={`match-row ${selected === match.id ? 'is-selected' : ''}${match.isJoined ? ' is-mine-joined' : ''}`}
+                    className={`ba-room${selected === match.id ? ' is-selected' : ''}${match.isJoined ? ' is-joined' : ''}`}
                     onClick={() => setSelected(match.id)}
                     onDoubleClick={() => navigate(`/user/play/${match.id}/detail?from=${gameId}`)}
                     onKeyDown={(e) => {
@@ -356,18 +392,18 @@ export function MatchListPage() {
                       }
                     }}
                   >
-                    <span
-                      className="match-banner"
+                    <div
+                      className="ba-room-image"
                       data-map={mapKey ? mapKey.toLowerCase() : undefined}
                       data-game={mapKey ? undefined : gameKey({ name: match.gameName, banner: match.banner })}
                     >
                       <img
                         src={cover}
-                        srcSet={webpSrcSet(cover, 220, 440)}
-                        sizes="(max-width: 820px) 88px, 128px"
+                        srcSet={webpSrcSet(cover, 640, 960)}
+                        sizes="(max-width: 680px) 100vw, (max-width: 1100px) 50vw, 33vw"
                         alt=""
-                        width={220}
-                        height={124}
+                        width={640}
+                        height={216}
                         loading="lazy"
                         decoding="async"
                         onError={(e) => {
@@ -387,84 +423,52 @@ export function MatchListPage() {
                           img.src = local;
                         }}
                       />
-                    </span>
-                    <span className="match-copy">
-                      <strong>{match.matchName}</strong>
-                      <small>
-                        {match.teamType || 'Solo'} · {match.map || t('match.mapTbd')} · {formatWhen(match.matchSchedule)}
-                      </small>
-                    </span>
-                    <span className="match-meta">
-                      <span className="match-stat">
-                        <small>{t('match.entry')}</small>
-                        <strong>
-                          {match.matchType === 'free' || !match.entryFee ? t('match.free') : <CoinValue value={match.entryFee} size={15} />}
-                        </strong>
+                      <span className={`ba-room-status${match.isJoined ? ' is-joined' : ''}${full ? ' is-full' : ''}`}>
+                        {match.isJoined ? t('match.joined') : full ? t('match.full') : t('match.openEntry')}
                       </span>
-                      {prize > 0 ? (
-                        <span className="match-stat">
-                          <small>{t('match.prize')}</small>
-                          <strong>
-                            <CoinValue value={prize} size={15} />
-                          </strong>
-                        </span>
-                      ) : null}
-                      <span className="match-stat">
-                        <small>{t('match.spots')}</small>
-                        <strong>
-                          {used}/{cap}
-                        </strong>
-                        <SpotBar used={used} total={cap} />
-                      </span>
-                      <span
-                        className={`match-status ${
-                          match.isJoined
-                            ? 'is-joined'
-                            : full
-                              ? 'is-full'
-                              : `is-${(match.status || 'active').toLowerCase()}`
-                        }`}
-                      >
-                        {match.isJoined ? t('match.joined') : full ? t('match.full') : match.status}
-                      </span>
-                    </span>
-                    {(match.status || '').toLowerCase() === 'complete' ? (
-                      <Link
-                        className="btn btn-primary"
-                        to={`/user/play/${match.id}/result?from=${gameId}`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {t('match.view')}
-                      </Link>
-                    ) : match.isJoined ? (
-                      <Link
-                        className="btn btn-primary"
-                        to={`/user/play/${match.id}/detail?from=${encodeURIComponent(gameId)}#match-room`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {t('match.lobby')}
-                      </Link>
-                    ) : open ? (
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          requestJoin(match);
-                        }}
-                      >
-                        {t('match.join')}
-                      </button>
-                    ) : (
-                      <Link
-                        className="btn btn-primary"
-                        to={`/user/play/${match.id}/detail?from=${gameId}`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {t('match.view')}
-                      </Link>
-                    )}
-                  </div>
+                      <span className="ba-room-map">{match.map || t('match.mapTbd')}</span>
+                      <span className="ba-room-mode">{(match.teamType || 'Solo').toUpperCase()}</span>
+                    </div>
+                    <div className="ba-room-body">
+                      <h3>{match.matchName}</h3>
+                      <div className="ba-room-time">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden>
+                          <circle cx="12" cy="12" r="8" stroke="currentColor" strokeWidth="1.8" />
+                          <path d="M12 8v4.5l3 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                        </svg>
+                        {formatWhen(match.matchSchedule)}
+                      </div>
+                      <div className="ba-room-stats">
+                        <div>
+                          <label>{t('match.entry')}</label>
+                          <div className="ba-room-stat">
+                            {match.matchType === 'free' || !match.entryFee ? t('match.free') : <CoinValue value={match.entryFee} size={15} />}
+                          </div>
+                        </div>
+                        <div>
+                          <label>{t('match.prize')}</label>
+                          <div className="ba-room-stat is-prize">
+                            {prize > 0 ? <CoinValue value={prize} size={15} /> : '—'}
+                          </div>
+                        </div>
+                        <div>
+                          <label>{t('match.spots')}</label>
+                          <div className="ba-room-stat">
+                            {used}
+                            <span className="ba-room-total">/ {cap}</span>
+                          </div>
+                          <span className="ba-room-bar" aria-hidden>
+                            <i style={{ width: `${spotPct}%` }} />
+                          </span>
+                        </div>
+                      </div>
+                      {action}
+                      <div className="ba-room-foot">
+                        <span>{match.gameName || t('nav.play')}</span>
+                        <span>#{match.id.slice(-6).toUpperCase()}</span>
+                      </div>
+                    </div>
+                  </article>
                 );
               })}
             </div>

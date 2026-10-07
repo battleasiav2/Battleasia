@@ -395,6 +395,9 @@
     "prize": "Prize",
     "insufficient": "Insufficient",
     "joinMatch": "Join Match",
+    "joined": "Joined",
+    "full": "Full",
+    "openEntry": "Open for entry",
     "joining": "Joining…",
     "cancel": "Cancel",
     "free": "Free"
