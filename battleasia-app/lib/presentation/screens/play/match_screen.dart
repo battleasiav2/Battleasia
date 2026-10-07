@@ -169,10 +169,27 @@ class _MatchScreenState extends State<MatchScreen> {
     final match = _confirmMatch;
     if (match == null || _joiningMatchId != null) return;
 
+    if (match.id.startsWith('demo-')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('match.demoDisabled'.tr())),
+      );
+      return;
+    }
+
     setState(() {
       _confirmMatch = null;
       _joiningMatchId = match.id;
     });
+
+    final block = await _gamesService.joinBlockReason(match.id);
+    if (!mounted) return;
+    if (block != null) {
+      setState(() => _joiningMatchId = null);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(block.isEmpty ? 'match.joinFail'.tr() : block)),
+      );
+      return;
+    }
 
     final result = await _gamesService.joinMatch(match.id);
 
@@ -190,8 +207,8 @@ class _MatchScreenState extends State<MatchScreen> {
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Joined match successfully'),
+          SnackBar(
+            content: Text('match.joinedSuccessfully'.tr()),
             backgroundColor: Colors.green,
           ),
         );

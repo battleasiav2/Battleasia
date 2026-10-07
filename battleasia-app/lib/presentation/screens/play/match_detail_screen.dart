@@ -16,6 +16,7 @@ import 'package:battleasia_app/core/utils/date_utils.dart' as date_utils;
 import 'package:battleasia_app/data/models/match_model.dart';
 import 'package:battleasia_app/data/models/match_participant_model.dart';
 import 'package:battleasia_app/presentation/screens/labs/labs_screen.dart';
+import 'package:battleasia_app/presentation/screens/play/match_result_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
@@ -243,19 +244,30 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
     }
   }
 
+  bool get _matchStarted {
+    final status = (_matchDetail?.status ?? '').toLowerCase();
+    return status == 'start' || status == 'complete';
+  }
+
   Future<void> _leaveMatch() async {
+    if (_matchStarted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('match.leaveBlocked'.tr())),
+      );
+      return;
+    }
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF121318),
-        title: const Text('Leave match?', style: TextStyle(color: Colors.white)),
-        content: const Text(
-          'You will leave this room. Entry fee is refunded when the match allows it.',
-          style: TextStyle(color: Colors.white70),
+        title: Text('match.leaveTitle'.tr(), style: const TextStyle(color: Colors.white)),
+        content: Text(
+          'match.leaveLead'.tr(),
+          style: const TextStyle(color: Colors.white70),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Stay')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Leave')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text('match.stay'.tr())),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text('match.leave'.tr())),
         ],
       ),
     );
@@ -338,9 +350,26 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       return;
     }
 
+    if (_matchDetail!.id.startsWith('demo-')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('match.demoDisabled'.tr())),
+      );
+      return;
+    }
+
     setState(() {
       _joining = true;
     });
+
+    final block = await _gamesService.joinBlockReason(_matchDetail!.id);
+    if (!mounted) return;
+    if (block != null) {
+      setState(() => _joining = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(block.isEmpty ? 'match.joinFail'.tr() : block)),
+      );
+      return;
+    }
 
     final result = await _gamesService.joinMatch(_matchDetail!.id);
 
@@ -357,8 +386,8 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Joined match successfully'),
+          SnackBar(
+            content: Text('match.joinedSuccessfully'.tr()),
             backgroundColor: Colors.green,
           ),
         );
@@ -774,9 +803,20 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
           activeThumbColor: AppColors.gold,
           onChanged: _readyBusy ? null : _toggleReady,
         ),
+        Text(
+          _matchStarted ? 'match.leaveBlocked'.tr() : 'match.leaveBefore'.tr(),
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.55)),
+        ),
         OutlinedButton(
-          onPressed: _leaving ? null : _leaveMatch,
-          child: Text(_leaving ? 'Leaving…' : 'Leave match'),
+          onPressed: _leaving || _matchStarted ? null : _leaveMatch,
+          child: Text(_leaving ? 'Leaving…' : 'match.leave'.tr()),
+        ),
+        OutlinedButton(
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => MatchResultScreen(matchId: widget.matchId)),
+          ),
+          child: Text('match.results'.tr()),
         ),
         if (_share?['enabled'] == true) ...[
           const SizedBox(height: 8),

@@ -49,7 +49,11 @@
     "clip": "Clip",
     "photo": "Photo",
     "posted": "Posted",
-    "postFail": "Could not post"
+    "postFail": "Could not post",
+    "newMsg": "New message",
+    "searchPlayer": "Search a player (2+ chars)",
+    "reqSent": "Request sent",
+    "chatOpen": "Chat opened"
   },
   "feedHub": {
     "feed": "Feed",
@@ -500,7 +504,17 @@
     "copyId": "Copy ID",
     "copyPass": "Copy pass",
     "roomHidden": "Join this match to unlock room ID and password.",
-    "roomPending": "Joined — room ID & password will appear here when the host posts them."
+    "roomPending": "Joined — room ID & password will appear here when the host posts them.",
+    "demoDisabled": "Demo rooms are off — only live matches can be joined.",
+    "joinFail": "Could not join",
+    "joinedSuccessfully": "Joined match successfully",
+    "leaveBlocked": "Leave blocked after start",
+    "leaveBefore": "Leave before start",
+    "leaveTitle": "Leave this match?",
+    "leaveLead": "Entry fee refunds only if the match has not started.",
+    "stay": "Stay",
+    "leave": "Leave",
+    "results": "Results"
   },
   "common": {
     "retry": "Retry",

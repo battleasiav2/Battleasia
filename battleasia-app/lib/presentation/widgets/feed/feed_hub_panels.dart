@@ -712,6 +712,10 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
         ..._conversations.where((c) => c.id != conversationId),
       ];
     });
+    final pending = data['requestStatus']?.toString() == 'pending';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(pending ? 'feed.reqSent'.tr() : 'feed.chatOpen'.tr())),
+    );
     await _openConversation(conversation);
   }
 

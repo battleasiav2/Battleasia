@@ -1,8 +1,8 @@
 ﻿import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:battleasia_app/core/utils/api_client.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/services/auth_service.dart';
+import 'package:battleasia_app/core/utils/idempotency.dart';
 import 'package:battleasia_app/data/models/game_model.dart';
 
 class GamesService {
@@ -12,11 +12,12 @@ class GamesService {
   String get _baseUrl => AppConfig.serverUrl;
 
   // Get authorization headers
-  Future<Map<String, String>> _getHeaders() async {
+  Future<Map<String, String>> _getHeaders({bool money = false}) async {
     final token = await _authService.getToken();
     return {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
+      if (money) 'Idempotency-Key': newIdempotencyKey(),
     };
   }
 
@@ -251,9 +252,10 @@ class GamesService {
     String action, {
     String method = 'POST',
     Map<String, dynamic>? body,
+    bool money = false,
   }) async {
     try {
-      final headers = await _getHeaders();
+      final headers = await _getHeaders(money: money);
       final uri = Uri.parse('$_baseUrl/api/v2/games/matches/$matchId/$action');
       final response = method == 'GET'
           ? await ApiClient.get(uri, headers: headers)
@@ -272,7 +274,30 @@ class GamesService {
     }
   }
 
-  Future<Map<String, dynamic>> leaveMatch(String matchId) => _matchAction(matchId, 'leave');
+  Future<Map<String, dynamic>> checkJoin(String matchId) => _matchAction(matchId, 'check-join');
+
+  /// Null means join may continue. A string is the website block message.
+  Future<String?> joinBlockReason(String matchId) async {
+    final check = await checkJoin(matchId);
+    if (check['success'] == true) {
+      final data = check['data'];
+      if (data is Map && data['canJoin'] == false) {
+        final issues = data['issues'];
+        if (issues is List) {
+          final text = issues.map((item) => item.toString()).where((item) => item.isNotEmpty).join(' · ');
+          if (text.isNotEmpty) return text;
+        }
+        return '';
+      }
+      return null;
+    }
+    final message = check['message']?.toString() ?? '';
+    if (message.toLowerCase().contains('not found')) return null;
+    return message;
+  }
+
+  Future<Map<String, dynamic>> leaveMatch(String matchId) =>
+      _matchAction(matchId, 'leave', money: true);
 
   Future<Map<String, dynamic>> setReady(String matchId, bool ready) =>
       _matchAction(matchId, 'ready', body: {'ready': ready});
@@ -289,7 +314,7 @@ class GamesService {
   /// Join a match
   Future<Map<String, dynamic>> joinMatch(String matchId) async {
     try {
-      final headers = await _getHeaders();
+      final headers = await _getHeaders(money: true);
       final response = await ApiClient.post(
         Uri.parse('$_baseUrl/api/v2/games/matches/$matchId/join'),
         headers: headers,

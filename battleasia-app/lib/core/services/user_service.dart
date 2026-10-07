@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:battleasia_app/core/utils/api_client.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/services/auth_service.dart';
+import 'package:battleasia_app/core/utils/idempotency.dart';
 
 class UserService {
   final AuthService _authService = AuthService();
@@ -14,11 +15,12 @@ class UserService {
   String get _baseUrl => AppConfig.serverUrl;
 
   // Get authorization headers
-  Future<Map<String, String>> _getHeaders() async {
+  Future<Map<String, String>> _getHeaders({bool money = false}) async {
     final token = await _authService.getToken();
     return {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
+      if (money) 'Idempotency-Key': newIdempotencyKey(),
     };
   }
 
@@ -358,7 +360,7 @@ class UserService {
 
   Future<Map<String, dynamic>> sendTip(String recipientUsername, num amount) async {
     try {
-      final headers = await _getHeaders();
+      final headers = await _getHeaders(money: true);
       final response = await ApiClient.post(
         Uri.parse('$_baseUrl/api/v2/users/tip'),
         headers: headers,
@@ -1191,7 +1193,7 @@ class UserService {
     String? note,
   }) async {
     try {
-      final headers = await _getHeaders();
+      final headers = await _getHeaders(money: true);
       final response = await ApiClient.post(
         Uri.parse('$_baseUrl/api/v2/users/transfer'),
         headers: headers,
