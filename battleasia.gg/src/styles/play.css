@@ -2879,6 +2879,9 @@ a.hist-item-link {
 
 .ig-scope {
   margin: 0;
+  justify-self: start;
+  width: max-content;
+  max-width: 100%;
   justify-content: center;
 }
 
@@ -2890,12 +2893,23 @@ a.hist-item-link {
 
 .ig-stories {
   margin: 0;
-  padding: 10px 4px 6px;
+  padding: 12px 8px 10px;
   border: 0;
   border-radius: 0;
   background: transparent;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+}
+
+.ig-stories::-webkit-scrollbar {
+  display: none;
+}
+
+.ig-stories .story-dot {
+  scroll-snap-align: start;
 }
 
 .ig-suggest {
@@ -3077,6 +3091,9 @@ a.hist-item-link {
 
   .ig-feed.ig-feed--home > .ig-scope {
     grid-column: 1;
+    justify-self: start;
+    width: max-content;
+    max-width: 100%;
     justify-content: flex-start;
   }
 
@@ -3550,7 +3567,9 @@ a.hist-item-link {
   cursor: pointer;
 }
 
-.feed-card img {
+.feed-card .feed-media > img,
+.feed-card .ig-post-media img,
+.feed-card .ig-post-media video {
   width: 100%;
   border-radius: 12px;
   object-fit: cover;
@@ -3584,7 +3603,21 @@ a.hist-item-link {
   border-radius: 0;
 }
 
-.ig-feed .feed-card.ig-post img,
+.ig-feed .ig-post-avatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  flex: 0 0 36px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.ig-feed .ig-post-user {
+  flex: 1;
+  min-width: 0;
+}
+
 .ig-feed .ig-post-media img,
 .ig-feed .ig-post-media video {
   width: 100%;
@@ -3592,6 +3625,7 @@ a.hist-item-link {
   margin: 0;
   border-radius: 0;
   aspect-ratio: 1;
+  max-height: min(72vh, 640px);
   object-fit: cover;
 }
 
@@ -5467,7 +5501,7 @@ a.hist-item-link {
 
   .play-main.ig-feed .ig-feed-head {
     position: sticky;
-    top: 0;
+    top: 56px;
     z-index: 12;
     margin-inline: 0;
     padding: 4px 0 10px;
@@ -5487,13 +5521,11 @@ a.hist-item-link {
   }
 
   .ig-feed-tabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    flex-wrap: wrap;
+    overflow: visible;
     gap: 6px;
-    margin: 0 -2px;
-    padding: 2px 2px 6px;
+    margin: 0;
+    padding: 0;
   }
 
   .ig-feed-tabs::-webkit-scrollbar {
@@ -5509,6 +5541,12 @@ a.hist-item-link {
   .ig-scope {
     flex-wrap: wrap;
     justify-content: flex-start;
+  }
+
+  .ig-feed .money-tabs.ig-scope {
+    display: inline-flex;
+    width: max-content;
+    max-width: 100%;
   }
 
   .ig-stories,
@@ -5666,13 +5704,29 @@ a.hist-item-link {
     flex-direction: row;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
-    scroll-snap-type: x proximity;
-    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 2px;
+    padding: 0 2px 8px;
+    scrollbar-width: none;
+  }
+
+  .ig-feed.ig-feed--home .ig-suggest-row::-webkit-scrollbar {
+    display: none;
   }
 
   .ig-feed.ig-feed--home .ig-suggest-card {
-    flex: 0 0 min(148px, 42vw);
+    flex: 0 0 min(160px, 46vw);
     scroll-snap-align: start;
+    min-width: 0;
+  }
+
+  .ig-composer-row {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+
+  .ig-composer-go {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 
   .ig-comments-sheet {
