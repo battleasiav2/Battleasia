@@ -289,6 +289,7 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
       isPremium: _user!.isPremium,
       premiumSince: _user!.premiumSince,
       premiumExpiresAt: _user!.premiumExpiresAt,
+      usernameChangedAt: _user!.usernameChangedAt,
     );
     notifyListeners();
   }

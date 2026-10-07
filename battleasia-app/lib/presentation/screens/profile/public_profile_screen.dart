@@ -10,6 +10,7 @@ import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/public_user_model.dart';
+import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_screen.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/profile/public_profile_info.dart';
@@ -44,12 +45,15 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
   double _amountWon = 0;
   List<ActivityCard> _activities = [];
   List<Map<String, dynamic>> _highlights = [];
+  List<Map<String, dynamic>> _posts = [];
+  String _gridTab = 'posts';
   bool _playerTip = false;
   bool _tipping = false;
 
   @override
   void initState() {
     super.initState();
+    _loadPosts();
     _fetchUserProfile();
   }
 
@@ -199,8 +203,42 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     );
   }
 
+  Future<void> _loadPosts() async {
+    final result = await _userService.getUserFeeds(widget.userId);
+    if (!mounted || result['success'] != true) return;
+    final data = result['data'];
+    final list = data is Map
+        ? (data['results'] as List? ?? [])
+        : (data is List ? data : const []);
+    setState(() {
+      _posts = list.whereType<Map>().map((row) => Map<String, dynamic>.from(row)).toList();
+    });
+  }
+
+  bool _isReel(Map<String, dynamic> post) {
+    final media = post['mediaUrls'];
+    if (media is List && media.any((url) => url.toString().toLowerCase().contains('.mp4'))) {
+      return true;
+    }
+    final cover = post['coverUrl']?.toString().toLowerCase() ?? '';
+    return cover.contains('.mp4');
+  }
+
   Future<void> _handleFollowToggle() async {
     if (_viewingUser == null || _followLoading) return;
+    if (_isFollowing) {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          content: Text('profile.unfollowConfirm'.tr()),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('feed.cancelReply'.tr())),
+            TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text('profile.unfollow'.tr())),
+          ],
+        ),
+      );
+      if (ok != true || !mounted) return;
+    }
 
     setState(() {
       _followLoading = true;
@@ -410,6 +448,8 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
                           amountWon: _amountWon,
                           activities: _activities,
                         ),
+                        SizedBox(height: spacing24),
+                        _buildPostGrid(),
                         const SizedBox(height: 100),
                       ],
                     ),
@@ -621,6 +661,105 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
           icon: const Icon(Icons.flag_outlined, size: 18),
           label: Text('profile.reportUser'.tr()),
         ),
+      ],
+    );
+  }
+
+  Widget _buildPostGrid() {
+    final rows = _gridTab == 'reels' ? _posts.where(_isReel).toList() : _posts;
+    final own = context.read<AuthProvider>().user?.id == widget.userId;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            TextButton(
+              onPressed: () => setState(() => _gridTab = 'posts'),
+              child: Text(
+                'profile.posts'.tr(),
+                style: TextStyle(
+                  color: _gridTab == 'posts' ? AppColors.gold : Colors.white70,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () => setState(() => _gridTab = 'reels'),
+              child: Text(
+                'profile.reels'.tr(),
+                style: TextStyle(
+                  color: _gridTab == 'reels' ? AppColors.gold : Colors.white70,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (rows.isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Column(
+              children: [
+                Text(
+                  _gridTab == 'reels' ? 'profile.noReels'.tr() : 'profile.noPosts'.tr(),
+                  style: AppTheme.heading3.copyWith(color: Colors.white),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  own ? 'profile.ownEmpty'.tr() : 'profile.otherEmpty'.tr(),
+                  style: AppTheme.bodySmall.copyWith(color: Colors.white70),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          )
+        else
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: rows.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+            ),
+            itemBuilder: (context, index) {
+              final post = rows[index];
+              final id = post['id']?.toString() ?? '';
+              final cover = post['coverUrl']?.toString() ?? '';
+              final label = post['description']?.toString() ?? post['title']?.toString() ?? '';
+              return GestureDetector(
+                onTap: id.isEmpty
+                    ? null
+                    : () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => FeedDetailScreen(feedId: id)),
+                        );
+                      },
+                child: ColoredBox(
+                  color: const Color(0xFF161618),
+                  child: cover.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Text(
+                            label,
+                            maxLines: 4,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(color: Colors.white70, fontSize: 12),
+                          ),
+                        )
+                      : ImageUtils.networkImage(
+                          cover,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                          errorWidget: const SizedBox.shrink(),
+                        ),
+                ),
+              );
+            },
+          ),
       ],
     );
   }

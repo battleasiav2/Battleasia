@@ -982,7 +982,9 @@ class UserService {
     try {
       final headers = await _getHeaders();
       final response = await ApiClient.get(
-        Uri.parse('$_baseUrl/api/v2/feed/user/$userId'),
+        Uri.parse('$_baseUrl/api/v2/feed/user/$userId').replace(
+          queryParameters: {'limit': '24'},
+        ),
         headers: headers,
       );
 

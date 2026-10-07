@@ -230,6 +230,24 @@ class _ProfileContentState extends State<ProfileContent> {
     super.dispose();
   }
 
+  String? _optionalUrl(String? value) {
+    final text = value?.trim() ?? '';
+    if (text.isEmpty) return null;
+    if (!RegExp(r'^https?://.+', caseSensitive: false).hasMatch(text)) {
+      return 'profile.linkInvalid'.tr();
+    }
+    return null;
+  }
+
+  (bool, int) _usernameLock(String? raw) {
+    final at = DateTime.tryParse(raw ?? '');
+    if (at == null) return (false, 0);
+    final until = at.add(const Duration(days: 7));
+    if (!until.isAfter(DateTime.now())) return (false, 0);
+    final days = (until.difference(DateTime.now()).inMilliseconds / Duration(days: 1).inMilliseconds).ceil();
+    return (true, days < 1 ? 1 : days);
+  }
+
   Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) {
       if (mounted) {
@@ -674,8 +692,19 @@ class _ProfileContentState extends State<ProfileContent> {
                 // In Game User Name
                 TextFormField(
                   controller: _usernameController,
+                  enabled: !_usernameLock(
+                    Provider.of<AuthProvider>(context, listen: false).user?.usernameChangedAt,
+                  ).$1,
                   decoration: InputDecoration(
                     labelText: 'In Game User Name *',
+                    helperText: _usernameLock(
+                          Provider.of<AuthProvider>(context, listen: false).user?.usernameChangedAt,
+                        ).$1
+                        ? 'profile.usernameCooldown'.tr(namedArgs: {
+                            'n': '${_usernameLock(Provider.of<AuthProvider>(context, listen: false).user?.usernameChangedAt).$2}',
+                          })
+                        : 'profile.usernameHint'.tr(),
+                    helperMaxLines: 2,
                     labelStyle: TextStyle(
                       color: Colors.blueGrey,
                       fontSize: labelFontSize,
@@ -727,6 +756,9 @@ class _ProfileContentState extends State<ProfileContent> {
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
                       return 'In Game User Name is required';
+                    }
+                    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value.trim())) {
+                      return 'auth.usernameRule'.tr();
                     }
                     return null;
                   },
@@ -1182,6 +1214,7 @@ class _ProfileContentState extends State<ProfileContent> {
                 // Social Media Links (optional)
                 TextFormField(
                   controller: _twitterLinkController,
+                  validator: _optionalUrl,
                   decoration: InputDecoration(
                     labelText: 'Twitter Link (optional)',
                     hintText: 'https://twitter.com/username',
@@ -1233,19 +1266,11 @@ class _ProfileContentState extends State<ProfileContent> {
                     ),
                   ),
                   style: AppTheme.bodyMedium.copyWith(fontSize: inputFontSize),
-                  validator: (value) {
-                    if (value != null &&
-                        value.trim().isNotEmpty &&
-                        !value.startsWith('http://') &&
-                        !value.startsWith('https://')) {
-                      return 'Twitter link must be a valid URL';
-                    }
-                    return null;
-                  },
                 ),
                 SizedBox(height: spacing16),
                 TextFormField(
                   controller: _facebookLinkController,
+                  validator: _optionalUrl,
                   decoration: InputDecoration(
                     labelText: 'Facebook Link (optional)',
                     hintText: 'https://facebook.com/username',
@@ -1297,19 +1322,11 @@ class _ProfileContentState extends State<ProfileContent> {
                     ),
                   ),
                   style: AppTheme.bodyMedium.copyWith(fontSize: inputFontSize),
-                  validator: (value) {
-                    if (value != null &&
-                        value.trim().isNotEmpty &&
-                        !value.startsWith('http://') &&
-                        !value.startsWith('https://')) {
-                      return 'Facebook link must be a valid URL';
-                    }
-                    return null;
-                  },
                 ),
                 SizedBox(height: spacing16),
                 TextFormField(
                   controller: _instagramLinkController,
+                  validator: _optionalUrl,
                   decoration: InputDecoration(
                     labelText: 'Instagram Link (optional)',
                     hintText: 'https://instagram.com/username',
@@ -1361,15 +1378,6 @@ class _ProfileContentState extends State<ProfileContent> {
                     ),
                   ),
                   style: AppTheme.bodyMedium.copyWith(fontSize: inputFontSize),
-                  validator: (value) {
-                    if (value != null &&
-                        value.trim().isNotEmpty &&
-                        !value.startsWith('http://') &&
-                        !value.startsWith('https://')) {
-                      return 'Instagram link must be a valid URL';
-                    }
-                    return null;
-                  },
                 ),
                 SizedBox(height: spacing24),
                 SizedBox(

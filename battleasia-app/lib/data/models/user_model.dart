@@ -26,6 +26,7 @@ class UserModel {
   final bool? isPremium;
   final String? premiumSince;
   final String? premiumExpiresAt;
+  final String? usernameChangedAt;
 
   UserModel({
     required this.id,
@@ -52,6 +53,7 @@ class UserModel {
     this.isPremium,
     this.premiumSince,
     this.premiumExpiresAt,
+    this.usernameChangedAt,
   });
 
   /// Returns true if the user currently has an active premium subscription.
@@ -117,6 +119,7 @@ class UserModel {
           : null,
       premiumSince: json['premiumSince']?.toString(),
       premiumExpiresAt: json['premiumExpiresAt']?.toString(),
+      usernameChangedAt: json['usernameChangedAt']?.toString(),
     );
   }
 
@@ -147,6 +150,7 @@ class UserModel {
       'isPremium': isPremium,
       'premiumSince': premiumSince,
       'premiumExpiresAt': premiumExpiresAt,
+      'usernameChangedAt': usernameChangedAt,
     };
   }
 }

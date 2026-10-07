@@ -501,7 +501,18 @@
     "reportSubmitted": "Report submitted",
     "bio": "Bio",
     "noBio": "No bio yet.",
-    "live": "live"
+    "live": "live",
+    "posts": "Posts",
+    "reels": "Reels",
+    "noPosts": "No posts yet",
+    "noReels": "No reels",
+    "ownEmpty": "Share from Feed to fill this grid.",
+    "otherEmpty": "Nothing here yet.",
+    "usernameHint": "You can change your username once every 7 days.",
+    "usernameCooldown": "Username locked. Try again in {n} days.",
+    "linkInvalid": "Enter a valid http(s) URL",
+    "unfollow": "Unfollow",
+    "unfollowConfirm": "Unfollow this player?"
   },
   "footer": {
     "home": "Home"

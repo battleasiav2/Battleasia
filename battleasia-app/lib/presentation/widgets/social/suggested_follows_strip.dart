@@ -49,8 +49,21 @@ class _SuggestedFollowsStripState extends State<SuggestedFollowsStrip> {
   Future<void> _toggleFollow(Map<String, dynamic> user) async {
     final id = user['id']?.toString() ?? user['_id']?.toString() ?? '';
     if (id.isEmpty || _actionId != null) return;
-    setState(() => _actionId = id);
     final isFollowing = user['isFollowing'] == true;
+    if (isFollowing) {
+      final ok = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          content: Text('profile.unfollowConfirm'.tr()),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('feed.cancelReply'.tr())),
+            TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text('profile.unfollow'.tr())),
+          ],
+        ),
+      );
+      if (ok != true || !mounted) return;
+    }
+    setState(() => _actionId = id);
     final result = isFollowing
         ? await _userService.unfollowUser(id)
         : await _userService.followUser(id);

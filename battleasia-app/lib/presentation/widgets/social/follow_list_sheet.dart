@@ -100,9 +100,48 @@ class _FollowListSheetState extends State<FollowListSheet> {
                   final u = _users[i];
                   final id = u['id']?.toString() ?? u['_id']?.toString() ?? '';
                   final name = u['username']?.toString() ?? u['name']?.toString() ?? 'User';
+                  final following = u['isFollowing'] == true;
                   return ListTile(
                     title: Text(name),
-                    trailing: const Icon(Icons.chevron_right),
+                    trailing: TextButton(
+                      onPressed: id.isEmpty
+                          ? null
+                          : () async {
+                              if (following) {
+                                final ok = await showDialog<bool>(
+                                  context: context,
+                                  builder: (ctx) => AlertDialog(
+                                    content: Text('profile.unfollowConfirm'.tr()),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(ctx, false),
+                                        child: Text('feed.cancelReply'.tr()),
+                                      ),
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(ctx, true),
+                                        child: Text('profile.unfollow'.tr()),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                                if (ok != true || !mounted) return;
+                              }
+                              final result = following
+                                  ? await _userService.unfollowUser(id)
+                                  : await _userService.followUser(id);
+                              if (!mounted || result['success'] != true) return;
+                              setState(() {
+                                _users = _users
+                                    .map((row) {
+                                      final rowId = row['id']?.toString() ?? row['_id']?.toString() ?? '';
+                                      if (rowId != id) return row;
+                                      return {...row, 'isFollowing': !following};
+                                    })
+                                    .toList();
+                              });
+                            },
+                      child: Text(following ? 'profile.unfollow'.tr() : 'profile.follow'.tr()),
+                    ),
                     onTap: id.isEmpty
                         ? null
                         : () {
