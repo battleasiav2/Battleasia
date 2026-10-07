@@ -6,6 +6,16 @@ import 'package:battleasia_app/core/utils/api_client.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/services/auth_service.dart';
 
+class UploadTicket {
+  http.Client? client;
+  bool cancelled = false;
+
+  void cancel() {
+    cancelled = true;
+    client?.close();
+  }
+}
+
 class FeedService {
   final AuthService _authService = AuthService();
 
@@ -520,7 +530,14 @@ class FeedService {
     String filePath, {
     String folder = 'feed',
     void Function(int percent)? onProgress,
+    UploadTicket? ticket,
   }) async {
+    final client = http.Client();
+    ticket?.client = client;
+    if (ticket?.cancelled == true) {
+      client.close();
+      return {'success': false, 'cancelled': true};
+    }
     try {
       final token = await _authService.getToken();
       final request = http.MultipartRequest(
@@ -555,7 +572,7 @@ class FeedService {
         ),
       );
 
-      final streamed = await ApiClient.send(request);
+      final streamed = await client.send(request).timeout(const Duration(seconds: 60));
       final response = await http.Response.fromStream(streamed);
       final data = response.body.isEmpty
           ? <String, dynamic>{}
@@ -578,10 +595,15 @@ class FeedService {
         'message': data['message'] as String? ?? 'Upload failed',
       };
     } catch (e) {
+      if (ticket?.cancelled == true) {
+        return {'success': false, 'cancelled': true};
+      }
       return {
         'success': false,
         'message': e.toString().replaceAll('Exception: ', ''),
       };
+    } finally {
+      client.close();
     }
   }
 }

@@ -1,6 +1,8 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
@@ -71,6 +73,33 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
     setState(() {
       _watchOn = data is Map && data['watchParty'] == true;
     });
+  }
+
+  Future<void> _copyRoom() async {
+    final id = _matchDetail?.roomId?.trim() ?? '';
+    if (_matchDetail?.isJoined != true || id.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('match.roomSoon'.tr())),
+      );
+      return;
+    }
+    final pass = _matchDetail?.password?.trim() ?? '';
+    final passBit = pass.isEmpty ? '' : '  ${'match.pass'.tr()}: $pass';
+    final text = 'match.roomClip'.tr(namedArgs: {'id': id, 'pass': passBit});
+    await Clipboard.setData(ClipboardData(text: text));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('match.roomCopied'.tr())),
+    );
+  }
+
+  Future<void> _copyMatchLink() async {
+    final url = '${AppConfig.siteUrl}/user/play/${widget.matchId}/detail';
+    await Clipboard.setData(ClipboardData(text: url));
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('match.linkCopied'.tr())),
+    );
   }
 
   Future<void> _openWatch() async {
@@ -884,6 +913,19 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
               color: Colors.white,
               fontSize: bodyFontSize,
             ),
+          ),
+          Wrap(
+            spacing: 8,
+            children: [
+              TextButton(
+                onPressed: _copyRoom,
+                child: Text('match.copyRoom'.tr()),
+              ),
+              TextButton(
+                onPressed: _copyMatchLink,
+                child: Text('feed.copyLink'.tr()),
+              ),
+            ],
           ),
         ],
       ),

@@ -22,8 +22,10 @@ class _FeedComposerState extends State<FeedComposer> {
   final ImagePicker _picker = ImagePicker();
 
   String? _imagePath;
+  bool _isVideo = false;
   bool _submitting = false;
   int? _uploadPct;
+  UploadTicket? _ticket;
 
   @override
   void dispose() {
@@ -39,13 +41,32 @@ class _FeedComposerState extends State<FeedComposer> {
       imageQuality: 85,
     );
     if (file == null) return;
-    setState(() => _imagePath = file.path);
+    setState(() {
+      _imagePath = file.path;
+      _isVideo = false;
+    });
+  }
+
+  Future<void> _pickVideo() async {
+    final file = await _picker.pickVideo(source: ImageSource.gallery);
+    if (file == null) return;
+    setState(() {
+      _imagePath = file.path;
+      _isVideo = true;
+    });
+  }
+
+  void _cancelUpload() {
+    _ticket?.cancel();
   }
 
   Future<void> _submit() async {
     final description = _controller.text.trim();
     if ((description.isEmpty && _imagePath == null) || _submitting) return;
+    if (description.length > 500) return;
 
+    final ticket = UploadTicket();
+    _ticket = ticket;
     setState(() {
       _submitting = true;
       _uploadPct = _imagePath != null ? 0 : null;
@@ -58,24 +79,27 @@ class _FeedComposerState extends State<FeedComposer> {
       if (_imagePath != null) {
         final upload = await _feedService.uploadMedia(
           _imagePath!,
-          folder: 'feed',
+          folder: _isVideo ? 'reels' : 'feed',
+          ticket: ticket,
           onProgress: (pct) {
             if (mounted) setState(() => _uploadPct = pct);
           },
         );
+        if (upload['cancelled'] == true) return;
         if (upload['success'] != true) {
-          throw Exception(upload['message'] ?? 'Image upload failed');
+          throw Exception(upload['message'] ?? 'feed.postFail'.tr());
         }
         coverUrl = (upload['data'] as Map)['url']?.toString();
         if (coverUrl == null || coverUrl.isEmpty) {
-          throw Exception('Image upload failed');
+          throw Exception('feed.postFail'.tr());
         }
         mediaUrls = [coverUrl];
-        postType = 'image';
+        postType = _isVideo ? 'video' : 'image';
       }
 
+      final fallback = _isVideo ? 'feed.clip'.tr() : 'feed.photo'.tr();
       final result = await _feedService.createFeedPost(
-        description: description.isNotEmpty ? description : 'Photo',
+        description: description.isNotEmpty ? description : fallback,
         coverUrl: coverUrl,
         mediaUrls: mediaUrls,
         postType: postType,
@@ -83,7 +107,10 @@ class _FeedComposerState extends State<FeedComposer> {
 
       if (result['success'] == true) {
         _controller.clear();
-        setState(() => _imagePath = null);
+        setState(() {
+          _imagePath = null;
+          _isVideo = false;
+        });
         widget.onPosted?.call();
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -99,6 +126,7 @@ class _FeedComposerState extends State<FeedComposer> {
         );
       }
     } finally {
+      _ticket = null;
       if (mounted) {
         setState(() {
           _submitting = false;
@@ -124,6 +152,7 @@ class _FeedComposerState extends State<FeedComposer> {
             controller: _controller,
             maxLines: 3,
             minLines: 2,
+            maxLength: 500,
             style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
             decoration: InputDecoration(
               hintText: "What's on your mind?",
@@ -138,18 +167,28 @@ class _FeedComposerState extends State<FeedComposer> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(2),
-                  child: Image.file(
-                    File(_imagePath!),
-                    height: 140,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  child: _isVideo
+                      ? Container(
+                          height: 140,
+                          color: const Color(0xFF121318),
+                          alignment: Alignment.center,
+                          child: Text('feed.clip'.tr(), style: TextStyle(color: AppColors.gold)),
+                        )
+                      : Image.file(
+                          File(_imagePath!),
+                          height: 140,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
                 ),
                 Positioned(
                   top: 4,
                   right: 4,
                   child: IconButton(
-                    onPressed: () => setState(() => _imagePath = null),
+                    onPressed: () => setState(() {
+                      _imagePath = null;
+                      _isVideo = false;
+                    }),
                     icon: const Icon(Icons.close, color: Colors.white, size: 18),
                     style: IconButton.styleFrom(
                       backgroundColor: Colors.black54,
@@ -167,6 +206,13 @@ class _FeedComposerState extends State<FeedComposer> {
               'feed.progress'.tr(namedArgs: {'n': '$_uploadPct'}),
               style: AppTheme.bodySmall.copyWith(color: AppColors.gold),
             ),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                onPressed: _cancelUpload,
+                child: Text('feed.cancelUpload'.tr()),
+              ),
+            ),
           ],
           const SizedBox(height: 8),
           Row(
@@ -174,7 +220,12 @@ class _FeedComposerState extends State<FeedComposer> {
               IconButton(
                 onPressed: _submitting ? null : _pickImage,
                 icon: Icon(Icons.image_outlined, color: AppColors.gold),
-                tooltip: 'Add photo',
+                tooltip: 'feed.photo'.tr(),
+              ),
+              IconButton(
+                onPressed: _submitting ? null : _pickVideo,
+                icon: Icon(Icons.videocam_outlined, color: AppColors.gold),
+                tooltip: 'feed.clip'.tr(),
               ),
               const Spacer(),
               TextButton(

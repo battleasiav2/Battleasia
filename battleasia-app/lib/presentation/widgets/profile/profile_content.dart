@@ -36,6 +36,17 @@ class _ProfileContentState extends State<ProfileContent> {
   String? _countryCode;
   String? _phoneNumber;
   String? _selectedGameServer;
+  String _baseUsername = '';
+  String _baseEmail = '';
+  String _basePubg = '';
+  String _baseReferral = '';
+  String _baseTwitter = '';
+  String _baseFacebook = '';
+  String _baseInstagram = '';
+  String _baseBio = '';
+  String? _baseServer;
+  String? _basePhone;
+  String? _baseCountry;
   bool _isSubmitting = false;
   String? _errorMessage;
   // Premium state
@@ -43,12 +54,60 @@ class _ProfileContentState extends State<ProfileContent> {
   int _premiumDuration = 0;
   int _premiumPrice = 0;
   bool _premiumDialogOpen = false;
+  bool _watchDirty = false;
 
   @override
   void initState() {
     super.initState();
+    for (final controller in [
+      _usernameController,
+      _emailController,
+      _pubgIdController,
+      _referralCodeController,
+      _twitterLinkController,
+      _facebookLinkController,
+      _instagramLinkController,
+      _bioController,
+    ]) {
+      controller.addListener(_touch);
+    }
     _loadUserData();
+    _watchDirty = true;
     _loadPremiumDetails();
+  }
+
+  void _touch() {
+    if (!_watchDirty || !mounted) return;
+    setState(() {});
+  }
+
+  void _captureBaseline() {
+    _baseUsername = _usernameController.text;
+    _baseEmail = _emailController.text;
+    _basePubg = _pubgIdController.text;
+    _baseReferral = _referralCodeController.text;
+    _baseTwitter = _twitterLinkController.text;
+    _baseFacebook = _facebookLinkController.text;
+    _baseInstagram = _instagramLinkController.text;
+    _baseBio = _bioController.text;
+    _baseServer = _selectedGameServer;
+    _basePhone = _phoneNumber;
+    _baseCountry = _countryCode;
+  }
+
+  bool get _dirty {
+    return _usernameController.text != _baseUsername ||
+        _emailController.text != _baseEmail ||
+        _pubgIdController.text != _basePubg ||
+        _referralCodeController.text != _baseReferral ||
+        _twitterLinkController.text != _baseTwitter ||
+        _facebookLinkController.text != _baseFacebook ||
+        _instagramLinkController.text != _baseInstagram ||
+        _bioController.text != _baseBio ||
+        _selectedGameServer != _baseServer ||
+        _phoneNumber != _basePhone ||
+        _countryCode != _baseCountry ||
+        widget.pendingAvatarFile != null;
   }
 
   Future<void> _loadPremiumDetails() async {
@@ -214,6 +273,7 @@ class _ProfileContentState extends State<ProfileContent> {
       if (user.mobileNo != null) {
         _phoneNumber = user.mobileNo;
       }
+      _captureBaseline();
     }
   }
 
@@ -351,6 +411,7 @@ class _ProfileContentState extends State<ProfileContent> {
       if (widget.pendingAvatarFile != null && avatarBase64 != null) {
         widget.onAvatarSaved?.call();
       }
+      _captureBaseline();
 
       if (mounted) {
         String message =
@@ -479,7 +540,24 @@ class _ProfileContentState extends State<ProfileContent> {
       baseSize: 20.0,
     ).clamp(18.0, 20.0);
 
-    return Card(
+    return PopScope(
+      canPop: !_dirty,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop || !_dirty) return;
+        final navigator = Navigator.of(context);
+        final discard = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            content: Text('profile.unsaved'.tr()),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('common.cancel'.tr())),
+              TextButton(onPressed: () => Navigator.pop(ctx, true), child: Text('common.confirm'.tr())),
+            ],
+          ),
+        );
+        if (discard == true && mounted) navigator.pop();
+      },
+      child: Card(
       color: AppTheme.surfaceColor,
       child: Padding(
         padding: EdgeInsets.all(cardPadding),
@@ -1415,6 +1493,7 @@ class _ProfileContentState extends State<ProfileContent> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

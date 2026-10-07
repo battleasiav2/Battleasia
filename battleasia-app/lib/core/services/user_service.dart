@@ -1,5 +1,7 @@
 ﻿import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:battleasia_app/core/utils/api_client.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
@@ -57,6 +59,24 @@ class UserService {
         'message': e.toString().replaceAll('Exception: ', ''),
       };
     }
+  }
+
+  Future<void> registerPushToken() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var token = prefs.getString('ba-push-token') ?? '';
+      if (token.isEmpty) {
+        final rand = Random.secure();
+        token = 'android:${List.generate(32, (_) => rand.nextInt(16).toRadixString(16)).join()}';
+        await prefs.setString('ba-push-token', token);
+      }
+      final headers = await _getHeaders();
+      await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/users/me/push-token'),
+        headers: headers,
+        body: jsonEncode({'token': token, 'platform': 'android'}),
+      );
+    } catch (_) {}
   }
 
   /// Fetch the current user's live profile (including latest balance) from the server.

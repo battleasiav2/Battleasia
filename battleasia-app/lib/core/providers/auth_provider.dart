@@ -77,6 +77,7 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
         _connectSocket(token);
       }
       _isAuthenticated = true;
+      _userService.registerPushToken();
     } else {
       _isAuthenticated = false;
     }
@@ -110,6 +111,7 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
       if (_session != null) {
         _isAuthenticated = true;
         _connectSocket(_session!.accessToken);
+        _userService.registerPushToken();
       }
       notifyListeners();
     }
@@ -134,6 +136,7 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
     _session = session;
     _isAuthenticated = true;
     _connectSocket(session.accessToken);
+    _userService.registerPushToken();
     notifyListeners();
   }
 
@@ -178,6 +181,7 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
       _session = result['session'] as SessionModel?;
       if (_session != null) {
         _isAuthenticated = true;
+        _userService.registerPushToken();
       }
       notifyListeners();
     }

@@ -38,7 +38,16 @@
     "mediaLink": "media",
     "copyLink": "Copy link",
     "copied": "Link copied",
-    "progress": "Uploading {n}%"
+    "progress": "Uploading {n}%",
+    "cancelUpload": "Cancel upload",
+    "suggested": "Suggested",
+    "follow": "Follow",
+    "following": "Following",
+    "followFail": "Could not follow",
+    "clip": "Clip",
+    "photo": "Photo",
+    "posted": "Posted",
+    "postFail": "Could not post"
   },
   "feedHub": {
     "feed": "Feed",
@@ -472,7 +481,13 @@
     "filterEmpty": "No rooms in this filter",
     "filterEmptyLead": "Try another filter or show all rooms.",
     "cancel": "Cancel",
-    "free": "Free"
+    "free": "Free",
+    "copyRoom": "Copy room",
+    "roomCopied": "Room copied",
+    "roomSoon": "Room not available yet",
+    "roomClip": "Room: {id}{pass}",
+    "pass": "Pass",
+    "linkCopied": "Link copied"
   },
   "common": {
     "retry": "Retry",
@@ -540,7 +555,13 @@
     "emailLocked": "Email can’t be changed",
     "highlights": "Highlights",
     "noHighlights": "No highlights",
-    "highlightsLead": "Pin a story from the viewer while Highlights is on in Admin P1."
+    "highlightsLead": "Pin a story from the viewer while Highlights is on in Admin P1.",
+    "postsN": "posts",
+    "wins": "wins",
+    "followingN": "following",
+    "serverTbd": "server TBD",
+    "unsaved": "Discard unsaved profile changes?",
+    "unfollowed": "Unfollowed"
   },
   "stats": {
     "matches": "Matches",

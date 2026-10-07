@@ -6,6 +6,7 @@ import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/feed_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
@@ -17,6 +18,7 @@ import 'package:battleasia_app/presentation/widgets/feed/feed_item.dart';
 import 'package:battleasia_app/presentation/widgets/feed/feed_composer.dart';
 import 'package:battleasia_app/presentation/widgets/feed/stories_bar.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
+import 'package:battleasia_app/presentation/screens/profile/public_profile_screen.dart';
 
 class FeedScreen extends StatefulWidget {
   const FeedScreen({
@@ -385,6 +387,8 @@ class _FeedScreenState extends State<FeedScreen> {
                         const StoriesBar(),
                         SizedBox(height: spacing16),
                         FeedComposer(onPosted: () => _fetchFeeds()),
+                        SizedBox(height: spacing16),
+                        const _FeedSuggestRow(),
                         SizedBox(height: spacing16),
                         _buildFeedModes(context),
                         if (_gameFeed || _muteOn) ...[
@@ -856,5 +860,137 @@ class _FeedScreenState extends State<FeedScreen> {
       case FeedHubSection.feed:
         return const SizedBox.shrink();
     }
+  }
+}
+
+class _FeedSuggestRow extends StatefulWidget {
+  const _FeedSuggestRow();
+
+  @override
+  State<_FeedSuggestRow> createState() => _FeedSuggestRowState();
+}
+
+class _FeedSuggestRowState extends State<_FeedSuggestRow> {
+  final UserService _users = UserService();
+  List<Map<String, dynamic>> _rows = [];
+  String? _busyId;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final result = await _users.getSuggestedFollows();
+    if (!mounted || result['success'] != true) return;
+    final data = result['data'];
+    final list = data is List
+        ? data
+        : (data is Map ? (data['results'] as List? ?? data['users'] as List? ?? const []) : const []);
+    setState(() {
+      _rows = list
+          .take(8)
+          .map((row) => Map<String, dynamic>.from(row as Map))
+          .toList();
+    });
+  }
+
+  Future<void> _toggle(Map<String, dynamic> user) async {
+    final id = user['id']?.toString() ?? user['_id']?.toString() ?? '';
+    if (id.isEmpty || _busyId != null) return;
+    final following = user['isFollowing'] == true;
+    setState(() => _busyId = id);
+    final result = following ? await _users.unfollowUser(id) : await _users.followUser(id);
+    if (!mounted) return;
+    setState(() {
+      _busyId = null;
+      if (result['success'] == true) {
+        final index = _rows.indexWhere(
+          (row) => (row['id']?.toString() ?? row['_id']?.toString()) == id,
+        );
+        if (index >= 0) _rows[index] = {..._rows[index], 'isFollowing': !following};
+      }
+    });
+    final name = user['username']?.toString() ?? user['name']?.toString() ?? '';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          result['success'] == true
+              ? (following ? 'profile.unfollowed'.tr() : '${'feed.following'.tr()} $name')
+              : (result['message']?.toString() ?? 'feed.followFail'.tr()),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_rows.isEmpty) return const SizedBox.shrink();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'feed.suggested'.tr(),
+          style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          height: 148,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: _rows.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 8),
+            itemBuilder: (context, index) {
+              final user = _rows[index];
+              final id = user['id']?.toString() ?? user['_id']?.toString() ?? '';
+              final name = user['username']?.toString() ?? user['name']?.toString() ?? '';
+              final avatar = ImageUtils.getImageUrl(user['avatar']?.toString());
+              final following = user['isFollowing'] == true;
+              return Container(
+                width: 120,
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF161618),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                ),
+                child: Column(
+                  children: [
+                    GestureDetector(
+                      onTap: id.isEmpty
+                          ? null
+                          : () => Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (_) => PublicProfileScreen(userId: id)),
+                              ),
+                      child: CircleAvatar(
+                        radius: 28,
+                        backgroundImage: avatar == null || avatar.isEmpty ? null : NetworkImage(avatar),
+                        child: avatar == null || avatar.isEmpty
+                            ? Text(name.isEmpty ? '?' : name[0].toUpperCase())
+                            : null,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTheme.bodySmall.copyWith(color: Colors.white),
+                    ),
+                    const Spacer(),
+                    TextButton(
+                      onPressed: _busyId == id ? null : () => _toggle(user),
+                      child: Text(following ? 'profile.following'.tr() : 'feed.follow'.tr()),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
   }
 }

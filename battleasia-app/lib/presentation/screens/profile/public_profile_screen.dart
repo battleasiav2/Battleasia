@@ -9,6 +9,7 @@ import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
+import 'package:battleasia_app/core/utils/link_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/public_user_model.dart';
 import 'package:battleasia_app/presentation/screens/feed/feed_detail_screen.dart';
@@ -41,6 +42,12 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
   bool _followLoading = false;
   int _followersCount = 0;
   int _followingCount = 0;
+  int _postsCount = 0;
+  int _careerWins = 0;
+  int _careerKills = 0;
+  String _instagram = '';
+  String _twitter = '';
+  String _facebook = '';
   bool _loading = true;
   int _gamesPlayed = 0;
   int _totalKills = 0;
@@ -81,8 +88,17 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
           _viewingUser = user;
           _isFollowing = userData['isFollowing'] ?? false;
           _isBlocked = userData['isBlocked'] == true;
-          _followersCount = userData['followersCount'] ?? 0;
-          _followingCount = userData['followingCount'] ?? 0;
+          _followersCount = _asInt(userData['followersCount'] ?? userData['followers']);
+          _followingCount = _asInt(userData['followingCount'] ?? userData['following']);
+          _postsCount = _asInt(userData['posts']);
+          final stats = userData['gamingStats'];
+          if (stats is Map) {
+            _careerWins = _asInt(stats['totalWins']);
+            _careerKills = _asInt(stats['totalKills']);
+          }
+          _instagram = userData['instagramLink']?.toString() ?? '';
+          _twitter = userData['twitterLink']?.toString() ?? '';
+          _facebook = userData['facebookLink']?.toString() ?? '';
         });
 
         await _fetchUserStats();
@@ -472,6 +488,20 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
     );
   }
 
+  int _asInt(dynamic value) {
+    if (value is num) return value.toInt();
+    return int.tryParse('$value') ?? 0;
+  }
+
+  String _tier(int wins) {
+    if (wins >= 50) return 'Elite';
+    if (wins >= 20) return 'Diamond';
+    if (wins >= 8) return 'Platinum';
+    if (wins >= 3) return 'Gold';
+    if (wins >= 1) return 'Silver';
+    return 'Bronze';
+  }
+
   Widget _buildProfileHeader() {
     return Card(
       color: Colors.white,
@@ -543,10 +573,23 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
             ],
             const SizedBox(height: 8),
             Text(
+              '${_tier(_careerWins)} · $_careerWins ${'profile.wins'.tr()} · $_careerKills ${'profile.kills'.tr()}',
+              textAlign: TextAlign.center,
+              style: AppTheme.bodySmall.copyWith(color: Colors.black87, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 6),
+            Text(
               _viewingUser!.bio.trim().isEmpty ? 'profile.noBio'.tr() : _viewingUser!.bio,
               textAlign: TextAlign.center,
               style: AppTheme.bodyMedium.copyWith(color: Colors.black87),
             ),
+            const SizedBox(height: 4),
+            Text(
+              'PUBG ${_viewingUser!.pubgId?.trim().isNotEmpty == true ? _viewingUser!.pubgId : '—'} · ${_viewingUser!.gameServer?.trim().isNotEmpty == true ? _viewingUser!.gameServer : 'profile.serverTbd'.tr()}',
+              textAlign: TextAlign.center,
+              style: AppTheme.bodySmall.copyWith(color: Colors.black54),
+            ),
+            _buildSocialLinks(),
             if (context.read<AuthProvider>().user?.id == widget.userId)
               TextButton(
                 onPressed: () async {
@@ -563,6 +606,11 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _buildStatItem(
+                  'profile.postsN'.tr(),
+                  (_postsCount > 0 ? _postsCount : _posts.length).toString(),
+                ),
+                const SizedBox(width: 24),
+                _buildStatItem(
                   'profile.followers'.tr(),
                   _followersCount.toString(),
                   onTap: () => _openFollowList(FollowListType.followers),
@@ -577,6 +625,29 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSocialLinks() {
+    final links = <(String, String)>[
+      if (_instagram.startsWith('http')) ('Instagram', _instagram),
+      if (_twitter.startsWith('http')) ('X', _twitter),
+      if (_facebook.startsWith('http')) ('Facebook', _facebook),
+    ];
+    if (links.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Wrap(
+        alignment: WrapAlignment.center,
+        spacing: 12,
+        children: [
+          for (final link in links)
+            TextButton(
+              onPressed: () => LinkUtils.openExternal(link.$2),
+              child: Text(link.$1),
+            ),
+        ],
       ),
     );
   }
