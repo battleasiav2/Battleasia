@@ -149,9 +149,24 @@ svg {
     white-space: nowrap;
   }
 
+  .play-hud .hud-bell {
+    order: 3;
+    display: inline-grid;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    flex-shrink: 0;
+  }
+
+  .play-hud .hud-bell svg {
+    width: 18px;
+    height: 18px;
+  }
+
   .play-hud .nav-burger {
     display: grid;
-    order: 3;
+    order: 4;
     margin-left: 0;
   }
 

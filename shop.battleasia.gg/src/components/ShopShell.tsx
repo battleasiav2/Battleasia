@@ -4,7 +4,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { HudProvider, useHud } from '../contexts/HudContext';
 import { ASSETS } from '../lib/assets';
 import { fetchMe, getMainAppUrl, isShopAuthed, leaveShop, patchSessionBalance, readSessionUser } from '../lib/auth';
-import { isApiError } from '../lib/api';
+import { api, isApiError, unwrapList } from '../lib/api';
 import { shopUntil } from '../lib/shopSession';
 import { useI18n } from '../lib/i18n';
 import { getAuthedSocket } from '../lib/socket';
@@ -29,6 +29,7 @@ function ShopChrome() {
   const [balance, setBalance] = useState(Number(readSessionUser()?.balance) || 0);
   const [hide, setHide] = useState(() => sessionStorage.getItem('ba-shop-hide-balance') === '1');
   const [navOpen, setNavOpen] = useState(false);
+  const [alerts, setAlerts] = useState(0);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -109,11 +110,14 @@ function ShopChrome() {
         setBalance(next);
         patchSessionBalance(next);
       };
+      const onNote = () => setAlerts((n) => n + 1);
       sock.on('balance-updated', onBal);
       sock.on('user-stats-updated', onBal);
+      sock.on('new-notification', onNote);
       off = () => {
         sock.off('balance-updated', onBal);
         sock.off('user-stats-updated', onBal);
+        sock.off('new-notification', onNote);
       };
     });
     return () => off?.();
@@ -122,6 +126,19 @@ function ShopChrome() {
   useEffect(() => {
     setNavOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!isShopAuthed()) return;
+    const id = window.setTimeout(() => {
+      api('/api/v2/notifications?limit=40')
+        .then((payload) => {
+          const rows = unwrapList<{ isUnRead?: boolean }>(payload);
+          setAlerts(rows.filter((row) => row.isUnRead).length);
+        })
+        .catch(() => undefined);
+    }, 1400);
+    return () => window.clearTimeout(id);
+  }, []);
 
   useEffect(() => {
     if (!navOpen) return;
@@ -173,6 +190,20 @@ function ShopChrome() {
         </nav>
         <div className="play-hud-right">
           <ThemeDock />
+          <a
+            className="hud-bell"
+            href={getMainAppUrl('/user/account/notifications')}
+            aria-label={t('hud.alerts')}
+            title={t('hud.alerts')}
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path
+                d="M6 17h12l-1.4-2.1V11a4.6 4.6 0 0 0-3.1-4.3V6a1.5 1.5 0 1 0-3 0v.7A4.6 4.6 0 0 0 7.4 11v3.9L6 17Zm6 3a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2Z"
+                fill="currentColor"
+              />
+            </svg>
+            {alerts > 0 ? <span className="hud-dot">{alerts > 9 ? '9+' : alerts}</span> : null}
+          </a>
           <button type="button" className="balance-pill hud-balance" onClick={toggleBalance}>
             {hide ? <span className="coin"><b>**** BAC</b></span> : <CoinValue value={balance} />}
           </button>

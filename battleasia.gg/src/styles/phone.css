@@ -432,7 +432,7 @@ svg {
   }
 
   .play-hud-rail-foot .play-hud-rail-tools {
-    display: none;
+    display: contents;
   }
 
   .play-hud .hud-bell {

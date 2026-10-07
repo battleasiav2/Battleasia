@@ -111,6 +111,47 @@
   min-height: 34px;
 }
 
+.hud-bell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--ba-hair);
+  background: color-mix(in srgb, var(--ba-text) 3%, transparent);
+  color: var(--ba-muted);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.hud-bell svg {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.hud-bell:hover {
+  color: var(--ba-text);
+  background: color-mix(in srgb, var(--ba-text) 8%, transparent);
+}
+
+.hud-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: var(--ba-danger, #ff5c7a);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
+
 .balance-pill {
   display: inline-flex;
   align-items: center;
