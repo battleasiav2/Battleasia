@@ -13,6 +13,7 @@ import { GamingCursor } from '../GamingCursor';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { LocaleSelect } from '../LocaleSelect';
 import { MobileDrawer } from '../MobileDrawer';
+import { NoticeDrawer } from '../NoticeDrawer';
 import { ThemeDock } from '../ThemeDock';
 import { UserAvatar } from '../UserAvatar';
 import { openBacShop } from '../../lib/wallet';
@@ -35,6 +36,7 @@ function UserChrome() {
   const [pop, setPop] = useState<'more' | 'user' | null>(null);
   const [muted, setMuted] = useState(() => localStorage.getItem('ba-mute') === '1');
   const [alerts, setAlerts] = useState(0);
+  const [notesOpen, setNotesOpen] = useState(false);
   const [labsOn, setLabsOn] = useState(false);
   const [me, setMe] = useState(readSessionUser());
 
@@ -343,6 +345,12 @@ function UserChrome() {
               to="/user/account/notifications"
               aria-label={t('hud.alerts')}
               title={t('hud.alerts')}
+              onClick={(e) => {
+                if (window.matchMedia('(max-width: 820px)').matches) {
+                  e.preventDefault();
+                  setNotesOpen(true);
+                }
+              }}
             >
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
                 <path
@@ -381,6 +389,7 @@ function UserChrome() {
           </button>
         </div>
       </header>
+      <NoticeDrawer open={notesOpen} onClose={() => setNotesOpen(false)} onCount={setAlerts} />
       <MobileDrawer
         open={navOpen}
         onClose={closeNav}

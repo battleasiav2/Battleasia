@@ -46,17 +46,39 @@ class _NotificationsDrawerButtonState extends State<NotificationsDrawerButton> {
   }
 
   Future<void> _openSheet() async {
-    await showModalBottomSheet<void>(
+    await showGeneralDialog<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => _NotificationsSheet(
-        onUnreadChanged: (count) {
-          if (mounted) setState(() => _unreadCount = count);
-        },
-      ),
+      barrierDismissible: true,
+      barrierLabel: 'Close',
+      barrierColor: Colors.black54,
+      transitionDuration: const Duration(milliseconds: 280),
+      pageBuilder: (dialogContext, _, __) {
+        final size = MediaQuery.sizeOf(dialogContext);
+        return Align(
+          alignment: Alignment.centerRight,
+          child: Material(
+            color: Colors.transparent,
+            child: SizedBox(
+              width: size.width > 520 ? 420 : size.width * 0.92,
+              height: size.height,
+              child: _NotificationsSheet(
+                onUnreadChanged: (count) {
+                  if (mounted) setState(() => _unreadCount = count);
+                },
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (context, animation, secondary, child) {
+        final offset = Tween<Offset>(
+          begin: const Offset(1, 0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
+        return SlideTransition(position: offset, child: child);
+      },
     );
-    _prefetchUnread();
+    if (mounted) _prefetchUnread();
   }
 
   @override
@@ -206,32 +228,20 @@ class _NotificationsSheetState extends State<_NotificationsSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.sizeOf(context).height * 0.72;
+    final top = MediaQuery.paddingOf(context).top;
     final bottom = MediaQuery.paddingOf(context).bottom;
 
     return Container(
-      height: height,
+      height: double.infinity,
       decoration: BoxDecoration(
         color: const Color(0xFF060607),
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.09)),
+        border: Border(
+          left: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        ),
       ),
       child: Column(
         children: [
-          Container(
-            height: 3,
-            margin: const EdgeInsets.fromLTRB(24, 0, 24, 0),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(2),
-              gradient: LinearGradient(
-                colors: [
-                  Colors.transparent,
-                  AppColors.gold.withValues(alpha: 0.95),
-                  Colors.transparent,
-                ],
-              ),
-            ),
-          ),
+          SizedBox(height: top),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
             child: Row(
@@ -253,10 +263,11 @@ class _NotificationsSheetState extends State<_NotificationsSheet> {
                     icon: Icon(Icons.done_all, color: AppColors.gold),
                   ),
                 IconButton(
+                  tooltip: 'Close',
                   onPressed: () => Navigator.pop(context),
                   icon: Icon(
                     Icons.close,
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: Colors.white.withValues(alpha: 0.9),
                   ),
                 ),
               ],

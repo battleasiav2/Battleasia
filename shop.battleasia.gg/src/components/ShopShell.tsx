@@ -12,6 +12,7 @@ import { CoinValue } from './CoinValue';
 import { GamingCursor } from './GamingCursor';
 import { LocaleSelect } from './LocaleSelect';
 import { DrawerIcons } from './MobileDrawer';
+import { NoticeDrawer } from './NoticeDrawer';
 import { ThemeDock } from './ThemeDock';
 
 function inEditable(target: EventTarget | null) {
@@ -30,6 +31,7 @@ function ShopChrome() {
   const [hide, setHide] = useState(() => sessionStorage.getItem('ba-shop-hide-balance') === '1');
   const [navOpen, setNavOpen] = useState(false);
   const [alerts, setAlerts] = useState(0);
+  const [notesOpen, setNotesOpen] = useState(false);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -195,6 +197,12 @@ function ShopChrome() {
             href={getMainAppUrl('/user/account/notifications')}
             aria-label={t('hud.alerts')}
             title={t('hud.alerts')}
+            onClick={(e) => {
+              if (window.matchMedia('(max-width: 820px)').matches) {
+                e.preventDefault();
+                setNotesOpen(true);
+              }
+            }}
           >
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
               <path
@@ -220,6 +228,7 @@ function ShopChrome() {
           </button>
         </div>
       </header>
+      <NoticeDrawer open={notesOpen} onClose={() => setNotesOpen(false)} onCount={setAlerts} />
       {navOpen
         ? createPortal(
             <div className="m-drawer m-drawer--landing" role="dialog" aria-modal="true" aria-label={t('nav.shop')}>

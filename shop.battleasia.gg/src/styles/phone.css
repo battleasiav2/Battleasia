@@ -777,3 +777,131 @@ svg {
   font-weight: 700;
   cursor: pointer;
 }
+
+.note-drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.note-drawer-bg {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.55);
+  cursor: pointer;
+}
+
+.note-drawer-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(420px, 92%);
+  height: 100%;
+  background: #0b0c10;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: -24px 0 48px rgba(0, 0, 0, 0.45);
+  animation: note-drawer-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@keyframes note-drawer-in {
+  from { transform: translateX(100%); }
+}
+
+.note-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: calc(16px + env(safe-area-inset-top)) 16px 8px;
+}
+
+.note-drawer-head h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.note-drawer-x {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.note-drawer-tools {
+  padding: 0 16px 12px;
+}
+
+.note-drawer-mark {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.note-drawer-mark:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.note-drawer-list {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 0 16px 16px;
+}
+
+.note-drawer-empty {
+  margin: 24px 0;
+  color: var(--ba-muted);
+}
+
+.note-drawer .note-item {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(8, 9, 12, 0.35);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.note-drawer .note-item.is-unread {
+  border-color: rgba(212, 232, 42, 0.45);
+  background: rgba(212, 232, 42, 0.08);
+}
+
+.note-drawer .note-item-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.note-drawer .note-item small {
+  color: var(--ba-muted);
+}
