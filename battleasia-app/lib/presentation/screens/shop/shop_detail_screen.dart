@@ -1115,8 +1115,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: spacing16),
-                        _buildBackButton(context),
-                        SizedBox(height: spacing24),
                         _buildItemContent(context),
                         SizedBox(height: spacing24),
                       ],
@@ -1134,32 +1132,6 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
           ),
           const ShopSectionNav(active: ShopNavTab.shop),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBackButton(BuildContext context) {
-    return Material(
-      color: AppTheme.surfaceColor,
-      borderRadius: BorderRadius.circular(8),
-      child: InkWell(
-        onTap: () => Navigator.pop(context),
-        borderRadius: BorderRadius.circular(8),
-        child: const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.arrow_back, size: 22, color: Colors.black),
-              SizedBox(width: 8),
-              Text('Back',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14)),
-            ],
-          ),
-        ),
       ),
     );
   }

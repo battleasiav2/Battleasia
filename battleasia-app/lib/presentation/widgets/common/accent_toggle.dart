@@ -53,27 +53,15 @@ class AccentToggle extends StatelessWidget {
           )
           .toList(),
       child: Container(
-        width: 42,
-        height: 42,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.06),
-          shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-        ),
-        child: Center(
-          child: Container(
-            width: 18,
-            height: 18,
-            decoration: BoxDecoration(
-              color: AppColors.gold,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.gold.withValues(alpha: 0.45),
-                  blurRadius: 8,
-                ),
-              ],
-            ),
+        width: 32,
+        height: 32,
+        alignment: Alignment.center,
+        child: Container(
+          width: 14,
+          height: 14,
+          decoration: BoxDecoration(
+            color: AppColors.gold,
+            shape: BoxShape.circle,
           ),
         ),
       ),

@@ -18,7 +18,6 @@ import 'package:battleasia_app/presentation/widgets/play/join_arena_card.dart';
 import 'package:battleasia_app/presentation/widgets/play/match_join_sheet.dart';
 import 'package:battleasia_app/presentation/widgets/play/room_seats_dialog.dart';
 import 'package:battleasia_app/core/utils/link_utils.dart';
-import 'package:battleasia_app/presentation/screens/play/play_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/match_detail_screen.dart';
 import 'package:battleasia_app/presentation/screens/play/match_result_screen.dart';
 
@@ -544,11 +543,6 @@ class _MatchScreenState extends State<MatchScreen> {
       baseSize: 16.0,
     ).clamp(8.0, 16.0);
     
-    final verticalPadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(8.0, 16.0);
-    
     final topPadding = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 100.0,
@@ -559,13 +553,6 @@ class _MatchScreenState extends State<MatchScreen> {
       baseSize: 16.0,
       min: 12.0,
       max: 18.0,
-    );
-    
-    final backFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 18.0,
-      min: 14.0,
-      max: 20.0,
     );
 
     return Scaffold(
@@ -580,51 +567,6 @@ class _MatchScreenState extends State<MatchScreen> {
               // Add top padding for header
               SliverToBoxAdapter(child: SizedBox(height: topPadding)),
               const SliverToBoxAdapter(child: NetworkStatusBanner()),
-
-              // Back button
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: horizontalPadding,
-                    vertical: verticalPadding,
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PlayScreen(),
-                        ),
-                      );
-                    },
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.arrow_back,
-                          color: AppTheme.textPrimary,
-                          size: ResponsiveUtils.getResponsiveSpacing(
-                            context,
-                            baseSize: 24.0,
-                          ).clamp(20.0, 24.0),
-                        ),
-                        SizedBox(
-                          width: ResponsiveUtils.getResponsiveSpacing(
-                            context,
-                            baseSize: 8.0,
-                          ).clamp(4.0, 8.0),
-                        ),
-                        Text(
-                          'Back',
-                          style: AppTheme.bodyLarge.copyWith(
-                            color: AppTheme.textPrimary,
-                            fontSize: backFontSize,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
 
               SliverToBoxAdapter(
                 child: Padding(

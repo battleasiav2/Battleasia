@@ -80,15 +80,6 @@ class _LabsScreenState extends State<LabsScreen> {
             controller: _scroll,
             padding: const EdgeInsets.fromLTRB(16, 108, 16, 120),
             children: [
-              if (spec != null)
-                TextButton.icon(
-                  onPressed: () => Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LabsScreen()),
-                  ),
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  label: Text('labs.back'.tr(), style: const TextStyle(color: Colors.white)),
-                ),
               Text(
                 spec?.$4 ?? 'nav.labs'.tr(),
                 style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700, height: 1.1),
@@ -127,7 +118,7 @@ class _LabsScreenState extends State<LabsScreen> {
       title: Text(row.$4, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
       subtitle: Text(on ? 'labs.on'.tr() : 'labs.off'.tr(), style: TextStyle(color: on ? AppColors.gold : Colors.white54)),
       onTap: () {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => LabsScreen(path: row.$2)),
         );

@@ -505,24 +505,12 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       context,
       baseSize: 16.0,
     ).clamp(8.0, 16.0);
-    
-    final verticalPadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(8.0, 16.0);
     final bottomPadding = 80.0 + MediaQuery.of(context).padding.bottom;
 
     final topPadding = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 100.0,
     ).clamp(80.0, 100.0);
-    
-    final backFontSize = ResponsiveUtils.getResponsiveFontSize(
-      context,
-      baseSize: 18.0,
-      min: 14.0,
-      max: 20.0,
-    );
     
     if (_isLoading || _matchDetail == null) {
       return Scaffold(
@@ -587,44 +575,6 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
             slivers: [
               // Add top padding for header
               SliverToBoxAdapter(child: SizedBox(height: topPadding)),
-
-              // Back button
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: horizontalPadding,
-                    vertical: verticalPadding,
-                  ),
-                  child: InkWell(
-                    onTap: _handleBack,
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.arrow_back,
-                          color: AppTheme.textPrimary,
-                          size: ResponsiveUtils.getResponsiveSpacing(
-                            context,
-                            baseSize: 24.0,
-                          ).clamp(20.0, 24.0),
-                        ),
-                        SizedBox(
-                          width: ResponsiveUtils.getResponsiveSpacing(
-                            context,
-                            baseSize: 8.0,
-                          ).clamp(4.0, 8.0),
-                        ),
-                        Text(
-                          'Back',
-                          style: AppTheme.bodyLarge.copyWith(
-                            color: AppTheme.textPrimary,
-                            fontSize: backFontSize,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
 
               // Main content
               SliverToBoxAdapter(

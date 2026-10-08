@@ -30,7 +30,7 @@ class AppHeader extends StatelessWidget {
       baseSize: isMobile ? 28.0 : 36.0,
     ).clamp(isMobile ? 26.0 : 32.0, 40.0);
     final topInset = MediaQuery.of(context).padding.top;
-    final gap = isMobile ? 6.0 : 12.0;
+    final gap = isMobile ? 2.0 : 8.0;
     final canPop = Navigator.canPop(context);
 
     return Container(
@@ -40,10 +40,10 @@ class AppHeader extends StatelessWidget {
         horizontalPadding,
         isMobile ? 8 : 12,
       ),
-      decoration: BoxDecoration(
-        color: const Color(0xF00A0A0A),
+      decoration: const BoxDecoration(
+        color: Color(0xFF0B0C10),
         border: Border(
-          bottom: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+          bottom: BorderSide(color: Color(0x14FFFFFF)),
         ),
       ),
       child: Row(

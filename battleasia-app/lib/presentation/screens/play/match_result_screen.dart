@@ -217,11 +217,6 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
       baseSize: 16.0,
     ).clamp(8.0, 16.0);
 
-    final verticalPadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(8.0, 16.0);
-
     final topPadding = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 100.0,
@@ -275,44 +270,6 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
             controller: _scrollController,
             slivers: [
               SliverToBoxAdapter(child: SizedBox(height: topPadding)),
-
-              // Back button
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: horizontalPadding,
-                    vertical: verticalPadding,
-                  ),
-                  child: InkWell(
-                    onTap: () => Navigator.pop(context),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.arrow_back,
-                          color: AppTheme.textPrimary,
-                          size: ResponsiveUtils.getResponsiveSpacing(
-                            context,
-                            baseSize: 24.0,
-                          ).clamp(20.0, 24.0),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Back',
-                          style: AppTheme.bodyLarge.copyWith(
-                            color: AppTheme.textPrimary,
-                            fontSize: ResponsiveUtils.getResponsiveFontSize(
-                              context,
-                              baseSize: 18.0,
-                              min: 14.0,
-                              max: 20.0,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
 
               // Main content
               SliverToBoxAdapter(

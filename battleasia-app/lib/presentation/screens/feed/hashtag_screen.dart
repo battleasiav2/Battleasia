@@ -75,13 +75,6 @@ class _HashtagScreenState extends State<HashtagScreen> {
             controller: _scroll,
             padding: const EdgeInsets.fromLTRB(16, 108, 16, 120),
             children: [
-              TextButton(
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const FeedScreen()),
-                ),
-                child: Text('feed.back'.tr(), style: const TextStyle(color: Colors.white)),
-              ),
               Text('#$_hash', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               Text(
