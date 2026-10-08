@@ -13,7 +13,6 @@ import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
 import 'package:battleasia_app/presentation/widgets/common/glass_stat_tile.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_item_card.dart';
-import 'package:battleasia_app/presentation/widgets/common/glass_card.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_buy_flow.dart';
 
@@ -253,8 +252,25 @@ class _ShopScreenState extends State<ShopScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const SizedBox(height: 12),
-                      _buildHero(),
+                      const SizedBox(height: 8),
+                      Text(
+                        'nav.shop'.tr(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          height: 1.1,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'shop.heroSubtitle'.tr(),
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.62),
+                          fontSize: 13,
+                          height: 1.35,
+                        ),
+                      ),
                       const SizedBox(height: 14),
                       _buildStats(balance),
                       if (screenWidth < 900 || _loading) ...[
@@ -392,65 +408,6 @@ class _ShopScreenState extends State<ShopScreen> {
             child: AppHeader(scrollController: _scrollController),
           ),
           const ShopSectionNav(active: ShopNavTab.shop),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHero() {
-    return Container(
-      width: double.infinity,
-      constraints: const BoxConstraints(minHeight: 148),
-      decoration: BoxDecoration(
-        color: AppColors.panelFill(0.45),
-        borderRadius: BorderRadius.circular(AppColors.radius),
-        border: Border.all(color: AppColors.hair()),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: Opacity(
-              opacity: 0.55,
-              child: Image.asset(
-                'assets/images/shop/bac-store-hero.webp',
-                fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const SizedBox.shrink(),
-              ),
-            ),
-          ),
-          Positioned(
-            left: 0,
-            top: 0,
-            bottom: 0,
-            child: Container(width: 2, color: AppColors.gold),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(18, 20, 18, 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'shop.heroTitle'.tr(),
-                  style: AppTheme.heading2.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.2,
-                    fontSize: 22,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'shop.heroSubtitle'.tr(),
-                  style: AppTheme.bodySmall.copyWith(
-                    color: Colors.white.withValues(alpha: 0.72),
-                    height: 1.35,
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
