@@ -61,7 +61,7 @@ class GlassStatTile extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          label.toUpperCase(),
+          label,
           style: AppTheme.bodySmall.copyWith(
             color: AppColors.textMuted.withValues(alpha: 0.85),
             fontSize: 10,
@@ -96,7 +96,7 @@ class GlassStatTile extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                label.toUpperCase(),
+                label,
                 style: AppTheme.bodySmall.copyWith(
                   color: AppColors.textMuted.withValues(alpha: 0.85),
                   fontSize: 10,

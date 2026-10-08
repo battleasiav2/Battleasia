@@ -31,7 +31,7 @@ String _supportStatusLabel(String status) => switch (status.toLowerCase()) {
       'open' => 'support.filterOpen'.tr(),
       'pending' => 'support.filterPending'.tr(),
       'closed' => 'support.filterClosed'.tr(),
-      _ => status.toUpperCase(),
+      _ => status,
     };
 
 class CustomerSupportScreen extends StatefulWidget {
@@ -519,7 +519,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          cell.$1.toUpperCase(),
+                          cell.$1,
                           style: AppTheme.bodySmall.copyWith(
                             color: Colors.white.withValues(alpha: 0.45),
                             fontSize: 10,
@@ -658,7 +658,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                                                   Text(
                                                     _supportStatusLabel(
                                                       t.status,
-                                                    ).toUpperCase(),
+                                                    ),
                                                     style: TextStyle(
                                                       color: _statusColor(
                                                         t.status,
@@ -826,7 +826,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                 const SizedBox(width: 8),
                 Text(
                   _supportCategoryLabel(_conversation?.category ?? 'other')
-                      .toUpperCase(),
+                      ,
                   style: AppTheme.bodySmall.copyWith(
                     color: AppColors.gold,
                     fontWeight: FontWeight.w700,

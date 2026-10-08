@@ -742,7 +742,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
           children: [
             _buildInfoCard(
               'Team',
-              _matchDetail!.teamType?.toUpperCase() ?? 'N/A',
+              _matchDetail!.teamType ?? 'N/A',
             ),
             _buildInfoCard(
               'Entry Fee',
@@ -754,7 +754,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
             ),
             _buildInfoCard(
               'Match Type',
-              _matchDetail!.matchType?.toUpperCase() ?? 'N/A',
+              _matchDetail!.matchType ?? 'N/A',
             ),
           ],
         ),

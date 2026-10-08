@@ -212,7 +212,7 @@ class ShopItemCard extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        item.badge.toUpperCase(),
+                        item.badge,
                         style: TextStyle(
                           fontSize: badgeSize,
                           color: badgeColor,

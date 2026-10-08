@@ -286,7 +286,7 @@ class _MyMatchesScreenState extends State<MyMatchesScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  cell.$1.toUpperCase(),
+                  cell.$1,
                   style: AppTheme.bodySmall.copyWith(
                     color: Colors.white.withValues(alpha: 0.45),
                     fontSize: 10,

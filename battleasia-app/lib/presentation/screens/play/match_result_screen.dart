@@ -449,7 +449,7 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
             ),
             _buildInfoTile(
               'Type',
-              _match!.matchType?.toUpperCase() ?? 'N/A',
+              _match!.matchType ?? 'N/A',
             ),
             _buildInfoTile(
               'Map',
@@ -457,7 +457,7 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
             ),
             _buildInfoTile(
               'Team',
-              _match!.teamType?.toUpperCase() ?? 'N/A',
+              _match!.teamType ?? 'N/A',
             ),
             _buildInfoTile(
               'Per Kill',
@@ -517,7 +517,7 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            label.toUpperCase(),
+            label,
             style: TextStyle(
               color: AppTheme.textSecondary,
               fontSize: labelFontSize,

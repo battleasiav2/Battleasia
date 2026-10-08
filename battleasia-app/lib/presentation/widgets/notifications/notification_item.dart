@@ -72,7 +72,7 @@ class NotificationItem extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          _titleText.toUpperCase(),
+                          _titleText,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppTheme.bodyMedium.copyWith(

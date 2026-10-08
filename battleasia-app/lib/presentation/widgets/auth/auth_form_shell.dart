@@ -459,7 +459,7 @@ class AuthSecondaryButton extends StatelessWidget {
           letterSpacing: 0.8,
         ),
       ),
-      child: Text(label.toUpperCase()),
+      child: Text(label),
     );
   }
 }

@@ -564,7 +564,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         child: Text(
-          label.toUpperCase(),
+          label,
           style: const TextStyle(
             fontWeight: FontWeight.w900,
             letterSpacing: 0.6,

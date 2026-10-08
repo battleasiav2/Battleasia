@@ -517,7 +517,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              label.toUpperCase(),
+              label,
               style: AppTheme.bodySmall.copyWith(
                 color: AppColors.textMuted,
                 fontSize: 10,

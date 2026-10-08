@@ -133,8 +133,7 @@ class MatchJoinSheet extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      '${match.map ?? 'match.mapTbd'.tr()} · ${match.teamType ?? 'Solo'} · ${match.gameName}'
-                          .toUpperCase(),
+                      '${match.map ?? 'match.mapTbd'.tr()} · ${match.teamType ?? 'Solo'} · ${match.gameName}',
                       style: TextStyle(
                         color: AppColors.gold,
                         fontSize: 11,
@@ -197,7 +196,7 @@ class MatchJoinSheet extends StatelessWidget {
                       const Divider(height: 1, color: Color(0x14FFFFFF)),
                       const SizedBox(height: 12),
                       Text(
-                        'match.prize'.tr().toUpperCase(),
+                        'match.prize'.tr(),
                         style: TextStyle(
                           color: AppColors.textMuted,
                           fontSize: 10,

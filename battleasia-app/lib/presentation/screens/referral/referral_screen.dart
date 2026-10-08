@@ -407,7 +407,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                     const SizedBox(width: 6),
                     Expanded(
                       child: Text(
-                        item.label.toUpperCase(),
+                        item.label,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTheme.bodySmall.copyWith(
@@ -695,7 +695,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                         children: [
                           Expanded(
                             child: Text(
-                              item.playerName.toUpperCase(),
+                              item.playerName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: AppTheme.bodyMedium.copyWith(
@@ -810,7 +810,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        item.playerName.toUpperCase(),
+                        item.playerName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTheme.bodyMedium.copyWith(

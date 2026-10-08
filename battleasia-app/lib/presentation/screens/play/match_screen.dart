@@ -838,7 +838,7 @@ class _MatchScreenState extends State<MatchScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'JOINED ACCESS',
+                              'Joined access',
                               style: TextStyle(
                                 color: AppColors.gold.withValues(alpha: 0.9),
                                 fontSize: 11,
@@ -992,7 +992,7 @@ class _MatchScreenState extends State<MatchScreen> {
               Icon(icon, size: 14, color: AppColors.gold),
               const SizedBox(width: 6),
               Text(
-                label.toUpperCase(),
+                label,
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.45),
                   fontSize: 11,

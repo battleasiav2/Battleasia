@@ -353,7 +353,7 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                                     (_submitting
                                             ? 'shop.submitting'.tr()
                                             : 'shop.requestWithdrawal'.tr())
-                                        .toUpperCase(),
+                                        ,
                                     style: const TextStyle(
                                       fontWeight: FontWeight.w900,
                                       letterSpacing: 0.6,
@@ -385,7 +385,7 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
   }
 
   Widget _label(String text) => Text(
-        text.toUpperCase(),
+        text,
         style: AppTheme.bodySmall.copyWith(
           color: AppColors.textMuted,
           fontWeight: FontWeight.w700,

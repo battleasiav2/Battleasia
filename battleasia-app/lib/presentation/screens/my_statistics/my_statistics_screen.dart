@@ -335,7 +335,7 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  cell.$1.toUpperCase(),
+                  cell.$1,
                   style: AppTheme.bodySmall.copyWith(
                     color: Colors.white.withValues(alpha: 0.45),
                     fontSize: 10,
@@ -425,7 +425,7 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        stat.matchName.toUpperCase(),
+                        stat.matchName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTheme.bodyMedium.copyWith(
