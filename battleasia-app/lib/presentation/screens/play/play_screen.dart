@@ -13,7 +13,6 @@ import 'package:battleasia_app/data/models/public_dashboard_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/common/bottom_menu.dart';
 import 'package:battleasia_app/presentation/widgets/common/network_status_banner.dart';
-import 'package:battleasia_app/presentation/widgets/play/play_hero_banner.dart';
 import 'package:battleasia_app/presentation/widgets/play/play_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/play/game_card.dart';
 import 'package:battleasia_app/presentation/widgets/play/game_cover_art.dart';
@@ -228,11 +227,6 @@ class _PlayScreenState extends State<PlayScreen> {
       baseSize: 16.0,
     ).clamp(8.0, 16.0);
     
-    final verticalPadding = ResponsiveUtils.getResponsiveSpacing(
-      context,
-      baseSize: 16.0,
-    ).clamp(8.0, 16.0);
-    
     final gridSpacing = ResponsiveUtils.getResponsiveSpacing(
       context,
       baseSize: 16.0,
@@ -262,31 +256,35 @@ class _PlayScreenState extends State<PlayScreen> {
               SliverToBoxAdapter(child: SizedBox(height: topPadding)),
               const SliverToBoxAdapter(child: NetworkStatusBanner()),
 
-              // Hero Banner
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: horizontalPadding,
-                    vertical: verticalPadding,
-                  ),
-                  child: PlayHeroBanner(
-                    slides: const [
-                      {
-                        'title': 'BATTLEASIA',
-                        'description':
-                            'eSports Tournament App for PUBG, FreeFire, Pubg Lite, COD, Fortnite & more + Admin panel + Website',
-                        'imageUrl': 'assets/images/banner2.webp',
-                      },
-                      {
-                        'title': 'BATTLEASIA',
-                        'description':
-                            'eSports Tournament App for PUBG, FreeFire, Pubg Lite, COD, Fortnite & more + Admin panel + Website',
-                        'imageUrl': 'assets/images/banner4.webp',
-                      },
+                  padding: EdgeInsets.fromLTRB(horizontalPadding, 4, 8, 4),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'nav.play'.tr(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            height: 1.1,
+                          ),
+                        ),
+                      ),
+                      TextButton.icon(
+                        onPressed: _handleWatchLive,
+                        icon: Icon(Icons.live_tv_outlined, size: 18, color: AppColors.gold),
+                        label: Text(
+                          'play.watchLive'.tr(),
+                          style: TextStyle(
+                            color: AppColors.gold,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
                     ],
-                    onWatchLive: () {
-                      _handleWatchLive();
-                    },
                   ),
                 ),
               ),

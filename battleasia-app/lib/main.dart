@@ -8,7 +8,6 @@ import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/providers/accent_provider.dart';
 import 'package:battleasia_app/presentation/screens/splash/splash_screen.dart';
-import 'package:battleasia_app/presentation/widgets/common/gaming_backdrop.dart';
 import 'package:battleasia_app/presentation/widgets/common/presence_pinger.dart';
 import 'package:battleasia_app/presentation/widgets/common/site_notice_host.dart';
 
@@ -84,7 +83,7 @@ class BattleAsiaApp extends StatelessWidget {
               return Stack(
                 fit: StackFit.expand,
                 children: [
-                  const GamingBackdrop(),
+                  const ColoredBox(color: Color(0xFF0B0C10)),
                   child ?? const SizedBox.shrink(),
                   const PresencePinger(),
                   const SiteNoticeHost(),

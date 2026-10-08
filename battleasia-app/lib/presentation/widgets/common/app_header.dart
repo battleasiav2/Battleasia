@@ -27,8 +27,8 @@ class AppHeader extends StatelessWidget {
     ).clamp(isMobile ? 8.0 : 10.0, 24.0);
     final logoSize = ResponsiveUtils.getResponsiveSpacing(
       context,
-      baseSize: isMobile ? 44.0 : 64.0,
-    ).clamp(isMobile ? 40.0 : 48.0, 72.0);
+      baseSize: isMobile ? 28.0 : 36.0,
+    ).clamp(isMobile ? 26.0 : 32.0, 40.0);
     final topInset = MediaQuery.of(context).padding.top;
     final gap = isMobile ? 6.0 : 12.0;
 
