@@ -425,14 +425,14 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
           ),
         Expanded(
           child: Text(
-            title.toUpperCase(),
+            title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppTheme.heading2.copyWith(
               color: AppColors.textPrimary,
-              fontWeight: FontWeight.w800,
+              fontWeight: FontWeight.w700,
               fontSize: 22,
-              letterSpacing: 1,
+              height: 1.1,
             ),
           ),
         ),
@@ -640,7 +640,7 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                                                 children: [
                                                   Expanded(
                                                     child: Text(
-                                                      t.subject.toUpperCase(),
+                                                      t.subject,
                                                       maxLines: 1,
                                                       overflow:
                                                           TextOverflow.ellipsis,

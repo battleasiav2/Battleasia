@@ -224,13 +224,13 @@ class _ReferralScreenState extends State<ReferralScreen> {
                               const SizedBox(height: 8),
                               Text(
                                 widget.showInviteSection
-                                    ? 'REFER & EARN'
-                                    : 'MY REFERRALS',
-                                style: AppTheme.heading2.copyWith(
+                                    ? 'nav.referral'.tr()
+                                    : 'account.myReferrals'.tr(),
+                                style: TextStyle(
                                   color: AppColors.textPrimary,
-                                  fontWeight: FontWeight.w800,
+                                  fontWeight: FontWeight.w700,
                                   fontSize: titleFontSize,
-                                  letterSpacing: 1,
+                                  height: 1.1,
                                 ),
                               ),
                               const SizedBox(height: 4),

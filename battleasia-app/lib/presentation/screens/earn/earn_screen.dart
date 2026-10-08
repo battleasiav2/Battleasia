@@ -180,9 +180,10 @@ class _EarnScreenState extends State<EarnScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('nav.earn'.tr().toUpperCase(), style: TextStyle(color: AppColors.gold, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.1)),
-        const SizedBox(height: 4),
-        const Text('Earn', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800)),
+        Text(
+          'nav.earn'.tr(),
+          style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700, height: 1.1),
+        ),
         const SizedBox(height: 14),
         Container(
           padding: const EdgeInsets.all(16),

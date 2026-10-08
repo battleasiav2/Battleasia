@@ -230,31 +230,12 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                     children: [
                       SizedBox(height: spacing16),
                       Text(
-                        'Season board',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.62),
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'The ones to beat',
+                        'account.leaderboard'.tr(),
                         style: TextStyle(
                           color: const Color(0xFFE7E9DE),
-                          fontSize: isMobile ? 28 : 36,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: -0.8,
-                          height: 1,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Live results from completed matches',
-                        style: TextStyle(
-                          color: const Color(0xFF777D7B),
-                          fontSize: 12,
-                          height: 1.4,
+                          fontSize: isMobile ? 22 : 24,
+                          fontWeight: FontWeight.w700,
+                          height: 1.1,
                         ),
                       ),
                       SizedBox(height: spacing16),

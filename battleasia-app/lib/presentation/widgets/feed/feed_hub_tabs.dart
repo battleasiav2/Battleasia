@@ -57,9 +57,9 @@ class FeedHubTabs extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      tab.$3.tr().toUpperCase(),
+                      tab.$3.tr(),
                       style: AppTheme.bodySmall.copyWith(
-                        fontSize: 9,
+                        fontSize: 11,
                         fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
                         letterSpacing: 0.6,
                         color: isActive ? AppColors.gold : AppColors.textMuted,

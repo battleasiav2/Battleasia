@@ -25,15 +25,6 @@ class LegalScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
           Text(
-            'legal.eyebrow'.tr(),
-            style: AppTheme.bodySmall.copyWith(
-              color: const Color(0xFFCCFF00),
-              fontWeight: FontWeight.w800,
-              letterSpacing: 1.2,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
             'legal.${kind}Title'.tr(),
             style: AppTheme.heading2.copyWith(color: Colors.white, fontWeight: FontWeight.w800),
           ),

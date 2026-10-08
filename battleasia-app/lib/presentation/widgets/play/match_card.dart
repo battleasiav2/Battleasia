@@ -134,10 +134,10 @@ class _MatchCardState extends State<MatchCard> {
                       ),
                       child: Text(
                         widget.isJoined
-                            ? 'match.joined'.tr().toUpperCase()
+                            ? 'match.joined'.tr()
                             : capacity.isFull
-                                ? 'match.full'.tr().toUpperCase()
-                                : 'match.openEntry'.tr().toUpperCase(),
+                                ? 'match.full'.tr()
+                                : 'match.openEntry'.tr(),
                         style: TextStyle(
                           color: widget.isJoined ? AppColors.gold : Colors.white,
                           fontSize: 9,

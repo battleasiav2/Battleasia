@@ -7,7 +7,7 @@
     "referral": "Referral",
     "feed": "Feed",
     "labs": "Labs",
-    "login": "LOGIN",
+    "login": "Log in",
     "home": "Home",
     "siteColor": "Site color"
   },
@@ -692,7 +692,7 @@
     "winner": "Winner",
     "lose": "Lose",
     "prize": "Prize",
-    "eyebrow": "RESULT"
+    "eyebrow": "Results"
   },
   "orders": {
     "empty": "No deposits yet",

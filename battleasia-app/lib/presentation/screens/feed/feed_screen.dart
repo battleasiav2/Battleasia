@@ -518,9 +518,9 @@ class _FeedScreenState extends State<FeedScreen> {
   Widget _buildHeader(BuildContext context) {
     final titleFontSize = ResponsiveUtils.getResponsiveFontSize(
       context,
-      baseSize: 28.0,
-      min: 24.0,
-      max: 36.0,
+      baseSize: 22.0,
+      min: 20.0,
+      max: 24.0,
     );
 
     return Text(
@@ -529,7 +529,7 @@ class _FeedScreenState extends State<FeedScreen> {
         color: AppColors.textPrimary,
         fontWeight: FontWeight.w800,
         fontSize: titleFontSize,
-        letterSpacing: 1,
+        letterSpacing: 0,
       ),
     );
   }

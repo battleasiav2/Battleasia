@@ -82,16 +82,7 @@ class _HashtagScreenState extends State<HashtagScreen> {
                 ),
                 child: Text('feed.back'.tr(), style: const TextStyle(color: Colors.white)),
               ),
-              Text(
-                'tag.title'.tr(),
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.55), fontSize: 12, letterSpacing: 1.2, fontWeight: FontWeight.w700),
-              ),
-              Text('#$_hash', style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800)),
-              const SizedBox(height: 6),
-              Text(
-                '${'tag.emptyLead'.tr()} #$_hash.',
-                style: TextStyle(color: Colors.white.withValues(alpha: 0.6)),
-              ),
+              Text('#$_hash', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700)),
               const SizedBox(height: 8),
               Text(
                 '${_loading ? '—' : _posts.length} ${'tag.posts'.tr()}',

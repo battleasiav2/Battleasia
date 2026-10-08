@@ -89,10 +89,9 @@ class _LabsScreenState extends State<LabsScreen> {
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   label: Text('labs.back'.tr(), style: const TextStyle(color: Colors.white)),
                 ),
-              Text('Labs', style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.w800, letterSpacing: 1)),
               Text(
-                spec?.$4 ?? 'Labs',
-                style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.w800),
+                spec?.$4 ?? 'nav.labs'.tr(),
+                style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700, height: 1.1),
               ),
               const SizedBox(height: 12),
               if (_loading)

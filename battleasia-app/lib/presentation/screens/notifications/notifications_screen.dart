@@ -254,27 +254,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     children: [
                       SizedBox(height: spacing16),
                       Text(
-                        'note.eyebrow'.tr(),
-                        style: AppTheme.bodySmall.copyWith(
-                          color: AppColors.textMuted,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
                         'note.title'.tr(),
-                        style: AppTheme.heading2.copyWith(
+                        style: TextStyle(
                           color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           fontSize: titleFontSize,
-                          letterSpacing: 1,
+                          height: 1.1,
                         ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'note.lead'.tr(),
-                        style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
                       ),
                       const SizedBox(height: 10),
                       Row(

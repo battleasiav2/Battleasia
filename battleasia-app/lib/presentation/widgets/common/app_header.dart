@@ -31,6 +31,7 @@ class AppHeader extends StatelessWidget {
     ).clamp(isMobile ? 26.0 : 32.0, 40.0);
     final topInset = MediaQuery.of(context).padding.top;
     final gap = isMobile ? 6.0 : 12.0;
+    final canPop = Navigator.canPop(context);
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -47,11 +48,19 @@ class AppHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
-          BattleAsiaLogo(
-            isMobile: isMobile,
-            showText: !isMobile,
-            logoSize: logoSize,
-          ),
+          if (canPop)
+            IconButton(
+              tooltip: MaterialLocalizations.of(context).backButtonTooltip,
+              visualDensity: VisualDensity.compact,
+              onPressed: () => Navigator.pop(context),
+              icon: Icon(Icons.arrow_back, color: Colors.white.withValues(alpha: 0.92), size: 22),
+            )
+          else
+            BattleAsiaLogo(
+              isMobile: isMobile,
+              showText: false,
+              logoSize: logoSize,
+            ),
           const Spacer(),
           const AccentToggle(),
           SizedBox(width: gap),

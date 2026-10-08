@@ -201,27 +201,13 @@ class _MyStatisticsScreenState extends State<MyStatisticsScreen> {
                     children: [
                       SizedBox(height: spacing16),
                       Text(
-                        'stats.eyebrow'.tr(),
-                        style: AppTheme.bodySmall.copyWith(
-                          color: AppColors.textMuted,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
                         'stats.title'.tr(),
-                        style: AppTheme.heading2.copyWith(
+                        style: TextStyle(
                           color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                           fontSize: titleFontSize,
-                          letterSpacing: 1,
+                          height: 1.1,
                         ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'stats.lead'.tr(),
-                        style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
                       ),
                       SizedBox(height: spacing24),
                       if (_loading)

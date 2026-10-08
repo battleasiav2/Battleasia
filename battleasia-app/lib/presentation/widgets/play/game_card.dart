@@ -152,7 +152,7 @@ class GameCard extends StatelessWidget {
                       ),
                     if (subTitle != null) const SizedBox(height: 2),
                     Text(
-                      title.toUpperCase(),
+                      title,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
