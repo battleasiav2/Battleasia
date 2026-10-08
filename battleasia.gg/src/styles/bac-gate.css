@@ -1,116 +1,106 @@
 .bac-gate {
-  width: min(760px, calc(100% - 40px));
+  width: min(1080px, calc(100% - 48px));
   margin: 28px auto 64px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   color: var(--ba-text);
 }
 
+.bac-gate-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  grid-template-areas:
+    "card head"
+    "card panel";
+  gap: 22px 28px;
+  align-items: start;
+}
+
+.bac-gate-head { grid-area: head; }
+.bac-gate-card { grid-area: card; }
+.bac-gate-panel { grid-area: panel; align-self: end; }
+
+.bac-mark {
+  width: 72px;
+  height: 72px;
+  margin-bottom: 14px;
+}
+
+.bac-mark svg { display: block; width: 72px; height: 72px; }
+
 .bac-gate h1 {
-  margin: 8px 0 10px;
-  font-size: clamp(28px, 4vw, 36px);
+  margin: 0 0 10px;
+  font-size: clamp(28px, 3vw, 40px);
   font-weight: 800;
   letter-spacing: -0.03em;
-  text-align: center;
+  line-height: 1.05;
   color: var(--ba-text);
 }
 
 .bac-gate-lead {
-  max-width: 640px;
-  margin: 0 0 22px;
+  margin: 0;
   color: var(--ba-muted);
-  font-size: 14px;
-  line-height: 1.55;
-  text-align: center;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 .bac-gate-card {
-  width: 100%;
-  padding: 14px;
+  padding: 10px;
   border-radius: 18px;
   background: #161618;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 18px 44px -32px rgba(0, 0, 0, 0.82);
 }
 
 .bac-gate-stage {
   position: relative;
-  aspect-ratio: 16 / 9;
-  border-radius: 16px;
+  aspect-ratio: 4 / 5;
+  max-height: 560px;
+  border-radius: 12px;
   overflow: hidden;
-  background: #121418;
+  background: #101114;
 }
 
 .bac-gate-stage > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 18%;
+  filter: saturate(0.78) contrast(1.06);
 }
 
-.bac-gate-badge {
+.bac-gate-stage::after {
+  content: "";
   position: absolute;
-  top: 0;
-  right: 18px;
-  width: 64px;
-  height: 58px;
-  display: grid;
-  place-items: center;
-  background: var(--ba-accent);
-  clip-path: polygon(0 0, 100% 0, 100% 78%, 50% 100%, 0 78%);
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 11, 15, 0.08), transparent 28%, transparent 70%, rgba(10, 11, 15, 0.45));
+  pointer-events: none;
 }
 
-.bac-gate-badge img {
-  width: 34px;
-  height: 34px;
+.bac-gate-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  padding: 0 4px;
 }
 
-.bac-gate-copy {
-  position: absolute;
-  left: 22px;
-  right: 92px;
-  bottom: 22px;
-  color: #fff;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
-}
-
-.bac-gate-copy p {
-  margin: 0 0 4px;
-  color: var(--ba-accent);
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.bac-gate-copy h2 {
-  margin: 0;
-  max-width: 16ch;
-  font-size: clamp(28px, 4vw, 42px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 0.95;
-  text-transform: uppercase;
+.bac-gate-caption span {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .bac-gate-pager {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 6px;
-  border-radius: 999px;
-  background: rgba(20, 22, 26, 0.72);
-  color: #fff;
+  color: #c8cacf;
   font-size: 12px;
 }
 
 .bac-gate-pager button {
-  width: 22px;
-  height: 22px;
-  border: 0;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 50%;
   background: transparent;
   color: #fff;
@@ -120,16 +110,16 @@
 .bac-gate-thumbs {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 10px;
 }
 
 .bac-gate-thumbs button {
   padding: 0;
-  border: 2px solid transparent;
-  border-radius: 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
   overflow: hidden;
-  background: #121418;
+  background: #101114;
   cursor: pointer;
 }
 
@@ -139,9 +129,51 @@
 
 .bac-gate-thumbs img {
   width: 100%;
-  height: 58px;
+  height: 52px;
   object-fit: cover;
+  object-position: center 20%;
   display: block;
+  filter: saturate(0.78) contrast(1.06);
+}
+
+.bac-gate-dots { display: none; }
+
+.bac-facts {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.bac-facts li {
+  display: grid;
+  grid-template-columns: 8px 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.bac-facts li::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--ba-accent);
+}
+
+.bac-facts b {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.bac-facts span {
+  display: block;
+  margin-top: 2px;
+  color: #c8cacf;
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .bac-gate-note {
@@ -151,12 +183,11 @@
 }
 
 .bac-gate-go {
-  margin-top: 22px;
-  min-width: 180px;
-  min-height: 44px;
+  margin-top: 18px;
+  min-height: 46px;
   padding: 0 22px;
   border: 0;
-  border-radius: 7px;
+  border-radius: 8px;
   background: var(--ba-accent);
   color: var(--ba-gold-ink);
   font-size: 15px;
@@ -164,93 +195,66 @@
   cursor: pointer;
 }
 
-.bac-gate-go:hover {
-  background: var(--ba-accent-hover);
-}
+.bac-gate-go:hover { background: var(--ba-accent-hover); }
 
-@media (min-width: 1100px) {
+@media (max-width: 860px) {
   .bac-gate {
-    width: min(800px, calc(100% - 64px));
-    margin-top: 36px;
+    width: calc(100% - 28px);
+    margin: 16px auto 40px;
   }
 
-  .bac-gate-thumbs img {
-    height: 64px;
-  }
-}
-
-@media (max-width: 720px) {
-  .bac-gate {
-    width: calc(100% - 24px);
-    margin: 18px auto 36px;
+  .bac-gate-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "head"
+      "card"
+      "panel";
+    gap: 16px;
   }
 
-  .bac-gate h1 {
-    font-size: 26px;
+  .bac-mark,
+  .bac-mark svg {
+    width: 56px;
+    height: 56px;
   }
 
-  .bac-gate-lead {
-    font-size: 13px;
-    margin-bottom: 16px;
-  }
+  .bac-gate h1 { font-size: 28px; }
 
-  .bac-gate-card {
-    padding: 10px;
-    border-radius: 16px;
-  }
+  .bac-gate-lead { font-size: 14px; }
 
   .bac-gate-stage {
-    border-radius: 12px;
+    aspect-ratio: 16 / 10;
+    max-height: none;
   }
 
-  .bac-gate-badge {
-    right: 12px;
-    width: 46px;
-    height: 42px;
+  .bac-gate-stage > img { object-position: center 30%; }
+
+  .bac-gate-thumbs { display: none; }
+
+  .bac-gate-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
   }
 
-  .bac-gate-badge img {
-    width: 24px;
-    height: 24px;
+  .bac-gate-dots button {
+    width: 7px;
+    height: 7px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.28);
+    cursor: pointer;
   }
 
-  .bac-gate-copy {
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
+  .bac-gate-dots button.on {
+    width: 18px;
+    border-radius: 99px;
+    background: var(--ba-accent);
   }
 
-  .bac-gate-copy p {
-    font-size: 11px;
-  }
+  .bac-gate-panel { align-self: stretch; }
 
-  .bac-gate-copy h2 {
-    font-size: 24px;
-    max-width: 12ch;
-  }
-
-  .bac-gate-pager {
-    top: 10px;
-    right: auto;
-    bottom: auto;
-    left: 10px;
-  }
-
-  .bac-gate-pager button {
-    width: 28px;
-    height: 28px;
-  }
-
-  .bac-gate-thumbs {
-    gap: 6px;
-  }
-
-  .bac-gate-thumbs img {
-    height: 52px;
-  }
-
-  .bac-gate-go {
-    width: 100%;
-    max-width: 420px;
-  }
+  .bac-gate-go { width: 100%; }
 }

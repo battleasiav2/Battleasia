@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
@@ -71,42 +73,126 @@ class _BacGateScreenState extends State<BacGateScreen> {
         title: Text('nav.shop'.tr(), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
       ),
       body: SafeArea(
-        child: Padding(
+        child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'shop.bacTitle'.tr(),
-                style: const TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.w700),
+          children: [
+            const _BacMark(),
+            const SizedBox(height: 14),
+            Text(
+              'shop.bacTitle'.tr(),
+              style: const TextStyle(color: AppColors.textPrimary, fontSize: 22, fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'shop.heroSubtitle'.tr(),
+              style: const TextStyle(color: AppColors.textPlaceholder, fontSize: 14, height: 1.45),
+            ),
+            const SizedBox(height: 18),
+            const _BacFact(titleKey: 'shop.bacFactRoom', bodyKey: 'shop.bacFactRoomBody'),
+            const _BacFact(titleKey: 'shop.bacFactPrize', bodyKey: 'shop.bacFactPrizeBody'),
+            const _BacFact(titleKey: 'shop.bacFactHour', bodyKey: 'shop.bacFactHourBody'),
+            if (_note.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(_note, style: const TextStyle(color: Color(0xFF9A3B32))),
               ),
-              const SizedBox(height: 8),
-              Text(
-                'shop.heroSubtitle'.tr(),
-                style: const TextStyle(color: AppColors.textPlaceholder, fontSize: 14, height: 1.4),
+            const SizedBox(height: 20),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.gold,
+                foregroundColor: const Color(0xFF12140A),
+                minimumSize: const Size.fromHeight(48),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
-              if (_note.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: Text(_note, style: const TextStyle(color: Color(0xFF9A3B32))),
-                ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.gold,
-                    foregroundColor: const Color(0xFF12140A),
-                    minimumSize: const Size.fromHeight(48),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: _go,
-                  child: Text('shop.goToBacShop'.tr(), style: const TextStyle(fontWeight: FontWeight.w700)),
-                ),
-              ),
-            ],
-          ),
+              onPressed: _go,
+              child: Text('shop.goToBacShop'.tr(), style: const TextStyle(fontWeight: FontWeight.w700)),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+}
+
+class _BacMark extends StatelessWidget {
+  const _BacMark();
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(size: const Size(64, 64), painter: _BacCoinPainter(AppColors.gold));
+  }
+}
+
+class _BacCoinPainter extends CustomPainter {
+  _BacCoinPainter(this.ring);
+
+  final Color ring;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+    canvas.drawCircle(center, radius - 1, Paint()..color = const Color(0xFF12140A));
+    canvas.drawCircle(
+      center,
+      radius - 1.6,
+      Paint()
+        ..color = ring
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.4,
+    );
+    canvas.drawCircle(
+      center,
+      radius * 0.72,
+      Paint()
+        ..color = ring.withValues(alpha: 0.4)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1,
+    );
+    final label = TextPainter(
+      text: TextSpan(
+        text: 'B',
+        style: TextStyle(color: ring, fontSize: 28, fontWeight: FontWeight.w800, height: 1),
+      ),
+      textDirection: ui.TextDirection.ltr,
+    )..layout();
+    label.paint(canvas, center - Offset(label.width / 2, label.height / 2));
+  }
+
+  @override
+  bool shouldRepaint(covariant _BacCoinPainter oldDelegate) => oldDelegate.ring != ring;
+}
+
+class _BacFact extends StatelessWidget {
+  const _BacFact({required this.titleKey, required this.bodyKey});
+
+  final String titleKey;
+  final String bodyKey;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            margin: const EdgeInsets.only(top: 6, right: 10),
+            decoration: BoxDecoration(color: AppColors.gold, shape: BoxShape.circle),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(titleKey.tr(), style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 14)),
+                const SizedBox(height: 2),
+                Text(bodyKey.tr(), style: const TextStyle(color: AppColors.textPlaceholder, fontSize: 13, height: 1.4)),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
