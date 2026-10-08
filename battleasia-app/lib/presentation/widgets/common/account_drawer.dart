@@ -246,8 +246,12 @@ class _AccountDrawerContent extends StatelessWidget {
                     );
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
+                Divider(height: 1, color: Colors.white.withValues(alpha: 0.08)),
+                const SizedBox(height: 8),
                 _buildExpandableAccountMenu(context),
+                Divider(height: 1, color: Colors.white.withValues(alpha: 0.08)),
+                const SizedBox(height: 6),
                 AccountMenuTile(
                   label: 'nav.play'.tr(),
                   icon: Icons.sports_esports_outlined,
@@ -331,37 +335,25 @@ class _AccountDrawerContent extends StatelessWidget {
             24,
             16 + MediaQuery.of(context).padding.bottom,
           ),
-          child: SizedBox(
-            width: double.infinity,
-            height: 36,
-            child: FilledButton.icon(
-              onPressed: () async {
-                await authProvider.signOut();
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => const SignInScreen()),
-                  );
-                }
-              },
-              icon: const Icon(Icons.logout, size: 16),
-              label: Text(
-                'account.logout'.tr().toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.8,
-                ),
-              ),
-              style: FilledButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: AppColors.error,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
+          child: TextButton.icon(
+            onPressed: () async {
+              await authProvider.signOut();
+              if (context.mounted) {
+                Navigator.pop(context);
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => const SignInScreen()),
+                );
+              }
+            },
+            icon: const Icon(Icons.logout, size: 18),
+            label: Text(
+              'account.logout'.tr(),
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+            ),
+            style: TextButton.styleFrom(
+              foregroundColor: const Color(0xFFFB7185),
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 10),
             ),
           ),
         ),
@@ -378,30 +370,25 @@ class _AccountDrawerContent extends StatelessWidget {
         ),
         child: ExpansionTile(
           clipBehavior: Clip.antiAlias,
-          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-          childrenPadding: const EdgeInsets.only(top: 8),
-          backgroundColor: const Color(0xFF16181F),
-          collapsedBackgroundColor: const Color(0xFF16181F),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-            side: const BorderSide(color: Color(0xFF232634)),
-          ),
-          collapsedShape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(999),
-            side: const BorderSide(color: Color(0xFF232634)),
-          ),
+          tilePadding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+          childrenPadding: EdgeInsets.zero,
+          backgroundColor: Colors.transparent,
+          collapsedBackgroundColor: Colors.transparent,
+          shape: const RoundedRectangleBorder(),
+          collapsedShape: const RoundedRectangleBorder(),
           title: Text(
             'account.menuAccount'.tr(),
             style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w800,
-              fontSize: 16,
+              color: Color(0xFFE8EAEE),
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
               height: 1.2,
               decoration: TextDecoration.none,
             ),
           ),
-          iconColor: AppColors.gold,
-          collapsedIconColor: Colors.white,
+          leading: const Icon(Icons.manage_accounts_outlined, size: 20, color: Color(0xFF9AA0AB)),
+          iconColor: const Color(0xFF9AA0AB),
+          collapsedIconColor: const Color(0xFF9AA0AB),
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 0, 8, 8),

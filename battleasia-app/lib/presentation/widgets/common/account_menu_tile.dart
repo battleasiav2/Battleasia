@@ -43,67 +43,41 @@ class AccountMenuTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     context.watch<AccentProvider>();
-    const card = Color(0xFF16181F);
-    const line = Color(0xFF232634);
     final accent = AppColors.gold;
-    final ink = AppColors.goldInk;
-    return Padding(
-      padding: EdgeInsets.only(left: nested ? 8 : 0, bottom: 10),
-      child: Material(
-        color: active ? accent : card,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(999),
-          side: BorderSide(color: active ? accent : line),
-        ),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(999),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(8, 8, 16, 8),
-            child: Row(
-              children: [
+    const idle = Color(0xFF9AA0AB);
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(nested ? 18 : 2, 11, 4, 11),
+          child: Row(
+            children: [
+              Icon(
+                icon ?? Icons.circle,
+                size: 20,
+                color: active ? accent : idle,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: active ? Colors.white : const Color(0xFFE8EAEE),
+                    fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                    fontSize: 15,
+                    height: 1.2,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ),
+              if (active)
                 Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: ink,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: active ? ink : line),
-                    boxShadow: active
-                        ? [BoxShadow(color: accent.withValues(alpha: 0.7), blurRadius: 12)]
-                        : null,
-                  ),
-                  child: Icon(
-                    icon ?? Icons.circle,
-                    size: 18,
-                    color: active ? accent : Colors.white,
-                  ),
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(color: accent, shape: BoxShape.circle),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    nested ? label.toUpperCase() : label,
-                    style: TextStyle(
-                      color: active ? ink : Colors.white,
-                      fontWeight: FontWeight.w800,
-                      fontSize: nested ? 13 : 16,
-                      letterSpacing: nested ? 0.4 : 0.1,
-                      height: 1.2,
-                      decoration: TextDecoration.none,
-                    ),
-                  ),
-                ),
-                if (active)
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: ink,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-              ],
-            ),
+            ],
           ),
         ),
       ),

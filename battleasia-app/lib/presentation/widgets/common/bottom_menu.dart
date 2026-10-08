@@ -19,11 +19,11 @@ class FloatingBottomNav extends StatefulWidget {
 
 class _FloatingBottomNavState extends State<FloatingBottomNav> {
   static List<NavItem> navItems(BuildContext context) => [
-    NavItem(label: 'nav.play'.tr(), route: '/play', icon: Icons.sports_esports),
-    NavItem(label: 'nav.shop'.tr(), route: '/shop', icon: Icons.shopping_bag),
-    NavItem(label: 'nav.earn'.tr(), route: '/earn', icon: Icons.bolt),
-    NavItem(label: 'nav.transfer'.tr(), route: '/transfer', icon: Icons.swap_horiz),
-    NavItem(label: 'nav.feed'.tr(), route: '/feed', icon: Icons.article),
+    NavItem(label: 'nav.play'.tr(), route: '/play', icon: Icons.sports_esports, idleIcon: Icons.sports_esports_outlined),
+    NavItem(label: 'nav.shop'.tr(), route: '/shop', icon: Icons.shopping_bag, idleIcon: Icons.shopping_bag_outlined),
+    NavItem(label: 'nav.earn'.tr(), route: '/earn', icon: Icons.bolt, idleIcon: Icons.bolt_outlined),
+    NavItem(label: 'nav.transfer'.tr(), route: '/transfer', icon: Icons.swap_horiz, idleIcon: Icons.swap_horiz),
+    NavItem(label: 'nav.feed'.tr(), route: '/feed', icon: Icons.article, idleIcon: Icons.article_outlined),
   ];
 
   String _currentRoute = '/play';
@@ -218,21 +218,14 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
       bottom: 0,
       child: ClipRect(
         child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: const Color(0xFF060607),
+            decoration: const BoxDecoration(
+              color: Color(0xFF0B0C10),
               border: Border(
-                top: BorderSide(color: Colors.white.withValues(alpha: 0.09)),
+                top: BorderSide(color: Color(0x14FFFFFF)),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.55),
-                  blurRadius: 24,
-                  offset: const Offset(0, -8),
-                ),
-              ],
             ),
             child: Padding(
-              padding: EdgeInsets.fromLTRB(6, 8, 6, 8 + bottomInset),
+              padding: EdgeInsets.fromLTRB(8, 6, 8, 6 + bottomInset),
               child: Row(
                 children: navItems(context).map((item) {
                   final isActive = _isActive(item.route, _currentRoute);
@@ -246,48 +239,39 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
   }
 
   Widget _buildNavItem(BuildContext context, NavItem item, bool isActive) {
+    final color = isActive ? AppColors.gold : const Color(0xFF8E939C);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => _handleNavigation(context, item.route),
-      child: AnimatedScale(
-        scale: isActive ? 1 : 0.96,
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeOutCubic,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 280),
-          curve: Curves.easeOutCubic,
-          margin: const EdgeInsets.symmetric(horizontal: 1),
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
-          decoration: BoxDecoration(
-            color: isActive ? AppColors.gold.withValues(alpha: 0.16) : Colors.transparent,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(
-              color: isActive ? AppColors.gold.withValues(alpha: 0.55) : Colors.transparent,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              width: 18,
+              height: 2,
+              margin: const EdgeInsets.only(bottom: 6),
+              decoration: BoxDecoration(
+                color: isActive ? AppColors.gold : Colors.transparent,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                item.icon,
-                size: 18,
-                color: isActive ? AppColors.gold : AppColors.textMuted,
+            Icon(isActive ? item.icon : item.idleIcon, size: 22, color: color),
+            const SizedBox(height: 3),
+            Text(
+              item.label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTheme.bodySmall.copyWith(
+                color: color,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                fontSize: 11,
+                decoration: TextDecoration.none,
               ),
-              const SizedBox(height: 4),
-              Text(
-                item.label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTheme.bodySmall.copyWith(
-                  color: isActive ? AppColors.gold : AppColors.textMuted,
-                  fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
-                  fontSize: 9,
-                  letterSpacing: 0.3,
-                  decoration: TextDecoration.none,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -298,6 +282,12 @@ class NavItem {
   final String label;
   final String route;
   final IconData icon;
+  final IconData idleIcon;
 
-  const NavItem({required this.label, required this.route, required this.icon});
+  const NavItem({
+    required this.label,
+    required this.route,
+    required this.icon,
+    required this.idleIcon,
+  });
 }
