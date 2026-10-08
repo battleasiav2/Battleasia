@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowDownRight, ArrowLeft, ArrowRight, ChevronDown, Crosshair, Crown, Eye, EyeOff, Headphones, MessageCircle, ShieldCheck, Sparkles, Users, X, Zap } from 'lucide-react';
 import '../styles/landing-5173.css';
 import { GamingCursor } from '../components/GamingCursor';
-import { ThemeDock } from '../components/ThemeDock';
 import { UserAvatar } from '../components/UserAvatar';
 import { isApiError } from '../lib/api';
 import { fetchAppDownload, formatApkSize } from '../lib/app-download';
@@ -1091,7 +1090,6 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
             {logged ? <><button className="btn btn-ghost" onClick={signOut}>{appT('cta.signout')}</button><Link className="btn btn-primary" to="/user/play">{t.arena} <ArrowRight size={14}/></Link></> : <><button className="btn btn-ghost" onClick={() => openAuth('signin')}>{t.signin}</button><button className="btn btn-primary" onClick={onJoin}>{t.signup} <ArrowRight size={14}/></button></>}
           </div>
           <div className="header-tools">
-            <ThemeDock />
             <LangMenu locale={locale} onPick={chooseLocale} />
           </div>
           </div>
@@ -1358,7 +1356,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
         </nav>
         <div className="drawer-cards">{logged ? <Link className="drawer-card drawer-profile" to="/user/play" onClick={() => setMobileOpen(false)}><UserAvatar src={me?.avatar} name={playerName} size={36} /><span>{playerName}<small>{appT('cta.enterArena')}</small></span></Link> : <button className="drawer-card" onClick={()=>openAuth('signin')}>{t.signin}<small>Access your player profile</small></button>}<button className="drawer-card" onClick={()=>logged?navigate('/user/play'):onJoin()}>{t.arena}<small>Join a live tournament</small></button></div>
         <button className="drawer-card drawer-apk" onClick={() => { if (apkUrl) window.location.href = apkUrl; }}>Download the APK <small>{apkLabel}</small></button>
-        <div className="drawer-tools"><ThemeDock dropUp /><LangMenu locale={locale} onPick={chooseLocale} dropUp /></div>
+        <div className="drawer-tools"><LangMenu locale={locale} onPick={chooseLocale} dropUp /></div>
         <div className="drawer-foot">{logged ? <><button className="btn btn-ghost" onClick={signOut}>{appT('cta.signout')}</button><Link className="btn btn-primary" to="/user/play" onClick={() => setMobileOpen(false)}>{t.arena}</Link></> : <><button className="btn btn-ghost" onClick={()=>openAuth('signin')}>{t.signin}</button><button className="btn btn-primary" onClick={onJoin}>{t.signup}</button></>}</div>
       </div>
 

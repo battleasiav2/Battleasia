@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" translate="no" class="notranslate" data-theme="dark" data-accent="violet">
+<html lang="en" translate="no" class="notranslate" data-theme="dark" data-accent="lime">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/webp" href="/logo/logo.webp?v=8" />
@@ -11,8 +11,8 @@
     <script>
       (function () {
         try {
-          var id = localStorage.getItem('ba-accent') || 'violet';
-          document.documentElement.dataset.accent = id;
+          document.documentElement.dataset.accent = 'lime';
+          localStorage.setItem('ba-accent', 'lime');
           var theme = localStorage.getItem('ba-theme') || 'dark';
           document.documentElement.dataset.theme = theme;
         } catch (e) {}

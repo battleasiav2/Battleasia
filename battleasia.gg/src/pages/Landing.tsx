@@ -6,7 +6,6 @@ import { EMPTY_PULSE, fetchPublicDashboard, mapPulse, openMatchesForGame, type P
 import { useI18n } from '../lib/i18n';
 import { ZipLocaleSelect } from '../components/landing/ZipLocaleSelect';
 import { mediaUrl } from '../components/UserAvatar';
-import { ZipAccentChips } from '../components/landing/ZipAccentChips';
 import { ZipMobileDrawer } from '../components/landing/ZipMobileDrawer';
 import { ZipSocialFab } from '../components/landing/ZipSocialFab';
 import { ZipAmount, ZipAvatar } from '../components/landing/ZipMedia';
@@ -323,7 +322,6 @@ export function Landing({ openChat }: { openChat?: boolean }) {
           </nav>
           <div className="header-actions" onPointerDown={(e) => e.stopPropagation()}>
             <div className="settings-row">
-              <ZipAccentChips />
               <ZipLocaleSelect />
             </div>
             {inArena ? (

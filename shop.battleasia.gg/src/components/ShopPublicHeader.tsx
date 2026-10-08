@@ -5,7 +5,6 @@ import { ASSETS } from '../lib/assets';
 import { fetchMe, getMainAppUrl, isShopAuthed, leaveShop, patchSessionBalance, readSessionUser, type AuthUser } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 import { LocaleSelect } from './LocaleSelect';
-import { ThemeDock } from './ThemeDock';
 import '../styles/bac-gate.css';
 
 type Props = {
@@ -119,7 +118,6 @@ export function ShopPublicHeader({ balance, hideBalance, onToggleBalance }: Prop
         <button type="button" className="shop-top-user" aria-label={t('nav.account')} title={who?.username || t('nav.account')} onClick={() => goMain('/user/account/profile')}>
           {(who?.username || 'B').slice(0, 1).toUpperCase()}
         </button>
-        <ThemeDock />
         <button type="button" className="shop-top-bell" aria-label={t('hud.alerts')} onClick={() => goMain('/user/account/notifications')}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path d="M6 17h12l-1.4-2.1V11a4.6 4.6 0 0 0-3.1-4.3V6a1.5 1.5 0 1 0-3 0v.7A4.6 4.6 0 0 0 7.4 11v3.9L6 17Zm6 3a2 2 0 0 0 2-2h-4a2 2 0 0 0 2 2Z" fill="currentColor" />

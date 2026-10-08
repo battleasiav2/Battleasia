@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ZipLocaleSelect } from './ZipLocaleSelect';
-import { ZipAccentChips } from './ZipAccentChips';
 import { formatApkSize, type AppDownloadInfo } from '../../lib/app-download';
 import { useI18n } from '../../lib/i18n';
 
@@ -72,7 +71,6 @@ export function ZipMobileDrawer({ open, onClose, logo, siteName, links, inArena,
           )}
         </div>
         <div className="settings-row">
-          <ZipAccentChips />
           <ZipLocaleSelect />
         </div>
         <div className="drawer-footer-actions btn-row btn-row--stretch">

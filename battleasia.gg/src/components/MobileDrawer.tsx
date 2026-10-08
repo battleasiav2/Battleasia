@@ -3,7 +3,6 @@ import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { fetchAppDownload, formatApkSize } from '../lib/app-download';
 import { useI18n } from '../lib/i18n';
-import { applyAccent, readAccent, type AccentId } from '../lib/theme';
 import { openBacShop } from '../lib/wallet';
 import { LocaleSelect } from './LocaleSelect';
 import { UserAvatar } from './UserAvatar';
@@ -27,12 +26,6 @@ export type DrawerCard = DrawerLink & {
   icon: ReactNode;
   badge?: number;
 };
-
-const MENU_ACCENTS: { id: AccentId; color: string }[] = [
-  { id: 'lime', color: '#d4e82a' },
-  { id: 'jade', color: '#61d7bd' },
-  { id: 'ember', color: '#f08c63' },
-];
 
 type Props = {
   open: boolean;
@@ -198,13 +191,11 @@ export function MobileDrawer({ open, onClose, logo, playerName, avatar, onSignOu
   const { t } = useI18n();
   const location = useLocation();
   const closeRef = useRef<HTMLButtonElement>(null);
-  const [accentId, setAccentId] = useState<AccentId>(readAccent);
   const [apkHref, setApkHref] = useState('/api/uploads/app/BattleAsia.apk');
   const [apkNote, setApkNote] = useState('');
 
   useEffect(() => {
     if (!open) return;
-    setAccentId(readAccent());
     let live = true;
     void fetchAppDownload().then((apk) => {
       if (!live || !apk.enabled) return;
@@ -216,12 +207,6 @@ export function MobileDrawer({ open, onClose, logo, playerName, avatar, onSignOu
       live = false;
     };
   }, [open]);
-
-  const pickAccent = (id: AccentId) => {
-    applyAccent(id);
-    setAccentId(id);
-    window.dispatchEvent(new Event('ba-theme-change'));
-  };
 
   const links: DrawerLink[] = [
     { key: 'play', label: t('nav.play'), to: '/user/play', active: location.pathname.startsWith('/user/play') },
@@ -290,18 +275,6 @@ export function MobileDrawer({ open, onClose, logo, playerName, avatar, onSignOu
         </a>
 
         <div className="ld-tools">
-          <div className="ld-accents" aria-label={t('theme.accent')}>
-            {MENU_ACCENTS.map((chip) => (
-              <button
-                key={chip.id}
-                type="button"
-                aria-label={chip.id}
-                className={accentId === chip.id ? 'is-on' : undefined}
-                style={{ background: chip.color }}
-                onClick={() => pickAccent(chip.id)}
-              />
-            ))}
-          </div>
           <LocaleSelect />
         </div>
 

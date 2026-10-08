@@ -13,13 +13,7 @@ export type AccentId = (typeof ACCENTS)[number]['id'];
 export type ThemeId = 'dark' | 'light';
 
 export function readAccent(): AccentId {
-  try {
-    const id = localStorage.getItem('ba-accent');
-    if (ACCENTS.some((a) => a.id === id)) return id as AccentId;
-  } catch {
-    /* ignore */
-  }
-  return 'violet';
+  return 'lime';
 }
 
 export function readTheme(): ThemeId {
@@ -30,10 +24,10 @@ export function readTheme(): ThemeId {
   }
 }
 
-export function applyAccent(id: string) {
-  document.documentElement.dataset.accent = id;
+export function applyAccent(_id?: string) {
+  document.documentElement.dataset.accent = 'lime';
   try {
-    localStorage.setItem('ba-accent', id);
+    localStorage.setItem('ba-accent', 'lime');
   } catch {
     /* ignore */
   }

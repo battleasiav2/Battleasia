@@ -13,7 +13,6 @@ import { GamingCursor } from './GamingCursor';
 import { LocaleSelect } from './LocaleSelect';
 import { DrawerIcons } from './MobileDrawer';
 import { NoticeDrawer } from './NoticeDrawer';
-import { ThemeDock } from './ThemeDock';
 
 function inEditable(target: EventTarget | null) {
   const el = target as HTMLElement | null;
@@ -193,7 +192,6 @@ function ShopChrome() {
           </nav>
         </div>
         <div className="play-hud-right">
-          <ThemeDock />
           <a
             className="hud-bell"
             href={getMainAppUrl('/user/account/notifications')}
@@ -263,7 +261,6 @@ function ShopChrome() {
                   {hide ? <b>**** BAC</b> : <CoinValue value={balance} />}
                 </button>
                 <div className="ld-tools">
-                  <ThemeDock />
                   <LocaleSelect />
                 </div>
                 <footer className="ld-foot">

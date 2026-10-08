@@ -1973,6 +1973,15 @@ html[lang="hi"] .ba5173 { --app-font-sans: 'Noto Sans Devanagari', 'Inter', syst
 html[lang="ur"] .ba5173 { --app-font-sans: 'Noto Nastaliq Urdu', 'Inter', system-ui, sans-serif; }
 .ba5173 img.bac-coin-icon, .ba5173 img.brand-logo { max-width: none; display: inline-block; }
 .ba5173 .nav-end{margin-left:auto;display:flex;align-items:center;gap:22px}
+.ba5173 .topbar .nav-links a{
+  display:inline-flex;
+  align-items:center;
+  height:46px;
+  line-height:1;
+  color:#c8cacf;
+}
+.ba5173 .topbar .nav-actions{margin-left:18px}
+.ba5173 .topbar .btn{line-height:1}
 .ba5173 .lang-menu{position:relative}
 .ba5173 .lang-trigger{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 10px 0 8px;border-radius:8px;border:1px solid rgba(255,255,255,.14);background:#16181c;color:#f2f3f0;box-shadow:inset 0 0 0 1px rgba(212,232,42,.08)}
 .ba5173 .lang-trigger:hover,.ba5173 .lang-menu.open .lang-trigger{border-color:color-mix(in srgb, var(--accent-color) 55%, transparent);background:#1c1f18}

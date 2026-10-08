@@ -14,13 +14,13 @@
   --ba-radius-control: 12px;
   --ba-font-display: 'Space Grotesk', Barlow, sans-serif;
   --ba-font-body: Inter, 'Public Sans', system-ui, sans-serif;
-  --ba-accent: #7c5cff;
-  --ba-accent-b: #21d4fd;
-  --ba-accent-hover: #9174ff;
-  --ba-accent-glow: rgba(124, 92, 255, 0.45);
+  --ba-accent: #cbfb24;
+  --ba-accent-b: #9de006;
+  --ba-accent-hover: #d4ff4d;
+  --ba-accent-glow: rgba(203, 251, 36, 0.4);
   --ba-gold: var(--ba-accent);
-  --ba-gold-ink: #ffffff;
-  --ba-gold-rgb: 124, 92, 255;
+  --ba-gold-ink: #081401;
+  --ba-gold-rgb: 203, 251, 36;
   --ba-input: #0b0c12;
   --ba-hud: rgba(14, 15, 20, 0.84);
 }

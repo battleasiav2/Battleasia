@@ -14,7 +14,6 @@ import { ErrorBoundary } from '../ErrorBoundary';
 import { LocaleSelect } from '../LocaleSelect';
 import { MobileDrawer } from '../MobileDrawer';
 import { NoticeDrawer } from '../NoticeDrawer';
-import { ThemeDock } from '../ThemeDock';
 import { UserAvatar } from '../UserAvatar';
 import { openBacShop } from '../../lib/wallet';
 
@@ -341,7 +340,6 @@ function UserChrome() {
             ) : null}
           </div>
           <div className="play-hud-rail-tools">
-            <ThemeDock />
             <Link
               className={`hud-bell ${location.pathname.startsWith('/user/account/notifications') ? 'active' : ''}`}
               to="/user/account/notifications"

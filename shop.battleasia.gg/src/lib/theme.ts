@@ -49,22 +49,6 @@ function isTheme(id: string | null | undefined): id is ThemeId {
 }
 
 function readStoredAccent(): AccentId {
-  let stored = '';
-  try {
-    stored = localStorage.getItem(ACCENT_KEY) || '';
-  } catch {
-    stored = '';
-  }
-  if (!stored) stored = readCookie(ACCENT_KEY);
-  try {
-    if ((!stored || stored === 'violet') && localStorage.getItem('ba-landing-accent') !== '1') {
-      localStorage.setItem('ba-landing-accent', '1');
-      return 'lime';
-    }
-  } catch {
-    /* ignore */
-  }
-  if (isAccent(stored)) return stored;
   return 'lime';
 }
 
@@ -127,16 +111,14 @@ export function readTheme(): ThemeId {
   return readStoredTheme();
 }
 
-export function applyAccent(id: string) {
-  const picked = id === 'gold' ? 'lime' : id;
-  const next = isAccent(picked) ? picked : 'lime';
-  document.documentElement.dataset.accent = next;
+export function applyAccent(_id?: string) {
+  document.documentElement.dataset.accent = 'lime';
   try {
-    localStorage.setItem(ACCENT_KEY, next);
+    localStorage.setItem(ACCENT_KEY, 'lime');
   } catch {
     /* ignore */
   }
-  writeCookie(ACCENT_KEY, next);
+  writeCookie(ACCENT_KEY, 'lime');
 }
 
 export function applyTheme(id: ThemeId) {
@@ -158,9 +140,9 @@ export function toggleTheme() {
 
 /** Call once at app boot — one choice applies site-wide. */
 export function bootTheme() {
-  const fromUrl = consumeThemeFromUrl();
-  applyAccent(fromUrl.accent || readStoredAccent());
-  applyTheme(fromUrl.theme || readStoredTheme());
+  consumeThemeFromUrl();
+  applyAccent('lime');
+  applyTheme(readStoredTheme());
 }
 
 /** Append current accent/theme so outbound shop/player links keep the same look. */
