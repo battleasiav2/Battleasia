@@ -70,7 +70,7 @@ class AuthTextField extends StatelessWidget {
                 fontSize: 15,
               ),
               filled: true,
-              fillColor: const Color(0xFF14160C),
+              fillColor: const Color(0xFF14161C),
               isDense: true,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 14,
@@ -83,11 +83,11 @@ class AuthTextField extends StatelessWidget {
               suffixIcon: suffix,
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(9),
-                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.16), width: 1.5),
+                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(9),
-                borderSide: BorderSide(color: AppColors.gold, width: 1.5),
+                borderSide: BorderSide(color: AppColors.gold.withValues(alpha: 0.7)),
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(9),

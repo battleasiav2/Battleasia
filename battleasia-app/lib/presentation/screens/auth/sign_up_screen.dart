@@ -260,10 +260,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     return AuthFormShell(
       wide: true,
-      showTrustRow: true,
       progress: progress,
       title: 'auth.createAccountTitle'.tr(),
-      description: 'auth.signUpStepsDescription'.tr(),
       steps: AuthStepProgress(
         currentStep: _step,
         steps: [
@@ -293,7 +291,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 label: 'auth.email'.tr(),
                 hint: 'auth.emailPlaceholder'.tr(),
                 keyboardType: TextInputType.emailAddress,
-                prefixIcon: Icons.mail_outline,
                 textInputAction: TextInputAction.next,
               ),
               if (_emailChecking)
@@ -317,7 +314,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 label: 'auth.password'.tr(),
                 hint: 'auth.passwordPlaceholder'.tr(),
                 obscureText: _obscurePassword,
-                prefixIcon: Icons.lock_outline,
                 suffix: IconButton(
                   icon: Icon(
                     _obscurePassword
@@ -337,7 +333,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 label: 'auth.confirmPassword'.tr(),
                 hint: 'auth.confirmPasswordHint'.tr(),
                 obscureText: _obscureConfirmPassword,
-                prefixIcon: Icons.lock_outline,
                 suffix: IconButton(
                   icon: Icon(
                     _obscureConfirmPassword
@@ -361,7 +356,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 controller: _inGameUserNameController,
                 label: 'auth.inGameName'.tr(),
                 hint: 'auth.inGameNameHint'.tr(),
-                prefixIcon: Icons.person_outline,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'auth.inGameNameRequired'.tr();
@@ -374,7 +368,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 controller: _pubgIdController,
                 label: 'auth.pubgId'.tr(),
                 hint: 'auth.pubgIdHint'.tr(),
-                prefixIcon: Icons.sports_esports_outlined,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'auth.pubgIdRequired'.tr();

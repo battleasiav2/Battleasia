@@ -230,7 +230,6 @@ class _SignInScreenState extends State<SignInScreen> {
 
     return AuthFormShell(
       heroAfter: true,
-      showTrustRow: true,
       title: widget.titleKey.tr(),
       description: null,
       child: AutofillGroup(
@@ -435,7 +434,7 @@ class _SocialButton extends StatelessWidget {
         onPressed: busy ? null : onPressed,
         style: OutlinedButton.styleFrom(
           foregroundColor: Colors.white,
-          side: BorderSide(color: Colors.white.withValues(alpha: 0.16), width: 1.5),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.12)),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
         ),
         child: Row(

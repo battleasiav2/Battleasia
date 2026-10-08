@@ -36,32 +36,19 @@ class AuthFormShell extends StatelessWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
       child: Scaffold(
-        backgroundColor: const Color(0xFF0A0B0F),
+        backgroundColor: const Color(0xFF0B0C10),
         resizeToAvoidBottomInset: true,
         body: Stack(
           fit: StackFit.expand,
           children: [
-            const ColoredBox(color: Color(0xFF0A0B0F)),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: RadialGradient(
-                  center: const Alignment(-0.6, -0.85),
-                  radius: 1.15,
-                  colors: [
-                    AppColors.gold.withValues(alpha: 0.18),
-                    Colors.transparent,
-                  ],
-                  stops: const [0.0, 0.58],
-                ),
-              ),
-            ),
+            const ColoredBox(color: Color(0xFF0B0C10)),
             SafeArea(
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   return SingleChildScrollView(
                     physics: const ClampingScrollPhysics(),
                     keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 28),
+                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
                     child: ConstrainedBox(
                       constraints: BoxConstraints(minHeight: constraints.maxHeight - 46),
                       child: Center(
@@ -76,10 +63,10 @@ class AuthFormShell extends StatelessWidget {
                                   alignment: Alignment.centerLeft,
                                   child: _AuthBackButton(),
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 8),
                               ],
                               const _AuthWordmark(),
-                              const SizedBox(height: 22),
+                              const SizedBox(height: 28),
                               _AuthPanel(
                                 title: title,
                                 description: description,
@@ -113,34 +100,13 @@ class _AuthBackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.white.withValues(alpha: 0.06),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(999),
-        side: BorderSide(color: Colors.white.withValues(alpha: 0.14)),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(999),
-        onTap: () => Navigator.of(context).pop(),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 8, 14, 8),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.arrow_back_rounded, size: 18, color: AppColors.gold),
-              const SizedBox(width: 6),
-              Text(
-                'auth.back'.tr(),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13.5,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+    return IconButton(
+      onPressed: () => Navigator.of(context).pop(),
+      visualDensity: VisualDensity.compact,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+      icon: const Icon(Icons.arrow_back_rounded, size: 22, color: Colors.white),
+      tooltip: 'auth.back'.tr(),
     );
   }
 }
@@ -156,25 +122,25 @@ class _AuthWordmark extends StatelessWidget {
         ClipOval(
           child: Image.asset(
             'assets/icon/icon.png',
-            width: 40,
-            height: 40,
+            width: 28,
+            height: 28,
             fit: BoxFit.cover,
             errorBuilder: (_, __, ___) => Image.asset(
               'assets/images/logo.webp',
-              width: 40,
-              height: 40,
+              width: 28,
+              height: 28,
               fit: BoxFit.contain,
             ),
           ),
         ),
-        const SizedBox(width: 10),
+        const SizedBox(width: 8),
         const Text(
           'BattleAsia',
           style: TextStyle(
             color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.6,
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.2,
           ),
         ),
       ],
@@ -201,15 +167,9 @@ class _AuthPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
+    return Container(
           width: double.infinity,
-          decoration: BoxDecoration(
-            color: const Color(0xFF121318),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-          ),
+          color: Colors.transparent,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -229,14 +189,14 @@ class _AuthPanel extends StatelessWidget {
                   ),
                 ),
               Padding(
-                padding: const EdgeInsets.fromLTRB(22, 26, 22, 22),
+                padding: EdgeInsets.zero,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
                       title,
                       style: AppTheme.heading2.copyWith(
-                        fontSize: 24,
+                        fontSize: 22,
                         height: 1.25,
                         fontWeight: FontWeight.w700,
                         color: Colors.white,
@@ -275,7 +235,6 @@ class _AuthPanel extends StatelessWidget {
               ),
             ],
           ),
-        ),
     );
   }
 }
