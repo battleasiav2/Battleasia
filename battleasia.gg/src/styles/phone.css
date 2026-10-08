@@ -36,14 +36,13 @@ svg {
 
 .nav-burger {
   display: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  border: 1px solid var(--ba-hair);
-  background: rgba(255, 255, 255, 0.04);
+  width: 28px;
+  height: 22px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   cursor: pointer;
-  place-items: center;
-  gap: 5px;
+  place-items: center start;
   padding: 0;
   flex-shrink: 0;
   margin-left: auto;
@@ -53,11 +52,14 @@ svg {
 .nav-burger span::before,
 .nav-burger span::after {
   display: block;
-  width: 18px;
   height: 2px;
-  background: var(--ba-text);
-  border-radius: 99px;
+  background: #fff;
+  border-radius: 2px;
   position: relative;
+}
+
+.nav-burger span {
+  width: 14px;
 }
 
 .nav-burger span::before,
@@ -65,14 +67,15 @@ svg {
   content: '';
   position: absolute;
   left: 0;
+  width: 22px;
 }
 
 .nav-burger span::before {
-  top: -6px;
+  top: -7px;
 }
 
 .nav-burger span::after {
-  top: 6px;
+  top: 7px;
 }
 
 @media (max-width: 1100px) {
@@ -252,9 +255,11 @@ svg {
     display: grid;
     order: 3;
     margin-left: 0;
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    width: 28px;
+    height: 22px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
   }
 
   .top-actions .hud-user {

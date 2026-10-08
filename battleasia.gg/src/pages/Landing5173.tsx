@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowDownRight, ArrowLeft, ArrowRight, ChevronDown, Crosshair, Crown, Eye, EyeOff, Headphones, Menu, MessageCircle, ShieldCheck, Sparkles, Users, X, Zap } from 'lucide-react';
+import { ArrowDownRight, ArrowLeft, ArrowRight, ChevronDown, Crosshair, Crown, Eye, EyeOff, Headphones, MessageCircle, ShieldCheck, Sparkles, Users, X, Zap } from 'lucide-react';
 import '../styles/landing-5173.css';
 import { GamingCursor } from '../components/GamingCursor';
 import { ThemeDock } from '../components/ThemeDock';
@@ -1100,7 +1100,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
               <UserAvatar src={me?.avatar} name={playerName} size={34} priority />
             </Link>
           ) : null}
-          <button className="mobile-trigger" aria-label="Open menu" onClick={() => setMobileOpen(true)}><Menu size={22}/></button>
+          <button className="mobile-trigger" aria-label="Open menu" onClick={() => setMobileOpen(true)}><span className="ba-menu-ico" /></button>
         </div>
       </header>
 

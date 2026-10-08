@@ -116,7 +116,12 @@ html[lang="bn"] .ba5173{
   min-height: 0;
   font: inherit;
 }
-.ba5173 .mobile-trigger{display:none;background:none;color:#fff;border:0}
+.ba5173 .mobile-trigger{display:none;background:none;color:#fff;border:0;width:28px;height:28px;padding:0;place-items:center start}
+.ba5173 .ba-menu-ico,.ba5173 .ba-menu-ico::before,.ba5173 .ba-menu-ico::after{display:block;height:2px;background:#fff;border-radius:2px}
+.ba5173 .ba-menu-ico{position:relative;width:14px}
+.ba5173 .ba-menu-ico::before,.ba5173 .ba-menu-ico::after{content:"";position:absolute;left:0;width:22px}
+.ba5173 .ba-menu-ico::before{top:-7px}
+.ba5173 .ba-menu-ico::after{top:7px}
 .ba5173 .hero{min-height:780px;height:min(900px,100svh);padding-top:78px;position:relative;display:flex;align-items:center;overflow:hidden}
 .ba5173 .hero-bg{position:absolute;inset:0;background:linear-gradient(90deg,#0a0b0f 0%,rgba(10,11,15,.94) 34%,rgba(10,11,15,.52) 58%,rgba(10,11,15,.28) 100%),linear-gradient(0deg,#0a0b0f 0%,transparent 42%,rgba(10,11,15,.32)),var(--hero-bg-image) center 52%/cover no-repeat;animation:heroEnter 1.4s ease both}
 .ba5173 .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:80px 80px;mask-image:linear-gradient(90deg,black,transparent 80%);opacity:.28}
