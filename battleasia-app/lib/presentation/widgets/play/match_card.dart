@@ -151,7 +151,7 @@ class _MatchCardState extends State<MatchCard> {
                     left: 16,
                     bottom: 8,
                     child: Text(
-                      (widget.match.map ?? '').toUpperCase(),
+                      widget.match.map ?? '',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
