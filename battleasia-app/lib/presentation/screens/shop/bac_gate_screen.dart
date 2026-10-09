@@ -1,4 +1,4 @@
-import 'dart:ui' as ui;
+import 'dart:math' as math;
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -133,81 +133,22 @@ class _BacMarkState extends State<_BacMark> with SingleTickerProviderStateMixin 
   @override
   Widget build(BuildContext context) {
     final reduce = MediaQuery.disableAnimationsOf(context);
-    final ring = RotationTransition(
-      turns: reduce ? const AlwaysStoppedAnimation(0) : _spin,
-      child: CustomPaint(size: const Size(64, 64), painter: _BacRingPainter(AppColors.gold)),
-    );
-    return SizedBox(
-      width: 64,
-      height: 64,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          ring,
-          CustomPaint(size: const Size(64, 64), painter: _BacFacePainter(AppColors.gold)),
-        ],
-      ),
-    );
-  }
-}
-
-class _BacRingPainter extends CustomPainter {
-  _BacRingPainter(this.ring);
-
-  final Color ring;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius - 1.6),
-      -0.6,
-      5.3,
-      false,
-      Paint()
-        ..color = ring
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.4
-        ..strokeCap = StrokeCap.round,
-    );
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius * 0.72),
-      0.4,
-      4.2,
-      false,
-      Paint()
-        ..color = ring.withValues(alpha: 0.55)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.2,
+    final coin = Image.asset('assets/images/currency.webp', width: 64, height: 64);
+    if (reduce) return coin;
+    return AnimatedBuilder(
+      animation: _spin,
+      builder: (context, child) {
+        return Transform(
+          alignment: Alignment.center,
+          transform: Matrix4.identity()
+            ..setEntry(3, 2, 0.002)
+            ..rotateY(_spin.value * math.pi * 2),
+          child: child,
+        );
+      },
+      child: coin,
     );
   }
-
-  @override
-  bool shouldRepaint(covariant _BacRingPainter oldDelegate) => oldDelegate.ring != ring;
-}
-
-class _BacFacePainter extends CustomPainter {
-  _BacFacePainter(this.ring);
-
-  final Color ring;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    canvas.drawCircle(center, size.width * 0.36, Paint()..color = const Color(0xFF12140A));
-    final label = TextPainter(
-      text: TextSpan(
-        text: 'B',
-        style: TextStyle(color: ring, fontSize: 26, fontWeight: FontWeight.w800, height: 1),
-      ),
-      textDirection: ui.TextDirection.ltr,
-    )..layout();
-    label.paint(canvas, center - Offset(label.width / 2, label.height / 2));
-  }
-
-  @override
-  bool shouldRepaint(covariant _BacFacePainter oldDelegate) => oldDelegate.ring != ring;
 }
 
 class _BacFact extends StatelessWidget {
