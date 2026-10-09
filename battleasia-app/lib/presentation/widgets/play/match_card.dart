@@ -90,14 +90,14 @@ class _MatchCardState extends State<MatchCard> {
       color: Colors.transparent,
       elevation: 0,
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: DecoratedBox(
-        decoration: AppTheme.surfaceCard(radius: 8),
+        decoration: AppTheme.surfaceCard(radius: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              height: 108,
+              height: 168,
               child: Stack(
                 fit: StackFit.expand,
                 children: [

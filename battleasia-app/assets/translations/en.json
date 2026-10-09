@@ -783,7 +783,7 @@
     "noReels": "No reels",
     "ownEmpty": "Share from Feed to fill this grid.",
     "otherEmpty": "Nothing here yet.",
-    "usernameHint": "You can change your username once every 7 days.",
+    "usernameHint": "Your username is your ID. It cannot be changed.",
     "usernameCooldown": "Username locked. Try again in {n} days.",
     "linkInvalid": "Enter a valid http(s) URL",
     "unfollow": "Unfollow",

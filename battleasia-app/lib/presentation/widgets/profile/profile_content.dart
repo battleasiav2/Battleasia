@@ -300,15 +300,6 @@ class _ProfileContentState extends State<ProfileContent> {
     return null;
   }
 
-  (bool, int) _usernameLock(String? raw) {
-    final at = DateTime.tryParse(raw ?? '');
-    if (at == null) return (false, 0);
-    final until = at.add(const Duration(days: 7));
-    if (!until.isAfter(DateTime.now())) return (false, 0);
-    final days = (until.difference(DateTime.now()).inMilliseconds / Duration(days: 1).inMilliseconds).ceil();
-    return (true, days < 1 ? 1 : days);
-  }
-
   Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) {
       if (mounted) {
@@ -768,79 +759,34 @@ class _ProfileContentState extends State<ProfileContent> {
                   ),
                   SizedBox(height: spacing16),
                 ],
-                // In Game User Name
-                TextFormField(
-                  controller: _usernameController,
-                  enabled: !_usernameLock(
-                    Provider.of<AuthProvider>(context, listen: false).user?.usernameChangedAt,
-                  ).$1,
+                Text(
+                  'In Game User Name',
+                  style: TextStyle(color: Colors.blueGrey, fontSize: labelFontSize),
+                ),
+                SizedBox(height: spacing8),
+                InputDecorator(
                   decoration: InputDecoration(
-                    labelText: 'In Game User Name *',
-                    helperText: _usernameLock(
-                          Provider.of<AuthProvider>(context, listen: false).user?.usernameChangedAt,
-                        ).$1
-                        ? 'profile.usernameCooldown'.tr(namedArgs: {
-                            'n': '${_usernameLock(Provider.of<AuthProvider>(context, listen: false).user?.usernameChangedAt).$2}',
-                          })
-                        : 'profile.usernameHint'.tr(),
+                    helperText: 'profile.usernameHint'.tr(),
                     helperMaxLines: 2,
-                    labelStyle: TextStyle(
-                      color: Colors.blueGrey,
-                      fontSize: labelFontSize,
-                    ),
+                    filled: true,
+                    fillColor: Colors.white.withValues(alpha: 0.06),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
-                        color: Colors.blueGrey,
-                        width: 1,
-                      ),
+                      borderSide: const BorderSide(color: Colors.blueGrey, width: 1),
                     ),
-                    filled: true,
-                    fillColor: Colors.white.withOpacity(0.1),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
-                        color: Colors.blueGrey,
-                        width: 1,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: AppTheme.accentColor,
-                        width: 1,
-                      ),
-                    ),
-                    disabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(
-                        color: Colors.blueGrey,
-                        width: 1,
-                      ),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Colors.red, width: 1),
-                    ),
-                    focusedErrorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: Colors.red, width: 1),
+                      borderSide: const BorderSide(color: Colors.blueGrey, width: 1),
                     ),
                     contentPadding: EdgeInsets.symmetric(
                       horizontal: spacing16,
                       vertical: spacing16,
                     ),
                   ),
-                  style: AppTheme.bodyMedium.copyWith(fontSize: inputFontSize),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'In Game User Name is required';
-                    }
-                    if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value.trim())) {
-                      return 'auth.usernameRule'.tr();
-                    }
-                    return null;
-                  },
+                  child: Text(
+                    _usernameController.text,
+                    style: AppTheme.bodyMedium.copyWith(fontSize: inputFontSize),
+                  ),
                 ),
                 SizedBox(height: spacing16),
 

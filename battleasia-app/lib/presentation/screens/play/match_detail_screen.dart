@@ -656,13 +656,14 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
           height: bannerHeight,
           width: double.infinity,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: const Color.fromARGB(255, 170, 170, 170),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            color: const Color(0xFF161618),
             image: DecorationImage(
               image: bannerUrl.startsWith('http')
                   ? NetworkImage(bannerUrl)
                   : AssetImage(bannerUrl) as ImageProvider,
-              fit: BoxFit.contain,
+              fit: BoxFit.cover,
             ),
           ),
         ),
@@ -673,7 +674,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
         Text(
           _matchDetail!.matchName,
           style: AppTheme.heading2.copyWith(
-            color: const Color(0xFF10b981),
+            color: const Color(0xFFD4E82A),
             fontWeight: FontWeight.bold,
             fontSize: titleFontSize,
           ),
@@ -945,9 +946,9 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       width: fullWidth ? double.infinity : null,
       padding: EdgeInsets.all(cardPadding),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E).withOpacity(0.95),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        color: const Color(0xFF161618),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Text(
         '$label: $value',
@@ -989,9 +990,9 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       width: double.infinity,
       padding: EdgeInsets.all(cardPadding),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E).withOpacity(0.95),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        color: const Color(0xFF161618),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -999,7 +1000,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
           Text(
             'match.roomCreds'.tr(),
             style: AppTheme.heading3.copyWith(
-              color: const Color(0xFF10b981),
+              color: const Color(0xFFD4E82A),
               fontWeight: FontWeight.w600,
               fontSize: titleFontSize,
             ),

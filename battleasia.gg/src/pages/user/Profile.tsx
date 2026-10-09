@@ -40,7 +40,6 @@ const SERVERS = [
   { value: 'krjp', key: 'srv.krjp' },
 ] as const;
 
-const USERNAME_RE = /^[a-zA-Z0-9_]+$/;
 const PUBG_RE = /^[a-zA-Z0-9]{1,20}$/;
 const URL_RE = /^https?:\/\/.+/i;
 
@@ -188,11 +187,6 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
   if (!profile || !form) return <main className="play-main"><div className="match-row skeleton" /></main>;
 
   const isOwn = own || profile.isOwnProfile || profile.id === session?.id;
-  const usernameCooldownMs = 7 * 24 * 60 * 60 * 1000;
-  const usernameChangedAtMs = profile.usernameChangedAt ? new Date(profile.usernameChangedAt).getTime() : 0;
-  const usernameLockedUntil = usernameChangedAtMs ? usernameChangedAtMs + usernameCooldownMs : 0;
-  const usernameLocked = Boolean(isOwn && usernameLockedUntil > Date.now());
-  const usernameLockDays = usernameLocked ? Math.ceil((usernameLockedUntil - Date.now()) / (24 * 60 * 60 * 1000)) : 0;
   const grid =
     tab === 'highlights'
       ? []
@@ -202,8 +196,6 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
 
   const validate = () => {
     const next: Record<string, string> = {};
-    const username = sanitizeLine(form.username);
-    if (!username || !USERNAME_RE.test(username)) next.username = t('errors.username');
     const pubg = sanitizeLine(form.pubgId);
     if (!pubg || !PUBG_RE.test(pubg)) next.pubgId = t('errors.pubg');
     const mobile = sanitizeLine(form.mobile).replace(/\D/g, '');
@@ -490,7 +482,6 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
             if (!validate()) return;
             setBusy(true);
             try {
-              const username = sanitizeLine(form.username);
               const pubgId = sanitizeLine(form.pubgId);
               const mobileNo = sanitizeLine(form.mobile).replace(/\D/g, '');
               const countryCode = countryDial(form.countryIso);
@@ -500,7 +491,6 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
               const facebookLink = safeHref(sanitizeLine(form.facebookLink));
               const instagramLink = safeHref(sanitizeLine(form.instagramLink));
               const payload = {
-                username,
                 email: form.email,
                 countryCode,
                 mobileNo,
@@ -541,31 +531,19 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
           <label className="field">
             {t('auth.username')}
             <span className="username-edit-row">
-              <input
-                value={form.username}
-                autoComplete="username"
-                maxLength={32}
-                disabled={usernameLocked}
-                onChange={(e) => setField('username', e.target.value)}
-                onBlur={(e) => setField('username', sanitizeLine(e.target.value))}
-              />
+              <input value={profile.username} readOnly disabled aria-readonly="true" />
               <button
                 className="btn btn-ghost"
                 type="button"
                 onClick={async () => {
-                  await navigator.clipboard.writeText(form.username || profile.username);
+                  await navigator.clipboard.writeText(profile.username);
                   toast(t('profile.usernameCopied'));
                 }}
               >
                 {t('profile.copy')}
               </button>
             </span>
-            {usernameLocked ? (
-              <span className="field-hint">{t('profile.usernameCooldown').replace('{n}', String(usernameLockDays))}</span>
-            ) : (
-              <span className="field-hint">{t('profile.usernameHint')}</span>
-            )}
-            {fieldErrors.username ? <span className="field-error">{fieldErrors.username}</span> : null}
+            <span className="field-hint">{t('profile.usernameHint')}</span>
           </label>
 
           <label className="field">

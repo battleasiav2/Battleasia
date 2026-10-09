@@ -950,7 +950,6 @@ router.put('/me', requireAuth, async (req: AuthedRequest, res) => {
     }
 
     const body = req.body as Record<string, unknown>;
-    const USERNAME_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
     const allowed = [
       'countryCode',
       'mobileNo',
@@ -997,26 +996,10 @@ router.put('/me', requireAuth, async (req: AuthedRequest, res) => {
     if (typeof body.username === 'string' && body.username.trim()) {
       const nextName = body.username.trim();
       if (nextName.toLowerCase() !== (user.username || '').toLowerCase()) {
-        const last = user.usernameChangedAt ? user.usernameChangedAt.getTime() : 0;
-        const waitMs = last + USERNAME_COOLDOWN_MS - Date.now();
-        if (waitMs > 0) {
-          const days = Math.ceil(waitMs / (24 * 60 * 60 * 1000));
-          return res.status(429).json({
-            status: false,
-            message: `Username can only be changed every 7 days. Try again in ${days} day${days === 1 ? '' : 's'}.`,
-            retryAfterDays: days,
-            usernameChangedAt: user.usernameChangedAt?.toISOString() || null,
-          });
-        }
-        const taken = await User.findOne({
-          username: { $regex: new RegExp(`^${nextName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
-          _id: { $ne: user._id },
+        return res.status(400).json({
+          status: false,
+          message: 'Username cannot be changed. It works like your game ID.',
         });
-        if (taken) {
-          return res.status(409).json({ status: false, message: 'Username already taken' });
-        }
-        user.username = nextName;
-        user.usernameChangedAt = new Date();
       }
     }
 

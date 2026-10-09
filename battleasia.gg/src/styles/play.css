@@ -1478,13 +1478,13 @@
 
 .match-hero {
   position: relative;
-  border-radius: 18px;
+  border-radius: 16px;
   overflow: hidden;
-  background: var(--ba-card);
+  background: #161618;
   margin-bottom: 0;
-  min-height: 140px;
-  aspect-ratio: 21 / 7;
-  border: 0;
+  min-height: 180px;
+  aspect-ratio: 21 / 8;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: none;
 }
 
@@ -1496,7 +1496,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.55;
+  opacity: 1;
 }
 
 .match-hero-copy {
@@ -1525,6 +1525,9 @@
 .match-facts article {
   min-height: 108px;
   padding: 16px 14px 14px;
+  border-radius: 16px;
+  background: #161618;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .match-facts small {
@@ -6983,9 +6986,9 @@ a.hist-item-link {
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  background: #121318;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: #161618;
   color: inherit;
   cursor: pointer;
   transition: border-color 0.2s ease, transform 0.2s ease;
@@ -7002,7 +7005,7 @@ a.hist-item-link {
 
 .ba-room-image {
   position: relative;
-  height: 108px;
+  height: 168px;
   overflow: hidden;
   background: #16181c;
 }
@@ -7094,12 +7097,14 @@ a.hist-item-link {
 }
 
 .ba-room-body h3 {
-  margin: 7px 0;
-  font-size: 14px;
+  margin: 10px 0 6px;
+  font-size: 16px;
   font-weight: 700;
-  white-space: nowrap;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .ba-room-time {
@@ -7389,7 +7394,7 @@ a.hist-item-link {
   }
 
   .ba-room-image {
-    height: 124px;
+    height: 148px;
   }
 }
 
