@@ -6500,6 +6500,33 @@ a.hist-item-link {
   cursor: pointer;
 }
 
+.support-ticket.is-waiting {
+  margin: 6px 0;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(212, 232, 42, 0.55);
+  box-shadow: 0 0 0 1px rgba(212, 232, 42, 0.25), 0 0 18px rgba(212, 232, 42, 0.18);
+}
+
+.support-ticket.is-seen {
+  opacity: 0.78;
+}
+
+.support-flag {
+  justify-self: start;
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.support-flag.is-new {
+  color: #d4e82a;
+}
+
+.support-flag.is-seen {
+  color: #9ca3af;
+}
+
 .support-ticket-list li:last-child .support-ticket {
   border-bottom: 0;
 }

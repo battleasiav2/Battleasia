@@ -584,6 +584,8 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                               children: List.generate(_tickets.length, (index) {
                                 final t = _tickets[index];
                                 final isLast = index == _tickets.length - 1;
+                                final waiting = t.unreadCount > 0;
+                                final seen = t.lastFrom == 'admin' && !waiting;
                                 final meta = [
                                   _supportCategoryLabel(t.category),
                                   if ((t.previewBody ?? '').isNotEmpty)
@@ -604,13 +606,24 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                                       vertical: 12,
                                     ),
                                     decoration: BoxDecoration(
-                                      border: Border(
-                                        bottom: BorderSide(
-                                          color: Colors.white.withValues(
-                                            alpha: isLast ? 0 : 0.08,
-                                          ),
-                                        ),
-                                      ),
+                                      borderRadius: waiting ? BorderRadius.circular(14) : null,
+                                      border: waiting
+                                          ? Border.all(color: const Color(0xFFD4E82A).withValues(alpha: 0.55))
+                                          : Border(
+                                              bottom: BorderSide(
+                                                color: Colors.white.withValues(
+                                                  alpha: isLast ? 0 : 0.08,
+                                                ),
+                                              ),
+                                            ),
+                                      boxShadow: waiting
+                                          ? [
+                                              BoxShadow(
+                                                color: const Color(0xFFD4E82A).withValues(alpha: 0.22),
+                                                blurRadius: 16,
+                                              ),
+                                            ]
+                                          : null,
                                     ),
                                     child: Row(
                                       children: [
@@ -656,13 +669,21 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
                                                   ),
                                                   const SizedBox(width: 8),
                                                   Text(
-                                                    _supportStatusLabel(
-                                                      t.status,
-                                                    ),
+                                                    waiting
+                                                        ? '${t.unreadCount} ${'support.waiting'.tr()}'
+                                                        : seen
+                                                            ? 'support.seen'.tr()
+                                                            : _supportStatusLabel(
+                                                                t.status,
+                                                              ),
                                                     style: TextStyle(
-                                                      color: _statusColor(
-                                                        t.status,
-                                                      ),
+                                                      color: waiting
+                                                          ? const Color(0xFFD4E82A)
+                                                          : seen
+                                                              ? Colors.white.withValues(alpha: 0.45)
+                                                              : _statusColor(
+                                                                  t.status,
+                                                                ),
                                                       fontSize: 10,
                                                       fontWeight:
                                                           FontWeight.w800,

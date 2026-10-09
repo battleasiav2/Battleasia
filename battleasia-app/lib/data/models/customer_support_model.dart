@@ -16,6 +16,8 @@ class ConversationModel {
   final String? previewBody;
   final List<String> previewAttachments;
   final int attachmentCount;
+  final int unreadCount;
+  final String lastFrom;
 
   ConversationModel({
     required this.id,
@@ -30,6 +32,8 @@ class ConversationModel {
     this.previewBody,
     this.previewAttachments = const [],
     this.attachmentCount = 0,
+    this.unreadCount = 0,
+    this.lastFrom = '',
   });
 
   bool get isClosed => status.toLowerCase() == 'closed';
@@ -75,6 +79,10 @@ class ConversationModel {
       attachmentCount: (json['attachmentCount'] as num?)?.toInt() ??
           (json['attachment_count'] as num?)?.toInt() ??
           previews.length,
+      unreadCount: (json['unreadCount'] as num?)?.toInt() ??
+          (json['unread_count'] as num?)?.toInt() ??
+          0,
+      lastFrom: getString(json['lastFrom']) ?? getString(json['last_from']) ?? '',
     );
   }
 
@@ -92,6 +100,8 @@ class ConversationModel {
       previewBody: previewBody,
       previewAttachments: previewAttachments,
       attachmentCount: attachmentCount,
+      unreadCount: unreadCount,
+      lastFrom: lastFrom,
     );
   }
 
@@ -109,6 +119,8 @@ class ConversationModel {
       'previewBody': previewBody,
       'previewAttachments': previewAttachments,
       'attachmentCount': attachmentCount,
+      'unreadCount': unreadCount,
+      'lastFrom': lastFrom,
     };
   }
 }

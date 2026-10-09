@@ -83,6 +83,8 @@ export function serializeConversation(
           avatar: u.avatar || '',
         }
       : conversation.userId.toString(),
+    username: u?.username || '',
+    email: u?.email || '',
     subject: conversation.subject || 'Live Support',
     category: conversation.category || 'other',
     status: conversation.status,

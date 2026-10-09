@@ -285,12 +285,21 @@ export function CustomerSupportPage() {
               </div>
             ) : (
               <ul className="support-ticket-list">
-                {tickets.map((ticket) => (
+                {tickets.map((ticket) => {
+                  const unread = Number(ticket.unreadCount) || 0;
+                  const seen = ticket.lastFrom === 'admin' && unread === 0;
+                  return (
                   <li key={ticket.id}>
-                    <button type="button" className="support-ticket" onClick={() => openTicket(ticket)}>
+                    <button
+                      type="button"
+                      className={`support-ticket${unread ? ' is-waiting' : ''}${seen ? ' is-seen' : ''}`}
+                      onClick={() => openTicket(ticket)}
+                    >
                       <span className={`support-status is-${ticket.status || 'open'}`}>
                         {ticket.status || 'open'}
                       </span>
+                      {unread ? <em className="support-flag is-new">{unread} {t('support.waiting')}</em> : null}
+                      {seen ? <em className="support-flag is-seen">{t('support.seen')}</em> : null}
                       <strong>{ticket.subject || t('support.staff')}</strong>
                       <small>
                         {(ticket.category || 'other').toUpperCase()}
@@ -299,7 +308,8 @@ export function CustomerSupportPage() {
                       {ticket.previewBody ? <p>{ticket.previewBody}</p> : null}
                     </button>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             )}
           </section>

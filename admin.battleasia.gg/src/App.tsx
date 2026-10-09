@@ -41,6 +41,7 @@ const GameFormPage = lazy(() => import('./pages/GameFormPage').then((m) => ({ de
 const MatchFormPage = lazy(() => import('./pages/MatchFormPage').then((m) => ({ default: m.MatchFormPage })));
 const MatchResultPage = lazy(() => import('./pages/MatchResultPage').then((m) => ({ default: m.MatchResultPage })));
 const SupportThreadPage = lazy(() => import('./pages/SupportThreadPage').then((m) => ({ default: m.SupportThreadPage })));
+const SupportInboxPage = lazy(() => import('./pages/SupportInboxPage').then((m) => ({ default: m.SupportInboxPage })));
 const IntegrityPage = lazy(() => import('./pages/IntegrityPage').then((m) => ({ default: m.IntegrityPage })));
 const FlagsPage = lazy(() => import('./pages/FlagsPage').then((m) => ({ default: m.FlagsPage })));
 const ProfilePage = lazy(() => import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
@@ -68,9 +69,12 @@ export default function App() {
             }
           >
             <Route path="/dashboard" element={<DashboardPage />} />
-            {Object.keys(LISTS).map((path) => (
-              <Route key={path} path={path} element={<ListPage />} />
-            ))}
+            {Object.keys(LISTS)
+              .filter((path) => path !== '/customer-support/list')
+              .map((path) => (
+                <Route key={path} path={path} element={<ListPage />} />
+              ))}
+            <Route path="/customer-support/list" element={<SupportInboxPage />} />
             {GENERIC_SETTINGS.map((path) => (
               <Route key={path} path={path} element={<SettingsPage />} />
             ))}

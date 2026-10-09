@@ -831,6 +831,8 @@
   "support.attachHint": "ড্রপ করুন বা একসাথে সর্বোচ্চ ৮টি ছবি নিন",
   "support.create": "টিকিট তৈরি",
   "support.created": "টিকিট তৈরি হয়েছে",
+  "support.waiting": "নতুন",
+  "support.seen": "রিপ্লাই হয়েছে",
   "support.needSubject": "বিষয় লাগবে",
   "support.needBody": "বর্ণনা বা ছবি দিন",
   "support.close": "টিকিট বন্ধ",

@@ -901,6 +901,8 @@
   "support.attachHint": "Drop or pick up to 8 images",
   "support.create": "Create ticket",
   "support.created": "Ticket created",
+  "support.waiting": "new",
+  "support.seen": "Replied",
   "support.needSubject": "Subject is required",
   "support.needBody": "Add a description or image",
   "support.close": "Close ticket",

@@ -130,7 +130,9 @@
     "failedClose": "বন্ধ করা ব্যর্থ",
     "failedSend": "পাঠানো ব্যর্থ",
     "defaultSubject": "সাপোর্ট টিকিট",
-    "seeAttached": "অ্যাটাচমেন্ট দেখুন"
+    "seeAttached": "অ্যাটাচমেন্ট দেখুন",
+    "waiting": "নতুন",
+    "seen": "রিপ্লাই হয়েছে"
   },
   "wallet": {
     "paymentChannel": "পেমেন্ট চ্যানেল",

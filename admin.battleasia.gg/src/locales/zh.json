@@ -76,6 +76,8 @@
   "chrome.newWithdrawal": "新提现",
   "chrome.dep": "充",
   "chrome.wdr": "提",
+  "chrome.support": "客服",
+  "chrome.newSupport": "新的客服消息",
   "chrome.palette": "命令面板",
   "chrome.close": "关闭",
   "login.title": "管理员登录",

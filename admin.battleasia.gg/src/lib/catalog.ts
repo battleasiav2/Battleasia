@@ -3,7 +3,7 @@ export type NavItem = {
   label: string;
   perm?: string | null;
   icon?: string;
-  badge?: 'deposits' | 'withdrawals';
+  badge?: 'deposits' | 'withdrawals' | 'support';
 };
 
 export type NavGroup = {
@@ -72,7 +72,7 @@ export const NAV: NavGroup[] = [
       { to: '/feed/profile-social-settings', label: 'nav.profileSocial', perm: 'feed.edit', icon: 'social' },
       { to: '/feed/social-reports', label: 'nav.reports', perm: 'feed.view', icon: 'flag' },
       { to: '/feed/reels-moderation', label: 'nav.reels', perm: 'feed.view', icon: 'reel' },
-      { to: '/customer-support/list', label: 'nav.support', perm: 'customer-support.view', icon: 'support' },
+      { to: '/customer-support/list', label: 'nav.support', perm: 'customer-support.view', icon: 'support', badge: 'support' },
       { to: '/customer-support/live-chat-settings', label: 'nav.liveChat', perm: 'customer-support.view', icon: 'chat' },
       { to: '/customer-support/messaging-provider-settings', label: 'nav.messaging', perm: 'customer-support.view', icon: 'send' },
     ],

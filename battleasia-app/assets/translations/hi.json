@@ -98,7 +98,9 @@
     "failedClose": "बंद करना विफल",
     "failedSend": "भेजना विफल",
     "defaultSubject": "सपोर्ट टिकट",
-    "seeAttached": "अटैचमेंट देखें"
+    "seeAttached": "अटैचमेंट देखें",
+    "waiting": "नया",
+    "seen": "जवाब दिया"
   },
   "wallet": {
     "paymentChannel": "पेमेंट चैनल",

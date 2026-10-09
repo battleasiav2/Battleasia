@@ -12,10 +12,11 @@ import {
   serializeConversation,
   serializeSupportMessage,
 } from '../../utils/feed-serialize.js';
-import { getSocketServer } from '../../utils/socket.js';
+import { emitNewSupport, emitSupportUnread, getSocketServer } from '../../utils/socket.js';
 import { notifySupportReply } from '../../utils/payment-notifications.js';
 import { getAppSettings, normalizeLiveChatSettings } from '../../models/AppSettings.js';
 import { sanitizeAttachmentList } from '../../utils/safe-url.js';
+import { countOpenSupportUnread, supportPreviews, ticketUnread, type SupportPreview } from '../../utils/support-inbox.js';
 
 const router = Router();
 
@@ -45,40 +46,20 @@ async function canAccessConversation(userId: string, conversationId: string): Pr
   return conversation.userId.toString() === userId;
 }
 
-async function enrichConversationsWithPreview(conversations: InstanceType<typeof SupportConversation>[]) {
-  const ids = conversations.map((c) => c._id);
-  if (!ids.length) return new Map<string, { previewBody: string; previewAttachments: string[]; attachmentCount: number }>();
-
-  const messages = await SupportMessage.find({ conversationId: { $in: ids } })
-    .sort({ createdAt: -1 })
-    .select('conversationId body attachments createdAt');
-
-  const previewMap = new Map<
-    string,
-    { previewBody: string; previewAttachments: string[]; attachmentCount: number }
-  >();
-
-  for (const msg of messages) {
-    const key = msg.conversationId.toString();
-    const existing = previewMap.get(key);
-    if (!existing) {
-      previewMap.set(key, {
-        previewBody: msg.body || '',
-        previewAttachments: Array.isArray(msg.attachments) ? msg.attachments.slice(0, 3) : [],
-        attachmentCount: Array.isArray(msg.attachments) ? msg.attachments.length : 0,
-      });
-    } else if (Array.isArray(msg.attachments) && msg.attachments.length) {
-      existing.attachmentCount += msg.attachments.length;
-      if (existing.previewAttachments.length < 3) {
-        existing.previewAttachments = [
-          ...existing.previewAttachments,
-          ...msg.attachments.slice(0, 3 - existing.previewAttachments.length),
-        ];
-      }
-    }
-  }
-
-  return previewMap;
+function withPreview(
+  conversation: InstanceType<typeof SupportConversation>,
+  user: Parameters<typeof serializeConversation>[1],
+  preview: SupportPreview | undefined,
+) {
+  const unread = ticketUnread(conversation.status, conversation.subject || '', preview);
+  return {
+    ...serializeConversation(conversation, user),
+    previewBody: preview?.previewBody || '',
+    previewAttachments: preview?.previewAttachments || [],
+    attachmentCount: preview?.attachmentCount || 0,
+    unreadCount: unread.unread,
+    lastFrom: unread.lastFrom,
+  };
 }
 
 router.get('/conversation', requireAuth, async (req: AuthedRequest, res) => {
@@ -114,7 +95,7 @@ router.post('/conversation', requireAuth, async (req: AuthedRequest, res) => {
     const subject = normalizeSubject(req.body?.subject);
     const category = normalizeCategory(req.body?.category);
     const body = String(req.body?.body || '').trim();
-    const attachments = Array.isArray(req.body?.attachments) ? req.body.attachments : [];
+    const attachments = sanitizeAttachmentList(req.body?.attachments, 8);
 
     if (!body && attachments.length === 0) {
       return res.status(400).json({ status: false, message: 'Description or attachment is required' });
@@ -134,10 +115,9 @@ router.post('/conversation', requireAuth, async (req: AuthedRequest, res) => {
     });
 
     const matchId = String(req.body?.matchId || '').trim();
-    const evidenceUrls = Array.isArray(req.body?.evidenceUrls)
-      ? req.body.evidenceUrls.map((u: unknown) => String(u).slice(0, 500)).filter(Boolean).slice(0, 8)
-      : attachments.map((a: { url?: string }) => String(a?.url || '')).filter(Boolean).slice(0, 8);
-    if (category === 'match' || matchId || evidenceUrls.length) {
+    const evidenceUrls = sanitizeAttachmentList(req.body?.evidenceUrls, 8);
+    const disputeUrls = evidenceUrls.length ? evidenceUrls : attachments;
+    if (category === 'match' || matchId || disputeUrls.length) {
       const { Dispute } = await import('../../models/Dispute.js');
       const { default: mongoose } = await import('mongoose');
       await Dispute.create({
@@ -145,7 +125,7 @@ router.post('/conversation', requireAuth, async (req: AuthedRequest, res) => {
         matchId: mongoose.isValidObjectId(matchId) ? matchId : undefined,
         conversationId: conversation._id,
         subject,
-        evidenceUrls,
+        evidenceUrls: disputeUrls,
         status: 'open',
       }).catch((error) => {
         console.warn('[dispute] fail-open', error instanceof Error ? error.message : error);
@@ -164,6 +144,12 @@ router.post('/conversation', requireAuth, async (req: AuthedRequest, res) => {
 
     const serializedMessage = serializeSupportMessage(message);
     emitToConversation(conversation._id.toString(), 'new-message', serializedMessage);
+    emitNewSupport({
+      conversationId: conversation._id.toString(),
+      username: sender.username,
+      subject,
+    });
+    await emitSupportUnread();
 
     return res.status(201).json({
       status: true,
@@ -172,6 +158,8 @@ router.post('/conversation', requireAuth, async (req: AuthedRequest, res) => {
         previewBody: serializedMessage.body,
         previewAttachments: attachments.slice(0, 3),
         attachmentCount: attachments.length,
+        unreadCount: 1,
+        lastFrom: 'player',
         firstMessage: serializedMessage,
       },
     });
@@ -195,21 +183,23 @@ router.get('/conversations/mine', requireAuth, async (req: AuthedRequest, res) =
       User.findById(req.userId),
     ]);
 
-    const previewMap = await enrichConversationsWithPreview(conversations);
-    const results = conversations.map((conv) => {
-      const preview = previewMap.get(conv._id.toString());
-      return {
-        ...serializeConversation(conv, user),
-        previewBody: preview?.previewBody || '',
-        previewAttachments: preview?.previewAttachments || [],
-        attachmentCount: preview?.attachmentCount || 0,
-      };
-    });
+    const previewMap = await supportPreviews(conversations);
+    const results = conversations.map((conv) => withPreview(conv, user, previewMap.get(conv._id.toString())));
 
     return res.json(paginatedWithTotal(results, total));
   } catch (error) {
     console.error('my tickets error:', error);
     return res.status(500).json({ status: false, message: 'Failed to fetch tickets' });
+  }
+});
+
+router.get('/conversations/unread-count', requireAuth, requireAdmin, async (_req, res) => {
+  try {
+    const count = await countOpenSupportUnread();
+    return res.json({ status: true, data: { count } });
+  } catch (error) {
+    console.error('support unread error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to count support messages' });
   }
 });
 
@@ -228,17 +218,11 @@ router.get('/conversations', requireAuth, requireAdmin, async (req, res) => {
     const userIds = conversations.map((c) => c.userId);
     const users = await User.find({ _id: { $in: userIds } });
     const userMap = new Map(users.map((u) => [u._id.toString(), u]));
-    const previewMap = await enrichConversationsWithPreview(conversations);
+    const previewMap = await supportPreviews(conversations);
 
-    const results = conversations.map((conv) => {
-      const preview = previewMap.get(conv._id.toString());
-      return {
-        ...serializeConversation(conv, userMap.get(conv.userId.toString())),
-        previewBody: preview?.previewBody || '',
-        previewAttachments: preview?.previewAttachments || [],
-        attachmentCount: preview?.attachmentCount || 0,
-      };
-    });
+    const results = conversations.map((conv) =>
+      withPreview(conv, userMap.get(conv.userId.toString()) || null, previewMap.get(conv._id.toString())),
+    );
 
     return res.json(paginatedWithTotal(results, total));
   } catch (error) {
@@ -304,7 +288,7 @@ router.post('/message', requireAuth, async (req: AuthedRequest, res) => {
       senderName: sender.username,
       senderAvatar: sender.avatar || '',
       isAdmin,
-      attachments: sanitizeAttachmentList(attachments),
+      attachments: sanitizeAttachmentList(attachments, 8),
     });
 
     conversation.lastMessageAt = new Date();
@@ -320,7 +304,14 @@ router.post('/message', requireAuth, async (req: AuthedRequest, res) => {
         conversationId: conversation._id.toString(),
         preview: String(body),
       });
+    } else {
+      emitNewSupport({
+        conversationId: conversation._id.toString(),
+        username: sender.username,
+        subject: conversation.subject,
+      });
     }
+    await emitSupportUnread();
 
     return res.status(201).json({ status: true, data: serialized });
   } catch (error) {

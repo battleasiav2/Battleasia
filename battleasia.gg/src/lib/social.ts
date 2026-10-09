@@ -514,6 +514,8 @@ export type SupportTicket = {
   previewBody?: string;
   previewAttachments?: string[];
   attachmentCount?: number;
+  unreadCount?: number;
+  lastFrom?: string;
 };
 
 export type SupportMessage = {

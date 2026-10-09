@@ -17,7 +17,12 @@ export function sanitizePublicUrl(raw: unknown, maxLen = 500): string {
 
 /** Only same-origin upload paths (or https CDN that includes /uploads/). */
 export function sanitizeUploadAttachment(raw: unknown, maxLen = 500): string {
-  const value = String(raw || '').trim().slice(0, maxLen);
+  let source = raw;
+  if (raw && typeof raw === 'object') {
+    const rec = raw as { url?: unknown; path?: unknown };
+    source = rec.url || rec.path || '';
+  }
+  const value = String(source || '').trim().slice(0, maxLen);
   if (!value) return '';
   if (value.startsWith('/uploads/') && !value.includes('..')) return value;
   if (value.startsWith('/api/uploads/') && !value.includes('..')) {

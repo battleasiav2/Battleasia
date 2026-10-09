@@ -98,7 +98,9 @@
     "failedClose": "关闭失败",
     "failedSend": "发送失败",
     "defaultSubject": "支持工单",
-    "seeAttached": "见附件"
+    "seeAttached": "见附件",
+    "waiting": "新",
+    "seen": "已回复"
   },
   "wallet": {
     "paymentChannel": "支付渠道",

@@ -98,7 +98,9 @@
     "failedClose": "بند کرنا ناکام",
     "failedSend": "بھیجنا ناکام",
     "defaultSubject": "سپورٹ ٹکٹ",
-    "seeAttached": "منسلکہ دیکھیں"
+    "seeAttached": "منسلکہ دیکھیں",
+    "waiting": "نیا",
+    "seen": "جواب دیا"
   },
   "wallet": {
     "paymentChannel": "ادائیگی چینل",

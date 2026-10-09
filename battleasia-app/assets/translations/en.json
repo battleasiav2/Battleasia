@@ -248,7 +248,9 @@
     "seeAttached": "See attached",
     "needSubject": "Subject is required",
     "needBody": "Add a description or image",
-    "created": "Ticket created"
+    "created": "Ticket created",
+    "waiting": "new",
+    "seen": "Replied"
   },
   "wallet": {
     "paymentChannel": "Payment Channel",

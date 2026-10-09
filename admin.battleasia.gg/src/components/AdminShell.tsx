@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ASSETS } from '../lib/assets';
 import { adminLogout, can, fetchAdminMe, readAdminUser } from '../lib/auth';
-import { isApiError } from '../lib/api';
+import { api, isApiError, unwrapData } from '../lib/api';
 import { NAV, paletteItems } from '../lib/catalog';
 import { NavGlyph } from '../lib/nav-icons';
 import { disconnectAdminSocket, getAdminSocket } from '../lib/socket';
@@ -69,7 +69,7 @@ export function AdminShell() {
   const [q, setQ] = useState('');
   const [mute, setMute] = useState(() => localStorage.getItem('ba-admin-mute') === '1');
   const [hi, setHi] = useState(0);
-  const [pending, setPending] = useState({ deposits: 0, withdrawals: 0 });
+  const [pending, setPending] = useState({ deposits: 0, withdrawals: 0, support: 0 });
   const [drawer, setDrawer] = useState(false);
   const [account, setAccount] = useState(false);
   const [rail, setRail] = useState(() => localStorage.getItem(RAIL_KEY) === '1');
@@ -158,19 +158,34 @@ export function AdminShell() {
       const onWdr = () => ping(t('chrome.newWithdrawal'));
       const onDepCount = (d: { count?: number }) => setPending((p) => ({ ...p, deposits: Number(d.count) || 0 }));
       const onWdrCount = (d: { count?: number }) => setPending((p) => ({ ...p, withdrawals: Number(d.count) || 0 }));
+      const onSup = () => ping(t('chrome.newSupport'));
+      const onSupCount = (d: { count?: number }) => setPending((p) => ({ ...p, support: Number(d.count) || 0 }));
       sock.on('new-deposit', onDep);
       sock.on('new-withdrawal', onWdr);
+      sock.on('new-support', onSup);
       sock.on('pending-deposits-count', onDepCount);
       sock.on('pending-withdrawals-count', onWdrCount);
+      sock.on('support-unread-count', onSupCount);
       off = () => {
         sock.off('new-deposit', onDep);
         sock.off('new-withdrawal', onWdr);
+        sock.off('new-support', onSup);
         sock.off('pending-deposits-count', onDepCount);
         sock.off('pending-withdrawals-count', onWdrCount);
+        sock.off('support-unread-count', onSupCount);
       };
     });
     return () => off?.();
   }, [t]);
+
+  useEffect(() => {
+    api('/api/v2/customer-support/conversations/unread-count')
+      .then((payload) => {
+        const data = unwrapData<{ count?: number }>(payload);
+        setPending((p) => ({ ...p, support: Number(data?.count) || 0 }));
+      })
+      .catch(() => undefined);
+  }, []);
 
   const items = useMemo(() => {
     const all = paletteItems().filter((i) => {
@@ -233,7 +248,7 @@ export function AdminShell() {
     navigate(next === 'shop' ? SHOP_HOME : ARENA_HOME);
   }
 
-  const pendingTotal = pending.deposits + pending.withdrawals;
+  const pendingTotal = pending.deposits + pending.withdrawals + pending.support;
   const navGroups = useMemo(
     () => NAV.filter((group) => {
       const scope = GROUP_MODE[group.label] || 'both';
@@ -271,7 +286,14 @@ export function AdminShell() {
                 </button>
                 {expanded
                   ? visible.map((item) => {
-                      const count = item.badge === 'deposits' ? pending.deposits : item.badge === 'withdrawals' ? pending.withdrawals : 0;
+                      const count =
+                        item.badge === 'deposits'
+                          ? pending.deposits
+                          : item.badge === 'withdrawals'
+                            ? pending.withdrawals
+                            : item.badge === 'support'
+                              ? pending.support
+                              : 0;
                       return (
                         <Link
                           key={item.to}
@@ -282,7 +304,7 @@ export function AdminShell() {
                         >
                           <NavGlyph name={item.icon} />
                           <span className="nav-label">{t(item.label)}</span>
-                          {count ? <em className="nav-count">{count}</em> : null}
+                          {count ? <em className={item.badge === 'support' ? 'nav-count is-live' : 'nav-count'}>{count}</em> : null}
                         </Link>
                       );
                     })
@@ -334,6 +356,12 @@ export function AdminShell() {
                 {pending.withdrawals ? (
                   <Link to="/payments/withdrawal">
                     {pending.withdrawals} {t('chrome.wdr')}
+                  </Link>
+                ) : null}
+                {(pending.deposits || pending.withdrawals) && pending.support ? <span>·</span> : null}
+                {pending.support ? (
+                  <Link className="is-support" to="/customer-support/list">
+                    {pending.support} {t('chrome.support')}
                   </Link>
                 ) : null}
               </span>

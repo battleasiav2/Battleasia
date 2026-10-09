@@ -95,7 +95,7 @@ import { verifyToken } from './utils/jwt.js';
 
 import { requireAdmin } from './middleware/admin.js';
 
-import { emitPendingPaymentCounts } from './utils/socket.js';
+import { emitPendingPaymentCounts, emitSupportUnread } from './utils/socket.js';
 
 import { env } from './config/env.js';
 
@@ -369,6 +369,7 @@ export function createSocketServer(app: express.Express) {
       socket.join('admin-room');
 
       await emitPendingPaymentCounts();
+      await emitSupportUnread();
 
     });
 
