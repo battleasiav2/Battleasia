@@ -1,5 +1,4 @@
 import type { Types } from 'mongoose';
-import { User } from '../models/User.js';
 import { UserEngagementSpin } from '../models/UserEngagementSpin.js';
 import {
   getAppSettings,
@@ -8,8 +7,7 @@ import {
   type LuckySpinSettings,
 } from '../models/AppSettings.js';
 import { getBdDateKey } from './engagement-period.js';
-import { recordBalanceHistory } from './balance-history.js';
-import { notifyBalanceChange } from './balance-notify.js';
+import { creditUserBac } from './credit-bac.js';
 
 export type LuckySpinPrizePublic = LuckySpinPrize & {
   probability: number;
@@ -151,33 +149,18 @@ export async function performLuckySpin(userId: Types.ObjectId | string) {
   const rewardAmount = Math.max(Number(prize.bacAmount) || 0, 0);
 
   if (rewardAmount > 0) {
-    const user = await User.findById(userId);
-    if (!user) {
+    const credited = await creditUserBac(userId, rewardAmount, {
+      reason: 'engagement_spin_reward',
+      prizeId: prize.id,
+      prizeLabel: prize.label,
+      probability: publicPrize.probability,
+      periodKey,
+    });
+    if (!credited) {
       await UserEngagementSpin.deleteOne({ _id: spinDoc._id });
       return { ok: false as const, message: 'User not found' };
     }
-
-    const balanceBefore = user.balance ?? 0;
-    balanceAfter = balanceBefore + rewardAmount;
-    user.balance = balanceAfter;
-    await user.save();
-
-    await recordBalanceHistory({
-      user,
-      amount: rewardAmount,
-      type: 'deposit',
-      balanceBefore,
-      balanceAfter,
-      detail: {
-        reason: 'engagement_spin_reward',
-        prizeId: prize.id,
-        prizeLabel: prize.label,
-        probability: publicPrize.probability,
-        periodKey,
-      },
-    });
-
-    notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
+    balanceAfter = credited.balanceAfter;
   }
 
   const luckySpin = await syncUserLuckySpin(userId);

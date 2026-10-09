@@ -11,8 +11,8 @@ import {
   serializeEngagementSettings,
   serializeUserEngagementProgress,
 } from './engagement-serialize.js';
-import { recordBalanceHistory } from './balance-history.js';
-import { notifyBalanceChange } from './balance-notify.js';
+import { creditUserBac } from './credit-bac.js';
+import { listClaimOffersForUser } from './engagement-offers.js';
 import { syncDailyStreak, serializeStreakState } from './engagement-streak.js';
 import { syncUserWelcomeBonuses } from './engagement-welcome.js';
 import { checkAndUnlockBadges } from './engagement-badges.js';
@@ -403,6 +403,7 @@ export async function syncUserEngagement(userId: Types.ObjectId | string) {
     depositBonusDays,
     luckySpin,
     seasonPass,
+    claimOffers: await listClaimOffersForUser(userId),
     dailyMissions: {
       count: settings.dailyMissionsCount,
       resetHour,
@@ -447,36 +448,21 @@ export async function claimEngagementReward(userId: Types.ObjectId | string, pro
     return { ok: false as const, message: 'Reward already claimed' };
   }
 
-  const user = await User.findById(userId);
-  if (!user) {
+  const credited = await creditUserBac(userId, rewardAmount, {
+    reason: 'engagement_reward',
+    missionId: mission._id.toString(),
+    missionKey: mission.key,
+    missionTitle: mission.title,
+    progressId: progress._id.toString(),
+  });
+  if (!credited) {
     await UserEngagementProgress.updateOne(
       { _id: progressId, userId },
       { $set: { status: 'completed', claimedAt: null } }
     );
     return { ok: false as const, message: 'User not found' };
   }
-
-  const balanceBefore = user.balance ?? 0;
-  const balanceAfter = balanceBefore + rewardAmount;
-  user.balance = balanceAfter;
-  await user.save();
-
-  await recordBalanceHistory({
-    user,
-    amount: rewardAmount,
-    type: 'deposit',
-    balanceBefore,
-    balanceAfter,
-    detail: {
-      reason: 'engagement_reward',
-      missionId: mission._id.toString(),
-      missionKey: mission.key,
-      missionTitle: mission.title,
-      progressId: progress._id.toString(),
-    },
-  });
-
-  notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
+  const { balanceAfter } = credited;
 
   awardMissionClaimXp(userId).catch((error) => {
     console.error('engagement mission claim xp failed:', error);

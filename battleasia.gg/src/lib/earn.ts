@@ -91,6 +91,18 @@ export type EarnHome = {
   weeklyArena?: { enabled?: boolean; title?: string; viewerRank?: number | null };
   level?: { level?: number; xp?: number; progressPct?: number; title?: { title?: string } };
   depositBonusDays?: { enabled?: boolean; active?: boolean; percent?: number; title?: string };
+  claimOffers?: ClaimOffer[];
+};
+
+export type ClaimOffer = {
+  id: string;
+  title: string;
+  description?: string;
+  bacAmount?: number;
+  startsAt?: string;
+  endsAt?: string | null;
+  status?: 'upcoming' | 'open' | 'claimed' | 'full' | 'ended';
+  canClaim?: boolean;
 };
 
 export type BadgeRow = {
@@ -120,6 +132,11 @@ export async function claimMission(progressId: string) {
 export async function claimStreak() {
   const payload = await api('/api/v2/engagement/streak/claim', { method: 'POST' });
   return unwrapData<{ balanceAfter?: number }>(payload);
+}
+
+export async function claimOffer(offerId: string) {
+  const payload = await api(`/api/v2/engagement/offers/${encodeURIComponent(offerId)}/claim`, { method: 'POST' });
+  return unwrapData<{ balanceAfter?: number; rewardAmount?: number }>(payload);
 }
 
 export async function claimWelcome(key: string) {

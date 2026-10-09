@@ -10,8 +10,7 @@ import {
   normalizeEngagementSettings,
   type ReferralTierConfig,
 } from '../models/AppSettings.js';
-import { recordBalanceHistory } from './balance-history.js';
-import { notifyBalanceChange } from './balance-notify.js';
+import { creditUserBac } from './credit-bac.js';
 import { notifyClaimReady } from './engagement-notifications.js';
 
 const TIER_FIELD: Record<ReferralTierKey, 'tier5' | 'tier10' | 'tier25'> = {
@@ -174,35 +173,20 @@ export async function claimReferralMilestone(userId: Types.ObjectId | string, ra
     return { ok: false as const, message: 'Already claimed' };
   }
 
-  const user = await User.findById(userId);
-  if (!user) {
+  const credited = await creditUserBac(userId, rewardAmount, {
+    reason: 'engagement_referral_reward',
+    referralTierKey: key,
+    referralTierTitle: config.title,
+    referralThreshold: config.threshold,
+  });
+  if (!credited) {
     await UserEngagementReferral.updateOne(
       { userId },
       { $set: { [`${field}.status`]: 'ready', [`${field}.claimedAt`]: null } }
     );
     return { ok: false as const, message: 'User not found' };
   }
-
-  const balanceBefore = user.balance ?? 0;
-  const balanceAfter = balanceBefore + rewardAmount;
-  user.balance = balanceAfter;
-  await user.save();
-
-  await recordBalanceHistory({
-    user,
-    amount: rewardAmount,
-    type: 'deposit',
-    balanceBefore,
-    balanceAfter,
-    detail: {
-      reason: 'engagement_referral_reward',
-      referralTierKey: key,
-      referralTierTitle: config.title,
-      referralThreshold: config.threshold,
-    },
-  });
-
-  notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
+  const { balanceAfter } = credited;
 
   const referral = await syncUserReferralMilestones(userId);
 

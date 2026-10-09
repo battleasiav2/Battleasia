@@ -62,6 +62,8 @@ import engagementBadgesRoutes from './routes/v3/engagement/badges.js';
 
 import engagementSettingsRoutes from './routes/v3/engagement/settings.js';
 
+import engagementOffersRoutes from './routes/v3/engagement/offers.js';
+
 import notificationsRoutes from './routes/v3/notifications.js';
 
 import customerSupportRoutes from './routes/v2/customer-support.js';
@@ -280,6 +282,7 @@ export function createApp() {
   app.use('/api/v3/engagement/badges', requireAdmin, engagementBadgesRoutes);
 
   app.use('/api/v3/engagement/settings', requireAdmin, engagementSettingsRoutes);
+  app.use('/api/v3/engagement/offers', requireAdmin, engagementOffersRoutes);
   app.use('/api/v3/integrity', requireAdmin, integrityRoutes);
 
   app.use('/api/v3/notifications', requireAdmin, notificationsRoutes);

@@ -8,8 +8,7 @@ import {
   type SeasonPassTier,
 } from '../models/AppSettings.js';
 import { isUserPremium } from './serialize.js';
-import { recordBalanceHistory } from './balance-history.js';
-import { notifyBalanceChange } from './balance-notify.js';
+import { creditUserBac } from './credit-bac.js';
 
 type TierTrackStatus = 'locked' | 'ready' | 'claimed' | 'plus_locked';
 
@@ -218,34 +217,18 @@ export async function claimSeasonPassReward(
   }
 
   if (rewardAmount > 0) {
-    const freshUser = await User.findById(userId);
-    if (!freshUser) {
+    const credited = await creditUserBac(userId, rewardAmount, {
+      reason: 'engagement_season_pass_reward',
+      seasonKey: config.seasonKey,
+      seasonTitle: config.title,
+      seasonLevel: level,
+      seasonTrack: track,
+      seasonRewardLabel: reward.label,
+    });
+    if (!credited) {
       await UserEngagementSeason.updateOne({ _id: locked._id }, { $pull: { [claimedField]: level } });
       return { ok: false as const, message: 'User not found' };
     }
-
-    const balanceBefore = freshUser.balance ?? 0;
-    const balanceAfter = balanceBefore + rewardAmount;
-    freshUser.balance = balanceAfter;
-    await freshUser.save();
-
-    await recordBalanceHistory({
-      user: freshUser,
-      amount: rewardAmount,
-      type: 'deposit',
-      balanceBefore,
-      balanceAfter,
-      detail: {
-        reason: 'engagement_season_pass_reward',
-        seasonKey: config.seasonKey,
-        seasonTitle: config.title,
-        seasonLevel: level,
-        seasonTrack: track,
-        seasonRewardLabel: reward.label,
-      },
-    });
-
-    notifyBalanceChange(freshUser._id.toString(), balanceAfter, balanceBefore);
   }
 
   const seasonPass = await syncUserSeasonPass(userId);

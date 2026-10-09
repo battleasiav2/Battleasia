@@ -33,6 +33,7 @@
   "nav.messaging": "Messaging",
   "nav.engagement": "Engagement",
   "nav.missions": "Missions",
+  "nav.claimOffers": "Claim offers",
   "nav.badges": "Badges",
   "nav.settings": "Settings",
   "nav.flags": "Feature flags",
@@ -411,5 +412,18 @@
   "dash.offline": "Dashboard offline",
   "dash.ledgerAlert": "Liability is above reserve BAC. Top up reserve or investigate.",
   "locale.label": "Language",
-  "locale.list": "Languages"
+  "locale.list": "Languages",
+  "offers.lead": "Create a timed BAC collect. Each player can claim once, and only after the start time. The amount is set here.",
+  "offers.title": "Title",
+  "offers.note": "Note",
+  "offers.bac": "BAC",
+  "offers.starts": "Opens at",
+  "offers.ends": "Ends at (optional)",
+  "offers.cap": "Max claims (0 = no cap)",
+  "offers.active": "Live",
+  "offers.save": "Save offer",
+  "offers.create": "Create offer",
+  "offers.empty": "No offers yet",
+  "offers.delete": "Delete",
+  "offers.claimed": "claimed"
 }

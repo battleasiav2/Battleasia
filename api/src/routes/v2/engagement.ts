@@ -16,6 +16,7 @@ import {
   leaveEngagementSquad,
 } from '../../utils/engagement-squad.js';
 import { claimSeasonPassReward } from '../../utils/engagement-season-pass.js';
+import { claimOfferReward } from '../../utils/engagement-offers.js';
 import { EngagementSquad } from '../../models/EngagementSquad.js';
 import { SquadChatMessage } from '../../models/SquadChatMessage.js';
 import { User } from '../../models/User.js';
@@ -231,6 +232,25 @@ router.post('/squad/leave', requireAuth, async (req: AuthedRequest, res) => {
   } catch (error) {
     console.error('engagement squad leave error:', error);
     return res.status(500).json({ status: false, message: 'Failed to leave squad' });
+  }
+});
+
+router.post('/offers/:offerId/claim', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ status: false, message: 'Unauthorized' });
+    }
+
+    const result = await claimOfferReward(userId, String(req.params.offerId));
+    if (!result.ok) {
+      return res.status(400).json({ status: false, message: result.message });
+    }
+
+    return res.json({ status: true, data: result.data });
+  } catch (error) {
+    console.error('engagement offer claim error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to claim offer' });
   }
 });
 

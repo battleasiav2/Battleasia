@@ -1,10 +1,8 @@
 import type { Types } from 'mongoose';
 import { UserEngagementStreak } from '../models/UserEngagementStreak.js';
-import { User } from '../models/User.js';
 import { getAppSettings, normalizeEngagementSettings, type EngagementSettings } from '../models/AppSettings.js';
 import { getBdDateKey, getBdRecentDateKeys, getBdYesterdayKey } from './engagement-period.js';
-import { recordBalanceHistory } from './balance-history.js';
-import { notifyBalanceChange } from './balance-notify.js';
+import { creditUserBac } from './credit-bac.js';
 
 const MAX_HISTORY_DAYS = 35;
 
@@ -140,34 +138,19 @@ export async function claimDailyStreakReward(userId: Types.ObjectId | string) {
     return { ok: false as const, message: 'Already claimed today' };
   }
 
-  const user = await User.findById(userId);
-  if (!user) {
+  const credited = await creditUserBac(userId, totalReward, {
+    reason: 'engagement_streak_reward',
+    streakDay: locked.currentStreak,
+    dateKey: todayKey,
+  });
+  if (!credited) {
     await UserEngagementStreak.updateOne(
       { userId, lastClaimDate: todayKey },
       { $set: { lastClaimDate: streak.lastClaimDate || '' }, $pull: { claimDates: todayKey } }
     );
     return { ok: false as const, message: 'User not found' };
   }
-
-  const balanceBefore = user.balance ?? 0;
-  const balanceAfter = balanceBefore + totalReward;
-  user.balance = balanceAfter;
-  await user.save();
-
-  await recordBalanceHistory({
-    user,
-    amount: totalReward,
-    type: 'deposit',
-    balanceBefore,
-    balanceAfter,
-    detail: {
-      reason: 'engagement_streak_reward',
-      streakDay: locked.currentStreak,
-      dateKey: todayKey,
-    },
-  });
-
-  notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
+  const { balanceAfter } = credited;
 
   return {
     ok: true as const,

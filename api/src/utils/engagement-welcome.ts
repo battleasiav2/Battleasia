@@ -12,8 +12,7 @@ import {
   normalizeEngagementSettings,
   type WelcomeMilestoneConfig,
 } from '../models/AppSettings.js';
-import { recordBalanceHistory } from './balance-history.js';
-import { notifyBalanceChange } from './balance-notify.js';
+import { creditUserBac } from './credit-bac.js';
 import { notifyClaimReady } from './engagement-notifications.js';
 
 const MILESTONE_FIELD: Record<
@@ -197,34 +196,19 @@ export async function claimWelcomeBonus(userId: Types.ObjectId | string, rawKey:
     return { ok: false as const, message: 'Already claimed' };
   }
 
-  const user = await User.findById(userId);
-  if (!user) {
+  const credited = await creditUserBac(userId, rewardAmount, {
+    reason: 'engagement_welcome_reward',
+    welcomeKey: key,
+    welcomeTitle: config.title,
+  });
+  if (!credited) {
     await UserEngagementWelcome.updateOne(
       { userId },
       { $set: { [`${field}.status`]: 'ready', [`${field}.claimedAt`]: null } }
     );
     return { ok: false as const, message: 'User not found' };
   }
-
-  const balanceBefore = user.balance ?? 0;
-  const balanceAfter = balanceBefore + rewardAmount;
-  user.balance = balanceAfter;
-  await user.save();
-
-  await recordBalanceHistory({
-    user,
-    amount: rewardAmount,
-    type: 'deposit',
-    balanceBefore,
-    balanceAfter,
-    detail: {
-      reason: 'engagement_welcome_reward',
-      welcomeKey: key,
-      welcomeTitle: config.title,
-    },
-  });
-
-  notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
+  const { balanceAfter } = credited;
 
   const welcome = await syncUserWelcomeBonuses(userId);
 

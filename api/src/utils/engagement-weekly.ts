@@ -7,8 +7,7 @@ import {
   type WeeklyArenaChallengeSettings,
 } from '../models/AppSettings.js';
 import { getEngagementPeriodKey } from './engagement-period.js';
-import { recordBalanceHistory } from './balance-history.js';
-import { notifyBalanceChange } from './balance-notify.js';
+import { creditUserBac } from './credit-bac.js';
 import { notifyClaimReady } from './engagement-notifications.js';
 
 function normalizeTeamType(value?: string | null) {
@@ -223,35 +222,20 @@ export async function claimWeeklyArenaReward(userId: Types.ObjectId | string) {
     return { ok: false as const, message: 'Already claimed this week' };
   }
 
-  const user = await User.findById(userId);
-  if (!user) {
+  const credited = await creditUserBac(userId, rewardAmount, {
+    reason: 'engagement_weekly_reward',
+    weeklyPeriodKey: periodKey,
+    weeklyTitle: config.title,
+    weeklyWinCount: locked.winCount,
+  });
+  if (!credited) {
     await UserEngagementWeekly.updateOne(
       { _id: locked._id },
       { $set: { status: 'completed', claimedAt: null } }
     );
     return { ok: false as const, message: 'User not found' };
   }
-
-  const balanceBefore = user.balance ?? 0;
-  const balanceAfter = balanceBefore + rewardAmount;
-  user.balance = balanceAfter;
-  await user.save();
-
-  await recordBalanceHistory({
-    user,
-    amount: rewardAmount,
-    type: 'deposit',
-    balanceBefore,
-    balanceAfter,
-    detail: {
-      reason: 'engagement_weekly_reward',
-      weeklyPeriodKey: periodKey,
-      weeklyTitle: config.title,
-      weeklyWinCount: locked.winCount,
-    },
-  });
-
-  notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
+  const { balanceAfter } = credited;
 
   const refreshed = await syncUserWeeklyArena(userId);
 

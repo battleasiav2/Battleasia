@@ -11,8 +11,7 @@ import {
   type SquadChallengeSettings,
 } from '../models/AppSettings.js';
 import { getEngagementPeriodKey } from './engagement-period.js';
-import { recordBalanceHistory } from './balance-history.js';
-import { notifyBalanceChange } from './balance-notify.js';
+import { creditUserBac } from './credit-bac.js';
 import { notifyClaimReady } from './engagement-notifications.js';
 
 const INVITE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -450,33 +449,18 @@ export async function claimSquadChallengeReward(userId: Types.ObjectId | string)
     throw error;
   }
 
-  const user = await User.findById(userId);
-  if (!user) {
+  const credited = await creditUserBac(userId, rewardAmount, {
+    reason: 'engagement_squad_reward',
+    squadPeriodKey: periodKey,
+    squadTitle: config.title,
+    squadWinCount: weeklyDoc.winCount,
+    squadId: membership.squadId.toString(),
+  });
+  if (!credited) {
     await EngagementSquadWeeklyClaim.deleteOne({ _id: claimRow._id });
     return { ok: false as const, message: 'User not found' };
   }
-
-  const balanceBefore = user.balance ?? 0;
-  const balanceAfter = balanceBefore + rewardAmount;
-  user.balance = balanceAfter;
-  await user.save();
-
-  await recordBalanceHistory({
-    user,
-    amount: rewardAmount,
-    type: 'deposit',
-    balanceBefore,
-    balanceAfter,
-    detail: {
-      reason: 'engagement_squad_reward',
-      squadPeriodKey: periodKey,
-      squadTitle: config.title,
-      squadWinCount: weeklyDoc.winCount,
-      squadId: membership.squadId.toString(),
-    },
-  });
-
-  notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
+  const { balanceAfter } = credited;
 
   const squadChallenge = await syncUserSquadChallenge(userId);
 

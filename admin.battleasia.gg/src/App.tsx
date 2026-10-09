@@ -34,6 +34,9 @@ const NotificationsPage = lazy(() =>
 const SiteNoticePage = lazy(() =>
   import('./pages/SiteNoticePage').then((m) => ({ default: m.SiteNoticePage }))
 );
+const ClaimOffersPage = lazy(() =>
+  import('./pages/ClaimOffersPage').then((m) => ({ default: m.ClaimOffersPage }))
+);
 const GameFormPage = lazy(() => import('./pages/GameFormPage').then((m) => ({ default: m.GameFormPage })));
 const MatchFormPage = lazy(() => import('./pages/MatchFormPage').then((m) => ({ default: m.MatchFormPage })));
 const MatchResultPage = lazy(() => import('./pages/MatchResultPage').then((m) => ({ default: m.MatchResultPage })));
@@ -80,6 +83,7 @@ export default function App() {
             <Route path="/shop/bac" element={<BacShopPage />} />
             <Route path="/shop/coinrate" element={<CoinRatesPage />} />
             <Route path="/feature-flags" element={<FlagsPage />} />
+            <Route path="/engagement/offers" element={<ClaimOffersPage />} />
             <Route path="/payments/wallet" element={<WalletOpsPage />} />
             <Route path="/payments/deposit" element={<PaymentsPage />} />
             <Route path="/payments/withdrawal" element={<PaymentsPage />} />

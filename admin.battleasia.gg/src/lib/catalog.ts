@@ -81,6 +81,7 @@ export const NAV: NavGroup[] = [
     label: 'nav.engagement',
     items: [
       { to: '/engagement/missions', label: 'nav.missions', perm: 'engagement.view', icon: 'mission' },
+      { to: '/engagement/offers', label: 'nav.claimOffers', perm: 'engagement.edit', icon: 'mission' },
       { to: '/engagement/badges', label: 'nav.badges', perm: 'engagement.view', icon: 'badge' },
       { to: '/engagement/settings', label: 'nav.settings', perm: 'engagement.edit', icon: 'sliders' },
       { to: '/feature-flags', label: 'nav.flags', perm: 'engagement.edit', icon: 'toggle' },

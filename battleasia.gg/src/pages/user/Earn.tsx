@@ -5,6 +5,7 @@ import { useHudPage } from '../../hooks/useHudPage';
 import { isApiError } from '../../lib/api';
 import {
   claimMission,
+  claimOffer,
   claimSeason,
   claimSquad,
   claimStreak,
@@ -27,6 +28,41 @@ import { createPost } from '../../lib/social';
 import { openBacShop, fetchBalanceHistory, type HistoryRow } from '../../lib/wallet';
 
 type ShellCtx = { setBalance: (n: number) => void };
+
+function flyBacToBalance(from: HTMLElement) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const target = document.querySelector('.hud-balance');
+  if (!target) return;
+  const start = from.getBoundingClientRect();
+  const end = target.getBoundingClientRect();
+  const layer = document.createElement('div');
+  layer.className = 'bac-fly-layer';
+  document.body.appendChild(layer);
+  const sy = start.top + start.height / 2;
+  const ey = end.top + end.height / 2;
+  const ex = end.left + end.width / 2;
+  for (let i = 0; i < 7; i += 1) {
+    const coin = document.createElement('img');
+    coin.src = '/assets/bac-coin.webp';
+    coin.alt = '';
+    coin.width = 28;
+    coin.height = 28;
+    coin.className = 'bac-fly-coin';
+    const left = start.left + start.width / 2 + (i - 3) * 12;
+    coin.style.left = `${left}px`;
+    coin.style.top = `${sy}px`;
+    layer.appendChild(coin);
+    window.setTimeout(() => {
+      coin.style.transform = `translate(${ex - left}px, ${ey - sy}px) scale(0.32)`;
+      coin.style.opacity = '0';
+    }, 24 + i * 42);
+  }
+  target.classList.add('is-collecting');
+  window.setTimeout(() => {
+    target.classList.remove('is-collecting');
+    layer.remove();
+  }, 1100);
+}
 
 const TABS = [
   ['overview', 'earn.tabOverview'],
@@ -103,11 +139,15 @@ export function EarnPage() {
     };
   }, [tab]);
 
-  async function run(id: string, fn: () => Promise<{ balanceAfter?: number } | unknown>) {
+  async function run(id: string, fn: () => Promise<{ balanceAfter?: number } | unknown>, from?: HTMLElement | null) {
     setBusy(id);
     try {
       const res = (await fn()) as { balanceAfter?: number };
-      if (res && typeof res === 'object' && res.balanceAfter != null) setBalance(Number(res.balanceAfter) || 0);
+      if (res && typeof res === 'object' && res.balanceAfter != null) {
+        const next = Number(res.balanceAfter) || 0;
+        if (from) flyBacToBalance(from);
+        window.setTimeout(() => setBalance(next), from ? 680 : 0);
+      }
       toast(t('earn.claimedToast'));
       await reload();
     } catch (err) {
@@ -225,6 +265,47 @@ export function EarnPage() {
         ))}
       </div>
 
+      {tab === 'overview' && (home.claimOffers || []).length ? (
+        <section className="earn-offers" aria-label={t('earn.offers')}>
+          <h2>{t('earn.offers')}</h2>
+          <ul>
+            {(home.claimOffers || []).map((offer) => (
+              <li key={offer.id} className={`earn-offer is-${offer.status || 'open'}`}>
+                <img className="earn-offer-coin" src="/assets/bac-coin.webp" alt="" width={56} height={56} />
+                <div className="earn-offer-copy">
+                  <strong>{offer.title}</strong>
+                  {offer.description ? <small>{offer.description}</small> : null}
+                  {offer.status === 'upcoming' && offer.startsAt ? (
+                    <small>
+                      {t('earn.offerSoon')} {new Date(offer.startsAt).toLocaleString()}
+                    </small>
+                  ) : null}
+                </div>
+                <span className="earn-offer-pay">
+                  +<CoinValue value={offer.bacAmount || 0} />
+                </span>
+                <button
+                  className="btn btn-primary"
+                  type="button"
+                  disabled={!offer.canClaim || busy === offer.id}
+                  onClick={(e) => void run(offer.id, () => claimOffer(offer.id), e.currentTarget)}
+                >
+                  {offer.status === 'claimed'
+                    ? t('earn.offerClaimed')
+                    : offer.status === 'full'
+                      ? t('earn.offerFull')
+                      : offer.status === 'upcoming'
+                        ? t('earn.offerSoon')
+                        : busy === offer.id
+                          ? t('earn.claiming')
+                          : t('earn.collect')}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       {tab === 'overview' ? (
         <section className="earn-tasks">
           <h2>{t('earn.tabMissions')}</h2>
@@ -242,7 +323,7 @@ export function EarnPage() {
                   +<CoinValue value={w.bacAmount || 0} />
                 </span>
                 {w.canClaim && w.key ? (
-                  <button className="btn btn-primary earn-task-go" type="button" disabled={busy === w.key} onClick={() => void run(w.key!, () => claimWelcome(w.key!))}>
+                  <button className="btn btn-primary earn-task-go" type="button" disabled={busy === w.key} onClick={(e) => void run(w.key!, () => claimWelcome(w.key!), e.currentTarget)}>
                     {busy === w.key ? t('earn.claiming') : t('earn.claim')}
                   </button>
                 ) : (
@@ -343,7 +424,7 @@ export function EarnPage() {
                   </small>
                 </div>
                 <span className="earn-task-reward">BAC</span>
-                <button className="btn btn-primary earn-task-go" type="button" disabled={busy === 'weekly'} onClick={() => void run('weekly', claimWeekly)}>
+                <button className="btn btn-primary earn-task-go" type="button" disabled={busy === 'weekly'} onClick={(e) => void run('weekly', claimWeekly, e.currentTarget)}>
                   {t('earn.claimWeekly')}
                 </button>
               </li>
@@ -384,7 +465,7 @@ export function EarnPage() {
                     +<CoinValue value={m.mission?.reward?.bacAmount || 0} />
                   </span>
                   {m.status === 'completed' ? (
-                    <button className="btn btn-primary earn-task-go" type="button" disabled={busy === m.id} onClick={() => void run(m.id, () => claimMission(m.id))}>
+                    <button className="btn btn-primary earn-task-go" type="button" disabled={busy === m.id} onClick={(e) => void run(m.id, () => claimMission(m.id), e.currentTarget)}>
                       {busy === m.id ? t('earn.claiming') : t('earn.claim')}
                     </button>
                   ) : (
@@ -425,7 +506,7 @@ export function EarnPage() {
                 className="btn btn-primary"
                 type="button"
                 disabled={!streak.canClaim || busy === 'streak'}
-                onClick={() => void run('streak', claimStreak)}
+                onClick={(e) => void run('streak', claimStreak, e.currentTarget)}
               >
                 {streak.claimedToday ? t('earn.claimedToday') : t('earn.claimStreak')}
               </button>
@@ -463,11 +544,15 @@ export function EarnPage() {
                 className="btn btn-primary"
                 type="button"
                 disabled={!spin.remaining || busy === 'spin'}
-                onClick={async () => {
+                onClick={async (e) => {
+                  const from = e.currentTarget;
                   setBusy('spin');
                   try {
                     const res = await doSpin();
-                    if (res.balanceAfter != null) setBalance(Number(res.balanceAfter) || 0);
+                    if (res.balanceAfter != null) {
+                      flyBacToBalance(from);
+                      window.setTimeout(() => setBalance(Number(res.balanceAfter) || 0), 680);
+                    }
                     toast(res.prizeLabel ? `${t('earn.youWon')} ${res.prizeLabel}` : t('earn.spinOk'));
                     await reload();
                   } catch (err) {
@@ -521,7 +606,7 @@ export function EarnPage() {
                       {t('earn.copyInvite')}
                     </button>
                     {squad.canClaim ? (
-                      <button className="btn btn-primary" type="button" disabled={busy === 'squad'} onClick={() => void run('squad', claimSquad)}>
+                      <button className="btn btn-primary" type="button" disabled={busy === 'squad'} onClick={(e) => void run('squad', claimSquad, e.currentTarget)}>
                         {t('earn.claimSquad')}
                       </button>
                     ) : null}
@@ -603,7 +688,7 @@ export function EarnPage() {
                         className="btn btn-ghost"
                         type="button"
                         disabled={!tier.canClaimFree || busy === `s${tier.level}f`}
-                        onClick={() => void run(`s${tier.level}f`, () => claimSeason(tier.level || 1, 'free'))}
+                        onClick={(e) => void run(`s${tier.level}f`, () => claimSeason(tier.level || 1, 'free'), e.currentTarget)}
                       >
                         {t('earn.free')} {tier.freeReward?.bacAmount ?? 0}
                       </button>
@@ -611,7 +696,7 @@ export function EarnPage() {
                         className="btn btn-primary"
                         type="button"
                         disabled={!tier.canClaimPlus || busy === `s${tier.level}p`}
-                        onClick={() => void run(`s${tier.level}p`, () => claimSeason(tier.level || 1, 'plus'))}
+                        onClick={(e) => void run(`s${tier.level}p`, () => claimSeason(tier.level || 1, 'plus'), e.currentTarget)}
                       >
                         {t('earn.plus')} {tier.plusReward?.bacAmount ?? 0}
                       </button>

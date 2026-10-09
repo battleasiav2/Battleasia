@@ -1,6 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/engagement_service.dart';
 import 'package:battleasia_app/core/services/feed_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
@@ -16,7 +20,7 @@ class EarnScreen extends StatefulWidget {
   State<EarnScreen> createState() => _EarnScreenState();
 }
 
-class _EarnScreenState extends State<EarnScreen> {
+class _EarnScreenState extends State<EarnScreen> with TickerProviderStateMixin {
   final EngagementService _api = EngagementService();
   final FeedService _feed = FeedService();
   final UserService _users = UserService();
@@ -34,6 +38,7 @@ class _EarnScreenState extends State<EarnScreen> {
   String? _error;
   String _busy = '';
   bool _loading = true;
+  final List<AnimationController> _flies = [];
 
   static const _tabs = ['overview', 'missions', 'streak', 'spin', 'squad', 'season', 'badges', 'claims'];
 
@@ -45,6 +50,10 @@ class _EarnScreenState extends State<EarnScreen> {
 
   @override
   void dispose() {
+    for (final fly in List<AnimationController>.from(_flies)) {
+      fly.dispose();
+    }
+    _flies.clear();
     _scroll.dispose();
     _squadName.dispose();
     _invite.dispose();
@@ -130,7 +139,28 @@ class _EarnScreenState extends State<EarnScreen> {
     }
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
     setState(() => _busy = '');
-    if (result['success'] == true) await _load();
+    if (result['success'] == true) {
+      final after = data is Map ? data['balanceAfter'] : null;
+      if (after is num) {
+        context.read<AuthProvider>().updateBalance(after.toDouble());
+      }
+      _launchCoins();
+      await _load();
+    }
+  }
+
+  void _launchCoins() {
+    if (!mounted || MediaQuery.disableAnimationsOf(context)) return;
+    for (var i = 0; i < 6; i++) {
+      final controller = AnimationController(vsync: this, duration: Duration(milliseconds: 720 + i * 40));
+      setState(() => _flies.add(controller));
+      controller.addStatusListener((status) {
+        if (status != AnimationStatus.completed || !mounted) return;
+        setState(() => _flies.remove(controller));
+        controller.dispose();
+      });
+      controller.forward();
+    }
   }
 
   @override
@@ -167,6 +197,16 @@ class _EarnScreenState extends State<EarnScreen> {
             ),
           Positioned(top: 0, left: 0, right: 0, child: AppHeader(scrollController: _scroll)),
           const FloatingBottomNav(),
+          if (_flies.isNotEmpty)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: Stack(
+                  children: [
+                    for (var i = 0; i < _flies.length; i++) _FlyCoin(controller: _flies[i], index: i),
+                  ],
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -290,8 +330,26 @@ class _EarnScreenState extends State<EarnScreen> {
     final missions = _list(home['missions']);
     final ready = missions.where((m) => m['status'] == 'completed').length;
     final milestones = _list(welcome['milestones']);
+    final offers = _list(home['claimOffers']);
     return Column(
       children: [
+        for (final offer in offers)
+          _task(
+            title: offer['title']?.toString() ?? 'earn.offers'.tr(),
+            detail: offer['status'] == 'upcoming'
+                ? '${'earn.offerSoon'.tr()} ${offer['startsAt'] ?? ''}'
+                : (offer['description']?.toString() ?? 'earn.offers'.tr()),
+            reward: '+${offer['bacAmount'] ?? 0}',
+            action: offer['status'] == 'claimed'
+                ? 'earn.offerClaimed'.tr()
+                : offer['canClaim'] == true
+                    ? 'earn.collect'.tr()
+                    : 'earn.offerSoon'.tr(),
+            enabled: offer['canClaim'] == true && _busy != offer['id'],
+            onTap: offer['canClaim'] == true
+                ? () => _run('${offer['id']}', () => _api.claimOffer('${offer['id']}'))
+                : null,
+          ),
         if (_cashbackDays)
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
@@ -767,5 +825,38 @@ class _EarnScreenState extends State<EarnScreen> {
   List<Map<String, dynamic>> _list(dynamic value) {
     if (value is! List) return [];
     return value.whereType<Map>().map((row) => Map<String, dynamic>.from(row)).toList();
+  }
+}
+
+class _FlyCoin extends StatelessWidget {
+  const _FlyCoin({required this.controller, required this.index});
+
+  final AnimationController controller;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final top = MediaQuery.paddingOf(context).top + 18;
+    final anim = CurvedAnimation(parent: controller, curve: Curves.easeIn);
+    return AnimatedBuilder(
+      animation: anim,
+      builder: (context, _) {
+        final t = anim.value;
+        final startX = size.width * 0.42 + (index - 2.5) * 16;
+        final startY = size.height * 0.58;
+        final endX = size.width - 86;
+        final x = startX + (endX - startX) * t;
+        final y = startY + (top - startY) * t - math.sin(t * math.pi) * 36;
+        return Positioned(
+          left: x,
+          top: y,
+          child: Opacity(
+            opacity: (1 - t * 0.8).clamp(0.0, 1.0),
+            child: Image.asset('assets/images/currency.webp', width: 26, height: 26),
+          ),
+        );
+      },
+    );
   }
 }

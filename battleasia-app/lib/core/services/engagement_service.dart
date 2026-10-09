@@ -210,6 +210,18 @@ class EngagementService {
     }
   }
 
+  Future<Map<String, dynamic>> claimOffer(String offerId) async {
+    try {
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/engagement/offers/$offerId/claim'),
+        headers: await _headers(),
+      );
+      return _parseResponse(response, fallbackMessage: 'Failed to collect offer');
+    } catch (e) {
+      return {'success': false, 'message': e.toString()};
+    }
+  }
+
   Future<Map<String, dynamic>> claimSquad() async {
     try {
       final response = await ApiClient.post(

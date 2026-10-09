@@ -1,6 +1,5 @@
 import type { Types } from 'mongoose';
 import mongoose from 'mongoose';
-import { User } from '../models/User.js';
 import { Match } from '../models/Match.js';
 import { MatchParticipant } from '../models/MatchParticipant.js';
 import { UserEngagementShare } from '../models/UserEngagementShare.js';
@@ -9,8 +8,7 @@ import {
   normalizeEngagementSettings,
   type ShareToEarnSettings,
 } from '../models/AppSettings.js';
-import { recordBalanceHistory } from './balance-history.js';
-import { notifyBalanceChange } from './balance-notify.js';
+import { creditUserBac } from './credit-bac.js';
 
 export function serializeShareToEarnState(
   config: ShareToEarnSettings,
@@ -159,33 +157,18 @@ export async function claimShareReward(
   let balanceAfter: number | undefined;
 
   if (rewardAmount > 0) {
-    const user = await User.findById(userId);
-    if (!user) {
+    const credited = await creditUserBac(userId, rewardAmount, {
+      reason: 'engagement_share_reward',
+      matchId: String(matchId),
+      matchName: match.matchName,
+      shareTitle: config.title,
+      platform: safePlatform,
+    });
+    if (!credited) {
       await UserEngagementShare.deleteOne({ _id: shareDoc._id });
       return { ok: false as const, message: 'User not found' };
     }
-
-    const balanceBefore = user.balance ?? 0;
-    balanceAfter = balanceBefore + rewardAmount;
-    user.balance = balanceAfter;
-    await user.save();
-
-    await recordBalanceHistory({
-      user,
-      amount: rewardAmount,
-      type: 'deposit',
-      balanceBefore,
-      balanceAfter,
-      detail: {
-        reason: 'engagement_share_reward',
-        matchId: String(matchId),
-        matchName: match.matchName,
-        shareTitle: config.title,
-        platform: safePlatform,
-      },
-    });
-
-    notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
+    balanceAfter = credited.balanceAfter;
   }
 
   const state = await syncUserShareToEarn(userId);
