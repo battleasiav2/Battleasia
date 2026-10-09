@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { api, isApiError, unwrapData, unwrapList } from '../lib/api';
+import { useLocation, useOutletContext } from 'react-router-dom';
+import { api, explainError, unwrapData, unwrapList } from '../lib/api';
 import { INTEGRITY } from '../lib/catalog';
 import { cell, downloadCsv, downloadExcel, pick, rowId, toCsv } from '../lib/format';
 import { useI18n } from '../lib/i18n';
 
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
+
 export function IntegrityPage() {
   const { t } = useI18n();
+  const { toast } = useOutletContext<Ctx>();
   const spec = INTEGRITY[useLocation().pathname];
   const [rows, setRows] = useState<Array<Record<string, unknown>>>([]);
   const [error, setError] = useState('');
@@ -32,9 +35,27 @@ export function IntegrityPage() {
       })
       .catch((err) => {
         setRows([]);
-        setError(isApiError(err) ? err.message : 'Integrity API not mounted yet');
+        setError(explainError(err, 'Integrity API not mounted yet'));
       });
   }, [spec]);
+
+  async function act(url: string, status: string, id: string, okText: string, failText: string) {
+    try {
+      await api(url, { method: 'PATCH', body: JSON.stringify({ status }) });
+      setError('');
+      setRows((prev) => prev.map((r) => (rowId(r) === id ? { ...r, status } : r)));
+      toast(okText, 'ok');
+    } catch (err) {
+      const msg = explainError(err, failText);
+      setError(msg);
+      toast(msg, 'err');
+    }
+  }
+
+  function fail(msg: string) {
+    setError(msg);
+    toast(msg, 'err');
+  }
 
   if (!spec) {
     return (
@@ -66,12 +87,19 @@ export function IntegrityPage() {
               type="button"
               className="btn btn-primary"
               onClick={async () => {
+                const n = Number(reserve);
+                if (!Number.isFinite(n)) {
+                  fail('Reserve must be a number');
+                  return;
+                }
                 try {
-                  await api('/api/v3/integrity/reserve', { method: 'PUT', body: JSON.stringify({ reserveBac: Number(reserve) }) });
+                  await api('/api/v3/integrity/reserve', { method: 'PUT', body: JSON.stringify({ reserveBac: n }) });
                   const payload = await api(`${spec.api}?limit=50`);
                   setRows(unwrapList<Record<string, unknown>>(payload));
+                  setError('');
+                  toast('Reserve saved', 'ok');
                 } catch (err) {
-                  setError(isApiError(err) ? err.message : 'Could not set reserve');
+                  fail(explainError(err, 'Could not set reserve'));
                 }
               }}
             >
@@ -82,13 +110,20 @@ export function IntegrityPage() {
               type="button"
               className="btn btn-primary"
               onClick={async () => {
+                const n = Number(highValue);
+                if (!Number.isFinite(n) || n <= 0) {
+                  fail('High-value limit must be above 0');
+                  return;
+                }
                 try {
                   await api('/api/v3/integrity/high-value', {
                     method: 'PUT',
-                    body: JSON.stringify({ highValueWithdrawBac: Number(highValue) }),
+                    body: JSON.stringify({ highValueWithdrawBac: n }),
                   });
+                  setError('');
+                  toast('High-value limit saved', 'ok');
                 } catch (err) {
-                  setError(isApiError(err) ? err.message : 'Could not set high-value threshold');
+                  fail(explainError(err, 'Could not set high-value threshold'));
                 }
               }}
             >
@@ -128,34 +163,18 @@ export function IntegrityPage() {
                       <button
                         type="button"
                         className="btn btn-ghost"
-                        onClick={async () => {
-                          try {
-                            await api(`/api/v3/integrity/kyc/${rowId(row)}`, {
-                              method: 'PATCH',
-                              body: JSON.stringify({ status: 'approved' }),
-                            });
-                            setRows((prev) => prev.map((r) => (rowId(r) === rowId(row) ? { ...r, status: 'approved' } : r)));
-                          } catch {
-                            setError(t('integrity.approveFail'));
-                          }
-                        }}
+                        onClick={() =>
+                          void act(`/api/v3/integrity/kyc/${rowId(row)}`, 'approved', rowId(row), 'KYC approved', t('integrity.approveFail'))
+                        }
                       >
                         {t('integrity.approve')}
                       </button>
                       <button
                         type="button"
                         className="btn btn-ghost"
-                        onClick={async () => {
-                          try {
-                            await api(`/api/v3/integrity/kyc/${rowId(row)}`, {
-                              method: 'PATCH',
-                              body: JSON.stringify({ status: 'rejected' }),
-                            });
-                            setRows((prev) => prev.map((r) => (rowId(r) === rowId(row) ? { ...r, status: 'rejected' } : r)));
-                          } catch {
-                            setError(t('integrity.rejectFail'));
-                          }
-                        }}
+                        onClick={() =>
+                          void act(`/api/v3/integrity/kyc/${rowId(row)}`, 'rejected', rowId(row), 'KYC rejected', t('integrity.rejectFail'))
+                        }
                       >
                         {t('integrity.reject')}
                       </button>
@@ -166,17 +185,15 @@ export function IntegrityPage() {
                       <button
                         type="button"
                         className="btn btn-ghost"
-                        onClick={async () => {
-                          try {
-                            await api(`/api/v3/integrity/fraud-holds/${rowId(row)}`, {
-                              method: 'PATCH',
-                              body: JSON.stringify({ status: 'released' }),
-                            });
-                            setRows((prev) => prev.map((r) => (rowId(r) === rowId(row) ? { ...r, status: 'released' } : r)));
-                          } catch {
-                            setError(t('integrity.releaseFail'));
-                          }
-                        }}
+                        onClick={() =>
+                          void act(
+                            `/api/v3/integrity/fraud-holds/${rowId(row)}`,
+                            'released',
+                            rowId(row),
+                            'Hold released',
+                            t('integrity.releaseFail'),
+                          )
+                        }
                       >
                         {t('integrity.release')}
                       </button>
@@ -187,34 +204,30 @@ export function IntegrityPage() {
                       <button
                         type="button"
                         className="btn btn-ghost"
-                        onClick={async () => {
-                          try {
-                            await api(`/api/v3/integrity/match-reports/${rowId(row)}`, {
-                              method: 'PATCH',
-                              body: JSON.stringify({ status: 'reviewed' }),
-                            });
-                            setRows((prev) => prev.map((r) => (rowId(r) === rowId(row) ? { ...r, status: 'reviewed' } : r)));
-                          } catch {
-                            setError(t('integrity.approveFail'));
-                          }
-                        }}
+                        onClick={() =>
+                          void act(
+                            `/api/v3/integrity/match-reports/${rowId(row)}`,
+                            'reviewed',
+                            rowId(row),
+                            'Report reviewed',
+                            t('integrity.approveFail'),
+                          )
+                        }
                       >
                         {t('integrity.approve')}
                       </button>
                       <button
                         type="button"
                         className="btn btn-ghost"
-                        onClick={async () => {
-                          try {
-                            await api(`/api/v3/integrity/match-reports/${rowId(row)}`, {
-                              method: 'PATCH',
-                              body: JSON.stringify({ status: 'dismissed' }),
-                            });
-                            setRows((prev) => prev.map((r) => (rowId(r) === rowId(row) ? { ...r, status: 'dismissed' } : r)));
-                          } catch {
-                            setError(t('integrity.rejectFail'));
-                          }
-                        }}
+                        onClick={() =>
+                          void act(
+                            `/api/v3/integrity/match-reports/${rowId(row)}`,
+                            'dismissed',
+                            rowId(row),
+                            'Report dismissed',
+                            t('integrity.rejectFail'),
+                          )
+                        }
                       >
                         {t('integrity.reject')}
                       </button>
@@ -225,34 +238,30 @@ export function IntegrityPage() {
                       <button
                         type="button"
                         className="btn btn-ghost"
-                        onClick={async () => {
-                          try {
-                            await api(`/api/v3/integrity/disputes/${rowId(row)}`, {
-                              method: 'PATCH',
-                              body: JSON.stringify({ status: 'resolved' }),
-                            });
-                            setRows((prev) => prev.map((r) => (rowId(r) === rowId(row) ? { ...r, status: 'resolved' } : r)));
-                          } catch {
-                            setError(t('integrity.releaseFail'));
-                          }
-                        }}
+                        onClick={() =>
+                          void act(
+                            `/api/v3/integrity/disputes/${rowId(row)}`,
+                            'resolved',
+                            rowId(row),
+                            'Dispute resolved',
+                            t('integrity.releaseFail'),
+                          )
+                        }
                       >
                         {t('integrity.release')}
                       </button>
                       <button
                         type="button"
                         className="btn btn-ghost"
-                        onClick={async () => {
-                          try {
-                            await api(`/api/v3/integrity/disputes/${rowId(row)}`, {
-                              method: 'PATCH',
-                              body: JSON.stringify({ status: 'rejected' }),
-                            });
-                            setRows((prev) => prev.map((r) => (rowId(r) === rowId(row) ? { ...r, status: 'rejected' } : r)));
-                          } catch {
-                            setError(t('integrity.rejectFail'));
-                          }
-                        }}
+                        onClick={() =>
+                          void act(
+                            `/api/v3/integrity/disputes/${rowId(row)}`,
+                            'rejected',
+                            rowId(row),
+                            'Dispute rejected',
+                            t('integrity.rejectFail'),
+                          )
+                        }
                       >
                         {t('integrity.reject')}
                       </button>
@@ -263,34 +272,18 @@ export function IntegrityPage() {
                       <button
                         type="button"
                         className="btn btn-ghost"
-                        onClick={async () => {
-                          try {
-                            await api(`/api/v3/integrity/ocr/${rowId(row)}`, {
-                              method: 'PATCH',
-                              body: JSON.stringify({ status: 'accepted' }),
-                            });
-                            setRows((prev) => prev.map((r) => (rowId(r) === rowId(row) ? { ...r, status: 'accepted' } : r)));
-                          } catch {
-                            setError(t('integrity.approveFail'));
-                          }
-                        }}
+                        onClick={() =>
+                          void act(`/api/v3/integrity/ocr/${rowId(row)}`, 'accepted', rowId(row), 'OCR accepted', t('integrity.approveFail'))
+                        }
                       >
                         {t('integrity.approve')}
                       </button>
                       <button
                         type="button"
                         className="btn btn-ghost"
-                        onClick={async () => {
-                          try {
-                            await api(`/api/v3/integrity/ocr/${rowId(row)}`, {
-                              method: 'PATCH',
-                              body: JSON.stringify({ status: 'rejected' }),
-                            });
-                            setRows((prev) => prev.map((r) => (rowId(r) === rowId(row) ? { ...r, status: 'rejected' } : r)));
-                          } catch {
-                            setError(t('integrity.rejectFail'));
-                          }
-                        }}
+                        onClick={() =>
+                          void act(`/api/v3/integrity/ocr/${rowId(row)}`, 'rejected', rowId(row), 'OCR rejected', t('integrity.rejectFail'))
+                        }
                       >
                         {t('integrity.reject')}
                       </button>

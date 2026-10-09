@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Navigate, useOutletContext } from 'react-router-dom';
-import { api, isApiError, unwrapData } from '../lib/api';
+import { api, unwrapData, explainError } from '../lib/api';
 import { can } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 type Offer = {
   id: string;
@@ -70,7 +70,7 @@ export function ClaimOffersPage() {
       const payload = await api('/api/v3/engagement/offers');
       setRows(unwrapData<Offer[]>(payload) || []);
     } catch (err) {
-      setError(isApiError(err) ? err.message : t('settings.loadFail'));
+      setError(explainError(err, t('settings.loadFail')));
     } finally {
       setLoading(false);
     }
@@ -90,7 +90,7 @@ export function ClaimOffersPage() {
     event.preventDefault();
     const startsAt = toIso(form.startsAt);
     if (!startsAt) {
-      toast(t('offers.starts'));
+      toast(t('offers.needStart'), 'err');
       return;
     }
     setBusy(true);
@@ -110,10 +110,10 @@ export function ClaimOffersPage() {
         await api('/api/v3/engagement/offers', { method: 'POST', body: JSON.stringify(body) });
       }
       setForm(EMPTY);
-      toast(t('offers.save'));
+      toast(t('offers.save'), 'ok');
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('settings.loadFail'));
+      toast(explainError(err, t('settings.fail')), 'err');
     } finally {
       setBusy(false);
     }
@@ -124,9 +124,10 @@ export function ClaimOffersPage() {
     try {
       await api(`/api/v3/engagement/offers/${id}`, { method: 'DELETE' });
       if (form.id === id) setForm(EMPTY);
+      toast(t('offers.deleted'), 'ok');
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('settings.loadFail'));
+      toast(explainError(err, t('settings.fail')), 'err');
     } finally {
       setBusy(false);
     }

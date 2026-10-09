@@ -1,4 +1,6 @@
 {
+  "status.ok": "Success",
+  "status.err": "Error",
   "nav.overview": "Overview",
   "nav.dashboard": "Dashboard",
   "nav.users": "Users",
@@ -128,6 +130,7 @@
   "list.loadFail": "Could not load",
   "settings.lead": "Edit JSON from live AppSettings. Unsaved route changes warn in the browser.",
   "settings.save": "Save",
+  "settings.saved": "Settings saved",
   "settings.saving": "Saving…",
   "settings.fail": "Invalid JSON or save failed",
   "settings.loadFail": "Could not load settings",
@@ -425,5 +428,7 @@
   "offers.create": "Create offer",
   "offers.empty": "No offers yet",
   "offers.delete": "Delete",
+  "offers.deleted": "Offer deleted",
+  "offers.needStart": "Start time is required",
   "offers.claimed": "claimed"
 }

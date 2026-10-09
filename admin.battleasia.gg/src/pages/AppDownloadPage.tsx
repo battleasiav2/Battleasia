@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { api, isApiError, unwrapData } from '../lib/api';
+import { api, unwrapData, explainError } from '../lib/api';
 import { useI18n } from '../lib/i18n';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 type AppDownloadForm = {
   enabled: boolean;
@@ -54,7 +54,7 @@ export function AppDownloadPage() {
         updatedAt: data.updatedAt || '',
       });
     } catch (err) {
-      setError(isApiError(err) ? err.message : t('settings.loadFail'));
+      setError(explainError(err, t('settings.loadFail')));
     } finally {
       setLoading(false);
     }
@@ -82,9 +82,9 @@ export function AppDownloadPage() {
           downloadUrl: data.downloadUrl || prev.downloadUrl,
         }));
       }
-      toast(t('apk.saved'));
+      toast(t('apk.saved'), 'ok');
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('settings.fail'));
+      toast(explainError(err, t('settings.fail')), 'err');
     } finally {
       setBusy(false);
     }
@@ -92,7 +92,7 @@ export function AppDownloadPage() {
 
   async function upload(file: File) {
     if (!file.name.toLowerCase().endsWith('.apk')) {
-      toast(t('apk.needApk'));
+      toast(t('apk.needApk'), 'err');
       return;
     }
     setUploading(true);
@@ -116,9 +116,9 @@ export function AppDownloadPage() {
           fileName: data.fileName || prev.fileName,
         }));
       }
-      toast(t('apk.uploaded'));
+      toast(t('apk.uploaded'), 'ok');
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('apk.uploadFail'));
+      toast(explainError(err, t('apk.uploadFail')), 'err');
     } finally {
       setUploading(false);
       if (fileRef.current) fileRef.current.value = '';

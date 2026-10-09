@@ -1,10 +1,10 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { Navigate, useOutletContext } from 'react-router-dom';
-import { api, isApiError, unwrapData, unwrapList } from '../lib/api';
+import { api, unwrapData, unwrapList, explainError } from '../lib/api';
 import { can } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 type Pack = {
   id: string;
@@ -83,7 +83,7 @@ export function BacShopPage() {
       setEdits(next);
     } catch (err) {
       setRows([]);
-      setError(isApiError(err) ? err.message : t('bacShop.loadFail'));
+      setError(explainError(err, t('bacShop.loadFail')));
     }
   }, [t]);
 
@@ -108,9 +108,9 @@ export function BacShopPage() {
       if (!url) throw new Error('No url');
       if (target === 'draft') setDraft((d) => ({ ...d, image: url }));
       else setEdits((prev) => ({ ...prev, [target]: { ...prev[target], image: url } }));
-      toast(t('bacShop.imageOk'));
+      toast(t('bacShop.imageOk'), 'ok');
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('bacShop.imageFail'));
+      toast(explainError(err, t('bacShop.imageFail')), 'err');
     } finally {
       setUploading('');
     }
@@ -120,7 +120,7 @@ export function BacShopPage() {
     const amount = Number(draft.amount);
     const discount = draft.discount.trim() === '' ? 0 : Number(draft.discount);
     if (!Number.isFinite(amount) || amount <= 0 || !Number.isFinite(discount) || discount < 0 || discount > 90) {
-      toast(t('bacShop.invalid'));
+      toast(t('bacShop.invalid'), 'err');
       return;
     }
     setCreating(true);
@@ -134,11 +134,11 @@ export function BacShopPage() {
           isActive: draft.isActive,
         }),
       });
-      toast(t('bacShop.created'));
+      toast(t('bacShop.created'), 'ok');
       setDraft(EMPTY);
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('bacShop.createFail'));
+      toast(explainError(err, t('bacShop.createFail')), 'err');
     } finally {
       setCreating(false);
     }
@@ -150,7 +150,7 @@ export function BacShopPage() {
     const amount = Number(edit.amount);
     const discount = edit.discount.trim() === '' ? 0 : Number(edit.discount);
     if (!Number.isFinite(amount) || amount <= 0 || !Number.isFinite(discount) || discount < 0 || discount > 90) {
-      toast(t('bacShop.invalid'));
+      toast(t('bacShop.invalid'), 'err');
       return;
     }
     setBusyId(id);
@@ -164,10 +164,10 @@ export function BacShopPage() {
           isActive: edit.isActive,
         }),
       });
-      toast(t('bacShop.saved'));
+      toast(t('bacShop.saved'), 'ok');
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('bacShop.saveFail'));
+      toast(explainError(err, t('bacShop.saveFail')), 'err');
     } finally {
       setBusyId('');
     }
@@ -178,10 +178,10 @@ export function BacShopPage() {
     setBusyId(id);
     try {
       await api(`/api/v4/shop/items/${id}`, { method: 'DELETE' });
-      toast(t('bacShop.deleted'));
+      toast(t('bacShop.deleted'), 'ok');
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('bacShop.deleteFail'));
+      toast(explainError(err, t('bacShop.deleteFail')), 'err');
     } finally {
       setBusyId('');
     }

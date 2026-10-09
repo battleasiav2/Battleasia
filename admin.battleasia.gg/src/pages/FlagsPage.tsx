@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import { api, isApiError, unwrapData } from '../lib/api';
+import { Navigate, useOutletContext } from 'react-router-dom';
+import { api, explainError, unwrapData } from '../lib/api';
 import { can } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 
@@ -45,14 +45,16 @@ const VELOCITY_OFF: Velocity = {
   maxJoins: 30,
 };
 
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
+
 export function FlagsPage() {
   const { t } = useI18n();
+  const { toast } = useOutletContext<Ctx>();
   const [p1, setP1] = useState<Record<string, boolean>>({});
   const [p2, setP2] = useState<Record<string, boolean>>({});
   const [velocity, setVelocity] = useState<Velocity>(VELOCITY_OFF);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const [toast, setToast] = useState('');
 
   useEffect(() => {
     Promise.all([
@@ -65,19 +67,21 @@ export function FlagsPage() {
         setP2({ ...unwrapData<Record<string, boolean>>(b) });
         setVelocity({ ...VELOCITY_OFF, ...unwrapData<Partial<Velocity>>(c) });
       })
-      .catch((err) => setError(isApiError(err) ? err.message : 'Could not load flags'));
+      .catch((err) => setError(explainError(err, 'Could not load flags')));
   }, []);
 
   if (!can('engagement.edit')) return <Navigate to="/403" replace />;
 
   async function save(which: 'p1' | 'p2', next: Record<string, boolean>) {
     setBusy(true);
+    setError('');
     try {
       await api(`/api/v2/app-settings/${which}`, { method: 'PUT', body: JSON.stringify(next) });
-      setToast('Saved');
-      window.setTimeout(() => setToast(''), 1600);
+      toast(which === 'p1' ? 'P1 flags saved' : 'P2 flags saved', 'ok');
     } catch (err) {
-      setError(isApiError(err) ? err.message : 'Save failed');
+      const msg = explainError(err, 'Save failed');
+      setError(msg);
+      toast(msg, 'err');
     } finally {
       setBusy(false);
     }
@@ -85,13 +89,15 @@ export function FlagsPage() {
 
   async function saveVelocity(next: Velocity) {
     setBusy(true);
+    setError('');
     try {
       const payload = await api('/api/v2/app-settings/velocity', { method: 'PUT', body: JSON.stringify(next) });
       setVelocity({ ...VELOCITY_OFF, ...unwrapData<Partial<Velocity>>(payload) });
-      setToast('Saved');
-      window.setTimeout(() => setToast(''), 1600);
+      toast('Velocity hold saved', 'ok');
     } catch (err) {
-      setError(isApiError(err) ? err.message : 'Save failed');
+      const msg = explainError(err, 'Save failed');
+      setError(msg);
+      toast(msg, 'err');
     } finally {
       setBusy(false);
     }
@@ -105,7 +111,6 @@ export function FlagsPage() {
         <p className="admin-lead">P1 and P2 are on. Flip any off here. Velocity hold stays off. P2 is lobby, gifts, and labs — not a live camera.</p>
       </header>
       {error ? <p className="form-error">{error}</p> : null}
-      {toast ? <p className="play-muted">{toast}</p> : null}
 
       <section className="dash-stage">
         <h2>P1</h2>

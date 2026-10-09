@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Navigate, useLocation, useOutletContext } from 'react-router-dom';
-import { api, isApiError, unwrapData } from '../lib/api';
+import { api, unwrapData, explainError } from '../lib/api';
 import { can } from '../lib/auth';
 import { SETTINGS } from '../lib/catalog';
 import { useI18n } from '../lib/i18n';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 export function SettingsPage() {
   const { t } = useI18n();
@@ -24,7 +24,7 @@ export function SettingsPage() {
         const data = unwrapData<unknown>(payload);
         setRaw(JSON.stringify(data ?? payload, null, 2));
       })
-      .catch((err) => setError(isApiError(err) ? err.message : t('settings.loadFail')));
+      .catch((err) => setError(explainError(err, t('settings.loadFail'))));
   }, [spec, t]);
 
   if (!spec) {
@@ -39,13 +39,16 @@ export function SettingsPage() {
   async function save() {
     if (!spec.put) return;
     setBusy(true);
+    setError('');
     try {
       const parsed = JSON.parse(raw) as Record<string, unknown>;
       const body = spec.wrap ? { [spec.wrap]: parsed[spec.wrap] ?? parsed } : parsed;
       await api(spec.put, { method: 'PUT', body: JSON.stringify(body) });
-      toast(t('settings.save'));
+      toast(t('settings.saved'), 'ok');
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('settings.fail'));
+      const msg = explainError(err, t('settings.fail'));
+      setError(msg);
+      toast(msg, 'err');
     } finally {
       setBusy(false);
     }
@@ -96,9 +99,11 @@ export function SettingsPage() {
                   onClick={async () => {
                     try {
                       await api(spec.testPath!, { method: 'POST', body: JSON.stringify({ to: testTo.trim() }) });
-                      toast(t('mail.sendTest'));
+                      toast(t('mail.testOk'), 'ok');
                     } catch (err) {
-                      toast(isApiError(err) ? err.message : t('settings.fail'));
+                      const msg = explainError(err, t('settings.fail'));
+                      setError(msg);
+                      toast(msg, 'err');
                     }
                   }}
                 >

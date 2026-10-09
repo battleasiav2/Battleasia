@@ -1,4 +1,6 @@
 {
+  "status.ok": "کامیاب",
+  "status.err": "خرابی",
   "nav.overview": "اوورویو",
   "nav.dashboard": "ڈیش بورڈ",
   "nav.users": "یوزرز",

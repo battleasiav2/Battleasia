@@ -1,4 +1,6 @@
 {
+  "status.ok": "成功",
+  "status.err": "错误",
   "nav.overview": "总览",
   "nav.dashboard": "仪表盘",
   "nav.users": "用户",

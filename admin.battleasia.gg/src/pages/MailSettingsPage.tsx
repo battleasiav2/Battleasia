@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { api, isApiError, unwrapData } from '../lib/api';
+import { api, unwrapData, explainError } from '../lib/api';
 import { useI18n } from '../lib/i18n';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 type MailSettingsForm = {
   enabled: boolean;
@@ -54,7 +54,7 @@ export function MailSettingsPage() {
         fromEmail: data.fromEmail || '',
       });
     } catch (err) {
-      setError(isApiError(err) ? err.message : t('settings.loadFail'));
+      setError(explainError(err, t('settings.loadFail')));
     } finally {
       setLoading(false);
     }
@@ -83,9 +83,9 @@ export function MailSettingsPage() {
           smtpPass: data.smtpPass || prev.smtpPass,
         }));
       }
-      toast(t('mail.saved'));
+      toast(t('mail.saved'), 'ok');
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('settings.fail'));
+      toast(explainError(err, t('settings.fail')), 'err');
     } finally {
       setBusy(false);
     }
@@ -93,7 +93,7 @@ export function MailSettingsPage() {
 
   async function sendTest() {
     if (!testTo.trim()) {
-      toast(t('mail.testRequired'));
+      toast(t('mail.testRequired'), 'err');
       return;
     }
     setTesting(true);
@@ -102,9 +102,9 @@ export function MailSettingsPage() {
         method: 'POST',
         body: JSON.stringify({ to: testTo.trim() }),
       });
-      toast(t('mail.testOk'));
+      toast(t('mail.testOk'), 'ok');
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('mail.testFail'));
+      toast(explainError(err, t('mail.testFail')), 'err');
     } finally {
       setTesting(false);
     }

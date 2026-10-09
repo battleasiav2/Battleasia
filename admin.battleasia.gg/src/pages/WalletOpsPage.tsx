@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { api, isApiError, unwrapData, unwrapList } from '../lib/api';
+import { api, unwrapData, unwrapList, explainError } from '../lib/api';
 import { cell, pick, rowId } from '../lib/format';
 import { useI18n } from '../lib/i18n';
 import { useOutletContext } from 'react-router-dom';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 function isCryptoWallet(row: Record<string, unknown>) {
   const currency = String(row.currency_type || '').toLowerCase();
@@ -37,7 +37,7 @@ export function WalletOpsPage() {
       .catch((err) => {
         setChannels([]);
         setWallets([]);
-        setError(isApiError(err) ? err.message : t('list.loadFail'));
+        setError(explainError(err, t('list.loadFail')));
       });
   }
 
@@ -58,10 +58,10 @@ export function WalletOpsPage() {
         method: 'PUT',
         body: JSON.stringify({ qr_code: url }),
       });
-      toast(t('walletOps.qrOk'));
+      toast(t('walletOps.qrOk'), 'ok');
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('walletOps.qrFail'));
+      toast(explainError(err, t('walletOps.qrFail')), 'err');
     } finally {
       setUploading('');
     }

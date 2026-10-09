@@ -1390,13 +1390,71 @@
 
 .admin-toast {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--ba-surface);
-  border: 1px solid var(--ba-hair);
-  padding: 12px 16px;
+  top: 76px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(560px, calc(100vw - 32px));
+  padding: 12px 14px;
   border-radius: 12px;
-  z-index: 60;
+  background: #161618;
+  color: #f4f5f2;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+.admin-toast strong {
+  flex: 0 0 auto;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-toast span {
+  flex: 1 1 auto;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.admin-toast button {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.admin-toast.is-ok {
+  border-color: #d4e82a;
+}
+
+.admin-toast.is-ok strong {
+  color: #d4e82a;
+}
+
+.admin-toast.is-err {
+  border-color: #fb7185;
+}
+
+.admin-toast.is-err strong {
+  color: #fb7185;
+}
+
+.form-ok {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #d4e82a;
+  background: rgba(212, 232, 42, 0.12);
+  color: #e7f58a;
+  font-weight: 700;
 }
 
 .flag-list {
@@ -1548,9 +1606,9 @@
   }
 
   .admin-toast {
-    left: 12px;
-    right: 12px;
-    bottom: 12px;
+    top: auto;
+    bottom: 16px;
+    width: min(560px, calc(100vw - 24px));
   }
 }
 

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom';
-import { api, isApiError, unwrapData } from '../lib/api';
+import { api, unwrapData, explainError } from '../lib/api';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 function slugify(value: string) {
   return value
@@ -47,7 +47,7 @@ export function GameFormPage() {
           canCreateChallenge: g.canCreateChallenge !== false,
         });
       })
-      .catch((err) => setError(isApiError(err) ? err.message : 'Game missing'));
+      .catch((err) => setError(explainError(err, 'Game missing')));
   }, [id]);
 
   return (
@@ -60,14 +60,24 @@ export function GameFormPage() {
         style={{ maxWidth: 560 }}
         onSubmit={async (e) => {
           e.preventDefault();
+          if (!form.name.trim()) {
+            const msg = 'Game name is required';
+            setError(msg);
+            toast(msg, 'err');
+            return;
+          }
+          setError('');
           setBusy(true);
           try {
             if (id) await api(`/api/v3/games/list/${id}`, { method: 'PUT', body: JSON.stringify(form) });
             else await api('/api/v3/games/list', { method: 'POST', body: JSON.stringify(form) });
-            toast(id ? 'Game updated' : 'Game created');
-            navigate('/games/list');
+            const done = id ? 'Game updated' : 'Game created';
+            toast(done, 'ok');
+            navigate('/games/list', { state: { flash: done } });
           } catch (err) {
-            toast(isApiError(err) ? err.message : 'Save failed');
+            const msg = explainError(err, 'Save failed');
+            setError(msg);
+            toast(msg, 'err');
           } finally {
             setBusy(false);
           }

@@ -171,6 +171,12 @@ export function isApiError(err: unknown): err is ApiError {
   return Boolean(err && typeof err === 'object' && 'status' in err && 'message' in err);
 }
 
+export function explainError(err: unknown, fallback: string) {
+  if (isApiError(err) && err.message.trim()) return err.message.trim();
+  if (err instanceof Error && err.message.trim()) return err.message.trim();
+  return fallback;
+}
+
 export function newIdempotencyKey() {
   return crypto.randomUUID();
 }

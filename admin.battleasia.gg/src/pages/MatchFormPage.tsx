@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom';
-import { api, isApiError, unwrapData, unwrapList } from '../lib/api';
+import { api, unwrapData, unwrapList, explainError } from '../lib/api';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 type GameRow = { id?: string; _id?: string; name?: string; packageName?: string };
 
@@ -246,7 +246,7 @@ export function MatchFormPage() {
           premiumOnly: Boolean(m.premiumOnly),
         });
       })
-      .catch((err) => setError(isApiError(err) ? err.message : 'Match missing'));
+      .catch((err) => setError(explainError(err, 'Match missing')));
   }, [id]);
 
   function mapForGame(gameId: string) {
@@ -318,30 +318,36 @@ export function MatchFormPage() {
         className="money-form match-form-grid"
         onSubmit={async (e) => {
           e.preventDefault();
+          const fail = (msg: string) => {
+            setError(msg);
+            toast(msg, 'err');
+          };
           if (!form.matchName.trim() || !form.password.trim() || !form.map) {
-            toast('Fill required match fields');
+            fail('Fill required match fields');
             return;
           }
           if (!form.matchSchedule) {
-            toast('Match schedule is required');
+            fail('Match schedule is required');
             return;
           }
           if (!createForAllFive && !form.gameId) {
-            toast('Select a game');
+            fail('Select a game');
             return;
           }
+          setError('');
           setBusy(true);
           try {
+            let done = '';
             if (id) {
               await api(`/api/v3/games/matches/${id}`, {
                 method: 'PUT',
                 body: JSON.stringify(buildBody(form.gameId, form.roomId.trim() || randRoom(), form.password.trim())),
               });
-              toast('Match updated');
+              done = 'Match updated';
             } else if (createForAllFive) {
               const targets = arenaGameIds();
               if (targets.length < 1) {
-                toast('No arena games found — create games first');
+                fail('No arena games found — create games first');
                 return;
               }
               let ok = 0;
@@ -352,7 +358,7 @@ export function MatchFormPage() {
                 });
                 ok += 1;
               }
-              toast(`Match created for ${ok} games`);
+              done = `Match created for ${ok} games`;
             } else {
               await api('/api/v3/games/matches', {
                 method: 'POST',
@@ -360,11 +366,12 @@ export function MatchFormPage() {
                   buildBody(form.gameId, form.roomId.trim() || randRoom(), form.password.trim() || randPass()),
                 ),
               });
-              toast('Match created');
+              done = 'Match created';
             }
-            navigate('/games/matches');
+            toast(done, 'ok');
+            navigate('/games/matches', { state: { flash: done } });
           } catch (err) {
-            toast(isApiError(err) ? err.message : 'Save failed');
+            fail(explainError(err, 'Save failed'));
           } finally {
             setBusy(false);
           }
@@ -472,9 +479,14 @@ export function MatchFormPage() {
                   const url = String(unwrapData<{ url?: string }>(payload)?.url || '');
                   if (!url) throw new Error('No url');
                   set('banner', url);
-                  toast('Banner uploaded');
+                  setError('');
+                  toast('Banner uploaded', 'ok');
                 })
-                .catch((err) => toast(isApiError(err) ? err.message : 'Banner upload failed'))
+                .catch((err) => {
+                  const msg = explainError(err, 'Banner upload failed');
+                  setError(msg);
+                  toast(msg, 'err');
+                })
                 .finally(() => setUploadingBanner(false));
             }}
           />

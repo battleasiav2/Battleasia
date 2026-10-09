@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Navigate, useOutletContext } from 'react-router-dom';
-import { api, isApiError, unwrapList } from '../lib/api';
+import { api, unwrapList, explainError } from '../lib/api';
 import { can } from '../lib/auth';
 import { cell, pick, rowId } from '../lib/format';
 import { useI18n } from '../lib/i18n';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 type Draft = {
   title: string;
@@ -41,7 +41,7 @@ export function NotificationsPage() {
       setRows(unwrapList<Record<string, unknown>>(payload));
     } catch (err) {
       setRows([]);
-      setError(isApiError(err) ? err.message : t('list.loadFail'));
+      setError(explainError(err, t('list.loadFail')));
     }
   }, [t]);
 
@@ -55,7 +55,7 @@ export function NotificationsPage() {
     const title = draft.title.trim();
     const message = draft.message.trim();
     if (!title || !message) {
-      toast(t('notif.needFields'));
+      toast(t('notif.needFields'), 'err');
       return;
     }
     if (!window.confirm(t('notif.confirmAll'))) return;
@@ -72,12 +72,12 @@ export function NotificationsPage() {
           target: 'all',
         }),
       });
-      toast(t('notif.sent'));
+      toast(t('notif.sent'), 'ok');
       setDraft(EMPTY);
       setOpen(false);
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('notif.fail'));
+      toast(explainError(err, t('notif.fail')), 'err');
     } finally {
       setBusy(false);
     }

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Navigate, useOutletContext } from 'react-router-dom';
-import { api, isApiError, unwrapList } from '../lib/api';
+import { api, unwrapList, explainError } from '../lib/api';
 import { can } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 type CoinRateRow = {
   id: string;
@@ -66,7 +66,7 @@ export function CoinRatesPage() {
       setEdits(next);
     } catch (err) {
       setRows([]);
-      setError(isApiError(err) ? err.message : t('rates.loadFail'));
+      setError(explainError(err, t('rates.loadFail')));
     }
   }, [t]);
 
@@ -86,7 +86,7 @@ export function CoinRatesPage() {
     const isBdt = edit.currency.toUpperCase() === 'BDT';
     const rateNum = isBdt ? 1 : Number(edit.rate);
     if (!edit.region.trim() || !edit.currency.trim() || !Number.isFinite(rateNum) || rateNum < 0) {
-      toast(t('rates.invalid'));
+      toast(t('rates.invalid'), 'err');
       return;
     }
     setBusyId(id);
@@ -100,10 +100,10 @@ export function CoinRatesPage() {
           isActive: edit.isActive,
         }),
       });
-      toast(t('rates.saved'));
+      toast(t('rates.saved'), 'ok');
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('rates.saveFail'));
+      toast(explainError(err, t('rates.saveFail')), 'err');
     } finally {
       setBusyId('');
     }
@@ -113,7 +113,7 @@ export function CoinRatesPage() {
     const isBdt = draft.currency.toUpperCase() === 'BDT';
     const rateNum = isBdt ? 1 : Number(draft.rate);
     if (!draft.region.trim() || !draft.currency.trim() || !Number.isFinite(rateNum) || rateNum < 0) {
-      toast(t('rates.invalid'));
+      toast(t('rates.invalid'), 'err');
       return;
     }
     setCreating(true);
@@ -127,11 +127,11 @@ export function CoinRatesPage() {
           isActive: draft.isActive,
         }),
       });
-      toast(t('rates.created'));
+      toast(t('rates.created'), 'ok');
       setDraft(EMPTY);
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('rates.createFail'));
+      toast(explainError(err, t('rates.createFail')), 'err');
     } finally {
       setCreating(false);
     }
@@ -139,17 +139,17 @@ export function CoinRatesPage() {
 
   async function removeRow(id: string, currency: string) {
     if (currency.toUpperCase() === 'BDT') {
-      toast(t('rates.keepBase'));
+      toast(t('rates.keepBase'), 'err');
       return;
     }
     if (!window.confirm(t('rates.confirmDelete'))) return;
     setBusyId(id);
     try {
       await api(`/api/v4/shop/coins/${id}`, { method: 'DELETE' });
-      toast(t('rates.deleted'));
+      toast(t('rates.deleted'), 'ok');
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('rates.deleteFail'));
+      toast(explainError(err, t('rates.deleteFail')), 'err');
     } finally {
       setBusyId('');
     }

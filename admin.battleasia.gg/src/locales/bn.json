@@ -1,4 +1,6 @@
 {
+  "status.ok": "সফল",
+  "status.err": "সমস্যা",
   "nav.overview": "ওভারভিউ",
   "nav.dashboard": "ড্যাশবোর্ড",
   "nav.users": "ইউজার",
@@ -120,6 +122,7 @@
   "list.loadFail": "লোড হয়নি",
   "settings.lead": "লাইভ AppSettings JSON এডিট। আনসেভড রুট চেঞ্জ ব্রাউজারে ওয়ার্ন করবে।",
   "settings.save": "সেভ",
+  "settings.saved": "সেটিংস সেভ হয়েছে",
   "settings.saving": "সেভ হচ্ছে…",
   "settings.fail": "ভুল JSON বা সেভ ফেল",
   "settings.loadFail": "সেটিংস লোড হয়নি",

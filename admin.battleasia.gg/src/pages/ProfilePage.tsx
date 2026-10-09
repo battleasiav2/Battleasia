@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { PasswordField } from '../components/PasswordField';
-import { api, isApiError, unwrapList } from '../lib/api';
+import { api, unwrapList, explainError } from '../lib/api';
 import { fetchAdminMe, readAdminUser } from '../lib/auth';
 import { cell, rowId } from '../lib/format';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 export function ProfilePage() {
   const { toast } = useOutletContext<Ctx>();
@@ -36,9 +36,9 @@ export function ProfilePage() {
               method: 'PATCH',
               body: JSON.stringify({ currentPassword: current, newPassword: next }),
             });
-            toast('Profile updated');
+            toast('Profile updated', 'ok');
           } catch (err) {
-            toast(isApiError(err) ? err.message : 'Update failed');
+            toast(explainError(err, 'Update failed'), 'err');
           }
         }}
       >
@@ -70,9 +70,9 @@ export function ProfilePage() {
                         try {
                           await api(`/api/v3/users/sessions/${id}`, { method: 'DELETE' });
                           setSessions((s) => s.filter((r) => rowId(r) !== id));
-                          toast('Revoked');
+                          toast('Revoked', 'ok');
                         } catch (err) {
-                          toast(isApiError(err) ? err.message : 'Revoke failed');
+                          toast(explainError(err, 'Revoke failed'), 'err');
                         }
                       }}
                     >

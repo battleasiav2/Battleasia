@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Navigate, useOutletContext } from 'react-router-dom';
-import { api, isApiError, unwrapData } from '../lib/api';
+import { api, unwrapData, explainError } from '../lib/api';
 import { can } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 type PremiumForm = {
   premiumDuration: number;
@@ -31,7 +31,7 @@ export function PremiumSettingsPage() {
         premiumPrice: Number(premium.premiumPrice) || 0,
       });
     } catch (err) {
-      setError(isApiError(err) ? err.message : t('settings.loadFail'));
+      setError(explainError(err, t('settings.loadFail')));
     } finally {
       setLoading(false);
     }
@@ -45,17 +45,17 @@ export function PremiumSettingsPage() {
 
   async function save() {
     if (!can('users.edit')) {
-      toast(t('premium.noEdit'));
+      toast(t('premium.noEdit'), 'err');
       return;
     }
     const duration = Number(form.premiumDuration);
     const price = Number(form.premiumPrice);
     if (!Number.isFinite(duration) || duration < 1) {
-      toast(t('premium.badDuration'));
+      toast(t('premium.badDuration'), 'err');
       return;
     }
     if (!Number.isFinite(price) || price < 0) {
-      toast(t('premium.badPrice'));
+      toast(t('premium.badPrice'), 'err');
       return;
     }
     setBusy(true);
@@ -64,10 +64,10 @@ export function PremiumSettingsPage() {
         method: 'PUT',
         body: JSON.stringify({ premiumDuration: duration, premiumPrice: price }),
       });
-      toast(t('premium.saved'));
+      toast(t('premium.saved'), 'ok');
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('settings.fail'));
+      toast(explainError(err, t('settings.fail')), 'err');
     } finally {
       setBusy(false);
     }

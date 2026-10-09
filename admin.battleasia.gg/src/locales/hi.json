@@ -1,4 +1,6 @@
 {
+  "status.ok": "सफल",
+  "status.err": "समस्या",
   "nav.overview": "ओवरव्यू",
   "nav.dashboard": "डैशबोर्ड",
   "nav.users": "यूज़र",

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CoinValue } from '../components/CoinValue';
-import { api, isApiError, unwrapData } from '../lib/api';
+import { api, unwrapData, explainError } from '../lib/api';
 import { useI18n } from '../lib/i18n';
 
 type Dash = {
@@ -36,7 +36,7 @@ export function DashboardPage() {
   useEffect(() => {
     api('/api/v3/dashboard')
       .then((payload) => setData(unwrapData<Dash>(payload)))
-      .catch((err) => setError(isApiError(err) ? err.message : t('dash.offline')));
+      .catch((err) => setError(explainError(err, t('dash.offline'))));
     api('/api/v3/integrity/ops')
       .then((payload) => setOps(unwrapData<Ops>(payload)))
       .catch(() => setOps(null));

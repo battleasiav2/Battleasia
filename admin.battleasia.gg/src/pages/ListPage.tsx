@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useLocation, useOutletContext } from 'react-router-dom';
-import { api, isApiError, unwrapList } from '../lib/api';
+import { api, unwrapList, explainError } from '../lib/api';
 import { can } from '../lib/auth';
 import { LISTS } from '../lib/catalog';
 import { cell, downloadCsv, downloadExcel, pick, rangeFor, rowId, toCsv } from '../lib/format';
 import { useI18n } from '../lib/i18n';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 const RANGES = [
   ['all', 'list.range.all'],
@@ -52,10 +52,15 @@ export function ListPage() {
       if (range.endDate) params.set('endDate', range.endDate);
       const path = spec.api.includes('?') ? `${spec.api}&${params}` : `${spec.api}?${params}`;
       api(path)
-        .then((payload) => setRows(unwrapList<Record<string, unknown>>(payload)))
+        .then((payload) => {
+          setError('');
+          setRows(unwrapList<Record<string, unknown>>(payload));
+        })
         .catch((err) => {
           setRows([]);
-          setError(isApiError(err) ? err.message : t('list.loadFail'));
+          const msg = explainError(err, t('list.loadFail'));
+          setError(msg);
+          toast(msg, 'err');
         });
     }, 350);
     return () => window.clearTimeout(timer);
@@ -66,12 +71,12 @@ export function ListPage() {
   async function runBulk(kind: 'disable' | 'enable' | 'hide' | 'publish') {
     if (!spec) return;
     if (!selected.length) {
-      toast(t('list.needSelect'));
+      toast(t('list.needSelect'), 'err');
       return;
     }
     const needsReason = kind === 'disable' || kind === 'hide';
     if (needsReason && !reason.trim()) {
-      toast(t('list.needReason'));
+      toast(t('list.needReason'), 'err');
       return;
     }
     const confirmKey =
@@ -95,7 +100,7 @@ export function ListPage() {
           body: JSON.stringify({ ids: selected, status: kind === 'publish' ? 'published' : 'draft', reason: reason.trim() }),
         });
       }
-      toast(t('list.bulkOk'));
+      toast(t('list.bulkOk'), 'ok');
       setSelected([]);
       setReason('');
       setSearch((s) => s);
@@ -107,7 +112,7 @@ export function ListPage() {
       const path = spec.api.includes('?') ? `${spec.api}&${params}` : `${spec.api}?${params}`;
       setRows(unwrapList<Record<string, unknown>>(await api(path)));
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('list.bulkFail'));
+      toast(explainError(err, t('list.bulkFail')), 'err');
     }
   }
 
@@ -148,6 +153,9 @@ export function ListPage() {
             {t('list.newGame')}
           </Link>
         </p>
+      ) : null}
+      {typeof (location.state as { flash?: unknown } | null)?.flash === 'string' ? (
+        <p className="form-ok">{(location.state as { flash: string }).flash}</p>
       ) : null}
       {error ? <p className="form-error">{error}</p> : null}
       <div className="dash-stage list-stage">

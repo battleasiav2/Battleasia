@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useOutletContext, useParams } from 'react-router-dom';
-import { api, isApiError, unwrapList } from '../lib/api';
+import { api, unwrapList, explainError } from '../lib/api';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 export function SupportThreadPage() {
   const { toast } = useOutletContext<Ctx>();
@@ -15,7 +15,7 @@ export function SupportThreadPage() {
     if (!conversationId) return;
     api(`/api/v2/customer-support/conversation/${conversationId}/messages`)
       .then((payload) => setRows(unwrapList<Record<string, unknown>>(payload)))
-      .catch((err) => setError(isApiError(err) ? err.message : 'Thread offline'));
+      .catch((err) => setError(explainError(err, 'Thread offline')));
   }
 
   useEffect(() => {
@@ -57,10 +57,10 @@ export function SupportThreadPage() {
                 body: JSON.stringify({ conversationId, message: text }),
               });
               setText('');
-              toast('Sent');
+              toast('Sent', 'ok');
               load();
             } catch (err) {
-              toast(isApiError(err) ? err.message : 'Send failed');
+              toast(explainError(err, 'Send failed'), 'err');
             }
           }}
         >
@@ -73,9 +73,9 @@ export function SupportThreadPage() {
             if (!window.confirm('Close this conversation?')) return;
             try {
               await api(`/api/v2/customer-support/conversation/${conversationId}/close`, { method: 'PATCH' });
-              toast('Closed');
+              toast('Closed', 'ok');
             } catch (err) {
-              toast(isApiError(err) ? err.message : 'Close failed');
+              toast(explainError(err, 'Close failed'), 'err');
             }
           }}
         >

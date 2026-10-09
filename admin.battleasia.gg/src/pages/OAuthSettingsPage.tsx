@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { api, isApiError, unwrapData } from '../lib/api';
+import { api, unwrapData, explainError } from '../lib/api';
 import { useI18n } from '../lib/i18n';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 type OAuthForm = {
   redirectBase: string;
@@ -45,7 +45,7 @@ export function OAuthSettingsPage() {
       const data = unwrapData<Partial<OAuthForm>>(payload) || {};
       setForm({ ...DEFAULT_FORM, ...data, googleEnabled: data.googleEnabled === true, discordEnabled: data.discordEnabled === true });
     } catch (err) {
-      setError(isApiError(err) ? err.message : t('settings.loadFail'));
+      setError(explainError(err, t('settings.loadFail')));
     } finally {
       setLoading(false);
     }
@@ -75,9 +75,9 @@ export function OAuthSettingsPage() {
           discordClientSecret: data.discordClientSecret || prev.discordClientSecret,
         }));
       }
-      toast(t('oauth.saved'));
+      toast(t('oauth.saved'), 'ok');
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('settings.fail'));
+      toast(explainError(err, t('settings.fail')), 'err');
     } finally {
       setBusy(false);
     }
@@ -87,9 +87,9 @@ export function OAuthSettingsPage() {
     if (!value) return;
     try {
       await navigator.clipboard.writeText(value);
-      toast(t('oauth.copied'));
+      toast(t('oauth.copied'), 'ok');
     } catch {
-      toast(t('settings.fail'));
+      toast(t('settings.fail'), 'err');
     }
   }
 

@@ -63,7 +63,8 @@ export function AdminShell() {
   const location = useLocation();
   const navigate = useNavigate();
   const user = readAdminUser();
-  const [toast, setToast] = useState('');
+  const [toast, setToast] = useState<{ text: string; kind: 'ok' | 'err' } | null>(null);
+  const toastTimer = useRef(0);
   const [palette, setPalette] = useState(false);
   const [q, setQ] = useState('');
   const [mute, setMute] = useState(() => localStorage.getItem('ba-admin-mute') === '1');
@@ -185,9 +186,19 @@ export function AdminShell() {
       : all;
   }, [q, t, mode]);
 
-  function ping(msg: string) {
-    setToast(msg);
-    window.setTimeout(() => setToast(''), 2800);
+  function ping(msg: string, kind?: 'ok' | 'err') {
+    const text = msg.trim();
+    if (!text) return;
+    const tone: 'ok' | 'err' =
+      kind ||
+      (/fail|error|invalid|required|blocked|missing|could not|not found|offline|denied|exceeds|at least|no participant|no arena|select a|fill |need |unable|cannot/i.test(
+        text,
+      )
+        ? 'err'
+        : 'ok');
+    window.clearTimeout(toastTimer.current);
+    setToast({ text, kind: tone });
+    toastTimer.current = window.setTimeout(() => setToast(null), 8000);
     if (!muteRef.current) {
       try {
         const ctx = new AudioContext();
@@ -417,8 +428,12 @@ export function AdminShell() {
         </div>
       ) : null}
       {toast ? (
-        <div className="admin-toast" role="status">
-          {toast}
+        <div className={`admin-toast is-${toast.kind}`} role="status" aria-live="polite">
+          <strong>{toast.kind === 'ok' ? t('status.ok') : t('status.err')}</strong>
+          <span>{toast.text}</span>
+          <button type="button" aria-label="Dismiss" onClick={() => setToast(null)}>
+            ×
+          </button>
         </div>
       ) : null}
     </div>

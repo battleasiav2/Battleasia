@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Navigate, useOutletContext } from 'react-router-dom';
-import { api, isApiError, unwrapData } from '../lib/api';
+import { api, unwrapData, explainError } from '../lib/api';
 import { can } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 type SiteNoticeForm = {
   enabled: boolean;
@@ -58,7 +58,7 @@ export function SiteNoticePage() {
         updatedAt: data.updatedAt ? String(data.updatedAt) : null,
       });
     } catch (err) {
-      setError(isApiError(err) ? err.message : t('settings.loadFail'));
+      setError(explainError(err, t('settings.loadFail')));
     } finally {
       setLoading(false);
     }
@@ -84,9 +84,9 @@ export function SiteNoticePage() {
       const url = String(data?.url || '');
       if (!url) throw new Error('No url');
       update('imageUrl', url);
-      toast(t('notice.imageOk'));
+      toast(t('notice.imageOk'), 'ok');
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('notice.imageFail'));
+      toast(explainError(err, t('notice.imageFail')), 'err');
     } finally {
       setUploading(false);
     }
@@ -94,7 +94,7 @@ export function SiteNoticePage() {
 
   async function save(opts?: { bumpVersion?: boolean }) {
     if (!form.title.trim() && !form.message.trim() && form.enabled) {
-      toast(t('notice.needContent'));
+      toast(t('notice.needContent'), 'err');
       return;
     }
     setBusy(true);
@@ -129,9 +129,9 @@ export function SiteNoticePage() {
         }));
       }
       const emailQueued = Boolean((payload as { emailQueued?: boolean })?.emailQueued);
-      toast(emailQueued ? t('notice.savedMail') : t('notice.saved'));
+      toast(emailQueued ? t('notice.savedMail') : t('notice.saved'), 'ok');
     } catch (err) {
-      toast(isApiError(err) ? err.message : t('settings.fail'));
+      toast(explainError(err, t('settings.fail')), 'err');
     } finally {
       setBusy(false);
     }

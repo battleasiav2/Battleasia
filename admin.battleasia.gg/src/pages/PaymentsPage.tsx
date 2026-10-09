@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useOutletContext } from 'react-router-dom';
 import { ReceiptLightbox } from '../components/ReceiptLightbox';
-import { api, isApiError, newIdempotencyKey, unwrapData, unwrapList } from '../lib/api';
+import { api, newIdempotencyKey, unwrapData, unwrapList, explainError } from '../lib/api';
 import { cell, downloadCsv, downloadExcel, pick, rangeFor, rowId, toCsv } from '../lib/format';
 import { useI18n } from '../lib/i18n';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 const COLS = {
   deposit: ['status', 'username', 'coin_amount', 'payment_amount', 'transaction_id', 'created_at'],
@@ -52,7 +52,7 @@ export function PaymentsPage() {
       .then((payload) => setRows(unwrapList<Record<string, unknown>>(payload)))
       .catch((err) => {
         setRows([]);
-        setError(isApiError(err) ? err.message : t('list.loadFail'));
+        setError(explainError(err, t('list.loadFail')));
       });
   }
 
@@ -83,7 +83,7 @@ export function PaymentsPage() {
       body: JSON.stringify({ rejection_reason: reason, password }),
       idempotencyKey: newIdempotencyKey(),
     });
-    toast(fill('pay.saved', { action: t(`pay.${action}`) }));
+    toast(fill('pay.saved', { action: t(`pay.${action}`) }), 'ok');
     setConfirm(null);
     setPassword('');
     load();
@@ -257,11 +257,11 @@ export function PaymentsPage() {
             onClick={() => {
               const high = (rows || []).some((r) => selected.includes(rowId(r)) && Number(r.coin_amount || r.amount || 0) >= threshold);
               if (high && !password) {
-                toast(fill('pay.needPassword', { n: threshold }));
+                toast(fill('pay.needPassword', { n: threshold }), 'err');
                 return;
               }
               if (!window.confirm(fill('pay.confirmApprove', { n: selected.length, kind: kindLabel }))) return;
-              void Promise.all(selected.map((id) => run(id, 'approve'))).catch((err) => toast(isApiError(err) ? err.message : t('pay.bulkFail')));
+              void Promise.all(selected.map((id) => run(id, 'approve'))).catch((err) => toast(explainError(err, t('pay.bulkFail')), 'err'));
             }}
           >
             {t('pay.bulkApprove')}
@@ -271,11 +271,11 @@ export function PaymentsPage() {
             className="btn btn-danger"
             onClick={() => {
               if (!reason.trim()) {
-                toast(t('pay.needReason'));
+                toast(t('pay.needReason'), 'err');
                 return;
               }
               if (!window.confirm(fill('pay.confirmReject', { n: selected.length }))) return;
-              void Promise.all(selected.map((id) => run(id, 'reject'))).catch((err) => toast(isApiError(err) ? err.message : t('pay.bulkFail')));
+              void Promise.all(selected.map((id) => run(id, 'reject'))).catch((err) => toast(explainError(err, t('pay.bulkFail')), 'err'));
             }}
           >
             {t('pay.bulkReject')}
@@ -308,10 +308,10 @@ export function PaymentsPage() {
                 type="button"
                 onClick={() => {
                   if (confirm.amount >= threshold && !password) {
-                    toast(fill('pay.needPassword', { n: threshold }));
+                    toast(fill('pay.needPassword', { n: threshold }), 'err');
                     return;
                   }
-                  void run(confirm.id, confirm.action).catch((err) => toast(isApiError(err) ? err.message : t('pay.failed')));
+                  void run(confirm.id, confirm.action).catch((err) => toast(explainError(err, t('pay.failed')), 'err'));
                 }}
               >
                 {fill('pay.confirmGo', { action: t(`pay.${confirm.action}`), n: confirm.amount })}
@@ -328,7 +328,7 @@ export function PaymentsPage() {
           onClose={() => setLightbox(null)}
           onCopy={(text) => {
             void navigator.clipboard.writeText(text);
-            toast(t('pay.copied'));
+            toast(t('pay.copied'), 'ok');
           }}
         />
       ) : null}

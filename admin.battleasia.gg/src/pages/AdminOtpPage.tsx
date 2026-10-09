@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AdminAuthShell } from '../components/AdminAuthShell';
 import { OtpInputs } from '../components/OtpInputs';
-import { isApiError } from '../lib/api';
+import { explainError } from '../lib/api';
 import { adminVerifyOtp, finishLogin, safeReturnTo, takeOtpPassword } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 
@@ -38,7 +38,7 @@ export function AdminOtpPage() {
       finishLogin(payload);
       navigate(safeReturnTo(params.get('returnTo')), { replace: true });
     } catch (err) {
-      setError(isApiError(err) ? err.message : t('otp.invalid'));
+      setError(explainError(err, t('otp.invalid')));
     } finally {
       setBusy(false);
     }

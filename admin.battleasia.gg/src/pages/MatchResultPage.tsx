@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useOutletContext, useParams } from 'react-router-dom';
-import { api, isApiError, unwrapData } from '../lib/api';
+import { api, unwrapData, explainError } from '../lib/api';
 
-type Ctx = { toast: (m: string) => void };
+type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
 type MatchRow = {
   id?: string;
@@ -172,7 +172,7 @@ export function MatchResultPage() {
   }, [id]);
 
   useEffect(() => {
-    load().catch((err) => setError(isApiError(err) ? err.message : 'Match missing'));
+    load().catch((err) => setError(explainError(err, 'Match missing')));
   }, [load]);
 
   const pool = useMemo(() => buildPrizePoolSummary(match, entries), [match, entries]);
@@ -256,19 +256,20 @@ export function MatchResultPage() {
   async function saveEntries() {
     if (busy) return;
     if (!entries.length) {
-      toast('No participants to save');
+      toast('No participants to save', 'err');
       return;
     }
     if (!winners.length) {
-      toast('Mark at least one winner (or set losers) before save');
+      toast('Mark at least one winner (or set losers) before save', 'err');
+      return;
     }
     setBusy(true);
     try {
       await persistEntries();
-      toast(`Results saved · ${winners.length} winner / ${losers.length} lose`);
+      toast(`Results saved · ${winners.length} winner / ${losers.length} lose`, 'ok');
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : 'Save failed');
+      toast(explainError(err, 'Save failed'), 'err');
     } finally {
       setBusy(false);
     }
@@ -277,15 +278,15 @@ export function MatchResultPage() {
   async function distribute() {
     if (!id || busy) return;
     if (!entries.length) {
-      toast('No participants to distribute');
+      toast('No participants to distribute', 'err');
       return;
     }
     if (payoutTotal <= 0) {
-      toast('Enter kills / prizes for winners before distribute');
+      toast('Enter kills / prizes for winners before distribute', 'err');
       return;
     }
     if (payoutTotal - pool.prizePool > 0.05) {
-      toast(`Payout ${payoutTotal.toFixed(2)} exceeds prize pool ${pool.prizePool.toFixed(2)}`);
+      toast(`Payout ${payoutTotal.toFixed(2)} exceeds prize pool ${pool.prizePool.toFixed(2)}`, 'err');
       return;
     }
     if (!window.confirm(`Distribute ${payoutTotal.toLocaleString()} BAC to winners?`)) return;
@@ -293,10 +294,10 @@ export function MatchResultPage() {
     try {
       await persistEntries();
       await api(`/api/v3/games/matches/${id}/distribute-winnings`, { method: 'POST', body: '{}' });
-      toast('Winnings distributed — users see win/lose on result page');
+      toast('Winnings distributed — users see win/lose on result page', 'ok');
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : 'Distribute blocked');
+      toast(explainError(err, 'Distribute blocked'), 'err');
     } finally {
       setBusy(false);
     }
@@ -309,10 +310,10 @@ export function MatchResultPage() {
     try {
       const res = await api(`/api/v3/games/matches/${id}/refund`, { method: 'POST', body: '{}' });
       const data = unwrapData<{ refunded?: number }>(res);
-      toast(`Refund complete: ${data?.refunded ?? 0} participant(s)`);
+      toast(`Refund complete: ${data?.refunded ?? 0} participant(s)`, 'ok');
       await load();
     } catch (err) {
-      toast(isApiError(err) ? err.message : 'Refund failed');
+      toast(explainError(err, 'Refund failed'), 'err');
     } finally {
       setBusy(false);
     }
