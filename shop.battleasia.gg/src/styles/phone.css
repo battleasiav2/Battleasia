@@ -995,3 +995,35 @@ svg {
     transition: none;
   }
 }
+
+@media (max-width: 900px) {
+  .xfer-hub {
+    width: min(100% - 28px, 720px);
+    padding-top: 12px;
+  }
+
+  .xfer-hub-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .xfer-hub-head .play-count {
+    align-self: flex-start;
+  }
+
+  .xfer-hub .xfer-break {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .xfer-hub .xfer-break {
+    grid-template-columns: 1fr;
+  }
+
+  .xfer-hub-form,
+  .xfer-hub-recent {
+    padding: 16px 14px 16px 18px;
+  }
+}

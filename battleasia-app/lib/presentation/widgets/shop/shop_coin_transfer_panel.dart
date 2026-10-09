@@ -211,32 +211,29 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
                             hintText: 'shop.transferNotePlaceholder'.tr(),
                           ),
                         ),
-                        if (_parsedAmount > 0) ...[
-                          const SizedBox(height: 12),
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              gradient: AppColors.dashCardGradient,
-                              borderRadius: BorderRadius.circular(AppColors.dashCardRadius),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-                            ),
-                            child: Column(
-                              children: [
-                                _PreviewRow('shop.transferAmount'.tr(), '${_parsedAmount.toStringAsFixed(2)} BAC'),
-                                _PreviewRow(
-                                  'shop.transferFee'.tr(namedArgs: {'percent': _feePercent.toStringAsFixed(1)}),
-                                  '${_feeAmount.toStringAsFixed(2)} BAC',
-                                ),
-                                const Divider(height: 16),
-                                _PreviewRow(
-                                  'shop.transferTotalDebit'.tr(),
-                                  '${_totalDebited.toStringAsFixed(2)} BAC',
-                                  bold: true,
-                                ),
-                              ],
-                            ),
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF101114),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
                           ),
-                        ],
+                          child: Row(
+                            children: [
+                              Expanded(child: _PreviewCell('shop.transferAmount'.tr(), _parsedAmount)),
+                              Expanded(
+                                child: _PreviewCell(
+                                  'shop.transferFee'.tr(namedArgs: {'percent': _feePercent.toStringAsFixed(0)}),
+                                  _feeAmount,
+                                ),
+                              ),
+                              Expanded(
+                                child: _PreviewCell('shop.transferTotalDebit'.tr(), _totalDebited, accent: true),
+                              ),
+                            ],
+                          ),
+                        ),
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: _submitting ? null : _submit,
@@ -345,26 +342,32 @@ class _StatChip extends StatelessWidget {
   }
 }
 
-class _PreviewRow extends StatelessWidget {
+class _PreviewCell extends StatelessWidget {
   final String label;
-  final String value;
-  final bool bold;
+  final double value;
+  final bool accent;
 
-  const _PreviewRow(this.label, this.value, {this.bold = false});
+  const _PreviewCell(this.label, this.value, {this.accent = false});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Container(
+      margin: const EdgeInsets.all(4),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      decoration: BoxDecoration(
+        color: accent ? AppColors.gold.withValues(alpha: 0.12) : Colors.transparent,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted)),
+          Text(label, style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted, fontSize: 10)),
+          const SizedBox(height: 4),
           Text(
-            value,
+            value.toStringAsFixed(2),
             style: AppTheme.bodySmall.copyWith(
-              fontWeight: bold ? FontWeight.w800 : FontWeight.w600,
-              color: Colors.white,
+              fontWeight: FontWeight.w800,
+              color: accent ? AppColors.gold : Colors.white,
             ),
           ),
         ],
@@ -382,13 +385,23 @@ class _DashCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
       decoration: BoxDecoration(
-        gradient: AppColors.dashCardGradient,
-        borderRadius: BorderRadius.circular(AppColors.dashCardRadius),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        color: const Color(0xFF161618),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
-      child: child,
+      child: Stack(
+        children: [
+          Positioned(
+            left: -18,
+            top: 0,
+            bottom: 0,
+            child: Container(width: 3, color: AppColors.gold),
+          ),
+          child,
+        ],
+      ),
     );
   }
 }
