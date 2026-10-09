@@ -29,6 +29,47 @@ class LocaleToggle extends StatelessWidget {
     final flag = _flagEmoji[code] ?? '🌐';
     final isMobile = MediaQuery.sizeOf(context).width < 600;
 
+    final button = Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 9 : 12,
+        vertical: isMobile ? 7 : 8,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(flag, style: TextStyle(fontSize: isMobile ? 16 : 18, height: 1)),
+          if (!isMobile) ...[
+            const SizedBox(width: 6),
+            Text(
+              current,
+              style: AppTheme.bodySmall.copyWith(
+                color: Colors.white.withValues(alpha: 0.88),
+                fontWeight: FontWeight.w600,
+                fontSize: 14,
+                letterSpacing: 0.2,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+
+    if (isMobile) {
+      return Tooltip(
+        message: 'Language',
+        child: InkWell(
+          onTap: () => _openSheet(context),
+          borderRadius: BorderRadius.circular(999),
+          child: button,
+        ),
+      );
+    }
+
     return PopupMenuButton<Locale>(
       tooltip: 'Language',
       onSelected: (locale) => context.setLocale(locale),
@@ -64,35 +105,49 @@ class LocaleToggle extends StatelessWidget {
             ),
           )
           .toList(),
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: isMobile ? 9 : 12,
-          vertical: isMobile ? 7 : 8,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(flag, style: TextStyle(fontSize: isMobile ? 16 : 18, height: 1)),
-            if (!isMobile) ...[
-              const SizedBox(width: 6),
-              Text(
-                current,
-                style: AppTheme.bodySmall.copyWith(
-                  color: Colors.white.withValues(alpha: 0.88),
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                  letterSpacing: 0.2,
-                ),
-              ),
-            ],
-          ],
-        ),
+      child: button,
+    );
+  }
+
+  void _openSheet(BuildContext context) {
+    final current = context.locale.languageCode;
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: const Color(0xFF161618),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
+      builder: (sheetContext) {
+        return SafeArea(
+          child: ListView(
+            shrinkWrap: true,
+            children: [
+              for (final lang in _langs)
+                ListTile(
+                  onTap: () {
+                    context.setLocale(lang.$1);
+                    Navigator.pop(sheetContext);
+                  },
+                  leading: Text(_flagEmoji[lang.$1.languageCode] ?? '🌐'),
+                  title: Text(
+                    lang.$2,
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: current == lang.$1.languageCode ? FontWeight.w800 : FontWeight.w500,
+                    ),
+                  ),
+                  trailing: Text(
+                    lang.$3,
+                    style: AppTheme.bodySmall.copyWith(
+                      color: AppColors.gold,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
