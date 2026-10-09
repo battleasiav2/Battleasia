@@ -15,8 +15,48 @@ const ARENA_GAMES = [
   { name: 'Mobile Legends', packageName: 'com.mobilelegends', idPrefix: 'ML', image: '/covers/mlbb.webp' },
 ] as const;
 
-const CLASSIC_MAPS = ['Erangel', 'Rondo', 'Miramar', 'Nusa', 'Vikendi', 'Sanhok', 'Livik', 'Karakin'];
-const TDM_MAPS = ['Warehouse', 'Hanger', 'Gun'];
+type ArenaMapKey = 'pubg' | 'freefire' | 'cod' | 'valorant' | 'mlbb';
+
+const GAME_MAPS: Record<ArenaMapKey, { classic: string[]; tdm: string[] }> = {
+  pubg: {
+    classic: ['Erangel', 'Miramar', 'Sanhok', 'Vikendi', 'Livik', 'Karakin', 'Nusa', 'Rondo'],
+    tdm: ['Warehouse', 'Hanger', 'Ruins', 'Bootcamp', 'Stalber', 'Gun'],
+  },
+  freefire: {
+    classic: ['Bermuda', 'Bermuda Remastered', 'Purgatory', 'Kalahari', 'Alpine', 'NeXTerra', 'Solara'],
+    tdm: ['Bermuda', 'Purgatory', 'Kalahari', 'Alpine', 'Mars Electric', 'Azores', 'Shanghai', 'Peak', 'Clock Tower'],
+  },
+  cod: {
+    classic: ['Isolated', 'Blackout', 'Alcatraz'],
+    tdm: ['Crash', 'Crossfire', 'Firing Range', 'Highrise', 'Nuketown', 'Raid', 'Rust', 'Shipment', 'Standoff', 'Takeoff', 'Terminal', 'Summit', 'Hackney Yard', 'Meltdown'],
+  },
+  valorant: {
+    classic: ['Ascent', 'Bind', 'Haven', 'Split', 'Icebox', 'Breeze', 'Fracture', 'Pearl', 'Lotus', 'Sunset', 'Abyss', 'Corrode'],
+    tdm: ['Ascent', 'Bind', 'Haven', 'Split', 'Icebox', 'Breeze', 'Fracture', 'Pearl', 'Lotus', 'Sunset', 'Abyss', 'Corrode'],
+  },
+  mlbb: {
+    classic: ['Land of Dawn', 'Imperial Sanctuary'],
+    tdm: ['Brawl', 'Mirror', 'Survival', 'Mayhem', 'Overdrive'],
+  },
+};
+
+const MAP_ART = new Set([
+  'Erangel', 'Miramar', 'Sanhok', 'Vikendi', 'Livik', 'Karakin', 'Nusa', 'Rondo', 'Warehouse', 'Hanger', 'Gun',
+]);
+
+function arenaMapKey(game?: GameRow): ArenaMapKey {
+  const blob = `${game?.packageName || ''} ${game?.name || ''}`.toLowerCase();
+  if (blob.includes('free fire') || blob.includes('freefire') || blob.includes('dts.freefire')) return 'freefire';
+  if (blob.includes('duty') || blob.includes('activision')) return 'cod';
+  if (blob.includes('valorant') || blob.includes('riot')) return 'valorant';
+  if (blob.includes('legend') || blob.includes('mlbb')) return 'mlbb';
+  return 'pubg';
+}
+
+function mapsFor(key: ArenaMapKey, mode: string) {
+  const set = GAME_MAPS[key];
+  return mode === 'tdm' ? set.tdm : set.classic;
+}
 
 function slugify(value: string) {
   return value
@@ -69,6 +109,7 @@ export function MatchFormPage() {
   const [busy, setBusy] = useState(false);
   const [slugLocked, setSlugLocked] = useState(Boolean(id));
   const [createForAllFive, setCreateForAllFive] = useState(!id);
+  const [uploadingBanner, setUploadingBanner] = useState(false);
   const [form, setForm] = useState({
     gameId: '',
     matchName: '',
@@ -80,6 +121,7 @@ export function MatchFormPage() {
     teamType: 'squad',
     gameMode: 'classic',
     map: '',
+    banner: '',
     matchSchedule: '',
     platformFeePercent: '5',
     status: 'active',
@@ -98,7 +140,8 @@ export function MatchFormPage() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  const maps = form.gameMode === 'tdm' ? TDM_MAPS : CLASSIC_MAPS;
+  const selectedGame = games.find((g) => gameKey(g) === form.gameId);
+  const mapKey = arenaMapKey(selectedGame);
   const wSize = winnerTeamSize(form.teamType);
   const players = Number(form.totalPlayer) || 0;
   const fee = Number(form.entryFee) || 0;
@@ -188,6 +231,7 @@ export function MatchFormPage() {
           teamType: String(m.teamType || 'squad'),
           gameMode: String(m.gameMode || 'classic'),
           map: String(m.map || ''),
+          banner: String(m.banner || ''),
           matchSchedule: toLocalInput(String(m.matchSchedule || m.startTime || '')),
           platformFeePercent: String(m.platformFeePercent ?? 5),
           status: String(m.status || 'active'),
@@ -205,10 +249,22 @@ export function MatchFormPage() {
       .catch((err) => setError(isApiError(err) ? err.message : 'Match missing'));
   }, [id]);
 
+  function mapForGame(gameId: string) {
+    const game = games.find((g) => gameKey(g) === gameId);
+    const list = mapsFor(arenaMapKey(game), form.gameMode);
+    return list.includes(form.map) ? form.map : list[0] || form.map;
+  }
+
+  function bannerFor(map: string) {
+    if (form.banner.trim()) return form.banner.trim();
+    return MAP_ART.has(map) ? `/assets/images/map/${map}.webp` : '';
+  }
+
   function buildBody(gameId: string, roomId: string, password: string) {
     const entryFee = form.matchType === 'free' ? 0 : Number(form.entryFee) || 0;
     let matchUrl = form.matchUrl.trim() || slugify(form.matchName);
     matchUrl = ensureHttps(matchUrl);
+    const map = mapForGame(gameId);
     return {
       gameId,
       gameMode: form.gameMode,
@@ -223,9 +279,9 @@ export function MatchFormPage() {
       teamType: form.teamType,
       perKill: Number(form.perKill) || 0,
       matchType: entryFee <= 0 ? 'free' : 'paid',
-      map: form.map,
+      map,
       totalKills: form.gameMode === 'tdm' ? Number(form.totalKills) || 40 : undefined,
-      banner: form.map ? `/assets/images/map/${form.map}.webp` : '',
+      banner: bannerFor(map),
       prizeDescription: form.prizeDescription,
       matchSponsor: form.matchSponsor,
       matchDescription: form.matchDescription,
@@ -329,7 +385,15 @@ export function MatchFormPage() {
           Game *
           <select
             value={form.gameId}
-            onChange={(e) => set('gameId', e.target.value)}
+            onChange={(e) => {
+              const gameId = e.target.value;
+              const nextMaps = mapsFor(arenaMapKey(games.find((g) => gameKey(g) === gameId)), form.gameMode);
+              setForm((prev) => ({
+                ...prev,
+                gameId,
+                map: nextMaps.includes(prev.map) ? prev.map : '',
+              }));
+            }}
             required={!createForAllFive}
             disabled={createForAllFive}
           >
@@ -369,27 +433,72 @@ export function MatchFormPage() {
           Map *
           <select value={form.map} onChange={(e) => set('map', e.target.value)} required>
             <option value="">Select map</option>
-            {maps.map((m) => (
-              <option key={m} value={m}>
-                {m}
-              </option>
+            {form.map &&
+            !(createForAllFive ? (Object.keys(GAME_MAPS) as ArenaMapKey[]) : [mapKey]).some((key) =>
+              mapsFor(key, form.gameMode).includes(form.map),
+            ) ? (
+              <option value={form.map}>{form.map}</option>
+            ) : null}
+            {(createForAllFive ? (Object.keys(GAME_MAPS) as ArenaMapKey[]) : [mapKey]).map((key) => (
+              <optgroup key={key} label={ARENA_GAMES.find((g) => arenaMapKey(g) === key)?.name || key}>
+                {mapsFor(key, form.gameMode).map((m) => (
+                  <option key={`${key}-${m}`} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </label>
+        {createForAllFive ? (
+          <p className="admin-lead">Each game keeps this map when it has it. Otherwise that game uses its own first map.</p>
+        ) : null}
 
-        {form.map ? (
+        <label className="field">
+          Banner image
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            disabled={uploadingBanner}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              e.target.value = '';
+              if (!file) return;
+              setUploadingBanner(true);
+              const body = new FormData();
+              body.append('file', file);
+              void api('/api/v1/files/upload/matches', { method: 'POST', body })
+                .then((payload) => {
+                  const url = String(unwrapData<{ url?: string }>(payload)?.url || '');
+                  if (!url) throw new Error('No url');
+                  set('banner', url);
+                  toast('Banner uploaded');
+                })
+                .catch((err) => toast(isApiError(err) ? err.message : 'Banner upload failed'))
+                .finally(() => setUploadingBanner(false));
+            }}
+          />
+          <span className="field-hint">{uploadingBanner ? 'Uploading…' : 'Optional. Shown on the match card. JPG, PNG, or WebP.'}</span>
+        </label>
+
+        {form.banner || form.map ? (
           <div className="map-preview">
             <img
-              src={`/assets/images/map/${form.map}.webp`}
-              alt={form.map}
+              src={form.banner || (MAP_ART.has(form.map) ? `/assets/images/map/${form.map}.webp` : '')}
+              alt={form.map || 'Match banner'}
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
               }}
             />
-            <strong>{form.map}</strong>
+            <strong>{form.banner ? 'Custom banner' : form.map}</strong>
+            {form.banner ? (
+              <button type="button" onClick={() => set('banner', '')}>
+                Remove banner
+              </button>
+            ) : null}
           </div>
         ) : (
-          <p className="admin-lead">Select a map to preview</p>
+          <p className="admin-lead">Select a map or upload a banner</p>
         )}
 
         <label className="field">

@@ -188,6 +188,34 @@ async function buildMatchSummaries(matches: MatchSummarySource[]) {
   }));
 }
 
+/** Newest open rooms first, then fill with the highest prize so a fresh match is not hidden. */
+async function getVisibleOpenMatches(limit = 12) {
+  const newest = await Match.find({ status: { $in: ['active', 'start'] } })
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .lean<MatchSummarySource[]>();
+  if (newest.length >= limit) return newest;
+
+  const byPrize = await Match.aggregate<MatchSummarySource>([
+    {
+      $match: {
+        status: { $in: ['active', 'start'] },
+        _id: { $nin: newest.map((m) => m._id) },
+      },
+    },
+    {
+      $addFields: {
+        _prize: {
+          $multiply: [{ $ifNull: ['$entryFee', 0] }, { $ifNull: ['$totalPlayer', 0] }],
+        },
+      },
+    },
+    { $sort: { _prize: -1, createdAt: -1 } },
+    { $limit: limit - newest.length },
+  ]);
+  return [...newest, ...byPrize];
+}
+
 /** One highest-prize joinable match per game (up to `limit` titles). */
 async function getTopMatchPerGame(statuses: Array<'active' | 'start'>, limit = 5) {
   return Match.aggregate<MatchSummarySource>([
@@ -282,8 +310,8 @@ export async function getPublicDashboardStats() {
       countTodayJoinedUsers(),
       aggregatePlayerStats('totalWinnings', 11),
       aggregatePlayerStats('totalKills', 11),
-      getOngoingMatchList(5),
-      getTopMatchPerGame(['active', 'start'], 5),
+      getOngoingMatchList(8),
+      getVisibleOpenMatches(12),
     ]);
 
   const totalWinnings = winningsAgg[0]?.total ?? 0;

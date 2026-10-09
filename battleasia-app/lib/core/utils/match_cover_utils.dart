@@ -48,7 +48,19 @@ class MatchCoverUtils {
     return false;
   }
 
+  static bool _isUploaded(String banner) {
+    return banner.startsWith('/uploads/') ||
+        banner.startsWith('http://') ||
+        banner.startsWith('https://');
+  }
+
   static String resolve(MatchModel match) {
+    final uploaded = match.banner?.trim() ?? '';
+    if (_isUploaded(uploaded)) {
+      final remote = ImageUtils.getImageUrl(uploaded);
+      if (remote != null && remote.isNotEmpty) return remote;
+    }
+
     final fromMap = _mapAsset(match.map);
     if (fromMap != null) return fromMap;
 

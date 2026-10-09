@@ -110,7 +110,7 @@ router.get('/matches', requireAuth, async (req: AuthedRequest, res) => {
     };
     if (req.query.gameId) filter.gameId = req.query.gameId;
 
-    const matches = await Match.find(filter).sort({ matchSchedule: -1 }).limit(200);
+    const matches = await Match.find(filter).sort({ createdAt: -1 }).limit(200);
     const data = await enrichMatchesForUser(matches, req.userId!);
     return res.json({ status: true, data });
   } catch (error) {

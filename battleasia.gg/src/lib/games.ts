@@ -209,15 +209,21 @@ function isGenericGameBanner(src: string) {
   return isMissingArt(src);
 }
 
-/** Per-room art: map → arena name → map banner URL → mode → game default. */
+function isUploadedBanner(src: string) {
+  return src.startsWith('/uploads/') || src.startsWith('http://') || src.startsWith('https://');
+}
+
+/** Per-room art: uploaded banner → map → arena name → map banner URL → mode → game default. */
 export function coverForMatch(match: Pick<MatchItem, 'banner' | 'map' | 'matchName' | 'gameName' | 'teamType' | 'gameMode'>) {
+  const remote = (match.banner || '').trim();
+  if (remote && isUploadedBanner(remote)) return remote;
+
   const fromMap = localMapCover(match.map);
   if (fromMap) return fromMap;
 
   const fromArena = arenaCoverFromName(match.matchName);
   if (fromArena) return fromArena;
 
-  const remote = (match.banner || '').trim();
   if (remote) {
     const localMap = rewriteRemoteMapAsset(remote);
     if (localMap) return localMap;
