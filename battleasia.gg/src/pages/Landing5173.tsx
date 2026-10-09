@@ -90,7 +90,7 @@ const games = [
   { name: 'Mobile Legends', cls: 'mlbb', tag: '', image: '/images/game-mlbb-hero.jpg' },
   { name: 'Valorant Mobile', cls: 'valorant', tag: 'COMING SOON', image: '/images/game-valorant-hero.jpg' },
 ];
-type RailMatch = { id?: string; name: string; game: string; entry: number; prize: string; filled: number; capacity: number };
+type RailMatch = { id?: string; gameId?: string; name: string; game: string; entry: number; prize: string; filled: number; capacity: number };
 const matchStatus = (filled: number, capacity: number) =>
   filled >= capacity ? 'Full' : filled / capacity >= 0.9 ? 'Almost full' : 'Open';
 const questions = [
@@ -791,6 +791,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
         setArenaSeatsFilled(pulse.inSeats);
         const toRail = (m: (typeof pulse.ongoingMatches)[number]): RailMatch => ({
           id: m.id,
+          gameId: m.gameId,
           name: m.matchName,
           game: m.gameName,
           entry: m.entryFee,
@@ -986,7 +987,16 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
       notify('Signed out.');
     });
   };
-  const onMatch = (id?: string) => goArena(id ? `/user/play/${id}/detail` : '/user/play');
+  const onMatch = (match: RailMatch) => {
+    const dest = match.gameId ? `/user/play/${match.gameId}` : '/user/play';
+    if (logged) {
+      navigate(dest);
+      return;
+    }
+    setReturnPath(dest);
+    openAuth('signin');
+    navigate({ pathname: '/dashboard', search: `?auth=signin&returnTo=${encodeURIComponent(dest)}` });
+  };
   const onGame = (closed: boolean) => (closed ? notify(t.soon) : goArena('/user/play'));
   const anchor = (id: string) => {
     setMobileOpen(false);
@@ -1256,7 +1266,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
               const full = status === 'Full';
               const almostFull = status === 'Almost full';
               const joinClass = full ? 'join-btn-view' : almostFull ? 'join-btn-urgent' : 'join-btn-live';
-              return <article className={`match-card ${almostFull ? 'match-card-hot' : ''}`} key={match.name}><div className="match-card-top"><span className="game-tag">{match.game.split(' · ')[0]}</span><span className={`status ${full?'full':''}`}>{status}</span></div><h3>{match.name}</h3><div className="match-info"><span>Entry<strong><BacCoin size={14} />{match.entry} BAC</strong></span><span>Prize pool<strong><BacCoin size={14} />{match.prize} BAC</strong></span></div><div className="capacity"><span className="capacity-fill" style={{width:`${match.filled/match.capacity*100}%`}}/></div><div className="match-foot"><span><LiveNumber value={match.filled} />/{match.capacity} players</span><button type="button" className={`join-btn ${joinClass}`} onClick={() => onMatch(match.id)}><span className="join-btn-shine" aria-hidden="true" />{!full && <span className="join-btn-dot" aria-hidden="true" />}<span className="join-btn-text">{full ? 'View event' : 'Join match'}</span><span className="join-arrow" aria-hidden="true">↗</span></button></div></article>;
+              return <article className={`match-card ${almostFull ? 'match-card-hot' : ''}`} key={match.name}><div className="match-card-top"><span className="game-tag">{match.game.split(' · ')[0]}</span><span className={`status ${full?'full':''}`}>{status}</span></div><h3>{match.name}</h3><div className="match-info"><span>Entry<strong><BacCoin size={14} />{match.entry} BAC</strong></span><span>Prize pool<strong><BacCoin size={14} />{match.prize} BAC</strong></span></div><div className="capacity"><span className="capacity-fill" style={{width:`${match.filled/match.capacity*100}%`}}/></div><div className="match-foot"><span><LiveNumber value={match.filled} />/{match.capacity} players</span><button type="button" className={`join-btn ${joinClass}`} onClick={() => onMatch(match)}><span className="join-btn-shine" aria-hidden="true" />{!full && <span className="join-btn-dot" aria-hidden="true" />}<span className="join-btn-text">{full ? 'View event' : 'Join match'}</span><span className="join-arrow" aria-hidden="true">↗</span></button></div></article>;
             })}</div>
           </div>
         </section>

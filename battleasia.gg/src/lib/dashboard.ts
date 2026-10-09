@@ -1,5 +1,6 @@
 export type PulseMatch = {
   id: string;
+  gameId: string;
   matchName: string;
   gameName: string;
   prizeEstimate: number;
@@ -82,6 +83,7 @@ function mapMatch(row: unknown): PulseMatch {
   const m = asRecord(row);
   return {
     id: String(m.id || m._id || ''),
+    gameId: String(m.gameId || ''),
     matchName: String(m.matchName || 'Match'),
     gameName: String(m.gameName || ''),
     prizeEstimate: Number(m.prizeEstimate) || 0,
