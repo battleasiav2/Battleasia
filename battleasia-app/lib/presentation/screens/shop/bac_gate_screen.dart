@@ -114,17 +114,45 @@ class _BacGateScreenState extends State<BacGateScreen> {
   }
 }
 
-class _BacMark extends StatelessWidget {
+class _BacMark extends StatefulWidget {
   const _BacMark();
 
   @override
+  State<_BacMark> createState() => _BacMarkState();
+}
+
+class _BacMarkState extends State<_BacMark> with SingleTickerProviderStateMixin {
+  late final AnimationController _spin = AnimationController(vsync: this, duration: const Duration(seconds: 7))..repeat();
+
+  @override
+  void dispose() {
+    _spin.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return CustomPaint(size: const Size(64, 64), painter: _BacCoinPainter(AppColors.gold));
+    final reduce = MediaQuery.disableAnimationsOf(context);
+    final ring = RotationTransition(
+      turns: reduce ? const AlwaysStoppedAnimation(0) : _spin,
+      child: CustomPaint(size: const Size(64, 64), painter: _BacRingPainter(AppColors.gold)),
+    );
+    return SizedBox(
+      width: 64,
+      height: 64,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          ring,
+          CustomPaint(size: const Size(64, 64), painter: _BacFacePainter(AppColors.gold)),
+        ],
+      ),
+    );
   }
 }
 
-class _BacCoinPainter extends CustomPainter {
-  _BacCoinPainter(this.ring);
+class _BacRingPainter extends CustomPainter {
+  _BacRingPainter(this.ring);
 
   final Color ring;
 
@@ -132,27 +160,46 @@ class _BacCoinPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2;
-    canvas.drawCircle(center, radius - 1, Paint()..color = const Color(0xFF12140A));
-    canvas.drawCircle(
-      center,
-      radius - 1.6,
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius - 1.6),
+      -0.6,
+      5.3,
+      false,
       Paint()
         ..color = ring
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.4,
+        ..strokeWidth = 2.4
+        ..strokeCap = StrokeCap.round,
     );
-    canvas.drawCircle(
-      center,
-      radius * 0.72,
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius * 0.72),
+      0.4,
+      4.2,
+      false,
       Paint()
-        ..color = ring.withValues(alpha: 0.4)
+        ..color = ring.withValues(alpha: 0.55)
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 1,
+        ..strokeWidth = 1.2,
     );
+  }
+
+  @override
+  bool shouldRepaint(covariant _BacRingPainter oldDelegate) => oldDelegate.ring != ring;
+}
+
+class _BacFacePainter extends CustomPainter {
+  _BacFacePainter(this.ring);
+
+  final Color ring;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    canvas.drawCircle(center, size.width * 0.36, Paint()..color = const Color(0xFF12140A));
     final label = TextPainter(
       text: TextSpan(
         text: 'B',
-        style: TextStyle(color: ring, fontSize: 28, fontWeight: FontWeight.w800, height: 1),
+        style: TextStyle(color: ring, fontSize: 26, fontWeight: FontWeight.w800, height: 1),
       ),
       textDirection: ui.TextDirection.ltr,
     )..layout();
@@ -160,7 +207,7 @@ class _BacCoinPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _BacCoinPainter oldDelegate) => oldDelegate.ring != ring;
+  bool shouldRepaint(covariant _BacFacePainter oldDelegate) => oldDelegate.ring != ring;
 }
 
 class _BacFact extends StatelessWidget {

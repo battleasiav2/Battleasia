@@ -35,6 +35,11 @@
 
 .bac-mark { width: 72px; height: 72px; margin-bottom: 14px; }
 .bac-mark svg { display: block; width: 72px; height: 72px; }
+.bac-mark .bac-spin,
+.bac-mark .bac-spin-rev { transform-origin: 36px 36px; }
+.bac-mark .bac-spin { animation: bac-spin 7s linear infinite; }
+.bac-mark .bac-spin-rev { animation: bac-spin 11s linear infinite reverse; }
+@keyframes bac-spin { to { transform: rotate(360deg); } }
 
 .bac-gate h1 {
   margin: 0 0 10px;
@@ -74,7 +79,9 @@
   object-fit: cover;
   object-position: center 18%;
   filter: saturate(0.78) contrast(1.06);
+  animation: bac-fade .4s ease;
 }
+@keyframes bac-fade { from { opacity: .45; } to { opacity: 1; } }
 
 .bac-gate-stage::after {
   content: "";
@@ -358,4 +365,10 @@
 
 @media (max-width: 640px) {
   .bac-gate { padding: 20px 14px 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bac-mark .bac-spin,
+  .bac-mark .bac-spin-rev,
+  .bac-gate-stage > img { animation: none; }
 }
