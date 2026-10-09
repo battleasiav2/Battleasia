@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowDownRight, ArrowLeft, ArrowRight, ChevronDown, Crosshair, Crown, Eye, EyeOff, Headphones, MessageCircle, ShieldCheck, Sparkles, Users, X, Zap } from 'lucide-react';
 import '../styles/landing-5173.css';
 import { GamingCursor } from '../components/GamingCursor';
+import { LandingSupportChat } from '../components/LandingSupportChat';
 import { UserAvatar } from '../components/UserAvatar';
 import { isApiError } from '../lib/api';
 import { fetchAppDownload, formatApkSize } from '../lib/app-download';
@@ -24,6 +25,7 @@ import {
   type AuthUser,
 } from '../lib/auth';
 import { fetchPublicDashboard } from '../lib/dashboard';
+import { estimateMatchWinningPool, fetchGames, fetchMatches } from '../lib/games';
 import { useI18n } from '../lib/i18n';
 import { captureReferral } from '../lib/ref';
 import { LANDING_LANG, landingText, readLandingLocale, type LandingLocale } from './landing5173-text';
@@ -647,8 +649,6 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
   const [toast, setToast] = useState('');
   const [socialOpen, setSocialOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
-  const [chatInput, setChatInput] = useState('');
-  const [chatSent, setChatSent] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -699,6 +699,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
     [matchTab, highMatches, liveMatches],
   );
   const railRef = useRef<HTMLDivElement>(null);
+  const accountRail = useRef(false);
   const podiumRef = useRef<HTMLDivElement>(null);
   const chasingRef = useRef<HTMLDivElement>(null);
   const railHover = useRef(false);
@@ -799,8 +800,10 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
           filled: m.participantsCount,
           capacity: Math.max(m.totalPlayer, 1),
         });
-        setLiveMatches(pulse.ongoingMatches.map(toRail));
-        setHighMatches(pulse.highPrizeMatches.map(toRail));
+        if (!accountRail.current) {
+          setLiveMatches(pulse.ongoingMatches.map(toRail));
+          setHighMatches(pulse.highPrizeMatches.map(toRail));
+        }
         setProfitBoard(pulse.topProfit.map((p) => ({ name: p.username, score: p.totalWinnings })));
         setKillBoard(pulse.topKillers.map((p) => ({ name: p.username, score: p.totalKills })));
         setTrustMetrics({
@@ -854,6 +857,38 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
       window.clearTimeout(timer);
     };
   }, []);
+
+  useEffect(() => {
+    if (!me) return;
+    let cancel = false;
+    void (async () => {
+      const games = await fetchGames();
+      if (cancel || !games.length) return;
+      const lists = await Promise.all(games.filter((game) => !game.comingSoon).map((game) => fetchMatches(game.id)));
+      if (cancel) return;
+      const open = lists
+        .flat()
+        .filter((match) => match.status === 'active' || match.status === 'start');
+      if (!open.length) return;
+      accountRail.current = true;
+      const toRail = (match: (typeof open)[number]): RailMatch => ({
+        id: match.id,
+        gameId: match.gameId,
+        name: match.matchName,
+        game: match.gameName || '',
+        entry: Number(match.entryFee) || 0,
+        prize: formatNumber(estimateMatchWinningPool(match)),
+        filled: Number(match.participantsCount) || 0,
+        capacity: Math.max(Number(match.totalPlayer) || 1, 1),
+      });
+      setHighMatches(open.slice(0, 12).map(toRail));
+      const live = open.filter((match) => match.status === 'start');
+      if (live.length) setLiveMatches(live.slice(0, 12).map(toRail));
+    })();
+    return () => {
+      cancel = true;
+    };
+  }, [me]);
 
   useEffect(() => {
     const onScroll = () => {
@@ -1134,7 +1169,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
           <div className="hero-bottom-line" />
           <div className="wrap hero-content">
             <div className="hero-copy">
-              <div className="eyebrow"><span className="eyebrow-dot"/>{t.eyebrow} <span>·</span> Bangladesh & Asia</div>
+              <div className="eyebrow"><span className="eyebrow-dot"/><span>{t.eyebrow} · Bangladesh & Asia</span></div>
               <h1>Battle Asia</h1>
               <p className="hero-lead">{t.lead}</p>
               <div className="hero-ctas"><button className="btn btn-primary" onClick={onJoin}>{t.signup} <ArrowRight size={15}/></button><button className="btn btn-ghost" onClick={() => { if (apkUrl) window.location.href = apkUrl; }}><DownloadIcon size={15}/>{t.download} <span className="mono" style={{fontSize:9,opacity:.7}}>{apkLabel}</span></button></div>
@@ -1177,7 +1212,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
 
         <section className="pulse-section">
           <div className="wrap">
-            <div className="pulse-head reveal"><div><div className="section-kicker">{t.pulse}</div><h2 className="section-title" style={{marginBottom:0}}>Numbers don’t lie.</h2></div><div className="pulse-live kpi-pulse-badge"><span className="kpi-pulse-badge-dot" aria-hidden="true" />Live arena pulse</div></div>
+            <div className="pulse-head reveal"><h2 className="section-title">{t.pulse}</h2><div className="pulse-live kpi-pulse-badge"><span className="kpi-pulse-badge-dot" aria-hidden="true" />Live arena pulse</div></div>
             <div className="kpi-grid reveal kpi-grid-live">
               <div className="kpi-ecg" aria-hidden="true"><svg viewBox="0 0 400 24" preserveAspectRatio="none"><path className="kpi-ecg-path" d="M0 12h40l8-9 8 18 8-18 8 9h40l6-5 6 10 6-10 6 5h40l10-8 10 16 10-16 10 8h40l8-6 8 12 8-12 8 6h40" /></svg></div>
               <KpiLiveCard variant="joins" label={t.joins} tick={liveStats.joins} value={<LiveNumber value={liveStats.joins} />} note="Signed up today" />
@@ -1266,7 +1301,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
               const full = status === 'Full';
               const almostFull = status === 'Almost full';
               const joinClass = full ? 'join-btn-view' : almostFull ? 'join-btn-urgent' : 'join-btn-live';
-              return <article className={`match-card ${almostFull ? 'match-card-hot' : ''}`} key={match.name}><div className="match-card-top"><span className="game-tag">{match.game.split(' · ')[0]}</span><span className={`status ${full?'full':''}`}>{status}</span></div><h3>{match.name}</h3><div className="match-info"><span>Entry<strong><BacCoin size={14} />{match.entry} BAC</strong></span><span>Prize pool<strong><BacCoin size={14} />{match.prize} BAC</strong></span></div><div className="capacity"><span className="capacity-fill" style={{width:`${match.filled/match.capacity*100}%`}}/></div><div className="match-foot"><span><LiveNumber value={match.filled} />/{match.capacity} players</span><button type="button" className={`join-btn ${joinClass}`} onClick={() => onMatch(match)}><span className="join-btn-shine" aria-hidden="true" />{!full && <span className="join-btn-dot" aria-hidden="true" />}<span className="join-btn-text">{full ? 'View event' : 'Join match'}</span><span className="join-arrow" aria-hidden="true">↗</span></button></div></article>;
+              return <article className={`match-card ${almostFull ? 'match-card-hot' : ''}`} key={match.id || `${match.game}-${match.name}`}><div className="match-card-top"><span className="game-tag">{match.game.split(' · ')[0]}</span><span className={`status ${full?'full':''}`}>{status}</span></div><h3>{match.name}</h3><div className="match-info"><span>Entry<strong><BacCoin size={14} />{match.entry} BAC</strong></span><span>Prize pool<strong><BacCoin size={14} />{match.prize} BAC</strong></span></div><div className="capacity"><span className="capacity-fill" style={{width:`${match.filled/match.capacity*100}%`}}/></div><div className="match-foot"><span><LiveNumber value={match.filled} />/{match.capacity} players</span><button type="button" className={`join-btn ${joinClass}`} onClick={() => onMatch(match)}><span className="join-btn-shine" aria-hidden="true" />{!full && <span className="join-btn-dot" aria-hidden="true" />}<span className="join-btn-text">{full ? 'View event' : 'Join match'}</span><span className="join-arrow" aria-hidden="true">↗</span></button></div></article>;
             })}</div>
           </div>
         </section>
@@ -1287,7 +1322,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
         <section id="play" className="section">
           <div className="wrap">
             <div className="reveal"><div className="section-kicker">Games</div><h2 className="section-title">{t.games}</h2><p className="section-copy">{t.gamesub}</p></div>
-            <div className="games-grid reveal">{games.map((game) => <button key={game.name} type="button" className={`game-card ${game.cls} ${(gameOpen[game.cls] ?? 0) === 0 ? 'disabled' : ''}`} onClick={() => onGame((gameOpen[game.cls] ?? 0) === 0)} aria-label={`${game.name} ${(gameOpen[game.cls] ?? 0) === 0 ? 'coming soon' : `${gameOpen[game.cls] ?? 0} open matches`}`} onMouseMove={(e) => { const r=e.currentTarget.getBoundingClientRect(); e.currentTarget.style.setProperty('--mx',`${e.clientX-r.left}px`);e.currentTarget.style.setProperty('--my',`${e.clientY-r.top}px`); if(matchMedia('(hover:hover)').matches){e.currentTarget.style.setProperty('--rx',`${((e.clientY-r.top)/r.height-.5)*-7}deg`);e.currentTarget.style.setProperty('--ry',`${((e.clientX-r.left)/r.width-.5)*7}deg`);} }} onMouseLeave={(e) => {e.currentTarget.style.setProperty('--rx','0deg');e.currentTarget.style.setProperty('--ry','0deg')}}><img src={game.image} alt="" className="game-card-art" loading="lazy" decoding="async" />{game.tag && (game.cls !== 'valorant' || (gameOpen.valorant ?? 0) === 0) ? <span className="game-badge">{game.cls === 'valorant' ? t.soon : game.tag}</span> : null}<div className="game-card-copy"><h3>{game.name}</h3><p className={(gameOpen[game.cls] ?? 0) ? '' : 'soon'}>{(gameOpen[game.cls] ?? 0) ? `${gameOpen[game.cls] ?? 0} ${t.open}` : t.soon}</p></div></button>)}</div>
+            <div className="games-grid reveal">{games.map((game) => <button key={game.name} type="button" className={`game-card ${game.cls} ${game.cls === 'valorant' && (gameOpen.valorant ?? 0) === 0 ? 'disabled' : ''}`} onClick={() => onGame(game.cls === 'valorant' && (gameOpen.valorant ?? 0) === 0)} aria-label={`${game.name} ${(gameOpen[game.cls] ?? 0) === 0 ? 'coming soon' : `${gameOpen[game.cls] ?? 0} open matches`}`} onMouseMove={(e) => { const r=e.currentTarget.getBoundingClientRect(); e.currentTarget.style.setProperty('--mx',`${e.clientX-r.left}px`);e.currentTarget.style.setProperty('--my',`${e.clientY-r.top}px`); if(matchMedia('(hover:hover)').matches){e.currentTarget.style.setProperty('--rx',`${((e.clientY-r.top)/r.height-.5)*-7}deg`);e.currentTarget.style.setProperty('--ry',`${((e.clientX-r.left)/r.width-.5)*7}deg`);} }} onMouseLeave={(e) => {e.currentTarget.style.setProperty('--rx','0deg');e.currentTarget.style.setProperty('--ry','0deg')}}><img src={game.image} alt="" className="game-card-art" loading="lazy" decoding="async" />{game.tag && (game.cls !== 'valorant' || (gameOpen.valorant ?? 0) === 0) ? <span className="game-badge">{game.cls === 'valorant' ? t.soon : game.tag}</span> : null}<div className="game-card-copy"><h3>{game.name}</h3><p className={(gameOpen[game.cls] ?? 0) || game.cls !== 'valorant' ? '' : 'soon'}>{(gameOpen[game.cls] ?? 0) ? `${gameOpen[game.cls] ?? 0} ${t.open}` : game.cls === 'valorant' ? t.soon : `0 ${t.open}`}</p></div></button>)}</div>
           </div>
         </section>
 
@@ -1340,7 +1375,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
         <button className="float-btn" aria-label="Social links" onClick={() => setSocialOpen(!socialOpen)}>{socialOpen?<X size={18}/>:<Sparkles size={17}/>}</button>
         <button className="float-btn chat" aria-label="Open support chat" onClick={() => setChatOpen(!chatOpen)}><MessageCircle size={18}/></button>
       </div>
-      <div className={`chat-panel ${chatOpen?'open':''}`} aria-hidden={!chatOpen}><div className="chat-head"><div><strong>Player support</strong><small>Typically replies in a few minutes</small></div><button aria-label="Close chat" className="drawer-close" onClick={()=>setChatOpen(false)}><X size={16}/></button></div><div className="chat-body"><div className="chat-msg">Welcome to Battle Asia support. What can we help with?</div>{chatSent&&<><div className="chat-msg reply">{chatSent}</div><div className="chat-msg">Thanks — this is a demo chat. Reach us at support@battleasia.gg.</div></>}</div><form className="chat-form" onSubmit={(e)=>{e.preventDefault();if(chatInput.trim()){setChatSent(chatInput.trim());setChatInput('')}}}><input value={chatInput} onChange={(e)=>setChatInput(e.target.value)} placeholder="Write a message..." aria-label="Chat message"/><button aria-label="Send message"><ArrowRight size={15}/></button></form></div>
+      <LandingSupportChat open={chatOpen} onClose={() => setChatOpen(false)} />
       
       <div className="toast-stack" aria-live="polite">{toast&&<div className="toast">{toast}</div>}</div>
 

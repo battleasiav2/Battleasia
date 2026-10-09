@@ -10,6 +10,14 @@ export type LiveChatSocialLink = {
   href: string;
 };
 
+export type LiveChatFaqTopic = 'account' | 'gaming' | 'general';
+
+export type LiveChatFaq = {
+  topic: LiveChatFaqTopic;
+  question: string;
+  answer: string;
+};
+
 export type LiveChatSettings = {
   enabled: boolean;
   agentName: string;
@@ -18,6 +26,7 @@ export type LiveChatSettings = {
   logoUrl: string;
   welcomeMessage: string;
   socialLinks: LiveChatSocialLink[];
+  faqs: LiveChatFaq[];
 };
 
 export type MessagingProviderType =
@@ -620,6 +629,53 @@ export const DEFAULT_LIVE_CHAT_SETTINGS: LiveChatSettings = {
       href: 'https://www.tiktok.com/@battleasia?_r=1&_t=ZN-91f9vFOUJcc',
     },
   ],
+  faqs: [
+    {
+      topic: 'account',
+      question: 'How do I create an account?',
+      answer: 'Open Sign up, use your email, and confirm the message we send. Then sign in with that same email.',
+    },
+    {
+      topic: 'account',
+      question: 'How do I reset my password?',
+      answer: 'On the sign-in screen choose Forgot password. We email a reset link. It expires, so open it soon.',
+    },
+    {
+      topic: 'account',
+      question: 'Where is my wallet balance?',
+      answer: 'Sign in and open Wallet. A deposit stays pending until staff approve the payment proof.',
+    },
+    {
+      topic: 'gaming',
+      question: 'How do I join a match?',
+      answer: 'Open Play, pick a room that is open, and pay the entry from your wallet. The room page shows the schedule.',
+    },
+    {
+      topic: 'gaming',
+      question: 'When do I get the room ID?',
+      answer: 'The room ID and password appear on the match page when the lobby opens. Do not share them outside your squad.',
+    },
+    {
+      topic: 'gaming',
+      question: 'How are results decided?',
+      answer: 'After the match, submit your result screenshot on the match page. Staff check it before any prize is paid.',
+    },
+    {
+      topic: 'general',
+      question: 'What is BAC?',
+      answer: 'BAC is the BattleAsia coin. You use it for match entry, the shop, and rewards such as Earn.',
+    },
+    {
+      topic: 'general',
+      question: 'How do deposits work?',
+      answer: 'Choose bKash, Nagad, or USDT, send the exact amount shown, and upload proof. Staff approve it before the balance updates.',
+    },
+    {
+      topic: 'general',
+      question: 'How do I reach a person?',
+      answer: 'Write here with a screenshot, or email support@battleasia.gg. We usually reply within a few minutes.',
+    },
+  ],
 };
 
 export const DEFAULT_MESSAGING_SETTINGS: MessagingSettings = {
@@ -814,7 +870,30 @@ export function normalizeLiveChatSettings(raw?: Partial<LiveChatSettings> | null
     })(),
     welcomeMessage: englishOnly(raw?.welcomeMessage, DEFAULT_LIVE_CHAT_SETTINGS.welcomeMessage, 500),
     socialLinks: socialLinks.length ? socialLinks : DEFAULT_LIVE_CHAT_SETTINGS.socialLinks,
+    faqs: normalizeLiveChatFaqs(raw?.faqs),
   };
+}
+
+const LIVE_CHAT_TOPICS = new Set<LiveChatFaqTopic>(['account', 'gaming', 'general']);
+
+function normalizeLiveChatFaqs(raw: unknown): LiveChatFaq[] {
+  if (!Array.isArray(raw) || !raw.length) return DEFAULT_LIVE_CHAT_SETTINGS.faqs;
+  const faqs = raw
+    .map((item) => {
+      if (!item || typeof item !== 'object') return null;
+      const row = item as Partial<LiveChatFaq>;
+      const topic = LIVE_CHAT_TOPICS.has(row.topic as LiveChatFaqTopic)
+        ? (row.topic as LiveChatFaqTopic)
+        : 'general';
+      const question = String(row.question || '').trim().slice(0, 160);
+      const answer = String(row.answer || '').trim().slice(0, 600);
+      if (!question || !answer) return null;
+      if (/[\u0980-\u09FF]/.test(question + answer)) return null;
+      return { topic, question, answer };
+    })
+    .filter((item): item is LiveChatFaq => Boolean(item))
+    .slice(0, 24);
+  return faqs.length ? faqs : DEFAULT_LIVE_CHAT_SETTINGS.faqs;
 }
 
 export function normalizeMessagingSettings(raw?: Partial<MessagingSettings> | null): MessagingSettings {
