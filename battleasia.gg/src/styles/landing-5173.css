@@ -1974,11 +1974,25 @@ html[lang="ur"] .ba5173 { --app-font-sans: 'Noto Nastaliq Urdu', 'Inter', system
 .ba5173 img.bac-coin-icon, .ba5173 img.brand-logo { max-width: none; display: inline-block; }
 .ba5173 .nav-end{margin-left:auto;display:flex;align-items:center;gap:22px}
 .ba5173 .topbar .nav-links a{
+  position:relative;
   display:inline-flex;
   align-items:center;
   height:46px;
   line-height:1;
   color:#c8cacf;
+}
+.ba5173 .topbar .nav-links a.active{
+  color:#fff;
+}
+.ba5173 .topbar .nav-links a.active::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:11px;
+  width:100%;
+  height:2px;
+  border-radius:2px;
+  background:var(--ba-accent,#d4e82a);
 }
 .ba5173 .topbar .nav-actions{margin-left:18px}
 .ba5173 .topbar .btn{line-height:1}
