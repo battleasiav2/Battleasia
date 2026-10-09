@@ -16,7 +16,7 @@
 
 .bac-gate-head { grid-area: head; }
 .bac-gate-card { grid-area: card; }
-.bac-gate-panel { grid-area: panel; align-self: end; }
+.bac-gate-panel { grid-area: panel; align-self: start; }
 
 .bac-mark {
   width: 72px;
@@ -148,18 +148,27 @@
 
 .bac-facts li {
   display: grid;
-  grid-template-columns: 8px 1fr;
-  gap: 10px;
+  grid-template-columns: 8px minmax(0, 1fr);
+  column-gap: 10px;
+  row-gap: 2px;
   align-items: start;
 }
 
 .bac-facts li::before {
   content: "";
+  grid-column: 1;
+  grid-row: 1 / span 2;
   width: 8px;
   height: 8px;
   margin-top: 6px;
   border-radius: 50%;
   background: var(--ba-accent);
+}
+
+.bac-facts b,
+.bac-facts span {
+  grid-column: 2;
+  min-width: 0;
 }
 
 .bac-facts b {
@@ -170,7 +179,6 @@
 
 .bac-facts span {
   display: block;
-  margin-top: 2px;
   color: #c8cacf;
   font-size: 13px;
   line-height: 1.45;

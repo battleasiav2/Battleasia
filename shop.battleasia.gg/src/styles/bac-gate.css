@@ -31,7 +31,7 @@
 
 .bac-gate-head { grid-area: head; }
 .bac-gate-card { grid-area: card; }
-.bac-gate-panel { grid-area: panel; align-self: end; }
+.bac-gate-panel { grid-area: panel; align-self: start; }
 
 .bac-mark { width: 72px; height: 72px; margin-bottom: 14px; }
 .bac-mark svg { display: block; width: 72px; height: 72px; }
@@ -138,10 +138,18 @@
 
 .bac-facts { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 12px; }
 
-.bac-facts li { display: grid; grid-template-columns: 8px 1fr; gap: 10px; align-items: start; }
+.bac-facts li {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr);
+  column-gap: 10px;
+  row-gap: 2px;
+  align-items: start;
+}
 
 .bac-facts li::before {
   content: "";
+  grid-column: 1;
+  grid-row: 1 / span 2;
   width: 8px;
   height: 8px;
   margin-top: 6px;
@@ -149,9 +157,12 @@
   background: var(--ba-accent);
 }
 
+.bac-facts b,
+.bac-facts span { grid-column: 2; min-width: 0; }
+
 .bac-facts b { display: block; font-size: 13px; font-weight: 700; }
 
-.bac-facts span { display: block; margin-top: 2px; color: #c8cacf; font-size: 13px; line-height: 1.45; }
+.bac-facts span { display: block; color: #c8cacf; font-size: 13px; line-height: 1.45; }
 
 .bac-gate-note { margin: 14px 0 0; color: #9a3b32; font-size: 13px; }
 
