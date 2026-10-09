@@ -48,6 +48,7 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@battleasia.gg}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      SYNC_ADMIN_PASSWORD: ${SYNC_ADMIN_PASSWORD:-false}
       CORS_ORIGINS: ${CORS_ORIGINS:-https://battleasia.gg,https://www.battleasia.gg,https://shop.battleasia.gg,https://admin.battleasia.gg}
       APP_URL: ${APP_URL:-https://battleasia.gg}
       CDN_URL: ${CDN_URL:-}
