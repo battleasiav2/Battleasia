@@ -65,6 +65,10 @@ const FALLBACK: Faq[] = [
 
 const TOPICS: Topic[] = ['all', 'account', 'gaming', 'general'];
 
+function faqTopic(value: string): Faq['topic'] {
+  return value === 'account' || value === 'gaming' ? value : 'general';
+}
+
 function english(value: unknown, fallback: string) {
   const text = String(value || '').trim();
   if (!text || /[\u0980-\u09FF]/.test(text)) return fallback;
@@ -109,7 +113,7 @@ export function LandingSupportChat({ open, onClose }: Props) {
           const clean = data.faqs
             .filter((item) => item && item.question && item.answer && !/[\u0980-\u09FF]/.test(item.question + item.answer))
             .map((item) => ({
-              topic: item.topic === 'account' || item.topic === 'gaming' ? item.topic : 'general',
+              topic: faqTopic(String(item.topic || '')),
               question: item.question.slice(0, 160),
               answer: item.answer.slice(0, 600),
             }));
