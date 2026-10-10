@@ -671,6 +671,7 @@
     "copyId": "Copy ID",
     "copyPass": "Copy pass",
     "roomHidden": "Join this match to unlock room ID and password.",
+    "roomLockedValue": "••••••",
     "roomPending": "Joined — room ID & password will appear here when the host posts them.",
     "demoDisabled": "Demo rooms are off — only live matches can be joined.",
     "joinFail": "Could not join",

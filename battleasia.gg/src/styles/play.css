@@ -7172,6 +7172,18 @@ a.hist-item-link {
   color: var(--ba-accent);
 }
 
+.ba-room-stats-room {
+  grid-template-columns: 1fr 1fr;
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.ba-room-stat.is-locked {
+  color: var(--ba-muted);
+  letter-spacing: 0.12em;
+  font-size: 14px;
+}
+
 .ba-room-total {
   color: var(--ba-muted);
   font-size: 11px;

@@ -710,6 +710,7 @@
   "match.copyPass": "Copy pass",
   "match.roomPending": "Joined — room ID & password will appear here when the host posts them.",
   "match.roomHidden": "Join this match to unlock room ID and password.",
+  "match.roomLockedValue": "••••••",
   "match.pubgIdRequired": "Add your in-game ID (Profile → PUBG ID) before joining any match.",
   "match.openProfile": "Open profile",
   "match.roster": "Roster",

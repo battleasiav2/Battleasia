@@ -44,6 +44,7 @@ class _MatchScreenState extends State<MatchScreen> {
   String? _roomError;
   // The match waiting for the user to confirm before joining.
   MatchModel? _confirmMatch;
+  final Map<String, ({String roomId, String password})> _roomByMatchId = {};
 
   @override
   void initState() {
@@ -57,6 +58,34 @@ class _MatchScreenState extends State<MatchScreen> {
     super.dispose();
   }
 
+  Future<void> _hydrateRoomCredentials(List<MatchModel> matches) async {
+    for (final match in matches) {
+      if (!match.isJoined || match.id.startsWith('demo-')) continue;
+
+      final cached = _roomByMatchId[match.id];
+      if (cached != null && cached.roomId.trim().isNotEmpty) continue;
+
+      final fromList = match.roomId?.trim() ?? '';
+      if (fromList.isNotEmpty) {
+        _roomByMatchId[match.id] = (
+          roomId: fromList,
+          password: match.password?.trim() ?? '',
+        );
+        continue;
+      }
+
+      final result = await _gamesService.getMatchRoomCredentials(match.id);
+      if (!mounted) return;
+      if (result['success'] == true && result['data'] is Map) {
+        final data = Map<String, dynamic>.from(result['data'] as Map);
+        _roomByMatchId[match.id] = (
+          roomId: (data['roomId'] ?? '').toString(),
+          password: (data['password'] ?? '').toString(),
+        );
+      }
+    }
+  }
+
   Future<void> _fetchMatches() async {
     setState(() {
       _isLoading = true;
@@ -65,32 +94,34 @@ class _MatchScreenState extends State<MatchScreen> {
     final result = await _gamesService.getMatches(gameId: widget.gameId);
 
     if (mounted) {
+      List<MatchModel> next = [];
+      if (result['success'] == true) {
+        final matchesData = result['data'] as List<dynamic>?;
+        if (matchesData != null) {
+          next = matchesData
+              .map(
+                (matchJson) =>
+                    MatchModel.fromJson(matchJson as Map<String, dynamic>),
+              )
+              .toList();
+        }
+      } else {
+        final errorMsg =
+            result['message'] as String? ?? 'Failed to load matches';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMsg),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+
+      await _hydrateRoomCredentials(next);
+
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
-        if (result['success'] == true) {
-          final matchesData = result['data'] as List<dynamic>?;
-          if (matchesData != null) {
-            _matches = matchesData
-                .map(
-                  (matchJson) =>
-                      MatchModel.fromJson(matchJson as Map<String, dynamic>),
-                )
-                .toList();
-          } else {
-            _matches = [];
-          }
-        } else {
-          // Show error via snackbar
-          final errorMsg =
-              result['message'] as String? ?? 'Failed to load matches';
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(errorMsg),
-              backgroundColor: Colors.red,
-            ),
-          );
-          _matches = [];
-        }
+        _matches = next;
       });
     }
   }
@@ -199,10 +230,18 @@ class _MatchScreenState extends State<MatchScreen> {
 
       if (result['success'] == true) {
         // Update balance in provider if returned.
-        final updatedBalance = result['data']?['balance'];
-        if (updatedBalance != null && updatedBalance is num) {
-          Provider.of<AuthProvider>(context, listen: false)
-              .updateBalance(updatedBalance.toDouble());
+        final joinData = result['data'];
+        if (joinData is Map) {
+          final data = Map<String, dynamic>.from(joinData);
+          final updatedBalance = data['balance'];
+          if (updatedBalance != null && updatedBalance is num) {
+            Provider.of<AuthProvider>(context, listen: false)
+                .updateBalance(updatedBalance.toDouble());
+          }
+          _roomByMatchId[match.id] = (
+            roomId: (data['roomId'] ?? '').toString(),
+            password: (data['password'] ?? '').toString(),
+          );
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -416,8 +455,11 @@ class _MatchScreenState extends State<MatchScreen> {
       );
     }
 
+    final roomCreds = _roomByMatchId[match.id];
     final card = MatchCard(
       match: match,
+      displayRoomId: roomCreds?.roomId,
+      displayPassword: roomCreds?.password,
       onWatchLive: isResult ? null : _handleWatchLive,
       onJoin: isResult ? () {} : () => _handleJoinMatch(match),
       onShowRoomDetails: isResult ? null : () => _handleShowRoomDetails(match),

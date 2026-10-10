@@ -20,6 +20,8 @@ class MatchCard extends StatefulWidget {
   final bool isJoined;
   final bool showLive;
   final bool isPremiumUser;
+  final String? displayRoomId;
+  final String? displayPassword;
 
   const MatchCard({
     super.key,
@@ -34,6 +36,8 @@ class MatchCard extends StatefulWidget {
     this.isJoined = false,
     this.showLive = false,
     this.isPremiumUser = false,
+    this.displayRoomId,
+    this.displayPassword,
   });
 
   @override
@@ -41,6 +45,11 @@ class MatchCard extends StatefulWidget {
 }
 
 class _MatchCardState extends State<MatchCard> {
+  String _nonEmpty(String? value) {
+    final trimmed = value?.trim() ?? '';
+    return trimmed.isEmpty ? '—' : trimmed;
+  }
+
   Widget _banner(String bannerUrl) {
     final fallback = Image.asset(
       'assets/images/game.webp',
@@ -123,6 +132,13 @@ class _MatchCardState extends State<MatchCard> {
     final spotPct = cap > 0 ? (used / cap).clamp(0.0, 1.0) : 0.0;
     final code = match.id.length > 6 ? match.id.substring(match.id.length - 6) : match.id;
     final free = match.matchType == 'free' || match.entryFee <= 0;
+    final locked = 'match.roomLockedValue'.tr();
+    final roomIdText = widget.isJoined
+        ? _nonEmpty(widget.displayRoomId ?? match.roomId)
+        : locked;
+    final passText = widget.isJoined
+        ? _nonEmpty(widget.displayPassword ?? match.password)
+        : locked;
 
     return RepaintBoundary(
       child: GestureDetector(
@@ -287,6 +303,26 @@ class _MatchCardState extends State<MatchCard> {
                         ],
                       ),
                       const SizedBox(height: 12),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _Stat(
+                              label: 'match.roomIdLabel'.tr(),
+                              value: roomIdText,
+                              muted: !widget.isJoined,
+                            ),
+                          ),
+                          Expanded(
+                            child: _Stat(
+                              label: 'match.passLabel'.tr(),
+                              value: passText,
+                              muted: !widget.isJoined,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
                       GoldButton(
                         label: _actionLabel,
                         loading: widget.joining,
@@ -372,6 +408,7 @@ class _Stat extends StatelessWidget {
   final String value;
   final String? total;
   final bool accent;
+  final bool muted;
   final double? bar;
 
   const _Stat({
@@ -379,6 +416,7 @@ class _Stat extends StatelessWidget {
     required this.value,
     this.total,
     this.accent = false,
+    this.muted = false,
     this.bar,
   });
 
@@ -405,9 +443,14 @@ class _Stat extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: accent ? AppColors.gold : Colors.white,
-                  fontSize: 16,
+                  color: accent
+                      ? AppColors.gold
+                      : muted
+                          ? Colors.white.withValues(alpha: 0.45)
+                          : Colors.white,
+                  fontSize: muted ? 14 : 16,
                   fontWeight: FontWeight.w800,
+                  letterSpacing: muted ? 1.2 : 0,
                 ),
               ),
             ),

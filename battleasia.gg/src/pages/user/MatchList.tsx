@@ -15,6 +15,7 @@ import {
   mapCoverKey,
   fetchGames,
   fetchMatches,
+  fetchRoom,
   formatWhen,
   gameKey,
   isJoinable,
@@ -85,6 +86,8 @@ export function MatchListPage() {
   const [seatsMatch, setSeatsMatch] = useState<MatchItem | null>(null);
   const [joining, setJoining] = useState(false);
   const [joinError, setJoinError] = useState('');
+  const [roomCreds, setRoomCreds] = useState<Record<string, { roomId: string; password: string }>>({});
+  const roomFetchStarted = useRef<Set<string>>(new Set());
   const selectedRef = useRef('');
   const balance = Number(outlet?.balance ?? readSessionUser()?.balance) || 0;
 
@@ -122,6 +125,34 @@ export function MatchListPage() {
       live = false;
     };
   }, [gameId, t]);
+
+  useEffect(() => {
+    if (!matches?.length) return;
+    let live = true;
+    for (const match of matches) {
+      if (!match.isJoined || isDemoMatchId(match.id)) continue;
+      if (roomFetchStarted.current.has(match.id)) continue;
+      roomFetchStarted.current.add(match.id);
+      void fetchRoom(match.id)
+        .then((creds) => {
+          if (!live) return;
+          setRoomCreds((prev) => ({
+            ...prev,
+            [match.id]: { roomId: creds.roomId || '', password: creds.password || '' },
+          }));
+        })
+        .catch(() => {
+          if (!live) return;
+          setRoomCreds((prev) => ({
+            ...prev,
+            [match.id]: prev[match.id] || { roomId: '', password: '' },
+          }));
+        });
+    }
+    return () => {
+      live = false;
+    };
+  }, [matches]);
 
   useEffect(() => {
     if (!filtered.length) return;
@@ -211,6 +242,16 @@ export function MatchListPage() {
       const joinedRes = await joinMatch(match.id);
       if (joinedRes?.balance != null) setBalance?.(Number(joinedRes.balance) || 0);
       else if (fee > 0) setBalance?.(Math.max(balance - fee, 0));
+      if (joinedRes?.roomId != null || joinedRes?.password != null) {
+        setRoomCreds((prev) => ({
+          ...prev,
+          [match.id]: {
+            roomId: joinedRes.roomId || '',
+            password: joinedRes.password || '',
+          },
+        }));
+        roomFetchStarted.current.add(match.id);
+      }
       setMatches((prev) =>
         (prev || []).map((row) =>
           row.id === match.id
@@ -218,6 +259,8 @@ export function MatchListPage() {
                 ...row,
                 isJoined: true,
                 participantsCount: (row.participantsCount || 0) + 1,
+                roomId: joinedRes?.roomId,
+                password: joinedRes?.password,
               }
             : row,
         ),
@@ -343,6 +386,14 @@ export function MatchListPage() {
                 const cover = coverForMatch(match);
                 const mapKey = mapCoverKey(match.map);
                 const spotPct = cap > 0 ? Math.min(100, Math.round((used / cap) * 100)) : 0;
+                const lockedRoom = t('match.roomLockedValue');
+                const creds = roomCreds[match.id];
+                const roomIdDisplay = match.isJoined
+                  ? creds?.roomId?.trim() || match.roomId?.trim() || '—'
+                  : lockedRoom;
+                const passDisplay = match.isJoined
+                  ? creds?.password?.trim() || match.password?.trim() || '—'
+                  : lockedRoom;
                 const action = (match.status || '').toLowerCase() === 'complete' ? (
                   <Link
                     className="btn btn-primary ba-room-action"
@@ -465,6 +516,26 @@ export function MatchListPage() {
                           <span className="ba-room-bar" aria-hidden>
                             <i style={{ width: `${spotPct}%` }} />
                           </span>
+                        </div>
+                      </div>
+                      <div className="ba-room-stats ba-room-stats-room">
+                        <div>
+                          <label>{t('match.roomIdLabel')}</label>
+                          <div
+                            className={`ba-room-stat${match.isJoined ? '' : ' is-locked'}`}
+                            title={match.isJoined ? roomIdDisplay : t('match.roomHidden')}
+                          >
+                            {roomIdDisplay}
+                          </div>
+                        </div>
+                        <div>
+                          <label>{t('match.passLabel')}</label>
+                          <div
+                            className={`ba-room-stat${match.isJoined ? '' : ' is-locked'}`}
+                            title={match.isJoined ? passDisplay : t('match.roomHidden')}
+                          >
+                            {passDisplay}
+                          </div>
                         </div>
                       </div>
                       {action}
