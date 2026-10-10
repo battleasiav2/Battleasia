@@ -690,7 +690,6 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
     bacPaid: 0,
     liveRooms: 0,
     inSeats: 0,
-    joinedToday: 0,
   });
   const t = text[locale];
   const { t: appT } = useI18n();
@@ -811,7 +810,6 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
           bacPaid: pulse.winnings,
           liveRooms: pulse.ongoing,
           inSeats: pulse.inSeats,
-          joinedToday: pulse.todayJoins,
         });
         const open: Record<string, number> = {};
         const alias: Record<string, RegExp> = {
@@ -1337,7 +1335,6 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
                 <TrustLiveCard variant="payouts" icon="zap" title="Payouts that count" desc="BAC winnings after results." tick={trustMetrics.bacPaid} metric={<LiveNumber value={trustMetrics.bacPaid} format={formatBac} />} note="BAC paid" />
                 <TrustLiveCard variant="rooms" icon="crosshair" title="Fair rooms" desc="Competitive play, monitored." live tick={trustMetrics.liveRooms} metric={<LiveNumber value={trustMetrics.liveRooms} />} note="Live rooms now" />
                 <TrustLiveCard variant="community" icon="users" title="A real community" desc="Squads from across the region." tick={trustMetrics.inSeats} metric={<LiveNumber value={trustMetrics.inSeats} />} note="Players in open rooms" />
-                <TrustLiveCard variant="support" icon="help" title="Player-first support" desc="A person, not a bot." tick={trustMetrics.joinedToday} metric={<LiveNumber value={trustMetrics.joinedToday} />} note="Joined today" />
               </div>
             </div>
           </div>
