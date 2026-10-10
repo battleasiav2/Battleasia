@@ -210,6 +210,61 @@ router.get('/my-history', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
+router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
+  try {
+    const id = String(req.params.id);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ status: false, message: 'Invalid deposit id' });
+    }
+    const key = String(req.header('Idempotency-Key') || '').trim() || undefined;
+    await approveDepositMoney({ depositId: id, adminId: req.userId, idempotencyKey: key });
+    const deposit = await DepositHistory.findById(id);
+    if (!deposit) return res.status(404).json({ status: false, message: 'Deposit not found' });
+    const user = await User.findById(deposit.userId);
+    if (!user) return res.status(404).json({ status: false, message: 'User not found' });
+
+    const credited = deposit.coin_amount + (deposit.bonus_coins || 0);
+    const balanceAfter = user.balance ?? 0;
+    const balanceBefore = balanceAfter - credited;
+
+    try {
+      await emitPendingPaymentCounts();
+      await notifyBalanceChange(user._id.toString(), balanceAfter, balanceBefore);
+      await notifyDepositApproved({
+        userId: user._id.toString(),
+        amount: credited,
+        depositId: deposit._id.toString(),
+      });
+      await processReferralCommission({
+        depositor: user,
+        depositAmount: deposit.coin_amount,
+        depositId: deposit._id,
+        depositSource: 'manual',
+      });
+      touchWelcomeEligibility(user._id.toString()).catch((error) => {
+        console.error('engagement welcome touch failed:', error);
+      });
+      await applyDepositBonusOnApproval({
+        user,
+        depositAmount: deposit.coin_amount,
+        depositId: deposit._id.toString(),
+        performedBy: req.userId,
+      });
+    } catch (error) {
+      console.error('deposit approve side-effects failed:', error);
+    }
+
+    const channel = await PaymentChannel.findById(deposit.payment_channel);
+    return res.json({ status: true, data: serializeDeposit(deposit, channel) });
+  } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
+    console.error('approve deposit error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to approve deposit' });
+  }
+});
+
 router.get('/:id', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const id = String(req.params.id);
@@ -233,60 +288,13 @@ router.get('/:id', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
-  try {
-    const key = String(req.header('Idempotency-Key') || '').trim() || undefined;
-    await approveDepositMoney({ depositId: String(req.params.id), adminId: req.userId, idempotencyKey: key });
-    const deposit = await DepositHistory.findById(req.params.id);
-    if (!deposit) return res.status(404).json({ status: false, message: 'Deposit not found' });
-    const user = await User.findById(deposit.userId);
-    if (!user) return res.status(404).json({ status: false, message: 'User not found' });
-
-    await emitPendingPaymentCounts();
-    const credited = deposit.coin_amount + (deposit.bonus_coins || 0);
-    await notifyBalanceChange(user._id.toString(), user.balance ?? 0, (user.balance ?? 0) - credited);
-    await notifyDepositApproved({
-      userId: user._id.toString(),
-      amount: credited,
-      depositId: deposit._id.toString(),
-    });
-
-    await processReferralCommission({
-      depositor: user,
-      depositAmount: deposit.coin_amount,
-      depositId: deposit._id,
-      depositSource: 'manual',
-    });
-
-    touchWelcomeEligibility(user._id.toString()).catch((error) => {
-      console.error('engagement welcome touch failed:', error);
-    });
-
-    try {
-      await applyDepositBonusOnApproval({
-        user,
-        depositAmount: deposit.coin_amount,
-        depositId: deposit._id.toString(),
-        performedBy: req.userId,
-      });
-    } catch (error) {
-      console.error('engagement deposit bonus failed:', error);
-    }
-
-    const channel = await PaymentChannel.findById(deposit.payment_channel);
-    return res.json({ status: true, data: serializeDeposit(deposit, channel) });
-  } catch (error) {
-    if (error instanceof MoneyError) {
-      return res.status(error.status).json({ status: false, message: error.message });
-    }
-    console.error('approve deposit error:', error);
-    return res.status(500).json({ status: false, message: 'Failed to approve deposit' });
-  }
-});
-
 router.patch('/:id/reject', requireAdmin, async (req: AuthedRequest, res) => {
   try {
-    await rejectDepositMoney(String(req.params.id));
+    const id = String(req.params.id);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ status: false, message: 'Invalid deposit id' });
+    }
+    await rejectDepositMoney(id);
     const deposit = await DepositHistory.findById(req.params.id);
     if (!deposit) return res.status(404).json({ status: false, message: 'Deposit not found' });
     if (deposit.coupon_code) await releaseCoupon(deposit.coupon_code);

@@ -77,7 +77,12 @@ export function PaymentsPage() {
   }, []);
 
   async function run(id: string, action: string) {
-    const path = `${base}/${id}/${action}`;
+    const depositId = id.trim();
+    if (!depositId || depositId.length < 12) {
+      toast(t('pay.failed'), 'err');
+      return;
+    }
+    const path = `${base}/${depositId}/${action}`;
     await api(path, {
       method: 'PATCH',
       body: JSON.stringify({ rejection_reason: reason, password }),

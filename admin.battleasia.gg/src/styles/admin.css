@@ -42,7 +42,7 @@
 }
 
 .btn-primary {
-  color: #fff;
+  color: var(--ba-gold-ink);
   background: linear-gradient(90deg, var(--ba-accent), var(--ba-accent-b));
   box-shadow: 0 8px 24px -10px var(--ba-accent-glow);
 }
@@ -114,9 +114,9 @@
   grid-template-columns: 268px 1fr;
   min-height: 100svh;
   background:
-    radial-gradient(80% 46% at 78% 0%, rgba(124, 92, 255, 0.22), transparent 56%),
-    radial-gradient(50% 34% at 100% 18%, rgba(33, 212, 253, 0.14), transparent 50%),
-    radial-gradient(42% 28% at 8% 100%, rgba(124, 92, 255, 0.1), transparent 52%),
+    radial-gradient(80% 46% at 78% 0%, rgba(124, 92, 255, 0.08), transparent 56%),
+    radial-gradient(50% 34% at 100% 18%, rgba(33, 212, 253, 0.05), transparent 50%),
+    radial-gradient(42% 28% at 8% 100%, rgba(124, 92, 255, 0.04), transparent 52%),
     var(--ba-page);
   transition: grid-template-columns 0.2s ease;
 }
@@ -135,8 +135,8 @@
   height: 100svh;
   border-right: 1px solid var(--ba-hair);
   background:
-    linear-gradient(180deg, rgba(124, 92, 255, 0.12), transparent 22%),
-    #080910;
+    linear-gradient(180deg, rgba(124, 92, 255, 0.06), transparent 22%),
+    #050608;
   padding: 16px 12px 28px;
   overflow: auto;
   z-index: 8;
@@ -625,10 +625,10 @@
 .dash-stage {
   padding: 22px;
   border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   background:
-    radial-gradient(80% 60% at 10% 0%, rgba(124, 92, 255, 0.16), transparent 46%),
-    linear-gradient(180deg, rgba(28, 32, 44, 0.95), rgba(14, 16, 24, 0.92));
+    radial-gradient(80% 60% at 10% 0%, rgba(124, 92, 255, 0.06), transparent 46%),
+    linear-gradient(180deg, rgba(12, 14, 20, 0.98), rgba(6, 7, 11, 0.96));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 24px 60px -36px rgba(0, 0, 0, 0.9);
@@ -637,8 +637,8 @@
 .list-stage {
   padding: 0;
   overflow: hidden;
-  background: #161822;
-  border-color: rgba(255, 255, 255, 0.16);
+  background: #0a0b10;
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .list-stage .admin-lead,
@@ -1110,7 +1110,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-bottom: 0;
   border-radius: 20px 20px 0 0;
-  background: linear-gradient(180deg, rgba(28, 32, 44, 0.95), rgba(18, 20, 28, 0.92));
+  background: linear-gradient(180deg, rgba(14, 16, 22, 0.98), rgba(8, 9, 14, 0.96));
 }
 
 .table-tools input,
@@ -1177,9 +1177,9 @@
 }
 
 .chip.on {
-  color: var(--ba-text);
-  border-color: rgba(124, 92, 255, 0.55);
-  background: rgba(124, 92, 255, 0.22);
+  color: var(--ba-gold-ink);
+  border-color: color-mix(in srgb, var(--ba-accent) 55%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--ba-accent) 88%, #000), color-mix(in srgb, var(--ba-accent-b) 82%, #000));
 }
 
 .ops-chips {
@@ -1198,7 +1198,7 @@
   overflow: auto;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 0 0 20px 20px;
-  background: rgba(14, 16, 24, 0.88);
+  background: rgba(6, 7, 11, 0.96);
   box-shadow: 0 22px 48px -28px rgba(0, 0, 0, 0.9);
 }
 
@@ -1206,6 +1206,7 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
+  color: var(--ba-text);
 }
 
 .admin-table th,

@@ -1,10 +1,10 @@
 :root {
-  --ba-page: #0e0f14;
-  --ba-page-ink: #07080d;
-  --ba-surface: #171922;
-  --ba-card: #12141c;
-  --ba-text: #f4f5f7;
-  --ba-muted: #9aa0b4;
+  --ba-page: #06070b;
+  --ba-page-ink: #030408;
+  --ba-surface: #0f1016;
+  --ba-card: #0a0b10;
+  --ba-text: #eef0f5;
+  --ba-muted: #a8afc2;
   --ba-hair: rgba(255, 255, 255, 0.1);
   --ba-success: #22c55e;
   --ba-danger: #ff5c7a;
@@ -21,7 +21,7 @@
   --ba-gold: var(--ba-accent);
   --ba-gold-ink: #081401;
   --ba-gold-rgb: 203, 251, 36;
-  --ba-input: #0b0c12;
+  --ba-input: #07080d;
   --ba-hud: rgba(14, 15, 20, 0.84);
 }
 

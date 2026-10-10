@@ -91,8 +91,10 @@ async function silentRefresh() {
 function shouldRetryAuth(method: string, path: string) {
   if (path.includes('/refresh')) return false;
   const verb = method.toUpperCase();
-  if (verb === 'GET') return true;
+  if (verb === 'GET' || verb === 'HEAD') return true;
   if (verb === 'POST' && /\/upload(\/|$)/.test(path)) return true;
+  // Admin approve/reject and other writes must refresh once on expired access tokens.
+  if (verb === 'PATCH' || verb === 'PUT' || verb === 'DELETE') return true;
   return false;
 }
 
@@ -154,6 +156,15 @@ export async function api<T>(path: string, init: ApiInit = {}): Promise<T> {
               : 'Request failed'),
       fields: payload.errors,
       retryAfter: Number(res.headers.get('Retry-After')) || undefined,
+    };
+    throw err;
+  }
+  if (data && typeof data === 'object' && 'status' in data && (data as { status?: boolean }).status === false) {
+    const payload = data as { message?: string; errors?: Record<string, string> };
+    const err: ApiError = {
+      status: res.status,
+      message: readApiMessage(payload, statusMessage(res.status)),
+      fields: payload.errors,
     };
     throw err;
   }
