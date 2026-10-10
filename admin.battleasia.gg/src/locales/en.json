@@ -257,7 +257,7 @@
   "apk.uploadTitle": "Upload APK",
   "apk.uploadHint": "Select BattleAsia.apk (release build). Version from the field above is stored with the upload.",
   "apk.uploading": "Uploading…",
-  "apk.uploaded": "APK uploaded",
+  "apk.uploaded": "Your APK upload was successful. The landing Download button now serves this file.",
   "apk.uploadFail": "Upload failed",
   "apk.needApk": "Choose a .apk file",
   "integrity.lead": "Liability vs reserve, same-IP multi-account fingerprints, KYC queue, and velocity holds. CSV/Excel export is on every queue.",

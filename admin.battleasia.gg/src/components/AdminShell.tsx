@@ -205,12 +205,13 @@ export function AdminShell() {
     const text = msg.trim();
     if (!text) return;
     const tone: 'ok' | 'err' =
-      kind ||
-      (/fail|error|invalid|required|blocked|missing|could not|not found|offline|denied|exceeds|at least|no participant|no arena|select a|fill |need |unable|cannot/i.test(
-        text,
-      )
-        ? 'err'
-        : 'ok');
+      kind === 'ok' || kind === 'err'
+        ? kind
+        : /fail|error|invalid|required|blocked|missing|could not|not found|offline|denied|exceeds|at least|no participant|no arena|select a|fill |need |unable|cannot/i.test(
+            text,
+          )
+          ? 'err'
+          : 'ok';
     window.clearTimeout(toastTimer.current);
     setToast({ text, kind: tone });
     toastTimer.current = window.setTimeout(() => setToast(null), 8000);

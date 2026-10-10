@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { api, unwrapData, explainError } from '../lib/api';
+import { api, unwrapData, explainError, uploadMultipart, readApiMessage } from '../lib/api';
 import { useI18n } from '../lib/i18n';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
@@ -34,9 +34,11 @@ export function AppDownloadPage() {
   const { toast } = useOutletContext<Ctx>();
   const [form, setForm] = useState<AppDownloadForm>(DEFAULT);
   const [error, setError] = useState('');
+  const [okMsg, setOkMsg] = useState('');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadPct, setUploadPct] = useState(0);
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
@@ -66,6 +68,7 @@ export function AppDownloadPage() {
 
   async function save() {
     setBusy(true);
+    setOkMsg('');
     try {
       const payload = await api('/api/v2/app-settings/app-download', {
         method: 'PUT',
@@ -82,9 +85,13 @@ export function AppDownloadPage() {
           downloadUrl: data.downloadUrl || prev.downloadUrl,
         }));
       }
-      toast(t('apk.saved'), 'ok');
+      const msg = readApiMessage(payload, t('apk.saved'));
+      setOkMsg(msg);
+      toast(msg, 'ok');
     } catch (err) {
-      toast(explainError(err, t('settings.fail')), 'err');
+      const msg = explainError(err, t('settings.fail'));
+      setError(msg);
+      toast(msg, 'err');
     } finally {
       setBusy(false);
     }
@@ -96,13 +103,15 @@ export function AppDownloadPage() {
       return;
     }
     setUploading(true);
+    setUploadPct(0);
+    setError('');
+    setOkMsg('');
     try {
       const body = new FormData();
       body.append('apk', file);
       if (form.version.trim()) body.append('version', form.version.trim());
-      const payload = await api('/api/v2/app-settings/app-download/upload', {
-        method: 'POST',
-        body,
+      const payload = await uploadMultipart('/api/v2/app-settings/app-download/upload', body, {
+        onProgress: setUploadPct,
       });
       const data = unwrapData<Partial<AppDownloadForm>>(payload);
       if (data) {
@@ -116,11 +125,17 @@ export function AppDownloadPage() {
           fileName: data.fileName || prev.fileName,
         }));
       }
-      toast(t('apk.uploaded'), 'ok');
+      const msg = readApiMessage(payload, t('apk.uploaded'));
+      setOkMsg(msg);
+      toast(msg, 'ok');
     } catch (err) {
-      toast(explainError(err, t('apk.uploadFail')), 'err');
+      const msg = explainError(err, t('apk.uploadFail'));
+      setError(msg);
+      toast(msg, 'err');
+      await load();
     } finally {
       setUploading(false);
+      setUploadPct(0);
       if (fileRef.current) fileRef.current.value = '';
     }
   }
@@ -129,6 +144,7 @@ export function AppDownloadPage() {
     <main className="admin-body">
       <h1>{t('nav.appDownload')}</h1>
       <p className="admin-lead">{t('apk.lead')}</p>
+      {okMsg ? <p className="form-ok">{okMsg}</p> : null}
       {error ? <p className="form-error">{error}</p> : null}
 
       <div className="dash-stage form-stage match-form-grid">
@@ -200,7 +216,26 @@ export function AppDownloadPage() {
               }}
             />
           </label>
-          {uploading ? <p className="field-hint">{t('apk.uploading')}</p> : null}
+          {uploading ? (
+            <p className="field-hint">
+              {t('apk.uploading')} {uploadPct > 0 ? `${uploadPct}%` : ''}
+            </p>
+          ) : null}
+          {uploading && uploadPct > 0 ? (
+            <div
+              style={{
+                marginTop: 8,
+                maxWidth: 320,
+                height: 4,
+                borderRadius: 2,
+                background: 'rgba(255,255,255,0.12)',
+                overflow: 'hidden',
+              }}
+              aria-hidden
+            >
+              <div style={{ width: `${uploadPct}%`, height: '100%', background: '#d4e82a' }} />
+            </div>
+          ) : null}
         </div>
       </div>
     </main>

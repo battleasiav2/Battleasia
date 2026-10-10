@@ -186,7 +186,7 @@
   "apk.uploadTitle": "APK আপলোড",
   "apk.uploadHint": "BattleAsia.apk (release) বেছে নিন। উপরের ভার্সন আপলোডের সাথে সেভ হবে।",
   "apk.uploading": "আপলোড হচ্ছে…",
-  "apk.uploaded": "APK আপলোড হয়েছে",
+  "apk.uploaded": "আপনার APK আপলোড সফল হয়েছে। ল্যান্ডিং Download বাটন এখন এই ফাইল দেখাবে।",
   "apk.uploadFail": "আপলোড ফেল",
   "apk.needApk": ".apk ফাইল বেছে নিন",
   "integrity.lead": "লাইবিলিটি বনাম রিজার্ভ, একই আইপির মাল্টি-অ্যাকাউন্ট, কেওয়াইসি কিউ ও ভেলোসিটি হোল্ড।",
