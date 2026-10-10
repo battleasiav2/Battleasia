@@ -3,6 +3,7 @@ import { Navigate, useOutletContext } from 'react-router-dom';
 import { api, unwrapData, unwrapList, explainError } from '../lib/api';
 import { can } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
+import { mediaUrl } from '../lib/media';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
@@ -250,7 +251,7 @@ export function BacShopPage() {
           </label>
           <div className="form-actions span-all" style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
             {draft.image ? (
-              <img src={draft.image} alt="" width={56} height={56} style={{ objectFit: 'contain', borderRadius: 8 }} />
+              <img src={mediaUrl(draft.image)} alt="" width={56} height={56} style={{ objectFit: 'contain', borderRadius: 8 }} />
             ) : null}
             <p className="admin-lead" style={{ margin: 0 }}>
               {preview
@@ -298,7 +299,7 @@ export function BacShopPage() {
                       <tr key={row.id}>
                         <td>
                           {edit.image ? (
-                            <img src={edit.image} alt="" width={40} height={40} style={{ objectFit: 'contain' }} />
+                            <img src={mediaUrl(edit.image)} alt="" width={40} height={40} style={{ objectFit: 'contain' }} />
                           ) : (
                             <span className="admin-muted">—</span>
                           )}

@@ -7,6 +7,7 @@ import { isApiError } from '../../lib/api';
 import { ASSETS } from '../../lib/assets';
 import { readSessionUser } from '../../lib/auth';
 import { useI18n } from '../../lib/i18n';
+import { mediaUrl } from '../../lib/media';
 import {
   fetchBusinessWallets,
   fetchChannels,
@@ -37,7 +38,7 @@ function usd(n: number) {
 }
 
 function packPhoto(image?: string) {
-  const src = (image || '').trim();
+  const src = mediaUrl(image);
   if (!src || src.includes('currency.webp') || /bac-coin/i.test(src)) return '';
   return src;
 }
@@ -505,7 +506,7 @@ export function ShopPage() {
                       </strong>
                     </div>
                     {wallet.qr_code ? (
-                      <img className="crypto-qr" src={wallet.qr_code} alt="" width={200} height={200} />
+                      <img className="crypto-qr" src={mediaUrl(wallet.qr_code)} alt="" width={200} height={200} />
                     ) : (
                       <p className="sec-muted">{t('shop.cryptoNoQr')}</p>
                     )}

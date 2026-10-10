@@ -210,13 +210,34 @@ function isGenericGameBanner(src: string) {
 }
 
 function isUploadedBanner(src: string) {
-  return src.startsWith('/uploads/') || src.startsWith('http://') || src.startsWith('https://');
+  return (
+    src.startsWith('/uploads/') ||
+    src.startsWith('/api/uploads/') ||
+    src.startsWith('http://') ||
+    src.startsWith('https://')
+  );
+}
+
+function publicUploadUrl(src: string) {
+  const trimmed = src.trim();
+  if (trimmed.startsWith('/api/uploads/')) return trimmed;
+  if (trimmed.startsWith('/uploads/')) return `/api${trimmed}`;
+  if (/^https?:\/\//i.test(trimmed)) {
+    try {
+      const u = new URL(trimmed);
+      if (u.pathname.startsWith('/api/uploads/')) return u.pathname + u.search;
+      if (u.pathname.startsWith('/uploads/')) return `/api${u.pathname}${u.search}`;
+    } catch {
+      return trimmed;
+    }
+  }
+  return trimmed;
 }
 
 /** Per-room art: uploaded banner → map → arena name → map banner URL → mode → game default. */
 export function coverForMatch(match: Pick<MatchItem, 'banner' | 'map' | 'matchName' | 'gameName' | 'teamType' | 'gameMode'>) {
   const remote = (match.banner || '').trim();
-  if (remote && isUploadedBanner(remote)) return remote;
+  if (remote && isUploadedBanner(remote)) return publicUploadUrl(remote);
 
   const fromMap = localMapCover(match.map);
   if (fromMap) return fromMap;
@@ -254,6 +275,7 @@ export function coverForGame(game: {
   banner?: string;
 }) {
   const remote = game.banner || game.image || game.logo || '';
+  if (remote && isUploadedBanner(remote)) return publicUploadUrl(remote);
   if (remote && !isMissingArt(remote) && !remote.startsWith('/covers/')) return remote;
   const key = gameKey(game);
   if (key !== 'arena') return `/covers/${key}.webp?v=5`;

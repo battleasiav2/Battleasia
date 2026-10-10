@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { api, unwrapData, unwrapList, explainError } from '../lib/api';
+import { mediaUrl } from '../lib/media';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
@@ -496,7 +497,7 @@ export function MatchFormPage() {
         {form.banner || form.map ? (
           <div className="map-preview">
             <img
-              src={form.banner || (MAP_ART.has(form.map) ? `/assets/images/map/${form.map}.webp` : '')}
+              src={mediaUrl(form.banner) || (MAP_ART.has(form.map) ? `/assets/images/map/${form.map}.webp` : '')}
               alt={form.map || 'Match banner'}
               onError={(e) => {
                 e.currentTarget.style.display = 'none';

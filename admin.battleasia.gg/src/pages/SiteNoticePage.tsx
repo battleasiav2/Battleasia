@@ -3,6 +3,7 @@ import { Navigate, useOutletContext } from 'react-router-dom';
 import { api, unwrapData, explainError } from '../lib/api';
 import { can } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
+import { mediaUrl } from '../lib/media';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
@@ -203,7 +204,7 @@ export function SiteNoticePage() {
 
             {form.imageUrl ? (
               <div className="notice-admin-preview">
-                <img src={form.imageUrl} alt="" />
+                <img src={mediaUrl(form.imageUrl)} alt="" />
                 <button type="button" className="btn btn-ghost" onClick={() => update('imageUrl', '')}>
                   {t('notice.removeImage')}
                 </button>

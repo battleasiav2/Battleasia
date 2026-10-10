@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { api, unwrapData, unwrapList, explainError } from '../lib/api';
 import { cell, pick, rowId } from '../lib/format';
 import { useI18n } from '../lib/i18n';
+import { mediaUrl } from '../lib/media';
 import { useOutletContext } from 'react-router-dom';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
@@ -93,7 +94,7 @@ export function WalletOpsPage() {
               return (
                 <div key={id} style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
                   {qr ? (
-                    <img src={qr} alt="" width={96} height={96} style={{ objectFit: 'contain', background: '#fff', borderRadius: 8, padding: 6 }} />
+                    <img src={mediaUrl(qr)} alt="" width={96} height={96} style={{ objectFit: 'contain', background: '#fff', borderRadius: 8, padding: 6 }} />
                   ) : (
                     <span className="admin-muted">—</span>
                   )}

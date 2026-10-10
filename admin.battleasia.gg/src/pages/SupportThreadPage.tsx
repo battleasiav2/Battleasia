@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useOutletContext, useParams } from 'react-router-dom';
 import { api, explainError, unwrapList } from '../lib/api';
 import { useI18n } from '../lib/i18n';
+import { mediaUrl } from '../lib/media';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
@@ -97,8 +98,8 @@ export function SupportThreadPage() {
                 {files.length ? (
                   <div className="support-shots">
                     {files.map((url) => (
-                      <a key={url} href={url} target="_blank" rel="noreferrer">
-                        <img src={url} alt="" />
+                      <a key={url} href={mediaUrl(url)} target="_blank" rel="noreferrer">
+                        <img src={mediaUrl(url)} alt="" />
                       </a>
                     ))}
                   </div>

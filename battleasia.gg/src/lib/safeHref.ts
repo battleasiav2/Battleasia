@@ -23,9 +23,7 @@ export function safeHref(raw: unknown, maxLen = 500): string {
 export function safeMediaHref(raw: unknown): string {
   const value = String(raw || '').trim();
   if (!value) return '';
-  if (value.startsWith('/uploads/') && !value.includes('..')) return value;
-  if (value.startsWith('/api/uploads/') && !value.includes('..')) {
-    return value.replace(/^\/api/, '');
-  }
+  if (value.startsWith('/api/uploads/') && !value.includes('..')) return value;
+  if (value.startsWith('/uploads/') && !value.includes('..')) return `/api${value}`;
   return safeHref(value);
 }

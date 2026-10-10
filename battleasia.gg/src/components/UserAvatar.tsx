@@ -8,21 +8,16 @@ export function mediaUrl(src?: string | null) {
   if (/^https?:\/\//i.test(raw)) {
     try {
       const u = new URL(raw);
-      if (
-        u.pathname.startsWith('/uploads/') ||
-        u.pathname.startsWith('/api/uploads/') ||
-        u.pathname.startsWith('/assets/')
-      ) {
-        return u.pathname.startsWith('/api/uploads/')
-          ? u.pathname.replace(/^\/api/, '') + u.search
-          : u.pathname + u.search;
-      }
+      if (u.pathname.startsWith('/api/uploads/')) return u.pathname + u.search;
+      if (u.pathname.startsWith('/uploads/')) return `/api${u.pathname}${u.search}`;
+      if (u.pathname.startsWith('/assets/')) return u.pathname + u.search;
     } catch {
       /* keep absolute */
     }
     return raw;
   }
-  if (raw.startsWith('/api/uploads/')) return raw.replace(/^\/api/, '');
+  if (raw.startsWith('/api/uploads/')) return raw;
+  if (raw.startsWith('/uploads/') && !raw.includes('..')) return `/api${raw}`;
   const path = raw.startsWith('/') ? raw : `/${raw}`;
   if (path.includes('/assets/images/mock/avatar/') && path.endsWith('.webp')) {
     return path.replace(/\.webp$/, '.jpg');

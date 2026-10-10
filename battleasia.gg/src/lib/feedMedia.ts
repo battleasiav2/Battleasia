@@ -39,6 +39,8 @@ export function feedMediaUrl(raw: unknown): string {
   if (LEGACY_ASSET.test(href.split('?')[0]) || /\.png$/i.test(href.split('?')[0])) {
     return pickStockFromLegacy(href);
   }
+  if (href.startsWith('/uploads/') && !href.includes('..')) return `/api${href}`;
+  if (href.startsWith('/api/uploads/')) return href;
   return href;
 }
 

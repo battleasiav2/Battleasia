@@ -1,5 +1,6 @@
 import { useRef, useState, type PointerEvent, type WheelEvent } from 'react';
 import { useI18n } from '../lib/i18n';
+import { mediaUrl } from '../lib/media';
 
 type Props = {
   src: string;
@@ -84,7 +85,7 @@ export function ReceiptLightbox({ src, trx, phone, onClose, onCopy }: Props) {
         onPointerCancel={onUp}
       >
         <img
-          src={src}
+          src={mediaUrl(src)}
           alt={t('lightbox.receipt')}
           draggable={false}
           style={{ transform: `translate(${pos.x}px, ${pos.y}px) scale(${zoom}) rotate(${rot}deg)` }}

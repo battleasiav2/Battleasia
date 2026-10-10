@@ -144,7 +144,7 @@ router.post('/upload/:folder', requireAuth, (req: AuthedRequest, res) => {
       return res.status(400).json({ status: false, message: validationError });
     }
 
-    const url = `/uploads/${folder}/${req.file.filename}`;
+    const url = `/api/uploads/${folder}/${req.file.filename}`;
     return res.status(201).json({
       status: true,
       data: {
@@ -183,7 +183,7 @@ router.post('/upload/:folder/multi', requireAuth, (req: AuthedRequest, res) => {
         continue;
       }
       results.push({
-        url: `/uploads/${folder}/${file.filename}`,
+        url: `/api/uploads/${folder}/${file.filename}`,
         filename: file.filename,
         originalName: file.originalname,
         size: file.size,
