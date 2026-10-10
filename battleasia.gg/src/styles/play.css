@@ -7178,6 +7178,41 @@ a.hist-item-link {
   margin-bottom: 12px;
 }
 
+.ba-room-stat-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.ba-room-stat-row .ba-room-stat {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ba-room-copy {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(212, 232, 42, 0.08);
+  color: var(--ba-accent);
+  cursor: pointer;
+}
+
+.ba-room-copy:hover {
+  background: rgba(212, 232, 42, 0.16);
+  border-color: rgba(212, 232, 42, 0.35);
+}
+
 .ba-room-stat.is-locked {
   color: var(--ba-muted);
   letter-spacing: 0.12em;

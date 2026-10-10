@@ -164,7 +164,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/:id', requireAuth, async (req, res) => {
+router.put('/:id', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -187,7 +187,12 @@ router.put('/:id', requireAuth, async (req, res) => {
 
     if (username) user.username = username;
     if (email) user.email = email.toLowerCase();
-    if (typeof status === 'boolean') user.status = status;
+    if (typeof status === 'boolean') {
+      if (user.role?.type === 'admin' && !status) {
+        return res.status(403).json({ status: false, message: 'Cannot disable admin user' });
+      }
+      user.status = status;
+    }
     if (typeof avatar === 'string') user.avatar = avatar;
     if (typeof countryCode === 'string') user.countryCode = countryCode;
     if (typeof mobileNo === 'string') user.mobileNo = mobileNo;
@@ -199,6 +204,12 @@ router.put('/:id', requireAuth, async (req, res) => {
 
     await user.save();
     const roleDoc = user.roleRef ? await Role.findById(user.roleRef) : null;
+    await writeAudit({
+      actorId: req.userId,
+      action: 'users.update',
+      target: user._id.toString(),
+      detail: user.username,
+    });
     return res.json({ status: true, data: serializeUser(user, roleDoc) });
   } catch (error) {
     console.error('update user error:', error);
@@ -206,14 +217,28 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.patch('/:id/status', requireAuth, async (req, res) => {
+router.patch('/:id/status', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).json({ status: false, message: 'User not found' });
     }
-    user.status = Boolean(req.body.status);
+    const nextStatus = Boolean(req.body.status);
+    const reason = String(req.body.reason || '').trim();
+    if (!nextStatus && user.role?.type === 'admin') {
+      return res.status(403).json({ status: false, message: 'Cannot disable admin user' });
+    }
+    if (!nextStatus && !reason) {
+      return res.status(400).json({ status: false, message: 'Reason required to disable user' });
+    }
+    user.status = nextStatus;
     await user.save();
+    await writeAudit({
+      actorId: req.userId,
+      action: 'users.status',
+      target: user._id.toString(),
+      detail: `${nextStatus ? 'enable' : 'disable'} · ${reason || '—'}`,
+    });
     return res.json({ status: true, data: serializeUser(user) });
   } catch (error) {
     console.error('update status error:', error);
@@ -228,12 +253,20 @@ router.patch('/:id/balance', requireAuth, async (req: AuthedRequest, res) => {
       return res.status(404).json({ status: false, message: 'User not found' });
     }
 
-    const { amount, type } = req.body as { amount?: number; type?: 'deposit' | 'withdraw' };
+    const { amount, type, note } = req.body as {
+      amount?: number;
+      type?: 'deposit' | 'withdraw';
+      note?: string;
+    };
     if (!amount || amount <= 0 || !type) {
       return res.status(400).json({ status: false, message: 'Valid amount and type are required' });
     }
+    if (user.role?.type === 'admin' && type === 'withdraw') {
+      return res.status(403).json({ status: false, message: 'Cannot debit admin balance from here' });
+    }
 
     const admin = req.userId ? await User.findById(req.userId) : null;
+    const adminNote = String(note || '').trim();
     const balanceBefore = user.balance ?? 0;
 
     if (type === 'deposit') {
@@ -257,7 +290,15 @@ router.patch('/:id/balance', requireAuth, async (req: AuthedRequest, res) => {
       detail: {
         reason: 'admin_adjustment',
         adminName: admin?.username || 'Admin',
+        note: adminNote || undefined,
       },
+    });
+
+    await writeAudit({
+      actorId: req.userId,
+      action: 'users.balance',
+      target: user._id.toString(),
+      detail: `${type} ${amount}${adminNote ? ` · ${adminNote}` : ''}`,
     });
 
     await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
@@ -288,7 +329,7 @@ router.patch('/:id/balance', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -297,7 +338,14 @@ router.delete('/:id', requireAuth, async (req, res) => {
     if (user.role?.type === 'admin') {
       return res.status(403).json({ status: false, message: 'Cannot delete admin user' });
     }
+    const label = `${user.username} (${user.email})`;
     await user.deleteOne();
+    await writeAudit({
+      actorId: req.userId,
+      action: 'users.delete',
+      target: String(req.params.id),
+      detail: label,
+    });
     return res.json({ status: true, message: 'User deleted' });
   } catch (error) {
     console.error('delete user error:', error);

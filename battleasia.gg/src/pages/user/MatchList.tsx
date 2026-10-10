@@ -93,6 +93,20 @@ export function MatchListPage() {
 
   const filtered = useMemo(() => applyMatchFilter(matches || [], filter), [matches, filter]);
 
+  const copyRoomField = useCallback(
+    async (text: string) => {
+      const value = text.trim();
+      if (!value || value === '—') return;
+      try {
+        await httpCopy(value);
+        toast(t('match.roomCopied'));
+      } catch {
+        toast(t('play.copied'));
+      }
+    },
+    [t, toast],
+  );
+
   useEffect(() => {
     selectedRef.current = selected;
   }, [selected]);
@@ -521,20 +535,62 @@ export function MatchListPage() {
                       <div className="ba-room-stats ba-room-stats-room">
                         <div>
                           <label>{t('match.roomIdLabel')}</label>
-                          <div
-                            className={`ba-room-stat${match.isJoined ? '' : ' is-locked'}`}
-                            title={match.isJoined ? roomIdDisplay : t('match.roomHidden')}
-                          >
-                            {roomIdDisplay}
+                          <div className="ba-room-stat-row">
+                            <div
+                              className={`ba-room-stat${match.isJoined ? '' : ' is-locked'}`}
+                              title={match.isJoined ? roomIdDisplay : t('match.roomHidden')}
+                            >
+                              {roomIdDisplay}
+                            </div>
+                            {match.isJoined && roomIdDisplay !== '—' ? (
+                              <button
+                                type="button"
+                                className="ba-room-copy"
+                                aria-label={t('match.copyId')}
+                                title={t('match.copyId')}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  void copyRoomField(roomIdDisplay);
+                                }}
+                              >
+                                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden>
+                                  <path
+                                    fill="currentColor"
+                                    d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                                  />
+                                </svg>
+                              </button>
+                            ) : null}
                           </div>
                         </div>
                         <div>
                           <label>{t('match.passLabel')}</label>
-                          <div
-                            className={`ba-room-stat${match.isJoined ? '' : ' is-locked'}`}
-                            title={match.isJoined ? passDisplay : t('match.roomHidden')}
-                          >
-                            {passDisplay}
+                          <div className="ba-room-stat-row">
+                            <div
+                              className={`ba-room-stat${match.isJoined ? '' : ' is-locked'}`}
+                              title={match.isJoined ? passDisplay : t('match.roomHidden')}
+                            >
+                              {passDisplay}
+                            </div>
+                            {match.isJoined && passDisplay !== '—' ? (
+                              <button
+                                type="button"
+                                className="ba-room-copy"
+                                aria-label={t('match.copyPass')}
+                                title={t('match.copyPass')}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  void copyRoomField(passDisplay);
+                                }}
+                              >
+                                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden>
+                                  <path
+                                    fill="currentColor"
+                                    d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"
+                                  />
+                                </svg>
+                              </button>
+                            ) : null}
                           </div>
                         </div>
                       </div>

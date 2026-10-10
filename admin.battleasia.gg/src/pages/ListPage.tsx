@@ -249,6 +249,7 @@ export function ListPage() {
                 ))}
                 {location.pathname === '/games/matches' ? <th>{t('list.result')}</th> : null}
                 {location.pathname === '/games/list' ? <th>{t('list.edit')}</th> : null}
+                {location.pathname === '/users/list' ? <th>{t('list.edit')}</th> : null}
                 {location.pathname === '/customer-support/list' ? <th>{t('list.open')}</th> : null}
               </tr>
             </thead>
@@ -273,6 +274,11 @@ export function ListPage() {
                     {location.pathname === '/games/list' && id ? (
                       <td>
                         <Link to={`/games/list/${id}/edit`}>{t('list.edit')}</Link>
+                      </td>
+                    ) : null}
+                    {location.pathname === '/users/list' && id ? (
+                      <td>
+                        <Link to={`/users/list/${id}/edit`}>{t('list.edit')}</Link>
                       </td>
                     ) : null}
                     {location.pathname === '/customer-support/list' && id ? (

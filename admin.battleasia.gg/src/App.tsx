@@ -45,6 +45,7 @@ const SupportInboxPage = lazy(() => import('./pages/SupportInboxPage').then((m) 
 const IntegrityPage = lazy(() => import('./pages/IntegrityPage').then((m) => ({ default: m.IntegrityPage })));
 const FlagsPage = lazy(() => import('./pages/FlagsPage').then((m) => ({ default: m.FlagsPage })));
 const ProfilePage = lazy(() => import('./pages/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const UserEditPage = lazy(() => import('./pages/UserEditPage').then((m) => ({ default: m.UserEditPage })));
 const ForbiddenPage = lazy(() => import('./pages/StatusPages').then((m) => ({ default: m.ForbiddenPage })));
 const NotFoundPage = lazy(() => import('./pages/StatusPages').then((m) => ({ default: m.NotFoundPage })));
 
@@ -92,6 +93,7 @@ export default function App() {
             <Route path="/payments/deposit" element={<PaymentsPage />} />
             <Route path="/payments/withdrawal" element={<PaymentsPage />} />
             <Route path="/users/premium" element={<PremiumSettingsPage />} />
+            <Route path="/users/list/:id/edit" element={<UserEditPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/system/site-notice" element={<SiteNoticePage />} />
             <Route path="/games/list/new" element={<GameFormPage />} />

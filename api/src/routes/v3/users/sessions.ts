@@ -10,7 +10,10 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const now = new Date();
     const filter: Record<string, unknown> = { expiration: { $gt: now } };
-    if (String(req.query.mine || '') === '1' && req.userId) {
+    const userId = String(req.query.userId || '').trim();
+    if (userId) {
+      filter.userId = userId;
+    } else if (String(req.query.mine || '') === '1' && req.userId) {
       filter.userId = req.userId;
     }
     const sessions = await Session.find(filter).sort({ createdAt: -1 });
@@ -51,10 +54,16 @@ router.delete('/all', requireAuth, async (_req, res) => {
   }
 });
 
-router.delete('/user/:userId', requireAuth, async (req, res) => {
+router.delete('/user/:userId', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const result = await Session.deleteMany({ userId: req.params.userId });
     await User.updateOne({ _id: req.params.userId }, { $inc: { tokenVersion: 1 } });
+    await writeAudit({
+      actorId: req.userId,
+      action: 'session.revoke-all',
+      target: String(req.params.userId),
+      detail: String(result.deletedCount),
+    });
     return res.json({ status: true, message: `Logged out ${result.deletedCount} sessions` });
   } catch (error) {
     console.error('logout user error:', error);

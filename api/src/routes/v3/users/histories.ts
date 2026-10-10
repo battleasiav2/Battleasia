@@ -16,6 +16,9 @@ router.get('/', requireAuth, async (req, res) => {
       ...buildSearchFilter(search, ['username', 'email', 'ip', 'country']),
     };
 
+    const userId = String(req.query.userId || '').trim();
+    if (userId) filter.userId = userId;
+
     if (startDate || endDate) {
       filter.createdAt = {};
       if (startDate) (filter.createdAt as Record<string, Date>).$gte = startDate;

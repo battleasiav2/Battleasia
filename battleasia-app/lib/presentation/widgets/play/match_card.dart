@@ -1,5 +1,6 @@
-﻿import 'package:easy_localization/easy_localization.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/match_cover_utils.dart';
@@ -45,6 +46,19 @@ class MatchCard extends StatefulWidget {
 }
 
 class _MatchCardState extends State<MatchCard> {
+  void _copyField(String raw) {
+    final value = raw.trim();
+    if (value.isEmpty || value == '—') return;
+    Clipboard.setData(ClipboardData(text: value));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('match.roomCopied'.tr()),
+        duration: const Duration(seconds: 2),
+        backgroundColor: AppColors.gold.withValues(alpha: 0.92),
+      ),
+    );
+  }
+
   String _nonEmpty(String? value) {
     final trimmed = value?.trim() ?? '';
     return trimmed.isEmpty ? '—' : trimmed;
@@ -311,6 +325,8 @@ class _MatchCardState extends State<MatchCard> {
                               label: 'match.roomIdLabel'.tr(),
                               value: roomIdText,
                               muted: !widget.isJoined,
+                              copyValue: widget.isJoined ? roomIdText : null,
+                              onCopy: widget.isJoined ? () => _copyField(roomIdText) : null,
                             ),
                           ),
                           Expanded(
@@ -318,6 +334,8 @@ class _MatchCardState extends State<MatchCard> {
                               label: 'match.passLabel'.tr(),
                               value: passText,
                               muted: !widget.isJoined,
+                              copyValue: widget.isJoined ? passText : null,
+                              onCopy: widget.isJoined ? () => _copyField(passText) : null,
                             ),
                           ),
                         ],
@@ -410,6 +428,8 @@ class _Stat extends StatelessWidget {
   final bool accent;
   final bool muted;
   final double? bar;
+  final String? copyValue;
+  final VoidCallback? onCopy;
 
   const _Stat({
     required this.label,
@@ -418,6 +438,8 @@ class _Stat extends StatelessWidget {
     this.accent = false,
     this.muted = false,
     this.bar,
+    this.copyValue,
+    this.onCopy,
   });
 
   @override
@@ -458,6 +480,28 @@ class _Stat extends StatelessWidget {
               Text(
                 ' $total',
                 style: TextStyle(color: Colors.white.withValues(alpha: 0.45), fontSize: 11, fontWeight: FontWeight.w500),
+              ),
+            if (onCopy != null &&
+                copyValue != null &&
+                copyValue!.trim().isNotEmpty &&
+                copyValue != '—')
+              Padding(
+                padding: const EdgeInsets.only(left: 4),
+                child: Material(
+                  color: AppColors.gold.withValues(alpha: 0.08),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(color: AppColors.gold.withValues(alpha: 0.35)),
+                  ),
+                  child: InkWell(
+                    onTap: onCopy,
+                    borderRadius: BorderRadius.circular(8),
+                    child: const Padding(
+                      padding: EdgeInsets.all(6),
+                      child: Icon(Icons.copy, size: 14, color: AppColors.gold),
+                    ),
+                  ),
+                ),
               ),
           ],
         ),
