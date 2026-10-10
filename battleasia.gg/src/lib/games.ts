@@ -35,6 +35,8 @@ export type MatchItem = {
   status?: string;
   isJoined?: boolean;
   gameMode?: string;
+  roomId?: string;
+  password?: string;
 };
 
 export type MatchDetail = MatchItem & {
