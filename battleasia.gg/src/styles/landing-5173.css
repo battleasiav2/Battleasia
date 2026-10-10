@@ -641,7 +641,7 @@ html[lang="bn"] .ba5173{
 .ba5173 .pay-badge{border:1px solid rgba(255,255,255,.1);padding:7px 9px;border-radius:4px;color:#a9abb0}
 .ba5173 .footer-bottom{border-top:1px solid rgba(255,255,255,.07);padding-top:18px;display:flex;justify-content:space-between;color:#656871;font:9px var(--app-font-mono),monospace}
 .ba5173 .social-links{display:flex;gap:11px}
-.ba5173 .social-links button{width:32px;height:32px;border:1px solid var(--line);background:transparent;color:#aaa;border-radius:50%;display:grid;place-items:center}
+.ba5173 .social-links button,.ba5173 .social-links a{width:32px;height:32px;border:1px solid var(--line);background:transparent;color:#aaa;border-radius:50%;display:grid;place-items:center;text-decoration:none}
 .ba5173 .float-actions{position:fixed;right:22px;bottom:22px;z-index:40;display:flex;flex-direction:column;gap:9px}
 .ba5173 .float-btn{width:48px;height:48px;border:1px solid rgba(255,255,255,.18);border-radius:50%;background:#171a1d;color:#eee;display:grid;place-items:center;box-shadow:0 8px 30px rgba(0,0,0,.35);transition:.2s}
 .ba5173 .float-btn:hover{transform:translateY(-3px);border-color:var(--accent-color)}
@@ -649,7 +649,7 @@ html[lang="bn"] .ba5173{
 .ba5173 .chat-fab-badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#ef4444;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none}
 .ba5173 .social-pop{position:absolute;right:57px;bottom:0;display:flex;gap:6px;transform:scale(.8);opacity:0;pointer-events:none;transform-origin:right center;transition:.2s}
 .ba5173 .social-pop.open{transform:scale(1);opacity:1;pointer-events:auto}
-.ba5173 .social-pop button{height:38px;width:38px;border-radius:50%;background:#1b1e21;color:#eee;border:1px solid var(--line)}
+.ba5173 .social-pop button,.ba5173 .social-pop a{height:38px;width:38px;border-radius:50%;background:#1b1e21;color:#eee;border:1px solid var(--line);display:grid;place-items:center;text-decoration:none}
 .ba5173 .chat-panel{position:fixed;right:24px;bottom:82px;width:min(340px,calc(100vw - 32px));background:#14171b;border:1px solid var(--line);border-radius:14px;z-index:48;box-shadow:0 20px 70px #0009;overflow:hidden;transform:translateY(16px);opacity:0;pointer-events:none;transition:.25s}
 .ba5173 .chat-panel.open{transform:translateY(0);opacity:1;pointer-events:auto}
 .ba5173 .chat-head{padding:16px 17px;background:#1a1e21;display:flex;justify-content:space-between;align-items:center}

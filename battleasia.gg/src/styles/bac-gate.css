@@ -51,6 +51,28 @@
   line-height: 1.6;
 }
 
+.bac-gate-domain {
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-radius: 12px;
+  background: rgba(212, 232, 42, 0.06);
+  border: 1px solid rgba(212, 232, 42, 0.22);
+}
+
+.bac-gate-domain strong {
+  display: block;
+  font-size: 13px;
+  margin-bottom: 4px;
+  color: var(--ba-text);
+}
+
+.bac-gate-domain span {
+  display: block;
+  font-size: 12px;
+  color: var(--ba-muted);
+  line-height: 1.5;
+}
+
 .bac-gate-card {
   padding: 10px;
   border-radius: 18px;

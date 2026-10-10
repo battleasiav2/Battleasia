@@ -30,8 +30,16 @@ import { estimateMatchWinningPool, fetchGames, fetchMatches } from '../lib/games
 import { useI18n } from '../lib/i18n';
 import { captureReferral } from '../lib/ref';
 import { LANDING_LANG, landingText, readLandingLocale, type LandingLocale } from './landing5173-text';
+import { FALLBACK_SITE_SOCIALS, fetchSiteSocialLinks, type SiteSocialLink } from '../lib/siteSocials';
 
 type Locale = LandingLocale;
+
+function socialHref(links: SiteSocialLink[], needle: string) {
+  const hit = links.find((l) => l.label.toLowerCase().includes(needle));
+  if (hit?.href) return hit.href;
+  const fb = FALLBACK_SITE_SOCIALS.find((l) => l.label.toLowerCase().includes(needle));
+  return fb?.href || 'https://battleasia.gg';
+}
 
 const DownloadIcon = ArrowDownRight;
 const LANG_OPTIONS: { id: Locale; code: string; label: string; flag: string }[] = [
@@ -651,6 +659,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
   const [socialOpen, setSocialOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const { count: supportUnread, markRead: markSupportRead } = usePlayerSupportUnread(logged);
+  const [socialLinks, setSocialLinks] = useState<SiteSocialLink[]>(FALLBACK_SITE_SOCIALS);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -712,6 +721,10 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
 
   useFlipRows(podiumRef, leaderOrder);
   useFlipRows(chasingRef, leaderOrder);
+
+  useEffect(() => {
+    void fetchSiteSocialLinks().then(setSocialLinks);
+  }, []);
 
   const holdRail = (ms = 4000) => { railHoldUntil.current = Date.now() + ms; };
 
@@ -1359,7 +1372,11 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
       <footer className="footer">
         <div className="wrap">
           <div className="footer-main">
-            <div className="footer-brand"><a href="#home" className="brand" onClick={(e)=>{e.preventDefault();anchor('home')}}><BrandLogo /><span>Battle Asia</span></a><p>Mobile tournaments for the players who show up. Bangladesh and across Asia.</p><div className="social-links"><button aria-label="Facebook" onClick={() => notify('Facebook community link is coming soon.')}><span>f</span></button><button aria-label="Discord" onClick={() => notify('Discord invite is coming soon.')}><MessageCircle size={14}/></button><button aria-label="YouTube" onClick={() => notify('YouTube channel is coming soon.')}><span>▶</span></button></div></div>
+            <div className="footer-brand"><a href="#home" className="brand" onClick={(e)=>{e.preventDefault();anchor('home')}}><BrandLogo /><span>Battle Asia</span></a><p>Mobile tournaments for the players who show up. Bangladesh and across Asia.</p><div className="social-links">
+                <a href={socialHref(socialLinks, 'facebook')} target="_blank" rel="noopener noreferrer" aria-label="Facebook"><span>f</span></a>
+                <a href={socialHref(socialLinks, 'discord')} target="_blank" rel="noopener noreferrer" aria-label="Discord"><MessageCircle size={14}/></a>
+                <a href={socialHref(socialLinks, 'youtube')} target="_blank" rel="noopener noreferrer" aria-label="YouTube"><span>▶</span></a>
+              </div></div>
             <div className="footer-col"><h4>Support</h4><div className="footer-links"><a href="mailto:support@battleasia.gg">Contact support</a><a href="#rules" onClick={(e)=>{e.preventDefault();anchor('rules')}}>FAQ</a><a href="#rules" onClick={(e)=>{e.preventDefault();anchor('rules')}}>Fair play policy</a></div></div>
             <div className="footer-col"><h4>Legal</h4><div className="footer-links"><Link to="/terms-and-conditions">Terms of service</Link><Link to="/privacy-policy">Privacy policy</Link></div></div>
             <div className="footer-col"><h4>Explore</h4><div className="footer-links"><a href="#play" onClick={(e)=>{e.preventDefault();anchor('play')}}>Games</a><a href="#how-to-play" onClick={(e)=>{e.preventDefault();anchor('how-to-play')}}>Tournament modes</a><a href="#home" onClick={(e)=>{e.preventDefault();anchor('home')}}>Back to top ↑</a></div></div>
@@ -1370,7 +1387,11 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
       </footer>
 
       <div className="float-actions">
-        <div className={`social-pop ${socialOpen?'open':''}`}><button aria-label="Facebook" onClick={()=>notify('Facebook community link is coming soon.')}>f</button><button aria-label="Discord" onClick={()=>notify('Discord invite is coming soon.')}><MessageCircle size={15}/></button><button aria-label="YouTube" onClick={()=>notify('YouTube channel is coming soon.')}>▶</button></div>
+        <div className={`social-pop ${socialOpen?'open':''}`}>
+          <a href={socialHref(socialLinks, 'facebook')} target="_blank" rel="noopener noreferrer" aria-label="Facebook">f</a>
+          <a href={socialHref(socialLinks, 'discord')} target="_blank" rel="noopener noreferrer" aria-label="Discord"><MessageCircle size={15}/></a>
+          <a href={socialHref(socialLinks, 'youtube')} target="_blank" rel="noopener noreferrer" aria-label="YouTube">▶</a>
+        </div>
         <button className="float-btn" aria-label="Social links" onClick={() => setSocialOpen(!socialOpen)}>{socialOpen?<X size={18}/>:<Sparkles size={17}/>}</button>
         <button
           className="float-btn chat"

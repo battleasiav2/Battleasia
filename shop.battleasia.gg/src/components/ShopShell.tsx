@@ -228,6 +228,9 @@ function ShopChrome() {
           </button>
         </div>
       </header>
+      <p className="shop-domain-hint" role="note">
+        <strong>{t('shop.domainHint')}</strong> {t('shop.domainHintLead')}
+      </p>
       <NoticeDrawer open={notesOpen} onClose={() => setNotesOpen(false)} onCount={setAlerts} />
       {navOpen
         ? createPortal(

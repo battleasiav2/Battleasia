@@ -275,6 +275,8 @@
   "wd.request": "পেআউট রিকোয়েস্ট",
   "wd.none": "কোনো উইথড্র নেই",
   "wd.confirmLead": "অ্যাডমিন বা Coingo এই পেআউট প্রসেস করবে।",
+  "shop.domainHint": "BAC মানি হাব",
+  "shop.domainHintLead": "ডিপোজিট, ট্রান্সফার ও উইথড্র shop.battleasia.gg-এ — arena-র মতো একই অ্যাকাউন্ট, নিরাপত্তার জন্য আলাদা সাইন-ইন।",
   "shop.fiat": "ফিয়াট",
   "shop.submitN": "ডিপোজিট জমা",
   "xfer.gets": "প্রাপক পাবে",

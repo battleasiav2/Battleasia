@@ -100,6 +100,10 @@ export function ShopPage() {
           </div>
         </section>
         <div className="bac-gate-panel">
+          <div className="bac-gate-domain" role="note">
+            <strong>{t('shop.onShopDomain')}</strong>
+            <span>{t('shop.onShopDomainLead')}</span>
+          </div>
           <ul className="bac-facts">
             {facts.map(([title, body]) => (
               <li key={title}><b>{t(title)}</b><span>{t(body)}</span></li>

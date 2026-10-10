@@ -15,6 +15,7 @@ import 'package:battleasia_app/presentation/widgets/common/glass_stat_tile.dart'
 import 'package:battleasia_app/presentation/widgets/shop/shop_item_card.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_buy_flow.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_domain_hint.dart';
 
 /// Native BAC store — list + filters + buy, matching web shop.battleasia.gg.
 class ShopScreen extends StatefulWidget {
@@ -282,6 +283,8 @@ class _ShopScreenState extends State<ShopScreen> with WidgetsBindingObserver {
                           height: 1.35,
                         ),
                       ),
+                      const SizedBox(height: 12),
+                      const ShopDomainHint(),
                       const SizedBox(height: 14),
                       _buildStats(balance),
                       if (screenWidth < 900 || _loading) ...[

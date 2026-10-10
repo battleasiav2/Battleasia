@@ -136,6 +136,8 @@
     "seen": "রিপ্লাই হয়েছে"
   },
   "wallet": {
+    "arenaShopHint": "ডিপোজিট ও উইথড্র",
+    "arenaShopHintLead": "BAC কিনতে, পেমেন্ট প্রুফ দিতে, ট্রান্সফার ও উইথড্র করতে নিচের Shop ট্যাব খুলুন। ম্যাচ এন্ট্রিতে একই ব্যালেন্স।",
     "paymentChannel": "পেমেন্ট চ্যানেল",
     "requestWithdrawal": "উইথড্রয়াল অনুরোধ",
     "totalBalance": "মোট ব্যালেন্স",
@@ -271,7 +273,9 @@
     "tabTransfer": "ট্রান্সফার",
     "tabWithdraw": "উইথড্র",
     "signInTitle": "BAC স্টোরে সাইন ইন",
-    "signInDesc": "শপে আপনার BattleAsia লগইন লাগে। ইমেইল ও পাসওয়ার্ড সেভ থাকবে যাতে বারবার লিখতে না হয়।",
+    "signInDesc": "শপ ও ওয়ালেট ট্যাবে BAC প্যাক, ডিপোজিট, ট্রান্সফার ও উইথড্র। একই BattleAsia অ্যাকাউন্ট — এই সেকশনে দ্রুত রি-সাইন-ইন।",
+    "domainHint": "BAC মানি হাব",
+    "domainHintLead": "প্যাক কিনুন, প্রুফ দিয়ে ডিপোজিট, বন্ধুকে ট্রান্সফার ও উইথড্র এখানেই। প্লে ট্যাবে ম্যাচ এন্ট্রির জন্য একই ব্যালেন্স।",
     "heroTitle": "BAC COIN SHOP",
     "heroSubtitle": "Secure payments • Instant BAC delivery after approval",
     "goToBacShop": "BAC শপে যান",

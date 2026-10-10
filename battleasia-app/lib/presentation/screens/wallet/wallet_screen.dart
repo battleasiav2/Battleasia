@@ -16,6 +16,7 @@ import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/withdraw_sheet.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/wallet_section_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/wallet_earn_panel.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_domain_hint.dart';
 
 class WalletScreen extends StatefulWidget {
   /// When opened from the store section tabs (Shop / Wallet / Withdraw).
@@ -480,6 +481,13 @@ class _WalletScreenState extends State<WalletScreen> {
                       return Column(
                         children: [
                           SizedBox(height: spacing16),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: ShopDomainHint(
+                              titleKey: widget.fromShop ? 'shop.domainHint' : 'wallet.arenaShopHint',
+                              bodyKey: widget.fromShop ? 'shop.domainHintLead' : 'wallet.arenaShopHintLead',
+                            ),
+                          ),
                           WalletSectionTabs(
                             activeTab: _sectionTab,
                             onChanged: (tab) => setState(() => _sectionTab = tab),

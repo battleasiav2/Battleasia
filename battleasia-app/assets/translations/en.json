@@ -254,6 +254,8 @@
     "seen": "Replied"
   },
   "wallet": {
+    "arenaShopHint": "Deposits & withdraw",
+    "arenaShopHintLead": "Open the Shop tab (bottom nav) to buy BAC, upload payment proof, transfer, and withdraw. Match entry uses this same balance.",
     "paymentChannel": "Payment Channel",
     "requestWithdrawal": "Request Withdrawal",
     "totalBalance": "Total Balance",
@@ -397,7 +399,9 @@
     "tabTransfer": "Transfer",
     "tabWithdraw": "Withdraw",
     "signInTitle": "Sign in to BAC Store",
-    "signInDesc": "Shop uses your BattleAsia login. Email and password stay saved so you don't type them every visit.",
+    "signInDesc": "Shop & Wallet tabs handle BAC packs, deposits, transfer, and withdraw. Same BattleAsia account — quick re-sign-in for this section.",
+    "domainHint": "BAC money hub",
+    "domainHintLead": "Buy packs, deposit with proof, transfer to friends, and withdraw here. Play tab uses the same balance for match entry.",
     "heroTitle": "BAC COIN SHOP",
     "heroSubtitle": "Secure payments • Instant BAC delivery after approval",
     "goToBacShop": "Go to BAC Shop",

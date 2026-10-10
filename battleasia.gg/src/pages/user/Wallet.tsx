@@ -23,6 +23,7 @@ export function WalletPage() {
         </div>
       </header>
       <section className="room-card shop-hub-links">
+        <p className="play-lead">{t('shop.onShopDomainLead')}</p>
         <p>{t('wallet.redirecting')}</p>
         <div className="shop-hub-link-row">
           <button type="button" className="btn btn-primary" onClick={() => openBacShop('wallet')}>
