@@ -3,89 +3,67 @@ import { FilePick } from '../../components/FilePick';
 import { useHudPage } from '../../hooks/useHudPage';
 import { isApiError } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
+import { usePlayerSupportUnread } from '../../hooks/usePlayerSupportUnread';
 import {
   closeSupportTicket,
   createSupportTicket,
   fetchMySupportTickets,
   fetchSupportMessages,
+  markSupportChatRead,
   sendSupportMessage,
   uploadSupportImages,
   type SupportMessage,
   type SupportTicket,
 } from '../../lib/social';
+import { getAuthedSocket } from '../../lib/socket';
 
 type ViewMode = 'list' | 'create' | 'detail';
 type TicketCategory = 'payment' | 'match' | 'account' | 'other';
 type StatusFilter = 'all' | 'open' | 'pending' | 'closed';
 
-const CHANNELS: Array<{
+const CHANNEL_META: Array<{
   category: TicketCategory;
-  title: string;
+  titleKey: string;
   code: string;
-  desc: string;
-  badge: string;
+  descKey: string;
+  badgeKey: string;
   accent: string;
 }> = [
   {
     category: 'payment',
-    title: 'BAC Escrow & Payouts',
+    titleKey: 'support.ch.payment.title',
     code: 'CHANNEL_PAY_01',
-    desc: 'Deposits, withdrawals, wallet balances, and escrow disputes.',
-    badge: 'RAPID QUEUE',
+    descKey: 'support.ch.payment.desc',
+    badgeKey: 'support.ch.payment.badge',
     accent: '#f59e0b',
   },
   {
     category: 'match',
-    title: 'Match Disputes & Fair Play',
+    titleKey: 'support.ch.match.title',
     code: 'CHANNEL_TAC_02',
-    desc: 'Score arbitration, disconnect refunds, and anti-cheat appeals.',
-    badge: 'REFEREE',
+    descKey: 'support.ch.match.desc',
+    badgeKey: 'support.ch.match.badge',
     accent: '#ef4444',
   },
   {
     category: 'account',
-    title: 'Account & Security',
+    titleKey: 'support.ch.account.title',
     code: 'CHANNEL_SEC_03',
-    desc: 'Login recovery, 2FA, profile, and game UID linking.',
-    badge: 'SECURE',
+    descKey: 'support.ch.account.desc',
+    badgeKey: 'support.ch.account.badge',
     accent: '#38bdf8',
   },
   {
     category: 'other',
-    title: 'VIP Hotline',
+    titleKey: 'support.ch.other.title',
     code: 'CHANNEL_VIP_04',
-    desc: 'General questions, partnerships, and live Discord support.',
-    badge: 'DIRECT',
+    descKey: 'support.ch.other.desc',
+    badgeKey: 'support.ch.other.badge',
     accent: '#34d399',
   },
 ];
 
-const FAQ = [
-  {
-    id: 'faq-1',
-    tag: 'PAYOUTS',
-    q: 'How fast are BAC deposits and withdrawals?',
-    a: 'Deposits usually credit within seconds after confirmation. Withdrawals go through a short security check and typically land within a few minutes.',
-  },
-  {
-    id: 'faq-2',
-    tag: 'MATCH',
-    q: 'How do I dispute a match result?',
-    a: 'Open a Match channel ticket within 15 minutes of the match ending. Include the match ID and screenshots or video of the final score.',
-  },
-  {
-    id: 'faq-3',
-    tag: 'FAIR PLAY',
-    q: 'What anti-cheat rules apply?',
-    a: 'Emulators where banned, injected tools, and account sharing can void a match and ban the account. Report with proof via Support.',
-  },
-  {
-    id: 'faq-4',
-    tag: 'PLATFORMS',
-    q: 'Can I play on mobile and PC?',
-    a: 'Mobile tournaments require native Android/iOS. PC titles use verified desktop clients. Queues stay segregated for fair play.',
-  },
-] as const;
+const FAQ_IDS = ['faq-1', 'faq-2', 'faq-3', 'faq-4'] as const;
 
 function whenLabel(value?: string) {
   if (!value) return '';
@@ -103,6 +81,27 @@ function attachUrl(item: { url?: string } | string) {
 
 export function CustomerSupportPage() {
   const { t } = useI18n();
+  const { refresh: refreshSupportUnread } = usePlayerSupportUnread();
+  const channels = useMemo(
+    () =>
+      CHANNEL_META.map((ch) => ({
+        ...ch,
+        title: t(ch.titleKey),
+        desc: t(ch.descKey),
+        badge: t(ch.badgeKey),
+      })),
+    [t],
+  );
+  const faq = useMemo(
+    () =>
+      FAQ_IDS.map((id) => ({
+        id,
+        tag: t(`support.faq.${id}.tag`),
+        q: t(`support.faq.${id}.q`),
+        a: t(`support.faq.${id}.a`),
+      })),
+    [t],
+  );
   const chatRef = useRef<HTMLInputElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
   const { toast } = useHudPage({
@@ -157,6 +156,56 @@ export function CustomerSupportPage() {
     logRef.current?.scrollTo({ top: logRef.current.scrollHeight });
   }, [rows, view]);
 
+  useEffect(() => {
+    if (view !== 'list') return;
+    let leave: (() => void) | undefined;
+    getAuthedSocket().then((sock) => {
+      if (!sock) return;
+      const onUnread = () => {
+        void loadTickets();
+        void refreshSupportUnread();
+      };
+      const onMsg = (msg: SupportMessage) => {
+        if (msg.isAdmin) onUnread();
+      };
+      sock.on('support-player-unread', onUnread);
+      sock.on('new-message', onMsg);
+      leave = () => {
+        sock.off('support-player-unread', onUnread);
+        sock.off('new-message', onMsg);
+      };
+    });
+    return () => leave?.();
+  }, [view, loadTickets, refreshSupportUnread]);
+
+  useEffect(() => {
+    if (view !== 'detail' || !selected?.id) return;
+    let leave: (() => void) | undefined;
+    const cid = selected.id;
+    getAuthedSocket().then((sock) => {
+      if (!sock) return;
+      sock.emit('join-conversation', cid);
+      const onMsg = (msg: SupportMessage) => {
+        const id = msg.id || (msg as { _id?: string })._id || '';
+        setRows((prev) => {
+          if (prev.some((row) => row.id === id)) return prev;
+          return [...prev, msg];
+        });
+        if (msg.isAdmin) {
+          setTickets((prev) =>
+            prev?.map((row) => (row.id === cid ? { ...row, unreadCount: 0, lastFrom: 'admin' } : row)) ?? prev,
+          );
+        }
+      };
+      sock.on('new-message', onMsg);
+      leave = () => {
+        sock.emit('leave-conversation', cid);
+        sock.off('new-message', onMsg);
+      };
+    });
+    return () => leave?.();
+  }, [view, selected?.id]);
+
   async function openTicket(ticket: SupportTicket) {
     setSelected(ticket);
     setView('detail');
@@ -165,6 +214,11 @@ export function CustomerSupportPage() {
     setRows([]);
     try {
       setRows(await fetchSupportMessages(ticket.id));
+      await markSupportChatRead(ticket.id);
+      void refreshSupportUnread();
+      setTickets((prev) =>
+        prev?.map((row) => (row.id === ticket.id ? { ...row, unreadCount: 0 } : row)) ?? prev,
+      );
     } catch (err) {
       toast(isApiError(err) ? err.message : t('support.offline'));
     }
@@ -250,7 +304,7 @@ export function CustomerSupportPage() {
               </span>
             </div>
             <div className="support-channel-grid">
-              {CHANNELS.map((ch) => (
+              {channels.map((ch) => (
                 <button
                   key={ch.category}
                   type="button"
@@ -325,7 +379,7 @@ export function CustomerSupportPage() {
               </button>
             </div>
             <div className="support-faq-list">
-              {FAQ.map((item) => {
+              {faq.map((item) => {
                 const openFaq = faqOpen === item.id;
                 return (
                   <details
@@ -362,7 +416,7 @@ export function CustomerSupportPage() {
           <label className="field">
             <span>{t('support.category')}</span>
             <select value={category} onChange={(e) => setCategory(e.target.value as TicketCategory)}>
-              {CHANNELS.map((ch) => (
+              {channels.map((ch) => (
                 <option key={ch.category} value={ch.category}>
                   {ch.title}
                 </option>

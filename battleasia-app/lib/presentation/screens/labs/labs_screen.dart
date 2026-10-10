@@ -87,8 +87,43 @@ class _LabsScreenState extends State<LabsScreen> {
               const SizedBox(height: 12),
               if (_loading)
                 Center(child: CircularProgressIndicator(color: AppColors.gold, strokeWidth: 2))
-              else if (spec == null)
-                ..._labs.map((row) => _labTile(row))
+              else if (spec == null) ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF161618),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'labs.shipTitle'.tr(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 17,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'labs.shipLead'.tr(),
+                        style: const TextStyle(color: Colors.white70, height: 1.45, fontSize: 14),
+                      ),
+                      const SizedBox(height: 10),
+                      Text('1. ${'labs.shipStep1'.tr()}', style: const TextStyle(color: Colors.white60, fontSize: 13)),
+                      const SizedBox(height: 4),
+                      Text('2. ${'labs.shipStep2'.tr()}', style: const TextStyle(color: Colors.white60, fontSize: 13)),
+                      const SizedBox(height: 4),
+                      Text('3. ${'labs.shipStep3'.tr()}', style: const TextStyle(color: Colors.white60, fontSize: 13)),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ..._labs.map((row) => _labTile(row)),
+              ]
               else if (!_on(spec.$1))
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -95,3 +95,119 @@ export const landingText: Record<LandingLocale, Copy> = {
     phone: 'فون نمبر', server: 'گیم سرور', terms: 'میں سروس کی شرائط اور رازداری کی پالیسی مانتا ہوں', help: 'مدد',
   },
 };
+
+export type LandingFaqRow = ['Payments' | 'Fair play' | 'Rooms' | 'Account', string, string];
+
+const LIVE_FAQ_EN: LandingFaqRow[] = [
+  [
+    'Fair play',
+    'How do you keep tournaments fair?',
+    'Every room is monitored and match results are reviewed. Cheating, teaming, emulator abuse, or exploits can lead to disqualification and account action.',
+  ],
+  [
+    'Fair play',
+    'What happens if I suspect a cheater?',
+    'Open Support with the match name, player ID, and screenshots or video. Staff review reports after each event.',
+  ],
+  [
+    'Rooms',
+    'When do I receive my Room ID and password?',
+    'Room credentials appear on your match page shortly before the scheduled start. Join early and follow in-room instructions.',
+  ],
+  [
+    'Payments',
+    'How are prizes awarded?',
+    'After staff confirm results, BAC is credited to winners’ wallets. You can use BAC for the next match, the shop, or withdraw on shop.battleasia.gg after review.',
+  ],
+  [
+    'Payments',
+    'Which payment methods are supported?',
+    'Deposits use bKash, Nagad, or USDT (and channels your admin enables). Upload proof in the BAC shop; staff approve before balance updates.',
+  ],
+  [
+    'Payments',
+    'How do withdrawals work?',
+    'Sign in on shop.battleasia.gg, open Withdraw, and request a payout to bKash/Nagad or crypto. Requests are reviewed; Coingo may auto-pay when enabled in production.',
+  ],
+  [
+    'Account',
+    'Can I use a referral code?',
+    'Yes. Add a referral code when you sign up. Referral rewards follow Admin referral settings and show in your account area.',
+  ],
+  [
+    'Account',
+    'Can I change my game ID or region?',
+    'Contact Support if your game account changes. Play in the region listed on the match card so matchmaking stays fair.',
+  ],
+  [
+    'Rooms',
+    'How can I contact player support?',
+    'Use the chat bubble on this page, in-app Support after sign-in, or email support@battleasia.gg with your username and match title.',
+  ],
+  [
+    'Account',
+    'Who can play in tournaments?',
+    'You must meet the minimum age for your region and follow each game’s terms. Eligibility is shown on the match card before you join.',
+  ],
+];
+
+const LIVE_FAQ_BN: LandingFaqRow[] = [
+  [
+    'Fair play',
+    'টুর্নামেন্ট কীভাবে ফেয়ার রাখেন?',
+    'প্রতিটি রুম মনিটর করা হয় এবং রেজাল্ট রিভিউ হয়। চিট, টিমিং, এমুলেটর বা এক্সপ্লoit-এ ডিসকwalify ও অ্যাকাউন্ট অ্যাকশন হতে পারে।',
+  ],
+  [
+    'Fair play',
+    'চিটার সন্দেহ হলে কী করব?',
+    'Support-এ ম্যাচ নাম, প্লেয়ার ID ও স্ক্রিনশট/ভিডিও দিন। ইভেন্টের পর স্টাফ রিভিউ করে।',
+  ],
+  [
+    'Rooms',
+    'রুম ID ও পাসওয়ার্ড কখন পাব?',
+    'শিডিউল শুরুর আগে ম্যাচ পেজে credentials দেখা যায়। সময়মতো জয়েন করুন।',
+  ],
+  [
+    'Payments',
+    'পুরস্কার কীভাবে পাব?',
+    'স্টাফ রেজাল্ট কনফার্ম করলে বিজয়ীর ওয়ালেটে BAC যোগ হয়। পরের ম্যাচ, শপ, বা shop.battleasia.gg থেকে withdraw (রিভিউ পর)।',
+  ],
+  [
+    'Payments',
+    'কোন পেমেন্ট মেথড?',
+    'bKash, Nagad, USDT (এবং admin-এ enabled চ্যানেল)। BAC shop-এ proof আপলোড; স্টাফ approve-এর পর ব্যালেন্স।',
+  ],
+  [
+    'Payments',
+    'উইথড্র কীভাবে?',
+    'shop.battleasia.gg-এ সাইন ইন → Withdraw → bKash/Nagad/crypto payout। রিকোয়েস্ট রিভিউ হয়; prod-এ Coingo auto হতে পারে।',
+  ],
+  [
+    'Account',
+    'রেফারেল কোড?',
+    'হ্যাঁ, সাইন আপে কোড দিন। রিওয়ার্ড Admin referral settings অনুযায়ী।',
+  ],
+  [
+    'Account',
+    'গেম ID/রিজিয়ন বদল?',
+    'গেম অ্যাকাউন্ট বদলালে Support-এ জানান। ম্যাচ কার্ডের রিজিয়ন মেনে খেলুন।',
+  ],
+  [
+    'Rooms',
+    'সাপোর্টে যোগাযোগ?',
+    'এই পেজের chat, সাইন-ইনের পর in-app Support, বা support@battleasia.gg (username + match)।',
+  ],
+  [
+    'Account',
+    'কে খেলতে পারবে?',
+    'আপনার region-এর minimum age ও গেম terms মেনে। eligibility ম্যাচ কার্ডে দেখা যায়।',
+  ],
+];
+
+export const landingFaq: Record<LandingLocale, LandingFaqRow[]> = {
+  EN: LIVE_FAQ_EN,
+  BN: LIVE_FAQ_BN,
+  ZH: LIVE_FAQ_EN,
+  HI: LIVE_FAQ_EN,
+  UR: LIVE_FAQ_EN,
+};

@@ -29,7 +29,7 @@ import { fetchPublicDashboard } from '../lib/dashboard';
 import { estimateMatchWinningPool, fetchGames, fetchMatches } from '../lib/games';
 import { useI18n } from '../lib/i18n';
 import { captureReferral } from '../lib/ref';
-import { LANDING_LANG, landingText, readLandingLocale, type LandingLocale } from './landing5173-text';
+import { LANDING_LANG, landingFaq, landingText, readLandingLocale, type LandingLocale } from './landing5173-text';
 import { FALLBACK_SITE_SOCIALS, fetchSiteSocialLinks, type SiteSocialLink } from '../lib/siteSocials';
 
 type Locale = LandingLocale;
@@ -104,18 +104,6 @@ const games = [
 type RailMatch = { id?: string; gameId?: string; name: string; game: string; entry: number; prize: string; filled: number; capacity: number };
 const matchStatus = (filled: number, capacity: number) =>
   filled >= capacity ? 'Full' : filled / capacity >= 0.9 ? 'Almost full' : 'Open';
-const questions = [
-  ['Fair play','How do you keep tournaments fair?','Every room is monitored and match results are reviewed. Cheating, teaming, emulator abuse or exploiting a bug leads to disqualification and account action.'],
-  ['Fair play','What happens if I suspect a cheater?','Send a report through support with the match name, player ID and any evidence. Our team reviews reports after each event.'],
-  ['Rooms','When do I receive my Room ID and password?','Room credentials appear in your match details shortly before the scheduled start. Join early and follow the in-room instructions.'],
-  ['Payments','How are prizes awarded?','Prize pools are paid in BAC coins to the winners’ demo account balance after results are confirmed by tournament staff.'],
-  ['Payments','Which payment methods are supported?','The platform plans to support bKash, Nagad and selected crypto options. This preview does not process real deposits or payments.'],
-  ['Payments','How do withdrawals work?','Withdrawal requests are not available in this demo. In the live service, verified players can request a payout through supported channels.'],
-  ['Account','Can I use a referral code?','Yes. Add a referral code when creating an account. Referral rewards and eligibility are shown before you join a live event.'],
-  ['Account','Can I change my game ID or region?','Contact support if your game account changes. Your tournament region should match your game server to keep matchmaking fair.'],
-  ['Rooms','How can I contact player support?','Use the chat bubble on this page or email support@battleasia.gg. Include your username and match title so we can help faster.'],
-  ['Account','Who can play in tournaments?','Players must meet the minimum age for their region and follow each game’s terms. Tournament-specific eligibility is listed before registration.'],
-];
 const modeData = [['01','SOLO','One player. No backup. Every decision is yours.'],['02','DUO','Two minds, one plan. Find your rhythm together.'],['03','SQUAD','Four on the drop. A full team and a bigger prize.'],['04','TDM','Fast rounds. Clean aim. Straight into the action.']];
 
 const WIN_BOARD_PLAYERS = [
@@ -703,6 +691,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
     inSeats: 0,
   });
   const t = text[locale];
+  const questions = useMemo(() => landingFaq[locale], [locale]);
   const { t: appT } = useI18n();
   const activeMatches = useMemo(
     () => (matchTab === 'high' ? highMatches : liveMatches),

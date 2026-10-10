@@ -168,6 +168,23 @@ export async function fetchMyDeposits() {
   return unwrapList<Record<string, unknown>>(payload);
 }
 
+export type CoingoCapabilities = {
+  mockMode: boolean;
+  automatedPayout: boolean;
+  automatedCollection: boolean;
+  checklist: string[];
+};
+
+export async function fetchCoingoCapabilities(): Promise<CoingoCapabilities | null> {
+  try {
+    const payload = await api('/api/v4/payments/coingo/capabilities');
+    const data = unwrapData<CoingoCapabilities>(payload);
+    return data && typeof data === 'object' ? data : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function submitCoingoPayout(body: Record<string, string | number>, key = newIdempotencyKey()) {
   const payload = await api('/api/v4/payments/coingo/payout', {
     method: 'POST',

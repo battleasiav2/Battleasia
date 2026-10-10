@@ -549,6 +549,11 @@
   },
   "labs": {
     "back": "Labs",
+    "shipTitle": "Ship one experiment at a time",
+    "shipLead": "P2 stays off by default so Play, Wallet, and Shop stay fast. Turn on one flag, test with real players, then enable the next.",
+    "shipStep1": "Admin → Settings → Feature flags → P2",
+    "shipStep2": "Enable one module (e.g. Watch party), verify web + APK",
+    "shipStep3": "Leave other P2 flags off until that module is stable",
     "on": "On",
     "off": "Off",
     "flagOff": "Flag is off",
@@ -852,12 +857,22 @@
   "stats": {
     "eyebrow": "STATS",
     "title": "My statistics",
-    "lead": "Career totals from finished rooms.",
+    "lead": "Career totals plus BAC paid, won, and net from finished rooms.",
     "offline": "Stats offline",
     "matches": "Matches",
     "wins": "Wins",
     "kills": "Kills",
-    "losses": "Losses"
+    "losses": "Losses",
+    "career": "Career totals",
+    "bacSummary": "BAC summary",
+    "paid": "Entry paid",
+    "won": "Prize won",
+    "net": "Net BAC",
+    "recent": "Recent rooms",
+    "viewAll": "All matches",
+    "totalPaid": "Total paid",
+    "totalWon": "Total won",
+    "netProfit": "Net profit"
   },
   "matches": {
     "empty": "No completed matches",

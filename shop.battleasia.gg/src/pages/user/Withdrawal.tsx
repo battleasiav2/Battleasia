@@ -7,6 +7,7 @@ import { isApiError } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
 import {
   cancelWithdraw,
+  fetchCoingoCapabilities,
   fetchMyWithdrawals,
   fetchWithdrawable,
   submitCoingoPayout,
@@ -29,6 +30,8 @@ export function WithdrawalPage() {
   const [doneAmt, setDoneAmt] = useState(0);
   const [fieldErr, setFieldErr] = useState('');
   const [cancelBusy, setCancelBusy] = useState(false);
+  const [coingoChecklist, setCoingoChecklist] = useState<string[]>([]);
+  const [coingoMock, setCoingoMock] = useState(false);
   const maxAmt = Number(amount) || 0;
   const withdrawable = info?.withdrawableAmount ?? 0;
   const pendingId = info?.pendingWithdrawalId || '';
@@ -44,10 +47,14 @@ export function WithdrawalPage() {
   }, [register, t, toast]);
 
   useEffect(() => {
-    Promise.all([fetchWithdrawable(), fetchMyWithdrawals()])
-      .then(([w, h]) => {
+    Promise.all([fetchWithdrawable(), fetchMyWithdrawals(), fetchCoingoCapabilities()])
+      .then(([w, h, cap]) => {
         setInfo(w);
         setRows(h);
+        if (cap) {
+          setCoingoMock(Boolean(cap.mockMode));
+          setCoingoChecklist(Array.isArray(cap.checklist) ? cap.checklist : []);
+        }
       })
       .catch((err) => setError(isApiError(err) ? err.message : t('wd.offline')));
   }, [t]);
@@ -133,6 +140,16 @@ export function WithdrawalPage() {
       </header>
 
       {error ? <p className="form-error">{error}</p> : null}
+      {coingoChecklist.length ? (
+        <section className="room-card wd-coingo-note" aria-label={t('wd.coingoCheckTitle')}>
+          <h2>{coingoMock ? t('wd.coingoMockTitle') : t('wd.coingoCheckTitle')}</h2>
+          <ul>
+            {coingoChecklist.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
       {info && (info.balance ?? 0) > withdrawable ? (
         <p className="play-muted wd-hub-note">
           {t('wallet.lockedWhy')} <CoinValue value={(info.balance ?? 0) - withdrawable} />.

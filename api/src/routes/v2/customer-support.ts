@@ -24,6 +24,7 @@ import { sanitizeAttachmentList } from '../../utils/safe-url.js';
 import {
   countOpenSupportUnread,
   countPlayerSupportUnread,
+  mapPlayerTicketUnreads,
   markPlayerSupportRead,
   supportPreviews,
   ticketUnread,
@@ -71,6 +72,22 @@ function withPreview(
     attachmentCount: preview?.attachmentCount || 0,
     unreadCount: unread.unread,
     lastFrom: unread.lastFrom,
+  };
+}
+
+function withPlayerPreview(
+  conversation: InstanceType<typeof SupportConversation>,
+  user: Parameters<typeof serializeConversation>[1],
+  preview: SupportPreview | undefined,
+  adminUnread: number,
+) {
+  return {
+    ...serializeConversation(conversation, user),
+    previewBody: preview?.previewBody || '',
+    previewAttachments: preview?.previewAttachments || [],
+    attachmentCount: preview?.attachmentCount || 0,
+    unreadCount: conversation.status === 'closed' ? 0 : adminUnread,
+    lastFrom: preview?.lastFrom || '',
   };
 }
 
@@ -196,7 +213,10 @@ router.get('/conversations/mine', requireAuth, async (req: AuthedRequest, res) =
     ]);
 
     const previewMap = await supportPreviews(conversations);
-    const results = conversations.map((conv) => withPreview(conv, user, previewMap.get(conv._id.toString())));
+    const unreadMap = await mapPlayerTicketUnreads(conversations);
+    const results = conversations.map((conv) =>
+      withPlayerPreview(conv, user, previewMap.get(conv._id.toString()), unreadMap.get(conv._id.toString()) || 0),
+    );
 
     return res.json(paginatedWithTotal(results, total));
   } catch (error) {

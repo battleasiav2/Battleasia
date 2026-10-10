@@ -7,6 +7,22 @@ import { env } from '../../../config/env.js';
 
 const router = Router();
 
+/** Player/shop UI: whether automated Coingo is active (no secrets). */
+router.get('/capabilities', (_req, res) => {
+  const mockMode = env.coingoMock;
+  return res.json({
+    status: true,
+    data: {
+      mockMode,
+      automatedPayout: !mockMode,
+      automatedCollection: !mockMode,
+      checklist: mockMode
+        ? ['Set COINGO_MOCK=false on the API server before production', 'Add live Coingo gateway credentials in server env', 'Run one test payout on staging']
+        : ['Coingo gateway enabled — failed payouts fall back to manual admin review', 'Keep business wallet numbers updated in Admin → Wallets'],
+    },
+  });
+});
+
 function createMerchantSerialNo(prefix: string) {
   return `${prefix}${Date.now()}${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
 }

@@ -94,6 +94,22 @@ export async function countPlayerSupportUnread(userId: string): Promise<number> 
   return total;
 }
 
+/** Per-ticket admin-reply counts for the signed-in player's ticket list. */
+export async function mapPlayerTicketUnreads(
+  conversations: Array<{ _id: { toString(): string }; userReadAt?: Date | null; status: string }>,
+): Promise<Map<string, number>> {
+  const map = new Map<string, number>();
+  await Promise.all(
+    conversations
+      .filter((conv) => conv.status !== 'closed')
+      .map(async (conv) => {
+        const id = conv._id.toString();
+        map.set(id, await countAdminUnreadForConversation(id, conv.userReadAt));
+      }),
+  );
+  return map;
+}
+
 export async function markPlayerSupportRead(userId: string, conversationId?: string) {
   const filter: Record<string, unknown> = { userId, status: { $ne: 'closed' } };
   if (conversationId) filter._id = conversationId;

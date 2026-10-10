@@ -62,6 +62,15 @@ export function LabsPage() {
             <small>{t('labs.on')}</small>
           </p>
         </header>
+        <section className="room-card labs-ship-note">
+          <h2>{t('labs.shipTitle')}</h2>
+          <p className="play-muted">{t('labs.shipLead')}</p>
+          <ol className="labs-ship-steps">
+            <li>{t('labs.shipStep1')}</li>
+            <li>{t('labs.shipStep2')}</li>
+            <li>{t('labs.shipStep3')}</li>
+          </ol>
+        </section>
         <div className="play-stage">
           <div className="play-grid">
             {P2_LABS.map((s) => (

@@ -10,6 +10,7 @@ class AccountMenuTile extends StatelessWidget {
   final bool nested;
   final bool active;
   final IconData? icon;
+  final int? badgeCount;
 
   const AccountMenuTile({
     super.key,
@@ -18,6 +19,7 @@ class AccountMenuTile extends StatelessWidget {
     this.nested = false,
     this.active = false,
     this.icon,
+    this.badgeCount,
   });
 
   /// Expandable section wrapper (Account submenu).
@@ -71,6 +73,23 @@ class AccountMenuTile extends StatelessWidget {
                   ),
                 ),
               ),
+              if (badgeCount != null && badgeCount! > 0)
+                Container(
+                  margin: const EdgeInsets.only(right: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFEF4444),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    badgeCount! > 9 ? '9+' : '$badgeCount',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
               if (active)
                 Container(
                   width: 6,

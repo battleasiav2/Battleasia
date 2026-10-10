@@ -13,6 +13,8 @@ typedef NewNotificationCallback = void Function(Map<String, dynamic> notificatio
 /// Callback type for the new-message (chat) event.
 typedef NewMessageCallback = void Function(Map<String, dynamic> message);
 
+typedef SupportUnreadCallback = void Function(int count);
+
 typedef UserTypingCallback = void Function({
   required String conversationId,
   required bool isTyping,
@@ -42,6 +44,7 @@ class SocketService {
 
   /// All registered callbacks for the `new-message` (chat) event.
   final List<NewMessageCallback> _newMessageCallbacks = [];
+  final List<SupportUnreadCallback> _supportUnreadCallbacks = [];
   final List<UserTypingCallback> _typingCallbacks = [];
 
   /// True once the socket-level listeners have been attached,
@@ -206,6 +209,20 @@ class SocketService {
     }
   }
 
+  void onSupportPlayerUnread(SupportUnreadCallback callback) {
+    if (!_supportUnreadCallbacks.contains(callback)) {
+      _supportUnreadCallbacks.add(callback);
+    }
+  }
+
+  void offSupportPlayerUnread([SupportUnreadCallback? callback]) {
+    if (callback != null) {
+      _supportUnreadCallbacks.remove(callback);
+    } else {
+      _supportUnreadCallbacks.clear();
+    }
+  }
+
   // ──────────────────────────────────────────────────────────────────────────
   // Conversation room management (support chat)
   // ──────────────────────────────────────────────────────────────────────────
@@ -316,6 +333,14 @@ class SocketService {
       // Iterate over a copy so callbacks can safely remove themselves.
       for (final cb in List.of(_newMessageCallbacks)) {
         cb(message);
+      }
+    });
+
+    _socket!.on('support-player-unread', (data) {
+      if (data is! Map) return;
+      final count = (data['count'] as num?)?.toInt() ?? 0;
+      for (final cb in List.of(_supportUnreadCallbacks)) {
+        cb(count);
       }
     });
 

@@ -342,6 +342,8 @@
   "wd.request": "Request payout",
   "wd.none": "No withdrawals",
   "wd.confirmLead": "Admin or Coingo must process this payout.",
+  "wd.coingoCheckTitle": "Payout processing",
+  "wd.coingoMockTitle": "Coingo test mode (dev only)",
   "shop.fiat": "fiat",
   "shop.submitN": "Submit deposit",
   "xfer.gets": "Recipient gets",

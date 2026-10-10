@@ -86,7 +86,11 @@ class ConversationModel {
     );
   }
 
-  ConversationModel copyWith({String? status}) {
+  ConversationModel copyWith({
+    String? status,
+    int? unreadCount,
+    String? lastFrom,
+  }) {
     return ConversationModel(
       id: id,
       userId: userId,
@@ -100,8 +104,8 @@ class ConversationModel {
       previewBody: previewBody,
       previewAttachments: previewAttachments,
       attachmentCount: attachmentCount,
-      unreadCount: unreadCount,
-      lastFrom: lastFrom,
+      unreadCount: unreadCount ?? this.unreadCount,
+      lastFrom: lastFrom ?? this.lastFrom,
     );
   }
 

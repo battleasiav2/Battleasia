@@ -66,16 +66,28 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   int _attachmentUploadPct = 0;
   String _createCategory = 'other';
 
+  void _onSupportUnread(int count) {
+    if (_mode == _SupportMode.list) {
+      _loadTickets();
+    } else if (count == 0 && mounted) {
+      setState(() {
+        _tickets = _tickets.map((row) => row.copyWith(unreadCount: 0)).toList();
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     SocketService.instance.onNewMessage(_onNewMessage);
+    SocketService.instance.onSupportPlayerUnread(_onSupportUnread);
     _loadTickets();
   }
 
   @override
   void dispose() {
     SocketService.instance.offNewMessage(_onNewMessage);
+    SocketService.instance.offSupportPlayerUnread(_onSupportUnread);
     if (_conversation != null) {
       SocketService.instance.leaveConversation(_conversation!.id);
     }
@@ -147,8 +159,18 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
       _pendingUploadedUrls = [];
     });
     await _loadMessages(ticket.id);
+    await _service.markConversationRead(ticket.id);
     SocketService.instance.joinConversation(ticket.id);
-    if (mounted) setState(() => _loading = false);
+    if (mounted) {
+      setState(() {
+        _loading = false;
+        _tickets = _tickets
+            .map((row) => row.id == ticket.id
+                ? row.copyWith(unreadCount: 0, lastFrom: 'admin')
+                : row)
+            .toList();
+      });
+    }
   }
 
   Future<void> _loadMessages(String conversationId) async {

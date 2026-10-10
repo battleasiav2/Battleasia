@@ -310,6 +310,37 @@ class CustomerSupportService {
     }
   }
 
+  Future<int> getPlayerUnreadCount() async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v2/customer-support/player-unread-count'),
+        headers: headers,
+      );
+      if (response.body.isEmpty) return 0;
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      if (response.statusCode == 200 && data['status'] == true) {
+        final payload = data['data'];
+        if (payload is Map) {
+          return (payload['count'] as num?)?.toInt() ?? 0;
+        }
+      }
+    } catch (_) {}
+    return 0;
+  }
+
+  Future<void> markConversationRead(String conversationId) async {
+    try {
+      final headers = await _getHeaders();
+      await ApiClient.patch(
+        Uri.parse(
+          '$_baseUrl/api/v2/customer-support/conversation/$conversationId/mark-read',
+        ),
+        headers: headers,
+      );
+    } catch (_) {}
+  }
+
   /// Close a conversation
   Future<Map<String, dynamic>> closeConversation(String conversationId) async {
     try {

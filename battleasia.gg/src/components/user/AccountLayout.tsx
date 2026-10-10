@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom';
+import { usePlayerSupportUnread } from '../../hooks/usePlayerSupportUnread';
 import { useI18n } from '../../lib/i18n';
 
 const LINKS = [
@@ -38,13 +39,19 @@ function Mark({ label }: { label: string }) {
 
 export function AccountLayout() {
   const { t } = useI18n();
+  const { count: supportUnread } = usePlayerSupportUnread();
   return (
     <div className="account-wrap">
       <aside className="account-nav" aria-label={t('nav.account')}>
         {LINKS.map(([to, key, mark]) => (
           <NavLink key={to} to={to} className={({ isActive }) => (isActive ? 'active' : '')}>
             <Mark label={mark} />
-            {t(key)}
+            <span className="account-nav-label">{t(key)}</span>
+            {to === '/user/account/customer-support' && supportUnread > 0 ? (
+              <span className="account-nav-badge" aria-label={t('support.unreadNav')}>
+                {supportUnread > 9 ? '9+' : supportUnread}
+              </span>
+            ) : null}
           </NavLink>
         ))}
       </aside>

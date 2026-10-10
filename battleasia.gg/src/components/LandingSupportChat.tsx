@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { ImagePlus, X } from 'lucide-react';
 import { isSignedIn } from '../lib/auth';
+import { useI18n } from '../lib/i18n';
 import { safeHref } from '../lib/safeHref';
 import {
   fetchSupportConversation,
@@ -25,55 +26,20 @@ type Shot = { id: string; file: File; url: string };
 
 const MAX_IMAGES = 2;
 
-const FALLBACK: Faq[] = [
-  {
-    topic: 'account',
-    question: 'How do I create an account?',
-    answer: 'Open Sign up, use your email, and confirm the message we send. Then sign in with that same email.',
-  },
-  {
-    topic: 'account',
-    question: 'How do I reset my password?',
-    answer: 'On the sign-in screen choose Forgot password. We email a reset link. It expires, so open it soon.',
-  },
-  {
-    topic: 'account',
-    question: 'Where is my wallet balance?',
-    answer: 'Sign in and open Wallet. A deposit stays pending until staff approve the payment proof.',
-  },
-  {
-    topic: 'gaming',
-    question: 'How do I join a match?',
-    answer: 'Open Play, pick a room that is open, and pay the entry from your wallet. The room page shows the schedule.',
-  },
-  {
-    topic: 'gaming',
-    question: 'When do I get the room ID?',
-    answer: 'The room ID and password appear on the match page when the lobby opens. Do not share them outside your squad.',
-  },
-  {
-    topic: 'gaming',
-    question: 'How are results decided?',
-    answer: 'After the match, submit your result screenshot on the match page. Staff check it before any prize is paid.',
-  },
-  {
-    topic: 'general',
-    question: 'What is BAC?',
-    answer: 'BAC is the BattleAsia coin. You use it for match entry, the shop, and rewards such as Earn.',
-  },
-  {
-    topic: 'general',
-    question: 'How do deposits work?',
-    answer: 'Choose bKash, Nagad, or USDT, send the exact amount shown, and upload proof. Staff approve it before the balance updates.',
-  },
-  {
-    topic: 'general',
-    question: 'How do I reach a person?',
-    answer: 'Write here with a screenshot, or email support@battleasia.gg. We usually reply within a few minutes.',
-  },
-];
+const FAQ_COUNT = 9;
 
 const TOPICS: Topic[] = ['all', 'account', 'gaming', 'general'];
+
+function defaultFaqs(t: (key: string) => string): Faq[] {
+  return Array.from({ length: FAQ_COUNT }, (_, i) => {
+    const n = i + 1;
+    return {
+      topic: faqTopic(t(`landing.chat.faq.${n}.topic`)),
+      question: t(`landing.chat.faq.${n}.q`),
+      answer: t(`landing.chat.faq.${n}.a`),
+    };
+  });
+}
 
 function faqTopic(value: string): Faq['topic'] {
   return value === 'account' || value === 'gaming' ? value : 'general';
@@ -117,8 +83,10 @@ function matchFaq(text: string, faqs: Faq[]) {
 type Props = { open: boolean; onClose: () => void };
 
 export function LandingSupportChat({ open, onClose }: Props) {
-  const [faqs, setFaqs] = useState<Faq[]>(FALLBACK);
-  const [welcome, setWelcome] = useState('Welcome to Battle Asia support. What can we help with?');
+  const { t, locale } = useI18n();
+  const localizedFaqs = useMemo(() => defaultFaqs(t), [t, locale]);
+  const [faqs, setFaqs] = useState<Faq[]>(localizedFaqs);
+  const [welcome, setWelcome] = useState(() => t('landing.chat.welcome'));
   const [logo, setLogo] = useState('/logo/logo.webp?v=8');
   const [topic, setTopic] = useState<Topic>('all');
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
@@ -131,12 +99,17 @@ export function LandingSupportChat({ open, onClose }: Props) {
   const bodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setFaqs(localizedFaqs);
+    setWelcome(t('landing.chat.welcome'));
+  }, [localizedFaqs, t]);
+
+  useEffect(() => {
     fetch('/api/v2/customer-support/live-chat-settings')
       .then((r) => (r.ok ? r.json() : null))
       .then((payload) => {
         const data = (payload?.data ?? payload) as { welcomeMessage?: string; logoUrl?: string; faqs?: Faq[] } | null;
         if (!data) return;
-        setWelcome(english(data.welcomeMessage, 'Welcome to Battle Asia support. What can we help with?'));
+        setWelcome(english(data.welcomeMessage, t('landing.chat.welcome')));
         const nextLogo = safeHref(data.logoUrl);
         if (nextLogo) setLogo(nextLogo);
         if (Array.isArray(data.faqs) && data.faqs.length) {
@@ -148,10 +121,11 @@ export function LandingSupportChat({ open, onClose }: Props) {
               answer: item.answer.slice(0, 600),
             }));
           if (clean.length) setFaqs(clean);
+          else setFaqs(localizedFaqs);
         }
       })
       .catch(() => undefined);
-  }, []);
+  }, [localizedFaqs, t]);
 
   useEffect(() => {
     const el = bodyRef.current;
@@ -229,7 +203,7 @@ export function LandingSupportChat({ open, onClose }: Props) {
     if (fileRef.current) fileRef.current.value = '';
     setShots((prev) => {
       if (prev.length >= MAX_IMAGES) {
-        setNotice('You can add 2 images.');
+        setNotice(t('landing.chat.maxImages'));
         return prev;
       }
       const next = [...prev];
@@ -242,8 +216,8 @@ export function LandingSupportChat({ open, onClose }: Props) {
         }
         next.push({ id: `${Date.now()}-${next.length}-${file.name}`, file, url: URL.createObjectURL(file) });
       }
-      if (next.length === prev.length) setNotice('Use a JPG, PNG, or WebP under 4 MB.');
-      else if (bad || incoming.length > MAX_IMAGES - prev.length) setNotice('You can add 2 images.');
+      if (next.length === prev.length) setNotice(t('landing.chat.badImage'));
+      else if (bad || incoming.length > MAX_IMAGES - prev.length) setNotice(t('landing.chat.maxImages'));
       else setNotice('');
       return next;
     });
@@ -266,7 +240,7 @@ export function LandingSupportChat({ open, onClose }: Props) {
     const urls = shots.map((item) => item.url);
     setDraft('');
     setShots([]);
-    push('me', text || 'Screenshots', urls.length ? urls : undefined);
+    push('me', text || t('landing.chat.screenshots'), urls.length ? urls : undefined);
 
     const hit = text && !picked.length ? matchFaq(text, faqs) : undefined;
     if (hit) {
@@ -275,7 +249,7 @@ export function LandingSupportChat({ open, onClose }: Props) {
     }
 
     if (!isSignedIn()) {
-      push('agent', 'Sign in so a teammate can see your message and screenshot. You can still use the questions above.');
+      push('agent', t('landing.chat.signInHint'));
       return;
     }
 
@@ -286,10 +260,10 @@ export function LandingSupportChat({ open, onClose }: Props) {
       if (!id) throw new Error('no conversation');
       setCid(id);
       const attachments = picked.length ? await uploadSupportImages(picked) : [];
-      await sendSupportMessage(id, text || 'Screenshot', attachments);
+      await sendSupportMessage(id, text || t('landing.chat.screenshots'), attachments);
       setBubbles(rowsToBubbles(await fetchSupportMessages(id)));
     } catch {
-      push('agent', 'We could not send that just now. Email support@battleasia.gg or try again.');
+      push('agent', t('landing.chat.sendFail'));
     } finally {
       setBusy(false);
     }
@@ -300,17 +274,23 @@ export function LandingSupportChat({ open, onClose }: Props) {
       <div className="chat-head">
         <img src={logo} width={36} height={36} alt="" />
         <div>
-          <strong>Player support</strong>
-          <small>Typically replies in a few minutes</small>
+          <strong>{t('landing.chat.title')}</strong>
+          <small>{t('landing.chat.eta')}</small>
         </div>
-        <button type="button" aria-label="Close chat" className="drawer-close" onClick={onClose}>
+        <button type="button" aria-label={t('landing.chat.close')} className="drawer-close" onClick={onClose}>
           <X size={16} />
         </button>
       </div>
       <div className="chat-topics" role="tablist">
         {TOPICS.map((id) => (
           <button key={id} type="button" className={topic === id ? 'is-on' : ''} onClick={() => setTopic(id)}>
-            {id === 'all' ? 'All' : id === 'account' ? 'Account' : id === 'gaming' ? 'Gaming' : 'General'}
+            {id === 'all'
+              ? t('landing.chat.topic.all')
+              : id === 'account'
+                ? t('landing.chat.topic.account')
+                : id === 'gaming'
+                  ? t('landing.chat.topic.gaming')
+                  : t('landing.chat.topic.general')}
           </button>
         ))}
       </div>
@@ -335,9 +315,9 @@ export function LandingSupportChat({ open, onClose }: Props) {
             ) : null}
           </div>
         ))}
-        {bubbles.some((row) => row.text.startsWith('Sign in')) ? (
+        {bubbles.some((row) => row.text === t('landing.chat.signInHint')) ? (
           <Link className="chat-signin" to="/dashboard?auth=signin&returnTo=/">
-            Sign in
+            {t('landing.chat.signIn')}
           </Link>
         ) : null}
         {notice ? <p className="chat-note">{notice}</p> : null}
@@ -370,8 +350,8 @@ export function LandingSupportChat({ open, onClose }: Props) {
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          placeholder="Write a message..."
-          aria-label="Chat message"
+          placeholder={t('landing.chat.placeholder')}
+          aria-label={t('landing.chat.placeholder')}
         />
         <button type="submit" aria-label="Send message" disabled={busy}>
           →
