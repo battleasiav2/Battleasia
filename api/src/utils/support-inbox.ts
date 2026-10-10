@@ -69,6 +69,39 @@ export function ticketUnread(status: string, subject: string, preview?: SupportP
   return { unread: 0, lastFrom: '' as const };
 }
 
+/** Admin replies the player has not opened yet (per conversation userReadAt). */
+export async function countAdminUnreadForConversation(
+  conversationId: string,
+  userReadAt?: Date | null,
+): Promise<number> {
+  const filter: Record<string, unknown> = { conversationId, isAdmin: true };
+  if (userReadAt) {
+    filter.createdAt = { $gt: userReadAt };
+  }
+  return SupportMessage.countDocuments(filter);
+}
+
+export async function countPlayerSupportUnread(userId: string): Promise<number> {
+  const conversations = await SupportConversation.find({
+    userId,
+    status: { $ne: 'closed' },
+  }).select('_id userReadAt');
+
+  let total = 0;
+  for (const conv of conversations) {
+    total += await countAdminUnreadForConversation(conv._id.toString(), conv.userReadAt);
+  }
+  return total;
+}
+
+export async function markPlayerSupportRead(userId: string, conversationId?: string) {
+  const filter: Record<string, unknown> = { userId, status: { $ne: 'closed' } };
+  if (conversationId) filter._id = conversationId;
+  const now = new Date();
+  await SupportConversation.updateMany(filter, { $set: { userReadAt: now } });
+  return now;
+}
+
 export async function countOpenSupportUnread(): Promise<number> {
   const open = await SupportConversation.find({ status: { $ne: 'closed' } }).select('_id subject status');
   const map = await supportPreviews(open);

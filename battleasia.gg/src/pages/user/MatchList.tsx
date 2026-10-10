@@ -98,7 +98,7 @@ export function MatchListPage() {
       const value = text.trim();
       if (!value || value === '—') return;
       try {
-        await httpCopy(value);
+        await navigator.clipboard.writeText(value);
         toast(t('match.roomCopied'));
       } catch {
         toast(t('play.copied'));

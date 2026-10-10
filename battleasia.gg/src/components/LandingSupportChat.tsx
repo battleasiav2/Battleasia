@@ -3,7 +3,17 @@ import { Link } from 'react-router-dom';
 import { ImagePlus, X } from 'lucide-react';
 import { isSignedIn } from '../lib/auth';
 import { safeHref } from '../lib/safeHref';
-import { fetchSupportConversation, sendSupportMessage, uploadSupportImages } from '../lib/social';
+import {
+  fetchSupportConversation,
+  fetchSupportMessages,
+  markSupportChatRead,
+  sendSupportMessage,
+  uploadSupportImages,
+  type SupportMessage,
+} from '../lib/social';
+import { getAuthedSocket } from '../lib/socket';
+import { safeMediaHref } from '../lib/safeHref';
+import { dispatchSupportUnread } from '../hooks/usePlayerSupportUnread';
 
 type Topic = 'all' | 'account' | 'gaming' | 'general';
 
@@ -75,6 +85,25 @@ function english(value: unknown, fallback: string) {
   return text;
 }
 
+function nid(item: { id?: string; _id?: string }) {
+  return item.id || item._id || '';
+}
+
+function messageImages(m: SupportMessage) {
+  return (m.attachments || [])
+    .map((file) => safeMediaHref(typeof file === 'string' ? file : file.url || ''))
+    .filter(Boolean) as string[];
+}
+
+function rowsToBubbles(rows: SupportMessage[]): Bubble[] {
+  return rows.map((m) => ({
+    id: nid(m) || `${m.createdAt}-${m.body}`,
+    from: m.isAdmin ? 'agent' : 'me',
+    text: m.body || '',
+    images: messageImages(m).length ? messageImages(m) : undefined,
+  }));
+}
+
 function matchFaq(text: string, faqs: Faq[]) {
   const q = text.toLowerCase();
   return faqs.find((item) => item.question.toLowerCase() === q)
@@ -98,6 +127,7 @@ export function LandingSupportChat({ open, onClose }: Props) {
   const [busy, setBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const [notice, setNotice] = useState('');
+  const [cid, setCid] = useState('');
   const bodyRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -127,6 +157,57 @@ export function LandingSupportChat({ open, onClose }: Props) {
     const el = bodyRef.current;
     if (el && bubbles.length) el.scrollTop = el.scrollHeight;
   }, [bubbles]);
+
+  useEffect(() => {
+    if (!open || !isSignedIn()) return;
+    let live = true;
+    (async () => {
+      try {
+        await markSupportChatRead();
+        dispatchSupportUnread(0);
+        const conv = await fetchSupportConversation();
+        const id = nid(conv);
+        if (!live) return;
+        setCid(id);
+        if (id) setBubbles(rowsToBubbles(await fetchSupportMessages(id)));
+      } catch {
+        /* keep FAQ-only view */
+      }
+    })();
+    return () => {
+      live = false;
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || !cid || !isSignedIn()) return;
+    let leave: (() => void) | undefined;
+    getAuthedSocket().then((sock) => {
+      if (!sock) return;
+      sock.emit('join-conversation', cid);
+      const onMsg = (msg: SupportMessage) => {
+        const id = nid(msg);
+        setBubbles((prev) => {
+          if (prev.some((row) => row.id === id)) return prev;
+          return [
+            ...prev,
+            {
+              id,
+              from: msg.isAdmin ? 'agent' : 'me',
+              text: msg.body || '',
+              images: messageImages(msg).length ? messageImages(msg) : undefined,
+            },
+          ];
+        });
+      };
+      sock.on('new-message', onMsg);
+      leave = () => {
+        sock.emit('leave-conversation', cid);
+        sock.off('new-message', onMsg);
+      };
+    });
+    return () => leave?.();
+  }, [open, cid]);
 
   const shown = useMemo(
     () => (topic === 'all' ? faqs : faqs.filter((item) => item.topic === topic)),
@@ -201,11 +282,12 @@ export function LandingSupportChat({ open, onClose }: Props) {
     setBusy(true);
     try {
       const conv = await fetchSupportConversation();
-      const id = conv.id || (conv as { _id?: string })._id || '';
+      const id = nid(conv);
       if (!id) throw new Error('no conversation');
+      setCid(id);
       const attachments = picked.length ? await uploadSupportImages(picked) : [];
       await sendSupportMessage(id, text || 'Screenshot', attachments);
-      push('agent', 'Sent. A teammate usually replies within a few minutes.');
+      setBubbles(rowsToBubbles(await fetchSupportMessages(id)));
     } catch {
       push('agent', 'We could not send that just now. Email support@battleasia.gg or try again.');
     } finally {

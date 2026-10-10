@@ -645,7 +645,8 @@ html[lang="bn"] .ba5173{
 .ba5173 .float-actions{position:fixed;right:22px;bottom:22px;z-index:40;display:flex;flex-direction:column;gap:9px}
 .ba5173 .float-btn{width:48px;height:48px;border:1px solid rgba(255,255,255,.18);border-radius:50%;background:#171a1d;color:#eee;display:grid;place-items:center;box-shadow:0 8px 30px rgba(0,0,0,.35);transition:.2s}
 .ba5173 .float-btn:hover{transform:translateY(-3px);border-color:var(--accent-color)}
-.ba5173 .float-btn.chat{background:var(--accent-color);color:#13150a;border:0}
+.ba5173 .float-btn.chat{background:var(--accent-color);color:#13150a;border:0;position:relative}
+.ba5173 .chat-fab-badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#ef4444;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none}
 .ba5173 .social-pop{position:absolute;right:57px;bottom:0;display:flex;gap:6px;transform:scale(.8);opacity:0;pointer-events:none;transform-origin:right center;transition:.2s}
 .ba5173 .social-pop.open{transform:scale(1);opacity:1;pointer-events:auto}
 .ba5173 .social-pop button{height:38px;width:38px;border-radius:50%;background:#1b1e21;color:#eee;border:1px solid var(--line)}

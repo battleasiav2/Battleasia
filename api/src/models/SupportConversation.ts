@@ -9,6 +9,8 @@ export interface ISupportConversation extends Document {
   category: SupportTicketCategory;
   status: 'open' | 'closed' | 'pending';
   lastMessageAt: Date;
+  /** Last time the player opened/read messages (for admin-reply badge). */
+  userReadAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -20,6 +22,7 @@ const supportConversationSchema = new Schema<ISupportConversation>(
     category: { type: String, enum: SUPPORT_TICKET_CATEGORIES, default: 'other' },
     status: { type: String, enum: ['open', 'closed', 'pending'], default: 'open' },
     lastMessageAt: { type: Date, default: Date.now },
+    userReadAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

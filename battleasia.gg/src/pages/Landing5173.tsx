@@ -4,6 +4,7 @@ import { ArrowDownRight, ArrowLeft, ArrowRight, ChevronDown, Crosshair, Crown, E
 import '../styles/landing-5173.css';
 import { GamingCursor } from '../components/GamingCursor';
 import { LandingSupportChat } from '../components/LandingSupportChat';
+import { usePlayerSupportUnread } from '../hooks/usePlayerSupportUnread';
 import { UserAvatar } from '../components/UserAvatar';
 import { isApiError } from '../lib/api';
 import { fetchAppDownload, formatApkSize } from '../lib/app-download';
@@ -649,6 +650,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
   const [toast, setToast] = useState('');
   const [socialOpen, setSocialOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const { count: supportUnread, markRead: markSupportRead } = usePlayerSupportUnread(logged);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
@@ -1370,7 +1372,22 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
       <div className="float-actions">
         <div className={`social-pop ${socialOpen?'open':''}`}><button aria-label="Facebook" onClick={()=>notify('Facebook community link is coming soon.')}>f</button><button aria-label="Discord" onClick={()=>notify('Discord invite is coming soon.')}><MessageCircle size={15}/></button><button aria-label="YouTube" onClick={()=>notify('YouTube channel is coming soon.')}>▶</button></div>
         <button className="float-btn" aria-label="Social links" onClick={() => setSocialOpen(!socialOpen)}>{socialOpen?<X size={18}/>:<Sparkles size={17}/>}</button>
-        <button className="float-btn chat" aria-label="Open support chat" onClick={() => setChatOpen(!chatOpen)}><MessageCircle size={18}/></button>
+        <button
+          className="float-btn chat"
+          aria-label={supportUnread > 0 ? `Open support chat, ${supportUnread} new replies` : 'Open support chat'}
+          onClick={() => {
+            const next = !chatOpen;
+            setChatOpen(next);
+            if (next && logged) void markSupportRead();
+          }}
+        >
+          <MessageCircle size={18} />
+          {supportUnread > 0 && !chatOpen ? (
+            <span className="chat-fab-badge" aria-hidden>
+              {supportUnread > 9 ? '9+' : supportUnread}
+            </span>
+          ) : null}
+        </button>
       </div>
       <LandingSupportChat open={chatOpen} onClose={() => setChatOpen(false)} />
       

@@ -12,11 +12,23 @@ import {
   serializeConversation,
   serializeSupportMessage,
 } from '../../utils/feed-serialize.js';
-import { emitNewSupport, emitSupportUnread, getSocketServer } from '../../utils/socket.js';
+import {
+  emitNewSupport,
+  emitPlayerSupportUnread,
+  emitSupportUnread,
+  getSocketServer,
+} from '../../utils/socket.js';
 import { notifySupportReply } from '../../utils/payment-notifications.js';
 import { getAppSettings, normalizeLiveChatSettings } from '../../models/AppSettings.js';
 import { sanitizeAttachmentList } from '../../utils/safe-url.js';
-import { countOpenSupportUnread, supportPreviews, ticketUnread, type SupportPreview } from '../../utils/support-inbox.js';
+import {
+  countOpenSupportUnread,
+  countPlayerSupportUnread,
+  markPlayerSupportRead,
+  supportPreviews,
+  ticketUnread,
+  type SupportPreview,
+} from '../../utils/support-inbox.js';
 
 const router = Router();
 
@@ -203,6 +215,45 @@ router.get('/conversations/unread-count', requireAuth, requireAdmin, async (_req
   }
 });
 
+/** Unread admin replies for the signed-in player (live chat FAB badge). */
+router.get('/player-unread-count', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const count = await countPlayerSupportUnread(req.userId!);
+    return res.json({ status: true, data: { count } });
+  } catch (error) {
+    console.error('player support unread error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to count unread replies' });
+  }
+});
+
+router.patch('/conversation/mark-read', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    await markPlayerSupportRead(req.userId!);
+    await emitPlayerSupportUnread(req.userId!);
+    return res.json({ status: true, data: { count: 0 } });
+  } catch (error) {
+    console.error('mark support read error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to mark messages read' });
+  }
+});
+
+router.patch('/conversation/:conversationId/mark-read', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const conversationId = String(req.params.conversationId);
+    const allowed = await canAccessConversation(req.userId!, conversationId);
+    if (!allowed) {
+      return res.status(403).json({ status: false, message: 'Access denied' });
+    }
+    await markPlayerSupportRead(req.userId!, conversationId);
+    const count = await countPlayerSupportUnread(req.userId!);
+    await emitPlayerSupportUnread(req.userId!);
+    return res.json({ status: true, data: { count } });
+  } catch (error) {
+    console.error('mark conversation read error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to mark conversation read' });
+  }
+});
+
 router.get('/conversations', requireAuth, requireAdmin, async (req, res) => {
   try {
     const { skip, limit } = parsePagination(req);
@@ -304,6 +355,7 @@ router.post('/message', requireAuth, async (req: AuthedRequest, res) => {
         conversationId: conversation._id.toString(),
         preview: String(body),
       });
+      await emitPlayerSupportUnread(conversation.userId.toString());
     } else {
       emitNewSupport({
         conversationId: conversation._id.toString(),

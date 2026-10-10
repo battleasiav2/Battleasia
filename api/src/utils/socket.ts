@@ -1,7 +1,7 @@
 import type { Server } from 'socket.io';
 import { DepositHistory } from '../models/DepositHistory.js';
 import { WithdrawalHistory } from '../models/WithdrawalHistory.js';
-import { countOpenSupportUnread } from './support-inbox.js';
+import { countOpenSupportUnread, countPlayerSupportUnread } from './support-inbox.js';
 import { invalidateCache, setCached } from './cache.js';
 import {
   getPublicDashboardStats,
@@ -46,6 +46,16 @@ export async function emitSupportUnread() {
     ioInstance.to('admin-room').emit('support-unread-count', { count });
   } catch (error) {
     console.error('support unread emit error:', error);
+  }
+}
+
+export async function emitPlayerSupportUnread(userId: string) {
+  if (!ioInstance || !userId) return;
+  try {
+    const count = await countPlayerSupportUnread(userId);
+    ioInstance.to(`user:${userId}`).emit('support-player-unread', { count });
+  } catch (error) {
+    console.error('player support unread emit error:', error);
   }
 }
 

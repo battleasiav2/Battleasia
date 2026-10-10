@@ -14,6 +14,8 @@ import {
 } from '../lib/social';
 import { FALLBACK_SITE_SOCIALS, type SiteSocialLink } from '../lib/siteSocials';
 import { safeHref, safeMediaHref } from '../lib/safeHref';
+import { usePlayerSupportUnread } from '../hooks/usePlayerSupportUnread';
+import { markSupportChatRead } from '../lib/social';
 
 type ChatSettings = {
   enabled: boolean;
@@ -61,6 +63,7 @@ export function SupportChat({ forceOpen }: Props) {
   const fabRef = useRef<HTMLButtonElement>(null);
   const logRef = useRef<HTMLDivElement>(null);
   const drag = useRef({ active: false, moved: false, x: 0, y: 0, startX: 0, startY: 0 });
+  const { count: supportUnread, markRead: markSupportRead } = usePlayerSupportUnread(authed);
 
   useEffect(() => {
     fetch('/api/v2/customer-support/live-chat-settings')
@@ -109,6 +112,8 @@ export function SupportChat({ forceOpen }: Props) {
 
   useEffect(() => {
     if (!open || !authed) return;
+    void markSupportRead();
+    void markSupportChatRead();
     let live = true;
     setLoading(true);
     fetchSupportConversation()
@@ -125,7 +130,7 @@ export function SupportChat({ forceOpen }: Props) {
     return () => {
       live = false;
     };
-  }, [open, authed]);
+  }, [open, authed, markSupportRead]);
 
   useEffect(() => {
     logRef.current?.scrollTo(0, logRef.current.scrollHeight);
@@ -241,6 +246,11 @@ export function SupportChat({ forceOpen }: Props) {
         onPointerCancel={onPointerCancel}
       >
         {open ? <IconClose /> : <IconChat />}
+        {!open && supportUnread > 0 ? (
+          <span className="chat-fab-badge" aria-hidden>
+            {supportUnread > 9 ? '9+' : supportUnread}
+          </span>
+        ) : null}
       </button>
       {open ? (
         <aside className={low ? 'chat-panel origin-br' : 'chat-panel origin-tr'} aria-label="Live support">

@@ -567,6 +567,19 @@ export async function sendSupportMessage(
   });
 }
 
+export async function fetchPlayerSupportUnread() {
+  const payload = await api('/api/v2/customer-support/player-unread-count');
+  const data = unwrapData<{ count?: number }>(payload);
+  return Math.max(0, Number(data?.count) || 0);
+}
+
+export async function markSupportChatRead(conversationId?: string) {
+  if (conversationId) {
+    return api(`/api/v2/customer-support/conversation/${conversationId}/mark-read`, { method: 'PATCH' });
+  }
+  return api('/api/v2/customer-support/conversation/mark-read', { method: 'PATCH' });
+}
+
 export async function uploadSupportImages(files: File[]) {
   const urls: Array<{ url: string }> = [];
   for (const file of files.slice(0, 8)) {
