@@ -27,6 +27,7 @@ import 'package:battleasia_app/presentation/screens/notifications/notifications_
 import 'package:battleasia_app/presentation/screens/leaderboard/leaderboard_screen.dart';
 import 'package:battleasia_app/presentation/screens/legal/legal_screen.dart';
 import 'package:battleasia_app/presentation/screens/customer_support/customer_support_screen.dart';
+import 'package:battleasia_app/presentation/screens/settings/app_settings_screen.dart';
 
 class AccountDrawer extends StatelessWidget {
   const AccountDrawer({super.key});
@@ -324,6 +325,28 @@ class _AccountDrawerContent extends StatelessWidget {
                     );
                   },
                 ),
+                AccountMenuTile(
+                  label: 'settings.chat'.tr(),
+                  icon: Icons.chat_bubble_outline,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CustomerSupportScreen()),
+                    );
+                  },
+                ),
+                AccountMenuTile(
+                  label: 'settings.title'.tr(),
+                  icon: Icons.settings_outlined,
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const AppSettingsScreen()),
+                    );
+                  },
+                ),
               ],
             ),
           ),
@@ -414,7 +437,7 @@ class _AccountDrawerContent extends StatelessWidget {
                     Navigator.pop(context);
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const AccountScreen()),
+                      MaterialPageRoute(builder: (context) => const AppSettingsScreen()),
                     );
                   },
                 ),

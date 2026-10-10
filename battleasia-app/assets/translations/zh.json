@@ -214,6 +214,21 @@
     "customerSupport": "客户支持",
     "user": "用户"
   },
+  "settings": {
+    "title": "设置",
+    "support": "客服",
+    "chat": "客服聊天",
+    "chatLead": "比赛、付款或账号问题，直接发给团队。",
+    "play": "比赛",
+    "rules": "规则",
+    "faq": "常见问题",
+    "legal": "法律",
+    "privacy": "隐私政策",
+    "about": "关于",
+    "version": "应用版本",
+    "rulesLead": "每个房间都遵守这些规则。",
+    "faqLead": "开票前先看这些简短回答。"
+  },
   "play": {
     "failedLoadGames": "加载游戏失败",
     "noGames": "暂无可用游戏",

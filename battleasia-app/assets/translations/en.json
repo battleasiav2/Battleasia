@@ -490,6 +490,21 @@
     "customerSupport": "Customer Support",
     "user": "User"
   },
+  "settings": {
+    "title": "Settings",
+    "support": "Support",
+    "chat": "Support chat",
+    "chatLead": "Message the team about a match, payment, or account.",
+    "play": "Play",
+    "rules": "Rules",
+    "faq": "FAQ",
+    "legal": "Legal",
+    "privacy": "Privacy policy",
+    "about": "About",
+    "version": "App version",
+    "rulesLead": "Every room follows these rules.",
+    "faqLead": "Quick answers before you open a ticket."
+  },
   "play": {
     "failedLoadGames": "Failed to load games",
     "noGames": "No games available",
@@ -612,6 +627,10 @@
     "map": "Map",
     "mapTbd": "TBD",
     "typeLabel": "Type",
+    "entry": "Entry",
+    "join": "Join",
+    "lobby": "Lobby",
+    "view": "View",
     "entryFee": "Entry Fee",
     "perKill": "Per kill",
     "prize": "Prize",

@@ -1,7 +1,8 @@
 ﻿class AppConstants {
   // App Info
   static const String appName = 'BattleAsia';
-  static const String appVersion = '1.0.0';
+  /// Keep in step with pubspec.yaml `version`.
+  static const String appVersion = '1.0.2';
 
   // API Configuration
   static const String baseUrl = String.fromEnvironment(
