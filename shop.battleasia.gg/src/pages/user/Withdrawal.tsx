@@ -6,6 +6,7 @@ import { useHud } from '../../contexts/HudContext';
 import { isApiError } from '../../lib/api';
 import { useI18n } from '../../lib/i18n';
 import {
+  cancelWithdraw,
   fetchMyWithdrawals,
   fetchWithdrawable,
   submitCoingoPayout,
@@ -27,8 +28,11 @@ export function WithdrawalPage() {
   const [idem, setIdem] = useState(() => crypto.randomUUID());
   const [doneAmt, setDoneAmt] = useState(0);
   const [fieldErr, setFieldErr] = useState('');
+  const [cancelBusy, setCancelBusy] = useState(false);
   const maxAmt = Number(amount) || 0;
   const withdrawable = info?.withdrawableAmount ?? 0;
+  const pendingId = info?.pendingWithdrawalId || '';
+  const pendingAmt = info?.pendingWithdrawalAmount ?? 0;
 
   useEffect(() => {
     return register({
@@ -88,6 +92,23 @@ export function WithdrawalPage() {
     }
   }
 
+  async function doCancelPending() {
+    if (!pendingId) return;
+    setCancelBusy(true);
+    try {
+      const result = await cancelWithdraw(pendingId);
+      toast(t('wallet.cancelWithdrawOk'));
+      setDoneAmt(0);
+      setInfo(await fetchWithdrawable());
+      setRows(await fetchMyWithdrawals());
+      void result;
+    } catch (err) {
+      toast(isApiError(err) ? err.message : t('wallet.cancelWithdrawFail'));
+    } finally {
+      setCancelBusy(false);
+    }
+  }
+
   return (
     <main className="play-main wd-hub">
       <header className="play-head wd-hub-head">
@@ -132,7 +153,23 @@ export function WithdrawalPage() {
           {info?.hasPendingWithdrawal ? (
             <div className="money-alert">
               <strong>{t('shop.pendingTitle')}</strong>
-              <p>{t('wd.pending')}</p>
+              <p>
+                {t('wd.pending')}{' '}
+                {pendingAmt > 0 ? (
+                  <>
+                    (<CoinValue value={pendingAmt} />)
+                  </>
+                ) : null}
+              </p>
+              <p className="play-muted">{t('wallet.cancelWithdrawLead')}</p>
+              <button
+                className="btn btn-ghost"
+                type="button"
+                disabled={cancelBusy || !pendingId || !navigator.onLine}
+                onClick={() => void doCancelPending()}
+              >
+                {cancelBusy ? t('wallet.submitting') : t('wallet.cancelWithdraw')}
+              </button>
             </div>
           ) : (
             <form

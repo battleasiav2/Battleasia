@@ -9,6 +9,7 @@ export type WithdrawableInfo = {
   alreadyWithdrawn: number;
   balance: number;
   pendingWithdrawalId?: string | null;
+  pendingWithdrawalAmount?: number;
 };
 
 export type HistoryRow = {
@@ -179,6 +180,14 @@ export async function submitCoingoPayout(body: Record<string, string | number>, 
 export async function fetchMyWithdrawals() {
   const payload = await api('/api/v4/payments/withdrawal-history/my-history?limit=20');
   return unwrapList<Record<string, unknown>>(payload);
+}
+
+export async function cancelWithdraw(withdrawalId: string, key = newIdempotencyKey()) {
+  const payload = await api(`/api/v4/payments/withdrawal-history/${encodeURIComponent(withdrawalId)}/cancel`, {
+    method: 'PATCH',
+    idempotencyKey: key,
+  });
+  return unwrapData<{ balance?: number }>(payload);
 }
 
 export async function fetchTransferSettings() {

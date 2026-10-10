@@ -62,6 +62,8 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
   bool _sending = false;
   bool _creating = false;
   bool _closing = false;
+  bool _attachmentUploading = false;
+  int _attachmentUploadPct = 0;
   String _createCategory = 'other';
 
   @override
@@ -190,17 +192,35 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
         ..._pendingLocalPaths,
         ...files.map((f) => f.path),
       ];
+      _attachmentUploading = true;
+      _attachmentUploadPct = 0;
     });
     // Upload immediately so send/create can use URLs
-    final upload = await _service.uploadFiles(files.map((f) => f.path).toList());
+    final upload = await _service.uploadFiles(
+      files.map((f) => f.path).toList(),
+      onProgress: (pct) {
+        if (mounted) setState(() => _attachmentUploadPct = pct);
+      },
+    );
     if (!mounted) return;
+    setState(() {
+      _attachmentUploading = false;
+      _attachmentUploadPct = 0;
+    });
     if (upload['success'] == true) {
       final urls = ((upload['data'] as Map)['files'] as List).cast<String>();
       setState(() => _pendingUploadedUrls = [..._pendingUploadedUrls, ...urls]);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('support.uploadSuccess'.tr()),
+          backgroundColor: AppColors.success,
+        ),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(upload['message']?.toString() ?? 'support.uploadFailed'.tr()),
+          backgroundColor: AppColors.error,
         ),
       );
     }
@@ -781,8 +801,24 @@ class _CustomerSupportScreenState extends State<CustomerSupportScreen> {
             ),
           ),
           const SizedBox(height: 12),
+          if (_attachmentUploading) ...[
+            Text(
+              'feed.progress'.tr(namedArgs: {'n': '$_attachmentUploadPct'}),
+              style: AppTheme.bodySmall.copyWith(color: AppColors.gold),
+            ),
+            const SizedBox(height: 6),
+            LinearProgressIndicator(
+              value: _attachmentUploadPct > 0 ? _attachmentUploadPct / 100 : null,
+              minHeight: 4,
+              backgroundColor: AppColors.border(0.2),
+              color: AppColors.gold,
+            ),
+            const SizedBox(height: 8),
+          ],
           OutlinedButton.icon(
-            onPressed: _creating ? null : () => _pickAttachments(forCreate: true),
+            onPressed: (_creating || _attachmentUploading)
+                ? null
+                : () => _pickAttachments(forCreate: true),
             icon: const Icon(Icons.attach_file),
             label: Text(
               _pendingLocalPaths.isEmpty

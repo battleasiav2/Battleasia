@@ -20,10 +20,20 @@ bool _isCustomArt(String image) {
   return true;
 }
 
-String _artUrl(String image) {
-  if (image.startsWith('http')) return image;
-  final base = AppConfig.serverUrl.replaceAll(RegExp(r'/$'), '');
-  return '$base$image';
+String _artUrl(String image, {int? cacheEpoch}) {
+  var path = image.trim();
+  if (path.startsWith('/uploads/')) {
+    path = '/api$path';
+  }
+  String url;
+  if (path.startsWith('http')) {
+    url = path;
+  } else {
+    final base = AppConfig.serverUrl.replaceAll(RegExp(r'/$'), '');
+    url = '$base$path';
+  }
+  if (cacheEpoch == null) return url;
+  return '$url${url.contains('?') ? '&' : '?'}v=$cacheEpoch';
 }
 
 class ShopItemCard extends StatelessWidget {
@@ -32,6 +42,7 @@ class ShopItemCard extends StatelessWidget {
   final VoidCallback? onBuy;
   /// BDT FX rate from `/shop/coins` — web multiplies pack price by this.
   final double bdtRate;
+  final int? imageCacheEpoch;
 
   const ShopItemCard({
     super.key,
@@ -39,6 +50,7 @@ class ShopItemCard extends StatelessWidget {
     this.onTap,
     this.onBuy,
     this.bdtRate = 1,
+    this.imageCacheEpoch,
   });
 
   @override
@@ -102,7 +114,9 @@ class ShopItemCard extends StatelessWidget {
                               ),
                               Image(
                                 image: _isCustomArt(item.image)
-                                    ? NetworkImage(_artUrl(item.image))
+                                    ? NetworkImage(
+                                        _artUrl(item.image, cacheEpoch: imageCacheEpoch),
+                                      )
                                     : const AssetImage('assets/images/currency.webp') as ImageProvider,
                                 width: coinSize * 0.9,
                                 height: coinSize * 0.9,

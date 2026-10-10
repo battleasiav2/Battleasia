@@ -37,8 +37,10 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
   double _withdrawable = 0;
   bool _hasPending = false;
   double _pendingAmount = 0;
+  String? _pendingId;
   bool _loading = true;
   bool _submitting = false;
+  bool _cancelling = false;
 
   @override
   void initState() {
@@ -65,9 +67,32 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
         _hasPending = data['hasPendingWithdrawal'] == true;
         _pendingAmount =
             (data['pendingWithdrawalAmount'] as num?)?.toDouble() ?? 0;
+        _pendingId = data['pendingWithdrawalId'] as String?;
       }
     } finally {
       if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _cancelPending() async {
+    final id = _pendingId?.trim();
+    if (id == null || id.isEmpty || _cancelling) return;
+    setState(() => _cancelling = true);
+    try {
+      final result = await _userService.cancelWithdrawal(id);
+      if (!mounted) return;
+      if (result['success'] == true) {
+        final bal = (result['balance'] as num?)?.toDouble();
+        if (bal != null) {
+          context.read<AuthProvider>().updateBalance(bal);
+        }
+        _toast('wallet.cancelWithdrawOk'.tr(), ok: true);
+        await _load();
+      } else {
+        _toast(result['message']?.toString() ?? 'wallet.cancelWithdrawFail'.tr());
+      }
+    } finally {
+      if (mounted) setState(() => _cancelling = false);
     }
   }
 
@@ -261,13 +286,48 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                                     ),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
-                                  child: Text(
-                                    'shop.pendingBlocked'.tr(namedArgs: {
-                                      'amount': _pendingAmount.toStringAsFixed(2),
-                                    }),
-                                    style: AppTheme.bodySmall.copyWith(
-                                      color: AppColors.error,
-                                    ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'shop.pendingBlocked'.tr(namedArgs: {
+                                          'amount':
+                                              _pendingAmount.toStringAsFixed(2),
+                                        }),
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppColors.error,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'wallet.cancelWithdrawLead'.tr(),
+                                        style: AppTheme.bodySmall.copyWith(
+                                          color: AppColors.textMuted,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      SizedBox(
+                                        width: double.infinity,
+                                        child: OutlinedButton(
+                                          onPressed: _cancelling ||
+                                                  (_pendingId ?? '').isEmpty
+                                              ? null
+                                              : _cancelPending,
+                                          style: OutlinedButton.styleFrom(
+                                            foregroundColor:
+                                                AppColors.textPrimary,
+                                            side: BorderSide(
+                                              color: AppColors.border(0.28),
+                                            ),
+                                          ),
+                                          child: Text(
+                                            _cancelling
+                                                ? 'wallet.submitting'.tr()
+                                                : 'wallet.cancelWithdraw'.tr(),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],

@@ -217,24 +217,27 @@ export function AppDownloadPage() {
             />
           </label>
           {uploading ? (
-            <p className="field-hint">
-              {t('apk.uploading')} {uploadPct > 0 ? `${uploadPct}%` : ''}
-            </p>
-          ) : null}
-          {uploading && uploadPct > 0 ? (
-            <div
-              style={{
-                marginTop: 8,
-                maxWidth: 320,
-                height: 4,
-                borderRadius: 2,
-                background: 'rgba(255,255,255,0.12)',
-                overflow: 'hidden',
-              }}
-              aria-hidden
-            >
-              <div style={{ width: `${uploadPct}%`, height: '100%', background: '#d4e82a' }} />
-            </div>
+            <>
+              <p className="field-hint" role="status">
+                {t('apk.uploading')} {uploadPct}%
+              </p>
+              <div
+                className="upload-progress"
+                style={{
+                  marginTop: 8,
+                  maxWidth: 320,
+                  height: 4,
+                  borderRadius: 2,
+                  background: 'rgba(255,255,255,0.12)',
+                  overflow: 'hidden',
+                }}
+                aria-valuenow={uploadPct}
+                aria-valuemin={0}
+                aria-valuemax={100}
+              >
+                <div style={{ width: `${uploadPct}%`, height: '100%', background: '#d4e82a', transition: 'width 0.15s ease' }} />
+              </div>
+            </>
           ) : null}
         </div>
       </div>

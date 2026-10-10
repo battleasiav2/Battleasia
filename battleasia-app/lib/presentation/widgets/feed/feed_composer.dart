@@ -111,6 +111,14 @@ class _FeedComposerState extends State<FeedComposer> {
           _imagePath = null;
           _isVideo = false;
         });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('feed.posted'.tr()),
+              backgroundColor: AppColors.success,
+            ),
+          );
+        }
         widget.onPosted?.call();
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -205,6 +213,13 @@ class _FeedComposerState extends State<FeedComposer> {
             Text(
               'feed.progress'.tr(namedArgs: {'n': '$_uploadPct'}),
               style: AppTheme.bodySmall.copyWith(color: AppColors.gold),
+            ),
+            const SizedBox(height: 6),
+            LinearProgressIndicator(
+              value: _uploadPct! > 0 ? _uploadPct! / 100 : null,
+              minHeight: 4,
+              backgroundColor: AppColors.border(0.2),
+              color: AppColors.gold,
             ),
             Align(
               alignment: Alignment.centerLeft,

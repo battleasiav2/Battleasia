@@ -8,6 +8,7 @@ import { readSessionUser } from '../../lib/auth';
 import { formatWhen, isCredit, rowCategory, rowLabel, type HistFilter } from '../../lib/history';
 import { useI18n } from '../../lib/i18n';
 import {
+  cancelWithdraw,
   fetchBalanceHistory,
   fetchCoinRates,
   fetchWithdrawable,
@@ -98,6 +99,7 @@ export function WalletPage() {
   const [confirm, setConfirm] = useState(false);
   const [requestOpen, setRequestOpen] = useState(() => params.get('withdraw') === '1');
   const [idem, setIdem] = useState(() => crypto.randomUUID());
+  const [cancelBusy, setCancelBusy] = useState(false);
   const [doneAmt, setDoneAmt] = useState(0);
   const [fieldErr, setFieldErr] = useState('');
   const [q, setQ] = useState('');
@@ -174,6 +176,8 @@ export function WalletPage() {
   });
 
   const withdrawable = info?.withdrawableAmount ?? 0;
+  const pendingId = info?.pendingWithdrawalId || '';
+  const pendingAmt = info?.pendingWithdrawalAmount ?? 0;
   const maxAmt = Number(amount) || 0;
 
   const filtered = useMemo(() => {
@@ -247,6 +251,24 @@ export function WalletPage() {
       toast(isApiError(err) ? err.message : t('wallet.submitFail'));
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function doCancelPending() {
+    if (!pendingId || cancelBusy) return;
+    setCancelBusy(true);
+    try {
+      const result = await cancelWithdraw(pendingId);
+      toast(t('wallet.cancelWithdrawOk'));
+      const next = await fetchWithdrawable();
+      setInfo(next);
+      setRows(await fetchBalanceHistory());
+      if (typeof result?.balance === 'number') setBalance(result.balance);
+      else if (next?.balance != null) setBalance(next.balance);
+    } catch (err) {
+      toast(isApiError(err) ? err.message : t('wallet.cancelWithdrawFail'));
+    } finally {
+      setCancelBusy(false);
     }
   }
 
@@ -333,7 +355,23 @@ export function WalletPage() {
             <span>{bacText(withdrawable)} BAC</span>
           </p>
           <p className="wal-formula">{t('wallet.formula')}</p>
-          {info?.hasPendingWithdrawal ? <p className="wal-pending">{t('wallet.pending')}</p> : null}
+          {info?.hasPendingWithdrawal ? (
+            <div className="wal-pending-block">
+              <p className="wal-pending">
+                {t('wallet.pending')}
+                {pendingAmt > 0 ? ` · ${bacText(pendingAmt)} BAC` : ''}
+              </p>
+              <p className="wal-pending-hint">{t('wallet.cancelWithdrawLead')}</p>
+              <button
+                className="wal-cancel-wd"
+                type="button"
+                disabled={cancelBusy || !pendingId || !navigator.onLine}
+                onClick={() => void doCancelPending()}
+              >
+                {cancelBusy ? t('wallet.submitting') : t('wallet.cancelWithdraw')}
+              </button>
+            </div>
+          ) : null}
           <button
             className="wal-request"
             type="button"

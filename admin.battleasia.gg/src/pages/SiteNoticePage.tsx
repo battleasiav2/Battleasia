@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Navigate, useOutletContext } from 'react-router-dom';
-import { api, unwrapData, explainError } from '../lib/api';
+import { api, unwrapData, explainError, uploadMultipart } from '../lib/api';
 import { can } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 import { mediaUrl } from '../lib/media';
@@ -40,6 +40,7 @@ export function SiteNoticePage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadPct, setUploadPct] = useState(0);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -77,19 +78,26 @@ export function SiteNoticePage() {
 
   async function uploadImage(file: File) {
     setUploading(true);
+    setUploadPct(0);
+    setError('');
     try {
       const body = new FormData();
       body.append('file', file);
-      const payload = await api('/api/v1/files/upload/notice', { method: 'POST', body });
+      const payload = await uploadMultipart('/api/v1/files/upload/notice', body, {
+        onProgress: setUploadPct,
+      });
       const data = unwrapData<{ url?: string }>(payload);
       const url = String(data?.url || '');
       if (!url) throw new Error('No url');
       update('imageUrl', url);
       toast(t('notice.imageOk'), 'ok');
     } catch (err) {
-      toast(explainError(err, t('notice.imageFail')), 'err');
+      const msg = explainError(err, t('notice.imageFail'));
+      setError(msg);
+      toast(msg, 'err');
     } finally {
       setUploading(false);
+      setUploadPct(0);
     }
   }
 
@@ -132,7 +140,9 @@ export function SiteNoticePage() {
       const emailQueued = Boolean((payload as { emailQueued?: boolean })?.emailQueued);
       toast(emailQueued ? t('notice.savedMail') : t('notice.saved'), 'ok');
     } catch (err) {
-      toast(explainError(err, t('settings.fail')), 'err');
+      const msg = explainError(err, t('settings.fail'));
+      setError(msg);
+      toast(msg, 'err');
     } finally {
       setBusy(false);
     }
@@ -199,7 +209,12 @@ export function SiteNoticePage() {
                   e.target.value = '';
                 }}
               />
-              <span className="field-hint">{uploading ? t('notice.uploading') : t('notice.imageHint')}</span>
+              <span className="field-hint">{uploading ? `${t('notice.uploading')} ${uploadPct}%` : t('notice.imageHint')}</span>
+              {uploading ? (
+                <div style={{ marginTop: 8, maxWidth: 320, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
+                  <div style={{ width: `${uploadPct}%`, height: '100%', background: '#d4e82a' }} />
+                </div>
+              ) : null}
             </label>
 
             {form.imageUrl ? (

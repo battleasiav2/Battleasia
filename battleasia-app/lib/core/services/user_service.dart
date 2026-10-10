@@ -572,6 +572,45 @@ class UserService {
     }
   }
 
+  /// Cancel a pending withdrawal and restore balance
+  Future<Map<String, dynamic>> cancelWithdrawal(String withdrawalId) async {
+    try {
+      final headers = await _getHeaders(money: true);
+      final response = await ApiClient.patch(
+        Uri.parse(
+          '$_baseUrl/api/v4/payments/withdrawal-history/${Uri.encodeComponent(withdrawalId)}/cancel',
+        ),
+        headers: headers,
+      );
+
+      final responseBody = response.body;
+      if (responseBody.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+
+      final data = jsonDecode(responseBody) as Map<String, dynamic>;
+
+      if (response.statusCode == 200 && data['status'] == true) {
+        return {
+          'success': true,
+          'data': data['data'],
+          'balance': data['balance'],
+          'message': data['message'],
+        };
+      }
+
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to cancel withdrawal',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
   /// Get current user's deposit history
   /// Calls GET /api/v4/payments/deposit-history/my-history
   Future<Map<String, dynamic>> getMyDepositHistory({

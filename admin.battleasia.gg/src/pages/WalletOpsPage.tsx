@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { api, unwrapData, unwrapList, explainError } from '../lib/api';
+import { api, unwrapData, unwrapList, explainError, uploadMultipart } from '../lib/api';
 import { cell, pick, rowId } from '../lib/format';
 import { useI18n } from '../lib/i18n';
 import { mediaUrl } from '../lib/media';
@@ -25,6 +25,7 @@ export function WalletOpsPage() {
   const [wallets, setWallets] = useState<Array<Record<string, unknown>> | null>(null);
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState('');
+  const [uploadPct, setUploadPct] = useState(0);
 
   function load() {
     return Promise.all([
@@ -48,10 +49,12 @@ export function WalletOpsPage() {
 
   async function uploadQr(id: string, file: File) {
     setUploading(id);
+    setUploadPct(0);
+    setError('');
     try {
       const body = new FormData();
       body.append('file', file);
-      const uploaded = await api('/api/v1/files/upload/shop', { method: 'POST', body });
+      const uploaded = await uploadMultipart('/api/v1/files/upload/shop', body, { onProgress: setUploadPct });
       const data = unwrapData<{ url?: string }>(uploaded);
       const url = String(data?.url || '');
       if (!url) throw new Error('No url');
@@ -62,9 +65,12 @@ export function WalletOpsPage() {
       toast(t('walletOps.qrOk'), 'ok');
       await load();
     } catch (err) {
-      toast(explainError(err, t('walletOps.qrFail')), 'err');
+      const msg = explainError(err, t('walletOps.qrFail'));
+      setError(msg);
+      toast(msg, 'err');
     } finally {
       setUploading('');
+      setUploadPct(0);
     }
   }
 
@@ -111,6 +117,16 @@ export function WalletOpsPage() {
                         e.target.value = '';
                       }}
                     />
+                    {uploading === id ? (
+                      <p className="field-hint" role="status">
+                        {t('notice.uploading')} {uploadPct}%
+                      </p>
+                    ) : null}
+                    {uploading === id ? (
+                      <div style={{ maxWidth: 200, height: 4, marginTop: 6, borderRadius: 2, background: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
+                        <div style={{ width: `${uploadPct}%`, height: '100%', background: '#d4e82a' }} />
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               );

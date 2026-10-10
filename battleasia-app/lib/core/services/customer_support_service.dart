@@ -1,4 +1,6 @@
-﻿import 'dart:convert';
+﻿import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:battleasia_app/core/utils/api_client.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
@@ -346,6 +348,7 @@ class CustomerSupportService {
   Future<Map<String, dynamic>> uploadFiles(
     List<String> filePaths, {
     String folder = 'support',
+    void Function(int percent)? onProgress,
   }) async {
     try {
       if (filePaths.isEmpty) {
@@ -362,8 +365,29 @@ class CustomerSupportService {
         request.headers['Authorization'] = headers['Authorization']!;
       }
 
+      var totalBytes = 0;
       for (final filePath in filePaths) {
-        request.files.add(await http.MultipartFile.fromPath('files', filePath));
+        totalBytes += await File(filePath).length();
+      }
+      var sentBytes = 0;
+      for (final filePath in filePaths) {
+        final file = File(filePath);
+        final length = await file.length();
+        final name = filePath.split(Platform.pathSeparator).last;
+        final stream = file.openRead().transform(
+          StreamTransformer<List<int>, List<int>>.fromHandlers(
+            handleData: (data, sink) {
+              sentBytes += data.length;
+              if (totalBytes > 0) {
+                onProgress?.call(((sentBytes / totalBytes) * 100).round().clamp(0, 100));
+              }
+              sink.add(data);
+            },
+          ),
+        );
+        request.files.add(
+          http.MultipartFile('files', stream, length, filename: name),
+        );
       }
 
       final streamedResponse = await ApiClient.send(request);

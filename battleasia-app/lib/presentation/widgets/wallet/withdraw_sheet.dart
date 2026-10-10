@@ -9,12 +9,13 @@ import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
 /// Dark glass withdrawal sheet matching battleasia.gg wallet dialog (form → confirm).
-Future<bool?> showWithdrawSheet({
+Future<String?> showWithdrawSheet({
   required BuildContext context,
   required double availableBalance,
   required double withdrawableAmount,
   required bool hasPendingWithdrawal,
   required double pendingWithdrawalAmount,
+  String? pendingWithdrawalId,
   List<Map<String, dynamic>> currencyRates = const [],
 }) {
   return showModalBottomSheet<bool>(
@@ -26,6 +27,7 @@ Future<bool?> showWithdrawSheet({
       withdrawableAmount: withdrawableAmount,
       hasPendingWithdrawal: hasPendingWithdrawal,
       pendingWithdrawalAmount: pendingWithdrawalAmount,
+      pendingWithdrawalId: pendingWithdrawalId,
       currencyRates: currencyRates,
     ),
   );
@@ -36,6 +38,7 @@ class _WithdrawSheet extends StatefulWidget {
   final double withdrawableAmount;
   final bool hasPendingWithdrawal;
   final double pendingWithdrawalAmount;
+  final String? pendingWithdrawalId;
   final List<Map<String, dynamic>> currencyRates;
 
   const _WithdrawSheet({
@@ -43,6 +46,7 @@ class _WithdrawSheet extends StatefulWidget {
     required this.withdrawableAmount,
     required this.hasPendingWithdrawal,
     required this.pendingWithdrawalAmount,
+    this.pendingWithdrawalId,
     required this.currencyRates,
   });
 
@@ -58,6 +62,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
   String _step = 'form'; // form | confirm
   String _channel = kWithdrawalChannels.first.value;
   bool _submitting = false;
+  bool _cancelling = false;
 
   WithdrawalChannel get _selectedChannel =>
       kWithdrawalChannels.firstWhere((c) => c.value == _channel);
@@ -115,6 +120,28 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
     setState(() => _step = 'confirm');
   }
 
+  Future<void> _cancelPending() async {
+    final id = widget.pendingWithdrawalId?.trim();
+    if (id == null || id.isEmpty || _cancelling) return;
+    setState(() => _cancelling = true);
+    try {
+      final result = await _userService.cancelWithdrawal(id);
+      if (!mounted) return;
+      if (result['success'] == true) {
+        final bal = (result['balance'] as num?)?.toDouble();
+        if (bal != null) {
+          context.read<AuthProvider>().updateBalance(bal);
+        }
+        _toast('wallet.cancelWithdrawOk'.tr(), ok: true);
+        Navigator.pop(context, 'cancelled');
+      } else {
+        _toast(result['message']?.toString() ?? 'wallet.cancelWithdrawFail'.tr());
+      }
+    } finally {
+      if (mounted) setState(() => _cancelling = false);
+    }
+  }
+
   Future<void> _submit() async {
     final user = context.read<AuthProvider>().user;
     if (user == null) return;
@@ -134,7 +161,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
 
       if (!mounted) return;
       if (result['success'] == true) {
-        Navigator.pop(context, true);
+        Navigator.pop(context, 'submitted');
         return;
       }
       _toast(result['message']?.toString() ?? 'wallet.submitFailed'.tr());
@@ -339,6 +366,30 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
                         widget.pendingWithdrawalAmount.toStringAsFixed(2),
                   }),
                   style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  'wallet.cancelWithdrawLead'.tr(),
+                  style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton(
+                    onPressed: _cancelling || widget.pendingWithdrawalId == null
+                        ? null
+                        : _cancelPending,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.textPrimary,
+                      side: BorderSide(color: AppColors.border(0.28)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    child: Text(
+                      _cancelling
+                          ? 'wallet.submitting'.tr()
+                          : 'wallet.cancelWithdraw'.tr(),
+                    ),
+                  ),
                 ),
               ],
             ),

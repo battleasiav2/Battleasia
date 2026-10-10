@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom';
-import { api, unwrapData, unwrapList, explainError } from '../lib/api';
+import { api, unwrapData, unwrapList, explainError, uploadMultipart } from '../lib/api';
 import { mediaUrl } from '../lib/media';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
@@ -111,6 +111,7 @@ export function MatchFormPage() {
   const [slugLocked, setSlugLocked] = useState(Boolean(id));
   const [createForAllFive, setCreateForAllFive] = useState(!id);
   const [uploadingBanner, setUploadingBanner] = useState(false);
+  const [bannerUploadPct, setBannerUploadPct] = useState(0);
   const [form, setForm] = useState({
     gameId: '',
     matchName: '',
@@ -473,9 +474,10 @@ export function MatchFormPage() {
               e.target.value = '';
               if (!file) return;
               setUploadingBanner(true);
+              setBannerUploadPct(0);
               const body = new FormData();
               body.append('file', file);
-              void api('/api/v1/files/upload/matches', { method: 'POST', body })
+              void uploadMultipart('/api/v1/files/upload/matches', body, { onProgress: setBannerUploadPct })
                 .then((payload) => {
                   const url = String(unwrapData<{ url?: string }>(payload)?.url || '');
                   if (!url) throw new Error('No url');
@@ -488,10 +490,20 @@ export function MatchFormPage() {
                   setError(msg);
                   toast(msg, 'err');
                 })
-                .finally(() => setUploadingBanner(false));
+                .finally(() => {
+                  setUploadingBanner(false);
+                  setBannerUploadPct(0);
+                });
             }}
           />
-          <span className="field-hint">{uploadingBanner ? 'Uploading…' : 'Optional. Shown on the match card. JPG, PNG, or WebP.'}</span>
+          <span className="field-hint">
+            {uploadingBanner ? `Uploading… ${bannerUploadPct}%` : 'Optional. Shown on the match card. JPG, PNG, or WebP.'}
+          </span>
+          {uploadingBanner ? (
+            <div style={{ marginTop: 8, maxWidth: 320, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
+              <div style={{ width: `${bannerUploadPct}%`, height: '100%', background: '#d4e82a' }} />
+            </div>
+          ) : null}
         </label>
 
         {form.banner || form.map ? (

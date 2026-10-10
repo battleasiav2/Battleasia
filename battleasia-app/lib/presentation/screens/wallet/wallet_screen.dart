@@ -36,6 +36,8 @@ class _WalletScreenState extends State<WalletScreen> {
   double _withdrawableAmount = 0.0;
   bool _hasPendingWithdrawal = false;
   double _pendingWithdrawalAmount = 0.0;
+  String? _pendingWithdrawalId;
+  bool _cancelWithdrawBusy = false;
 
   // Withdrawal modal state
   List<Map<String, dynamic>> _currencyRates = [];
@@ -170,6 +172,8 @@ class _WalletScreenState extends State<WalletScreen> {
                 data['hasPendingWithdrawal'] as bool? ?? false;
             _pendingWithdrawalAmount =
                 (data['pendingWithdrawalAmount'] as num?)?.toDouble() ?? 0.0;
+            _pendingWithdrawalId =
+                data['pendingWithdrawalId'] as String?;
           });
         }
       }
@@ -203,6 +207,41 @@ class _WalletScreenState extends State<WalletScreen> {
     }
   }
 
+  Future<void> _cancelPendingWithdrawal(BuildContext context) async {
+    final id = _pendingWithdrawalId?.trim();
+    if (id == null || id.isEmpty || _cancelWithdrawBusy) return;
+    setState(() => _cancelWithdrawBusy = true);
+    try {
+      final result = await _userService.cancelWithdrawal(id);
+      if (!mounted) return;
+      if (result['success'] == true) {
+        final bal = (result['balance'] as num?)?.toDouble();
+        if (bal != null) {
+          context.read<AuthProvider>().updateBalance(bal);
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('wallet.cancelWithdrawOk'.tr()),
+            backgroundColor: Colors.green,
+          ),
+        );
+        await _fetchWithdrawableAmount();
+        await _fetchBalanceHistory();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              result['message']?.toString() ?? 'wallet.cancelWithdrawFail'.tr(),
+            ),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _cancelWithdrawBusy = false);
+    }
+  }
+
   void _showWithdrawalModal(BuildContext context, double availableBalance) {
     showWithdrawSheet(
       context: context,
@@ -210,19 +249,24 @@ class _WalletScreenState extends State<WalletScreen> {
       withdrawableAmount: _withdrawableAmount,
       hasPendingWithdrawal: _hasPendingWithdrawal,
       pendingWithdrawalAmount: _pendingWithdrawalAmount,
+      pendingWithdrawalId: _pendingWithdrawalId,
       currencyRates: _currencyRates,
-    ).then((ok) async {
-      if (ok != true || !mounted) return;
-      ScaffoldMessenger.of(this.context).showSnackBar(
-        SnackBar(
-          content: Text('wallet.submitSuccess'.tr()),
-          backgroundColor: Colors.green,
-        ),
-      );
-      await Future.wait([
-        _fetchBalanceHistory(),
-        _fetchWithdrawableAmount(),
-      ]);
+    ).then((result) async {
+      if (result == null || !mounted) return;
+      if (result == 'submitted') {
+        ScaffoldMessenger.of(this.context).showSnackBar(
+          SnackBar(
+            content: Text('wallet.submitSuccess'.tr()),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+      if (result == 'submitted' || result == 'cancelled') {
+        await Future.wait([
+          _fetchBalanceHistory(),
+          _fetchWithdrawableAmount(),
+        ]);
+      }
     });
   }
 
@@ -658,6 +702,38 @@ class _WalletScreenState extends State<WalletScreen> {
                 style: AppTheme.bodySmall.copyWith(
                   color: AppColors.error,
                   fontSize: 11.0,
+                ),
+              ),
+              SizedBox(height: spacing8),
+              Text(
+                'wallet.cancelWithdrawLead'.tr(),
+                style: AppTheme.bodySmall.copyWith(
+                  color: AppColors.textMuted,
+                  fontSize: 11.0,
+                ),
+              ),
+              SizedBox(height: spacing8),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: _cancelWithdrawBusy ||
+                          (_pendingWithdrawalId ?? '').isEmpty
+                      ? null
+                      : () => _cancelPendingWithdrawal(context),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.textPrimary,
+                    side: BorderSide(color: AppColors.border(0.28)),
+                    padding: EdgeInsets.symmetric(vertical: buttonPadding * 0.6),
+                  ),
+                  child: Text(
+                    _cancelWithdrawBusy
+                        ? 'wallet.submitting'.tr()
+                        : 'wallet.cancelWithdraw'.tr(),
+                    style: TextStyle(
+                      fontSize: buttonFontSize * 0.9,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
               ),
             ] else ...[

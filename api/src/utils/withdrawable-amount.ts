@@ -50,5 +50,6 @@ export async function getWithdrawableInfo(userId: string, balance: number) {
     alreadyWithdrawn: roundAmount(alreadyWithdrawn),
     balance: roundAmount(currentBalance),
     pendingWithdrawalId: pendingWithdrawal?._id.toString() || null,
+    pendingWithdrawalAmount: roundAmount(pendingWithdrawal?.coin_amount ?? 0),
   };
 }

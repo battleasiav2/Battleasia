@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CoinValue } from '../../components/CoinValue';
 import { PayBrand, payKindFromName } from '../../components/PayBrand';
@@ -37,10 +37,11 @@ function usd(n: number) {
   return `$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-function packPhoto(image?: string) {
+function packPhoto(image?: string, cacheBust?: number) {
   const src = mediaUrl(image);
   if (!src || src.includes('currency.webp') || /bac-coin/i.test(src)) return '';
-  return src;
+  if (!cacheBust) return src;
+  return `${src}${src.includes('?') ? '&' : '?'}v=${cacheBust}`;
 }
 
 function packPayLabel(currency: string, amount: number) {
@@ -80,6 +81,17 @@ export function ShopPage() {
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
   const [couponErr, setCouponErr] = useState('');
   const [couponBusy, setCouponBusy] = useState(false);
+  const [packImgEpoch, setPackImgEpoch] = useState(0);
+
+  const reloadCatalog = useCallback(async () => {
+    try {
+      const p = await fetchShopPacks();
+      setPacks(p);
+      setPackImgEpoch(Date.now());
+    } catch (err) {
+      setError(isApiError(err) ? err.message : t('errors.shopOffline'));
+    }
+  }, [t]);
 
   useEffect(() => {
     return register({
@@ -109,6 +121,7 @@ export function ShopPage() {
       .then(([p, c, d, w, rateRows]) => {
         if (!live) return;
         setPacks(p);
+        setPackImgEpoch(Date.now());
         setChannels(c);
         setWallets(w);
         setRates(rateRows);
@@ -125,6 +138,14 @@ export function ShopPage() {
       live = false;
     };
   }, [t]);
+
+  useEffect(() => {
+    const onVis = () => {
+      if (document.visibilityState === 'visible') void reloadCatalog();
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, [reloadCatalog]);
 
   const wallet = useMemo(
     () => wallets.find((row) => walletChannelId(row) === channelId),
@@ -453,8 +474,8 @@ export function ShopPage() {
                 </div>
                 <div className="shop-pack-art" aria-hidden>
                   <span className="shop-pack-glow" />
-                  {packPhoto(item.image) ? (
-                    <img className="shop-pack-photo" src={packPhoto(item.image)} alt="" width={108} height={108} decoding="async" />
+                  {packPhoto(item.image, packImgEpoch) ? (
+                    <img className="shop-pack-photo" src={packPhoto(item.image, packImgEpoch)} alt="" width={108} height={108} decoding="async" />
                   ) : (
                   <div className="shop-pack-stack">
                     <img src={ASSETS.coin} className="shop-pack-stack-coin is-back" alt="" decoding="async" />

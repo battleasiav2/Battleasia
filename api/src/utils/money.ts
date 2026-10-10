@@ -310,6 +310,102 @@ export async function rejectDepositMoney(depositId: string) {
   return { status: deposit.status };
 }
 
+async function releaseWithdrawHold(
+  session: mongoose.ClientSession,
+  withdrawal: InstanceType<typeof WithdrawalHistory>,
+  user: IUser,
+  idempotencyKey?: string,
+) {
+  const hold = await LedgerEntry.findOne({
+    refType: 'withdraw_hold',
+    refId: withdrawal._id.toString(),
+  }).session(session);
+  if (!hold) return false;
+  const amount = roundMoney(withdrawal.coin_amount);
+  const balanceBefore = user.balance ?? 0;
+  const updated = await User.findByIdAndUpdate(user._id, { $inc: { balance: amount } }, { new: true, session });
+  user.balance = updated?.balance ?? balanceBefore + amount;
+  await reverseEntry(session, hold._id, idempotencyKey);
+  await writeHistory(session, user, amount, 'deposit', balanceBefore, user.balance ?? 0, {
+    reason: 'withdrawal_cancelled_refund',
+    withdrawal_id: withdrawal._id.toString(),
+  });
+  return true;
+}
+
+export async function holdWithdrawOnSubmit(input: {
+  withdrawalId: string;
+  userId: string;
+  idempotencyKey?: string;
+}) {
+  return runMoney(async (session) => {
+    const withdrawal = await WithdrawalHistory.findById(input.withdrawalId).session(session);
+    if (!withdrawal) throw new MoneyError('Withdrawal not found', 404);
+    if (withdrawal.userId.toString() !== input.userId) throw new MoneyError('Forbidden', 403);
+    if (withdrawal.status !== 'pending') throw new MoneyError('Withdrawal is not pending');
+
+    const existing = await LedgerEntry.findOne({
+      refType: 'withdraw_hold',
+      refId: withdrawal._id.toString(),
+    }).session(session);
+    if (existing) {
+      const user = await User.findById(input.userId).session(session);
+      return { balance: user?.balance ?? 0 };
+    }
+
+    const user = await User.findById(input.userId).session(session);
+    if (!user) throw new MoneyError('User not found', 404);
+    const amount = roundMoney(withdrawal.coin_amount);
+    const balanceBefore = user.balance ?? 0;
+    if (balanceBefore < amount) throw new MoneyError('Insufficient user balance');
+    const updated = await User.findOneAndUpdate(
+      { _id: user._id, balance: { $gte: amount } },
+      { $inc: { balance: -amount } },
+      { new: true, session },
+    );
+    if (!updated) throw new MoneyError('Insufficient user balance');
+    user.balance = updated.balance;
+
+    await postPair(session, {
+      debitAccount: walletAccount(user._id.toString()),
+      creditAccount: 'reserve:pending-withdraw',
+      amount,
+      userId: user._id,
+      refType: 'withdraw_hold',
+      refId: withdrawal._id.toString(),
+      idempotencyKey: input.idempotencyKey,
+    });
+    await writeHistory(session, user, amount, 'withdraw', balanceBefore, updated.balance ?? 0, {
+      reason: 'withdrawal_requested',
+      withdrawal_id: withdrawal._id.toString(),
+    });
+    return { balance: updated.balance ?? 0 };
+  });
+}
+
+export async function cancelWithdrawByUser(input: {
+  withdrawalId: string;
+  userId: string;
+  idempotencyKey?: string;
+}) {
+  return runMoney(async (session) => {
+    const withdrawal = await WithdrawalHistory.findById(input.withdrawalId).session(session);
+    if (!withdrawal) throw new MoneyError('Withdrawal not found', 404);
+    if (withdrawal.userId.toString() !== input.userId) throw new MoneyError('Forbidden', 403);
+    if (withdrawal.status !== 'pending') throw new MoneyError('Withdrawal cannot be cancelled');
+
+    const user = await User.findById(input.userId).session(session);
+    if (!user) throw new MoneyError('User not found', 404);
+
+    await releaseWithdrawHold(session, withdrawal, user, input.idempotencyKey);
+    withdrawal.status = 'rejected';
+    withdrawal.rejection_reason = 'Cancelled by user';
+    withdrawal.processed_at = new Date();
+    await withdrawal.save({ session });
+    return { balance: user.balance ?? 0 };
+  });
+}
+
 export async function approveWithdrawMoney(input: { withdrawalId: string; idempotencyKey?: string }) {
   return runMoney(async (session) => {
     const withdrawal = await WithdrawalHistory.findById(input.withdrawalId).session(session);
@@ -318,6 +414,23 @@ export async function approveWithdrawMoney(input: { withdrawalId: string; idempo
     const user = await User.findById(withdrawal.userId).session(session);
     if (!user) throw new MoneyError('User not found', 404);
     const amount = roundMoney(withdrawal.coin_amount);
+
+    const hold = await LedgerEntry.findOne({
+      refType: 'withdraw_hold',
+      refId: withdrawal._id.toString(),
+    }).session(session);
+
+    if (hold) {
+      withdrawal.status = 'processing';
+      withdrawal.processed_at = new Date();
+      await withdrawal.save({ session });
+      await writeHistory(session, user, amount, 'withdraw', user.balance ?? 0, user.balance ?? 0, {
+        reason: 'withdrawal_approved',
+        withdrawal_id: withdrawal._id.toString(),
+      });
+      return { balance: user.balance ?? 0 };
+    }
+
     const balanceBefore = user.balance ?? 0;
     if (balanceBefore < amount) throw new MoneyError('Insufficient user balance');
     const updated = await User.findOneAndUpdate(
@@ -354,19 +467,25 @@ export async function refundWithdrawMoney(input: { withdrawalId: string; idempot
     const user = await User.findById(withdrawal.userId).session(session);
     if (!user) throw new MoneyError('User not found', 404);
     const amount = roundMoney(withdrawal.coin_amount);
-    if (withdrawal.status === 'processing') {
+    if (withdrawal.status === 'pending') {
+      await releaseWithdrawHold(session, withdrawal, user, input.idempotencyKey);
+    } else if (withdrawal.status === 'processing') {
       const original = await LedgerEntry.findOne({
         refType: 'withdraw_approve',
         refId: withdrawal._id.toString(),
       }).session(session);
-      const balanceBefore = user.balance ?? 0;
-      const updated = await User.findByIdAndUpdate(user._id, { $inc: { balance: amount } }, { new: true, session });
-      user.balance = updated?.balance ?? balanceBefore + amount;
-      if (original) await reverseEntry(session, original._id, input.idempotencyKey);
-      await writeHistory(session, user, amount, 'deposit', balanceBefore, user.balance ?? 0, {
-        reason: 'withdrawal_rejected_refund',
-        withdrawal_id: withdrawal._id.toString(),
-      });
+      if (original) {
+        const balanceBefore = user.balance ?? 0;
+        const updated = await User.findByIdAndUpdate(user._id, { $inc: { balance: amount } }, { new: true, session });
+        user.balance = updated?.balance ?? balanceBefore + amount;
+        await reverseEntry(session, original._id, input.idempotencyKey);
+        await writeHistory(session, user, amount, 'deposit', balanceBefore, user.balance ?? 0, {
+          reason: 'withdrawal_rejected_refund',
+          withdrawal_id: withdrawal._id.toString(),
+        });
+      } else {
+        await releaseWithdrawHold(session, withdrawal, user, input.idempotencyKey);
+      }
     }
     withdrawal.status = 'rejected';
     withdrawal.processed_at = new Date();

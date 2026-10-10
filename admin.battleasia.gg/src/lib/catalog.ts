@@ -19,11 +19,20 @@ export type ListSpec = {
   includeInactive?: boolean;
 };
 
+export type SettingsFormId =
+  | 'referral'
+  | 'transfer'
+  | 'profileSocial'
+  | 'liveChat'
+  | 'messaging'
+  | 'engagement';
+
 export type SettingsSpec = {
   title: string;
   get: string;
   put?: string;
   wrap?: string;
+  form?: SettingsFormId;
   perm?: string | null;
   testPath?: string;
 };
@@ -127,14 +136,61 @@ export const LISTS: Record<string, ListSpec> = {
 };
 
 export const SETTINGS: Record<string, SettingsSpec> = {
-  '/users/referral-settings': { title: 'nav.referralSettings', get: '/api/v3/users/referral-settings/details', put: '/api/v3/users/referral-settings/update', perm: 'users.edit' },
-  '/users/transfer-settings': { title: 'nav.transferSettings', get: '/api/v3/users/transfer-settings/details', put: '/api/v3/users/transfer-settings/update', wrap: 'transferSettings', perm: 'users.edit' },
-  '/feed/profile-social-settings': { title: 'page.profileSocial', get: '/api/v2/social/profile-social-settings', put: '/api/v2/social/profile-social-settings', perm: 'feed.edit' },
-  '/customer-support/live-chat-settings': { title: 'page.liveChat', get: '/api/v2/customer-support/live-chat-settings', put: '/api/v2/customer-support/live-chat-settings', perm: 'customer-support.view' },
-  '/customer-support/messaging-provider-settings': { title: 'page.messaging', get: '/api/v2/social/messaging-settings', put: '/api/v2/social/messaging-settings', perm: 'customer-support.view' },
-  '/engagement/settings': { title: 'page.engagement', get: '/api/v3/engagement/settings', put: '/api/v3/engagement/settings', perm: 'engagement.edit' },
-  '/system/mail-settings': { title: 'page.mail', get: '/api/v2/app-settings/mail-settings', put: '/api/v2/app-settings/mail-settings', testPath: '/api/v2/app-settings/mail-settings/test', perm: null },
-  '/system/app-download': { title: 'nav.appDownload', get: '/api/v2/app-settings/app-download', put: '/api/v2/app-settings/app-download', perm: null },
+  '/users/referral-settings': {
+    title: 'nav.referralSettings',
+    get: '/api/v3/users/referral-settings/details',
+    put: '/api/v3/users/referral-settings/update',
+    form: 'referral',
+    perm: 'users.edit',
+  },
+  '/users/transfer-settings': {
+    title: 'nav.transferSettings',
+    get: '/api/v3/users/transfer-settings/details',
+    put: '/api/v3/users/transfer-settings/update',
+    form: 'transfer',
+    perm: 'users.edit',
+  },
+  '/feed/profile-social-settings': {
+    title: 'page.profileSocial',
+    get: '/api/v2/social/profile-social-settings',
+    put: '/api/v2/social/profile-social-settings',
+    form: 'profileSocial',
+    perm: 'feed.edit',
+  },
+  '/customer-support/live-chat-settings': {
+    title: 'page.liveChat',
+    get: '/api/v2/customer-support/live-chat-settings',
+    put: '/api/v2/customer-support/live-chat-settings',
+    form: 'liveChat',
+    perm: 'customer-support.view',
+  },
+  '/customer-support/messaging-provider-settings': {
+    title: 'page.messaging',
+    get: '/api/v2/social/messaging-settings',
+    put: '/api/v2/social/messaging-settings',
+    form: 'messaging',
+    perm: 'customer-support.view',
+  },
+  '/engagement/settings': {
+    title: 'page.engagement',
+    get: '/api/v3/engagement/settings',
+    put: '/api/v3/engagement/settings',
+    form: 'engagement',
+    perm: 'engagement.edit',
+  },
+  '/system/mail-settings': {
+    title: 'page.mail',
+    get: '/api/v2/app-settings/mail-settings',
+    put: '/api/v2/app-settings/mail-settings',
+    testPath: '/api/v2/app-settings/mail-settings/test',
+    perm: null,
+  },
+  '/system/app-download': {
+    title: 'nav.appDownload',
+    get: '/api/v2/app-settings/app-download',
+    put: '/api/v2/app-settings/app-download',
+    perm: null,
+  },
 };
 
 export const INTEGRITY: Record<string, { title: string; api: string }> = {

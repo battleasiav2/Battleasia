@@ -24,7 +24,7 @@ class ShopScreen extends StatefulWidget {
   State<ShopScreen> createState() => _ShopScreenState();
 }
 
-class _ShopScreenState extends State<ShopScreen> {
+class _ShopScreenState extends State<ShopScreen> with WidgetsBindingObserver {
   final ScrollController _scrollController = ScrollController();
   final ShopService _shopService = ShopService();
   final TextEditingController _minPriceController = TextEditingController();
@@ -36,6 +36,7 @@ class _ShopScreenState extends State<ShopScreen> {
   List<Map<String, dynamic>> _rates = [];
   double _bdtRate = 1;
   bool _loading = true;
+  int _packImageEpoch = 0;
   String _selectedCategory = 'all';
   String _selectedChannelId = '';
 
@@ -48,11 +49,20 @@ class _ShopScreenState extends State<ShopScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _fetchAll();
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _fetchItems(silent: true);
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _scrollController.dispose();
     _minPriceController.dispose();
     _maxPriceController.dispose();
@@ -135,6 +145,7 @@ class _ShopScreenState extends State<ShopScreen> {
           setState(() {
             _allItems = itemsList;
             _items = _applyFilters(itemsList);
+            _packImageEpoch = DateTime.now().millisecondsSinceEpoch;
           });
         }
       } else if (mounted) {
@@ -355,6 +366,7 @@ class _ShopScreenState extends State<ShopScreen> {
                               return ShopItemCard(
                                 item: item,
                                 bdtRate: _bdtRate,
+                                imageCacheEpoch: _packImageEpoch,
                                 onTap: () => _handleBuy(item),
                                 onBuy: () => _handleBuy(item),
                               );
@@ -388,6 +400,7 @@ class _ShopScreenState extends State<ShopScreen> {
                             return ShopItemCard(
                               item: item,
                               bdtRate: _bdtRate,
+                              imageCacheEpoch: _packImageEpoch,
                               onTap: () => _handleBuy(item),
                               onBuy: () => _handleBuy(item),
                             );

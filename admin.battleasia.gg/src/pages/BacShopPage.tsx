@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState, useEffect } from 'react';
 import { Navigate, useOutletContext } from 'react-router-dom';
-import { api, unwrapData, unwrapList, explainError } from '../lib/api';
+import { api, unwrapData, unwrapList, explainError, uploadMultipart } from '../lib/api';
 import { can } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 import { mediaUrl } from '../lib/media';
@@ -60,6 +60,7 @@ export function BacShopPage() {
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const [creating, setCreating] = useState(false);
   const [uploading, setUploading] = useState('');
+  const [uploadPct, setUploadPct] = useState(0);
   const [busyId, setBusyId] = useState('');
   const [edits, setEdits] = useState<Record<string, Draft>>({});
 
@@ -100,10 +101,13 @@ export function BacShopPage() {
 
   async function uploadImage(file: File, target: 'draft' | string) {
     setUploading(target);
+    setUploadPct(0);
     try {
       const body = new FormData();
       body.append('file', file);
-      const payload = await api('/api/v1/files/upload/shop', { method: 'POST', body });
+      const payload = await uploadMultipart('/api/v1/files/upload/shop', body, {
+        onProgress: setUploadPct,
+      });
       const data = unwrapData<{ url?: string }>(payload);
       const url = String(data?.url || '');
       if (!url) throw new Error('No url');
@@ -111,9 +115,12 @@ export function BacShopPage() {
       else setEdits((prev) => ({ ...prev, [target]: { ...prev[target], image: url } }));
       toast(t('bacShop.imageOk'), 'ok');
     } catch (err) {
-      toast(explainError(err, t('bacShop.imageFail')), 'err');
+      const msg = explainError(err, t('bacShop.imageFail'));
+      setError(msg);
+      toast(msg, 'err');
     } finally {
       setUploading('');
+      setUploadPct(0);
     }
   }
 
@@ -139,7 +146,9 @@ export function BacShopPage() {
       setDraft(EMPTY);
       await load();
     } catch (err) {
-      toast(explainError(err, t('bacShop.createFail')), 'err');
+      const msg = explainError(err, t('bacShop.createFail'));
+      setError(msg);
+      toast(msg, 'err');
     } finally {
       setCreating(false);
     }
@@ -168,7 +177,9 @@ export function BacShopPage() {
       toast(t('bacShop.saved'), 'ok');
       await load();
     } catch (err) {
-      toast(explainError(err, t('bacShop.saveFail')), 'err');
+      const msg = explainError(err, t('bacShop.saveFail'));
+      setError(msg);
+      toast(msg, 'err');
     } finally {
       setBusyId('');
     }
@@ -258,9 +269,19 @@ export function BacShopPage() {
                 ? `${t('bacShop.pay')} ${money(preview.price)} · ${t('bacShop.list')} ${money(preview.original)}`
                 : t('bacShop.priceHint')}
             </p>
-            <button className="btn btn-primary" type="button" disabled={!canEdit || creating} onClick={() => void createPack()}>
+            <button className="btn btn-primary" type="button" disabled={!canEdit || creating || uploading === 'draft'} onClick={() => void createPack()}>
               {creating ? t('bacShop.saving') : t('bacShop.create')}
             </button>
+            {uploading === 'draft' ? (
+              <p className="field-hint" role="status">
+                {t('notice.uploading')} {uploadPct}%
+              </p>
+            ) : null}
+            {uploading === 'draft' ? (
+              <div style={{ flex: '1 1 100%', maxWidth: 280, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
+                <div style={{ width: `${uploadPct}%`, height: '100%', background: '#d4e82a' }} />
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
@@ -313,6 +334,16 @@ export function BacShopPage() {
                               e.target.value = '';
                             }}
                           />
+                          {uploading === row.id ? (
+                            <p className="field-hint" role="status">
+                              {t('notice.uploading')} {uploadPct}%
+                            </p>
+                          ) : null}
+                          {uploading === row.id ? (
+                            <div style={{ maxWidth: 120, height: 4, marginTop: 4, borderRadius: 2, background: 'rgba(255,255,255,0.12)', overflow: 'hidden' }}>
+                              <div style={{ width: `${uploadPct}%`, height: '100%', background: '#d4e82a' }} />
+                            </div>
+                          ) : null}
                         </td>
                         <td>
                           <input
@@ -356,7 +387,7 @@ export function BacShopPage() {
                             disabled={!canEdit || busyId === row.id}
                             onClick={() => void saveRow(row.id)}
                           >
-                            {t('bacShop.save')}
+                            {busyId === row.id ? t('bacShop.saving') : t('bacShop.save')}
                           </button>
                           <button
                             className="btn btn-ghost"

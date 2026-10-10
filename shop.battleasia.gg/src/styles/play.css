@@ -2744,6 +2744,39 @@ a.result-row {
   color: var(--ba-warning);
 }
 
+.wal-pending-block {
+  margin: 0 0 12px;
+}
+
+.wal-pending-hint {
+  margin: 0 0 10px;
+  color: var(--ba-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.wal-cancel-wd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 14px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--ba-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.wal-cancel-wd:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .wal-request {
   display: flex;
   align-items: center;

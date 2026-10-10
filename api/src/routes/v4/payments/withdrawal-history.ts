@@ -6,7 +6,14 @@ import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
 import { requireAdmin } from '../../../middleware/admin.js';
 import { paginatedResults, parsePagination } from '../../../utils/pagination.js';
 import { recordBalanceHistory } from '../../../utils/balance-history.js';
-import { approveWithdrawMoney, completeWithdrawMoney, refundWithdrawMoney, MoneyError } from '../../../utils/money.js';
+import {
+  approveWithdrawMoney,
+  cancelWithdrawByUser,
+  completeWithdrawMoney,
+  holdWithdrawOnSubmit,
+  refundWithdrawMoney,
+  MoneyError,
+} from '../../../utils/money.js';
 import { assertHighValuePassword, HighValueError } from '../../../utils/high-value.js';
 import { writeAudit } from '../../../models/AuditLog.js';
 import { serializeWithdrawal } from '../../../utils/payment-serialize.js';
@@ -143,6 +150,22 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
       status: 'pending',
     });
 
+    const idemKey = String(req.header('Idempotency-Key') || '').trim() || undefined;
+    try {
+      const held = await holdWithdrawOnSubmit({
+        withdrawalId: withdrawal._id.toString(),
+        userId: user._id.toString(),
+        idempotencyKey: idemKey,
+      });
+      await notifyBalanceChange(user._id.toString(), held.balance, (user.balance ?? 0));
+    } catch (holdError) {
+      await WithdrawalHistory.findByIdAndDelete(withdrawal._id);
+      if (holdError instanceof MoneyError) {
+        return res.status(holdError.status).json({ status: false, message: holdError.message });
+      }
+      throw holdError;
+    }
+
     await emitPendingPaymentCounts();
     emitNewWithdrawal(serializeWithdrawal(withdrawal));
     await notifyWithdrawalSubmitted({
@@ -185,6 +208,38 @@ router.get('/my-history', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
+router.patch('/:id/cancel', requireAuth, async (req: AuthedRequest, res) => {
+  try {
+    const id = String(req.params.id);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ status: false, message: 'Invalid withdrawal id' });
+    }
+    const userBefore = await User.findById(req.userId);
+    const balanceBefore = userBefore?.balance ?? 0;
+    const key = String(req.header('Idempotency-Key') || '').trim() || undefined;
+    const result = await cancelWithdrawByUser({
+      withdrawalId: id,
+      userId: String(req.userId),
+      idempotencyKey: key,
+    });
+    await emitPendingPaymentCounts();
+    await notifyBalanceChange(String(req.userId), result.balance, balanceBefore);
+    const withdrawal = await WithdrawalHistory.findById(id);
+    return res.json({
+      status: true,
+      message: 'Withdrawal cancelled and balance restored',
+      data: withdrawal ? serializeWithdrawal(withdrawal) : null,
+      balance: result.balance,
+    });
+  } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
+    console.error('cancel withdrawal error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to cancel withdrawal' });
+  }
+});
+
 router.get('/:id', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const id = String(req.params.id);
@@ -213,26 +268,32 @@ router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
     if (!existing) return res.status(404).json({ status: false, message: 'Withdrawal not found' });
     await assertHighValuePassword(req, Number(existing.coin_amount));
     const key = String(req.header('Idempotency-Key') || '').trim() || undefined;
-    await approveWithdrawMoney({ withdrawalId: String(req.params.id), idempotencyKey: key });
+    const approved = await approveWithdrawMoney({ withdrawalId: String(req.params.id), idempotencyKey: key });
     const withdrawal = await WithdrawalHistory.findById(req.params.id);
     if (!withdrawal) return res.status(404).json({ status: false, message: 'Withdrawal not found' });
-    const user = await User.findById(withdrawal.userId);
-    await emitPendingPaymentCounts();
-    if (user) {
-      await notifyBalanceChange(user._id.toString(), user.balance ?? 0, (user.balance ?? 0) + withdrawal.coin_amount);
+
+    try {
+      await emitPendingPaymentCounts();
+      await notifyWithdrawalApproved({
+        userId: withdrawal.userId.toString(),
+        amount: withdrawal.coin_amount,
+        withdrawalId: withdrawal._id.toString(),
+      });
+      await writeAudit({
+        actorId: req.userId,
+        action: 'withdraw.approve',
+        target: withdrawal._id.toString(),
+        detail: `${withdrawal.coin_amount} BAC`,
+      });
+    } catch (sideError) {
+      console.error('withdraw approve side-effects failed:', sideError);
     }
-    await notifyWithdrawalApproved({
-      userId: withdrawal.userId.toString(),
-      amount: withdrawal.coin_amount,
-      withdrawalId: withdrawal._id.toString(),
+
+    return res.json({
+      status: true,
+      data: serializeWithdrawal(withdrawal),
+      balance: approved.balance,
     });
-    await writeAudit({
-      actorId: req.userId,
-      action: 'withdraw.approve',
-      target: withdrawal._id.toString(),
-      detail: `${withdrawal.coin_amount} BAC`,
-    });
-    return res.json({ status: true, data: serializeWithdrawal(withdrawal) });
   } catch (error) {
     if (error instanceof HighValueError || error instanceof MoneyError) {
       return res.status((error as { status: number }).status).json({ status: false, message: error.message });
@@ -291,35 +352,26 @@ router.patch('/:id/reject', requireAdmin, async (req: AuthedRequest, res) => {
       return res.status(404).json({ status: false, message: 'User not found' });
     }
 
-    const admin = req.userId ? await User.findById(req.userId) : null;
-    const wasProcessing = withdrawal.status === 'processing';
-
-    if (wasProcessing) {
-      const key = String(req.header('Idempotency-Key') || '').trim() || undefined;
-      await refundWithdrawMoney({ withdrawalId: String(withdrawal._id), idempotencyKey: key });
-    } else {
-      withdrawal.status = 'rejected';
-      withdrawal.rejection_reason = req.body.rejection_reason || '';
-      withdrawal.processed_at = new Date();
-      withdrawal.processed_by = req.userId as unknown as import('mongoose').Types.ObjectId;
-      await withdrawal.save();
+    const balanceBefore = user.balance ?? 0;
+    const key = String(req.header('Idempotency-Key') || '').trim() || undefined;
+    const refunded = await refundWithdrawMoney({ withdrawalId: String(withdrawal._id), idempotencyKey: key });
+    const fresh = await WithdrawalHistory.findById(withdrawal._id);
+    if (fresh) {
+      fresh.rejection_reason = req.body.rejection_reason || '';
+      fresh.processed_by = req.userId as unknown as import('mongoose').Types.ObjectId;
+      await fresh.save();
     }
 
-    withdrawal.status = 'rejected';
-    withdrawal.rejection_reason = req.body.rejection_reason || '';
-    withdrawal.processed_at = new Date();
-    withdrawal.processed_by = req.userId as unknown as import('mongoose').Types.ObjectId;
-    await withdrawal.save();
-
     await emitPendingPaymentCounts();
+    await notifyBalanceChange(user._id.toString(), refunded.balance, balanceBefore);
     await notifyWithdrawalRejected({
       userId: user._id.toString(),
       amount: withdrawal.coin_amount,
       withdrawalId: withdrawal._id.toString(),
-      reason: withdrawal.rejection_reason,
-      refunded: wasProcessing,
+      reason: req.body.rejection_reason || '',
+      refunded: refunded.balance !== balanceBefore,
     });
-    return res.json({ status: true, data: serializeWithdrawal(withdrawal) });
+    return res.json({ status: true, data: serializeWithdrawal(fresh || withdrawal) });
   } catch (error) {
     if (error instanceof MoneyError) {
       return res.status(error.status).json({ status: false, message: error.message });
