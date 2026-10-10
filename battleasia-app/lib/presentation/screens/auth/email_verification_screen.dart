@@ -160,7 +160,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             userData != null) {
           // Save session using AuthService
           final authService = AuthService();
-          await authService.saveToken(sessionData['accessToken'] as String);
+          await authService.storeSessionTokens(sessionData);
           await authService.saveUser(UserModel.fromJson(userData));
 
           if (mounted) {

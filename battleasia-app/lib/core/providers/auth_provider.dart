@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/services/auth_service.dart';
+import 'package:battleasia_app/core/utils/api_client.dart';
 import 'package:battleasia_app/core/services/socket_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/data/models/user_model.dart';
@@ -40,11 +41,17 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
 
   AuthProvider() {
     WidgetsBinding.instance.addObserver(this);
+    AuthService.onTokensUpdated = _onTokensUpdated;
+    AuthService.onSignedOut = _onRemoteSignOut;
+    ApiClient.renewAccess = () => _authService.refreshSession();
     _checkAuthStatus();
   }
 
   @override
   void dispose() {
+    if (AuthService.onTokensUpdated == _onTokensUpdated) AuthService.onTokensUpdated = null;
+    if (AuthService.onSignedOut == _onRemoteSignOut) AuthService.onSignedOut = null;
+    ApiClient.renewAccess = null;
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -58,9 +65,31 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed && _isAuthenticated) {
-      _ensureSocketConnected();
-      _fetchFreshBalance();
+      _resumeSession();
     }
+  }
+
+  Future<void> _resumeSession() async {
+    final token = await _authService.getToken();
+    if (!_isAuthenticated || token == null || token.isEmpty) return;
+    _session = SessionModel(accessToken: token);
+    _ensureSocketConnected();
+    await _fetchFreshBalance();
+  }
+
+  void _onTokensUpdated(String accessToken) {
+    _session = SessionModel(accessToken: accessToken);
+    if (_isAuthenticated) _connectSocket(accessToken);
+  }
+
+  void _onRemoteSignOut() {
+    SocketService.instance.offBalanceUpdated(_onSocketBalanceUpdated);
+    SocketService.instance.disconnect();
+    _user = null;
+    _session = null;
+    _isAuthenticated = false;
+    _isLoading = false;
+    notifyListeners();
   }
 
   // Check authentication status on init

@@ -8,21 +8,133 @@ import 'package:battleasia_app/data/models/session_model.dart';
 
 class AuthService {
   static const String _tokenKey = 'auth_token';
+  static const String _refreshKey = 'auth_refresh';
   static const String _userKey = 'user_data';
+
+  static Future<String?>? _refreshFlight;
+  static void Function(String accessToken)? onTokensUpdated;
+  static void Function()? onSignedOut;
 
   // Get base URL from config
   String get _baseUrl => AppConfig.serverUrl;
 
-  // Get stored token
-  Future<String?> getToken() async {
+  Future<String?> _readStoredAccess() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_tokenKey);
+  }
+
+  /// Access token, renewed first when the saved one is expired.
+  Future<String?> getToken() async {
+    if (_refreshFlight != null) {
+      final next = await _refreshFlight;
+      if (next != null && next.isNotEmpty) return next;
+      return _readStoredAccess();
+    }
+    final access = await _readStoredAccess();
+    if (access != null && access.isNotEmpty && _accessUsable(access)) return access;
+    final refresh = await getRefreshToken();
+    if ((refresh == null || refresh.isEmpty) && (access == null || access.isEmpty)) return null;
+    final next = await refreshSession();
+    if (next != null && next.isNotEmpty) return next;
+    return _readStoredAccess();
   }
 
   // Save token
   Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_tokenKey, token);
+  }
+
+  Future<String?> getRefreshToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_refreshKey);
+  }
+
+  Future<void> saveRefreshToken(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_refreshKey, token);
+  }
+
+  Future<void> storeSessionTokens(Map sessionData) async {
+    final access = sessionData['accessToken'] ?? sessionData['token'];
+    final refresh = sessionData['refreshToken'];
+    if (access is String && access.isNotEmpty) await saveToken(access);
+    if (refresh is String && refresh.isNotEmpty) await saveRefreshToken(refresh);
+  }
+
+  /// Ask the server for a new access token. One flight is shared by every caller.
+  Future<String?> refreshSession() {
+    final existing = _refreshFlight;
+    if (existing != null) return existing;
+    late final Future<String?> flight;
+    flight = _refreshBody().whenComplete(() {
+      if (identical(_refreshFlight, flight)) _refreshFlight = null;
+    });
+    _refreshFlight = flight;
+    return flight;
+  }
+
+  Future<String?> _refreshBody() async {
+    final refresh = await getRefreshToken();
+    final access = await _readStoredAccess();
+    if ((refresh == null || refresh.isEmpty) && (access == null || access.isEmpty)) {
+      return null;
+    }
+    try {
+      final response = await ApiClient.post(
+        Uri.parse('$_baseUrl/api/v2/users/refresh'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (access != null && access.isNotEmpty) 'Authorization': 'Bearer $access',
+        },
+        body: jsonEncode({
+          if (refresh != null && refresh.isNotEmpty) 'refresh': refresh,
+        }),
+        skipAuthRenew: true,
+      );
+      if (response.statusCode == 401) {
+        await clearAuth();
+        onSignedOut?.call();
+        return null;
+      }
+      if (response.statusCode != 200 || response.body.isEmpty) return null;
+      final data = jsonDecode(response.body);
+      if (data is! Map) return null;
+      final session = data['session'];
+      final nextAccess = data['token'] ??
+          (session is Map ? session['accessToken'] : null) ??
+          (data['data'] is Map ? (data['data'] as Map)['token'] : null);
+      final nextRefresh = data['refreshToken'] ??
+          (session is Map ? session['refreshToken'] : null);
+      if (nextAccess is! String || nextAccess.isEmpty) return null;
+      await saveToken(nextAccess);
+      if (nextRefresh is String && nextRefresh.isNotEmpty) {
+        await saveRefreshToken(nextRefresh);
+      }
+      onTokensUpdated?.call(nextAccess);
+      return nextAccess;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  bool _accessUsable(String token) {
+    try {
+      final parts = token.split('.');
+      if (parts.length < 2) return false;
+      var payload = parts[1].replaceAll('-', '+').replaceAll('_', '/');
+      while (payload.length % 4 != 0) {
+        payload += '=';
+      }
+      final decoded = jsonDecode(utf8.decode(base64.decode(payload)));
+      if (decoded is! Map) return false;
+      final exp = decoded['exp'];
+      if (exp is! num) return true;
+      final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      return exp > now + 30;
+    } catch (_) {
+      return false;
+    }
   }
 
   // Get stored user
@@ -45,6 +157,7 @@ class AuthService {
   Future<void> clearAuth() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
+    await prefs.remove(_refreshKey);
     await prefs.remove(_userKey);
   }
 
@@ -100,8 +213,7 @@ class AuthService {
         final session = SessionModel.fromJson(sessionData);
         final user = userData != null ? UserModel.fromJson(userData) : null;
 
-        // Save token and user
-        await saveToken(session.accessToken);
+        await storeSessionTokens(sessionData);
         if (user != null) {
           await saveUser(user);
         }
@@ -232,8 +344,7 @@ class AuthService {
         final session = SessionModel.fromJson(sessionData);
         final user = userData != null ? UserModel.fromJson(userData) : null;
 
-        // Save token and user
-        await saveToken(session.accessToken);
+        await storeSessionTokens(sessionData);
         if (user != null) {
           await saveUser(user);
         }
@@ -394,7 +505,7 @@ class AuthService {
         final user = userData is Map
             ? UserModel.fromJson(Map<String, dynamic>.from(userData))
             : null;
-        await saveToken(session.accessToken);
+        await storeSessionTokens(Map<String, dynamic>.from(sessionData));
         if (user != null) await saveUser(user);
         parsed['session'] = session;
         parsed['user'] = user;
