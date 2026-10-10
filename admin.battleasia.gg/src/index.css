@@ -77,3 +77,33 @@ img {
   outline: 2px solid var(--ba-accent);
   outline-offset: 2px;
 }
+
+.crash-screen {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 40px 24px;
+  background: #07080b;
+  color: #fff;
+}
+
+.crash-screen h1 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.1;
+}
+
+.crash-screen p {
+  margin: 0;
+  max-width: 440px;
+  color: #9ca3af;
+}
+
+.crash-screen .btn {
+  width: auto;
+  min-height: 44px;
+  padding: 0 18px;
+}

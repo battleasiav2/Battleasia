@@ -41,6 +41,26 @@ function crashCopy() {
   }
 }
 
+const RELOAD_KEY = 'ba-bundle-reload';
+
+function isStaleBundleError(error: unknown) {
+  const msg = error instanceof Error ? `${error.name} ${error.message}` : String(error || '');
+  return /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|Loading chunk|Loading CSS chunk|Unable to preload CSS|dynamically imported module/i.test(msg);
+}
+
+/** After a deploy the open tab still asks for the old script. Reload once instead of the crash screen. */
+export function reloadIfStaleBundle(error?: unknown) {
+  if (error != null && !isStaleBundleError(error)) return false;
+  try {
+    if (sessionStorage.getItem(RELOAD_KEY) === '1') return false;
+    sessionStorage.setItem(RELOAD_KEY, '1');
+  } catch {
+    return false;
+  }
+  window.location.reload();
+  return true;
+}
+
 export class ErrorBoundary extends Component<Props, State> {
   state: State = { crashed: false };
 
@@ -49,6 +69,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
+    if (reloadIfStaleBundle(error)) return;
     captureException({ message: error.message, extra: info.componentStack });
   }
 
@@ -56,7 +77,7 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.crashed) {
       const copy = crashCopy();
       return (
-        <div className="auth-shell" style={{ padding: 40 }}>
+        <div className="crash-screen">
           <h1>{copy.title}</h1>
           <p>{copy.lead}</p>
           <button className="btn btn-primary" type="button" onClick={() => window.location.reload()}>
