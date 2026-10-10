@@ -449,20 +449,65 @@
 .admin-pending {
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: var(--ba-warning);
-  font-size: 12px;
-  font-weight: 800;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.admin-pending a {
-  color: inherit;
+.admin-inbox-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 4px 12px 4px 6px;
+  border-radius: 999px;
   text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.04);
 }
 
-.admin-pending a.is-support {
-  color: #d4e82a;
-  text-shadow: 0 0 12px rgba(212, 232, 42, 0.7);
+.admin-inbox-pill.is-deposit {
+  color: #ffe8a3;
+  border-color: rgba(255, 194, 75, 0.45);
+  background: rgba(255, 194, 75, 0.1);
+}
+
+.admin-inbox-pill.is-withdraw {
+  color: #ffd0dc;
+  border-color: rgba(251, 113, 133, 0.45);
+  background: rgba(251, 113, 133, 0.1);
+}
+
+.admin-inbox-pill.is-support {
+  color: #e7f58a;
+  border-color: rgba(212, 232, 42, 0.45);
+  background: rgba(212, 232, 42, 0.1);
+}
+
+.admin-inbox-count {
+  display: grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-style: normal;
+  font-size: 12px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: #0a0b10;
+  background: var(--ba-warning);
+}
+
+.admin-inbox-pill.is-withdraw .admin-inbox-count {
+  background: #fb7185;
+  color: #2a0810;
+}
+
+.admin-inbox-pill.is-support .admin-inbox-count {
+  background: #d4e82a;
+  color: #121408;
 }
 
 .admin-account {
@@ -1456,6 +1501,44 @@
 
 .admin-toast.is-err strong {
   color: #fb7185;
+}
+
+.admin-toast.is-inbox {
+  align-items: flex-start;
+  padding: 14px 16px;
+}
+
+.admin-toast-count {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 8px;
+  border-radius: 12px;
+  font-style: normal;
+  font-size: 18px;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+  color: #0a0b10;
+  background: var(--ba-warning);
+}
+
+.admin-toast.is-inbox.is-ok .admin-toast-count {
+  background: linear-gradient(180deg, #ffc24b, #ff8a1a);
+}
+
+.admin-toast-go {
+  flex: 0 0 auto;
+  align-self: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  color: var(--ba-gold-ink);
+  background: linear-gradient(90deg, var(--ba-accent), var(--ba-accent-b));
 }
 
 .form-ok {

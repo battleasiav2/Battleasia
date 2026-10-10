@@ -63,13 +63,20 @@ export function AdminShell() {
   const location = useLocation();
   const navigate = useNavigate();
   const user = readAdminUser();
-  const [toast, setToast] = useState<{ text: string; kind: 'ok' | 'err' } | null>(null);
+  const [toast, setToast] = useState<{
+    text: string;
+    kind: 'ok' | 'err';
+    count?: number;
+    href?: string;
+  } | null>(null);
   const toastTimer = useRef(0);
   const [palette, setPalette] = useState(false);
   const [q, setQ] = useState('');
   const [mute, setMute] = useState(() => localStorage.getItem('ba-admin-mute') === '1');
   const [hi, setHi] = useState(0);
   const [pending, setPending] = useState({ deposits: 0, withdrawals: 0, support: 0 });
+  const pendingRef = useRef(pending);
+  pendingRef.current = pending;
   const [drawer, setDrawer] = useState(false);
   const [account, setAccount] = useState(false);
   const [rail, setRail] = useState(() => localStorage.getItem(RAIL_KEY) === '1');
@@ -150,28 +157,84 @@ export function AdminShell() {
     return () => document.removeEventListener('pointerdown', onDoc);
   }, [account]);
 
+  function fill(key: string, vars: Record<string, string | number>) {
+    return Object.entries(vars).reduce((s, [k, v]) => s.replaceAll(`{${k}}`, String(v)), t(key));
+  }
+
+  function pingInbox(kind: 'deposit' | 'withdrawal', count: number) {
+    if (count <= 0) return;
+    const text =
+      kind === 'deposit'
+        ? fill('chrome.depositInbox', { n: count })
+        : fill('chrome.withdrawInbox', { n: count });
+    window.clearTimeout(toastTimer.current);
+    setToast({
+      text,
+      kind: 'ok',
+      count,
+      href: kind === 'deposit' ? '/payments/deposit' : '/payments/withdrawal',
+    });
+    toastTimer.current = window.setTimeout(() => setToast(null), 10000);
+    if (!muteRef.current) {
+      try {
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.frequency.value = kind === 'deposit' ? 880 : 740;
+        gain.gain.value = 0.04;
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.08);
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  useEffect(() => {
+    Promise.all([
+      api('/api/v4/payments/deposit-history/statistics'),
+      api('/api/v4/payments/withdrawal-history/stats'),
+    ])
+      .then(([depPayload, wdrPayload]) => {
+        const dep = unwrapData<{ pending?: number }>(depPayload);
+        const wdr = unwrapData<{ pending?: number }>(wdrPayload);
+        setPending((p) => ({
+          ...p,
+          deposits: Number(dep?.pending) || 0,
+          withdrawals: Number(wdr?.pending) || 0,
+        }));
+      })
+      .catch(() => undefined);
+  }, []);
+
   useEffect(() => {
     let off: (() => void) | undefined;
     getAdminSocket().then((sock) => {
       if (!sock) return;
-      const onDep = () => ping(t('chrome.newDeposit'));
-      const onWdr = () => ping(t('chrome.newWithdrawal'));
-      const onDepCount = (d: { count?: number }) => setPending((p) => ({ ...p, deposits: Number(d.count) || 0 }));
-      const onWdrCount = (d: { count?: number }) => setPending((p) => ({ ...p, withdrawals: Number(d.count) || 0 }));
+      const onDepCount = (d: { count?: number }) => {
+        const next = Number(d.count) || 0;
+        const prev = pendingRef.current.deposits;
+        setPending((p) => ({ ...p, deposits: next }));
+        if (next > prev) pingInbox('deposit', next);
+      };
+      const onWdrCount = (d: { count?: number }) => {
+        const next = Number(d.count) || 0;
+        const prev = pendingRef.current.withdrawals;
+        setPending((p) => ({ ...p, withdrawals: next }));
+        if (next > prev) pingInbox('withdrawal', next);
+      };
       const onSup = () => ping(t('chrome.newSupport'));
       const onSupCount = (d: { count?: number }) => setPending((p) => ({ ...p, support: Number(d.count) || 0 }));
-      sock.on('new-deposit', onDep);
-      sock.on('new-withdrawal', onWdr);
-      sock.on('new-support', onSup);
       sock.on('pending-deposits-count', onDepCount);
       sock.on('pending-withdrawals-count', onWdrCount);
+      sock.on('new-support', onSup);
       sock.on('support-unread-count', onSupCount);
       off = () => {
-        sock.off('new-deposit', onDep);
-        sock.off('new-withdrawal', onWdr);
-        sock.off('new-support', onSup);
         sock.off('pending-deposits-count', onDepCount);
         sock.off('pending-withdrawals-count', onWdrCount);
+        sock.off('new-support', onSup);
         sock.off('support-unread-count', onSupCount);
       };
     });
@@ -349,20 +412,21 @@ export function AdminShell() {
             {pendingTotal ? (
               <span className="admin-pending">
                 {pending.deposits ? (
-                  <Link to="/payments/deposit">
-                    {pending.deposits} {t('chrome.dep')}
+                  <Link className="admin-inbox-pill is-deposit" to="/payments/deposit">
+                    <em className="admin-inbox-count">{pending.deposits}</em>
+                    <span>{t('chrome.dep')}</span>
                   </Link>
                 ) : null}
-                {pending.deposits && pending.withdrawals ? <span>·</span> : null}
                 {pending.withdrawals ? (
-                  <Link to="/payments/withdrawal">
-                    {pending.withdrawals} {t('chrome.wdr')}
+                  <Link className="admin-inbox-pill is-withdraw" to="/payments/withdrawal">
+                    <em className="admin-inbox-count">{pending.withdrawals}</em>
+                    <span>{t('chrome.wdr')}</span>
                   </Link>
                 ) : null}
-                {(pending.deposits || pending.withdrawals) && pending.support ? <span>·</span> : null}
                 {pending.support ? (
-                  <Link className="is-support" to="/customer-support/list">
-                    {pending.support} {t('chrome.support')}
+                  <Link className="admin-inbox-pill is-support" to="/customer-support/list">
+                    <em className="admin-inbox-count">{pending.support}</em>
+                    <span>{t('chrome.support')}</span>
                   </Link>
                 ) : null}
               </span>
@@ -457,9 +521,24 @@ export function AdminShell() {
         </div>
       ) : null}
       {toast ? (
-        <div className={`admin-toast is-${toast.kind}`} role="status" aria-live="polite">
-          <strong>{toast.kind === 'ok' ? t('status.ok') : t('status.err')}</strong>
+        <div
+          className={`admin-toast is-${toast.kind}${toast.count ? ' is-inbox' : ''}`}
+          role="status"
+          aria-live="polite"
+        >
+          {toast.count ? (
+            <em className="admin-toast-count" aria-hidden>
+              {toast.count}
+            </em>
+          ) : (
+            <strong>{toast.kind === 'ok' ? t('status.ok') : t('status.err')}</strong>
+          )}
           <span>{toast.text}</span>
+          {toast.href ? (
+            <Link className="admin-toast-go" to={toast.href} onClick={() => setToast(null)}>
+              {t('chrome.openQueue')}
+            </Link>
+          ) : null}
           <button type="button" aria-label="Dismiss" onClick={() => setToast(null)}>
             ×
           </button>
