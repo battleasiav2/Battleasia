@@ -41,10 +41,26 @@
   border-color: var(--ba-hair);
 }
 
-.btn-primary {
-  color: var(--ba-gold-ink);
-  background: linear-gradient(90deg, var(--ba-accent), var(--ba-accent-b));
-  box-shadow: 0 8px 24px -10px var(--ba-accent-glow);
+.btn.btn-primary,
+a.btn.btn-primary {
+  color: var(--ba-primary-fg, #0a0b0f);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ba-accent) 58%, #252a08) 0%,
+    color-mix(in srgb, var(--ba-accent-b) 48%, #121508) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.42);
+  box-shadow: 0 6px 18px -12px rgba(0, 0, 0, 0.75);
+  text-shadow: none;
+}
+
+.btn.btn-primary:hover:not(:disabled),
+a.btn.btn-primary:hover {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ba-accent) 68%, #2e350a) 0%,
+    color-mix(in srgb, var(--ba-accent-b) 55%, #181c06) 100%
+  );
 }
 
 .btn-danger {
@@ -399,9 +415,14 @@
 }
 
 .admin-mode button.is-on {
-  color: var(--ba-gold-ink);
-  background: linear-gradient(90deg, var(--ba-accent), var(--ba-accent-b));
-  box-shadow: 0 8px 18px -12px var(--ba-accent-glow);
+  color: var(--ba-primary-fg, #0a0b0f);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ba-accent) 58%, #252a08) 0%,
+    color-mix(in srgb, var(--ba-accent-b) 48%, #121508) 100%
+  );
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  box-shadow: 0 6px 16px -12px rgba(0, 0, 0, 0.65);
 }
 
 .admin-search {
@@ -534,8 +555,12 @@
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, var(--ba-accent), var(--ba-accent-b));
-  color: #fff;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--ba-accent) 55%, #252a08),
+    color-mix(in srgb, var(--ba-accent-b) 45%, #121508)
+  );
+  color: var(--ba-primary-fg, #0a0b0f);
   font-size: 13px;
 }
 
@@ -1222,9 +1247,13 @@
 }
 
 .chip.on {
-  color: var(--ba-gold-ink);
-  border-color: color-mix(in srgb, var(--ba-accent) 55%, transparent);
-  background: linear-gradient(90deg, color-mix(in srgb, var(--ba-accent) 88%, #000), color-mix(in srgb, var(--ba-accent-b) 82%, #000));
+  color: var(--ba-primary-fg, #0a0b0f);
+  border-color: color-mix(in srgb, var(--ba-accent) 40%, #000);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ba-accent) 52%, #252a08),
+    color-mix(in srgb, var(--ba-accent-b) 42%, #121508)
+  );
 }
 
 .ops-chips {
@@ -1537,8 +1566,13 @@
   font-size: 12px;
   font-weight: 800;
   text-decoration: none;
-  color: var(--ba-gold-ink);
-  background: linear-gradient(90deg, var(--ba-accent), var(--ba-accent-b));
+  color: var(--ba-primary-fg, #0a0b0f);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ba-accent) 58%, #252a08),
+    color-mix(in srgb, var(--ba-accent-b) 48%, #121508)
+  );
+  border: 1px solid rgba(0, 0, 0, 0.35);
 }
 
 .form-ok {

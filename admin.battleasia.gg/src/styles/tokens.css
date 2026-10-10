@@ -20,6 +20,7 @@
   --ba-accent-glow: rgba(203, 251, 36, 0.4);
   --ba-gold: var(--ba-accent);
   --ba-gold-ink: #081401;
+  --ba-primary-fg: #0a0b0f;
   --ba-gold-rgb: 203, 251, 36;
   --ba-input: #07080d;
   --ba-hud: rgba(14, 15, 20, 0.84);
@@ -62,7 +63,8 @@ html[data-accent='violet'] {
   --ba-accent-b: #21d4fd;
   --ba-accent-hover: #9174ff;
   --ba-accent-glow: rgba(124, 92, 255, 0.45);
-  --ba-gold-ink: #ffffff;
+  --ba-gold-ink: #f4f5f7;
+  --ba-primary-fg: #0a0b0f;
   --ba-gold-rgb: 124, 92, 255;
 }
 html[data-accent='rose'] {
