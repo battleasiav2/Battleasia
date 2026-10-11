@@ -9,6 +9,7 @@ import 'package:battleasia_app/presentation/widgets/common/account_drawer.dart';
 import 'package:battleasia_app/presentation/widgets/common/animated_balance_display.dart';
 import 'package:battleasia_app/presentation/widgets/common/locale_toggle.dart';
 import 'package:battleasia_app/presentation/widgets/common/accent_toggle.dart';
+import 'package:battleasia_app/presentation/widgets/customer_support/support_header_button.dart';
 import 'package:battleasia_app/presentation/widgets/notifications/notifications_drawer_button.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 
@@ -79,6 +80,15 @@ class AppHeader extends StatelessWidget {
             builder: (context, authProvider, _) {
               if (authProvider.isAuthenticated) {
                 return const NotificationsDrawerButton();
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+          SizedBox(width: gap),
+          Consumer<AuthProvider>(
+            builder: (context, authProvider, _) {
+              if (authProvider.isAuthenticated) {
+                return const SupportHeaderButton();
               }
               return const SizedBox.shrink();
             },

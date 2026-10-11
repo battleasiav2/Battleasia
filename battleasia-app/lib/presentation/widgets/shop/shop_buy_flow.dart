@@ -155,6 +155,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
   double _couponValue = 0;
   String _couponErr = '';
   bool _couponBusy = false;
+  String? _submitIdem;
 
   @override
   void initState() {
@@ -287,7 +288,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
   Future<void> _confirmPay() async {
     final channel = _selectedChannel;
     if (channel == null) {
-      _toast('Please select a payment channel', Colors.red);
+      _toast('shop.pickChannel'.tr(), Colors.red);
       return;
     }
 
@@ -302,7 +303,10 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
           (result['data'] as Map<String, dynamic>?)?['results'] as List?;
       if (walletsRaw == null || walletsRaw.isEmpty) {
         _toast(
-          'No ${currency.toUpperCase()} wallet available for ${channel.name}',
+          'shop.noWalletForChannel'.tr(namedArgs: {
+            'currency': currency.toUpperCase(),
+            'channel': channel.name,
+          }),
           Colors.red,
         );
         return;
@@ -315,12 +319,13 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         _paidChannel = channel;
         _amount = _totalFor(currency);
         _paymentStep = true;
+        _submitIdem = newIdempotencyKey();
         _fromCtrl.clear();
         _txCtrl.clear();
       });
       _armCrypto(channel.isCrypto);
     } catch (e) {
-      _toast('Failed to get payment details: $e', Colors.red);
+      _toast('shop.paymentDetailsFail'.tr(), Colors.red);
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -329,7 +334,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
   Future<void> _applyCoupon() async {
     final code = _couponCtrl.text.trim();
     if (code.isEmpty) {
-      setState(() => _couponErr = 'Enter a coupon code');
+      setState(() => _couponErr = 'shop.couponEnterCode'.tr());
       return;
     }
     setState(() {
@@ -352,27 +357,27 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         _couponLabel = '';
         _couponKind = '';
         _couponValue = 0;
-        _couponErr = result['message']?.toString() ?? 'Could not apply coupon';
+        _couponErr = result['message']?.toString() ?? 'shop.couponApplyFail'.tr();
       }
     });
   }
 
   Future<void> _submitDeposit() async {
     if (_fromCtrl.text.trim().isEmpty) {
-      _toast('Please enter the address you sent from', Colors.red);
+      _toast('shop.fromAddressRequired'.tr(), Colors.red);
       return;
     }
     if (_txCtrl.text.trim().isEmpty) {
-      _toast('Please enter the transaction ID', Colors.red);
+      _toast('shop.trxRequired'.tr(), Colors.red);
       return;
     }
     if (_paidChannel?.isCrypto == true && _cryptoWindow && _cryptoLeft <= 0) {
-      _toast('Payment window expired. Go back and start again.', Colors.red);
+      _toast('shop.cryptoExpired'.tr(), Colors.red);
       return;
     }
     final user = context.read<AuthProvider>().user;
     if (user == null) {
-      _toast('Please log in to make a purchase', Colors.red);
+      _toast('shop.loginRequired'.tr(), Colors.red);
       return;
     }
     final channel = _paidChannel;
@@ -382,7 +387,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
     setState(() => _submitting = true);
     try {
       final currency = channel.payCode.isNotEmpty ? channel.payCode : _currency;
-      final idem = newIdempotencyKey();
+      final idem = _submitIdem ??= newIdempotencyKey();
       final result = await _shop.submitDeposit(
         userEmail: user.email,
         username: user.username,
@@ -400,14 +405,20 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
       if (result['success'] == true) {
         Navigator.of(context).pop();
         _toast(
-          'Deposit submitted successfully! Waiting for admin approval...',
+          'shop.depositSubmitOk'.tr(),
           Colors.green,
         );
       } else {
-        _toast(result['message']?.toString() ?? 'Failed to submit', Colors.red);
+        final conflict = result['conflict'] == true;
+        _toast(
+          conflict
+              ? 'shop.depositAlready'.tr()
+              : (result['message']?.toString() ?? 'shop.depositSubmitFail'.tr()),
+          Colors.red,
+        );
       }
     } catch (e) {
-      _toast('Error: $e', Colors.red);
+      _toast('common.error'.tr(namedArgs: {'error': e.toString()}), Colors.red);
     } finally {
       if (mounted) setState(() => _submitting = false);
     }
@@ -447,7 +458,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'SHOP',
+                                'shop.buyFlowBadge'.tr(),
                                 style: AppTheme.bodySmall.copyWith(
                                   color: AppColors.gold,
                                   fontWeight: FontWeight.w800,
@@ -458,8 +469,8 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                               const SizedBox(height: 4),
                               Text(
                                 _paymentStep
-                                    ? 'Payment Details'
-                                    : 'Security Payment',
+                                    ? 'shop.paymentDetailsTitle'.tr()
+                                    : 'shop.securityPaymentTitle'.tr(),
                                 style: AppTheme.heading3.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w900,
@@ -514,14 +525,16 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                                     ),
                                     minimumSize: const Size(0, 44),
                                   ),
-                                  child: Text('Back'),
+                                  child: Text('shop.back'.tr()),
                                 ),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
                                 flex: 2,
                                 child: _goldOutlineBtn(
-                                  label: _submitting ? 'Submitting…' : 'Confirm',
+                                  label: _submitting
+                                      ? 'shop.submitting'.tr()
+                                      : 'shop.confirm'.tr(),
                                   onPressed: _submitting ||
                                           (_paidChannel?.isCrypto == true &&
                                               _cryptoWindow &&
@@ -537,7 +550,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                               TextButton(
                                 onPressed: () => Navigator.of(context).pop(),
                                 child: Text(
-                                  'Cancel',
+                                  'shop.cancel'.tr(),
                                   style: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
                                 ),
                               ),
@@ -545,7 +558,9 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                               SizedBox(
                                 width: 180,
                                 child: _goldOutlineBtn(
-                                  label: _submitting ? 'Loading…' : 'Confirm & Pay',
+                                  label: _submitting
+                                      ? 'shop.loading'.tr()
+                                      : 'shop.confirmAndPay'.tr(),
                                   onPressed: _submitting || _channels.isEmpty
                                       ? null
                                       : _confirmPay,
@@ -613,7 +628,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Player Email',
+                'shop.playerEmail'.tr(),
                 style: AppTheme.bodySmall.copyWith(
                   color: AppColors.gold,
                   fontWeight: FontWeight.w700,
@@ -627,7 +642,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
               ),
               Divider(height: 20, color: Colors.white.withValues(alpha: 0.08)),
               Text(
-                'Coupon',
+                'shop.couponLabel'.tr(),
                 style: AppTheme.bodySmall.copyWith(
                   color: AppColors.gold,
                   fontWeight: FontWeight.w700,
@@ -655,7 +670,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                                 _couponErr = '';
                                 _couponCtrl.clear();
                               }),
-                      child: const Text('Remove'),
+                      child: Text('shop.couponRemove'.tr()),
                     ),
                   ],
                 )
@@ -667,7 +682,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                         controller: _couponCtrl,
                         style: const TextStyle(color: Colors.white),
                         decoration: InputDecoration(
-                          hintText: 'Coupon code',
+                          hintText: 'shop.couponCodeHint'.tr(),
                           hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
                           isDense: true,
                           filled: true,
@@ -680,7 +695,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                     const SizedBox(width: 8),
                     FilledButton(
                       onPressed: _couponBusy ? null : _applyCoupon,
-                      child: Text(_couponBusy ? '…' : 'Apply'),
+                      child: Text(_couponBusy ? '…' : 'shop.couponApply'.tr()),
                     ),
                   ],
                 ),
@@ -693,7 +708,10 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                 Padding(
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
-                    'Due ${(total * (1 - (_couponValue.clamp(0, 90) / 100))).toStringAsFixed(2)}',
+                    'shop.couponDue'.tr(namedArgs: {
+                      'amount': (total * (1 - (_couponValue.clamp(0, 90) / 100)))
+                          .toStringAsFixed(2),
+                    }),
                     style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 12, fontWeight: FontWeight.w700),
                   ),
                 )
@@ -701,7 +719,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                 Padding(
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
-                    'Extra BAC is added when this deposit is approved.',
+                    'shop.couponBonusHint'.tr(),
                     style: TextStyle(color: Colors.white.withValues(alpha: 0.55), fontSize: 12),
                   ),
                 ),
@@ -710,7 +728,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         ),
         const SizedBox(height: 14),
         Text(
-          'Select payment channels',
+          'shop.selectPaymentChannels'.tr(),
           style: AppTheme.bodyMedium.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.w700,
@@ -778,7 +796,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Rates',
+          'shop.rates'.tr(),
           style: AppTheme.bodyMedium.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.w700,
@@ -795,7 +813,9 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
               children: [
                 Text(code, style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w700)),
                 Text(
-                  '${rate.toStringAsFixed(2)} per coin',
+                  'shop.ratePerCoin'.tr(namedArgs: {
+                    'rate': rate.toStringAsFixed(2),
+                  }),
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
                 ),
               ],
@@ -805,7 +825,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         if (!isCrypto) ...[
           const SizedBox(height: 10),
           Text(
-            'Select Currency',
+            'shop.selectCurrency'.tr(),
             style: AppTheme.bodySmall.copyWith(
               color: AppColors.textMuted,
               fontWeight: FontWeight.w700,
@@ -839,10 +859,10 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         _panel(
           child: Column(
             children: [
-              _kv('Pack', '${widget.item.amount} ${widget.item.symbol}'),
+              _kv('shop.packLabel'.tr(), '${widget.item.amount} ${widget.item.symbol}'),
               const SizedBox(height: 8),
               _kv(
-                'Total',
+                'shop.totalLabel'.tr(),
                 '${total.toStringAsFixed(2)} ${payCode.toUpperCase()}',
                 highlight: true,
               ),
@@ -917,7 +937,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
           Row(
             children: [
               Text(
-                'Pay within',
+                'shop.payWithin'.tr(),
                 style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
               ),
               const Spacer(),
@@ -936,7 +956,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         if (qrUrl != null) ...[
           const SizedBox(height: 14),
           Text(
-            'Scan QR Code',
+            'shop.scanQr'.tr(),
             style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
           ),
           const SizedBox(height: 8),
@@ -968,7 +988,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Amount',
+                      'shop.amountLabel'.tr(),
                       style: AppTheme.bodySmall
                           .copyWith(color: AppColors.textMuted, fontSize: 11),
                     ),
@@ -991,7 +1011,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Wallet Address',
+                      'shop.walletAddress'.tr(),
                       style: AppTheme.bodySmall
                           .copyWith(color: AppColors.textMuted, fontSize: 11),
                     ),
@@ -1016,7 +1036,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                             Clipboard.setData(
                               ClipboardData(text: wallet.address),
                             );
-                            _toast('Address copied', Colors.green);
+                            _toast('shop.addressCopied'.tr(), Colors.green);
                           },
                           icon: Icon(Icons.copy, size: 16, color: AppColors.gold),
                         ),
@@ -1041,17 +1061,17 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    for (final line in const [
-                      'Send USDT on TRC20 only. Other networks or coins are not recovered.',
-                      'Send the exact amount shown.',
-                      'Network fee is yours. The amount that arrives must equal this order.',
-                      'One transfer for this order. Submit that TxID once.',
-                      'Submit the TxID before the timer ends.',
+                    for (final key in [
+                      'shop.buyCryptoHint1',
+                      'shop.buyCryptoHint2',
+                      'shop.buyCryptoHint3',
+                      'shop.buyCryptoHint4',
+                      'shop.buyCryptoHint5',
                     ])
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4),
                         child: Text(
-                          '• $line',
+                          '• ${key.tr()}',
                           style: AppTheme.bodySmall.copyWith(
                             color: Colors.white.withValues(alpha: 0.75),
                             height: 1.35,
@@ -1060,13 +1080,13 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                       ),
                     if (_cryptoWindow && _cryptoLeft <= 0)
                       Text(
-                        'This payment window expired. Go back and start again.',
+                        'shop.buyCryptoExpiredInline'.tr(),
                         style: AppTheme.bodySmall.copyWith(color: const Color(0xFFF87171)),
                       ),
                   ],
                 )
               : Text(
-                  'Send the amount to the wallet above, then enter your from-address and transaction ID.',
+                  'shop.buyFiatHint'.tr(),
                   style: AppTheme.bodySmall.copyWith(
                     color: Colors.white.withValues(alpha: 0.75),
                     height: 1.35,
@@ -1077,13 +1097,13 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         TextField(
           controller: _fromCtrl,
           style: const TextStyle(color: Colors.white),
-          decoration: _fieldDeco('From address / mobile'),
+          decoration: _fieldDeco('shop.fromAddressHint'.tr()),
         ),
         const SizedBox(height: 10),
         TextField(
           controller: _txCtrl,
           style: const TextStyle(color: Colors.white),
-          decoration: _fieldDeco('Transaction ID'),
+          decoration: _fieldDeco('shop.transactionIdHint'.tr()),
         ),
       ],
     );

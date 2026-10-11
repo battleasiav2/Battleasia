@@ -250,7 +250,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       return;
     }
 
-    setState(() => _errorMessage = result['message'] ?? 'Sign up failed');
+    setState(() => _errorMessage = result['message'] ?? 'auth.signUpFailed'.tr());
   }
 
   @override

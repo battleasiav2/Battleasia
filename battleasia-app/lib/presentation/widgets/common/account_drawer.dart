@@ -6,6 +6,7 @@ import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/providers/accent_provider.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/presentation/widgets/common/account_menu_tile.dart';
+import 'package:battleasia_app/core/utils/balance_hide_prefs.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
@@ -575,7 +576,7 @@ class _AccountDrawerContent extends StatelessWidget {
 }
 
 /// Home Pulse-style profile card — matches web Command Matrix card.
-class _HomeProfileCard extends StatelessWidget {
+class _HomeProfileCard extends StatefulWidget {
   final String displayName;
   final String pubgId;
   final double balance;
@@ -591,8 +592,23 @@ class _HomeProfileCard extends StatelessWidget {
   });
 
   @override
+  State<_HomeProfileCard> createState() => _HomeProfileCardState();
+}
+
+class _HomeProfileCardState extends State<_HomeProfileCard> {
+  @override
+  void initState() {
+    super.initState();
+    BalanceHidePrefs.ensureLoaded();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final bal = balance.round().toString();
+    return ListenableBuilder(
+      listenable: BalanceHidePrefs.hidden,
+      builder: (context, _) {
+        final balText =
+            '${BalanceHidePrefs.formatBalance(widget.balance, hide: BalanceHidePrefs.hidden.value)} BAC';
 
     return Container(
       width: double.infinity,
@@ -613,16 +629,16 @@ class _HomeProfileCard extends StatelessWidget {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: avatarUrl != null && avatarUrl!.isNotEmpty
+                      child: widget.avatarUrl != null && widget.avatarUrl!.isNotEmpty
                           ? Image.network(
-                              avatarUrl!,
+                              widget.avatarUrl!,
                               width: 48,
                               height: 48,
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) =>
-                                  _avatarFallback(displayName),
+                                  _avatarFallback(widget.displayName),
                             )
-                          : _avatarFallback(displayName),
+                          : _avatarFallback(widget.displayName),
                     ),
                     Positioned(
                       right: -2,
@@ -648,7 +664,7 @@ class _HomeProfileCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        displayName,
+                        widget.displayName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -696,11 +712,11 @@ class _HomeProfileCard extends StatelessWidget {
                               ],
                             ),
                           ),
-                          if (pubgId.isNotEmpty) ...[
+                          if (widget.pubgId.isNotEmpty) ...[
                             const SizedBox(width: 8),
                             Flexible(
                               child: Text(
-                                'ID: $pubgId',
+                                'ID: ${widget.pubgId}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -724,18 +740,22 @@ class _HomeProfileCard extends StatelessWidget {
               children: [
                 Icon(Icons.monetization_on, size: 18, color: AppColors.gold),
                 const SizedBox(width: 6),
-                Text(
-                  '$bal BAC',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w800,
-                    decoration: TextDecoration.none,
+                GestureDetector(
+                  onTap: () => BalanceHidePrefs.toggle(),
+                  behavior: HitTestBehavior.opaque,
+                  child: Text(
+                    balText,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      decoration: TextDecoration.none,
+                    ),
                   ),
                 ),
                 const Spacer(),
                 OutlinedButton(
-                  onPressed: onWalletTap,
+                  onPressed: widget.onWalletTap,
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.gold,
                     side: BorderSide(
@@ -766,6 +786,8 @@ class _HomeProfileCard extends StatelessWidget {
           ],
         ),
       ),
+    );
+      },
     );
   }
 

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/constants/withdrawal_channels.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
+import 'package:battleasia_app/core/utils/idempotency.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
@@ -63,6 +64,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
   String _channel = kWithdrawalChannels.first.value;
   bool _submitting = false;
   bool _cancelling = false;
+  final String _withdrawIdem = newIdempotencyKey();
 
   WithdrawalChannel get _selectedChannel =>
       kWithdrawalChannels.firstWhere((c) => c.value == _channel);
@@ -165,6 +167,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
         currencyType: _selectedChannel.currency,
         currencyAmount: _currencyAmount,
         description: 'Withdrawal request via $_channel',
+        idempotencyKey: _withdrawIdem,
       );
 
       if (!mounted) return;

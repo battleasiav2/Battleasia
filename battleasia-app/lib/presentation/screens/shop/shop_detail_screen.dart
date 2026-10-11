@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -310,7 +311,11 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
-                'No ${currency.toUpperCase()} wallet available for ${channel.name}'),
+              'shop.noWalletForChannel'.tr(namedArgs: {
+                'currency': currency.toUpperCase(),
+                'channel': channel.name,
+              }),
+            ),
             backgroundColor: Colors.red,
           ));
         }

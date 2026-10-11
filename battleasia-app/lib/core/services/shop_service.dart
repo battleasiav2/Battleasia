@@ -274,6 +274,14 @@ class ShopService {
         return {'success': true, 'data': data['data']};
       }
 
+      if (response.statusCode == 409) {
+        return {
+          'success': false,
+          'conflict': true,
+          'message': data['message'] as String? ?? 'Duplicate deposit request',
+        };
+      }
+
       return {
         'success': false,
         'message': data['message'] as String? ?? 'Failed to submit deposit',

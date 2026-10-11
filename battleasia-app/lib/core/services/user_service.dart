@@ -1274,9 +1274,13 @@ class UserService {
     required String recipientUsername,
     required double amount,
     String? note,
+    String? idempotencyKey,
   }) async {
     try {
-      final headers = await _getHeaders(money: true);
+      final headers = await _getHeaders(
+        money: true,
+        idempotencyKey: idempotencyKey,
+      );
       final response = await ApiClient.post(
         Uri.parse('$_baseUrl/api/v2/users/transfer'),
         headers: headers,

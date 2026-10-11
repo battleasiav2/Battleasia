@@ -25,7 +25,6 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
   double _delta = 0.0;
   bool _showDelta = false;
   bool _seeded = false;
-  bool _hideBalance = false;
 
   @override
   void initState() {
@@ -40,9 +39,7 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _deltaController, curve: Curves.easeOut));
     _deltaFade = CurvedAnimation(parent: _deltaController, curve: Curves.easeIn);
-    BalanceHidePrefs.isHidden().then((hidden) {
-      if (mounted) setState(() => _hideBalance = hidden);
-    });
+    BalanceHidePrefs.ensureLoaded();
   }
 
   @override
@@ -52,8 +49,7 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
   }
 
   Future<void> _toggleHide() async {
-    final hidden = await BalanceHidePrefs.toggle();
-    if (mounted) setState(() => _hideBalance = hidden);
+    await BalanceHidePrefs.toggle();
   }
 
   void _onBalanceChanged(double newBalance) {
@@ -78,19 +74,17 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
     });
   }
 
-  String _formatBalance(double balance) {
-    if (_hideBalance) return '••••';
-    if (balance >= 1000) return balance.toStringAsFixed(0);
-    return balance.toStringAsFixed(balance.truncateToDouble() == balance ? 0 : 2);
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Consumer<AuthProvider>(
+    return ListenableBuilder(
+      listenable: BalanceHidePrefs.hidden,
+      builder: (context, _) {
+        return Consumer<AuthProvider>(
       builder: (context, authProvider, _) {
         if (!authProvider.isAuthenticated) return const SizedBox.shrink();
 
         final balance = authProvider.user?.balance ?? 0.0;
+        final hide = BalanceHidePrefs.hidden.value;
         if (!_seeded || balance != _previousBalance) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) _onBalanceChanged(balance);
@@ -140,7 +134,7 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
                     ),
                     SizedBox(width: isMobile ? 4 : 6),
                     Text(
-                      _formatBalance(balance),
+                      BalanceHidePrefs.formatBalance(balance, hide: hide),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTheme.bodyMedium.copyWith(
@@ -152,7 +146,7 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
                   ],
                 ),
               ),
-              if (_showDelta && !_hideBalance)
+              if (_showDelta && !hide)
                 Positioned(
                   bottom: -22,
                   child: SlideTransition(
@@ -180,6 +174,8 @@ class _AnimatedBalanceDisplayState extends State<AnimatedBalanceDisplay>
                 ),
             ],
           ),
+        );
+      },
         );
       },
     );

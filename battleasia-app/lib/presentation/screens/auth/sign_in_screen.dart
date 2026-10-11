@@ -139,7 +139,7 @@ class _SignInScreenState extends State<SignInScreen> {
     if (retry is num && retry > 0) {
       _startWait(retry.toInt());
     }
-    setState(() => _errorMessage = result['message'] ?? 'Sign in failed');
+    setState(() => _errorMessage = result['message'] ?? 'auth.signInFailed'.tr());
   }
 
   void _startWait(int seconds) {

@@ -5,6 +5,7 @@ import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/socket_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
+import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/balance_history_model.dart';
@@ -129,10 +130,23 @@ class _WalletScreenState extends State<WalletScreen> {
     SocketService.instance.onBalanceUpdated(_onBalanceUpdated);
   }
 
-  Future<void> _fetchBalanceHistory() async {
-    setState(() {
-      _loading = true;
-    });
+  Future<void> _refreshWallet() async {
+    await Future.wait([
+      _fetchBalanceHistory(silent: true),
+      _fetchWithdrawableAmount(),
+      _fetchCurrencyRates(),
+    ]);
+    if (mounted) {
+      await context.read<AuthProvider>().refreshUser();
+    }
+  }
+
+  Future<void> _fetchBalanceHistory({bool silent = false}) async {
+    if (!silent) {
+      setState(() {
+        _loading = true;
+      });
+    }
 
     try {
       final result = await _userService.getBalanceHistory(page: 1, limit: 100);
@@ -159,7 +173,7 @@ class _WalletScreenState extends State<WalletScreen> {
         );
       }
     } finally {
-      if (mounted) {
+      if (mounted && !silent) {
         setState(() {
           _loading = false;
         });
@@ -274,6 +288,9 @@ class _WalletScreenState extends State<WalletScreen> {
           _fetchBalanceHistory(),
           _fetchWithdrawableAmount(),
         ]);
+        if (mounted) {
+          await context.read<AuthProvider>().refreshUser();
+        }
       }
     });
   }
@@ -465,8 +482,12 @@ class _WalletScreenState extends State<WalletScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          CustomScrollView(
+          RefreshIndicator(
+            color: AppColors.gold,
+            onRefresh: _refreshWallet,
+            child: CustomScrollView(
             controller: _scrollController,
+            physics: appScrollPhysics,
             slivers: [
               SliverToBoxAdapter(child: SizedBox(height: headerHeight)),
               SliverToBoxAdapter(
@@ -523,6 +544,7 @@ class _WalletScreenState extends State<WalletScreen> {
               // Bottom padding for floating nav
               SliverToBoxAdapter(child: SizedBox(height: bottomPadding)),
             ],
+            ),
           ),
           Positioned(
             top: 0,

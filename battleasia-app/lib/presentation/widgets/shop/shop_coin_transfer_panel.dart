@@ -6,6 +6,7 @@ import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
+import 'package:battleasia_app/core/utils/idempotency.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 
@@ -192,11 +193,14 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
   }
 
   Future<void> _submit() async {
+    if (_submitting) return;
     setState(() => _submitting = true);
+    final idem = newIdempotencyKey();
     final result = await _userService.submitCoinTransfer(
       recipientUsername: _recipientController.text.trim(),
       amount: _parsedAmount,
       note: _noteController.text.trim(),
+      idempotencyKey: idem,
     );
     if (!mounted) return;
     setState(() => _submitting = false);

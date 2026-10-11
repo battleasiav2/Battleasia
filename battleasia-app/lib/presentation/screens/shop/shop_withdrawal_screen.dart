@@ -202,6 +202,7 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
         _toast('shop.submitSuccess'.tr(), ok: true);
         _amountController.clear();
         _walletController.clear();
+        await context.read<AuthProvider>().refreshUser();
         await _load();
       } else {
         _toast(result['message']?.toString() ?? 'shop.submitFailed'.tr());
