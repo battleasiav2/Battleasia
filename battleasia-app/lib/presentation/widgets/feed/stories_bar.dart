@@ -377,10 +377,10 @@ class _StoryCreateSheetState extends State<_StoryCreateSheet> {
       final upload =
           await _feedService.uploadMedia(_path!, folder: 'stories');
       if (upload['success'] != true) {
-        throw Exception(upload['message'] ?? 'Upload failed');
+        throw Exception(upload['message'] ?? 'feed.uploadFail'.tr());
       }
       final url = (upload['data'] as Map)['url']?.toString();
-      if (url == null || url.isEmpty) throw Exception('Upload failed');
+      if (url == null || url.isEmpty) throw Exception('feed.uploadFail'.tr());
 
       final text = _caption.text.trim();
       final result = await _socialService.createStory(

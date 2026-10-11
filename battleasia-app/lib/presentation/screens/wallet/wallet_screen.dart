@@ -247,8 +247,13 @@ class _WalletScreenState extends State<WalletScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        await _fetchWithdrawableAmount();
-        await _fetchBalanceHistory();
+        await Future.wait([
+          _fetchWithdrawableAmount(),
+          _fetchBalanceHistory(),
+        ]);
+        if (mounted) {
+          await context.read<AuthProvider>().refreshUser();
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -100,19 +100,19 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
 
       if (response.statusCode == 200 && data['status'] == true) {
         setState(() {
-          _successMessage = 'Verification code has been resent to your email!';
+          _successMessage = 'auth.verifyResent'.tr();
           _timeLeft = 60;
           _canResend = false;
         });
         _startTimer();
       } else {
         setState(() {
-          _errorMessage = data['message'] as String? ?? 'Failed to resend code';
+          _errorMessage = data['message'] as String? ?? 'auth.verifyResendFail'.tr();
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to resend code. Please try again.';
+        _errorMessage = 'auth.verifyResendFailRetry'.tr();
       });
     } finally {
       setState(() {
@@ -175,18 +175,18 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
           }
         } else {
           setState(() {
-            _errorMessage = 'Session or user data is missing from response';
+            _errorMessage = 'auth.verifySessionMissing'.tr();
           });
         }
       } else {
         setState(() {
           _errorMessage =
-              data['message'] as String? ?? 'Invalid verification code';
+              data['message'] as String? ?? 'auth.verifyInvalidCode'.tr();
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Verification failed. Please try again.';
+        _errorMessage = 'auth.verifyFailRetry'.tr();
       });
     } finally {
       if (mounted) {
@@ -234,7 +234,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             Center(
               child: RichText(
                 text: TextSpan(
-                  text: "Didn't receive the code? ",
+                  text: 'auth.verifyNoCodeLead'.tr(),
                   style: AppTheme.bodySmall.copyWith(color: Colors.white70, fontSize: 13),
                   children: [
                     TextSpan(
@@ -261,7 +261,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   );
                 },
                 child: Text(
-                  'Sign Up Again',
+                  'auth.signUpAgain'.tr(),
                   style: TextStyle(color: AppTheme.accentColor, fontSize: 13, fontWeight: FontWeight.w600),
                 ),
               ),

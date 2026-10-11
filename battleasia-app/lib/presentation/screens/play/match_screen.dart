@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
+import 'package:battleasia_app/core/utils/idempotency.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/utils/match_capacity_utils.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
@@ -221,7 +222,11 @@ class _MatchScreenState extends State<MatchScreen> {
       return;
     }
 
-    final result = await _gamesService.joinMatch(match.id);
+    final joinIdem = newIdempotencyKey();
+    final result = await _gamesService.joinMatch(
+      match.id,
+      idempotencyKey: joinIdem,
+    );
 
     if (mounted) {
       setState(() {
@@ -256,7 +261,7 @@ class _MatchScreenState extends State<MatchScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              result['message'] as String? ?? 'Failed to join match',
+              result['message'] as String? ?? 'match.joinFail'.tr(),
             ),
             backgroundColor: Colors.red,
           ),

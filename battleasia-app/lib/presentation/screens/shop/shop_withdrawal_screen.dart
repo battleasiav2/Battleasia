@@ -103,6 +103,7 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
           context.read<AuthProvider>().updateBalance(bal);
         }
         _toast('wallet.cancelWithdrawOk'.tr(), ok: true);
+        await context.read<AuthProvider>().refreshUser();
         await _load();
       } else {
         _toast(result['message']?.toString() ?? 'wallet.cancelWithdrawFail'.tr());

@@ -12,12 +12,16 @@ class GamesService {
   String get _baseUrl => AppConfig.serverUrl;
 
   // Get authorization headers
-  Future<Map<String, String>> _getHeaders({bool money = false}) async {
+  Future<Map<String, String>> _getHeaders({
+    bool money = false,
+    String? idempotencyKey,
+  }) async {
     final token = await _authService.getToken();
     return {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
-      if (money) 'Idempotency-Key': newIdempotencyKey(),
+      if (money)
+        'Idempotency-Key': idempotencyKey ?? newIdempotencyKey(),
     };
   }
 
@@ -312,9 +316,15 @@ class GamesService {
       _matchAction(matchId, 'report', body: {'targetUserId': targetUserId, 'reason': reason});
 
   /// Join a match
-  Future<Map<String, dynamic>> joinMatch(String matchId) async {
+  Future<Map<String, dynamic>> joinMatch(
+    String matchId, {
+    String? idempotencyKey,
+  }) async {
     try {
-      final headers = await _getHeaders(money: true);
+      final headers = await _getHeaders(
+        money: true,
+        idempotencyKey: idempotencyKey,
+      );
       final response = await ApiClient.post(
         Uri.parse('$_baseUrl/api/v2/games/matches/$matchId/join'),
         headers: headers,

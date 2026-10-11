@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/constants/withdrawal_channels.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/core/services/shop_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/utils/idempotency.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
@@ -59,12 +60,37 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
   final _amountController = TextEditingController();
   final _walletController = TextEditingController();
   final _userService = UserService();
+  final _shopService = ShopService();
 
   String _step = 'form'; // form | confirm
   String _channel = kWithdrawalChannels.first.value;
   bool _submitting = false;
   bool _cancelling = false;
   final String _withdrawIdem = newIdempotencyKey();
+  List<String> _coingoChecklist = [];
+  bool _coingoMock = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCoingoCapabilities();
+  }
+
+  Future<void> _loadCoingoCapabilities() async {
+    final cap = await _shopService.fetchCoingoCapabilities();
+    if (!mounted) return;
+    if (cap['success'] == true && cap['data'] is Map) {
+      final data = Map<String, dynamic>.from(cap['data'] as Map);
+      setState(() {
+        _coingoMock = data['mockMode'] == true;
+        final raw = data['checklist'];
+        if (raw is List) {
+          _coingoChecklist =
+              raw.map((e) => e.toString()).where((s) => s.isNotEmpty).toList();
+        }
+      });
+    }
+  }
 
   WithdrawalChannel get _selectedChannel =>
       kWithdrawalChannels.firstWhere((c) => c.value == _channel);
@@ -138,8 +164,9 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
         if (bal != null) {
           context.read<AuthProvider>().updateBalance(bal);
         }
+        await context.read<AuthProvider>().refreshUser();
         _toast('wallet.cancelWithdrawOk'.tr(), ok: true);
-        Navigator.pop(context, 'cancelled');
+        if (mounted) Navigator.pop(context, 'cancelled');
       } else {
         _toast(result['message']?.toString() ?? 'wallet.cancelWithdrawFail'.tr());
       }
@@ -158,17 +185,32 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
 
     setState(() => _submitting = true);
     try {
-      final result = await _userService.submitWithdrawal(
-        userEmail: user.email,
-        username: user.username,
-        coinAmount: _coins,
+      final wallet = _walletController.text.trim();
+      var result = await _shopService.createCoingoPayout(
+        amount: _coins,
+        walletNumber: wallet,
         walletType: _channel,
-        walletAddress: _walletController.text.trim(),
+        description: 'Withdrawal: $_coins BAC via $_channel',
+        email: user.email,
+        username: user.username,
         currencyType: _selectedChannel.currency,
         currencyAmount: _currencyAmount,
-        description: 'Withdrawal request via $_channel',
         idempotencyKey: _withdrawIdem,
       );
+
+      if (result['success'] != true) {
+        result = await _userService.submitWithdrawal(
+          userEmail: user.email,
+          username: user.username,
+          coinAmount: _coins,
+          walletType: _channel,
+          walletAddress: wallet,
+          currencyType: _selectedChannel.currency,
+          currencyAmount: _currencyAmount,
+          description: 'Withdrawal request via $_channel',
+          idempotencyKey: _withdrawIdem,
+        );
+      }
 
       if (!mounted) return;
       if (result['success'] == true) {
@@ -564,6 +606,45 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
           'wallet.walletAddress'.tr(),
           _walletController.text.trim(),
         ),
+        if (_coingoChecklist.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.info.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.info.withValues(alpha: 0.25)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _coingoMock
+                      ? 'shop.coingoMockTitle'.tr()
+                      : 'shop.coingoCheckTitle'.tr(),
+                  style: AppTheme.bodyMedium.copyWith(
+                    color: AppColors.gold,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                for (final line in _coingoChecklist)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      '• $line',
+                      style: AppTheme.bodySmall.copyWith(
+                        color: AppColors.textMuted,
+                        height: 1.35,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ],
     );
   }

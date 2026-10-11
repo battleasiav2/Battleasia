@@ -8,6 +8,7 @@ import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
+import 'package:battleasia_app/core/utils/idempotency.dart';
 import 'package:battleasia_app/core/services/engagement_service.dart';
 import 'package:battleasia_app/core/services/labs_service.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
@@ -452,7 +453,11 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       return;
     }
 
-    final result = await _gamesService.joinMatch(_matchDetail!.id);
+    final joinIdem = newIdempotencyKey();
+    final result = await _gamesService.joinMatch(
+      _matchDetail!.id,
+      idempotencyKey: joinIdem,
+    );
 
     if (mounted) {
       setState(() {
@@ -460,10 +465,17 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
       });
 
       if (result['success'] == true) {
-        // Update balance if returned
-        final updatedBalance = result['data']?['balance'];
-        if (updatedBalance != null && updatedBalance is num) {
-          // Note: You may need to add an updateBalance method to AuthProvider
+        final joinData = result['data'];
+        if (joinData is Map) {
+          final data = Map<String, dynamic>.from(joinData);
+          final updatedBalance = data['balance'];
+          if (updatedBalance != null && updatedBalance is num) {
+            context.read<AuthProvider>().updateBalance(updatedBalance.toDouble());
+          } else {
+            await context.read<AuthProvider>().refreshUser();
+          }
+        } else {
+          await context.read<AuthProvider>().refreshUser();
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -479,7 +491,7 @@ class _MatchDetailScreenState extends State<MatchDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              result['message'] as String? ?? 'Failed to join match',
+              result['message'] as String? ?? 'match.joinFail'.tr(),
             ),
             backgroundColor: Colors.red,
           ),

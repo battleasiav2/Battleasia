@@ -811,7 +811,7 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
       }
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(upload['message']?.toString() ?? 'Upload failed')),
+        SnackBar(content: Text(upload['message']?.toString() ?? 'feed.uploadFail'.tr())),
       );
     }
   }
@@ -866,7 +866,7 @@ class _FeedMessagesPanelState extends State<FeedMessagesPanel> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(upload['message']?.toString() ?? 'Upload failed')),
+        SnackBar(content: Text(upload['message']?.toString() ?? 'feed.uploadFail'.tr())),
       );
     }
   }

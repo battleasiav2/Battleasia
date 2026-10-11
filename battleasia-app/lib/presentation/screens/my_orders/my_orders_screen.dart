@@ -157,17 +157,29 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     }
   }
 
-  String _statusLabel(String status) =>
-      status[0].toUpperCase() + status.substring(1);
+  String _statusLabel(String status) {
+    switch (status) {
+      case 'pending':
+        return 'orders.statusPending'.tr();
+      case 'processing':
+        return 'orders.statusProcessing'.tr();
+      case 'completed':
+        return 'orders.statusCompleted'.tr();
+      case 'rejected':
+        return 'orders.statusRejected'.tr();
+      default:
+        return status;
+    }
+  }
 
   String _formatDate(DateTime? dt) {
-    if (dt == null) return 'N/A';
+    if (dt == null) return 'orders.na'.tr();
     return DateFormat('dd/MM/yyyy HH:mm').format(dt.toLocal());
   }
 
   String _shortAddress(String address) {
     if (address.length <= 16) return address;
-    return '${address.substring(0, 8)}${address.substring(address.length - 8)}';
+    return '${address.substring(0, 8)}â€¦${address.substring(address.length - 8)}';
   }
 
   // ---------------------------------------------------------
@@ -228,14 +240,16 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          entry.isDeposit ? 'Deposit Details' : 'Withdrawal Details',
+                          entry.isDeposit
+                              ? 'orders.depositDetails'.tr()
+                              : 'orders.withdrawalDetails'.tr(),
                           style: AppTheme.heading3.copyWith(
                             color: Colors.black,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
                         Text(
-                          'ID: ${entry.id}',
+                          'orders.idLine'.tr(namedArgs: {'id': entry.id}),
                           style: AppTheme.bodySmall
                               .copyWith(color: Colors.grey, fontSize: 11),
                         ),
@@ -270,43 +284,63 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
   }
 
   List<Widget> _depositDetailRows(DepositModel d) => [
-        _detailRow('Transaction ID', d.transactionId),
-        _detailRow('Coin Amount', '${d.coinAmount.toStringAsFixed(0)} BAC'),
-        _detailRow('Currency', d.paymentCurrency),
-        _detailRow('Paid Amount', d.paymentAmount.toStringAsFixed(2)),
-        _detailRow('Channel', d.channelName),
-        _detailRow('To Address', d.toWalletAddress),
-        _detailRow('From Address', d.fromAddress),
-        _detailRow('Date', _formatDate(d.createdAt)),
+        _detailRow('orders.fieldTransactionId'.tr(), d.transactionId),
+        _detailRow(
+          'orders.fieldCoinAmount'.tr(),
+          '${d.coinAmount.toStringAsFixed(0)} BAC',
+        ),
+        _detailRow('orders.fieldCurrency'.tr(), d.paymentCurrency),
+        _detailRow(
+          'orders.fieldPaidAmount'.tr(),
+          d.paymentAmount.toStringAsFixed(2),
+        ),
+        _detailRow('orders.fieldChannel'.tr(), d.channelName),
+        _detailRow('orders.fieldToAddress'.tr(), d.toWalletAddress),
+        _detailRow('orders.fieldFromAddress'.tr(), d.fromAddress),
+        _detailRow('orders.fieldDate'.tr(), _formatDate(d.createdAt)),
         if (d.processedAt != null)
-          _detailRow('Processed At', _formatDate(d.processedAt)),
+          _detailRow('orders.fieldProcessedAt'.tr(), _formatDate(d.processedAt)),
         if (d.processedBy != null)
-          _detailRow('Processed By', d.processedBy!),
+          _detailRow('orders.fieldProcessedBy'.tr(), d.processedBy!),
         if (d.rejectionReason != null)
-          _detailRow('Rejection Reason', d.rejectionReason!, valueColor: Colors.red),
+          _detailRow(
+            'orders.fieldRejectionReason'.tr(),
+            d.rejectionReason!,
+            valueColor: Colors.red,
+          ),
         if (d.notes != null && d.notes!.isNotEmpty)
-          _detailRow('Notes', d.notes!),
+          _detailRow('orders.fieldNotes'.tr(), d.notes!),
       ];
 
   List<Widget> _withdrawalDetailRows(WithdrawalModel w) => [
-        _detailRow('Coin Amount', '${w.coinAmount.toStringAsFixed(0)} BAC'),
-        _detailRow('Wallet Type', w.walletType),
-        _detailRow('Wallet Address', w.walletAddress),
-        _detailRow('Currency', w.currencyType),
-        _detailRow('Payout Amount', w.currencyAmount.toStringAsFixed(2)),
+        _detailRow(
+          'orders.fieldCoinAmount'.tr(),
+          '${w.coinAmount.toStringAsFixed(0)} BAC',
+        ),
+        _detailRow('orders.fieldWalletType'.tr(), w.walletType),
+        _detailRow('orders.fieldWalletAddress'.tr(), w.walletAddress),
+        _detailRow('orders.fieldCurrency'.tr(), w.currencyType),
+        _detailRow(
+          'orders.fieldPayoutAmount'.tr(),
+          w.currencyAmount.toStringAsFixed(2),
+        ),
         if (w.description != null && w.description!.isNotEmpty)
-          _detailRow('Description', w.description!),
-        _detailRow('Date', _formatDate(w.createdAt)),
+          _detailRow('orders.fieldDescription'.tr(), w.description!),
+        _detailRow('orders.fieldDate'.tr(), _formatDate(w.createdAt)),
         if (w.processedAt != null)
-          _detailRow('Processed At', _formatDate(w.processedAt)),
+          _detailRow('orders.fieldProcessedAt'.tr(), _formatDate(w.processedAt)),
         if (w.processedBy != null)
-          _detailRow('Processed By', w.processedBy!),
+          _detailRow('orders.fieldProcessedBy'.tr(), w.processedBy!),
         if (w.transactionHash != null && w.transactionHash!.isNotEmpty)
-          _detailRow('Tx Hash', w.transactionHash!),
+          _detailRow('orders.fieldTxHash'.tr(), w.transactionHash!),
         if (w.rejectionReason != null)
-          _detailRow('Rejection Reason', w.rejectionReason!, valueColor: Colors.red),
+          _detailRow(
+            'orders.fieldRejectionReason'.tr(),
+            w.rejectionReason!,
+            valueColor: Colors.red,
+          ),
         if (w.notes != null && w.notes!.isNotEmpty)
-          _detailRow('Notes', w.notes!),
+          _detailRow('orders.fieldNotes'.tr(), w.notes!),
       ];
 
   Widget _detailRow(String label, String value, {Color? valueColor}) {
@@ -383,7 +417,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'My Orders',
+                            'orders.title'.tr(),
                             style: AppTheme.heading2.copyWith(
                               color: Colors.black,
                               fontWeight: FontWeight.w700,
@@ -401,7 +435,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                                   )
                                 : const Icon(Icons.refresh),
                             color: AppTheme.primaryColor,
-                            tooltip: 'Refresh',
+                            tooltip: 'orders.refresh'.tr(),
                           ),
                         ],
                       ),
@@ -456,9 +490,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
 
   Widget _buildTypeTabs() {
     final tabs = [
-      {'label': 'All', 'value': 'all'},
-      {'label': 'Deposit', 'value': 'deposit'},
-      {'label': 'Withdrawal', 'value': 'withdrawal'},
+      {'label': 'orders.filterAll'.tr(), 'value': 'all'},
+      {'label': 'orders.filterDeposit'.tr(), 'value': 'deposit'},
+      {'label': 'orders.filterWithdrawal'.tr(), 'value': 'withdrawal'},
     ];
     final counts = {
       'all': _allEntries.length,
@@ -547,11 +581,11 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
 
   Widget _buildStatusTabs() {
     final List<Map<String, String>> statusTabs = [
-      {'label': 'All', 'value': 'all'},
-      {'label': 'Pending', 'value': 'pending'},
-      {'label': 'Processing', 'value': 'processing'},
-      {'label': 'Completed', 'value': 'completed'},
-      {'label': 'Rejected', 'value': 'rejected'},
+      {'label': 'orders.filterAll'.tr(), 'value': 'all'},
+      {'label': 'orders.statusPending'.tr(), 'value': 'pending'},
+      {'label': 'orders.statusProcessing'.tr(), 'value': 'processing'},
+      {'label': 'orders.statusCompleted'.tr(), 'value': 'completed'},
+      {'label': 'orders.statusRejected'.tr(), 'value': 'rejected'},
     ];
     return Container(
       decoration: BoxDecoration(
@@ -646,7 +680,9 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     final IconData typeIcon = isDeposit
         ? Icons.arrow_downward_rounded
         : Icons.arrow_upward_rounded;
-    final String typeLabel = isDeposit ? 'Deposit' : 'Withdrawal';
+    final String typeLabel = isDeposit
+        ? 'orders.typeDeposit'.tr()
+        : 'orders.typeWithdrawal'.tr();
     final String subtitle = isDeposit
         ? entry.deposit!.channelName
         : entry.withdrawal!.walletType;
@@ -654,8 +690,12 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
         ? '${entry.deposit!.paymentCurrency} ${entry.deposit!.paymentAmount.toStringAsFixed(2)}'
         : '${entry.withdrawal!.currencyType} ${entry.withdrawal!.currencyAmount.toStringAsFixed(2)}';
     final String reference = isDeposit
-        ? 'TX: ${_shortAddress(entry.deposit!.transactionId)}'
-        : 'Wallet: ${_shortAddress(entry.withdrawal!.walletAddress)}';
+        ? 'orders.refTx'.tr(namedArgs: {
+            'ref': _shortAddress(entry.deposit!.transactionId),
+          })
+        : 'orders.refWallet'.tr(namedArgs: {
+            'ref': _shortAddress(entry.withdrawal!.walletAddress),
+          });
     final statusColor = _statusColor(entry.status);
 
     return Card(
@@ -778,8 +818,10 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
                 OutlinedButton.icon(
                   onPressed: () => _showDetails(entry),
                   icon: const Icon(Icons.remove_red_eye, size: 16),
-                  label: const Text('View Details',
-                      style: TextStyle(fontSize: 13)),
+                  label: Text(
+                    'orders.viewDetails'.tr(),
+                    style: const TextStyle(fontSize: 13),
+                  ),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppTheme.primaryColor,
                     side: BorderSide(color: AppTheme.primaryColor),
@@ -800,21 +842,25 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
   Widget _buildEmptyState() {
     final String message;
     final IconData icon;
+    final statusName = _statusFilter == 'all'
+        ? ''
+        : _statusLabel(_statusFilter);
     if (_typeFilter == 'deposit') {
       icon = Icons.arrow_downward_rounded;
       message = _statusFilter == 'all'
           ? 'orders.empty'.tr()
-          : 'No $_statusFilter deposits found.';
+          : 'orders.emptyDepositsFiltered'.tr(namedArgs: {'status': statusName});
     } else if (_typeFilter == 'withdrawal') {
       icon = Icons.arrow_upward_rounded;
       message = _statusFilter == 'all'
           ? 'orders.emptyOut'.tr()
-          : 'No $_statusFilter withdrawals found.';
+          : 'orders.emptyWithdrawalsFiltered'
+              .tr(namedArgs: {'status': statusName});
     } else {
       icon = Icons.swap_vert_rounded;
       message = _statusFilter == 'all'
-          ? 'No transaction history found.'
-          : 'No $_statusFilter transactions found.';
+          ? 'orders.emptyTxAll'.tr()
+          : 'orders.emptyTxFiltered'.tr(namedArgs: {'status': statusName});
     }
     return Center(
       child: Padding(
@@ -824,7 +870,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             Icon(icon, size: 60, color: Colors.grey[300]),
             const SizedBox(height: 16),
             Text(
-              'No transactions found',
+              'orders.emptyTitle'.tr(),
               style: AppTheme.heading3
                   .copyWith(fontSize: 18, color: Colors.grey),
             ),
@@ -870,13 +916,13 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             Icon(Icons.error_outline, size: 60, color: Colors.red[300]),
             const SizedBox(height: 16),
             Text(
-              'Failed to load data',
+              'orders.loadFail'.tr(),
               style: AppTheme.heading3
                   .copyWith(fontSize: 18, color: Colors.grey),
             ),
             const SizedBox(height: 8),
             Text(
-              _errorMessage ?? 'Unknown error',
+              _errorMessage ?? 'orders.unknownError'.tr(),
               style: AppTheme.bodyMedium
                   .copyWith(fontSize: 13, color: Colors.grey),
               textAlign: TextAlign.center,
@@ -885,7 +931,7 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
             ElevatedButton.icon(
               onPressed: _loadTransactions,
               icon: const Icon(Icons.refresh),
-              label: const Text('Retry'),
+              label: Text('common.retry'.tr()),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryColor,
                 foregroundColor: Colors.white,

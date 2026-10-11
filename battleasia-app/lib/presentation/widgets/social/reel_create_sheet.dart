@@ -60,7 +60,7 @@ class _ReelCreateSheetState extends State<ReelCreateSheet> {
     try {
       final upload = await _feedService.uploadMedia(_video!.path, folder: 'reels');
       if (upload['success'] != true) {
-        throw Exception(upload['message']?.toString() ?? 'Upload failed');
+        throw Exception(upload['message']?.toString() ?? 'feed.uploadFail'.tr());
       }
       var url = upload['data']?['url']?.toString() ?? '';
       if (url.isNotEmpty && !url.startsWith('http')) {
