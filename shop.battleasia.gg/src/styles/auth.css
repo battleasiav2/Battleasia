@@ -1722,6 +1722,18 @@ form.signin-panel,
   }
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 /* Shop user hub — auth-style inputs (placeholder inside, no label above). */
 .field-inbox {
   gap: 6px;
@@ -1757,6 +1769,6 @@ form.signin-panel,
 }
 
 .shop-filter-range .field-inbox .field-control--plain input {
-  min-height: 40px;
-  font-size: 14px;
+  min-height: 42px;
+  font-size: 15px;
 }

@@ -55,7 +55,7 @@ export function getBacShopWalletUrl() {
 }
 
 export function getBacShopWithdrawalUrl() {
-  return withSessionHandoff(shopPath('/user/withdrawal'));
+  return withSessionHandoff(shopPath('/user/wallet?withdraw=1'));
 }
 
 export function openBacShop(path: 'entry' | 'shop' | 'transfer' | 'wallet' | 'withdrawal' = 'entry') {

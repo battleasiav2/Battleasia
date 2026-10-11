@@ -380,9 +380,10 @@ export function ShopPage() {
       {error ? <p className="form-error">{error}</p> : null}
       <div className="shop-buy-layout">
       <section className="shop-filter" aria-label={t('shop.filterPayment')}>
-        <h2>{t('shop.filterPayment')}</h2>
+        <span className="visually-hidden">{t('shop.filterPayment')}</span>
         <select
           className={payFilter ? 'has-value' : ''}
+          aria-label={t('shop.filterPayment')}
           value={payFilter}
           onChange={(e) => {
             const next = e.target.value;
@@ -397,7 +398,7 @@ export function ShopPage() {
             </option>
           ))}
         </select>
-        <h2>{t('shop.filterAmount')}</h2>
+        <span className="visually-hidden">{t('shop.filterAmount')}</span>
         <div className="shop-filter-range">
           <InboxField
             label={t('shop.min')}
@@ -505,7 +506,7 @@ export function ShopPage() {
             aria-labelledby="sec-pay-title"
             onClick={(e) => e.stopPropagation()}
           >
-            <h2 id="sec-pay-title">{proof ? t('shop.pay') : 'Security Payment'}</h2>
+            <h2 id="sec-pay-title">{proof ? t('shop.pay') : t('shop.buyDialogTitle')}</h2>
             {proof ? (
               <form className="sec-proof" onSubmit={onSubmit}>
                 <div className="xfer-break pack-break">
@@ -597,7 +598,7 @@ export function ShopPage() {
                 {fieldErr ? <p className="field-error">{fieldErr}</p> : null}
                 <div className="sec-actions">
                   <button className="sec-cancel" type="button" onClick={() => setProof(false)}>
-                    Back
+                    {t('shop.dialogBack')}
                   </button>
                   <button className="sec-confirm" type="submit" disabled={busy || cryptoExpired || !channelId || !wallet || !navigator.onLine}>
                     {busy ? t('wallet.submitting') : t('shop.submitDep')}
@@ -608,7 +609,7 @@ export function ShopPage() {
               <div className="sec-pay-grid">
                 <div>
                   <div className="sec-card">
-                    <p className="sec-label">Player Email</p>
+                    <p className="sec-label">{t('shop.playerEmail')}</p>
                     <p className="sec-email">{user?.email || '—'}</p>
                   </div>
                   <div className="sec-card">
@@ -653,7 +654,7 @@ export function ShopPage() {
                     {couponErr ? <p className="sec-coupon-err">{couponErr}</p> : null}
                   </div>
                   <div className="sec-channels">
-                    <h3>Select payment channels</h3>
+                    <h3>{t('shop.channelsTitle')}</h3>
                     <div className="sec-channel-row">
                     {channels.map((c) => {
                       const kind = payKindFromName(c.channel_name);
@@ -678,15 +679,15 @@ export function ShopPage() {
                   </div>
                 </div>
                 <div className="sec-side">
-                  <h3>Order summary</h3>
+                  <h3>{t('shop.orderSummary')}</h3>
                   <div className="sec-summary">
                     <img src={ASSETS.coin} alt="" width={54} height={54} />
                     <div>
-                      <small>Coins</small>
+                      <small>{t('shop.coinsLabel')}</small>
                       <strong>{Number(pack.amount).toLocaleString()}</strong>
                     </div>
                   </div>
-                  <h3>Rates</h3>
+                  <h3>{t('shop.ratesTitle')}</h3>
                   {quoteRates.map((row) => (
                     <div className="sec-rate" key={row.code}>
                       <span>
@@ -694,14 +695,19 @@ export function ShopPage() {
                         {row.code}
                       </span>
                       <b>
-                        {row.rate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} per coin
+                        {row.rate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}{' '}
+                        {t('shop.perCoin')}
                       </b>
                     </div>
                   ))}
                   {channelKind !== 'crypto' ? (
                     <label className="field">
-                      Select Currency
-                      <select value={fiatCode} onChange={(e) => setFiatCode(e.target.value)}>
+                      <span className="visually-hidden">{t('shop.selectCurrency')}</span>
+                      <select
+                        aria-label={t('shop.selectCurrency')}
+                        value={fiatCode}
+                        onChange={(e) => setFiatCode(e.target.value)}
+                      >
                         {['BDT', 'INR', 'PKR'].map((code) => (
                           <option key={code} value={code}>
                             {flags[code]} {code}
@@ -714,7 +720,7 @@ export function ShopPage() {
                   )}
                   <div className="sec-actions">
                     <button className="sec-cancel" type="button" onClick={closeBuy}>
-                      Cancel
+                      {t('shop.dialogCancel')}
                     </button>
                     <button
                       className="sec-confirm"
@@ -736,7 +742,7 @@ export function ShopPage() {
                         setProof(true);
                       }}
                     >
-                      Confirm & Pay
+                      {t('shop.confirmPay')}
                     </button>
                   </div>
                 </div>

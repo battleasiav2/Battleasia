@@ -326,7 +326,7 @@ class ShopService {
 
   // ---------------------------------------------------------------------------
   // Coingo payout  (POST /api/v4/payments/coingo/payout)
-  // Dedicated store withdrawal path used by web /user/withdrawal.
+  // Coingo payout (web shop wallet withdraw uses the same API first).
   // ---------------------------------------------------------------------------
 
   Future<Map<String, dynamic>> createCoingoPayout({

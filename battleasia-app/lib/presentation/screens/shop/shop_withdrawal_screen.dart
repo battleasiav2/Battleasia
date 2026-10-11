@@ -16,7 +16,7 @@ import 'package:battleasia_app/presentation/widgets/common/glass_stat_tile.dart'
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/shop/pay_brand_icon.dart';
 
-/// Native store withdrawal — mirrors web shop `/user/withdrawal`.
+/// Native store withdrawal — same flow as web shop wallet withdraw (Coingo → v4).
 class ShopWithdrawalScreen extends StatefulWidget {
   const ShopWithdrawalScreen({super.key});
 

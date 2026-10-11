@@ -12,8 +12,11 @@ import {
   cancelWithdraw,
   fetchBalanceHistory,
   fetchCoinRates,
+  fetchCoingoCapabilities,
+  fetchMyWithdrawals,
   fetchWithdrawable,
   fiatFor,
+  submitCoingoPayout,
   submitWithdraw,
   type CoinRate,
   type HistoryRow,
@@ -113,6 +116,9 @@ export function WalletPage() {
   const [showDesc, setShowDesc] = useState(true);
   const [showAfter, setShowAfter] = useState(true);
   const [newestFirst, setNewestFirst] = useState(true);
+  const [coingoChecklist, setCoingoChecklist] = useState<string[]>([]);
+  const [coingoMock, setCoingoMock] = useState(false);
+  const [withdrawRows, setWithdrawRows] = useState<Array<Record<string, unknown>>>([]);
 
   const balance = info?.balance ?? sessionBal;
 
@@ -134,13 +140,24 @@ export function WalletPage() {
 
   useEffect(() => {
     let live = true;
-    Promise.all([fetchWithdrawable(), fetchCoinRates(), fetchBalanceHistory()])
-      .then(([w, r, h]) => {
+    Promise.all([
+      fetchWithdrawable(),
+      fetchCoinRates(),
+      fetchBalanceHistory(),
+      fetchCoingoCapabilities(),
+      fetchMyWithdrawals(),
+    ])
+      .then(([w, r, h, cap, wd]) => {
         if (!live) return;
         setInfo(w);
         setRates(r);
         setRows(h);
+        setWithdrawRows(wd);
         if (w?.balance != null) setBalance(w.balance);
+        if (cap) {
+          setCoingoMock(Boolean(cap.mockMode));
+          setCoingoChecklist(Array.isArray(cap.checklist) ? cap.checklist : []);
+        }
       })
       .catch((err) => {
         if (!live) return;
@@ -227,16 +244,29 @@ export function WalletPage() {
   async function doWithdraw() {
     if (busy) return;
     setBusy(true);
+    const currencyType = walletType === 'crypto' ? 'USDT' : 'BDT';
     try {
-      await submitWithdraw(
-        {
-          coin_amount: maxAmt,
-          wallet_address: address.trim(),
-          wallet_type: walletType,
-          currency_type: walletType === 'crypto' ? 'USDT' : 'BDT',
-        },
-        idem
-      );
+      try {
+        await submitCoingoPayout(
+          {
+            amount: maxAmt,
+            walletNumber: address.trim(),
+            walletType,
+            currency_type: currencyType,
+          },
+          idem
+        );
+      } catch {
+        await submitWithdraw(
+          {
+            coin_amount: maxAmt,
+            wallet_address: address.trim(),
+            wallet_type: walletType,
+            currency_type: currencyType,
+          },
+          idem
+        );
+      }
       toast(t('wallet.submitted'));
       setDoneAmt(maxAmt);
       setAmount('');
@@ -247,6 +277,7 @@ export function WalletPage() {
       const next = await fetchWithdrawable();
       setInfo(next);
       setRows(await fetchBalanceHistory());
+      setWithdrawRows(await fetchMyWithdrawals());
       if (next?.balance != null) setBalance(next.balance);
     } catch (err) {
       toast(isApiError(err) ? err.message : t('wallet.submitFail'));
@@ -264,6 +295,7 @@ export function WalletPage() {
       const next = await fetchWithdrawable();
       setInfo(next);
       setRows(await fetchBalanceHistory());
+      setWithdrawRows(await fetchMyWithdrawals());
       if (typeof result?.balance === 'number') setBalance(result.balance);
       else if (next?.balance != null) setBalance(next.balance);
     } catch (err) {
@@ -329,6 +361,17 @@ export function WalletPage() {
         </div>
       ) : null}
 
+      {coingoChecklist.length ? (
+        <section className="room-card wd-coingo-note wal-coingo-note" aria-label={t('wd.coingoCheckTitle')}>
+          <h2>{coingoMock ? t('wd.coingoMockTitle') : t('wd.coingoCheckTitle')}</h2>
+          <ul>
+            {coingoChecklist.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <section className="wal-cards">
         <article className="wal-card">
           <h2>{t('wallet.total')}</h2>
@@ -392,6 +435,35 @@ export function WalletPage() {
             {t('wallet.request')}
           </button>
         </article>
+      </section>
+
+      <section className="wal-wd-recent wal-history">
+        <header className="wal-toolbar">
+          <h2>{t('wallet.recentWithdrawals')}</h2>
+        </header>
+        {withdrawRows.length === 0 ? (
+          <p className="wal-empty">{t('wd.none')}</p>
+        ) : (
+          <div className="wal-wd-list">
+            {withdrawRows.slice(0, 10).map((row) => {
+              const id = String(row.id ?? row._id ?? '');
+              const amt = Math.abs(Number(row.coin_amount ?? row.amount) || 0);
+              const when = String(row.createdAt ?? row.created_at ?? '');
+              const status = String(row.status ?? row.state ?? 'pending');
+              return (
+                <div className="wal-wd-row" key={id || `${amt}-${when}`}>
+                  <span className="wal-amt">
+                    <img src={ASSETS.coin} width={16} height={16} alt="" />−{bacText(amt)} BAC
+                  </span>
+                  <span className="wal-wd-meta">
+                    <span className="wal-pill wal-pill-wd">{status}</span>
+                    <span className="wal-when">{tableWhen(when)}</span>
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       <section className="wal-history">
@@ -608,6 +680,11 @@ export function WalletPage() {
               </div>
             ) : (
               <form className="wal-form" onSubmit={askWithdraw}>
+                {coingoChecklist.length ? (
+                  <p className="sec-muted wal-dialog-coingo">
+                    {coingoMock ? t('wd.coingoMockTitle') : t('wd.coingoCheckTitle')}
+                  </p>
+                ) : null}
                 <InboxField
                   label={t('wallet.amount')}
                   placeholder={t('wd.amountPh')}

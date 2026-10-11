@@ -273,19 +273,9 @@ svg {
   .play-head,
   .shop-buy-head,
   .wallet-hub-head,
-  .xfer-hub-head,
-  .wd-hub-head {
+  .xfer-hub-head {
     flex-wrap: wrap;
     align-items: flex-start;
-  }
-
-  .wd-hub-head {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .wd-hub-facts {
-    width: 100%;
   }
 
   .result-table {
@@ -303,36 +293,9 @@ svg {
     grid-template-columns: 1fr 1fr;
   }
 
-  .wd-hub-table,
-  .wd-hub-table .result-table {
-    overflow: visible;
-  }
-
-  .wd-hub-table .result-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 4px 12px;
-    align-items: start;
-  }
-
-  .wd-hub-table .result-row > span:nth-child(1) {
-    grid-column: 1;
-    font-weight: 700;
-    text-transform: capitalize;
-  }
-
-  .wd-hub-table .result-row > span:nth-child(3) {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    align-self: center;
-    justify-self: end;
-  }
-
-  .wd-hub-table .result-row > span:nth-child(2),
-  .wd-hub-table .result-row > span:nth-child(4) {
-    grid-column: 1;
-    color: var(--ba-muted, var(--ink-soft));
-    font-size: 12px;
+  .wal-wd-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .money-tabs,
@@ -487,7 +450,7 @@ svg {
     --nav-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 7h11M15 4l3 3-3 3'/%3E%3Cpath d='M17 17H6M9 14l-3 3 3 3'/%3E%3C/svg%3E");
   }
 
-  .play-app > .play-hud .play-nav a[href='/user/withdrawal'] {
+  .play-app > .play-hud .play-nav a[href*='withdraw'] {
     --nav-ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v12M7 11l5 5 5-5M5 20h14'/%3E%3C/svg%3E");
   }
 

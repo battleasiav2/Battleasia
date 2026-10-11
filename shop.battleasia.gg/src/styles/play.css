@@ -1424,17 +1424,19 @@ a.result-row {
 }
 
 .shop-filter select,
-.shop-filter input {
+.shop-filter input,
+.shop-filter .field-inbox .field-control--plain input {
   width: 100%;
-  min-height: 36px;
-  border-radius: 8px;
+  min-height: 42px;
+  border-radius: 9px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  background: #0c0e12;
+  background: #14161c;
   color: #f2f3f0;
   color-scheme: dark;
-  padding: 0 10px;
+  padding: 0 14px;
   font: inherit;
-  font-size: 13px;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .shop-filter select {
@@ -1478,13 +1480,51 @@ a.result-row {
 }
 
 @media (max-width: 860px) {
+  .shop-buy {
+    justify-items: center;
+  }
+
+  .shop-buy > .shop-buy-head,
+  .shop-buy > .wallet-pending,
+  .shop-buy > .money-alert,
+  .shop-buy > .form-error {
+    width: min(100%, 420px);
+    max-width: 100%;
+  }
+
+  .shop-buy-head {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .shop-buy-head .play-lead {
+    max-width: 36ch;
+    margin-inline: auto;
+  }
+
+  .shop-buy-tools {
+    justify-content: center;
+    width: 100%;
+  }
+
   .shop-buy-layout {
     grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
+    width: min(100%, 420px);
+    max-width: 100%;
   }
 
   .shop-filter {
     position: static;
-    width: min(100%, 360px);
+    width: 100%;
+    margin: 0;
+    padding: 16px;
+    gap: 10px;
+  }
+
+  .shop-filter-clear {
+    justify-self: center;
   }
 }
 
@@ -1744,17 +1784,19 @@ a.result-row {
   margin: 6px 0 0;
 }
 
-@media (max-width: 900px) {
-  .shop-buy-stage {
-    grid-template-columns: 1fr;
-  }
-
+@media (max-width: 900px) and (min-width: 861px) {
   .shop-buy-head {
     align-items: start;
   }
 
   .shop-buy-tools {
     justify-content: flex-start;
+  }
+}
+
+@media (max-width: 900px) {
+  .shop-buy-stage {
+    grid-template-columns: 1fr;
   }
 
   .shop-pack-body {
@@ -2216,125 +2258,53 @@ a.result-row {
   }
 }
 
-.wd-hub {
-  width: min(1080px, calc(100% - 48px));
-  padding: 20px 0 40px;
-  display: grid;
-  gap: 12px;
-}
-
-.wd-hub-head {
-  align-items: end;
-  gap: 12px 20px;
-}
-
-.wd-hub-head h1 {
+.wd-coingo-note {
   margin: 0;
-  font-size: clamp(26px, 3vw, 34px);
-  letter-spacing: -0.04em;
 }
 
-.wd-hub-head .eyebrow {
-  margin-bottom: 4px;
+.wd-coingo-note h2 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
 }
 
-.wd-hub-facts {
+.wd-coingo-note ul {
   margin: 0;
-  gap: 8px;
-  grid-template-columns: repeat(2, minmax(120px, 160px));
-  width: auto;
-}
-
-.wd-hub-facts article {
-  min-height: 0;
-  padding: 12px 14px;
-  border-radius: 14px;
-  box-shadow: none;
-}
-
-.wd-hub-facts strong {
-  margin-top: 6px;
-  font-size: 20px;
-}
-
-.wd-hub-note {
-  margin: 0;
-  font-size: 12px;
-  max-width: none;
+  padding-left: 18px;
+  color: var(--ba-muted);
+  font-size: 13px;
   line-height: 1.45;
 }
 
-.wd-hub .money-alert {
-  margin: 0;
-  padding: 10px 12px;
-}
-
-.wd-hub-stage {
-  gap: 14px;
-  margin-top: 0;
-  grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
-  align-items: start;
-}
-
-.wd-hub-form,
-.wd-hub-recent {
-  margin: 0;
-  padding: 14px 14px 16px;
-  display: grid;
-  gap: 10px;
-  align-content: start;
-}
-
-.wd-hub-form h2,
-.wd-hub-recent h2 {
+.wal-wd-recent .wal-toolbar h2 {
   margin: 0;
   font-size: 16px;
 }
 
-.wd-hub-form .money-form {
-  gap: 10px;
-  margin: 0;
-  max-width: none;
+.wal-wd-list {
+  display: grid;
+  gap: 0;
 }
 
-.wd-hub-form .field {
-  gap: 6px;
-}
-
-.wd-hub-form .field input,
-.wd-hub-form .field select {
-  min-height: 40px;
-}
-
-.wd-hub-table {
-  margin-top: 0;
-}
-
-.wd-hub-table .result-row {
-  padding: 10px 0;
-  font-size: 13px;
-  grid-template-columns: minmax(72px, 0.8fr) minmax(0, 1.2fr) auto minmax(100px, 1.1fr);
-  gap: 8px 12px;
+.wal-wd-row {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.wd-hub-recent .play-empty {
-  padding: 16px 8px;
+.wal-wd-row:last-child {
+  border-bottom: none;
 }
 
-@media (max-width: 900px) {
-  .wd-hub-stage {
-    grid-template-columns: 1fr;
-  }
-
-  .wd-hub-head {
-    align-items: start;
-  }
-
-  .wd-hub-facts {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: 100%;
-  }
+.wal-wd-meta {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
 }
 
 .play-head {
@@ -2656,6 +2626,28 @@ a.result-row {
   border: 1px solid rgba(255, 194, 75, 0.45);
   background: rgba(255, 194, 75, 0.08);
   color: var(--ba-text);
+}
+
+.wal-coingo-note {
+  margin: 0;
+}
+
+.wal-coingo-note h2 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.wal-coingo-note ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--ba-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.wal-dialog-coingo {
+  margin: 0 0 4px;
 }
 
 .wal-cards {

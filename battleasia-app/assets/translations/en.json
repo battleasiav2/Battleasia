@@ -423,6 +423,8 @@
     "backToArena": "Back to Play",
     "noPaymentChannels": "No payment channels loaded. Sign in to the shop and pull to refresh, then try again.",
     "pickChannel": "Please select a payment channel",
+    "openingPack": "Opening pack…",
+    "packNotFound": "Pack not found. Returning to shop.",
     "paymentDetailsFail": "Failed to load payment details. Try again.",
     "noWalletForChannel": "No {currency} wallet available for {channel}",
     "depositSubmitOk": "Deposit submitted — waiting for admin approval",
