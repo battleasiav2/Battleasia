@@ -238,12 +238,10 @@ class _AccountDrawerContent extends StatelessWidget {
                   avatarUrl: ImageUtils.getImageUrl(authProvider.user?.avatar),
                   onWalletTap: () {
                     Navigator.pop(context);
-                    Navigator.push(
+                    openShopRoute(
                       context,
-                      MaterialPageRoute(
-                        settings: const RouteSettings(name: '/wallet'),
-                        builder: (context) => const WalletScreen(),
-                      ),
+                      const WalletScreen(fromShop: true),
+                      routeName: '/shop/wallet',
                     );
                   },
                 ),
@@ -437,12 +435,10 @@ class _AccountDrawerContent extends StatelessWidget {
                   icon: Icons.account_balance_wallet_outlined,
                   onTap: () {
                     Navigator.pop(context);
-                    Navigator.push(
+                    openShopRoute(
                       context,
-                      MaterialPageRoute(
-                        settings: const RouteSettings(name: '/wallet'),
-                        builder: (context) => const WalletScreen(),
-                      ),
+                      const WalletScreen(fromShop: true),
+                      routeName: '/shop/wallet',
                     );
                   },
                 ),
@@ -688,7 +684,7 @@ class _HomeProfileCard extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 3),
                                 Text(
-                                  'VERIFIED',
+                                  'account.verifiedBadge'.tr(),
                                   style: TextStyle(
                                     color: AppColors.gold,
                                     fontSize: 9.5,
@@ -755,9 +751,9 @@ class _HomeProfileCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text(
-                    'WALLET HUB >',
-                    style: TextStyle(
+                  child: Text(
+                    'account.walletHub'.tr(),
+                    style: const TextStyle(
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.6,

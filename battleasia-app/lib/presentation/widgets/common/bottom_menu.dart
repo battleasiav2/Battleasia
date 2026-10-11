@@ -152,15 +152,12 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
 
   void _handleNavigation(BuildContext context, String route) {
     HapticFeedback.selectionClick();
-    setState(() {
-      _currentRoute = route;
-    });
+    final current = _getCurrentRoute(context);
+    if (_isActive(route, current)) return;
 
-    Widget targetScreen;
+    setState(() => _currentRoute = route);
+
     switch (route) {
-      case '/play':
-        targetScreen = const PlayScreen();
-        break;
       case '/shop':
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
@@ -169,9 +166,6 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
           ),
         );
         return;
-      case '/earn':
-        targetScreen = const EarnScreen();
-        break;
       case '/transfer':
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
@@ -180,27 +174,40 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
           ),
         );
         return;
+      case '/play':
+        _switchRootTab(context, const PlayScreen(), '/play');
+        return;
+      case '/earn':
+        _switchRootTab(context, const EarnScreen(), '/earn');
+        return;
       case '/feed':
-        targetScreen = const FeedScreen();
-        break;
+        _switchRootTab(context, const FeedScreen(), '/feed');
+        return;
       default:
-        targetScreen = const PlayScreen();
+        _switchRootTab(context, const PlayScreen(), '/play');
     }
+  }
 
-    // Navigate to the target screen with route name set
-    Navigator.of(context)
-        .pushReplacement(
-          MaterialPageRoute(
-            builder: (_) => targetScreen,
-            settings: RouteSettings(name: route),
-          ),
-        )
-        .then((_) {
-          // Update route after navigation completes
-          if (mounted) {
-            _updateCurrentRoute();
-          }
-        });
+  void _switchRootTab(BuildContext context, Widget screen, String routeName) {
+    final navigator = Navigator.of(context);
+    navigator.popUntil((r) {
+      final name = r.settings.name;
+      return r.isFirst ||
+          name == '/play' ||
+          name == '/earn' ||
+          name == '/feed' ||
+          name == '/transfer' ||
+          name == '/shop';
+    });
+    if (ModalRoute.of(context)?.settings.name == routeName) return;
+    navigator.pushReplacement(
+      MaterialPageRoute(
+        builder: (_) => screen,
+        settings: RouteSettings(name: routeName),
+      ),
+    ).then((_) {
+      if (mounted) _updateCurrentRoute();
+    });
   }
 
   @override

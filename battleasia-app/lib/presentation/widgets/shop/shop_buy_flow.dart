@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
+import 'package:battleasia_app/core/utils/idempotency.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/shop_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
@@ -103,7 +105,9 @@ class _Wallet {
   factory _Wallet.fromJson(Map<String, dynamic> j) => _Wallet(
         id: j['_id']?.toString() ?? j['id']?.toString() ?? '',
         address: j['wallet_address']?.toString() ?? '',
-        currency: j['currency']?.toString() ?? '',
+        currency: j['currency']?.toString() ??
+            j['currency_type']?.toString() ??
+            '',
         qrCode: j['qr_code']?.toString(),
       );
 }
@@ -196,7 +200,11 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
       List<_Channel> channels = [];
       List<_Rate> rates = [];
 
-      if (widget.preloadedChannels != null && widget.preloadedRates != null) {
+      final hasPreload = widget.preloadedChannels != null &&
+          widget.preloadedRates != null &&
+          widget.preloadedChannels!.isNotEmpty;
+
+      if (hasPreload) {
         channels = widget.preloadedChannels!
             .map(_Channel.fromJson)
             .where((c) => c.enabled)
@@ -374,6 +382,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
     setState(() => _submitting = true);
     try {
       final currency = channel.payCode.isNotEmpty ? channel.payCode : _currency;
+      final idem = newIdempotencyKey();
       final result = await _shop.submitDeposit(
         userEmail: user.email,
         username: user.username,
@@ -385,6 +394,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         paymentChannelId: channel.id,
         toWalletAddress: wallet.address,
         couponCode: _couponCode,
+        idempotencyKey: idem,
       );
       if (!mounted) return;
       if (result['success'] == true) {
@@ -707,6 +717,14 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
           ),
         ),
         const SizedBox(height: 8),
+        if (_channels.isEmpty)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(
+              'shop.noPaymentChannels'.tr(),
+              style: AppTheme.bodySmall.copyWith(color: AppColors.error),
+            ),
+          ),
         LayoutBuilder(
           builder: (context, constraints) {
             const gap = 8.0;

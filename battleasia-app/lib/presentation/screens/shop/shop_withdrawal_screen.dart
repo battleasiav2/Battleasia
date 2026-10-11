@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/core/utils/idempotency.dart';
 import 'package:battleasia_app/core/services/shop_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
@@ -41,6 +42,8 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
   bool _loading = true;
   bool _submitting = false;
   bool _cancelling = false;
+  List<String> _coingoChecklist = [];
+  bool _coingoMock = false;
 
   @override
   void initState() {
@@ -59,7 +62,11 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
-      final result = await _userService.getWithdrawableAmount();
+      final results = await Future.wait([
+        _userService.getWithdrawableAmount(),
+        _shopService.fetchCoingoCapabilities(),
+      ]);
+      final result = results[0];
       if (result['success'] == true && result['data'] != null) {
         final data = result['data'] as Map<String, dynamic>;
         _withdrawable =
@@ -68,6 +75,15 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
         _pendingAmount =
             (data['pendingWithdrawalAmount'] as num?)?.toDouble() ?? 0;
         _pendingId = data['pendingWithdrawalId'] as String?;
+      }
+      final cap = results[1];
+      if (cap['success'] == true && cap['data'] is Map) {
+        final data = Map<String, dynamic>.from(cap['data'] as Map);
+        _coingoMock = data['mockMode'] == true;
+        final raw = data['checklist'];
+        if (raw is List) {
+          _coingoChecklist = raw.map((e) => e.toString()).where((s) => s.isNotEmpty).toList();
+        }
       }
     } finally {
       if (mounted) setState(() => _loading = false);
@@ -154,15 +170,32 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
 
     setState(() => _submitting = true);
     try {
-      final result = await _shopService.createCoingoPayout(
+      final idem = newIdempotencyKey();
+      final user = auth.user;
+      var result = await _shopService.createCoingoPayout(
         amount: amount,
         walletNumber: wallet,
         walletType: _channel,
         description: 'Withdrawal: $amount BAC to $_currency',
-        email: auth.user?.email,
-        username: auth.user?.username,
+        email: user?.email,
+        username: user?.username,
         currencyType: _currency,
+        idempotencyKey: idem,
       );
+
+      if (result['success'] != true && user != null) {
+        result = await _userService.submitWithdrawal(
+          userEmail: user.email,
+          username: user.username,
+          coinAmount: amount,
+          walletType: _channel,
+          walletAddress: wallet,
+          currencyType: _currency,
+          currencyAmount: 0,
+          description: 'Withdrawal: $amount BAC via $_channel',
+          idempotencyKey: idem,
+        );
+      }
 
       if (!mounted) return;
       if (result['success'] == true) {
@@ -242,6 +275,37 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                           ],
                         ),
                       ),
+                      if (_coingoChecklist.isNotEmpty) ...[
+                        const SizedBox(height: 12),
+                        GlassCard(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _coingoMock
+                                    ? 'shop.coingoMockTitle'.tr()
+                                    : 'shop.coingoCheckTitle'.tr(),
+                                style: AppTheme.bodyMedium.copyWith(
+                                  color: AppColors.gold,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              for (final line in _coingoChecklist)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 4),
+                                  child: Text(
+                                    '• $line',
+                                    style: AppTheme.bodySmall.copyWith(
+                                      color: AppColors.textMuted,
+                                      height: 1.35,
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: 16),
                       if (_loading)
                         const Center(

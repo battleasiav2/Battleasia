@@ -40,6 +40,17 @@ class PayBrandIcon extends StatelessWidget {
         height: size,
         fit: BoxFit.cover,
         filterQuality: FilterQuality.high,
+        errorBuilder: (_, __, ___) => Container(
+          width: size,
+          height: size,
+          color: AppColors.surfaceElevated,
+          alignment: Alignment.center,
+          child: Icon(
+            kind == 'crypto' ? Icons.currency_bitcoin : Icons.account_balance_wallet,
+            color: AppColors.gold,
+            size: size * 0.45,
+          ),
+        ),
       ),
     );
   }

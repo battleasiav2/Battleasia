@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/shop_service.dart';
+import 'package:battleasia_app/core/utils/idempotency.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/shop_item_model.dart';
@@ -384,6 +385,7 @@ class _ShopDetailScreenState extends State<ShopDetailScreen> {
         paymentChannelId: _selectedChannelObj!.id,
         toWalletAddress: _selectedWallet!.address,
         couponCode: _couponCode,
+        idempotencyKey: newIdempotencyKey(),
       );
 
       if (result['success'] == true) {

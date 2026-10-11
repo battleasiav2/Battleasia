@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
@@ -27,20 +30,63 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
   double _minAmount = 1;
   double _maxAmount = 10000;
   List<Map<String, dynamic>> _history = [];
+  Map<String, dynamic>? _previewUser;
+  bool _previewBusy = false;
+  String _previewErr = '';
+  Timer? _previewDebounce;
 
   @override
   void initState() {
     super.initState();
     _loadSettings();
     _loadHistory();
+    _recipientController.addListener(_onRecipientChanged);
   }
 
   @override
   void dispose() {
+    _previewDebounce?.cancel();
+    _recipientController.removeListener(_onRecipientChanged);
     _recipientController.dispose();
     _amountController.dispose();
     _noteController.dispose();
     super.dispose();
+  }
+
+  void _onRecipientChanged() {
+    _previewDebounce?.cancel();
+    final q = _recipientController.text.trim();
+    if (q.length < 2) {
+      setState(() {
+        _previewUser = null;
+        _previewErr = '';
+        _previewBusy = false;
+      });
+      return;
+    }
+    setState(() {
+      _previewBusy = true;
+      _previewErr = '';
+    });
+    _previewDebounce = Timer(const Duration(milliseconds: 350), () async {
+      final result = await _userService.lookupTransferUser(q);
+      if (!mounted) return;
+      if (result['success'] == true && result['data'] is Map) {
+        setState(() {
+          _previewUser = Map<String, dynamic>.from(result['data'] as Map);
+          _previewErr = '';
+          _previewBusy = false;
+        });
+      } else {
+        setState(() {
+          _previewUser = null;
+          _previewErr = result['notFound'] == true
+              ? 'shop.transferUserMissing'.tr()
+              : (result['message'] as String? ?? 'shop.transferUserMissing'.tr());
+          _previewBusy = false;
+        });
+      }
+    });
   }
 
   Future<void> _loadSettings() async {
@@ -86,23 +132,66 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
 
   double get _totalDebited => _parsedAmount + _feeAmount;
 
+  String? _validateTransfer() {
+    if (!_enabled) return 'shop.transferDisabled'.tr();
+    final to = _recipientController.text.trim();
+    if (to.isEmpty) return 'shop.transferRecipientRequired'.tr();
+    if (_previewUser == null ||
+        _previewUser!['username']?.toString().toLowerCase() != to.toLowerCase()) {
+      return 'shop.transferUserMissing'.tr();
+    }
+    final me = context.read<AuthProvider>().user;
+    if (me != null &&
+        (to.toLowerCase() == me.username.toLowerCase() ||
+            to.toLowerCase() == me.email.toLowerCase())) {
+      return 'shop.transferSelf'.tr();
+    }
+    if (_parsedAmount <= 0) return 'shop.transferAmountRequired'.tr();
+    if (_parsedAmount < _minAmount) {
+      return 'shop.transferMin'.tr(namedArgs: {'min': _minAmount.toStringAsFixed(0)});
+    }
+    if (_parsedAmount > _maxAmount) {
+      return 'shop.transferMax'.tr(namedArgs: {'max': _maxAmount.toStringAsFixed(0)});
+    }
+    final balance = me?.balance ?? 0;
+    if (_totalDebited > balance) return 'shop.transferInsufficientBalance'.tr();
+    return null;
+  }
+
+  Future<void> _requestConfirm() async {
+    final err = _validateTransfer();
+    if (err != null) {
+      _showSnack(err);
+      return;
+    }
+    final to = _recipientController.text.trim();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF161618),
+        title: Text('shop.transferConfirmTitle'.tr(), style: const TextStyle(color: Colors.white)),
+        content: Text(
+          'shop.transferConfirmBody'.tr(namedArgs: {
+            'amount': _parsedAmount.toStringAsFixed(2),
+            'fee': _feeAmount.toStringAsFixed(2),
+            'total': _totalDebited.toStringAsFixed(2),
+            'user': to,
+          }),
+          style: TextStyle(color: Colors.white.withValues(alpha: 0.75)),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text('shop.cancel'.tr())),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('shop.confirm'.tr(), style: TextStyle(color: AppColors.gold)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) await _submit();
+  }
+
   Future<void> _submit() async {
-    if (!_enabled) return;
-    if (_recipientController.text.trim().isEmpty) {
-      _showSnack('shop.transferRecipientRequired'.tr());
-      return;
-    }
-    if (_parsedAmount <= 0) {
-      _showSnack('shop.transferAmountRequired'.tr());
-      return;
-    }
-
-    final balance = context.read<AuthProvider>().user?.balance ?? 0;
-    if (_totalDebited > balance) {
-      _showSnack('shop.transferInsufficientBalance'.tr());
-      return;
-    }
-
     setState(() => _submitting = true);
     final result = await _userService.submitCoinTransfer(
       recipientUsername: _recipientController.text.trim(),
@@ -117,6 +206,10 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
       _recipientController.clear();
       _amountController.clear();
       _noteController.clear();
+      setState(() {
+        _previewUser = null;
+        _previewErr = '';
+      });
       await context.read<AuthProvider>().refreshUser();
       await _loadHistory();
     } else {
@@ -192,6 +285,63 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
                             hintText: 'shop.transferRecipientPlaceholder'.tr(),
                           ),
                         ),
+                        if (_previewBusy)
+                          const Padding(
+                            padding: EdgeInsets.only(top: 8),
+                            child: LinearProgressIndicator(minHeight: 2),
+                          )
+                        else if (_previewUser != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 18,
+                                  backgroundImage: _previewUser!['avatar'] != null &&
+                                          '${_previewUser!['avatar']}'.isNotEmpty
+                                      ? NetworkImage(
+                                          ImageUtils.getImageUrl('${_previewUser!['avatar']}'),
+                                        )
+                                      : null,
+                                  child: _previewUser!['avatar'] == null ||
+                                          '${_previewUser!['avatar']}'.isEmpty
+                                      ? const Icon(Icons.person, size: 18)
+                                      : null,
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '@${_previewUser!['username']}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w800,
+                                        ),
+                                      ),
+                                      if ((_previewUser!['displayName']?.toString() ?? '').isNotEmpty)
+                                        Text(
+                                          '${_previewUser!['displayName']}',
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(alpha: 0.55),
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else if (_previewErr.isNotEmpty && _recipientController.text.trim().length >= 2)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 6),
+                            child: Text(
+                              _previewErr,
+                              style: const TextStyle(color: AppColors.error, fontSize: 12),
+                            ),
+                          ),
                         const SizedBox(height: 12),
                         TextField(
                           controller: _amountController,
@@ -236,7 +386,7 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
                         ),
                         const SizedBox(height: 16),
                         ElevatedButton(
-                          onPressed: _submitting ? null : _submit,
+                          onPressed: _submitting ? null : _requestConfirm,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.gold,
                             foregroundColor: Colors.black,

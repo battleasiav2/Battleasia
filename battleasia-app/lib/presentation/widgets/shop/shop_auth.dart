@@ -26,7 +26,6 @@ Future<void> openShopRoute(
     return;
   }
 
-  ShopAuthGate.markShopSessionActive();
   await Navigator.of(context).pushReplacement(
     MaterialPageRoute(
       builder: (_) => screen,

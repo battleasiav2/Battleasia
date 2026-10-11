@@ -18,7 +18,7 @@ Future<String?> showWithdrawSheet({
   String? pendingWithdrawalId,
   List<Map<String, dynamic>> currencyRates = const [],
 }) {
-  return showModalBottomSheet<bool>(
+  return showModalBottomSheet<String?>(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
@@ -79,12 +79,12 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
         if (rate > 0) return rate;
       }
     }
-    // Fallback rates matching web wallet-view.tsx
-    const fallback = {'BDT': 5.5, 'INR': 4.2, 'PKR': 14.0, 'USD': 0.05};
-    return fallback[_selectedChannel.currency] ?? 1.0;
+    return 0;
   }
 
-  double get _currencyAmount => _coins * _rate;
+  bool get _hasLiveRate => _rate > 0;
+
+  double get _currencyAmount => _hasLiveRate ? _coins * _rate : 0;
 
   @override
   void dispose() {
@@ -103,6 +103,10 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
   }
 
   void _continue() {
+    if (!_hasLiveRate) {
+      _toast('wallet.ratesUnavailable'.tr());
+      return;
+    }
     if (_coins <= 0) {
       _toast('wallet.invalidCoinAmount'.tr());
       return;
@@ -145,6 +149,10 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
   Future<void> _submit() async {
     final user = context.read<AuthProvider>().user;
     if (user == null) return;
+    if (!_hasLiveRate) {
+      _toast('wallet.ratesUnavailable'.tr());
+      return;
+    }
 
     setState(() => _submitting = true);
     try {
@@ -245,7 +253,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
                       IconButton(
                         onPressed: _submitting
                             ? null
-                            : () => Navigator.pop(context, false),
+                            : () => Navigator.pop(context),
                         icon: Icon(Icons.close,
                             color: AppColors.textMuted.withValues(alpha: 0.8)),
                       ),
@@ -271,7 +279,7 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
                                 child: OutlinedButton(
                                   onPressed: _submitting
                                       ? null
-                                      : () => Navigator.pop(context, false),
+                                      : () => Navigator.pop(context),
                                   style: OutlinedButton.styleFrom(
                                     foregroundColor: AppColors.textPrimary,
                                     side: BorderSide(
@@ -513,8 +521,12 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
         ),
         const SizedBox(height: 6),
         Text(
-          '1 BAC = ${_rate.toStringAsFixed(2)} ${_selectedChannel.currency}',
-          style: AppTheme.bodySmall.copyWith(color: AppColors.textMuted),
+          _hasLiveRate
+              ? '1 BAC = ${_rate.toStringAsFixed(2)} ${_selectedChannel.currency}'
+              : 'wallet.ratesUnavailable'.tr(),
+          style: AppTheme.bodySmall.copyWith(
+            color: _hasLiveRate ? AppColors.textMuted : AppColors.error,
+          ),
         ),
         const SizedBox(height: 16),
         _label('wallet.walletAddress'.tr()),

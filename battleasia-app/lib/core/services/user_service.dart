@@ -15,12 +15,16 @@ class UserService {
   String get _baseUrl => AppConfig.serverUrl;
 
   // Get authorization headers
-  Future<Map<String, String>> _getHeaders({bool money = false}) async {
+  Future<Map<String, String>> _getHeaders({
+    bool money = false,
+    String? idempotencyKey,
+  }) async {
     final token = await _authService.getToken();
     return {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
-      if (money) 'Idempotency-Key': newIdempotencyKey(),
+      if (money)
+        'Idempotency-Key': idempotencyKey ?? newIdempotencyKey(),
     };
   }
 
@@ -530,9 +534,10 @@ class UserService {
     required String currencyType,
     required double currencyAmount,
     String? description,
+    String? idempotencyKey,
   }) async {
     try {
-      final headers = await _getHeaders();
+      final headers = await _getHeaders(money: true, idempotencyKey: idempotencyKey);
       final response = await ApiClient.post(
         Uri.parse('$_baseUrl/api/v4/payments/withdrawal-history/submit'),
         headers: headers,
@@ -1197,6 +1202,45 @@ class UserService {
       'success': false,
       'message': data['message'] as String? ?? fallback,
     };
+  }
+
+  Future<Map<String, dynamic>> lookupTransferUser(String username) async {
+    final q = username.trim();
+    if (q.isEmpty) {
+      return {'success': false, 'message': 'Username required'};
+    }
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse(
+          '$_baseUrl/api/v2/users/by-username/${Uri.encodeComponent(q)}',
+        ),
+        headers: headers,
+      );
+      final body = response.body;
+      if (body.isEmpty) {
+        return {'success': false, 'message': 'Empty response from server'};
+      }
+      final data = jsonDecode(body) as Map<String, dynamic>;
+      if (response.statusCode == 404) {
+        return {'success': false, 'message': 'User not found', 'notFound': true};
+      }
+      if (response.statusCode == 200 && data['status'] == true && data['data'] is Map) {
+        return {
+          'success': true,
+          'data': Map<String, dynamic>.from(data['data'] as Map),
+        };
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'User not found',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
   }
 
   Future<Map<String, dynamic>> getTransferSettings() async {

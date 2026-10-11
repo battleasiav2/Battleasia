@@ -89,7 +89,9 @@ class _SiteNoticeHostState extends State<SiteNoticeHost> {
     if (path.startsWith('/user/earn')) return const EarnScreen();
     if (path.startsWith('/user/feed')) return const FeedScreen();
     if (path.startsWith('/user/shop')) return const BacGateScreen();
-    if (path.startsWith('/user/wallet')) return const WalletScreen();
+    if (path.startsWith('/user/wallet')) {
+      return const WalletScreen(fromShop: true);
+    }
     if (path.startsWith('/user/transfer')) return const ShopWalletScreen();
     if (path.startsWith('/user/referral')) return const ReferralScreen();
     if (path.startsWith('/user/labs')) return const LabsScreen();

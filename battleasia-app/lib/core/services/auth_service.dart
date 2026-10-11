@@ -5,10 +5,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/data/models/user_model.dart';
 import 'package:battleasia_app/data/models/session_model.dart';
+import 'package:battleasia_app/core/utils/secure_auth_storage.dart';
 
 class AuthService {
-  static const String _tokenKey = 'auth_token';
-  static const String _refreshKey = 'auth_refresh';
   static const String _userKey = 'user_data';
 
   static Future<String?>? _refreshFlight;
@@ -18,10 +17,7 @@ class AuthService {
   // Get base URL from config
   String get _baseUrl => AppConfig.serverUrl;
 
-  Future<String?> _readStoredAccess() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_tokenKey);
-  }
+  Future<String?> _readStoredAccess() => SecureAuthStorage.readAccess();
 
   /// Access token, renewed first when the saved one is expired.
   Future<String?> getToken() async {
@@ -41,18 +37,13 @@ class AuthService {
 
   // Save token
   Future<void> saveToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_tokenKey, token);
+    await SecureAuthStorage.writeAccess(token);
   }
 
-  Future<String?> getRefreshToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_refreshKey);
-  }
+  Future<String?> getRefreshToken() => SecureAuthStorage.readRefresh();
 
   Future<void> saveRefreshToken(String token) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_refreshKey, token);
+    await SecureAuthStorage.writeRefresh(token);
   }
 
   Future<void> storeSessionTokens(Map sessionData) async {
@@ -155,9 +146,8 @@ class AuthService {
 
   // Clear auth data
   Future<void> clearAuth() async {
+    await SecureAuthStorage.clearTokens();
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_tokenKey);
-    await prefs.remove(_refreshKey);
     await prefs.remove(_userKey);
   }
 
@@ -377,6 +367,21 @@ class AuthService {
 
   // Sign out
   Future<void> signOut() async {
+    try {
+      final token = await _readStoredAccess();
+      if (token != null && token.isNotEmpty) {
+        await ApiClient.post(
+          Uri.parse('$_baseUrl/api/v2/users/logout'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          skipAuthRenew: true,
+        );
+      }
+    } catch (_) {
+      // Local session must clear even if the server is unreachable.
+    }
     await clearAuth();
   }
 

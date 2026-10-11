@@ -278,6 +278,9 @@
     "maximum": "Maximum: {amount} BAC",
     "exceedsWithdrawable": "Exceeds withdrawable amount",
     "exceedsWithdrawableMax": "Exceeds withdrawable amount. Maximum: {max} BAC",
+    "ratesUnavailable": "Exchange rates could not be loaded. Pull to refresh the wallet and try again.",
+    "balanceReceived": "Coins received: +{added} BAC → Balance: {balance} BAC",
+    "balanceDeducted": "Coins deducted: -{added} BAC → Balance: {balance} BAC",
     "estimatedCurrency": "Estimated {currency}",
     "paymentChannelHint": "Select your preferred payment method",
     "walletAddress": "Wallet Address",
@@ -405,6 +408,10 @@
     "heroTitle": "BAC COIN SHOP",
     "heroSubtitle": "Secure payments • Instant BAC delivery after approval",
     "goToBacShop": "Go to BAC Shop",
+    "backToArena": "Back to Play",
+    "noPaymentChannels": "No payment channels loaded. Sign in to the shop and pull to refresh, then try again.",
+    "coingoCheckTitle": "Payout processing",
+    "coingoMockTitle": "Coingo test mode (dev only)",
     "bacTitle": "Battle Asia Coin (BAC)",
     "bacLead": "BAC is the digital currency that powers in-game purchases, rewards, and marketplace trades across the Battle Asia ecosystem. Use it to unlock features, join events, and shop securely with instant settlement.",
     "bacNeedNet": "Internet is required to enter the shop.",
@@ -480,7 +487,13 @@
     "transferHistoryTitle": "Transfer history",
     "transferHistoryEmpty": "No transfers yet",
     "transferSentTo": "Sent to",
-    "transferReceivedFrom": "Received from"
+    "transferReceivedFrom": "Received from",
+    "transferUserMissing": "Enter a valid username — no matching player found",
+    "transferSelf": "You cannot transfer to yourself",
+    "transferMin": "Minimum transfer is {min} BAC",
+    "transferMax": "Maximum transfer is {max} BAC",
+    "transferConfirmTitle": "Confirm transfer",
+    "transferConfirmBody": "Send {amount} BAC to @{user}?\nFee: {fee} BAC\nTotal deducted: {total} BAC"
   },
   "account": {
     "logout": "Logout",
@@ -497,7 +510,9 @@
     "notifications": "Notifications",
     "leaderboard": "Leader Board",
     "customerSupport": "Customer Support",
-    "user": "User"
+    "user": "User",
+    "verifiedBadge": "VERIFIED",
+    "walletHub": "WALLET HUB >"
   },
   "settings": {
     "title": "Settings",
@@ -767,6 +782,8 @@
   "common": {
     "retry": "Retry",
     "loading": "Loading...",
+    "loadingBadge": "LOADING",
+    "networkWeak": "Weak network — check your signal",
     "brandTagline": "OFFICIAL PUBG ON MOBILE",
     "cancel": "Cancel",
     "confirm": "Confirm",

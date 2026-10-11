@@ -83,6 +83,7 @@ class PublicDashboardStats {
   final int ongoingMatches;
   final int todayJoinedUsers;
   final Map<String, int> liveCountByGame;
+  final Map<String, int> upcomingCountByGame;
   final Map<String, int> participantsByGame;
   final List<DashboardTopPlayer> topProfitPlayers;
   final List<DashboardTopPlayer> topPlayers;
@@ -95,6 +96,7 @@ class PublicDashboardStats {
     required this.ongoingMatches,
     this.todayJoinedUsers = 0,
     this.liveCountByGame = const {},
+    this.upcomingCountByGame = const {},
     this.participantsByGame = const {},
     required this.topProfitPlayers,
     required this.topPlayers,
@@ -131,6 +133,7 @@ class PublicDashboardStats {
       ongoingMatches: (platform['ongoingMatches'] as num?)?.toInt() ?? 0,
       todayJoinedUsers: (platform['todayJoinedUsers'] as num?)?.toInt() ?? 0,
       liveCountByGame: _parseCountMap(json['liveCountByGame']),
+      upcomingCountByGame: _parseCountMap(json['upcomingCountByGame']),
       participantsByGame: _parseCountMap(json['participantsByGame']),
       topProfitPlayers: parseList(
         json['topProfitPlayers'],
@@ -146,5 +149,18 @@ class PublicDashboardStats {
         DashboardMatchSummary.fromJson,
       ),
     );
+  }
+
+  /// Open-room style counts from public dashboard (same source as web pulse).
+  Map<String, int> get openCountByGame {
+    final out = <String, int>{};
+    void merge(Map<String, int> src) {
+      for (final e in src.entries) {
+        out[e.key] = (out[e.key] ?? 0) + e.value;
+      }
+    }
+    merge(upcomingCountByGame);
+    merge(liveCountByGame);
+    return out;
   }
 }

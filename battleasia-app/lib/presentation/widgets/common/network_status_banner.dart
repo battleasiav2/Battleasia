@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
@@ -45,10 +46,10 @@ class _NetworkStatusBannerState extends State<NetworkStatusBanner> {
               Icon(Icons.signal_wifi_statusbar_connected_no_internet_4,
                   color: AppColors.gold, size: 18),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Weak network — check your signal',
-                  style: TextStyle(
+                  'common.networkWeak'.tr(),
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -58,7 +59,7 @@ class _NetworkStatusBannerState extends State<NetworkStatusBanner> {
               TextButton(
                 onPressed: _ping,
                 child: Text(
-                  'RETRY',
+                  'common.retry'.tr().toUpperCase(),
                   style: TextStyle(
                     color: AppColors.gold,
                     fontWeight: FontWeight.w800,

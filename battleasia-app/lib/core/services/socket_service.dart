@@ -34,7 +34,6 @@ class SocketService {
   IO.Socket? _socket;
   bool _isConnecting = false;
   int _reconnectAttempts = 0;
-  static const int _maxReconnectAttempts = 5;
 
   /// All registered callbacks for the `balance-updated` event.
   final List<BalanceUpdatedCallback> _balanceUpdatedCallbacks = [];
@@ -82,7 +81,7 @@ class SocketService {
           .setTransports(['websocket', 'polling'])
           .setAuth({'token': token})
           .enableReconnection()
-          .setReconnectionAttempts(_maxReconnectAttempts)
+          .setReconnectionAttempts(10)
           .setReconnectionDelay(1000)
           .setReconnectionDelayMax(5000)
           .disableAutoConnect()
@@ -106,9 +105,6 @@ class SocketService {
     _socket!.onConnectError((_) {
       _reconnectAttempts++;
       _isConnecting = false;
-      if (_reconnectAttempts >= _maxReconnectAttempts) {
-        disconnect();
-      }
     });
 
     _socket!.connect();

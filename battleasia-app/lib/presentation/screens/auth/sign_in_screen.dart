@@ -22,7 +22,7 @@ import 'package:battleasia_app/presentation/widgets/auth/auth_text_field.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 
 const _rememberEmailKey = 'ba_remember_email';
-const _rememberPasswordKey = 'ba_remember_password';
+const _rememberPasswordKey = 'ba_remember_password'; // legacy — wiped on load
 const _rememberFlagKey = 'ba_remember_me';
 
 class SignInScreen extends StatefulWidget {
@@ -65,12 +65,11 @@ class _SignInScreenState extends State<SignInScreen> {
       final prefs = await SharedPreferences.getInstance();
       final remember = prefs.getBool(_rememberFlagKey) ?? true;
       final email = prefs.getString(_rememberEmailKey) ?? '';
-      final password = prefs.getString(_rememberPasswordKey) ?? '';
+      await prefs.remove(_rememberPasswordKey);
       if (!mounted) return;
       setState(() {
         _rememberMe = remember;
         if (email.isNotEmpty) _emailController.text = email;
-        if (password.isNotEmpty) _passwordController.text = password;
       });
     } catch (_) {}
   }
@@ -84,16 +83,15 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
-  Future<void> _persistRememberedCredentials(String email, String password) async {
+  Future<void> _persistRememberedCredentials(String email) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_rememberFlagKey, _rememberMe);
+      await prefs.remove(_rememberPasswordKey);
       if (_rememberMe) {
         await prefs.setString(_rememberEmailKey, email);
-        await prefs.setString(_rememberPasswordKey, password);
       } else {
         await prefs.remove(_rememberEmailKey);
-        await prefs.remove(_rememberPasswordKey);
       }
     } catch (_) {}
   }
@@ -115,7 +113,7 @@ class _SignInScreenState extends State<SignInScreen> {
     if (!mounted) return;
 
     if (result['success'] == true) {
-      await _persistRememberedCredentials(email, password);
+      await _persistRememberedCredentials(email);
       if (!mounted) return;
       if (result['emailVerificationRequired'] == true) {
         final verifyEmail = result['email'] as String? ?? email;
@@ -127,7 +125,7 @@ class _SignInScreenState extends State<SignInScreen> {
         return;
       }
       if (widget.afterLoginScreen != null) {
-        ShopAuthGate.markShopSessionActive();
+        await ShopAuthGate.markShopSessionActive();
       }
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
@@ -205,7 +203,7 @@ class _SignInScreenState extends State<SignInScreen> {
           poll['session'] as SessionModel,
         );
         if (widget.afterLoginScreen != null) {
-          ShopAuthGate.markShopSessionActive();
+          await ShopAuthGate.markShopSessionActive();
         }
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(

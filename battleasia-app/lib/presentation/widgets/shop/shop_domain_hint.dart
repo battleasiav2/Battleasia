@@ -28,7 +28,7 @@ class ShopDomainHint extends StatelessWidget {
         children: [
           Text(
             titleKey.tr(),
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.gold,
               fontWeight: FontWeight.w700,
               fontSize: 13,

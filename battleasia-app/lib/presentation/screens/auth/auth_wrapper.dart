@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
@@ -29,7 +30,7 @@ class AuthWrapper extends StatelessWidget {
                   ),
                   const SizedBox(height: 14),
                   Text(
-                    'LOADING',
+                    'common.loadingBadge'.tr(),
                     style: TextStyle(
                       color: AppColors.gold.withValues(alpha: 0.85),
                       fontSize: 11,

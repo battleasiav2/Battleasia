@@ -7,6 +7,7 @@ import 'package:battleasia_app/presentation/screens/shop/shop_screen.dart';
 import 'package:battleasia_app/presentation/screens/shop/shop_wallet_screen.dart';
 import 'package:battleasia_app/presentation/screens/wallet/wallet_screen.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_arena_exit.dart';
 
 /// Shop-area footer — Shop / Wallet / Transfer. Withdraw lives inside Wallet.
 class ShopSectionNav extends StatelessWidget {
@@ -39,7 +40,11 @@ class ShopSectionNav extends StatelessWidget {
       left: 0,
       right: 0,
       bottom: 0,
-      child: DecoratedBox(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const ShopArenaExit(),
+          DecoratedBox(
         decoration: BoxDecoration(
           color: const Color(0xE8060607),
           border: Border(
@@ -101,6 +106,8 @@ class ShopSectionNav extends StatelessWidget {
             }).toList(),
           ),
         ),
+      ),
+        ],
       ),
     );
   }

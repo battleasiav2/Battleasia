@@ -28,8 +28,8 @@ class _BacGateScreenState extends State<BacGateScreen> {
     }
     setState(() => _note = '');
     final auth = context.read<AuthProvider>();
-    if (auth.isAuthenticated) {
-      ShopAuthGate.markShopSessionActive();
+    if (auth.isAuthenticated && await ShopAuthGate.hourAlive()) {
+      if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (_) => const ShopScreen(),

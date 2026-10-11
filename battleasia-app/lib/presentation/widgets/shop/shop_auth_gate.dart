@@ -1,11 +1,12 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/providers/auth_provider.dart';
+import 'package:battleasia_app/core/utils/api_client.dart';
 import 'package:battleasia_app/presentation/screens/auth/sign_in_screen.dart';
 
 const _shopUntilKey = 'ba_shop_until';
@@ -34,15 +35,14 @@ class ShopAuthGate extends StatefulWidget {
     return until > DateTime.now().millisecondsSinceEpoch;
   }
 
-  static void markShopSessionActive() {
+  /// Call only after a successful shop-domain sign-in (starts / renews 1-hour window).
+  static Future<void> markShopSessionActive() async {
     _shopSessionActive = true;
-    unawaited(_startHourIfNeeded());
-  }
-
-  static Future<void> _startHourIfNeeded() async {
-    if (await hourAlive()) return;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt(_shopUntilKey, DateTime.now().millisecondsSinceEpoch + _shopHourMs);
+    await prefs.setInt(
+      _shopUntilKey,
+      DateTime.now().millisecondsSinceEpoch + _shopHourMs,
+    );
   }
 
   static void clearShopSession() {
@@ -66,7 +66,7 @@ class ShopAuthGate extends StatefulWidget {
   State<ShopAuthGate> createState() => _ShopAuthGateState();
 }
 
-class _ShopAuthGateState extends State<ShopAuthGate> {
+class _ShopAuthGateState extends State<ShopAuthGate> with WidgetsBindingObserver {
   Timer? _timer;
   bool _ready = false;
   bool _allowed = false;
@@ -74,6 +74,7 @@ class _ShopAuthGateState extends State<ShopAuthGate> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _refresh();
     _timer = Timer.periodic(const Duration(seconds: 20), (_) => _refresh());
   }
@@ -90,7 +91,15 @@ class _ShopAuthGateState extends State<ShopAuthGate> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _refresh();
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
     super.dispose();
   }
@@ -114,8 +123,9 @@ class _ShopAuthGateState extends State<ShopAuthGate> {
 
 Future<bool> shopHasInternet() async {
   try {
-    final result = await InternetAddress.lookup('one.one.one.one');
-    return result.isNotEmpty && result.first.rawAddress.isNotEmpty;
+    final uri = Uri.parse('${AppConfig.serverUrl}/api/health');
+    final res = await ApiClient.get(uri).timeout(const Duration(seconds: 4));
+    return res.statusCode >= 200 && res.statusCode < 500;
   } catch (_) {
     return false;
   }

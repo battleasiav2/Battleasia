@@ -8,6 +8,7 @@ import 'package:battleasia_app/core/services/socket_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/data/models/user_model.dart';
 import 'package:battleasia_app/data/models/session_model.dart';
+import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 
 class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
   final AuthService _authService = AuthService();
@@ -83,6 +84,7 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
   }
 
   void _onRemoteSignOut() {
+    ShopAuthGate.clearShopSession();
     SocketService.instance.offBalanceUpdated(_onSocketBalanceUpdated);
     SocketService.instance.disconnect();
     _user = null;
@@ -210,6 +212,7 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
       _session = result['session'] as SessionModel?;
       if (_session != null) {
         _isAuthenticated = true;
+        _connectSocket(_session!.accessToken);
         _userService.registerPushToken();
       }
       notifyListeners();
@@ -329,6 +332,7 @@ class AuthProvider with ChangeNotifier, WidgetsBindingObserver {
 
   // Sign out
   Future<void> signOut() async {
+    ShopAuthGate.clearShopSession();
     SocketService.instance.offBalanceUpdated(_onSocketBalanceUpdated);
     SocketService.instance.disconnect();
     await _authService.signOut();

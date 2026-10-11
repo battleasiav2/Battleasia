@@ -496,8 +496,8 @@ class _Stat extends StatelessWidget {
                   child: InkWell(
                     onTap: onCopy,
                     borderRadius: BorderRadius.circular(8),
-                    child: const Padding(
-                      padding: EdgeInsets.all(6),
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
                       child: Icon(Icons.copy, size: 14, color: AppColors.gold),
                     ),
                   ),

@@ -145,6 +145,7 @@
     "totalJoin": "মোট জয়েন",
     "totalWithdrawal": "মোট উইথড্রয়াল",
     "withdrawable": "উইথড্রয়েবল",
+    "buy": "BAC কিনুন",
     "withdrawButton": "উইথড্র",
     "withdrawableFormula": "* Min(মোট ম্যাচ বেট × ৭০% - ইতিমধ্যে উইথড্র, বর্তমান ব্যালেন্স)",
     "pendingWithdrawal": "পেন্ডিং উইথড্রয়াল: {amount} BAC",
@@ -163,6 +164,9 @@
     "maximum": "সর্বোচ্চ: {amount} BAC",
     "exceedsWithdrawable": "উইথড্রয়েবল সীমা অতিক্রম",
     "exceedsWithdrawableMax": "উইথড্রয়েবল সীমা অতিক্রম। সর্বোচ্চ: {max} BAC",
+    "ratesUnavailable": "এক্সচেঞ্জ রেট লোড হয়নি। ওয়ালেট রিফ্রেশ করে আবার চেষ্টা করুন।",
+    "balanceReceived": "কয়েন পেয়েছেন: +{added} BAC → ব্যালেন্স: {balance} BAC",
+    "balanceDeducted": "কয়েন কাটা: -{added} BAC → ব্যালেন্স: {balance} BAC",
     "estimatedCurrency": "আনুমানিক {currency}",
     "paymentChannelHint": "পছন্দের পেমেন্ট পদ্ধতি নির্বাচন করুন",
     "walletAddress": "ওয়ালেট ঠিকানা",
@@ -279,6 +283,10 @@
     "heroTitle": "BAC COIN SHOP",
     "heroSubtitle": "Secure payments • Instant BAC delivery after approval",
     "goToBacShop": "BAC শপে যান",
+    "backToArena": "প্লে-তে ফিরুন",
+    "noPaymentChannels": "পেমেন্ট চ্যানেল লোড হয়নি। শপে সাইন ইন করে রিফ্রেশ করুন।",
+    "coingoCheckTitle": "পেআউট প্রসেসিং",
+    "coingoMockTitle": "Coingo টেস্ট মোড (শুধু dev)",
     "statBalance": "ব্যালেন্স",
     "statPacks": "প্যাক",
     "statChannels": "চ্যানেল",
@@ -342,7 +350,13 @@
     "transferHistoryTitle": "ট্রান্সফার ইতিহাস",
     "transferHistoryEmpty": "এখনো কোনো ট্রান্সফার নেই",
     "transferSentTo": "পাঠানো হয়েছে",
-    "transferReceivedFrom": "পাওয়া গেছে"
+    "transferReceivedFrom": "পাওয়া গেছে",
+    "transferUserMissing": "সঠিক ইউজারনেম দিন — কোনো প্লেয়ার পাওয়া যায়নি",
+    "transferSelf": "নিজের কাছে ট্রান্সফার করা যাবে না",
+    "transferMin": "সর্বনিম্ন ট্রান্সফার {min} BAC",
+    "transferMax": "সর্বোচ্চ ট্রান্সফার {max} BAC",
+    "transferConfirmTitle": "ট্রান্সফার নিশ্চিত করুন",
+    "transferConfirmBody": "@{user} কে {amount} BAC পাঠাবেন?\nফি: {fee} BAC\nমোট কাটা: {total} BAC"
   },
   "account": {
     "logout": "লগআউট",
@@ -359,7 +373,9 @@
     "notifications": "নোটিফিকেশন",
     "leaderboard": "লিডারবোর্ড",
     "customerSupport": "কাস্টমার সাপোর্ট",
-    "user": "ইউজার"
+    "user": "ইউজার",
+    "verifiedBadge": "VERIFIED",
+    "walletHub": "WALLET HUB >"
   },
   "settings": {
     "title": "সেটিংস",
@@ -397,6 +413,8 @@
   "common": {
     "retry": "আবার চেষ্টা",
     "loading": "লোড হচ্ছে...",
+    "loadingBadge": "LOADING",
+    "networkWeak": "নেটওয়ার্ক দুর্বল — সিগনাল চেক করুন",
     "brandTagline": "OFFICIAL PUBG ON MOBILE",
     "cancel": "বাতিল",
     "confirm": "নিশ্চিত",

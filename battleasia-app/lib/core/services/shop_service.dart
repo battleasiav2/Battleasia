@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:battleasia_app/core/utils/api_client.dart';
 import 'package:battleasia_app/core/config/app_config.dart';
 import 'package:battleasia_app/core/services/auth_service.dart';
+import 'package:battleasia_app/core/utils/idempotency.dart';
 
 class ShopService {
   final AuthService _authService = AuthService();
@@ -16,11 +17,16 @@ class ShopService {
   /// Returns auth + content-type headers.
   /// The Authorization header is omitted when the user is not logged in so the
   /// server falls back to the optionalAuth middleware (no token = no premium).
-  Future<Map<String, String>> _getHeaders() async {
+  Future<Map<String, String>> _getHeaders({
+    bool money = false,
+    String? idempotencyKey,
+  }) async {
     final token = await _authService.getToken();
     return {
       'Content-Type': 'application/json',
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      if (money)
+        'Idempotency-Key': idempotencyKey ?? newIdempotencyKey(),
     };
   }
 
@@ -114,7 +120,7 @@ class ShopService {
     try {
       final headers = await _getHeaders();
       final response = await ApiClient.get(
-        Uri.parse('$_baseUrl/api/v4/shop/coins'),
+        Uri.parse('$_baseUrl/api/v4/shop/coins/public'),
         headers: headers,
       );
       final data = _parseResponse(response);
@@ -141,9 +147,11 @@ class ShopService {
 
   Future<Map<String, dynamic>> getPaymentChannels() async {
     try {
+      final headers = await _getHeaders();
       final response = await ApiClient.get(
         Uri.parse(
             '$_baseUrl/api/v4/payments/payment-channels/public?limit=100'),
+        headers: headers,
       );
       final data = _parseResponse(response);
 
@@ -181,7 +189,8 @@ class ShopService {
         'currency': currency.toUpperCase(),
       });
 
-      final response = await ApiClient.get(uri);
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(uri, headers: headers);
       final data = _parseResponse(response);
 
       if (response.statusCode == 200 && data['status'] == true) {
@@ -238,9 +247,10 @@ class ShopService {
     required String paymentChannelId,
     required String toWalletAddress,
     String? couponCode,
+    String? idempotencyKey,
   }) async {
     try {
-      final headers = await _getHeaders();
+      final headers = await _getHeaders(money: true, idempotencyKey: idempotencyKey);
       final response = await ApiClient.post(
         Uri.parse('$_baseUrl/api/v4/payments/deposit-history/submit'),
         headers: headers,
@@ -277,6 +287,36 @@ class ShopService {
   }
 
   // ---------------------------------------------------------------------------
+  // Coingo capabilities  (GET /api/v4/payments/coingo/capabilities)
+  // ---------------------------------------------------------------------------
+
+  Future<Map<String, dynamic>> fetchCoingoCapabilities() async {
+    try {
+      final headers = await _getHeaders();
+      final response = await ApiClient.get(
+        Uri.parse('$_baseUrl/api/v4/payments/coingo/capabilities'),
+        headers: headers,
+      );
+      final data = _parseResponse(response);
+      if (response.statusCode == 200 && data['status'] == true && data['data'] is Map) {
+        return {
+          'success': true,
+          'data': Map<String, dynamic>.from(data['data'] as Map),
+        };
+      }
+      return {
+        'success': false,
+        'message': data['message'] as String? ?? 'Failed to load payout info',
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'message': e.toString().replaceAll('Exception: ', ''),
+      };
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // Coingo payout  (POST /api/v4/payments/coingo/payout)
   // Dedicated store withdrawal path used by web /user/withdrawal.
   // ---------------------------------------------------------------------------
@@ -290,9 +330,10 @@ class ShopService {
     String? username,
     String? currencyType,
     double? currencyAmount,
+    String? idempotencyKey,
   }) async {
     try {
-      final headers = await _getHeaders();
+      final headers = await _getHeaders(money: true, idempotencyKey: idempotencyKey);
       final body = <String, dynamic>{
         'amount': amount,
         'walletNumber': walletNumber,

@@ -17,6 +17,7 @@ import 'package:battleasia_app/presentation/widgets/wallet/withdraw_sheet.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/wallet_section_tabs.dart';
 import 'package:battleasia_app/presentation/widgets/wallet/wallet_earn_panel.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_domain_hint.dart';
+import 'package:battleasia_app/presentation/screens/shop/bac_gate_screen.dart';
 
 class WalletScreen extends StatefulWidget {
   /// When opened from the store section tabs (Shop / Wallet / Withdraw).
@@ -96,8 +97,14 @@ class _WalletScreenState extends State<WalletScreen> {
     final isGain = added >= 0;
     final absAdded = added.abs().toStringAsFixed(0);
     final message = isGain
-        ? 'Coins received: +$absAdded BAC → Balance: ${balance.toStringAsFixed(2)} BAC'
-        : 'Coins deducted: -$absAdded BAC → Balance: ${balance.toStringAsFixed(2)} BAC';
+        ? 'wallet.balanceReceived'.tr(namedArgs: {
+            'added': absAdded,
+            'balance': balance.toStringAsFixed(2),
+          })
+        : 'wallet.balanceDeducted'.tr(namedArgs: {
+            'added': absAdded,
+            'balance': balance.toStringAsFixed(2),
+          });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -759,6 +766,34 @@ class _WalletScreenState extends State<WalletScreen> {
             // Action Buttons
             Row(
               children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const BacGateScreen(),
+                        ),
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.gold,
+                      side: BorderSide(color: AppColors.gold.withValues(alpha: 0.85)),
+                      padding: EdgeInsets.symmetric(vertical: buttonPadding),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Text(
+                      'wallet.buy'.tr(),
+                      style: TextStyle(
+                        fontSize: buttonFontSize,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(width: spacing12),
                 Expanded(
                   child: ElevatedButton(
                     onPressed: _hasPendingWithdrawal

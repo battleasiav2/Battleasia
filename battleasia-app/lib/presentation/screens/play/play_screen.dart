@@ -6,7 +6,6 @@ import 'package:battleasia_app/core/theme/app_theme.dart';
 import 'package:battleasia_app/core/services/games_service.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/game_model.dart';
-import 'package:battleasia_app/data/models/match_model.dart';
 import 'package:battleasia_app/core/services/customer_support_service.dart';
 import 'package:battleasia_app/core/services/public_dashboard_service.dart';
 import 'package:battleasia_app/data/models/public_dashboard_model.dart';
@@ -58,7 +57,28 @@ class _PlayScreenState extends State<PlayScreen> {
     setState(() {
       _liveCountByGame = stats.liveCountByGame;
       _participantsByGame = stats.participantsByGame;
+      _openByGame = _openCountsForGames(stats.openCountByGame);
     });
+  }
+
+  Map<String, int> _openCountsForGames(Map<String, int> pulseByName) {
+    final out = <String, int>{};
+    for (final game in _games) {
+      final n = game.name.trim();
+      var count = pulseByName[n] ?? 0;
+      if (count == 0 && n.isNotEmpty) {
+        final needle = n.toLowerCase();
+        for (final e in pulseByName.entries) {
+          if (e.key.toLowerCase().contains(needle) ||
+              needle.contains(e.key.toLowerCase())) {
+            count += e.value;
+          }
+        }
+      }
+      out[game.id] = count;
+      out[game.name] = count;
+    }
+    return out;
   }
 
   @override
@@ -87,38 +107,16 @@ class _PlayScreenState extends State<PlayScreen> {
               result['message'] as String? ?? 'play.failedLoadGames'.tr();
         }
       });
-      if (result['success'] == true) _countOpenMatches();
-    }
-  }
-
-  Future<void> _countOpenMatches() async {
-    final games = List<GameModel>.from(_games);
-    final counts = <String, int>{};
-    await Future.wait(games.map((game) async {
-      if (game.comingSoon) {
-        counts[game.id] = 0;
-        counts[game.name] = 0;
-        return;
-      }
-      final result = await _gamesService.getMatches(gameId: game.id);
-      final rows = result['data'];
-      if (result['success'] != true || rows is! List) return;
-      var open = 0;
-      for (final row in rows) {
-        if (row is! Map) continue;
-        final match = MatchModel.fromJson(Map<String, dynamic>.from(row));
-        final status = match.status.toLowerCase();
-        final spots = match.totalPlayer - (match.participantsCount ?? 0);
-        final left = spots < 0 ? 0 : spots;
-        if ((status == 'active' || status == 'start') && left > 0 && !match.isJoined) {
-          open++;
+      if (result['success'] == true) {
+        final dash = await _dashboardService.fetchDashboard();
+        if (mounted && dash['success'] == true) {
+          final stats = dash['data'] as PublicDashboardStats?;
+          if (stats != null) {
+            setState(() => _openByGame = _openCountsForGames(stats.openCountByGame));
+          }
         }
       }
-      counts[game.id] = open;
-      counts[game.name] = open;
-    }));
-    if (!mounted) return;
-    setState(() => _openByGame = counts);
+    }
   }
 
   String _cardSubtitle(GameModel game) {
