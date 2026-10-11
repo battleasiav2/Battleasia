@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CoinValue } from '../../components/CoinValue';
+import { InboxField } from '../../components/InboxField';
 import { PayPicks } from '../../components/PayBrand';
 import { useHud } from '../../contexts/HudContext';
 import { isApiError } from '../../lib/api';
@@ -205,18 +206,25 @@ export function WithdrawalPage() {
                 setConfirm(true);
               }}
             >
-              <label className="field">
-                {t('wallet.amount')}
-                <input type="number" min={1} value={amount} onChange={(e) => setAmount(e.target.value)} />
-              </label>
+              <InboxField
+                label={t('wallet.amount')}
+                placeholder={t('wd.amountPh')}
+                type="number"
+                min={1}
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
               <label className="field">
                 {t('wallet.channel')}
                 <PayPicks value={walletType} onChange={setWalletType} />
               </label>
-              <label className="field">
-                {t('wd.dest')}
-                <input value={address} onChange={(e) => setAddress(e.target.value)} maxLength={120} />
-              </label>
+              <InboxField
+                label={t('wd.dest')}
+                placeholder={t('wd.destPh')}
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                maxLength={120}
+              />
               {fieldErr ? <p className="field-error">{fieldErr}</p> : null}
               <button className="btn btn-primary" type="submit" disabled={busy || withdrawable <= 0 || !navigator.onLine}>
                 {t('wd.request')}

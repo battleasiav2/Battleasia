@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { InboxField } from '../../components/InboxField';
 import { PayPicks } from '../../components/PayBrand';
 import { useHud } from '../../contexts/HudContext';
 import { isApiError } from '../../lib/api';
@@ -607,18 +608,26 @@ export function WalletPage() {
               </div>
             ) : (
               <form className="wal-form" onSubmit={askWithdraw}>
-                <label className="field">
-                  {t('wallet.amount')}
-                  <input type="number" min={1} step={1} value={amount} onChange={(e) => setAmount(e.target.value)} />
-                </label>
+                <InboxField
+                  label={t('wallet.amount')}
+                  placeholder={t('wd.amountPh')}
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                />
                 <label className="field">
                   {t('wallet.channel')}
                   <PayPicks value={walletType} onChange={setWalletType} />
                 </label>
-                <label className="field">
-                  {t('wallet.dest')}
-                  <input value={address} onChange={(e) => setAddress(e.target.value)} maxLength={120} />
-                </label>
+                <InboxField
+                  label={t('wallet.dest')}
+                  placeholder={t('wd.destPh')}
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  maxLength={120}
+                />
                 <p className="sec-muted">
                   {t('wallet.max')}: {bacText(withdrawable)} BAC
                 </p>

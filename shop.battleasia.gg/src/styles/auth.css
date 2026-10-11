@@ -1721,3 +1721,42 @@ form.signin-panel,
     animation: none;
   }
 }
+
+/* Shop user hub — auth-style inputs (placeholder inside, no label above). */
+.field-inbox {
+  gap: 6px;
+}
+
+.field-inbox .field-control--plain input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #14161c;
+  color: #f4f4f0;
+  font-size: 15px;
+  font-weight: 500;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field-inbox .field-control--plain input::placeholder {
+  color: rgba(255, 255, 255, 0.42);
+  opacity: 1;
+}
+
+.field-inbox .field-control--plain input:focus {
+  outline: none;
+  border-color: rgba(212, 232, 42, 0.7);
+  box-shadow: 0 0 0 3px rgba(212, 232, 42, 0.12);
+}
+
+.shop-filter-range .field-inbox {
+  min-width: 0;
+  margin: 0;
+}
+
+.shop-filter-range .field-inbox .field-control--plain input {
+  min-height: 40px;
+  font-size: 14px;
+}

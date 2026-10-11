@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useOutletContext } from 'react-router-dom';
 import { CoinValue } from '../../components/CoinValue';
+import { InboxField } from '../../components/InboxField';
 import { useHud } from '../../contexts/HudContext';
 import { isApiError } from '../../lib/api';
 import { fetchMe, patchSessionBalance, readSessionUser } from '../../lib/auth';
@@ -212,16 +213,15 @@ export function TransferPage() {
             }}
           >
             <h2>{t('xfer.sendTo')}</h2>
-            <label className="field">
-              {t('xfer.user')}
-              <input
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-                onBlur={(e) => setTo(e.target.value.trim())}
-                autoComplete="off"
-                maxLength={32}
-              />
-            </label>
+            <InboxField
+              label={t('xfer.user')}
+              placeholder={t('xfer.userPh')}
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              onBlur={(e) => setTo(e.target.value.trim())}
+              autoComplete="off"
+              maxLength={32}
+            />
             {previewBusy ? <p className="play-muted">{t('xfer.looking')}</p> : null}
             {preview ? (
               <div className="xfer-preview">
@@ -239,20 +239,30 @@ export function TransferPage() {
               </div>
             ) : null}
             {!previewBusy && previewErr && to.trim().length >= 2 ? <p className="field-error">{previewErr}</p> : null}
-            <label className="field">
-              {t('wallet.amount')}
-              <input type="number" min={1} step={1} value={amount} onChange={(e) => setAmount(e.target.value)} />
-              {settings ? (
-                <span className="field-hint">
-                  {t('xfer.minHint')} {settings.minAmount} · {t('xfer.maxHint')} {settings.maxAmount}
-                </span>
-              ) : null}
-            </label>
-            <label className="field">
-              {t('xfer.note')}
-              <input value={note} maxLength={200} onChange={(e) => setNote(e.target.value)} />
-              <span className="field-hint">{note.length}/200</span>
-            </label>
+            <InboxField
+              label={t('wallet.amount')}
+              placeholder={t('xfer.amountPh')}
+              type="number"
+              min={1}
+              step={1}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              hint={
+                settings ? (
+                  <>
+                    {t('xfer.minHint')} {settings.minAmount} · {t('xfer.maxHint')} {settings.maxAmount}
+                  </>
+                ) : null
+              }
+            />
+            <InboxField
+              label={t('xfer.note')}
+              placeholder={t('xfer.notePh')}
+              value={note}
+              maxLength={200}
+              onChange={(e) => setNote(e.target.value)}
+              hint={`${note.length}/200`}
+            />
             <div className="xfer-break">
               <div>
                 <small>{t('xfer.gets')}</small>

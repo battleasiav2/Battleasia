@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CoinValue } from '../../components/CoinValue';
+import { InboxField } from '../../components/InboxField';
 import { PayBrand, payKindFromName } from '../../components/PayBrand';
 import { useHud } from '../../contexts/HudContext';
 import { isApiError } from '../../lib/api';
@@ -398,15 +399,17 @@ export function ShopPage() {
         </select>
         <h2>{t('shop.filterAmount')}</h2>
         <div className="shop-filter-range">
-          <input
-            inputMode="decimal"
+          <InboxField
+            label={t('shop.min')}
             placeholder={t('shop.min')}
+            inputMode="decimal"
             value={minPrice}
             onChange={(e) => setMinPrice(e.target.value)}
           />
-          <input
-            inputMode="decimal"
+          <InboxField
+            label={t('shop.max')}
             placeholder={t('shop.max')}
+            inputMode="decimal"
             value={maxPrice}
             onChange={(e) => setMaxPrice(e.target.value)}
           />
@@ -575,20 +578,22 @@ export function ShopPage() {
                 ) : (
                   <p className="sec-muted">{t('shop.noWallet')}</p>
                 )}
-                <label className="field">
-                  {t('shop.from')}
-                  <input value={fromAddr} onChange={(e) => setFromAddr(e.target.value)} maxLength={120} />
-                </label>
-                <label className="field">
-                  {t('shop.trx')}
-                  <input
-                    value={trx}
-                    onChange={(e) => setTrx(e.target.value)}
-                    onBlur={(e) => setTrx(e.target.value.trim())}
-                    maxLength={80}
-                    required
-                  />
-                </label>
+                <InboxField
+                  label={t('shop.from')}
+                  placeholder={t('shop.fromPh')}
+                  value={fromAddr}
+                  onChange={(e) => setFromAddr(e.target.value)}
+                  maxLength={120}
+                />
+                <InboxField
+                  label={t('shop.trx')}
+                  placeholder={t('shop.trxPh')}
+                  value={trx}
+                  onChange={(e) => setTrx(e.target.value)}
+                  onBlur={(e) => setTrx(e.target.value.trim())}
+                  maxLength={80}
+                  required
+                />
                 {fieldErr ? <p className="field-error">{fieldErr}</p> : null}
                 <div className="sec-actions">
                   <button className="sec-cancel" type="button" onClick={() => setProof(false)}>
