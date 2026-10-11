@@ -9,6 +9,7 @@ import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/utils/idempotency.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/core/theme/auth_input_style.dart';
 
 class ShopCoinTransferPanel extends StatefulWidget {
   const ShopCoinTransferPanel({super.key});
@@ -284,9 +285,10 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
                         const SizedBox(height: 12),
                         TextField(
                           controller: _recipientController,
-                          decoration: InputDecoration(
-                            labelText: 'shop.transferRecipient'.tr(),
-                            hintText: 'shop.transferRecipientPlaceholder'.tr(),
+                          style: AuthInputStyle.textStyle,
+                          cursorColor: AppColors.gold,
+                          decoration: AuthInputStyle.decoration(
+                            'shop.transferRecipientPlaceholder'.tr(),
                           ),
                         ),
                         if (_previewBusy)
@@ -351,18 +353,24 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
                           controller: _amountController,
                           keyboardType: const TextInputType.numberWithOptions(decimal: true),
                           onChanged: (_) => setState(() {}),
-                          decoration: InputDecoration(
-                            labelText: 'shop.transferAmount'.tr(),
-                            hintText: 'shop.transferAmountPlaceholder'.tr(),
+                          style: AuthInputStyle.textStyle,
+                          cursorColor: AppColors.gold,
+                          decoration: AuthInputStyle.decoration(
+                            'shop.transferAmountPlaceholder'.tr(),
+                            helperText: 'shop.transferLimitsHint'.tr(namedArgs: {
+                              'min': _minAmount.toStringAsFixed(0),
+                              'max': _maxAmount.toStringAsFixed(0),
+                            }),
                           ),
                         ),
                         const SizedBox(height: 12),
                         TextField(
                           controller: _noteController,
                           maxLines: 2,
-                          decoration: InputDecoration(
-                            labelText: 'shop.transferNote'.tr(),
-                            hintText: 'shop.transferNotePlaceholder'.tr(),
+                          style: AuthInputStyle.textStyle,
+                          cursorColor: AppColors.gold,
+                          decoration: AuthInputStyle.decoration(
+                            'shop.transferNotePlaceholder'.tr(),
                           ),
                         ),
                         const SizedBox(height: 12),

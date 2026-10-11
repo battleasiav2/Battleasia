@@ -494,6 +494,7 @@
     "transferRecipientPlaceholder": "Enter player username",
     "transferAmount": "Amount (BAC)",
     "transferAmountPlaceholder": "Enter amount to send",
+    "transferLimitsHint": "Min {min} · Max {max}",
     "transferNote": "Note (optional)",
     "transferNotePlaceholder": "Add a short message",
     "transferFee": "Transfer fee ({percent}%)",

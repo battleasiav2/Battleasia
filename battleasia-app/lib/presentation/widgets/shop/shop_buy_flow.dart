@@ -11,6 +11,7 @@ import 'package:battleasia_app/core/providers/auth_provider.dart';
 import 'package:battleasia_app/core/services/shop_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/core/theme/auth_input_style.dart';
 import 'package:battleasia_app/core/utils/image_utils.dart';
 import 'package:battleasia_app/data/models/shop_item_model.dart';
 import 'package:battleasia_app/presentation/widgets/shop/pay_brand_icon.dart';
@@ -680,15 +681,10 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
                     Expanded(
                       child: TextField(
                         controller: _couponCtrl,
-                        style: const TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
-                          hintText: 'shop.couponCodeHint'.tr(),
-                          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.4)),
-                          isDense: true,
-                          filled: true,
-                          fillColor: const Color(0xFF0A0B0F),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(9)),
+                        style: AuthInputStyle.textStyle,
+                        cursorColor: AppColors.gold,
+                        decoration: AuthInputStyle.decoration(
+                          'shop.couponCodeHint'.tr(),
                         ),
                       ),
                     ),
@@ -1096,33 +1092,18 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         const SizedBox(height: 14),
         TextField(
           controller: _fromCtrl,
-          style: const TextStyle(color: Colors.white),
-          decoration: _fieldDeco('shop.fromAddressHint'.tr()),
+          style: AuthInputStyle.textStyle,
+          cursorColor: AppColors.gold,
+          decoration: AuthInputStyle.decoration('shop.fromAddressHint'.tr()),
         ),
         const SizedBox(height: 10),
         TextField(
           controller: _txCtrl,
-          style: const TextStyle(color: Colors.white),
-          decoration: _fieldDeco('shop.transactionIdHint'.tr()),
+          style: AuthInputStyle.textStyle,
+          cursorColor: AppColors.gold,
+          decoration: AuthInputStyle.decoration('shop.transactionIdHint'.tr()),
         ),
       ],
     );
   }
-
-  InputDecoration _fieldDeco(String hint) => InputDecoration(
-        hintText: hint,
-        hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35)),
-        filled: true,
-        fillColor: Colors.black.withValues(alpha: 0.45),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: AppColors.hair()),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: AppColors.gold.withValues(alpha: 0.6)),
-        ),
-      );
 }

@@ -7,6 +7,7 @@ import 'package:battleasia_app/core/services/shop_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_scroll_behavior.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/core/theme/auth_input_style.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/data/models/shop_item_model.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
@@ -548,8 +549,9 @@ class _ShopScreenState extends State<ShopScreen> with WidgetsBindingObserver {
                         decimal: true,
                       ),
                       onChanged: (_) => _refilter(),
-                      style: const TextStyle(color: ink, fontSize: 14),
-                      decoration: _priceDecoration('shop.minPrice'.tr()),
+                      style: AuthInputStyle.textStyle,
+                      cursorColor: AppColors.gold,
+                      decoration: AuthInputStyle.decoration('shop.minPrice'.tr()),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -560,8 +562,9 @@ class _ShopScreenState extends State<ShopScreen> with WidgetsBindingObserver {
                         decimal: true,
                       ),
                       onChanged: (_) => _refilter(),
-                      style: const TextStyle(color: ink, fontSize: 14),
-                      decoration: _priceDecoration('shop.maxPrice'.tr()),
+                      style: AuthInputStyle.textStyle,
+                      cursorColor: AppColors.gold,
+                      decoration: AuthInputStyle.decoration('shop.maxPrice'.tr()),
                     ),
                   ),
                 ],
@@ -591,24 +594,6 @@ class _ShopScreenState extends State<ShopScreen> with WidgetsBindingObserver {
           ),
     );
   }
-
-  InputDecoration _priceDecoration(String hint) => InputDecoration(
-        hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xFF9CA3AF), fontSize: 14),
-        filled: true,
-        fillColor: const Color(0xFF0C0E12),
-        isDense: true,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0x1AFFFFFF)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Color(0xFFD4E82A)),
-        ),
-      );
 
   Widget _buildCategories() {
     return SingleChildScrollView(

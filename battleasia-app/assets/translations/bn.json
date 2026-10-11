@@ -361,6 +361,7 @@
     "transferRecipientPlaceholder": "প্লেয়ারের ইউজারনেম লিখুন",
     "transferAmount": "পরিমাণ (BAC)",
     "transferAmountPlaceholder": "পাঠানোর পরিমাণ লিখুন",
+    "transferLimitsHint": "ন্যূন {min} · সর্ব {max}",
     "transferNote": "নোট (ঐচ্ছিক)",
     "transferNotePlaceholder": "ছোট বার্তা যোগ করুন",
     "transferFee": "ট্রান্সফার ফি ({percent}%)",

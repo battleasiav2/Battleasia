@@ -8,6 +8,7 @@ import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/utils/idempotency.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/core/theme/auth_input_style.dart';
 import 'package:battleasia_app/presentation/widgets/common/gold_button.dart';
 
 /// Dark glass withdrawal sheet matching battleasia.gg wallet dialog (form → confirm).
@@ -226,26 +227,6 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
       if (mounted) setState(() => _submitting = false);
     }
   }
-
-  InputDecoration _fieldDeco(String hint) => InputDecoration(
-        hintText: hint,
-        hintStyle: AppTheme.bodyMedium.copyWith(
-          color: Colors.white.withValues(alpha: 0.35),
-          fontSize: 13,
-        ),
-        filled: true,
-        fillColor: Colors.black.withValues(alpha: 0.45),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: AppColors.border(0.22)),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: AppColors.gold),
-        ),
-      );
 
   @override
   Widget build(BuildContext context) {
@@ -475,21 +456,17 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
           ),
         ),
         const SizedBox(height: 18),
-        _label('wallet.coinAmount'.tr()),
-        const SizedBox(height: 8),
         TextField(
           controller: _amountController,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
+          style: AuthInputStyle.textStyle,
+          cursorColor: AppColors.gold,
           onChanged: (_) => setState(() {}),
-          decoration: _fieldDeco('wallet.coinAmountHint'.tr()).copyWith(
+          decoration: AuthInputStyle.decoration(
+            'wallet.coinAmountHint'.tr(),
             helperText: 'wallet.maximum'.tr(namedArgs: {
               'amount': _maxOut.toStringAsFixed(2),
             }),
-            helperStyle: AppTheme.bodySmall.copyWith(
-              color: AppColors.textMuted,
-              fontSize: 11,
-            ),
             prefixIcon: Padding(
               padding: const EdgeInsets.all(10),
               child: Image.asset(
@@ -574,12 +551,11 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
           ),
         ),
         const SizedBox(height: 16),
-        _label('wallet.walletAddress'.tr()),
-        const SizedBox(height: 8),
         TextField(
           controller: _walletController,
-          style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
-          decoration: _fieldDeco('wallet.walletAddressHint'.tr()),
+          style: AuthInputStyle.textStyle,
+          cursorColor: AppColors.gold,
+          decoration: AuthInputStyle.decoration('wallet.walletAddressHint'.tr()),
         ),
       ],
     );

@@ -7,6 +7,7 @@ import 'package:battleasia_app/core/services/shop_service.dart';
 import 'package:battleasia_app/core/services/user_service.dart';
 import 'package:battleasia_app/core/theme/app_colors.dart';
 import 'package:battleasia_app/core/theme/app_theme.dart';
+import 'package:battleasia_app/core/theme/auth_input_style.dart';
 import 'package:battleasia_app/core/utils/responsive_utils.dart';
 import 'package:battleasia_app/presentation/widgets/common/app_header.dart';
 import 'package:battleasia_app/presentation/widgets/shop/shop_section_nav.dart';
@@ -431,29 +432,24 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                                 ],
                               ),
                               const SizedBox(height: 14),
-                              _label('shop.labelBacAmount'.tr()),
-                              const SizedBox(height: 6),
                               TextField(
                                 controller: _amountController,
                                 keyboardType:
                                     const TextInputType.numberWithOptions(
                                   decimal: true,
                                 ),
-                                style: AppTheme.bodyMedium.copyWith(
-                                  color: AppColors.textPrimary,
-                                ),
-                                decoration: _fieldDecoration('0.00'),
+                                style: AuthInputStyle.textStyle,
+                                cursorColor: AppColors.gold,
+                                decoration: AuthInputStyle.decoration('0.00'),
                               ),
                               const SizedBox(height: 14),
-                              _label('shop.labelWalletMobile'.tr()),
-                              const SizedBox(height: 6),
                               TextField(
                                 controller: _walletController,
-                                style: AppTheme.bodyMedium.copyWith(
-                                  color: AppColors.textPrimary,
+                                style: AuthInputStyle.textStyle,
+                                cursorColor: AppColors.gold,
+                                decoration: AuthInputStyle.decoration(
+                                  'shop.walletHint'.tr(),
                                 ),
-                                decoration:
-                                    _fieldDecoration('shop.walletHint'.tr()),
                               ),
                               const SizedBox(height: 24),
                               SizedBox(
@@ -552,22 +548,4 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
     );
   }
 
-  InputDecoration _fieldDecoration(String hint) => InputDecoration(
-        hintText: hint,
-        hintStyle: AppTheme.bodyMedium.copyWith(
-          color: const Color(0xFF9CA3AF),
-        ),
-        filled: true,
-        fillColor: const Color(0xFF0A0A0C).withValues(alpha: 0.62),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.hair()),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.gold.withValues(alpha: 0.55)),
-        ),
-      );
 }
