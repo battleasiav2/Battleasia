@@ -23,6 +23,9 @@ const Spotlight = lazy(() => import('./components/Spotlight').then((m) => ({ def
 const SiteNoticeModal = lazy(() =>
   import('./components/SiteNoticeModal').then((m) => ({ default: m.SiteNoticeModal }))
 )
+const CookieConsent = lazy(() =>
+  import('./components/CookieConsent').then((m) => ({ default: m.CookieConsent }))
+)
 const RequireAuth = lazy(() => import('./components/user/RequireAuth').then((m) => ({ default: m.RequireAuth })))
 
 const Landing5173 = lazy(() => import('./pages/Landing5173').then((m) => ({ default: m.Landing5173 })))
@@ -63,6 +66,9 @@ export default function App() {
       </Suspense>
       <Suspense fallback={null}>
         <SiteNoticeModal />
+      </Suspense>
+      <Suspense fallback={null}>
+        <CookieConsent />
       </Suspense>
       <RouteProgress />
       <Suspense fallback={<div className="landing" style={{ minHeight: '100svh', background: 'var(--ba-page)' }} />}>

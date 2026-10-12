@@ -981,5 +981,9 @@
   "board.kills": "KILLS",
   "board.matches": "MATCHES",
   "board.level": "Level",
-  "board.top3": "Top three"
+  "board.top3": "Top three",
+  "cookies.lead": "سائن ان اور سیکیورٹی کے لیے ضروری کوکیز استعمال کرتے ہیں۔ اختیاری تجزیات غلطیوں کو ٹھیک کرنے میں مدد کرتے ہیں۔",
+  "cookies.privacy": "پرائیویسی پالیسی",
+  "cookies.acceptAll": "سب قبول کریں",
+  "cookies.essentialOnly": "صرف ضروری"
 }

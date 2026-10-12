@@ -1,3 +1,5 @@
+import { allowsAnalytics } from './cookie-consent';
+
 type SentryMod = typeof import('@sentry/browser');
 
 let sentry: SentryMod | null = null;
@@ -9,6 +11,7 @@ function dsn() {
 export function bootSentry() {
   const key = dsn();
   if (!key || sentry) return;
+  if (!allowsAnalytics()) return;
   const start = () => {
     void import('@sentry/browser')
       .then((mod) => {

@@ -26,12 +26,16 @@ const LegalPage = lazy(() => import('./pages/Legal').then((m) => ({ default: m.L
 const ShopPage = lazy(() => import('./pages/user/Shop').then((m) => ({ default: m.ShopPage })));
 const WalletPage = lazy(() => import('./pages/user/Wallet').then((m) => ({ default: m.WalletPage })));
 const TransferPage = lazy(() => import('./pages/user/Transfer').then((m) => ({ default: m.TransferPage })));
+const CookieConsent = lazy(() => import('./components/CookieConsent').then((m) => ({ default: m.CookieConsent })));
 
 export default function App() {
   return (
     <BrowserRouter>
       <OfflineBanner />
       <Spotlight />
+      <Suspense fallback={null}>
+        <CookieConsent />
+      </Suspense>
       <RouteProgress />
       <Suspense fallback={<div className="auth-shell" />}>
         <Routes>

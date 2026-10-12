@@ -981,5 +981,9 @@
   "board.kills": "KILLS",
   "board.matches": "MATCHES",
   "board.level": "Level",
-  "board.top3": "Top three"
+  "board.top3": "Top three",
+  "cookies.lead": "我们使用必要 Cookie 用于登录与安全。可选分析帮助我们修复错误。",
+  "cookies.privacy": "隐私政策",
+  "cookies.acceptAll": "全部接受",
+  "cookies.essentialOnly": "仅必要"
 }

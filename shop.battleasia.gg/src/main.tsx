@@ -5,7 +5,6 @@ import App from './App.tsx';
 import { ErrorBoundary, reloadIfStaleBundle } from './components/ErrorBoundary';
 import { I18nProvider } from './lib/i18n';
 import { captureReferral } from './lib/ref';
-import { bootSentry } from './lib/sentry';
 import { bootTheme } from './lib/theme';
 import { consumePlayerHandoff } from './lib/handoff';
 import { migrateShopSession } from './lib/shopSession';
@@ -14,7 +13,6 @@ bootTheme();
 migrateShopSession();
 consumePlayerHandoff();
 captureReferral();
-bootSentry();
 window.addEventListener('vite:preloadError', (event) => {
   event.preventDefault();
   reloadIfStaleBundle();

@@ -5,7 +5,6 @@ import App from './App.tsx'
 import { ErrorBoundary, reloadIfStaleBundle } from './components/ErrorBoundary'
 import { I18nProvider } from './lib/i18n'
 import { captureReferral } from './lib/ref'
-import { bootSentry } from './lib/sentry'
 import { bootTheme } from './lib/theme'
 
 bootTheme()
@@ -28,10 +27,6 @@ try {
   /* ignore */
 }
 document.getElementById('boot-shell')?.remove()
-
-const idle = window.requestIdleCallback?.bind(window)
-if (idle) idle(() => bootSentry(), { timeout: 4000 })
-else window.setTimeout(() => bootSentry(), 2500)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
