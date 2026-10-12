@@ -306,7 +306,7 @@ class _ShopCoinTransferPanelState extends State<ShopCoinTransferPanel> {
                                   backgroundImage: _previewUser!['avatar'] != null &&
                                           '${_previewUser!['avatar']}'.isNotEmpty
                                       ? NetworkImage(
-                                          ImageUtils.getImageUrl('${_previewUser!['avatar']}'),
+                                          ImageUtils.getImageUrl('${_previewUser!['avatar']}') ?? '',
                                         )
                                       : null,
                                   child: _previewUser!['avatar'] == null ||

@@ -31,9 +31,6 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _walletController = TextEditingController();
 
-  final List<String> _channels = const ['bkash', 'nagad', 'crypto'];
-  final List<String> _currencies = const ['BDT', 'INR', 'PKR', 'USD'];
-
   String _channel = 'bkash';
   String _currency = 'BDT';
   double _withdrawable = 0;
@@ -398,40 +395,32 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
                                   ),
                                 ),
                               ],
-                              const SizedBox(height: 20),
+                              const SizedBox(height: 16),
                               _label('shop.labelCurrency'.tr()),
                               const SizedBox(height: 6),
-                              _dropdown(
+                              _DarkPick(
                                 value: _currency,
-                                items: _currencies,
-                                onChanged: (v) =>
-                                    setState(() => _currency = v!),
+                                items: const [
+                                  _PickItem('BDT', 'Bangladeshi Taka (BDT)', _FlagKind.bd),
+                                  _PickItem('INR', 'Indian Rupee (INR)', _FlagKind.ind),
+                                  _PickItem('PKR', 'Pakistani Rupee (PKR)', _FlagKind.pk),
+                                  _PickItem('USD', 'US Dollar (USD)', _FlagKind.us),
+                                ],
+                                onPick: (id) => setState(() => _currency = id),
                               ),
-                              const SizedBox(height: 14),
+                              const SizedBox(height: 12),
                               _label('shop.labelChannel'.tr()),
                               const SizedBox(height: 6),
-                              Row(
-                                children: [
-                                  for (var i = 0; i < _channels.length; i++) ...[
-                                    if (i > 0) const SizedBox(width: 8),
-                                    Expanded(
-                                      child: PayBrandTile(
-                                        kind: _channels[i],
-                                        label: _channels[i] == 'bkash'
-                                            ? 'bKash'
-                                            : _channels[i] == 'nagad'
-                                                ? 'Nagad'
-                                                : 'Crypto',
-                                        selected: _channel == _channels[i],
-                                        onTap: () => setState(
-                                          () => _channel = _channels[i],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                              _DarkPick(
+                                value: _channel,
+                                items: const [
+                                  _PickItem('bkash', 'bKash', _FlagKind.bkash),
+                                  _PickItem('nagad', 'Nagad', _FlagKind.nagad),
+                                  _PickItem('crypto', 'Crypto (USDT)', _FlagKind.crypto),
                                 ],
+                                onPick: (id) => setState(() => _channel = id),
                               ),
-                              const SizedBox(height: 14),
+                              const SizedBox(height: 12),
                               TextField(
                                 controller: _amountController,
                                 keyboardType:
@@ -516,36 +505,152 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
         ),
       );
 
-  Widget _dropdown({
-    required String value,
-    required List<String> items,
-    required ValueChanged<String?> onChanged,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0A0A0C).withValues(alpha: 0.62),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.hair()),
+}
+
+enum _FlagKind { bd, ind, pk, us, bkash, nagad, crypto }
+
+class _PickItem {
+  final String id;
+  final String label;
+  final _FlagKind kind;
+
+  const _PickItem(this.id, this.label, this.kind);
+}
+
+class _DarkPick extends StatelessWidget {
+  final String value;
+  final List<_PickItem> items;
+  final ValueChanged<String> onPick;
+
+  const _DarkPick({
+    required this.value,
+    required this.items,
+    required this.onPick,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final selected = items.firstWhere((item) => item.id == value, orElse: () => items.first);
+    return MenuAnchor(
+      style: const MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(Color(0xFF14161B)),
+        surfaceTintColor: WidgetStatePropertyAll(Colors.transparent),
+        elevation: WidgetStatePropertyAll(8),
+        padding: WidgetStatePropertyAll(EdgeInsets.symmetric(vertical: 6)),
       ),
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton<String>(
-          value: value,
-          isExpanded: true,
-          dropdownColor: AppColors.surfaceElevated,
-          style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary),
-          items: items
-              .map(
-                (e) => DropdownMenuItem(
-                  value: e,
-                  child: Text(e.toUpperCase()),
-                ),
-              )
-              .toList(),
-          onChanged: onChanged,
-        ),
-      ),
+      alignmentOffset: const Offset(0, 6),
+      menuChildren: [
+        for (final item in items)
+          MenuItemButton(
+            onPressed: () => onPick(item.id),
+            style: ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(
+                item.id == value ? Colors.white.withValues(alpha: 0.07) : Colors.transparent,
+              ),
+            ),
+            leadingIcon: _PickMark(kind: item.kind),
+            child: Text(
+              item.label,
+              style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+            ),
+          ),
+      ],
+      builder: (context, controller, child) {
+        return Material(
+          color: const Color(0xFF0A0A0C).withValues(alpha: 0.62),
+          borderRadius: BorderRadius.circular(10),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(10),
+            onTap: () => controller.isOpen ? controller.close() : controller.open(),
+            child: Container(
+              height: 44,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.hair()),
+              ),
+              child: Row(
+                children: [
+                  _PickMark(kind: selected.kind),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      selected.label,
+                      style: AppTheme.bodyMedium.copyWith(color: AppColors.textPrimary, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                  Icon(
+                    controller.isOpen ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                    color: AppColors.textMuted,
+                    size: 18,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
+}
 
+class _PickMark extends StatelessWidget {
+  final _FlagKind kind;
+
+  const _PickMark({required this.kind});
+
+  @override
+  Widget build(BuildContext context) {
+    switch (kind) {
+      case _FlagKind.bkash:
+      case _FlagKind.nagad:
+      case _FlagKind.crypto:
+        return PayBrandIcon(
+          kind: kind == _FlagKind.bkash ? 'bkash' : kind == _FlagKind.nagad ? 'nagad' : 'crypto',
+          size: 22,
+        );
+      case _FlagKind.us:
+        return const _UsFlag();
+      case _FlagKind.bd:
+        return _flagAsset('assets/images/flags/bd.webp');
+      case _FlagKind.ind:
+        return _flagAsset('assets/images/flags/in.gif');
+      case _FlagKind.pk:
+        return _flagAsset('assets/images/flags/pk.gif');
+    }
+  }
+
+  Widget _flagAsset(String path) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(2),
+      child: Image.asset(path, width: 22, height: 14, fit: BoxFit.cover),
+    );
+  }
+}
+
+class _UsFlag extends StatelessWidget {
+  const _UsFlag();
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: const Size(22, 14),
+      painter: _UsFlagPainter(),
+    );
+  }
+}
+
+class _UsFlagPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawRect(Offset.zero & size, Paint()..color = const Color(0xFFBF0A30));
+    final white = Paint()..color = Colors.white;
+    for (var i = 0; i < 3; i++) {
+      canvas.drawRect(Rect.fromLTWH(0, size.height * (0.15 + i * 0.28), size.width, size.height * 0.14), white);
+    }
+    canvas.drawRect(Rect.fromLTWH(0, 0, size.width * 0.4, size.height * 0.54), Paint()..color = const Color(0xFF002868));
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

@@ -71,6 +71,7 @@ flutter:
     - assets/images/hero/
     - assets/images/games/
     - assets/images/map/
+    - assets/images/flags/
     - assets/icon/
     - assets/translations/
     - .env

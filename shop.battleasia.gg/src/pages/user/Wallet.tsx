@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useState, type FormEvent, type ReactNode } from 'react';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
 import { useHud } from '../../contexts/HudContext';
 import { isApiError } from '../../lib/api';
@@ -31,6 +31,21 @@ const FIATS = [
 ] as const;
 
 const PAGE_SIZES = [10, 25, 50];
+
+type PayCode = 'BDT' | 'INR' | 'PKR' | 'USD';
+
+const PAY_CURRENCIES: { code: PayCode; flag: string; labelKey: string }[] = [
+  { code: 'BDT', flag: 'bd', labelKey: 'wallet.currencyBdt' },
+  { code: 'INR', flag: 'in', labelKey: 'wallet.currencyInr' },
+  { code: 'PKR', flag: 'pk', labelKey: 'wallet.currencyPkr' },
+  { code: 'USD', flag: 'us', labelKey: 'wallet.currencyUsd' },
+];
+
+const PAY_CHANNELS = [
+  { id: 'bkash', label: 'bKash', mark: '/assets/pay/bkash.png' },
+  { id: 'nagad', label: 'Nagad', mark: '/assets/pay/nagad.png' },
+  { id: 'crypto', label: '', mark: '/assets/pay/usdt.png' },
+];
 
 function money(n: number | null) {
   if (n == null) return '—';
@@ -84,6 +99,62 @@ function Flag({ code }: { code: string }) {
   return <img className="wal-flag" src={src} width={18} height={12} alt="" />;
 }
 
+function WdPick({
+  label,
+  hint,
+  open,
+  selectedId,
+  valueLabel,
+  mark,
+  options,
+  onToggle,
+  onPick,
+}: {
+  label: string;
+  hint?: string;
+  open: boolean;
+  selectedId: string;
+  valueLabel: string;
+  mark: ReactNode;
+  options: { id: string; label: string; mark: ReactNode }[];
+  onToggle: () => void;
+  onPick: (id: string) => void;
+}) {
+  return (
+    <div className={`wd-field wd-pick${open ? ' is-open' : ''}`}>
+      <span>{label}</span>
+      <div className="wd-pick-box">
+      <button type="button" className="wd-control wd-pick-btn" aria-expanded={open} aria-haspopup="listbox" onClick={onToggle}>
+        {mark}
+        <span className="wd-pick-value">{valueLabel}</span>
+        <svg className="wd-chevron" viewBox="0 0 20 20" width="16" height="16" aria-hidden>
+          <path d="M5 7.5 10 12.5 15 7.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
+      </button>
+      {open ? (
+        <ul className="wd-pick-list" role="listbox">
+          {options.map((opt) => (
+            <li key={opt.id}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={opt.id === selectedId}
+                className={opt.id === selectedId ? 'is-on' : ''}
+                onClick={() => onPick(opt.id)}
+              >
+                {opt.mark}
+                <span>{opt.label}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+      </div>
+      {hint ? <span className="wd-hint">{hint}</span> : null}
+    </div>
+  );
+}
+
 export function WalletPage() {
   const { t } = useI18n();
   const { toast, register } = useHud();
@@ -97,7 +168,8 @@ export function WalletPage() {
   const [amount, setAmount] = useState('');
   const [address, setAddress] = useState('');
   const [walletType, setWalletType] = useState('bkash');
-  const [payoutCurrency, setPayoutCurrency] = useState<'BDT' | 'USDT'>('BDT');
+  const [payoutCurrency, setPayoutCurrency] = useState<PayCode>('BDT');
+  const [wdMenu, setWdMenu] = useState<'currency' | 'channel' | null>(null);
   const [busy, setBusy] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const [requestOpen, setRequestOpen] = useState(() => params.get('withdraw') === '1');
@@ -186,10 +258,24 @@ export function WalletPage() {
   useEffect(() => {
     if (!requestOpen) return;
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape' && !busy) closeRequest();
+      if (e.key !== 'Escape' || busy) return;
+      if (wdMenu) {
+        setWdMenu(null);
+        return;
+      }
+      closeRequest();
+    }
+    function onPointer(e: PointerEvent) {
+      const node = e.target instanceof Element ? e.target : (e.target as Node).parentElement;
+      if (node?.closest('.wd-pick')) return;
+      setWdMenu(null);
     }
     window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener('pointerdown', onPointer);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('pointerdown', onPointer);
+    };
   });
 
   const withdrawable = info?.withdrawableAmount ?? 0;
@@ -227,6 +313,7 @@ export function WalletPage() {
     setRequestOpen(false);
     setConfirm(false);
     setFieldErr('');
+    setWdMenu(null);
     if (params.get('withdraw')) {
       const next = new URLSearchParams(params);
       next.delete('withdraw');
@@ -238,26 +325,17 @@ export function WalletPage() {
     setRequestOpen(true);
     setConfirm(false);
     setFieldErr('');
+    setWdMenu(null);
   }
 
-  function pickCurrency(code: 'BDT' | 'USDT') {
-    setPayoutCurrency(code);
-    setWalletType(code === 'USDT' ? 'crypto' : walletType === 'crypto' ? 'bkash' : walletType);
-  }
-
-  const channelOptions =
-    payoutCurrency === 'USDT'
-      ? [{ id: 'crypto', label: 'USDT', mark: '/assets/pay/usdt.png' }]
-      : [
-          { id: 'bkash', label: 'bKash', mark: '/assets/pay/bkash.png' },
-          { id: 'nagad', label: 'Nagad', mark: '/assets/pay/nagad.png' },
-        ];
-  const channel = channelOptions.find((item) => item.id === walletType) || channelOptions[0];
+  const currency = PAY_CURRENCIES.find((item) => item.code === payoutCurrency) || PAY_CURRENCIES[0];
+  const channel = PAY_CHANNELS.find((item) => item.id === walletType) || PAY_CHANNELS[0];
+  const channelLabel = channel.id === 'crypto' ? t('wallet.crypto') : channel.label;
 
   async function doWithdraw() {
     if (busy) return;
     setBusy(true);
-    const currencyType = walletType === 'crypto' ? 'USDT' : 'BDT';
+    const currencyType = payoutCurrency;
     try {
       try {
         await submitCoingoPayout(
@@ -695,7 +773,7 @@ export function WalletPage() {
                     <span>{t('wallet.payChannel')}</span>
                     <strong className="wd-bal-text">
                       <img src={channel.mark} width={20} height={20} alt="" />
-                      {channel.label}
+                      {channelLabel}
                     </strong>
                   </div>
                 </div>
@@ -728,24 +806,24 @@ export function WalletPage() {
                     </strong>
                   </div>
                 </div>
-                <label className="wd-field">
-                  <span>{t('wallet.selectCurrency')}</span>
-                  <span className="wd-control">
-                    {payoutCurrency === 'USDT' ? (
-                      <img className="wd-mark" src="/assets/pay/usdt.png" width={22} height={22} alt="" />
-                    ) : (
-                      <Flag code="bd" />
-                    )}
-                    <select
-                      value={payoutCurrency}
-                      onChange={(e) => pickCurrency(e.target.value === 'USDT' ? 'USDT' : 'BDT')}
-                    >
-                      <option value="BDT">{t('wallet.currencyBdt')}</option>
-                      <option value="USDT">{t('wallet.currencyUsdt')}</option>
-                    </select>
-                  </span>
-                  <span className="wd-hint">{t('wallet.currencyHint')}</span>
-                </label>
+                <WdPick
+                  label={t('wallet.selectCurrency')}
+                  hint={t('wallet.currencyHint')}
+                  open={wdMenu === 'currency'}
+                  selectedId={currency.code}
+                  valueLabel={t(currency.labelKey)}
+                  mark={<Flag code={currency.flag} />}
+                  options={PAY_CURRENCIES.map((item) => ({
+                    id: item.code,
+                    label: t(item.labelKey),
+                    mark: <Flag code={item.flag} />,
+                  }))}
+                  onToggle={() => setWdMenu((cur) => (cur === 'currency' ? null : 'currency'))}
+                  onPick={(id) => {
+                    setPayoutCurrency(id as PayCode);
+                    setWdMenu(null);
+                  }}
+                />
                 <label className="wd-field">
                   <span>{t('wallet.coinAmount')}</span>
                   <span className="wd-control">
@@ -765,24 +843,24 @@ export function WalletPage() {
                     {t('wallet.max')}: {bacText(withdrawable)} BAC
                   </span>
                 </label>
-                <label className="wd-field">
-                  <span>{t('wallet.payChannel')}</span>
-                  <span className="wd-control">
-                    <img className="wd-mark" src={channel.mark} width={22} height={22} alt="" />
-                    <select
-                      value={channel.id}
-                      onChange={(e) => setWalletType(e.target.value)}
-                      aria-label={t('wallet.payChannel')}
-                    >
-                      {channelOptions.map((item) => (
-                        <option key={item.id} value={item.id}>
-                          {item.label}
-                        </option>
-                      ))}
-                    </select>
-                  </span>
-                  <span className="wd-hint">{t('wallet.channelHint')}</span>
-                </label>
+                <WdPick
+                  label={t('wallet.payChannel')}
+                  hint={t('wallet.channelHint')}
+                  open={wdMenu === 'channel'}
+                  selectedId={channel.id}
+                  valueLabel={channelLabel}
+                  mark={<img className="wd-mark" src={channel.mark} width={22} height={22} alt="" />}
+                  options={PAY_CHANNELS.map((item) => ({
+                    id: item.id,
+                    label: item.id === 'crypto' ? t('wallet.crypto') : item.label,
+                    mark: <img className="wd-mark" src={item.mark} width={22} height={22} alt="" />,
+                  }))}
+                  onToggle={() => setWdMenu((cur) => (cur === 'channel' ? null : 'channel'))}
+                  onPick={(id) => {
+                    setWalletType(id);
+                    setWdMenu(null);
+                  }}
+                />
                 <label className="wd-field">
                   <span>{t('wallet.walletAddress')}</span>
                   <span className="wd-control">
@@ -795,7 +873,6 @@ export function WalletPage() {
                       autoComplete="off"
                     />
                   </span>
-                  <span className="wd-hint">{t('wallet.destHint')}</span>
                 </label>
                 {coingoChecklist.length ? (
                   <p className="wd-hint">{coingoMock ? t('wd.coingoMockTitle') : t('wd.coingoCheckTitle')}</p>

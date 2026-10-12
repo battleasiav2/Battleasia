@@ -3054,16 +3054,18 @@ a.result-row {
 .wal-dialog {
   position: relative;
   z-index: 1;
-  width: min(440px, 100%);
-  padding: 18px 18px 14px;
+  width: min(400px, calc(100vw - 28px));
+  max-height: calc(100dvh - 24px);
+  overflow: visible;
+  padding: 14px 14px 0;
 }
 
 .wal-dialog .wd-title {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 0 14px;
-  font-size: 17px;
+  margin: 0 0 10px;
+  font-size: 16px;
 }
 
 .wal-dialog .wd-title svg {
@@ -3074,7 +3076,7 @@ a.result-row {
 .wal-form,
 .wal-confirm {
   display: grid;
-  gap: 14px;
+  gap: 8px;
 }
 
 .wd-balances {
@@ -3088,8 +3090,8 @@ a.result-row {
 
 .wd-bal {
   display: grid;
-  gap: 4px;
-  padding: 12px 0;
+  gap: 2px;
+  padding: 7px 0;
 }
 
 .wd-bal + .wd-bal {
@@ -3109,7 +3111,7 @@ a.result-row {
   align-items: center;
   gap: 8px;
   color: var(--ba-accent);
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
   letter-spacing: -0.03em;
 }
@@ -3130,18 +3132,90 @@ a.result-row {
 
 .wd-field {
   display: grid;
-  gap: 6px;
-  font-size: 13px;
+  gap: 4px;
+  font-size: 12px;
   font-weight: 700;
+}
+
+.wd-pick.is-open {
+  position: relative;
+  z-index: 5;
+}
+
+.wd-pick-box {
+  position: relative;
+}
+
+.wd-pick-btn {
+  width: 100%;
+  cursor: pointer;
+  color: var(--ba-text);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+}
+
+.wd-pick-value {
+  flex: 1;
+  min-width: 0;
+}
+
+.wd-chevron {
+  margin-left: auto;
+  color: var(--ba-muted);
+  flex: none;
+  transition: transform 0.15s ease;
+}
+
+.wd-pick.is-open .wd-chevron {
+  transform: rotate(180deg);
+}
+
+.wd-pick-list {
+  position: absolute;
+  z-index: 6;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #14161b;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+}
+
+.wd-pick-list button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ba-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wd-pick-list button.is-on,
+.wd-pick-list button:hover {
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .wd-control {
   display: flex;
   align-items: center;
   gap: 8px;
-  min-height: 46px;
+  min-height: 40px;
   padding: 0 12px;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(8, 9, 12, 0.45);
 }
@@ -3154,7 +3228,7 @@ a.result-row {
 .wd-control select {
   flex: 1;
   width: 100%;
-  min-height: 44px;
+  min-height: 38px;
   border: 0;
   background: transparent;
   color: var(--ba-text);
@@ -3180,8 +3254,8 @@ a.result-row {
 }
 
 .wal-dialog .sec-actions {
-  margin: 2px -18px -14px;
-  padding: 12px 18px 14px;
+  margin: 4px -14px 0;
+  padding: 10px 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
