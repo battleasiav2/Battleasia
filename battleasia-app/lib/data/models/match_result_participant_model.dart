@@ -3,7 +3,6 @@ class MatchResultParticipantModel {
   final String username;
   final String? pubgId;
   final String? avatar;
-  final String? email;
   final String status; // "winner" | "lose"
   final int placement;
   final int kills;
@@ -19,7 +18,6 @@ class MatchResultParticipantModel {
     required this.username,
     this.pubgId,
     this.avatar,
-    this.email,
     required this.status,
     required this.placement,
     required this.kills,
@@ -37,7 +35,6 @@ class MatchResultParticipantModel {
     String username = '';
     String? pubgId;
     String? avatar;
-    String? email;
     String id = '';
 
     if (userObj is Map<String, dynamic>) {
@@ -45,13 +42,11 @@ class MatchResultParticipantModel {
       username = userObj['username'] ?? '';
       pubgId = userObj['pubgId'] as String?;
       avatar = userObj['avatar'] as String?;
-      email = userObj['email'] as String?;
     } else {
       id = json['_id'] ?? json['id'] ?? '';
       username = json['username'] ?? '';
       pubgId = json['pubgId'] as String?;
       avatar = json['avatar'] as String?;
-      email = json['email'] as String?;
     }
 
     return MatchResultParticipantModel(
@@ -59,7 +54,6 @@ class MatchResultParticipantModel {
       username: username,
       pubgId: pubgId,
       avatar: avatar,
-      email: email,
       status: json['status'] ?? 'lose',
       placement: json['placement'] != null ? (json['placement'] as num).toInt() : 0,
       kills: json['kills'] != null ? (json['kills'] as num).toInt() : 0,

@@ -670,16 +670,6 @@ class _MatchResultScreenState extends State<MatchResultScreen> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      if (p.email != null && p.email!.isNotEmpty)
-                        Text(
-                          p.email!,
-                          style: const TextStyle(
-                            color: AppTheme.textSecondary,
-                            fontSize: 11,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
                     ],
                   ),
                 ),

@@ -21,6 +21,41 @@ import mongoose from 'mongoose';
 
 const router = Router();
 
+type PublicResultParticipant = {
+  id: string;
+  username: string;
+  avatar: string;
+  pubgId: string;
+  status: string;
+  placement: number | null;
+  kills: number;
+  points: number;
+  placePoint: number;
+  winPrize: number;
+  bonus: number;
+  refund: number;
+  entryFee: number;
+};
+
+/** Result rows for other players. Never include account email, secrets, or a user document. */
+function publicResultParticipant(row: PublicResultParticipant): PublicResultParticipant {
+  return {
+    id: row.id,
+    username: row.username,
+    avatar: row.avatar,
+    pubgId: row.pubgId,
+    status: row.status,
+    placement: row.placement,
+    kills: row.kills,
+    points: row.points,
+    placePoint: row.placePoint,
+    winPrize: row.winPrize,
+    bonus: row.bonus,
+    refund: row.refund,
+    entryFee: row.entryFee,
+  };
+}
+
 async function getGameNameMap(gameIds: string[]) {
   const games = await Game.find({ _id: { $in: gameIds } });
   return new Map(games.map((g) => [g._id.toString(), g.name]));
@@ -127,16 +162,17 @@ router.get('/matches/:id/result', requireAuth, async (req, res) => {
     }
 
     const game = await Game.findById(match.gameId);
-    const participants = await MatchParticipant.find({ matchId: match._id });
+    const participants = await MatchParticipant.find({ matchId: match._id }).select(
+      'username avatar pubgId entryFee placement kills points',
+    );
 
     const resultParticipants = (match.results?.length ? match.results : []).map((entry) => {
       const participant = participants.find((p) => p._id.toString() === entry.participantId?.toString());
-      return {
+      return publicResultParticipant({
         id: participant?._id.toString() || entry.participantId?.toString() || '',
         username: entry.playerName || participant?.username || 'Player',
         avatar: entry.avatar || participant?.avatar || '',
         pubgId: entry.pubgId || participant?.pubgId || '',
-        email: participant?.email || '',
         status: entry.status || 'lose',
         placement: entry.placement ?? null,
         kills: Number(entry.kills) || 0,
@@ -146,27 +182,28 @@ router.get('/matches/:id/result', requireAuth, async (req, res) => {
         bonus: Number(entry.bonus) || 0,
         refund: Number(entry.refund) || 0,
         entryFee: participant?.entryFee ?? match.entryFee,
-      };
+      });
     });
 
     if (!resultParticipants.length && participants.length) {
       for (const p of participants) {
-        resultParticipants.push({
-          id: p._id.toString(),
-          username: p.username,
-          avatar: p.avatar || '',
-          pubgId: p.pubgId || '',
-          email: p.email || '',
-          status: p.placement === 1 ? 'winner' : 'lose',
-          placement: p.placement ?? null,
-          kills: p.kills ?? 0,
-          points: p.points ?? 0,
-          placePoint: 0,
-          winPrize: 0,
-          bonus: 0,
-          refund: 0,
-          entryFee: p.entryFee,
-        });
+        resultParticipants.push(
+          publicResultParticipant({
+            id: p._id.toString(),
+            username: p.username,
+            avatar: p.avatar || '',
+            pubgId: p.pubgId || '',
+            status: p.placement === 1 ? 'winner' : 'lose',
+            placement: p.placement ?? null,
+            kills: p.kills ?? 0,
+            points: p.points ?? 0,
+            placePoint: 0,
+            winPrize: 0,
+            bonus: 0,
+            refund: 0,
+            entryFee: p.entryFee,
+          }),
+        );
       }
     }
 
