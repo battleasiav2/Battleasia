@@ -6,11 +6,12 @@ import { ShopItem } from '../../../models/ShopItem.js';
 import { User } from '../../../models/User.js';
 import { CoinRate } from '../../../models/CoinRate.js';
 import { DEFAULT_COIN_RATES } from '../../../utils/coin-rates.js';
-import { roundMoney } from '../../../utils/money.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
 import { requireAdmin, requirePermission } from '../../../middleware/admin.js';
 import { paginatedResults, parsePagination } from '../../../utils/pagination.js';
-import { approveDepositMoney, MoneyError, rejectDepositMoney } from '../../../utils/money.js';
+import { approveDepositMoney, MoneyError, rejectDepositMoney, roundMoney } from '../../../utils/money.js';
+import { assertHighValuePassword, HighValueError } from '../../../utils/high-value.js';
+import { writeAudit } from '../../../models/AuditLog.js';
 import { serializeDeposit } from '../../../utils/payment-serialize.js';
 import { emitNewDeposit, emitPendingPaymentCounts } from '../../../utils/socket.js';
 import { notifyBalanceChange } from '../../../utils/balance-notify.js';
@@ -128,6 +129,13 @@ router.get('/', requireAdmin, requirePermission('payments.manage'), async (req, 
   }
 });
 
+/**
+ * shop_item_id and Idempotency-Key are required.
+ * An older APK that omits either one receives HTTP 400 and cannot submit a deposit.
+ * The update path is an app build that sends the catalog pack id as shop_item_id
+ * and an Idempotency-Key header, which the current shop buy flow already does.
+ * Client coin_amount is not accepted as a substitute.
+ */
 router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const body = req.body as DepositSubmitBody;
@@ -298,6 +306,9 @@ router.patch('/:id/approve', requireAdmin, requirePermission('payments.manage'),
       return res.status(400).json({ status: false, message: 'Invalid deposit id' });
     }
     const key = String(req.header('Idempotency-Key') || '').trim() || undefined;
+    const pending = await DepositHistory.findById(id);
+    if (!pending) return res.status(404).json({ status: false, message: 'Deposit not found' });
+    await assertHighValuePassword(req, roundMoney(pending.coin_amount + (pending.bonus_coins || 0)));
     await approveDepositMoney({ depositId: id, adminId: req.userId, idempotencyKey: key });
     const deposit = await DepositHistory.findById(id);
     if (!deposit) return res.status(404).json({ status: false, message: 'Deposit not found' });
@@ -331,6 +342,12 @@ router.patch('/:id/approve', requireAdmin, requirePermission('payments.manage'),
         depositId: deposit._id.toString(),
         performedBy: req.userId,
       });
+      await writeAudit({
+        actorId: req.userId,
+        action: 'deposit.approve',
+        target: deposit._id.toString(),
+        detail: `${deposit.coin_amount} BAC`,
+      });
     } catch (error) {
       console.error('deposit approve side-effects failed:', error);
     }
@@ -338,7 +355,7 @@ router.patch('/:id/approve', requireAdmin, requirePermission('payments.manage'),
     const channel = await PaymentChannel.findById(deposit.payment_channel);
     return res.json({ status: true, data: serializeDeposit(deposit, channel) });
   } catch (error) {
-    if (error instanceof MoneyError) {
+    if (error instanceof HighValueError || error instanceof MoneyError) {
       return res.status(error.status).json({ status: false, message: error.message });
     }
     console.error('approve deposit error:', error);

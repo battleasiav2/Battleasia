@@ -268,9 +268,26 @@ export async function leavePaidMatch(input: { userId: string; matchId: string; i
 
 export async function approveDepositMoney(input: { depositId: string; adminId?: string; idempotencyKey?: string }) {
   return runMoney(async (session) => {
-    const deposit = await DepositHistory.findById(input.depositId).session(session);
-    if (!deposit) throw new MoneyError('Deposit not found', 404);
-    if (deposit.status !== 'pending') throw new MoneyError('Deposit is not pending');
+    const processedBy =
+      input.adminId && mongoose.Types.ObjectId.isValid(input.adminId)
+        ? new mongoose.Types.ObjectId(input.adminId)
+        : undefined;
+    const deposit = await DepositHistory.findOneAndUpdate(
+      { _id: input.depositId, status: 'pending' },
+      {
+        $set: {
+          status: 'completed',
+          processed_at: new Date(),
+          ...(processedBy ? { processed_by: processedBy } : {}),
+        },
+      },
+      { new: true, session },
+    );
+    if (!deposit) {
+      const existing = await DepositHistory.findById(input.depositId).session(session);
+      if (!existing) throw new MoneyError('Deposit not found', 404);
+      throw new MoneyError('Deposit is not pending');
+    }
     const user = await User.findById(deposit.userId).session(session);
     if (!user) throw new MoneyError('User not found', 404);
     const amount = roundMoney(deposit.coin_amount);
@@ -279,9 +296,6 @@ export async function approveDepositMoney(input: { depositId: string; adminId?: 
     const balanceBefore = user.balance ?? 0;
     const updated = await User.findByIdAndUpdate(user._id, { $inc: { balance: credit } }, { new: true, session });
     user.balance = updated?.balance ?? balanceBefore + credit;
-    deposit.status = 'completed';
-    deposit.processed_at = new Date();
-    await deposit.save({ session });
     await postPair(session, {
       debitAccount: 'platform:reserve',
       creditAccount: walletAccount(user._id.toString()),

@@ -38,6 +38,12 @@ export function PaymentsPage() {
   const [threshold, setThreshold] = useState(1000);
   const kindLabel = t(`pay.${kind}`);
 
+  function staffAmount(row: Record<string, unknown>) {
+    const coins = Number(row.coin_amount || row.amount || 0);
+    const bonus = Number(row.bonus_coins || 0);
+    return (Number.isFinite(coins) ? coins : 0) + (Number.isFinite(bonus) ? bonus : 0);
+  }
+
   function fill(key: string, vars: Record<string, string | number>) {
     return Object.entries(vars).reduce((s, [k, v]) => s.replaceAll(`{${k}}`, String(v)), t(key));
   }
@@ -105,6 +111,12 @@ export function PaymentsPage() {
         <p className="dash-eyebrow">{t('nav.money')}</p>
         <h1>{kindLabel}</h1>
         <p className="admin-lead">{fill('pay.lead', { n: threshold })}</p>
+        {kind === 'deposit' ? (
+          <>
+            <p className="admin-lead">{t('pay.playerRef')}</p>
+            <p className="admin-lead">{t('pay.manualDecision')}</p>
+          </>
+        ) : null}
       </header>
       {error ? <p className="form-error">{error}</p> : null}
       <div className="dash-stage list-stage">
@@ -180,7 +192,7 @@ export function PaymentsPage() {
                   />
                 </th>
                 {cols.map((c) => (
-                  <th key={c}>{c}</th>
+                  <th key={c}>{kind === 'deposit' && c === 'transaction_id' ? t('pay.playerRef') : c}</th>
                 ))}
                 <th>{t('pay.actions')}</th>
               </tr>
@@ -188,7 +200,7 @@ export function PaymentsPage() {
             <tbody>
               {rows.map((row) => {
                 const id = rowId(row);
-                const amount = Number(row.coin_amount || row.amount || 0);
+                const amount = staffAmount(row);
                 const shot = String(row.receipt || row.screenshot || row.image || '');
                 const rowStatus = String(row.status || '');
                 const canApprove = rowStatus === 'pending';
@@ -253,7 +265,7 @@ export function PaymentsPage() {
             {selected.length} {t('list.selected')}
           </span>
           <input value={reason} placeholder={t('list.rejectPh')} onChange={(e) => setReason(e.target.value)} />
-          {(rows || []).some((r) => selected.includes(rowId(r)) && Number(r.coin_amount || r.amount || 0) >= threshold) ? (
+          {(rows || []).some((r) => selected.includes(rowId(r)) && staffAmount(r) >= threshold) ? (
             <label className="field">
               {t('pay.password')}
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
@@ -263,7 +275,7 @@ export function PaymentsPage() {
             type="button"
             className="btn btn-primary"
             onClick={() => {
-              const high = (rows || []).some((r) => selected.includes(rowId(r)) && Number(r.coin_amount || r.amount || 0) >= threshold);
+              const high = (rows || []).some((r) => selected.includes(rowId(r)) && staffAmount(r) >= threshold);
               if (high && !password) {
                 toast(fill('pay.needPassword', { n: threshold }), 'err');
                 return;
@@ -295,6 +307,12 @@ export function PaymentsPage() {
           <button className="play-sheet-bg" type="button" aria-label={t('chrome.close')} onClick={() => setConfirm(null)} />
           <div className="play-sheet-card">
             <h2>{fill('pay.confirmTitle', { action: t(`pay.${confirm.action}`), n: confirm.amount })}</h2>
+            {kind === 'deposit' && confirm.action === 'approve' ? (
+              <>
+                <p>{t('pay.playerRef')}</p>
+                <p>{t('pay.manualDecision')}</p>
+              </>
+            ) : null}
             {confirm.action === 'reject' ? (
               <label className="field">
                 {t('pay.reason')}

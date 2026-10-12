@@ -413,6 +413,8 @@
   "pay.deposit": "Deposits",
   "pay.withdrawal": "Withdrawals",
   "pay.lead": "Approve / reject with confirm. ≥ {n} BAC asks for password. Receipts open in a lightbox.",
+  "pay.playerRef": "Player-submitted reference — not provider verified.",
+  "pay.manualDecision": "Approval is a manual staff decision. Credit BAC only after you have independently checked the payment evidence.",
   "pay.empty": "No {kind}",
   "pay.emptyLead": "When the API is up, rows appear here. Clear filters if this view is empty.",
   "pay.selectAll": "Select all",

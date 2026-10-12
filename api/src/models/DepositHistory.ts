@@ -55,6 +55,9 @@ const depositHistorySchema = new Schema<IDepositHistory>(
   { timestamps: true }
 );
 
+// Before deploying this unique index onto a database that already has deposits, run:
+// node scripts/deposit-duplicate-transaction-ids.mjs --uri "<mongodb-uri>"
+// That script is read-only. It does not delete or merge duplicate deposits.
 depositHistorySchema.index({ transaction_id: 1 }, { unique: true });
 depositHistorySchema.index({ idempotencyKey: 1 }, { unique: true, sparse: true });
 

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import bcrypt from 'bcryptjs';
 import { mkdirSync, statfsSync } from 'node:fs';
 import http from 'node:http';
 import os from 'node:os';
@@ -200,5 +201,135 @@ describe('deposit submission amount and idempotency', () => {
     const still = await User.findById(playerId);
     assert.equal(still?.balance, 100);
     assert.equal(await LedgerEntry.countDocuments({ refType: 'deposit_approve', refId: id }), 1);
+  });
+
+  it('keeps the submitted quote when the pack price changes or the pack is deactivated', async () => {
+    const before = (await User.findById(playerId))?.balance ?? 0;
+    try {
+      const submitted = await submit({ transaction_id: 'trx-frozen' }, 'idem-frozen');
+      assert.equal(submitted.status, 201);
+      const body = (await submitted.json()) as { data?: { _id?: string } };
+      await ShopItem.findByIdAndUpdate(packId, { amount: 900, price: 40, isActive: false, status: 'soldout' });
+      await CoinRate.updateOne({ currency: 'BDT' }, { rate: 9 });
+
+      const approve = await fetch(`${base}/api/v4/payments/deposit-history/${body.data?._id}/approve`, {
+        method: 'PATCH',
+        headers: { authorization: `Bearer ${adminToken}`, 'idempotency-key': 'approve-frozen' },
+      });
+      assert.equal(approve.status, 200);
+      const stored = await DepositHistory.findById(body.data?._id);
+      assert.equal(stored?.coin_amount, 100);
+      assert.equal(stored?.payment_amount, 100);
+      assert.equal((await User.findById(playerId))?.balance, before + 100);
+    } finally {
+      await ShopItem.findByIdAndUpdate(packId, { amount: 100, price: 5, isActive: true, status: 'available' });
+      await CoinRate.updateOne({ currency: 'BDT' }, { rate: 1 });
+    }
+  });
+
+  it('credits a legacy deposit without shop_item_id from its stored amount and still requires the high-value password', async () => {
+    const password = 'staff-secret';
+    const cashier = await User.create({
+      email: 'deposit-cashier@test.local',
+      username: 'depositcashier',
+      password: await bcrypt.hash(password, 4),
+      balance: 0,
+      role: { type: 'admin', name: 'admin', permissions: [] },
+    });
+    const player = await User.create({
+      email: 'legacy-depositor@test.local',
+      username: 'legacydepositor',
+      password: 'hashed',
+      balance: 0,
+      role: { type: 'player', name: 'Player', permissions: [] },
+    });
+    const small = await DepositHistory.create({
+      userId: player._id,
+      user_email: player.email,
+      username: player.username,
+      transaction_id: 'legacy-small',
+      coin_amount: 40,
+      payment_amount: 2,
+      payment_channel: channelId,
+      status: 'pending',
+    });
+    const smallApprove = await fetch(`${base}/api/v4/payments/deposit-history/${small._id}/approve`, {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${signAccessToken(String(cashier._id), 0)}`, 'idempotency-key': 'legacy-small' },
+    });
+    assert.equal(smallApprove.status, 200);
+    assert.equal((await User.findById(player._id))?.balance, 40);
+    assert.equal(String((await DepositHistory.findById(small._id))?.processed_by), String(cashier._id));
+
+    const high = await DepositHistory.create({
+      userId: player._id,
+      user_email: player.email,
+      username: player.username,
+      transaction_id: 'legacy-high',
+      coin_amount: 1000,
+      bonus_coins: 0,
+      payment_amount: 50,
+      payment_channel: channelId,
+      status: 'pending',
+    });
+    const token = signAccessToken(String(cashier._id), 0);
+    const approveUrl = `${base}/api/v4/payments/deposit-history/${high._id}/approve`;
+    const missing = await fetch(approveUrl, {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${token}`, 'idempotency-key': 'legacy-high-missing' },
+      body: '{}',
+    });
+    assert.equal(missing.status, 403);
+    assert.match(((await missing.json()) as { message?: string }).message || '', /Password required/);
+    assert.equal((await User.findById(player._id))?.balance, 40);
+    assert.equal((await DepositHistory.findById(high._id))?.status, 'pending');
+
+    const wrong = await fetch(approveUrl, {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json', 'idempotency-key': 'legacy-high-wrong' },
+      body: JSON.stringify({ password: 'not-the-password' }),
+    });
+    assert.equal(wrong.status, 403);
+    assert.equal((await User.findById(player._id))?.balance, 40);
+
+    const ok = await fetch(approveUrl, {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json', 'idempotency-key': 'legacy-high-ok' },
+      body: JSON.stringify({ password }),
+    });
+    assert.equal(ok.status, 200);
+    assert.equal((await User.findById(player._id))?.balance, 1040);
+
+    const again = await fetch(approveUrl, {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json', 'idempotency-key': 'legacy-high-again' },
+      body: JSON.stringify({ password }),
+    });
+    assert.equal(again.status, 400);
+    assert.equal((await User.findById(player._id))?.balance, 1040);
+    assert.equal(await LedgerEntry.countDocuments({ refType: 'deposit_approve', refId: String(high._id) }), 1);
+  });
+
+  it('credits one pending deposit once when two approvals overlap', async () => {
+    const before = (await User.findById(playerId))?.balance ?? 0;
+    const submitted = await submit({ transaction_id: 'trx-concurrent' }, 'idem-concurrent');
+    assert.equal(submitted.status, 201);
+    const body = (await submitted.json()) as { data?: { _id?: string } };
+    const id = body.data?._id;
+    assert.ok(id);
+
+    const responses = await Promise.all(
+      ['overlap-a', 'overlap-b'].map((key) =>
+        fetch(`${base}/api/v4/payments/deposit-history/${id}/approve`, {
+          method: 'PATCH',
+          headers: { authorization: `Bearer ${adminToken}`, 'idempotency-key': key },
+        }),
+      ),
+    );
+    const statuses = responses.map((response) => response.status).sort();
+    assert.deepEqual(statuses, [200, 400]);
+    assert.equal((await User.findById(playerId))?.balance, before + 100);
+    assert.equal(await LedgerEntry.countDocuments({ refType: 'deposit_approve', refId: id }), 1);
+    assert.equal((await DepositHistory.findById(id))?.status, 'completed');
   });
 });
