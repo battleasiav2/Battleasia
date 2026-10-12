@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import type { Types } from 'mongoose';
 import { Game } from '../../../models/Game.js';
-import { Match, type IMatchResultEntry } from '../../../models/Match.js';
+import { Match, type IMatch, type IMatchResultEntry } from '../../../models/Match.js';
 import { MatchParticipant } from '../../../models/MatchParticipant.js';
 import { requireAuth } from '../../../middleware/auth.js';
 import { requirePermission } from '../../../middleware/admin.js';
@@ -28,6 +28,35 @@ import {
 import { recordMatchEngagementProgress } from '../../../utils/engagement-service.js';
 
 const router = Router();
+
+function resultPayout(entry: IMatchResultEntry) {
+  return (Number(entry.winPrize) || 0) + (Number(entry.bonus) || 0) + (Number(entry.placePoint) || 0);
+}
+
+/** Paid fees or unpaid prize rows still need the existing refund or distribution helper. */
+async function matchHasUnsettledPayout(match: IMatch) {
+  if (match.winningsDistributed || match.entriesRefunded) return false;
+  const paidEntry = await MatchParticipant.exists({ matchId: match._id, entryFee: { $gt: 0 } });
+  if (paidEntry) return true;
+  return (match.results || []).some((entry) => resultPayout(entry) > 0);
+}
+
+async function refundPaidEntries(match: IMatch) {
+  const { refunds } = await refundMatchEntries(match._id.toString());
+  for (const row of refunds) {
+    await notifyBalanceChange(row.userId, row.balance, row.before);
+    await notifyMatchRefund({
+      userId: row.userId,
+      amount: row.amount,
+      matchId: match._id.toString(),
+      matchName: match.matchName,
+    });
+  }
+  await notifyMatchCancelled({
+    matchId: match._id.toString(),
+    matchName: match.matchName,
+  });
+}
 
 async function getGameNameMap(gameIds: string[]) {
   const games = await Game.find({ _id: { $in: gameIds } });
@@ -316,13 +345,46 @@ router.post('/', requireAuth, requirePermission('matches.create'), async (req, r
 
 router.put('/:id', requireAuth, requirePermission('matches.edit'), async (req, res) => {
   try {
-    const match = await Match.findById(req.params.id);
+    let match = await Match.findById(req.params.id);
     if (!match) {
       return res.status(404).json({ status: false, message: 'Match not found' });
     }
 
     const prevStatus = match.status;
     const prevRoomId = (match.roomId || '').trim();
+    const requestedStatus = req.body.status;
+
+    if (requestedStatus === 'complete' && !match.winningsDistributed && (await matchHasUnsettledPayout(match))) {
+      return res.status(400).json({
+        status: false,
+        message: 'Distribute winnings before marking the match complete',
+      });
+    }
+
+    if (requestedStatus === 'cancel' && match.winningsDistributed && !match.entriesRefunded) {
+      return res.status(400).json({
+        status: false,
+        message: 'Cannot refund after winnings were distributed',
+      });
+    }
+
+    if (
+      requestedStatus === 'cancel' &&
+      !match.entriesRefunded &&
+      !match.winningsDistributed &&
+      (await MatchParticipant.exists({ matchId: match._id, entryFee: { $gt: 0 } }))
+    ) {
+      try {
+        await refundPaidEntries(match);
+      } catch (error) {
+        if (!(error instanceof MoneyError) || error.message !== 'Entries already refunded') throw error;
+      }
+      const refreshed = await Match.findById(match._id);
+      if (!refreshed) {
+        return res.status(404).json({ status: false, message: 'Match not found' });
+      }
+      match = refreshed;
+    }
 
     const updatable = [
       'gameId', 'gameMode', 'roomId', 'password', 'matchName', 'matchUrl',
@@ -364,6 +426,9 @@ router.put('/:id', requireAuth, requirePermission('matches.edit'), async (req, r
     await emitDashboardStatsUpdated();
     return res.json({ status: true, data });
   } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
     console.error('update match error:', error);
     return res.status(500).json({ status: false, message: 'Failed to update match' });
   }
@@ -374,6 +439,12 @@ router.delete('/:id', requireAuth, requirePermission('matches.delete'), async (r
     const match = await Match.findById(req.params.id);
     if (!match) {
       return res.status(404).json({ status: false, message: 'Match not found' });
+    }
+    if (await matchHasUnsettledPayout(match)) {
+      return res.status(400).json({
+        status: false,
+        message: 'Refund paid entries or distribute winnings before deleting this match',
+      });
     }
     await MatchParticipant.deleteMany({ matchId: match._id });
     await match.deleteOne();
