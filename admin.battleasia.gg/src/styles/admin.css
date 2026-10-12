@@ -704,6 +704,46 @@ a.btn.btn-primary:hover {
     0 24px 60px -36px rgba(0, 0, 0, 0.9);
 }
 
+.list-pager {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.role-perm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.role-perm-group {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+.role-perm-group legend {
+  padding: 0 6px;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.role-perm-group label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 6px 0;
+  font-size: 13px;
+}
+
 .list-stage {
   padding: 0;
   overflow: hidden;

@@ -3,20 +3,32 @@ import { Session } from '../../../models/Session.js';
 import { User } from '../../../models/User.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
 import { writeAudit } from '../../../models/AuditLog.js';
+import {
+  buildSearchFilter,
+  paginatedResults,
+  parsePagination,
+} from '../../../utils/pagination.js';
 
 const router = Router();
 
 router.get('/', requireAuth, async (req: AuthedRequest, res) => {
   try {
+    const { skip, limit, search } = parsePagination(req);
     const now = new Date();
-    const filter: Record<string, unknown> = { expiration: { $gt: now } };
+    const filter: Record<string, unknown> = {
+      expiration: { $gt: now },
+      ...buildSearchFilter(search, ['username', 'email', 'ip', 'country']),
+    };
     const userId = String(req.query.userId || '').trim();
     if (userId) {
       filter.userId = userId;
     } else if (String(req.query.mine || '') === '1' && req.userId) {
       filter.userId = req.userId;
     }
-    const sessions = await Session.find(filter).sort({ createdAt: -1 });
+    const [sessions, count] = await Promise.all([
+      Session.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Session.countDocuments(filter),
+    ]);
 
     const results = sessions.map((s) => ({
       _id: s._id.toString(),
@@ -33,7 +45,7 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
       expiration: s.expiration,
     }));
 
-    return res.json({ status: true, data: { results, count: results.length } });
+    return res.json(paginatedResults(results, count));
   } catch (error) {
     console.error('sessions error:', error);
     return res.status(500).json({ status: false, message: 'Failed to fetch sessions' });

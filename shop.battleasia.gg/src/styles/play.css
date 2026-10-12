@@ -3054,13 +3054,135 @@ a.result-row {
 .wal-dialog {
   position: relative;
   z-index: 1;
-  width: min(480px, 100%);
+  width: min(440px, 100%);
+  padding: 18px 18px 14px;
+}
+
+.wal-dialog .wd-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 14px;
+  font-size: 17px;
+}
+
+.wal-dialog .wd-title svg {
+  color: var(--ba-accent);
+  flex: none;
 }
 
 .wal-form,
 .wal-confirm {
   display: grid;
-  gap: 12px;
+  gap: 14px;
+}
+
+.wd-balances {
+  display: grid;
+  gap: 0;
+  padding: 4px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--ba-card-border);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.wd-bal {
+  display: grid;
+  gap: 4px;
+  padding: 12px 0;
+}
+
+.wd-bal + .wd-bal {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.wd-bal span,
+.wd-hint {
+  color: var(--ba-muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.wd-bal strong {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ba-accent);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.wd-bal strong img,
+.wd-coin,
+.wd-mark {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex: none;
+}
+
+.wd-bal-text {
+  color: var(--ba-text);
+  font-size: 15px;
+}
+
+.wd-field {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.wd-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(8, 9, 12, 0.45);
+}
+
+.wd-control:focus-within {
+  border-color: color-mix(in srgb, var(--ba-accent) 70%, transparent);
+}
+
+.wd-control input,
+.wd-control select {
+  flex: 1;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--ba-text);
+  color-scheme: dark;
+  font: inherit;
+  font-weight: 600;
+  outline: none;
+}
+
+.wd-control input::placeholder {
+  color: var(--ba-muted);
+  font-weight: 500;
+}
+
+.wd-control input[type='number'] {
+  appearance: textfield;
+}
+
+.wd-control input[type='number']::-webkit-outer-spin-button,
+.wd-control input[type='number']::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.wal-dialog .sec-actions {
+  margin: 2px -18px -14px;
+  padding: 12px 18px 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .wal-dialog .field input {

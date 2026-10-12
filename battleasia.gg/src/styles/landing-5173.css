@@ -2091,20 +2091,49 @@ html[lang="ur"] .ba5173 { --app-font-sans: 'Noto Nastaliq Urdu', 'Inter', system
   .ba5173 .legal-card p{font-size:16px}
 }
 
-/* One hero photo: PC keeps the squad on the right, phones keep them in the center crop */
+/* Five game stills crossfade every 10s. Gradients stay on top so the copy keeps contrast. */
 .ba5173 .hero-bg{
-  background-image:linear-gradient(90deg,#0a0b0f 0%,rgba(10,11,15,.9) 24%,rgba(10,11,15,.38) 46%,rgba(10,11,15,.08) 100%),linear-gradient(180deg,rgba(10,11,15,.35),transparent 28%,rgba(10,11,15,.4)),var(--hero-bg-image);
-  background-repeat:no-repeat;
-  background-size:auto,auto,168% auto;
-  background-position:0 0,0 0,8% 46%;
+  background-color:#0a0b0f;
+  background-image:none;
   opacity:1;
+}
+.ba5173 .hero-slides{
+  position:absolute;
+  inset:0;
+  z-index:0;
+}
+.ba5173 .hero-slides img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:68% center;
+  opacity:0;
+  transition:opacity 1.15s ease;
+}
+.ba5173 .hero-slides img.is-on{opacity:1}
+.ba5173 .hero-bg::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:1;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg,#0a0b0f 0%,rgba(10,11,15,.9) 24%,rgba(10,11,15,.38) 46%,rgba(10,11,15,.08) 100%),
+    linear-gradient(180deg,rgba(10,11,15,.35),transparent 28%,rgba(10,11,15,.4));
+}
+@media (prefers-reduced-motion:reduce){
+  .ba5173 .hero-slides img{transition:none}
 }
 @media (max-width:820px){
   .ba5173 .hero-bg{
     opacity:1;
-    background-image:linear-gradient(180deg,#0a0b0f 0%,rgba(10,11,15,.92) 26%,rgba(10,11,15,.78) 46%,rgba(10,11,15,.2) 64%,rgba(10,11,15,.5) 100%),var(--hero-bg-image);
-    background-size:auto,cover;
-    background-position:center,center 42%;
+    background-image:none;
+  }
+  .ba5173 .hero-slides img{object-position:74% 42%}
+  .ba5173 .hero-bg::after{
+    background:linear-gradient(180deg,#0a0b0f 0%,rgba(10,11,15,.92) 26%,rgba(10,11,15,.78) 46%,rgba(10,11,15,.2) 64%,rgba(10,11,15,.5) 100%);
   }
   .ba5173 .hero .eyebrow{max-width:100%}
   .ba5173 .hero .eyebrow span:last-child{min-width:0;line-height:1.45}

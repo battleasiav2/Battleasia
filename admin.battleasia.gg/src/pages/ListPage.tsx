@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate, useLocation, useOutletContext } from 'react-router-dom';
-import { api, unwrapList, explainError } from '../lib/api';
+import { api, unwrapPage, explainError } from '../lib/api';
 import { can } from '../lib/auth';
 import { LISTS } from '../lib/catalog';
-import { cell, downloadCsv, downloadExcel, pick, rangeFor, rowId, toCsv } from '../lib/format';
+import { cell, downloadCsv, downloadExcel, pick, rangeFor, rowId, shortUserAgent, toCsv } from '../lib/format';
 import { useI18n } from '../lib/i18n';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
@@ -26,6 +26,17 @@ function prettyCol(col: string) {
     .replace(/^./, (c) => c.toUpperCase());
 }
 
+function linkedUserId(pathname: string, row: Record<string, unknown>) {
+  if (pathname === '/users/list') return rowId(row);
+  const direct = String(row.userId || '');
+  if (direct) return direct;
+  const referrer = row.referrer;
+  if (referrer && typeof referrer === 'object' && '_id' in referrer) {
+    return String((referrer as { _id?: string })._id || '');
+  }
+  return '';
+}
+
 export function ListPage() {
   const { t } = useI18n();
   const { toast } = useOutletContext<Ctx>();
@@ -41,32 +52,105 @@ export function ListPage() {
   const [reason, setReason] = useState('');
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [catName, setCatName] = useState('');
+  const [catSlug, setCatSlug] = useState('');
+  const pageSize = 50;
+
+  async function loadRows(nextPage = page) {
+    if (!spec) return;
+    const range = rangeFor(chip, { from, to });
+    const params = new URLSearchParams({ limit: String(pageSize), page: String(nextPage) });
+    if (search.trim().length >= 2) params.set('search', search.trim());
+    if (range.startDate) params.set('startDate', range.startDate);
+    if (range.endDate) params.set('endDate', range.endDate);
+    const path = spec.api.includes('?') ? `${spec.api}&${params}` : `${spec.api}?${params}`;
+    const pageData = unwrapPage<Record<string, unknown>>(await api(path));
+    setError('');
+    setRows(pageData.rows);
+    setTotal(pageData.total);
+  }
 
   useEffect(() => {
     if (!spec) return;
     const timer = window.setTimeout(() => {
-      const range = rangeFor(chip, { from, to });
-      const params = new URLSearchParams({ limit: '50' });
-      if (search.trim().length >= 2) params.set('search', search.trim());
-      if (range.startDate) params.set('startDate', range.startDate);
-      if (range.endDate) params.set('endDate', range.endDate);
-      const path = spec.api.includes('?') ? `${spec.api}&${params}` : `${spec.api}?${params}`;
-      api(path)
-        .then((payload) => {
-          setError('');
-          setRows(unwrapList<Record<string, unknown>>(payload));
-        })
-        .catch((err) => {
-          setRows([]);
-          const msg = explainError(err, t('list.loadFail'));
-          setError(msg);
-          toast(msg, 'err');
-        });
+      void loadRows().catch((err) => {
+        setRows([]);
+        setTotal(0);
+        const msg = explainError(err, t('list.loadFail'));
+        setError(msg);
+        toast(msg, 'err');
+      });
     }, 350);
     return () => window.clearTimeout(timer);
-  }, [spec, search, chip, from, to, t]);
+  }, [spec, search, chip, from, to, page, t]);
 
   const cols = useMemo(() => (spec?.columns || []).filter((c) => !hidden[c]), [spec, hidden]);
+
+  async function saveCategory() {
+    const name = catName.trim();
+    const slug = catSlug.trim().toLowerCase();
+    if (!name || !slug) {
+      toast(t('feed.needCategory'), 'err');
+      return;
+    }
+    try {
+      await api('/api/v3/feed/categories', { method: 'POST', body: JSON.stringify({ name, slug }) });
+      toast(t('feed.categorySaved'), 'ok');
+      setCatName('');
+      setCatSlug('');
+      await loadRows();
+    } catch (err) {
+      toast(explainError(err, t('feed.categoryFail')), 'err');
+    }
+  }
+
+  async function setReportStatus(reportId: string, status: 'reviewed' | 'dismissed') {
+    try {
+      await api(`/api/v2/social/reports/${reportId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status }),
+      });
+      toast(t('feed.reportUpdated'), 'ok');
+      await loadRows();
+    } catch (err) {
+      toast(explainError(err, t('feed.reportFail')), 'err');
+    }
+  }
+
+  async function deleteReel(reelId: string) {
+    if (!window.confirm(t('feed.confirmDeleteReel'))) return;
+    try {
+      await api(`/api/v2/social/reels/${reelId}`, { method: 'DELETE' });
+      toast(t('feed.reelDeleted'), 'ok');
+      await loadRows();
+    } catch (err) {
+      toast(explainError(err, t('feed.reelFail')), 'err');
+    }
+  }
+
+  async function revokeSession(sessionId: string) {
+    if (!window.confirm(t('sessions.confirmOne'))) return;
+    try {
+      await api(`/api/v3/users/sessions/${sessionId}`, { method: 'DELETE' });
+      toast(t('sessions.revoked'), 'ok');
+      await loadRows();
+    } catch (err) {
+      toast(explainError(err, t('sessions.fail')), 'err');
+    }
+  }
+
+  async function revokeUser(userId: string) {
+    if (!window.confirm(t('sessions.confirmUser'))) return;
+    try {
+      await api(`/api/v3/users/sessions/user/${userId}`, { method: 'DELETE' });
+      toast(t('sessions.revoked'), 'ok');
+      await loadRows();
+    } catch (err) {
+      toast(explainError(err, t('sessions.fail')), 'err');
+    }
+  }
 
   async function runBulk(kind: 'disable' | 'enable' | 'hide' | 'publish') {
     if (!spec) return;
@@ -105,12 +189,14 @@ export function ListPage() {
       setReason('');
       setSearch((s) => s);
       const range = rangeFor(chip, { from, to });
-      const params = new URLSearchParams({ limit: '50' });
+      const params = new URLSearchParams({ limit: String(pageSize), page: String(page) });
       if (search.trim().length >= 2) params.set('search', search.trim());
       if (range.startDate) params.set('startDate', range.startDate);
       if (range.endDate) params.set('endDate', range.endDate);
       const path = spec.api.includes('?') ? `${spec.api}&${params}` : `${spec.api}?${params}`;
-      setRows(unwrapList<Record<string, unknown>>(await api(path)));
+      const pageData = unwrapPage<Record<string, unknown>>(await api(path));
+      setRows(pageData.rows);
+      setTotal(pageData.total);
     } catch (err) {
       toast(explainError(err, t('list.bulkFail')), 'err');
     }
@@ -135,7 +221,7 @@ export function ListPage() {
         </div>
         {rows ? (
           <p className="dash-count">
-            <strong>{rows.length}</strong>
+            <strong>{total || rows.length}</strong>
             <small>{t('list.rows')}</small>
           </p>
         ) : null}
@@ -154,15 +240,37 @@ export function ListPage() {
           </Link>
         </p>
       ) : null}
+      {location.pathname === '/feed/categories' && can('feed.edit') ? (
+        <form
+          className="table-tools"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void saveCategory();
+          }}
+        >
+          <input value={catName} placeholder={t('feed.categoryName')} onChange={(e) => setCatName(e.target.value)} />
+          <input value={catSlug} placeholder={t('feed.categorySlug')} onChange={(e) => setCatSlug(e.target.value)} />
+          <button className="btn btn-primary" type="submit">
+            {t('feed.addCategory')}
+          </button>
+        </form>
+      ) : null}
+      {location.pathname === '/users/role' && can('users.edit') ? (
+        <p>
+          <Link className="btn btn-primary" to="/users/role/new">
+            {t('roles.new')}
+          </Link>
+        </p>
+      ) : null}
       {typeof (location.state as { flash?: unknown } | null)?.flash === 'string' ? (
         <p className="form-ok">{(location.state as { flash: string }).flash}</p>
       ) : null}
       {error ? <p className="form-error">{error}</p> : null}
       <div className="dash-stage list-stage">
       <div className="table-tools">
-        <input value={search} placeholder={t('list.search')} onChange={(e) => setSearch(e.target.value)} />
+        <input value={search} placeholder={t('list.search')} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
         {RANGES.map(([id, key]) => (
-          <button key={id} type="button" className={`chip ${chip === id ? 'on' : ''}`} onClick={() => setChip(id)}>
+          <button key={id} type="button" className={`chip ${chip === id ? 'on' : ''}`} onClick={() => { setChip(id); setPage(1); }}>
             {t(key)}
           </button>
         ))}
@@ -226,6 +334,7 @@ export function ListPage() {
               setChip('all');
               setFrom('');
               setTo('');
+              setPage(1);
             }}
           >
             {t('list.clearFilters')}
@@ -249,7 +358,10 @@ export function ListPage() {
                 ))}
                 {location.pathname === '/games/matches' ? <th>{t('list.result')}</th> : null}
                 {location.pathname === '/games/list' ? <th>{t('list.edit')}</th> : null}
-                {location.pathname === '/users/list' ? <th>{t('list.edit')}</th> : null}
+                {location.pathname === '/games/participants-history' ? <th>{t('list.result')}</th> : null}
+                {location.pathname === '/feed/social-reports' || location.pathname === '/feed/reels-moderation' ? <th>{t('sessions.actions')}</th> : null}
+                {location.pathname === '/users/list' || location.pathname === '/users/role' ? <th>{t('list.edit')}</th> : null}
+                {location.pathname === '/users/online' ? <th>{t('sessions.actions')}</th> : null}
                 {location.pathname === '/customer-support/list' ? <th>{t('list.open')}</th> : null}
               </tr>
             </thead>
@@ -261,9 +373,37 @@ export function ListPage() {
                     <td>
                       <input type="checkbox" checked={selected.includes(id)} onChange={(e) => setSelected((cur) => (e.target.checked ? [...cur, id] : cur.filter((x) => x !== id)))} />
                     </td>
-                    {cols.map((col) => (
-                      <td key={col}>{cell(pick(row, col))}</td>
-                    ))}
+                    {cols.map((col) => {
+                      const uid = linkedUserId(location.pathname, row);
+                      if (col === 'username' && uid && location.pathname !== '/users/role') {
+                        return (
+                          <td key={col}>
+                            <Link to={`/users/list/${uid}/edit`}>{cell(pick(row, col))}</Link>
+                          </td>
+                        );
+                      }
+                      if (col === 'name' && location.pathname === '/games/list' && id) {
+                        return (
+                          <td key={col}>
+                            <Link to={`/games/list/${id}/edit`}>{cell(pick(row, col))}</Link>
+                          </td>
+                        );
+                      }
+                      if (col === 'matchName') {
+                        const matchId = location.pathname === '/games/matches' ? id : String(row.matchId || '');
+                        if (matchId) {
+                          return (
+                            <td key={col}>
+                              <Link to={`/games/matches/${matchId}/edit`}>{cell(pick(row, col)) || '—'}</Link>
+                            </td>
+                          );
+                        }
+                      }
+                      if (col === 'useragent') {
+                        return <td key={col} title={String(pick(row, col) || '')}>{shortUserAgent(pick(row, col))}</td>;
+                      }
+                      return <td key={col}>{cell(pick(row, col))}</td>;
+                    })}
                     {location.pathname === '/games/matches' && id ? (
                       <td>
                         <Link to={`/games/matches/${id}/edit`}>{t('list.edit')}</Link>
@@ -276,9 +416,58 @@ export function ListPage() {
                         <Link to={`/games/list/${id}/edit`}>{t('list.edit')}</Link>
                       </td>
                     ) : null}
+                    {location.pathname === '/games/participants-history' && row.matchId ? (
+                      <td>
+                        <Link to={`/games/matches/${String(row.matchId)}/result`}>{t('list.result')}</Link>
+                      </td>
+                    ) : null}
                     {location.pathname === '/users/list' && id ? (
                       <td>
                         <Link to={`/users/list/${id}/edit`}>{t('list.edit')}</Link>
+                      </td>
+                    ) : null}
+                    {location.pathname === '/users/role' && id ? (
+                      <td>
+                        <Link to={`/users/role/${id}/edit`}>{t('list.edit')}</Link>
+                      </td>
+                    ) : null}
+                    {location.pathname === '/users/online' && id ? (
+                      <td className="row-actions">
+                        {can('users.edit') ? (
+                          <>
+                            <button type="button" className="btn btn-ghost" onClick={() => void revokeSession(id)}>
+                              {t('sessions.revoke')}
+                            </button>
+                            {linkedUserId(location.pathname, row) ? (
+                              <button
+                                type="button"
+                                className="btn btn-ghost"
+                                onClick={() => void revokeUser(linkedUserId(location.pathname, row))}
+                              >
+                                {t('sessions.revokeUser')}
+                              </button>
+                            ) : null}
+                          </>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
+                    ) : null}
+                    {location.pathname === '/feed/social-reports' && id && can('feed.edit') ? (
+                      <td className="row-actions">
+                        <button type="button" className="btn btn-ghost" onClick={() => void setReportStatus(id, 'reviewed')}>
+                          {t('feed.review')}
+                        </button>
+                        <button type="button" className="btn btn-ghost" onClick={() => void setReportStatus(id, 'dismissed')}>
+                          {t('feed.dismiss')}
+                        </button>
+                      </td>
+                    ) : null}
+                    {location.pathname === '/feed/reels-moderation' && id && can('feed.edit') ? (
+                      <td>
+                        <button type="button" className="btn btn-ghost" onClick={() => void deleteReel(id)}>
+                          {t('feed.deleteReel')}
+                        </button>
                       </td>
                     ) : null}
                     {location.pathname === '/customer-support/list' && id ? (
@@ -293,6 +482,24 @@ export function ListPage() {
           </table>
         </div>
       )}
+      {rows && total > pageSize ? (
+        <div className="list-pager">
+          <button type="button" className="btn btn-ghost" disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>
+            {t('list.prev')}
+          </button>
+          <span>
+            {t('list.page')} {page} / {Math.max(1, Math.ceil(total / pageSize))}
+          </span>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            disabled={page >= Math.ceil(total / pageSize)}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            {t('list.next')}
+          </button>
+        </div>
+      ) : null}
       </div>
       {selected.length ? (
         <div className="bulk-bar">

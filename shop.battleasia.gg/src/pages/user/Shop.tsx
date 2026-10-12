@@ -45,16 +45,6 @@ function packPhoto(image?: string, cacheBust?: number) {
   return `${src}${src.includes('?') ? '&' : '?'}v=${cacheBust}`;
 }
 
-function bdtRateFrom(rates: CoinRate[]) {
-  return rates.find((row) => row.currency?.toUpperCase() === 'BDT')?.rate ?? 0;
-}
-
-function packListBdt(usdPrice: number, rates: CoinRate[]) {
-  const rate = bdtRateFrom(rates);
-  if (rate <= 0) return null;
-  return usdPrice * rate;
-}
-
 function packPayLabel(currency: string, amount: number) {
   if (currency === 'USDT' || currency === 'USD') return `${usd(amount)} USDT`;
   if (currency === 'BDT') return `৳${amount.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
@@ -490,28 +480,10 @@ export function ShopPage() {
                   <span className="shop-pack-rule-gem" />
                 </div>
                 <p className="shop-pack-price">
-                  {(() => {
-                    const bdt = packListBdt(item.price, rates);
-                    if (bdt != null) {
-                      return (
-                        <>
-                          <span className="shop-pack-price-main">
-                            ৳ {bdt.toLocaleString(undefined, { maximumFractionDigits: 0 })}{' '}
-                            <span className="shop-pack-price-unit">Taka</span>
-                          </span>
-                          {item.originalPrice != null && item.originalPrice > item.price ? (
-                            <s>৳ {packListBdt(item.originalPrice, rates)?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</s>
-                          ) : null}
-                        </>
-                      );
-                    }
-                    return (
-                      <>
-                        <span>{usd(item.price)}</span>
-                        {item.originalPrice != null && item.originalPrice > item.price ? <s>{usd(item.originalPrice)}</s> : null}
-                      </>
-                    );
-                  })()}
+                  <span className="shop-pack-price-main">{usd(item.price)}</span>
+                  {item.originalPrice != null && item.originalPrice > item.price ? (
+                    <s>{usd(item.originalPrice)}</s>
+                  ) : null}
                 </p>
                 <span className="shop-pack-cta">
                   <svg className="shop-pack-cta-icon" viewBox="0 0 24 24" aria-hidden="true">

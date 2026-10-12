@@ -55,6 +55,18 @@ router.get('/available-children', requireAuth, async (_req, res) => {
   }
 });
 
+router.get('/:id', requireAuth, async (req, res) => {
+  try {
+    const role = await Role.findById(req.params.id);
+    if (!role) return res.status(404).json({ status: false, message: 'Role not found' });
+    const parentDoc = role.parent ? await Role.findById(role.parent) : null;
+    return res.json({ status: true, data: serializeRole(role, parentDoc) });
+  } catch (error) {
+    console.error('role details error:', error);
+    return res.status(500).json({ status: false, message: 'Failed to fetch role' });
+  }
+});
+
 router.get('/', requireAuth, async (req, res) => {
   try {
     const { skip, limit, search } = parsePagination(req);

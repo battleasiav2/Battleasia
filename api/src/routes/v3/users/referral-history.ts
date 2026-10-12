@@ -64,6 +64,10 @@ router.get('/', requireAuth, async (req, res) => {
       const referred = h.referredUserId as unknown as { _id?: { toString(): string }; username?: string; email?: string };
       return {
         _id: h._id.toString(),
+        userId: referrer?._id ? referrer._id.toString() : '',
+        username: referrer?.username || '',
+        referredBy: referred?.username || h.referredUsername || '',
+        amount: h.commissionAmount,
         depositAmount: h.depositAmount,
         commissionRate: h.commissionRate,
         commissionAmount: h.commissionAmount,

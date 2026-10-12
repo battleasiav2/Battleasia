@@ -32,6 +32,7 @@ import { captureReferral } from '../lib/ref';
 import { LANDING_LANG, landingFaq, landingText, readLandingLocale, type LandingLocale } from './landing5173-text';
 import { FALLBACK_SITE_SOCIALS, fetchSiteSocialLinks, type SiteSocialLink } from '../lib/siteSocials';
 import { CookiePreferencesButton } from '../components/CookiePreferencesButton';
+import { HeroSlides } from '../components/landing/HeroSlides';
 
 type Locale = LandingLocale;
 
@@ -1152,7 +1153,9 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
 
       <main>
         <section id="home" className="hero">
-          <div className="hero-bg" />
+          <div className="hero-bg">
+            <HeroSlides />
+          </div>
           <div className="hero-grid" /><div className="hero-glow" />
           <div className="hero-animation" aria-hidden="true">
             <div className="arena-scene">

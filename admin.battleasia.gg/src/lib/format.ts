@@ -1,3 +1,19 @@
+export function shortUserAgent(value: unknown) {
+  if (value == null) return '—';
+  if (typeof value === 'string') {
+    const s = value.trim();
+    if (!s) return '—';
+    return s.length > 56 ? `${s.slice(0, 56)}…` : s;
+  }
+  if (typeof value === 'object') {
+    const u = value as { browser?: string; os?: string; ua?: string; device?: string };
+    const parts = [u.device, u.browser, u.os].filter(Boolean);
+    if (parts.length) return parts.join(' · ');
+    if (u.ua) return shortUserAgent(u.ua);
+  }
+  return cell(value);
+}
+
 export function cell(value: unknown) {
   if (value == null) return '—';
   if (typeof value === 'boolean') return value ? 'yes' : 'no';

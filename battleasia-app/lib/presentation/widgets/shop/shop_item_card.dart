@@ -59,8 +59,6 @@ class ShopItemCard extends StatelessWidget {
     final hasDiscount = item.discountPercent > 0;
     final badgeColor =
         _kBadgeColor[item.badge.toLowerCase()] ?? AppColors.gold;
-    final bdtPrice = bdtRate > 0 ? item.price * bdtRate : null;
-
     return LayoutBuilder(
       builder: (context, constraints) {
         final compact = constraints.maxWidth < 168;
@@ -157,9 +155,7 @@ class ShopItemCard extends StatelessWidget {
                         _PackDivider(gold: AppColors.gold),
                         const SizedBox(height: 12),
                         Text(
-                          bdtPrice != null
-                              ? '৳ ${_fmtMoney(bdtPrice)} Taka'
-                              : '\$${_fmtMoney(item.price)}',
+                          '\$${_fmtMoney(item.price)}',
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -173,9 +169,7 @@ class ShopItemCard extends StatelessWidget {
                         if (hasDiscount && item.originalPrice > item.price) ...[
                           const SizedBox(height: 4),
                           Text(
-                            bdtPrice != null
-                                ? '৳ ${_fmtMoney(item.originalPrice * bdtRate)}'
-                                : '\$${_fmtMoney(item.originalPrice)}',
+                            '\$${_fmtMoney(item.originalPrice)}',
                             textAlign: TextAlign.center,
                             style: AppTheme.bodySmall.copyWith(
                               fontSize: compact ? 10 : 11,

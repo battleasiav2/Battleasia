@@ -47,7 +47,17 @@ router.get('/', requireAuth, async (req, res) => {
     ]);
 
     const gameMap = await getGameNameMap(matches.map((m) => m.gameId.toString()));
-    const results = matches.map((m) => serializeMatch(m, gameMap.get(m.gameId.toString())));
+    const joinedRows = matches.length
+      ? await MatchParticipant.aggregate<{ _id: Types.ObjectId; joined: number }>([
+          { $match: { matchId: { $in: matches.map((m) => m._id) } } },
+          { $group: { _id: '$matchId', joined: { $sum: 1 } } },
+        ])
+      : [];
+    const joinedMap = new Map(joinedRows.map((row) => [row._id.toString(), row.joined]));
+    const results = matches.map((m) => ({
+      ...serializeMatch(m, gameMap.get(m.gameId.toString())),
+      joined: joinedMap.get(m._id.toString()) || 0,
+    }));
 
     return res.json(paginatedResults(results, count));
   } catch (error) {

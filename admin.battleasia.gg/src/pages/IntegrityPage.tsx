@@ -65,7 +65,11 @@ export function IntegrityPage() {
     );
   }
 
-  const cols = rows[0] ? Object.keys(rows[0]).filter((k) => k !== '__v' && k !== 'password').slice(0, 8) : ['id', 'status'];
+  const cols = rows[0]
+    ? Object.keys(rows[0])
+        .filter((k) => k !== '__v' && k !== 'password' && k !== 'id' && k !== '_id')
+        .slice(0, 8)
+    : ['status'];
 
   return (
     <main className="admin-body">
@@ -143,7 +147,7 @@ export function IntegrityPage() {
             <thead>
               <tr>
                 {cols.map((c) => (
-                  <th key={c}>{c}</th>
+                  <th key={c}>{c.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())}</th>
                 ))}
                 {spec.api.includes('/kyc') ? <th>{t('integrity.action')}</th> : null}
                 {spec.api.includes('/fraud-holds') ? <th>{t('integrity.action')}</th> : null}

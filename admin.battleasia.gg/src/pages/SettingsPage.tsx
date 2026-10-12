@@ -23,6 +23,7 @@ export function SettingsPage() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [testTo, setTestTo] = useState('');
+  const [savedMeta, setSavedMeta] = useState('');
 
   useEffect(() => {
     if (!spec?.form) return;
@@ -30,8 +31,16 @@ export function SettingsPage() {
     setError('');
     api(spec.get)
       .then((payload) => {
-        const data = unwrapData<unknown>(payload);
+        const data = unwrapData<Record<string, unknown>>(payload);
         setFormState(normalizeSettingsLoad(spec.form!, data ?? payload));
+        const audit = data?.lastAudit as { actorName?: string; createdAt?: string } | null;
+        const when = audit?.createdAt || (typeof data?.updatedAt === 'string' ? data.updatedAt : '');
+        const who = audit?.actorName || '';
+        if (spec.form === 'referral' || spec.form === 'transfer') {
+          setSavedMeta(when ? `${who ? `${who} · ` : ''}${new Date(when).toLocaleString()}` : t('settings.neverSaved'));
+        } else {
+          setSavedMeta('');
+        }
       })
       .catch((err) => setError(explainError(err, t('settings.loadFail'))))
       .finally(() => setLoading(false));
@@ -78,6 +87,11 @@ export function SettingsPage() {
         <p className="dash-eyebrow">{t('nav.system')}</p>
         <h1>{t(spec.title)}</h1>
         <p className="admin-lead">{t('settings.formLead')}</p>
+        {savedMeta ? (
+          <p className="admin-lead">
+            {t('settings.lastSaved')}: {savedMeta}
+          </p>
+        ) : null}
       </header>
       {error ? <p className="form-error">{error}</p> : null}
       <div className="dash-stage form-stage">

@@ -179,14 +179,29 @@ export function unwrapData<T>(payload: unknown): T {
 }
 
 export function unwrapList<T>(payload: unknown): T[] {
-  const data = unwrapData<unknown>(payload);
-  if (Array.isArray(data)) return data as T[];
-  if (data && typeof data === 'object') {
-    const rec = data as { results?: T[]; users?: T[]; notifications?: T[] };
-    if (Array.isArray(rec.results)) return rec.results;
-    if (Array.isArray(rec.users)) return rec.users;
+  return unwrapPage<T>(payload).rows;
+}
+
+export function unwrapPage<T>(payload: unknown): { rows: T[]; total: number } {
+  if (payload && typeof payload === 'object') {
+    const root = payload as { data?: unknown; pagination?: { total?: number } };
+    if (Array.isArray(root.data)) {
+      const total = Number(root.pagination?.total ?? root.data.length);
+      return { rows: root.data as T[], total };
+    }
   }
-  return [];
+  const data = unwrapData<unknown>(payload);
+  if (Array.isArray(data)) return { rows: data as T[], total: data.length };
+  if (data && typeof data === 'object') {
+    const rec = data as { results?: T[]; users?: T[]; notifications?: T[]; count?: number; total?: number };
+    if (Array.isArray(rec.results)) {
+      return { rows: rec.results, total: Number(rec.count ?? rec.total ?? rec.results.length) };
+    }
+    if (Array.isArray(rec.users)) {
+      return { rows: rec.users, total: Number(rec.count ?? rec.total ?? rec.users.length) };
+    }
+  }
+  return { rows: [], total: 0 };
 }
 
 export function unwrapUser<T>(payload: unknown): T {

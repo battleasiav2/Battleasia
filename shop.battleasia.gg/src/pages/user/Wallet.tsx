@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useOutletContext, useSearchParams } from 'react-router-dom';
-import { InboxField } from '../../components/InboxField';
-import { PayPicks } from '../../components/PayBrand';
 import { useHud } from '../../contexts/HudContext';
 import { isApiError } from '../../lib/api';
 import { ASSETS } from '../../lib/assets';
@@ -99,6 +97,7 @@ export function WalletPage() {
   const [amount, setAmount] = useState('');
   const [address, setAddress] = useState('');
   const [walletType, setWalletType] = useState('bkash');
+  const [payoutCurrency, setPayoutCurrency] = useState<'BDT' | 'USDT'>('BDT');
   const [busy, setBusy] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const [requestOpen, setRequestOpen] = useState(() => params.get('withdraw') === '1');
@@ -240,6 +239,20 @@ export function WalletPage() {
     setConfirm(false);
     setFieldErr('');
   }
+
+  function pickCurrency(code: 'BDT' | 'USDT') {
+    setPayoutCurrency(code);
+    setWalletType(code === 'USDT' ? 'crypto' : walletType === 'crypto' ? 'bkash' : walletType);
+  }
+
+  const channelOptions =
+    payoutCurrency === 'USDT'
+      ? [{ id: 'crypto', label: 'USDT', mark: '/assets/pay/usdt.png' }]
+      : [
+          { id: 'bkash', label: 'bKash', mark: '/assets/pay/bkash.png' },
+          { id: 'nagad', label: 'Nagad', mark: '/assets/pay/nagad.png' },
+        ];
+  const channel = channelOptions.find((item) => item.id === walletType) || channelOptions[0];
 
   async function doWithdraw() {
     if (busy) return;
@@ -662,13 +675,32 @@ export function WalletPage() {
         <div className="sec-pay-back" role="presentation">
           <button className="sec-pay-dismiss" type="button" aria-label={t('common.close')} onClick={closeRequest} />
           <div className="sec-pay wal-dialog" role="dialog" aria-labelledby="wd-title">
-            <h2 id="wd-title">{confirm ? t('wallet.confirm') : t('wallet.request')}</h2>
+            <h2 id="wd-title" className="wd-title">
+              <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden>
+                <path d="M13 2 4 14h7l-1 8 10-14h-7l0-6z" fill="currentColor" />
+              </svg>
+              {confirm ? t('wallet.confirm') : t('wallet.request')}
+            </h2>
             {confirm ? (
               <div className="wal-confirm">
-                <p>
-                  {bacText(maxAmt)} BAC · {walletType} · {address.trim()}
-                </p>
-                <p className="sec-muted">{t('wallet.confirmLead')}</p>
+                <div className="wd-balances">
+                  <div className="wd-bal">
+                    <span>{t('wallet.coinAmount')}</span>
+                    <strong>
+                      <img src={ASSETS.coin} width={20} height={20} alt="" />
+                      {bacText(maxAmt)} BAC
+                    </strong>
+                  </div>
+                  <div className="wd-bal">
+                    <span>{t('wallet.payChannel')}</span>
+                    <strong className="wd-bal-text">
+                      <img src={channel.mark} width={20} height={20} alt="" />
+                      {channel.label}
+                    </strong>
+                  </div>
+                </div>
+                <p className="wd-hint">{address.trim()}</p>
+                <p className="wd-hint">{t('wallet.confirmLead')}</p>
                 <div className="sec-actions">
                   <button className="sec-cancel" type="button" onClick={() => setConfirm(false)}>
                     {t('wallet.cancel')}
@@ -680,41 +712,101 @@ export function WalletPage() {
               </div>
             ) : (
               <form className="wal-form" onSubmit={askWithdraw}>
-                {coingoChecklist.length ? (
-                  <p className="sec-muted wal-dialog-coingo">
-                    {coingoMock ? t('wd.coingoMockTitle') : t('wd.coingoCheckTitle')}
-                  </p>
-                ) : null}
-                <InboxField
-                  label={t('wallet.amount')}
-                  placeholder={t('wd.amountPh')}
-                  type="number"
-                  min={1}
-                  step={1}
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                />
-                <label className="field">
-                  {t('wallet.channel')}
-                  <PayPicks value={walletType} onChange={setWalletType} />
+                <div className="wd-balances">
+                  <div className="wd-bal">
+                    <span>{t('wallet.available')}</span>
+                    <strong>
+                      <img src={ASSETS.coin} width={20} height={20} alt="" />
+                      {bacText(balance)} BAC
+                    </strong>
+                  </div>
+                  <div className="wd-bal">
+                    <span>{t('wallet.withdrawable')}</span>
+                    <strong>
+                      <img src={ASSETS.coin} width={20} height={20} alt="" />
+                      {bacText(withdrawable)} BAC
+                    </strong>
+                  </div>
+                </div>
+                <label className="wd-field">
+                  <span>{t('wallet.selectCurrency')}</span>
+                  <span className="wd-control">
+                    {payoutCurrency === 'USDT' ? (
+                      <img className="wd-mark" src="/assets/pay/usdt.png" width={22} height={22} alt="" />
+                    ) : (
+                      <Flag code="bd" />
+                    )}
+                    <select
+                      value={payoutCurrency}
+                      onChange={(e) => pickCurrency(e.target.value === 'USDT' ? 'USDT' : 'BDT')}
+                    >
+                      <option value="BDT">{t('wallet.currencyBdt')}</option>
+                      <option value="USDT">{t('wallet.currencyUsdt')}</option>
+                    </select>
+                  </span>
+                  <span className="wd-hint">{t('wallet.currencyHint')}</span>
                 </label>
-                <InboxField
-                  label={t('wallet.dest')}
-                  placeholder={t('wd.destPh')}
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  maxLength={120}
-                />
-                <p className="sec-muted">
-                  {t('wallet.max')}: {bacText(withdrawable)} BAC
-                </p>
+                <label className="wd-field">
+                  <span>{t('wallet.coinAmount')}</span>
+                  <span className="wd-control">
+                    <img className="wd-coin" src={ASSETS.coin} width={18} height={18} alt="" />
+                    <input
+                      type="number"
+                      min={1}
+                      step={1}
+                      inputMode="decimal"
+                      placeholder={t('wallet.amountEnter')}
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      aria-label={t('wallet.coinAmount')}
+                    />
+                  </span>
+                  <span className="wd-hint">
+                    {t('wallet.max')}: {bacText(withdrawable)} BAC
+                  </span>
+                </label>
+                <label className="wd-field">
+                  <span>{t('wallet.payChannel')}</span>
+                  <span className="wd-control">
+                    <img className="wd-mark" src={channel.mark} width={22} height={22} alt="" />
+                    <select
+                      value={channel.id}
+                      onChange={(e) => setWalletType(e.target.value)}
+                      aria-label={t('wallet.payChannel')}
+                    >
+                      {channelOptions.map((item) => (
+                        <option key={item.id} value={item.id}>
+                          {item.label}
+                        </option>
+                      ))}
+                    </select>
+                  </span>
+                  <span className="wd-hint">{t('wallet.channelHint')}</span>
+                </label>
+                <label className="wd-field">
+                  <span>{t('wallet.walletAddress')}</span>
+                  <span className="wd-control">
+                    <input
+                      value={address}
+                      maxLength={120}
+                      placeholder={t('wallet.destHint')}
+                      onChange={(e) => setAddress(e.target.value)}
+                      aria-label={t('wallet.walletAddress')}
+                      autoComplete="off"
+                    />
+                  </span>
+                  <span className="wd-hint">{t('wallet.destHint')}</span>
+                </label>
+                {coingoChecklist.length ? (
+                  <p className="wd-hint">{coingoMock ? t('wd.coingoMockTitle') : t('wd.coingoCheckTitle')}</p>
+                ) : null}
                 {fieldErr ? <p className="field-error">{fieldErr}</p> : null}
                 <div className="sec-actions">
                   <button className="sec-cancel" type="button" onClick={closeRequest}>
                     {t('wallet.cancel')}
                   </button>
                   <button className="sec-confirm" type="submit" disabled={busy || withdrawable <= 0 || !navigator.onLine}>
-                    {t('wallet.request')}
+                    {t('wallet.continue')}
                   </button>
                 </div>
               </form>

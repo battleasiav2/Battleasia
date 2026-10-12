@@ -140,13 +140,16 @@ router.get('/fingerprints', async (req, res) => {
     { $count: 'n' },
   ]);
   if (grouped.length || totalRows[0]?.n) {
+    const ids = grouped.flatMap((row) => row.users.map(String));
+    const users = await User.find({ _id: { $in: ids } }).select('username');
+    const names = new Map(users.map((u) => [u._id.toString(), u.username || u._id.toString()]));
     return res.json(
       paginatedWithTotal(
         grouped.map((row) => ({
           id: row._id,
-          hash: row._id,
+          hash: row._id.slice(0, 12),
           ip: row.ip,
-          accounts: row.users.map(String),
+          accounts: row.users.map((id) => names.get(String(id)) || String(id)),
           devices: row.count,
           updatedAt: row.lastAt,
           multiAccount: true,
@@ -385,7 +388,19 @@ router.patch('/disputes/:id', async (req: AuthedRequest, res) => {
     return res.status(400).json({ status: false, message: 'Invalid dispute status' });
   }
   const row = await Dispute.findById(req.params.id);
-  if (!row) return res.status(404).json({ status: false, message: 'Dispute not found' });
+  if (!row) {
+    const conv = await SupportConversation.findById(req.params.id);
+    if (!conv) return res.status(404).json({ status: false, message: 'Dispute not found' });
+    conv.status = 'closed';
+    await conv.save();
+    await writeAudit({
+      ...(await actorMeta(req)),
+      action: 'dispute.status',
+      target: conv._id.toString(),
+      detail: `${conv.subject || 'support'} → ${status}`,
+    });
+    return res.json({ status: true, data: { id: conv._id.toString(), status } });
+  }
   row.status = status as typeof row.status;
   if (typeof req.body?.resolution === 'string') row.resolution = String(req.body.resolution).slice(0, 500);
   await row.save();
