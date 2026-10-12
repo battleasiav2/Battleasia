@@ -16,7 +16,7 @@ import 'package:battleasia_app/presentation/widgets/common/glass_stat_tile.dart'
 import 'package:battleasia_app/presentation/widgets/shop/shop_auth_gate.dart';
 import 'package:battleasia_app/presentation/widgets/shop/pay_brand_icon.dart';
 
-/// Native store withdrawal — same flow as web shop wallet withdraw (Coingo → v4).
+/// Native store withdrawal — same manual review request as the web shop wallet.
 class ShopWithdrawalScreen extends StatefulWidget {
   const ShopWithdrawalScreen({super.key});
 
@@ -171,30 +171,21 @@ class _ShopWithdrawalScreenState extends State<ShopWithdrawalScreen> {
     try {
       final idem = newIdempotencyKey();
       final user = auth.user;
-      var result = await _shopService.createCoingoPayout(
-        amount: amount,
-        walletNumber: wallet,
+      if (user == null) {
+        _toast('shop.submitFailed'.tr());
+        return;
+      }
+      final result = await _userService.submitWithdrawal(
+        userEmail: user.email,
+        username: user.username,
+        coinAmount: amount,
         walletType: _channel,
-        description: 'Withdrawal: $amount BAC to $_currency',
-        email: user?.email,
-        username: user?.username,
+        walletAddress: wallet,
         currencyType: _currency,
+        currencyAmount: 0,
+        description: 'Withdrawal: $amount BAC via $_channel',
         idempotencyKey: idem,
       );
-
-      if (result['success'] != true && user != null) {
-        result = await _userService.submitWithdrawal(
-          userEmail: user.email,
-          username: user.username,
-          coinAmount: amount,
-          walletType: _channel,
-          walletAddress: wallet,
-          currencyType: _currency,
-          currencyAmount: 0,
-          description: 'Withdrawal: $amount BAC via $_channel',
-          idempotencyKey: idem,
-        );
-      }
 
       if (!mounted) return;
       if (result['success'] == true) {

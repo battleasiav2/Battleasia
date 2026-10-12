@@ -7,7 +7,7 @@
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "build": "tsc",
-    "test": "tsx --test src/money.test.ts",
+    "test": "tsx --test --test-concurrency=1 src/money.test.ts src/phase1-withdraw.test.ts",
     "backup:mongo": "node scripts/backup-mongo.mjs",
     "backup:install-task": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install-backup-task.ps1",
     "restore:mongo": "node scripts/restore-mongo.mjs",

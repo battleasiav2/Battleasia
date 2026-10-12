@@ -174,7 +174,7 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
       withdrawalId: withdrawal._id.toString(),
     });
 
-    return res.status(201).json({
+    return res.status(200).json({
       status: true,
       message: 'Withdrawal request submitted successfully',
       data: serializeWithdrawal(withdrawal),

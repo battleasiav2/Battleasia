@@ -14,7 +14,6 @@ import {
   fetchMyWithdrawals,
   fetchWithdrawable,
   fiatFor,
-  submitCoingoPayout,
   submitWithdraw,
   type CoinRate,
   type HistoryRow,
@@ -337,27 +336,15 @@ export function WalletPage() {
     setBusy(true);
     const currencyType = payoutCurrency;
     try {
-      try {
-        await submitCoingoPayout(
-          {
-            amount: maxAmt,
-            walletNumber: address.trim(),
-            walletType,
-            currency_type: currencyType,
-          },
-          idem
-        );
-      } catch {
-        await submitWithdraw(
-          {
-            coin_amount: maxAmt,
-            wallet_address: address.trim(),
-            wallet_type: walletType,
-            currency_type: currencyType,
-          },
-          idem
-        );
-      }
+      await submitWithdraw(
+        {
+          coin_amount: maxAmt,
+          wallet_address: address.trim(),
+          wallet_type: walletType,
+          currency_type: currencyType,
+        },
+        idem
+      );
       toast(t('wallet.submitted'));
       setDoneAmt(maxAmt);
       setAmount('');

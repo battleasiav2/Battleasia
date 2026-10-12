@@ -187,31 +187,17 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
     setState(() => _submitting = true);
     try {
       final wallet = _walletController.text.trim();
-      var result = await _shopService.createCoingoPayout(
-        amount: _coins,
-        walletNumber: wallet,
-        walletType: _channel,
-        description: 'Withdrawal: $_coins BAC via $_channel',
-        email: user.email,
+      final result = await _userService.submitWithdrawal(
+        userEmail: user.email,
         username: user.username,
+        coinAmount: _coins,
+        walletType: _channel,
+        walletAddress: wallet,
         currencyType: _selectedChannel.currency,
         currencyAmount: _currencyAmount,
+        description: 'Withdrawal request via $_channel',
         idempotencyKey: _withdrawIdem,
       );
-
-      if (result['success'] != true) {
-        result = await _userService.submitWithdrawal(
-          userEmail: user.email,
-          username: user.username,
-          coinAmount: _coins,
-          walletType: _channel,
-          walletAddress: wallet,
-          currencyType: _selectedChannel.currency,
-          currencyAmount: _currencyAmount,
-          description: 'Withdrawal request via $_channel',
-          idempotencyKey: _withdrawIdem,
-        );
-      }
 
       if (!mounted) return;
       if (result['success'] == true) {

@@ -560,7 +560,8 @@ class UserService {
 
       final data = jsonDecode(responseBody) as Map<String, dynamic>;
 
-      if (response.statusCode == 200 && data['status'] == true) {
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          data['status'] == true) {
         return {'success': true, 'data': data['data'], 'message': data['message']};
       }
 

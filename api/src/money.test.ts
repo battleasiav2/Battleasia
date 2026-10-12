@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, statfsSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { after, before, describe, it } from 'node:test';
 import mongoose from 'mongoose';
@@ -54,11 +55,6 @@ async function makeMatch(opts: { entryFee: number; totalPlayer: number; status?:
 
 describe('§2.9 money engine', () => {
   before(async () => {
-    const liveUri = process.env.MONGODB_URI || process.env.MONGO_URI || '';
-    if (liveUri && /replicaSet|mongodb\+srv/i.test(liveUri)) {
-      await mongoose.connect(liveUri);
-      return;
-    }
     try {
       const disk = statfsSync(process.cwd());
       const free = Number(disk.bavail) * Number(disk.bsize);
@@ -69,7 +65,7 @@ describe('§2.9 money engine', () => {
     } catch {
       /* statfs missing on some Node builds */
     }
-    const dbPath = path.join(process.cwd(), '.mongo-mem');
+    const dbPath = path.join(os.tmpdir(), `battleasia-money-${process.pid}`);
     mkdirSync(dbPath, { recursive: true });
     try {
       replset = await MongoMemoryReplSet.create({
