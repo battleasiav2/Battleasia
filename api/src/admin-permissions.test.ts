@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import bcrypt from 'bcryptjs';
 import { mkdirSync, statfsSync } from 'node:fs';
 import http from 'node:http';
 import os from 'node:os';
@@ -7,12 +8,14 @@ import { after, before, describe, it } from 'node:test';
 import express from 'express';
 import mongoose from 'mongoose';
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
+import { CoinRate } from './models/CoinRate.js';
 import { Role } from './models/Role.js';
 import { ShopItem } from './models/ShopItem.js';
 import { User } from './models/User.js';
 import { WithdrawalHistory } from './models/WithdrawalHistory.js';
 import { requireAdmin } from './middleware/admin.js';
 import coingoRoutes from './routes/v4/payments/coingo.js';
+import coinRateRoutes from './routes/v4/shop/coins.js';
 import shopItemRoutes from './routes/v4/shop/items.js';
 import withdrawalRoutes from './routes/v4/payments/withdrawal-history.js';
 import usersListRoutes from './routes/v3/users/list.js';
@@ -62,6 +65,7 @@ describe('admin permission enforcement', () => {
     app.use('/api/v4/payments/withdrawal-history', withdrawalRoutes);
     app.use('/api/v4/payments/coingo', coingoRoutes);
     app.use('/api/v4/shop/items', shopItemRoutes);
+    app.use('/api/v4/shop/coins', coinRateRoutes);
     const listening = await listen(app);
     server = listening.server;
     base = listening.base;
@@ -318,5 +322,246 @@ describe('admin permission enforcement', () => {
     const payoutBody = (await payout.json()) as { message?: string };
     assert.equal(payout.status, 400);
     assert.match(payoutBody.message || '', /Automated payout is not available/);
+  });
+
+  it('enforces shop.create, shop.edit, and shop.delete on coin rates', async () => {
+    const viewer = await staff('rate-view', 'official', ['shop.view']);
+    const creator = await staff('rate-create', 'agent', ['shop.create']);
+    const editor = await staff('rate-edit', 'agent', ['shop.edit']);
+    const remover = await staff('rate-delete', 'agent', ['shop.delete']);
+    const body = { region: 'nepal', currency: 'NPR', rate: 3.5 };
+
+    const deniedCreate = await fetch(`${base}/api/v4/shop/coins`, {
+      method: 'POST',
+      headers: headers(String(viewer._id)),
+      body: JSON.stringify(body),
+    });
+    assert.equal(deniedCreate.status, 403);
+    assert.equal(await CoinRate.countDocuments({ region: 'nepal', currency: 'NPR' }), 0);
+
+    const created = await fetch(`${base}/api/v4/shop/coins`, {
+      method: 'POST',
+      headers: headers(String(creator._id)),
+      body: JSON.stringify(body),
+    });
+    const createdBody = (await created.json()) as { status?: boolean; data?: { id?: string; rate?: number } };
+    assert.equal(created.status, 201);
+    assert.equal(createdBody.status, true);
+    assert.equal(createdBody.data?.rate, 3.5);
+    const rateId = String(createdBody.data?.id);
+    assert.ok(rateId);
+
+    const creatorEdit = await fetch(`${base}/api/v4/shop/coins/${rateId}`, {
+      method: 'PUT',
+      headers: headers(String(creator._id)),
+      body: JSON.stringify({ rate: 9 }),
+    });
+    assert.equal(creatorEdit.status, 403);
+    assert.equal((await CoinRate.findById(rateId))?.rate, 3.5);
+
+    const viewerEdit = await fetch(`${base}/api/v4/shop/coins/${rateId}`, {
+      method: 'PUT',
+      headers: headers(String(viewer._id)),
+      body: JSON.stringify({ rate: 9 }),
+    });
+    assert.equal(viewerEdit.status, 403);
+
+    const edited = await fetch(`${base}/api/v4/shop/coins/${rateId}`, {
+      method: 'PUT',
+      headers: headers(String(editor._id)),
+      body: JSON.stringify({ rate: 4.25 }),
+    });
+    const editedBody = (await edited.json()) as { data?: { rate?: number } };
+    assert.equal(edited.status, 200);
+    assert.equal(editedBody.data?.rate, 4.25);
+    assert.equal((await CoinRate.findById(rateId))?.rate, 4.25);
+
+    const editorDelete = await fetch(`${base}/api/v4/shop/coins/${rateId}`, {
+      method: 'DELETE',
+      headers: headers(String(editor._id)),
+    });
+    assert.equal(editorDelete.status, 403);
+    assert.ok(await CoinRate.findById(rateId));
+
+    const viewerDelete = await fetch(`${base}/api/v4/shop/coins/${rateId}`, {
+      method: 'DELETE',
+      headers: headers(String(viewer._id)),
+    });
+    assert.equal(viewerDelete.status, 403);
+
+    const removed = await fetch(`${base}/api/v4/shop/coins/${rateId}`, {
+      method: 'DELETE',
+      headers: headers(String(remover._id)),
+    });
+    assert.equal(removed.status, 200);
+    assert.equal(await CoinRate.findById(rateId), null);
+  });
+
+  it('rejects an official changing an existing role type to admin', async () => {
+    const role = await Role.create({
+      name: 'Desk',
+      type: 'official',
+      permissions: ['users.edit'],
+    });
+    const official = await User.create({
+      email: 'desk-official@perm.test',
+      username: 'deskofficial',
+      password: 'hashed',
+      roleRef: role._id,
+      role: { type: 'official', name: 'Desk', permissions: ['users.edit'] },
+    });
+
+    const updated = await fetch(`${base}/api/v3/users/roles/${role._id}`, {
+      method: 'PUT',
+      headers: headers(String(official._id)),
+      body: JSON.stringify({
+        name: 'Desk Admin',
+        type: 'admin',
+        permissions: ['users.edit', 'users.delete'],
+      }),
+    });
+    const updatedBody = (await updated.json()) as { message?: string };
+    assert.equal(updated.status, 403);
+    assert.equal(updatedBody.message, 'Permission denied');
+
+    const saved = await Role.findById(role._id);
+    assert.equal(saved?.type, 'official');
+    assert.equal(saved?.name, 'Desk');
+    assert.deepEqual(saved?.permissions, ['users.edit']);
+
+    const actor = await User.findById(official._id);
+    assert.equal(actor?.role?.type, 'official');
+    assert.deepEqual(actor?.role?.permissions, ['users.edit']);
+  });
+
+  it('still requires the staff password for high-value withdrawal approval and completion', async () => {
+    const password = 'staff-secret';
+    const cashier = await User.create({
+      email: 'cashier@perm.test',
+      username: 'cashier',
+      password: await bcrypt.hash(password, 4),
+      balance: 0,
+      role: { type: 'agent', name: 'agent', permissions: ['payments.manage'] },
+    });
+    const player = await User.create({
+      email: 'high-player@perm.test',
+      username: 'highplayer',
+      password: 'hashed',
+      balance: 2500,
+      role: { type: 'player', name: 'Player', permissions: [] },
+    });
+    const withdrawal = await WithdrawalHistory.create({
+      userId: player._id,
+      username: player.username,
+      user_email: player.email,
+      coin_amount: 1000,
+      wallet_address: '01733333333',
+      wallet_type: 'bkash',
+      status: 'pending',
+    });
+    const approveUrl = `${base}/api/v4/payments/withdrawal-history/${withdrawal._id}/approve`;
+    const completeUrl = `${base}/api/v4/payments/withdrawal-history/${withdrawal._id}/complete`;
+
+    const missing = await fetch(approveUrl, {
+      method: 'PATCH',
+      headers: { ...headers(String(cashier._id)), 'Idempotency-Key': 'high-approve-missing' },
+      body: '{}',
+    });
+    const missingBody = (await missing.json()) as { message?: string };
+    assert.equal(missing.status, 403);
+    assert.match(missingBody.message || '', /Password required/);
+    assert.equal((await WithdrawalHistory.findById(withdrawal._id))?.status, 'pending');
+    assert.equal((await User.findById(player._id))?.balance, 2500);
+
+    const wrong = await fetch(approveUrl, {
+      method: 'PATCH',
+      headers: { ...headers(String(cashier._id)), 'Idempotency-Key': 'high-approve-wrong' },
+      body: JSON.stringify({ password: 'not-the-password' }),
+    });
+    const wrongBody = (await wrong.json()) as { message?: string };
+    assert.equal(wrong.status, 403);
+    assert.match(wrongBody.message || '', /Password confirmation failed/);
+    assert.equal((await WithdrawalHistory.findById(withdrawal._id))?.status, 'pending');
+    assert.equal((await User.findById(player._id))?.balance, 2500);
+
+    const approved = await fetch(approveUrl, {
+      method: 'PATCH',
+      headers: { ...headers(String(cashier._id)), 'Idempotency-Key': 'high-approve-ok' },
+      body: JSON.stringify({ password }),
+    });
+    const approvedBody = (await approved.json()) as { status?: boolean; data?: { status?: string } };
+    assert.equal(approved.status, 200);
+    assert.equal(approvedBody.status, true);
+    assert.equal(approvedBody.data?.status, 'processing');
+    assert.equal((await User.findById(player._id))?.balance, 1500);
+
+    const completeMissing = await fetch(completeUrl, {
+      method: 'PATCH',
+      headers: { ...headers(String(cashier._id)), 'Idempotency-Key': 'high-complete-missing' },
+      body: '{}',
+    });
+    const completeMissingBody = (await completeMissing.json()) as { message?: string };
+    assert.equal(completeMissing.status, 403);
+    assert.match(completeMissingBody.message || '', /Password required/);
+    assert.equal((await WithdrawalHistory.findById(withdrawal._id))?.status, 'processing');
+
+    const completeWrong = await fetch(completeUrl, {
+      method: 'PATCH',
+      headers: { ...headers(String(cashier._id)), 'Idempotency-Key': 'high-complete-wrong' },
+      body: JSON.stringify({ password: 'not-the-password' }),
+    });
+    assert.equal(completeWrong.status, 403);
+    assert.equal((await WithdrawalHistory.findById(withdrawal._id))?.status, 'processing');
+
+    const completed = await fetch(completeUrl, {
+      method: 'PATCH',
+      headers: { ...headers(String(cashier._id)), 'Idempotency-Key': 'high-complete-ok' },
+      body: JSON.stringify({ password, transaction_hash: 'staff-ref-1' }),
+    });
+    const completedBody = (await completed.json()) as { status?: boolean; data?: { status?: string } };
+    assert.equal(completed.status, 200);
+    assert.equal(completedBody.status, true);
+    assert.equal(completedBody.data?.status, 'completed');
+    assert.equal((await User.findById(player._id))?.balance, 1500);
+  });
+
+  it('records whether users.edit can add permissions on the caller own role', async () => {
+    const role = await Role.create({
+      name: 'Limited Desk',
+      type: 'official',
+      permissions: ['users.edit'],
+    });
+    const official = await User.create({
+      email: 'self-edit@perm.test',
+      username: 'selfedit',
+      password: 'hashed',
+      roleRef: role._id,
+      role: { type: 'official', name: 'Limited Desk', permissions: ['users.edit'] },
+    });
+
+    const before = await fetch(`${base}/api/v4/payments/withdrawal-history`, {
+      headers: headers(String(official._id)),
+    });
+    assert.equal(before.status, 403);
+
+    const updated = await fetch(`${base}/api/v3/users/roles/${role._id}`, {
+      method: 'PUT',
+      headers: headers(String(official._id)),
+      body: JSON.stringify({
+        name: 'Limited Desk',
+        type: 'official',
+        permissions: ['users.edit', 'payments.manage'],
+      }),
+    });
+    assert.equal(updated.status, 200);
+
+    const fresh = await User.findById(official._id);
+    assert.equal(fresh?.role?.type, 'official');
+    assert.deepEqual(fresh?.role?.permissions, ['users.edit', 'payments.manage']);
+
+    const after = await fetch(`${base}/api/v4/payments/withdrawal-history`, {
+      headers: headers(String(official._id)),
+    });
+    assert.equal(after.status, 200);
   });
 });
