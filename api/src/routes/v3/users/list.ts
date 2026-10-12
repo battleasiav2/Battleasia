@@ -4,7 +4,7 @@ import { User } from '../../../models/User.js';
 import { Role } from '../../../models/Role.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
 import { requirePermission } from '../../../middleware/admin.js';
-import { hasAdminPermission } from '../../../utils/admin-role.js';
+import { canGrantPermissions, hasAdminPermission } from '../../../utils/admin-role.js';
 import {
   buildSearchFilter,
   paginatedResults,
@@ -31,6 +31,10 @@ async function rejectRoleAssignment(req: AuthedRequest, roleId: unknown, res: im
   }
   const role = await Role.findById(String(roleId));
   if (role?.type === 'admin' && actor.role?.type !== 'admin') {
+    res.status(403).json({ status: false, message: 'Permission denied' });
+    return true;
+  }
+  if (role && !canGrantPermissions(actor, role.permissions || [])) {
     res.status(403).json({ status: false, message: 'Permission denied' });
     return true;
   }

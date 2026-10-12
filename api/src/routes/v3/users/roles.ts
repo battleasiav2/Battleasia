@@ -3,6 +3,7 @@ import { Role } from '../../../models/Role.js';
 import { User } from '../../../models/User.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
 import { requirePermission } from '../../../middleware/admin.js';
+import { canGrantPermissions } from '../../../utils/admin-role.js';
 import {
   buildSearchFilter,
   paginatedResults,
@@ -99,10 +100,31 @@ async function rejectAdminType(req: AuthedRequest, type: unknown, res: import('e
   return true;
 }
 
+function addedPermissionKeys(next: unknown, current: readonly string[] = []): string[] {
+  if (!Array.isArray(next)) return [];
+  const held = new Set(current);
+  return next.map((key) => String(key)).filter((key) => key && !held.has(key));
+}
+
+async function rejectUngrantedPermissions(
+  req: AuthedRequest,
+  keys: readonly string[],
+  res: import('express').Response,
+) {
+  if (keys.length === 0) return false;
+  const actor = await User.findById(req.userId).select('role');
+  if (!actor || !canGrantPermissions(actor, keys)) {
+    res.status(403).json({ status: false, message: 'Permission denied' });
+    return true;
+  }
+  return false;
+}
+
 router.post('/', requireAuth, requirePermission('users.edit'), async (req: AuthedRequest, res) => {
   try {
     const { name, description = '', parent = null, permissions = [], type = 'player' } = req.body;
     if (await rejectAdminType(req, type, res)) return;
+    if (await rejectUngrantedPermissions(req, addedPermissionKeys(permissions), res)) return;
     if (!name) {
       return res.status(400).json({ status: false, message: 'Role name is required' });
     }
@@ -139,6 +161,7 @@ router.put('/:id', requireAuth, requirePermission('users.edit'), async (req: Aut
 
     const { name, description, parent, permissions, type } = req.body;
     if (await rejectAdminType(req, type, res)) return;
+    if (await rejectUngrantedPermissions(req, addedPermissionKeys(permissions, role.permissions || []), res)) return;
     if (name) role.name = name;
     if (typeof description === 'string') role.description = description;
     if (Array.isArray(permissions)) role.permissions = permissions;

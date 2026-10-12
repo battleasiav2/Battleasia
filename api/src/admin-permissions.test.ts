@@ -525,7 +525,7 @@ describe('admin permission enforcement', () => {
     assert.equal((await User.findById(player._id))?.balance, 1500);
   });
 
-  it('records whether users.edit can add permissions on the caller own role', async () => {
+  it('stops an official from adding permissions they do not hold to their own role', async () => {
     const role = await Role.create({
       name: 'Limited Desk',
       type: 'official',
@@ -538,11 +538,13 @@ describe('admin permission enforcement', () => {
       roleRef: role._id,
       role: { type: 'official', name: 'Limited Desk', permissions: ['users.edit'] },
     });
-
-    const before = await fetch(`${base}/api/v4/payments/withdrawal-history`, {
-      headers: headers(String(official._id)),
+    const coworker = await User.create({
+      email: 'coworker@perm.test',
+      username: 'coworker',
+      password: 'hashed',
+      roleRef: role._id,
+      role: { type: 'official', name: 'Limited Desk', permissions: ['users.edit'] },
     });
-    assert.equal(before.status, 403);
 
     const updated = await fetch(`${base}/api/v3/users/roles/${role._id}`, {
       method: 'PUT',
@@ -553,15 +555,131 @@ describe('admin permission enforcement', () => {
         permissions: ['users.edit', 'payments.manage'],
       }),
     });
-    assert.equal(updated.status, 200);
+    const updatedBody = (await updated.json()) as { message?: string };
+    assert.equal(updated.status, 403);
+    assert.equal(updatedBody.message, 'Permission denied');
 
+    const saved = await Role.findById(role._id);
+    assert.deepEqual(saved?.permissions, ['users.edit']);
     const fresh = await User.findById(official._id);
-    assert.equal(fresh?.role?.type, 'official');
-    assert.deepEqual(fresh?.role?.permissions, ['users.edit', 'payments.manage']);
+    const other = await User.findById(coworker._id);
+    assert.deepEqual(fresh?.role?.permissions, ['users.edit']);
+    assert.deepEqual(other?.role?.permissions, ['users.edit']);
 
-    const after = await fetch(`${base}/api/v4/payments/withdrawal-history`, {
+    const payments = await fetch(`${base}/api/v4/payments/withdrawal-history`, {
       headers: headers(String(official._id)),
     });
-    assert.equal(after.status, 200);
+    assert.equal(payments.status, 403);
+  });
+
+  it('stops an official from creating or assigning a role with permissions they do not hold', async () => {
+    const official = await staff('grant-limit', 'official', ['users.edit']);
+    const rich = await Role.create({
+      name: 'Payments Desk',
+      type: 'official',
+      permissions: ['users.edit', 'payments.manage'],
+    });
+    const same = await Role.create({
+      name: 'Edit Only',
+      type: 'official',
+      permissions: ['users.edit'],
+    });
+    const target = await User.create({
+      email: 'assign-target@perm.test',
+      username: 'assigntarget',
+      password: 'hashed',
+      role: { type: 'player', name: 'Player', permissions: [] },
+    });
+
+    const created = await fetch(`${base}/api/v3/users/roles`, {
+      method: 'POST',
+      headers: headers(String(official._id)),
+      body: JSON.stringify({
+        name: 'Self Granted',
+        type: 'official',
+        permissions: ['users.edit', 'payments.manage'],
+      }),
+    });
+    assert.equal(created.status, 403);
+    assert.equal(await Role.countDocuments({ name: 'Self Granted' }), 0);
+
+    const assigned = await fetch(`${base}/api/v3/users/list/${target._id}`, {
+      method: 'PUT',
+      headers: headers(String(official._id)),
+      body: JSON.stringify({ role: String(rich._id) }),
+    });
+    assert.equal(assigned.status, 403);
+    const unchanged = await User.findById(target._id);
+    assert.equal(unchanged?.role?.type, 'player');
+    assert.deepEqual(unchanged?.role?.permissions, []);
+
+    const allowed = await fetch(`${base}/api/v3/users/list/${target._id}`, {
+      method: 'PUT',
+      headers: headers(String(official._id)),
+      body: JSON.stringify({ role: String(same._id) }),
+    });
+    assert.equal(allowed.status, 200);
+    const moved = await User.findById(target._id);
+    assert.equal(moved?.role?.type, 'official');
+    assert.deepEqual(moved?.role?.permissions, ['users.edit']);
+  });
+
+  it('lets an admin grant permissions they do not personally list', async () => {
+    const admin = await staff('perm-admin', 'admin', []);
+    const role = await Role.create({
+      name: 'Open Desk',
+      type: 'official',
+      permissions: ['users.edit'],
+    });
+    const member = await User.create({
+      email: 'open-desk@perm.test',
+      username: 'opendesk',
+      password: 'hashed',
+      roleRef: role._id,
+      role: { type: 'official', name: 'Open Desk', permissions: ['users.edit'] },
+    });
+
+    const created = await fetch(`${base}/api/v3/users/roles`, {
+      method: 'POST',
+      headers: headers(String(admin._id)),
+      body: JSON.stringify({
+        name: 'Admin Granted',
+        type: 'agent',
+        permissions: ['payments.manage'],
+      }),
+    });
+    const createdBody = (await created.json()) as { data?: { id?: string; _id?: string } };
+    assert.equal(created.status, 201);
+    const createdId = String(createdBody.data?.id || createdBody.data?._id);
+    assert.ok(createdId);
+
+    const updated = await fetch(`${base}/api/v3/users/roles/${role._id}`, {
+      method: 'PUT',
+      headers: headers(String(admin._id)),
+      body: JSON.stringify({
+        name: 'Open Desk',
+        type: 'official',
+        permissions: ['users.edit', 'payments.manage'],
+      }),
+    });
+    assert.equal(updated.status, 200);
+    const synced = await User.findById(member._id);
+    assert.deepEqual(synced?.role?.permissions, ['users.edit', 'payments.manage']);
+
+    const target = await User.create({
+      email: 'admin-assign@perm.test',
+      username: 'adminassign',
+      password: 'hashed',
+      role: { type: 'player', name: 'Player', permissions: [] },
+    });
+    const assigned = await fetch(`${base}/api/v3/users/list/${target._id}`, {
+      method: 'PUT',
+      headers: headers(String(admin._id)),
+      body: JSON.stringify({ role: createdId }),
+    });
+    assert.equal(assigned.status, 200);
+    const moved = await User.findById(target._id);
+    assert.equal(moved?.role?.type, 'agent');
+    assert.deepEqual(moved?.role?.permissions, ['payments.manage']);
   });
 });
