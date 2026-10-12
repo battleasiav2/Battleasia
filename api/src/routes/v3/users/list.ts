@@ -2,6 +2,7 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import { User } from '../../../models/User.js';
 import { Role } from '../../../models/Role.js';
+import { Session } from '../../../models/Session.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
 import { requirePermission } from '../../../middleware/admin.js';
 import { canGrantPermissions, hasAdminPermission } from '../../../utils/admin-role.js';
@@ -90,10 +91,16 @@ router.patch('/bulk/status', requireAuth, requirePermission('users.edit'), async
     if (!status && !reason) {
       return res.status(400).json({ status: false, message: 'Reason required to disable users' });
     }
+    const targetFilter = { _id: { $in: ids }, 'role.type': { $ne: 'admin' } };
+    const targets = await User.find(targetFilter).select('_id');
+    const targetIds = targets.map((user) => user._id);
     const result = await User.updateMany(
-      { _id: { $in: ids }, 'role.type': { $ne: 'admin' } },
-      { $set: { status } },
+      targetFilter,
+      status ? { $set: { status } } : { $set: { status }, $inc: { tokenVersion: 1 } },
     );
+    if (!status && targetIds.length) {
+      await Session.deleteMany({ userId: { $in: targetIds } });
+    }
     await writeAudit({
       actorId: req.userId,
       action: 'users.bulk-status',
@@ -213,6 +220,7 @@ router.put('/:id', requireAuth, requirePermission('users.edit'), async (req: Aut
       if (user.role?.type === 'admin' && !status) {
         return res.status(403).json({ status: false, message: 'Cannot disable admin user' });
       }
+      if (!status && user.status) user.tokenVersion = Number(user.tokenVersion || 0) + 1;
       user.status = status;
     }
     if (typeof avatar === 'string') user.avatar = avatar;
@@ -228,6 +236,9 @@ router.put('/:id', requireAuth, requirePermission('users.edit'), async (req: Aut
     }
 
     await user.save();
+    if (typeof status === 'boolean' && !status) {
+      await Session.deleteMany({ userId: user._id });
+    }
     const roleDoc = user.roleRef ? await Role.findById(user.roleRef) : null;
     await writeAudit({
       actorId: req.userId,
@@ -256,8 +267,10 @@ router.patch('/:id/status', requireAuth, requirePermission('users.edit'), async 
     if (!nextStatus && !reason) {
       return res.status(400).json({ status: false, message: 'Reason required to disable user' });
     }
+    if (!nextStatus && user.status) user.tokenVersion = Number(user.tokenVersion || 0) + 1;
     user.status = nextStatus;
     await user.save();
+    if (!nextStatus) await Session.deleteMany({ userId: user._id });
     await writeAudit({
       actorId: req.userId,
       action: 'users.status',

@@ -29,15 +29,43 @@ export function providerReady(settings: OAuthSettings, provider: SocialProvider)
   return settings.discordEnabled && Boolean(settings.discordClientId && settings.discordClientSecret);
 }
 
+function allowedOrigins(settings: OAuthSettings) {
+  const allowed = new Set<string>();
+  const add = (value: string) => {
+    const clean = originOf(value);
+    if (clean) allowed.add(clean);
+  };
+  add(settings.redirectBase);
+  add(env.appUrl);
+  for (const origin of env.corsOrigins) add(origin);
+  return allowed;
+}
+
+function originOf(value: string) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  try {
+    const url = new URL(raw.includes('://') ? raw : `https://${raw}`);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
+    return url.origin;
+  } catch {
+    return '';
+  }
+}
+
+/**
+ * Callback origin comes from the configured public URL, or from the host Express
+ * derived with trust proxy, and only when that host is already allowlisted.
+ * Client-supplied X-Forwarded-Host values are not used on their own.
+ */
 export function publicOrigin(req: Request, settings: OAuthSettings) {
-  const forwarded = req.headers['x-forwarded-host'];
-  const host = (Array.isArray(forwarded) ? forwarded[0] : forwarded) || req.headers.host || '';
-  const protoHeader = req.headers['x-forwarded-proto'];
-  const proto = (Array.isArray(protoHeader) ? protoHeader[0] : protoHeader || req.protocol || 'http').split(',')[0].trim();
-  const fromRequest = host ? `${proto}://${host}` : '';
-  const internal = !fromRequest || /:(5050)(?:$|\/)/.test(fromRequest) || fromRequest.includes('://api');
-  const configured = (settings.redirectBase || env.appUrl || '').replace(/\/$/, '');
-  return (internal ? configured : fromRequest).replace(/\/$/, '');
+  const allowed = allowedOrigins(settings);
+  const configured = originOf(settings.redirectBase) || originOf(env.appUrl);
+  const proto = req.protocol === 'http' ? 'http' : 'https';
+  const host = String(req.get?.('host') || req.hostname || '').split(',')[0].trim();
+  const requestOrigin = originOf(host ? `${proto}://${host}` : '');
+  if (requestOrigin && allowed.has(requestOrigin)) return requestOrigin;
+  return configured;
 }
 
 export function callbackUrl(origin: string, provider: SocialProvider) {
@@ -179,7 +207,11 @@ export async function readHandoff(key: string) {
   return payload;
 }
 
-type Profile = { id: string; email: string; name: string; avatar: string };
+type Profile = { id: string; email: string; name: string; avatar: string; emailVerified: boolean };
+
+export function providerEmailIsVerified(emailVerified: boolean | undefined) {
+  return emailVerified === true;
+}
 
 async function googleProfile(settings: OAuthSettings, origin: string, code: string): Promise<Profile> {
   const body = new URLSearchParams({
@@ -201,14 +233,21 @@ async function googleProfile(settings: OAuthSettings, origin: string, code: stri
     headers: { Authorization: `Bearer ${token.access_token}` },
   });
   if (!profileRes.ok) throw new Error('failed');
-  const profile = (await profileRes.json()) as { sub?: string; email?: string; name?: string; picture?: string };
+  const profile = (await profileRes.json()) as {
+    sub?: string;
+    email?: string;
+    email_verified?: boolean;
+    name?: string;
+    picture?: string;
+  };
   if (!profile.sub) throw new Error('failed');
-  if (!profile.email) throw new Error('email');
+  if (!providerEmailIsVerified(profile.email_verified) || !profile.email) throw new Error('email');
   return {
     id: profile.sub,
     email: profile.email.toLowerCase().trim(),
     name: profile.name || '',
     avatar: profile.picture || '',
+    emailVerified: true,
   };
 }
 
@@ -235,18 +274,20 @@ async function discordProfile(settings: OAuthSettings, origin: string, code: str
   const profile = (await profileRes.json()) as {
     id?: string;
     email?: string;
+    verified?: boolean;
     username?: string;
     global_name?: string;
     avatar?: string;
   };
   if (!profile.id) throw new Error('failed');
-  if (!profile.email) throw new Error('email');
+  if (!providerEmailIsVerified(profile.verified) || !profile.email) throw new Error('email');
   const avatar = profile.avatar ? `https://cdn.discordapp.com/avatars/${profile.id}/${profile.avatar}.png` : '';
   return {
     id: profile.id,
     email: profile.email.toLowerCase().trim(),
     name: profile.global_name || profile.username || '',
     avatar,
+    emailVerified: true,
   };
 }
 
@@ -265,6 +306,7 @@ async function uniqueUsername(seed: string) {
 }
 
 export async function findOrCreateSocialUser(provider: SocialProvider, profile: Profile) {
+  if (!profile.emailVerified) throw new Error('email');
   const idField = provider === 'google' ? 'googleId' : 'discordId';
   const linked = await User.findOne({ [idField]: profile.id });
   if (linked) {

@@ -8,7 +8,7 @@ import { LoginHistory } from '../../models/LoginHistory.js';
 import { Session } from '../../models/Session.js';
 import { VerificationCode } from '../../models/VerificationCode.js';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
-import { attachPlayerCookies, issuePair, refreshSession, sessionPayload, userVer } from '../../utils/token-session.js';
+import { attachPlayerCookies, endSession, issuePair, refreshSession, sessionPayload, userVer } from '../../utils/token-session.js';
 import { BalanceHistory } from '../../models/BalanceHistory.js';
 import { ReferralHistory } from '../../models/ReferralHistory.js';
 import { serializeUser, generateReferralCode } from '../../utils/serialize.js';
@@ -42,8 +42,13 @@ import { buildMyMatchHistory, buildUserMatchHistory } from '../../utils/match-hi
 import { resolveReferrerId } from '../../utils/referral.js';
 import { logAuthCode } from '../../utils/auth-log.js';
 import { sendVerificationCodeEmail } from '../../utils/mail.js';
-import { clearAllAuthCookies } from '../../utils/auth-cookie.js';
 import { recordFingerprint } from '../../utils/fingerprint.js';
+import {
+  checkVerificationCode,
+  codeAttemptLimiter,
+  storeVerificationCode,
+  verificationOnCooldown,
+} from '../../utils/verification-code.js';
 import {
   authorizeUrl,
   beginOAuth,
@@ -87,26 +92,24 @@ function generateSixDigitCode() {
 }
 
 async function saveVerificationCode(email: string, type: 'signup' | 'reset', locale?: string | string[] | null) {
+  if (await verificationOnCooldown(email, type)) return null;
   const code = generateSixDigitCode();
   const expiresAt = new Date(Date.now() + CODE_TTL_MS);
-
-  await VerificationCode.deleteMany({ email, type });
-  await VerificationCode.create({ email, code, type, expiresAt });
-
+  await storeVerificationCode(email, type, code, expiresAt);
   await sendVerificationCodeEmail(email, code, type, locale);
-  logAuthCode(`${type} verification code`, email, code);
+  logAuthCode(`${type} verification code`, email);
   return code;
 }
 
-async function verifyCode(email: string, code: string, type: 'signup' | 'reset') {
-  const record = await VerificationCode.findOne({ email: email.toLowerCase().trim(), type, code });
-  if (!record) return false;
-  if (record.expiresAt.getTime() < Date.now()) {
-    await VerificationCode.deleteOne({ _id: record._id });
-    return false;
+function verificationFailure(
+  res: Response,
+  result: { ok: false; reason: 'invalid' | 'limited' },
+  extra?: Record<string, unknown>,
+) {
+  if (result.reason === 'limited') {
+    return res.status(429).json({ status: false, ...extra, message: 'Too many attempts. Try again later' });
   }
-  await VerificationCode.deleteOne({ _id: record._id });
-  return true;
+  return res.status(400).json({ status: false, ...extra, message: 'Invalid or expired verification code' });
 }
 
 async function createLoginSession(
@@ -291,8 +294,8 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-router.post('/logout', (_req, res) => {
-  clearAllAuthCookies(res);
+router.post('/logout', async (req, res) => {
+  await endSession(req, res);
   return res.json({ status: true, message: 'Logged out' });
 });
 
@@ -793,7 +796,7 @@ router.post('/premium/activate', requireAuth, async (req: AuthedRequest, res) =>
   }
 });
 
-router.post('/send-verification-email', requireAuth, async (req: AuthedRequest, res) => {
+router.post('/send-verification-email', requireAuth, codeAttemptLimiter, async (req: AuthedRequest, res) => {
   try {
     const user = await User.findById(req.userId);
     if (!user) {
@@ -811,7 +814,7 @@ router.post('/send-verification-email', requireAuth, async (req: AuthedRequest, 
   }
 });
 
-router.post('/verify-email', requireAuth, async (req: AuthedRequest, res) => {
+router.post('/verify-email', requireAuth, codeAttemptLimiter, async (req: AuthedRequest, res) => {
   try {
     const { code } = req.body as { code?: string };
     if (!code?.trim()) {
@@ -826,10 +829,8 @@ router.post('/verify-email', requireAuth, async (req: AuthedRequest, res) => {
       return res.status(400).json({ status: false, message: 'Email is already verified' });
     }
 
-    const valid = await verifyCode(user.email, code.trim(), 'signup');
-    if (!valid) {
-      return res.status(400).json({ status: false, message: 'Invalid or expired verification code' });
-    }
+    const result = await checkVerificationCode(user.email, 'signup', code.trim(), true);
+    if (!result.ok) return verificationFailure(res, result);
 
     user.emailVerified = true;
     await user.save();
@@ -1324,7 +1325,7 @@ router.delete('/:id/block', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.post('/resend-verification-code', async (req, res) => {
+router.post('/resend-verification-code', codeAttemptLimiter, async (req, res) => {
   try {
     const { email } = req.body as { email?: string };
     if (!email?.trim()) {
@@ -1332,26 +1333,21 @@ router.post('/resend-verification-code', async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+    const sent = { status: true, message: 'If an unverified account exists, a verification code has been sent' };
     const user = await User.findOne({ email: normalizedEmail });
-
-    if (!user) {
-      return res.status(404).json({ status: false, message: 'Account not found' });
-    }
-
-    if (user.emailVerified) {
-      return res.status(400).json({ status: false, message: 'Email is already verified' });
+    if (!user || user.emailVerified) {
+      return res.json(sent);
     }
 
     await saveVerificationCode(normalizedEmail, 'signup', req.headers['accept-language']);
-
-    return res.json({ status: true, message: 'Verification code resent' });
+    return res.json(sent);
   } catch (error) {
     console.error('resend-verification-code error:', error);
     return res.status(500).json({ status: false, message: 'Failed to resend code' });
   }
 });
 
-router.post('/verify-email-signup', async (req, res) => {
+router.post('/verify-email-signup', codeAttemptLimiter, async (req, res) => {
   try {
     const { email, code } = req.body as { email?: string; code?: string };
 
@@ -1361,19 +1357,12 @@ router.post('/verify-email-signup', async (req, res) => {
 
     const normalizedEmail = email.toLowerCase().trim();
     const user = await User.findOne({ email: normalizedEmail });
-
-    if (!user) {
-      return res.status(404).json({ status: false, message: 'Account not found' });
-    }
-
-    if (user.emailVerified) {
-      return res.status(400).json({ status: false, message: 'Email is already verified' });
-    }
-
-    const valid = await verifyCode(normalizedEmail, code.trim(), 'signup');
-    if (!valid) {
+    if (!user || user.emailVerified) {
       return res.status(400).json({ status: false, message: 'Invalid or expired verification code' });
     }
+
+    const result = await checkVerificationCode(normalizedEmail, 'signup', code.trim(), true);
+    if (!result.ok) return verificationFailure(res, result);
 
     user.emailVerified = true;
     user.status = true;
@@ -1400,7 +1389,7 @@ router.post('/verify-email-signup', async (req, res) => {
   }
 });
 
-router.post('/forgot-password', async (req, res) => {
+router.post('/forgot-password', codeAttemptLimiter, async (req, res) => {
   try {
     const { email } = req.body as { email?: string };
     if (!email?.trim()) {
@@ -1423,7 +1412,7 @@ router.post('/forgot-password', async (req, res) => {
   }
 });
 
-router.post('/verify-reset-code', async (req, res) => {
+router.post('/verify-reset-code', codeAttemptLimiter, async (req, res) => {
   try {
     const { email, code } = req.body as { email?: string; code?: string };
 
@@ -1432,19 +1421,10 @@ router.post('/verify-reset-code', async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    const valid = await verifyCode(normalizedEmail, code.trim(), 'reset');
-
-    if (!valid) {
-      return res.status(400).json({ status: false, codeValid: false, message: 'Invalid or expired code' });
+    const result = await checkVerificationCode(normalizedEmail, 'reset', code.trim(), false);
+    if (!result.ok) {
+      return verificationFailure(res, result, { codeValid: false });
     }
-
-    // Re-create code so reset-password can validate within TTL window
-    await VerificationCode.create({
-      email: normalizedEmail,
-      code: code.trim(),
-      type: 'reset',
-      expiresAt: new Date(Date.now() + CODE_TTL_MS),
-    });
 
     return res.json({ status: true, codeValid: true, message: 'Code verified' });
   } catch (error) {
@@ -1453,7 +1433,7 @@ router.post('/verify-reset-code', async (req, res) => {
   }
 });
 
-router.post('/reset-password', async (req, res) => {
+router.post('/reset-password', codeAttemptLimiter, async (req, res) => {
   try {
     const { email, code, newPassword } = req.body as {
       email?: string;
@@ -1470,19 +1450,12 @@ router.post('/reset-password', async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
-    const record = await VerificationCode.findOne({
-      email: normalizedEmail,
-      type: 'reset',
-      code: code.trim(),
-    });
-
-    if (!record || record.expiresAt.getTime() < Date.now()) {
-      return res.status(400).json({ status: false, message: 'Invalid or expired code' });
-    }
+    const result = await checkVerificationCode(normalizedEmail, 'reset', code.trim(), true);
+    if (!result.ok) return verificationFailure(res, result);
 
     const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
-      return res.status(404).json({ status: false, message: 'Account not found' });
+      return res.status(400).json({ status: false, message: 'Invalid or expired verification code' });
     }
 
     user.password = await bcrypt.hash(newPassword, 10);

@@ -1,7 +1,7 @@
 import { env } from '../config/env.js';
 
-export function logAuthCode(label: string, email: string, code: string) {
-  // Only when explicitly enabled (including production) — needed for admin OTP on Webuzo.
+/** Records that a code was requested. The code argument is ignored and never written to logs. */
+export function logAuthCode(label: string, email: string, _code?: string) {
   if (!env.logAuthCodes) return;
-  console.log(`[auth] ${label} for ${email}: ${code}`);
+  console.log(`[auth] ${label} requested for ${email}`);
 }

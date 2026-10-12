@@ -4,13 +4,13 @@ import bcrypt from 'bcryptjs';
 import { User } from '../../models/User.js';
 import { LoginHistory } from '../../models/LoginHistory.js';
 import { Session } from '../../models/Session.js';
-import { VerificationCode } from '../../models/VerificationCode.js';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
-import { attachAdminCookies, issuePair, refreshSession, sessionPayload, userVer } from '../../utils/token-session.js';
+import { attachAdminCookies, endSession, issuePair, refreshSession, sessionPayload, userVer } from '../../utils/token-session.js';
 import { serializeUser } from '../../utils/serialize.js';
 import { logAuthCode } from '../../utils/auth-log.js';
 import { sendVerificationCodeEmail } from '../../utils/mail.js';
-import { AUTH_COOKIE_NAME, clearAllAuthCookies, clearAuthCookie } from '../../utils/auth-cookie.js';
+import { AUTH_COOKIE_NAME, clearAuthCookie } from '../../utils/auth-cookie.js';
+import { checkVerificationCode, codeAttemptLimiter, storeVerificationCode } from '../../utils/verification-code.js';
 import { env } from '../../config/env.js';
 import type { Response } from 'express';
 
@@ -116,15 +116,9 @@ router.post('/signin', async (req, res) => {
     }
 
     const otpCode = String(crypto.randomInt(100000, 1000000));
-    await VerificationCode.deleteMany({ email: user.email, type: 'admin_login' });
-    await VerificationCode.create({
-      email: user.email,
-      code: otpCode,
-      type: 'admin_login',
-      expiresAt: new Date(Date.now() + OTP_TTL_MS),
-    });
+    await storeVerificationCode(user.email, 'admin_login', otpCode, new Date(Date.now() + OTP_TTL_MS));
     await sendVerificationCodeEmail(user.email, otpCode, 'admin_login', req.headers['accept-language']);
-    logAuthCode('admin OTP', user.email, otpCode);
+    logAuthCode('admin OTP', user.email);
 
     return res.json({
       otpRequired: true,
@@ -137,7 +131,7 @@ router.post('/signin', async (req, res) => {
   }
 });
 
-router.post('/verify-otp', async (req, res) => {
+router.post('/verify-otp', codeAttemptLimiter, async (req, res) => {
   try {
     const { email, password, code } = req.body as {
       email?: string;
@@ -163,17 +157,18 @@ router.post('/verify-otp', async (req, res) => {
       return res.status(403).json({ status: false, message: 'Admin access required' });
     }
 
-    const record = await VerificationCode.findOne({
-      email: user.email,
-      type: 'admin_login',
-      code: code.trim(),
-    });
-
-    if (!record || record.expiresAt.getTime() < Date.now()) {
-      return res.status(400).json({ status: false, message: 'Invalid or expired OTP' });
+    if (!user.status) {
+      return res.status(403).json({ status: false, message: 'Account is disabled' });
     }
 
-    await VerificationCode.deleteOne({ _id: record._id });
+    const result = await checkVerificationCode(user.email, 'admin_login', code.trim(), true);
+    if (!result.ok) {
+      const limited = result.reason === 'limited';
+      return res.status(limited ? 429 : 400).json({
+        status: false,
+        message: limited ? 'Too many attempts. Try again later' : 'Invalid or expired OTP',
+      });
+    }
 
     return completeAdminLogin(user, req, res);
   } catch (error) {
@@ -182,8 +177,8 @@ router.post('/verify-otp', async (req, res) => {
   }
 });
 
-router.post('/logout', (_req, res) => {
-  clearAllAuthCookies(res);
+router.post('/logout', async (req, res) => {
+  await endSession(req, res);
   return res.json({ status: true, message: 'Logged out' });
 });
 
