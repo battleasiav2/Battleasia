@@ -45,6 +45,16 @@ function packPhoto(image?: string, cacheBust?: number) {
   return `${src}${src.includes('?') ? '&' : '?'}v=${cacheBust}`;
 }
 
+function bdtRateFrom(rates: CoinRate[]) {
+  return rates.find((row) => row.currency?.toUpperCase() === 'BDT')?.rate ?? 0;
+}
+
+function packListBdt(usdPrice: number, rates: CoinRate[]) {
+  const rate = bdtRateFrom(rates);
+  if (rate <= 0) return null;
+  return usdPrice * rate;
+}
+
 function packPayLabel(currency: string, amount: number) {
   if (currency === 'USDT' || currency === 'USD') return `${usd(amount)} USDT`;
   if (currency === 'BDT') return `৳${amount.toLocaleString(undefined, { maximumFractionDigits: 2 })}`;
@@ -459,36 +469,59 @@ export function ShopPage() {
                   {t('shop.off')}
                 </span>
               ) : null}
-              <div className="shop-pack-body">
-                <div className="shop-pack-copy">
-                  <div className="shop-pack-amount">
-                    <span className="shop-pack-amt">{Number(item.amount).toLocaleString()}</span>
-                    <img className="shop-pack-amt-coin" src={ASSETS.coin} alt="" width={28} height={28} decoding="async" />
-                  </div>
-                  <p className="shop-pack-price">
-                    <span>{usd(item.price)}</span>
-                    {item.originalPrice != null && item.originalPrice > item.price ? (
-                      <s>{usd(item.originalPrice)}</s>
-                    ) : null}
-                  </p>
-                  <span className="shop-pack-cta">
-                    {t('shop.select')}
-                    <i aria-hidden>›</i>
-                  </span>
-                </div>
+              <div className="shop-pack-inner">
                 <div className="shop-pack-art" aria-hidden>
                   <span className="shop-pack-glow" />
                   {packPhoto(item.image, packImgEpoch) ? (
-                    <img className="shop-pack-photo" src={packPhoto(item.image, packImgEpoch)} alt="" width={108} height={108} decoding="async" />
+                    <img
+                      className="shop-pack-photo"
+                      src={packPhoto(item.image, packImgEpoch)}
+                      alt=""
+                      width={128}
+                      height={128}
+                      decoding="async"
+                    />
                   ) : (
-                  <div className="shop-pack-stack">
-                    <img src={ASSETS.coin} className="shop-pack-stack-coin is-back" alt="" decoding="async" />
-                    <img src={ASSETS.coin} className="shop-pack-stack-coin is-mid" alt="" decoding="async" />
-                    <img src={ASSETS.coin} className="shop-pack-stack-coin is-front" alt="" decoding="async" />
-                    <img src={ASSETS.coin} className="shop-pack-stack-coin is-hero" alt="" decoding="async" />
-                  </div>
+                    <img className="shop-pack-hero-coin" src={ASSETS.coin} alt="" width={128} height={128} decoding="async" />
                   )}
                 </div>
+                <h3 className="shop-pack-title">{Number(item.amount).toLocaleString()} BAC</h3>
+                <div className="shop-pack-rule" aria-hidden>
+                  <span className="shop-pack-rule-gem" />
+                </div>
+                <p className="shop-pack-price">
+                  {(() => {
+                    const bdt = packListBdt(item.price, rates);
+                    if (bdt != null) {
+                      return (
+                        <>
+                          <span className="shop-pack-price-main">
+                            ৳ {bdt.toLocaleString(undefined, { maximumFractionDigits: 0 })}{' '}
+                            <span className="shop-pack-price-unit">Taka</span>
+                          </span>
+                          {item.originalPrice != null && item.originalPrice > item.price ? (
+                            <s>৳ {packListBdt(item.originalPrice, rates)?.toLocaleString(undefined, { maximumFractionDigits: 0 })}</s>
+                          ) : null}
+                        </>
+                      );
+                    }
+                    return (
+                      <>
+                        <span>{usd(item.price)}</span>
+                        {item.originalPrice != null && item.originalPrice > item.price ? <s>{usd(item.originalPrice)}</s> : null}
+                      </>
+                    );
+                  })()}
+                </p>
+                <span className="shop-pack-cta">
+                  <svg className="shop-pack-cta-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      fill="currentColor"
+                      d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm10 0a2 2 0 1 0 .001 3.999A2 2 0 0 0 17 18zM6.2 2h14.5l-1.4 7H7.4L5.8 2zm-1.1-.5L2 4v2h2.2l2.4 12h11.4l2.3-12H6.3L5.1 1.5z"
+                    />
+                  </svg>
+                  {t('shop.select')}
+                </span>
               </div>
             </button>
           ))}

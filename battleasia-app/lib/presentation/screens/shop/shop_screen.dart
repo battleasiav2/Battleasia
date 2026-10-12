@@ -362,7 +362,7 @@ class _ShopScreenState extends State<ShopScreen> with WidgetsBindingObserver {
                               crossAxisCount: screenWidth >= 1240 ? 3 : 2,
                               crossAxisSpacing: 12,
                               mainAxisSpacing: 12,
-                              mainAxisExtent: 248,
+                              mainAxisExtent: 288,
                             ),
                             itemCount: _items.length,
                             itemBuilder: (context, index) {
@@ -396,7 +396,7 @@ class _ShopScreenState extends State<ShopScreen> with WidgetsBindingObserver {
                           crossAxisCount: crossAxisCount,
                           crossAxisSpacing: w < 600 ? 10 : 14,
                           mainAxisSpacing: w < 600 ? 10 : 14,
-                          mainAxisExtent: w < 600 ? 220 : 248,
+                          mainAxisExtent: w < 600 ? 268 : 288,
                         ),
                         delegate: SliverChildBuilderDelegate(
                           (context, index) {
