@@ -417,6 +417,7 @@ export async function cancelWithdrawByUser(input: {
     withdrawal.rejection_reason = 'Cancelled by user';
     withdrawal.processed_at = new Date();
     await withdrawal.save({ session });
+    await releaseOpenWithdrawalSlot(session, withdrawal._id);
     return { balance: user.balance ?? 0 };
   });
 }
@@ -505,6 +506,7 @@ export async function refundWithdrawMoney(input: { withdrawalId: string; idempot
     withdrawal.status = 'rejected';
     withdrawal.processed_at = new Date();
     await withdrawal.save({ session });
+    await releaseOpenWithdrawalSlot(session, withdrawal._id);
     return { balance: user.balance ?? 0 };
   });
 }
@@ -528,9 +530,17 @@ export async function completeWithdrawMoney(input: { withdrawalId: string; trans
     withdrawal.transaction_hash = input.transactionHash || withdrawal.transaction_hash || '';
     withdrawal.processed_at = new Date();
     await withdrawal.save({ session });
+    await releaseOpenWithdrawalSlot(session, withdrawal._id);
     const user = await User.findById(withdrawal.userId).session(session);
     return { balance: user?.balance ?? 0 };
   });
+}
+
+async function releaseOpenWithdrawalSlot(
+  session: mongoose.ClientSession,
+  withdrawalId: mongoose.Types.ObjectId,
+) {
+  await WithdrawalHistory.updateOne({ _id: withdrawalId }, { $unset: { openSlot: 1 } }).session(session);
 }
 
 function escapeRegex(value: string) {

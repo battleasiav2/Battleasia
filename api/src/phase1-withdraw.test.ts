@@ -9,6 +9,7 @@ import mongoose from 'mongoose';
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import { BalanceHistory } from './models/BalanceHistory.js';
 import { CoingoTransaction } from './models/CoingoTransaction.js';
+import { LedgerEntry } from './models/LedgerEntry.js';
 import { User } from './models/User.js';
 import { WithdrawalHistory } from './models/WithdrawalHistory.js';
 import coingoRoutes from './routes/v4/payments/coingo.js';
@@ -107,6 +108,7 @@ describe('phase 1 withdrawal safety', () => {
       replSet: { count: 1, storageEngine: 'wiredTiger' },
     });
     await mongoose.connect(replset.getUri());
+    await WithdrawalHistory.syncIndexes();
 
     const app = express();
     app.use(express.json());
@@ -311,5 +313,91 @@ describe('phase 1 withdrawal safety', () => {
     assert.equal(rejected?.status, 'rejected');
     const fresh = await User.findById(user._id);
     assert.equal(fresh?.balance, 90);
+  });
+
+  it('allows one open withdrawal, rejects another, and does not reserve funds twice for the same idempotency key', async () => {
+    const user = await makeUser(7, 100, 200);
+    const body = {
+      coin_amount: 20,
+      wallet_address: '01700000007',
+      wallet_type: 'bkash',
+      currency_type: 'BDT',
+    };
+    const first = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(user._id), 'open-once'),
+      body: JSON.stringify(body),
+    });
+    assert.equal(first.status, 200);
+    const replay = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(user._id), 'open-once'),
+      body: JSON.stringify({ ...body, coin_amount: 30 }),
+    });
+    assert.equal(replay.status, 400);
+    const other = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(user._id), 'open-other'),
+      body: JSON.stringify(body),
+    });
+    assert.equal(other.status, 400);
+    assert.equal((await User.findById(user._id))?.balance, 80);
+    assert.equal(await WithdrawalHistory.countDocuments({ userId: user._id, status: { $in: ['pending', 'processing'] } }), 1);
+    assert.equal(await LedgerEntry.countDocuments({ userId: user._id, refType: 'withdraw_hold' }), 1);
+
+    const created = await WithdrawalHistory.findOne({ userId: user._id });
+    await approveWithdrawMoney({ withdrawalId: String(created?._id) });
+    const whileProcessing = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(user._id), 'open-while-processing'),
+      body: JSON.stringify(body),
+    });
+    assert.equal(whileProcessing.status, 400);
+    assert.equal((await User.findById(user._id))?.balance, 80);
+    assert.equal(await LedgerEntry.countDocuments({ userId: user._id, refType: 'withdraw_hold' }), 1);
+
+    await refundWithdrawMoney({ withdrawalId: String(created?._id), idempotencyKey: 'open-close' });
+    assert.equal((await User.findById(user._id))?.balance, 100);
+    const sameKeyAfterClose = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(user._id), 'open-once'),
+      body: JSON.stringify(body),
+    });
+    assert.equal(sameKeyAfterClose.status, 200);
+    assert.equal((await User.findById(user._id))?.balance, 100);
+    assert.equal(await WithdrawalHistory.countDocuments({ userId: user._id }), 1);
+
+    const next = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(user._id), 'open-after-close'),
+      body: JSON.stringify(body),
+    });
+    assert.equal(next.status, 200);
+    assert.equal((await User.findById(user._id))?.balance, 80);
+    assert.equal(await WithdrawalHistory.countDocuments({ userId: user._id, status: 'pending' }), 1);
+    assert.equal(await LedgerEntry.countDocuments({ userId: user._id, refType: 'withdraw_hold' }), 2);
+  });
+
+  it('lets only one of several simultaneous submissions reserve funds', async () => {
+    const user = await makeUser(8, 100, 200);
+    const responses = await Promise.all(
+      [1, 2, 3, 4].map((n) =>
+        fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+          method: 'POST',
+          headers: authHeaders(String(user._id), `race-${n}`),
+          body: JSON.stringify({
+            coin_amount: 15,
+            wallet_address: '01700000008',
+            wallet_type: 'bkash',
+            currency_type: 'BDT',
+          }),
+        }),
+      ),
+    );
+    const statuses = responses.map((response) => response.status).sort();
+    assert.deepEqual(statuses, [200, 400, 400, 400]);
+    assert.equal((await User.findById(user._id))?.balance, 85);
+    assert.equal(await WithdrawalHistory.countDocuments({ userId: user._id }), 1);
+    assert.equal(await LedgerEntry.countDocuments({ userId: user._id, refType: 'withdraw_hold' }), 1);
   });
 });

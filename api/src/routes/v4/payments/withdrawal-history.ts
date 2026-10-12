@@ -30,6 +30,14 @@ import { safeQueryStatus, WITHDRAWAL_STATUSES } from '../../../utils/query-filte
 
 const router = Router();
 
+function duplicateWithdrawalField(error: unknown) {
+  if (!error || typeof error !== 'object' || (error as { code?: number }).code !== 11000) return '';
+  const pattern = (error as { keyPattern?: Record<string, unknown> }).keyPattern || {};
+  if (pattern.idempotencyKey) return 'idempotencyKey';
+  if (pattern.openSlot) return 'openSlot';
+  return Object.keys(pattern)[0] || 'openSlot';
+}
+
 type WithdrawalSubmitBody = {
   user_email?: string;
   username?: string;
@@ -119,6 +127,22 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
     const { assertClearOfVelocity } = await import('../../../utils/velocity.js');
     await assertClearOfVelocity(user._id.toString(), 'withdraw');
 
+    const idemKey = String(req.header('Idempotency-Key') || '').trim();
+    const prior = idemKey ? await WithdrawalHistory.findOne({ idempotencyKey: idemKey, userId: user._id }) : null;
+    if (prior && (prior.status === 'pending' || prior.status === 'processing')) {
+      return res.status(400).json({
+        status: false,
+        message: 'You already have a pending withdrawal request',
+      });
+    }
+    if (prior && prior.status !== 'pending' && prior.status !== 'processing') {
+      return res.status(200).json({
+        status: true,
+        message: 'Withdrawal request submitted successfully',
+        data: serializeWithdrawal(prior),
+      });
+    }
+
     const withdrawableInfo = await getWithdrawableInfo(user._id.toString(), user.balance ?? 0);
     if (withdrawableInfo.hasPendingWithdrawal) {
       return res.status(400).json({
@@ -148,14 +172,15 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
       description: body.description?.trim() || '',
       notes: body.notes?.trim() || '',
       status: 'pending',
+      openSlot: user._id,
+      ...(idemKey ? { idempotencyKey: idemKey } : {}),
     });
 
-    const idemKey = String(req.header('Idempotency-Key') || '').trim() || undefined;
     try {
       const held = await holdWithdrawOnSubmit({
         withdrawalId: withdrawal._id.toString(),
         userId: user._id.toString(),
-        idempotencyKey: idemKey,
+        idempotencyKey: idemKey || undefined,
       });
       await notifyBalanceChange(user._id.toString(), held.balance, (user.balance ?? 0));
     } catch (holdError) {
@@ -180,6 +205,28 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
       data: serializeWithdrawal(withdrawal),
     });
   } catch (error) {
+    const duplicate = duplicateWithdrawalField(error);
+    if (duplicate === 'idempotencyKey') {
+      const saved = await WithdrawalHistory.findOne({
+        idempotencyKey: String(req.header('Idempotency-Key') || '').trim(),
+        userId: req.userId,
+      });
+      if (saved) {
+        return res.status(saved.status === 'pending' || saved.status === 'processing' ? 400 : 200).json({
+          status: saved.status !== 'pending' && saved.status !== 'processing',
+          message: saved.status === 'pending' || saved.status === 'processing'
+            ? 'You already have a pending withdrawal request'
+            : 'Withdrawal request submitted successfully',
+          ...(saved.status === 'pending' || saved.status === 'processing' ? {} : { data: serializeWithdrawal(saved) }),
+        });
+      }
+    }
+    if (duplicate) {
+      return res.status(400).json({
+        status: false,
+        message: 'You already have a pending withdrawal request',
+      });
+    }
     if (error instanceof MoneyError) {
       return res.status(error.status).json({ status: false, message: error.message });
     }

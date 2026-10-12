@@ -18,6 +18,9 @@ export interface IWithdrawalHistory extends Document {
   rejection_reason?: string;
   notes?: string;
   transaction_hash?: string;
+  /** Set to the player id while status is pending or processing. Cleared when the request is closed. */
+  openSlot?: Types.ObjectId;
+  idempotencyKey?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -39,8 +42,15 @@ const withdrawalHistorySchema = new Schema<IWithdrawalHistory>(
     rejection_reason: { type: String, default: '' },
     notes: { type: String, default: '' },
     transaction_hash: { type: String, default: '' },
+    openSlot: { type: Schema.Types.ObjectId },
+    idempotencyKey: { type: String },
   },
   { timestamps: true }
 );
+
+// One open withdrawal per player. Historical rows without openSlot are reported by
+// scripts/withdrawal-open-duplicates.mjs before deployment. That script does not delete or merge rows.
+withdrawalHistorySchema.index({ openSlot: 1 }, { unique: true, sparse: true });
+withdrawalHistorySchema.index({ idempotencyKey: 1 }, { unique: true, sparse: true });
 
 export const WithdrawalHistory = mongoose.model<IWithdrawalHistory>('WithdrawalHistory', withdrawalHistorySchema);
