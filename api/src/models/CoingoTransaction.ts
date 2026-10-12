@@ -6,6 +6,8 @@ export type CoingoStatus = 'pending' | 'success' | 'failed' | 'cancelled';
 export interface ICoingoTransaction extends Document {
   merchantSerialNo: string;
   userId: Types.ObjectId;
+  /** Ledger withdrawal row debited via holdWithdrawOnSubmit for payout type. */
+  withdrawalId?: Types.ObjectId;
   type: CoingoType;
   amount: number;
   walletNumber: string;
@@ -25,6 +27,7 @@ const coingoTransactionSchema = new Schema<ICoingoTransaction>(
   {
     merchantSerialNo: { type: String, required: true, unique: true },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    withdrawalId: { type: Schema.Types.ObjectId, ref: 'WithdrawalHistory' },
     type: { type: String, enum: ['collection', 'payout'], required: true },
     amount: { type: Number, required: true },
     walletNumber: { type: String, default: '' },

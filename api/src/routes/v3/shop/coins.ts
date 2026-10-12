@@ -1,22 +1,26 @@
 import { Router } from 'express';
-import crypto from 'crypto';
 import { CoinRate } from '../../../models/CoinRate.js';
 import { CoingoTransaction } from '../../../models/CoingoTransaction.js';
-import { User } from '../../../models/User.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
 import { serializeCoinRate } from '../../../utils/payment-serialize.js';
+import { submitCoingoPayoutWithHold, syncCoingoPayoutWithdrawal } from '../../../utils/coingo-payout.js';
+import { MoneyError } from '../../../utils/money.js';
 
 const router = Router();
 
-function createMerchantSerialNo(prefix: string) {
-  return `${prefix}${Date.now()}${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
-}
-
 async function resolveStatus(tx: InstanceType<typeof CoingoTransaction>) {
   if (tx.status !== 'pending') return tx;
+  const prev = tx.status;
   tx.pollCount += 1;
   if (tx.pollCount >= 2) tx.status = 'success';
   await tx.save();
+  if (tx.status !== prev) {
+    try {
+      await syncCoingoPayoutWithdrawal(tx);
+    } catch (err) {
+      console.error('v3 coingo payout ledger sync error:', err);
+    }
+  }
   return tx;
 }
 
@@ -40,38 +44,22 @@ router.post('/payout', requireAuth, async (req: AuthedRequest, res) => {
       description?: string;
     };
 
-    const coinAmount = Number(body.amount);
-    if (!Number.isFinite(coinAmount) || coinAmount <= 0) {
-      return res.status(400).json({ status: false, message: 'Valid amount is required' });
-    }
-    if (!body.walletNumber?.trim()) {
-      return res.status(400).json({ status: false, message: 'Wallet number is required' });
-    }
-
-    const user = await User.findById(req.userId);
-    if (!user) {
-      return res.status(401).json({ status: false, message: 'Unauthorized' });
-    }
-
-    const merchantSerialNo = createMerchantSerialNo('POUT');
-    const tx = await CoingoTransaction.create({
-      merchantSerialNo,
-      userId: user._id,
-      type: 'payout',
-      amount: coinAmount,
-      walletNumber: body.walletNumber.trim(),
-      walletType: body.walletType?.trim() || 'bKash',
-      email: user.email,
-      username: user.username,
-      description: body.description?.trim() || '',
-      status: 'pending',
+    const idemKey = String(req.header('Idempotency-Key') || '').trim() || undefined;
+    const data = await submitCoingoPayoutWithHold({
+      userId: req.userId!,
+      coinAmount: Number(body.amount),
+      walletNumber: body.walletNumber ?? '',
+      walletType: body.walletType ?? 'bKash',
+      description: body.description,
+      idempotencyKey: idemKey,
+      req,
     });
 
-    return res.status(201).json({
-      status: true,
-      data: { merchantSerialNo: tx.merchantSerialNo, status: tx.status, amount: tx.amount },
-    });
+    return res.status(201).json({ status: true, data });
   } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
     console.error('v3 coingo payout error:', error);
     return res.status(500).json({ status: false, message: 'Failed to create payout' });
   }
