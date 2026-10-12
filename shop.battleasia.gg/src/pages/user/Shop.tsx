@@ -210,6 +210,7 @@ export function ShopPage() {
     try {
       await submitDeposit(
         {
+          shop_item_id: pack.id,
           coin_amount: pack.amount,
           payment_amount: payAmount,
           payment_channel: channelId,

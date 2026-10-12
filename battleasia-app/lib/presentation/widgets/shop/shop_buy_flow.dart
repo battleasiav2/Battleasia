@@ -399,6 +399,7 @@ class _ShopBuyDialogState extends State<_ShopBuyDialog> {
         fromAddress: _fromCtrl.text.trim(),
         paymentChannelId: channel.id,
         toWalletAddress: wallet.address,
+        shopItemId: widget.item.id,
         couponCode: _couponCode,
         idempotencyKey: idem,
       );

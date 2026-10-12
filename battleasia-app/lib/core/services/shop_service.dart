@@ -246,6 +246,7 @@ class ShopService {
     required String fromAddress,
     required String paymentChannelId,
     required String toWalletAddress,
+    required String shopItemId,
     String? couponCode,
     String? idempotencyKey,
   }) async {
@@ -264,6 +265,7 @@ class ShopService {
           'from_address': fromAddress,
           'payment_channel': paymentChannelId,
           'to_wallet_address': toWalletAddress,
+          'shop_item_id': shopItemId,
           if (couponCode != null && couponCode.trim().isNotEmpty) 'coupon_code': couponCode.trim(),
         }),
       );

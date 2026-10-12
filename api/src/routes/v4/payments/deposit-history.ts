@@ -2,7 +2,11 @@ import { Router } from 'express';
 import mongoose from 'mongoose';
 import { DepositHistory } from '../../../models/DepositHistory.js';
 import { PaymentChannel } from '../../../models/PaymentChannel.js';
+import { ShopItem } from '../../../models/ShopItem.js';
 import { User } from '../../../models/User.js';
+import { CoinRate } from '../../../models/CoinRate.js';
+import { DEFAULT_COIN_RATES } from '../../../utils/coin-rates.js';
+import { roundMoney } from '../../../utils/money.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
 import { requireAdmin, requirePermission } from '../../../middleware/admin.js';
 import { paginatedResults, parsePagination } from '../../../utils/pagination.js';
@@ -34,7 +38,35 @@ type DepositSubmitBody = {
   payment_channel?: string;
   to_wallet_address?: string;
   coupon_code?: string;
+  shop_item_id?: string;
 };
+
+function duplicateField(error: unknown) {
+  if (!error || typeof error !== 'object' || (error as { code?: number }).code !== 11000) return '';
+  const pattern = (error as { keyPattern?: Record<string, unknown> }).keyPattern;
+  return Object.keys(pattern || {})[0] || '';
+}
+
+async function rateFor(currency: string) {
+  const code = currency.toUpperCase();
+  const row = await CoinRate.findOne({ currency: code, isActive: true }).sort({ updatedAt: -1 });
+  if (row && row.rate > 0) return row.rate;
+  if (code === 'BDT') return 1;
+  const fallback = DEFAULT_COIN_RATES.find((entry) => entry.currency === code);
+  return fallback && fallback.rate > 0 ? fallback.rate : null;
+}
+
+/** Fiat due for a catalog pack. USD/USDT use the pack price; other currencies use server coin rates. */
+async function packPaymentAmount(priceUsd: number, currency: string) {
+  const code = currency.trim().toUpperCase();
+  const price = roundMoney(priceUsd);
+  if (!code || !(price > 0)) return null;
+  if (code === 'USD' || code === 'USDT') return price;
+  const local = await rateFor(code);
+  const usd = (await rateFor('USDT')) ?? (await rateFor('USD'));
+  if (local == null || usd == null || usd <= 0) return null;
+  return roundMoney(price * (local / usd));
+}
 
 async function loadDeposits(filter: Record<string, unknown>, limit?: number) {
   const query = DepositHistory.find(filter).sort({ createdAt: -1 });
@@ -101,16 +133,24 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
     const body = req.body as DepositSubmitBody;
     const transactionId = body.transaction_id?.trim();
     const paymentChannelId = body.payment_channel?.trim();
-    const coinAmount = Number(body.coin_amount);
+    const shopItemId = body.shop_item_id?.trim();
+    const idempotencyKey = String(req.header('Idempotency-Key') || '').trim();
+    const paymentCurrency = body.payment_currency?.trim().toUpperCase() || '';
 
+    if (!idempotencyKey) {
+      return res.status(400).json({ status: false, message: 'Idempotency-Key is required' });
+    }
     if (!transactionId) {
       return res.status(400).json({ status: false, message: 'Transaction ID is required' });
     }
     if (!paymentChannelId || !mongoose.Types.ObjectId.isValid(paymentChannelId)) {
       return res.status(400).json({ status: false, message: 'Valid payment channel is required' });
     }
-    if (!Number.isFinite(coinAmount) || coinAmount <= 0) {
-      return res.status(400).json({ status: false, message: 'Coin amount must be greater than zero' });
+    if (!shopItemId || !mongoose.Types.ObjectId.isValid(shopItemId)) {
+      return res.status(400).json({ status: false, message: 'Valid coin pack is required' });
+    }
+    if (!paymentCurrency) {
+      return res.status(400).json({ status: false, message: 'Payment currency is required' });
     }
 
     const user = await User.findById(req.userId);
@@ -118,9 +158,36 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
       return res.status(401).json({ status: false, message: 'Unauthorized' });
     }
 
+    const prior = await DepositHistory.findOne({ idempotencyKey });
+    if (prior) {
+      if (prior.userId.toString() !== user._id.toString()) {
+        return res.status(409).json({ status: false, message: 'Idempotency key already used' });
+      }
+      const priorChannel = await PaymentChannel.findById(prior.payment_channel);
+      return res.status(200).json({
+        status: true,
+        message: 'Deposit submitted successfully. Waiting for admin approval.',
+        data: serializeDeposit(prior, priorChannel),
+      });
+    }
+
     const channel = await PaymentChannel.findById(paymentChannelId);
     if (!channel) {
       return res.status(404).json({ status: false, message: 'Payment channel not found' });
+    }
+
+    const pack = await ShopItem.findById(shopItemId);
+    if (!pack || !pack.isActive || pack.status !== 'available') {
+      return res.status(400).json({ status: false, message: 'Coin pack is not available' });
+    }
+    const coinAmount = roundMoney(pack.amount);
+    if (!(coinAmount > 0)) {
+      return res.status(400).json({ status: false, message: 'Coin pack is not available' });
+    }
+
+    const listPrice = await packPaymentAmount(pack.price, paymentCurrency);
+    if (listPrice == null) {
+      return res.status(400).json({ status: false, message: 'Payment currency is not available' });
     }
 
     const duplicate = await DepositHistory.findOne({ transaction_id: transactionId });
@@ -141,7 +208,7 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
       }
     }
 
-    const paymentAmount = discountedPay(Number(body.payment_amount) || 0, quote);
+    const paymentAmount = discountedPay(listPrice, quote);
 
     let deposit;
     try {
@@ -151,7 +218,7 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
         username: body.username?.trim() || user.username,
         transaction_id: transactionId,
         coin_amount: coinAmount,
-        payment_currency: body.payment_currency?.trim().toUpperCase() || 'USD',
+        payment_currency: paymentCurrency,
         payment_amount: paymentAmount,
         from_address: body.from_address?.trim() || '',
         payment_channel: channel._id,
@@ -161,9 +228,23 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
         coupon_kind: quote?.kind || '',
         coupon_value: quote?.value || 0,
         bonus_coins: quote?.bonusCoins || 0,
+        shop_item_id: pack._id,
+        idempotencyKey,
       });
     } catch (error) {
       if (quote) await releaseCoupon(quote.code);
+      if (duplicateField(error)) {
+        const saved = await DepositHistory.findOne({ idempotencyKey, userId: user._id });
+        if (saved) {
+          const savedChannel = await PaymentChannel.findById(saved.payment_channel);
+          return res.status(200).json({
+            status: true,
+            message: 'Deposit submitted successfully. Waiting for admin approval.',
+            data: serializeDeposit(saved, savedChannel),
+          });
+        }
+        return res.status(409).json({ status: false, message: 'Transaction ID already submitted' });
+      }
       throw error;
     }
 

@@ -22,6 +22,8 @@ export interface IDepositHistory extends Document {
   coupon_kind?: '' | 'off' | 'bonus';
   coupon_value?: number;
   bonus_coins?: number;
+  shop_item_id?: Types.ObjectId;
+  idempotencyKey?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -47,8 +49,13 @@ const depositHistorySchema = new Schema<IDepositHistory>(
     coupon_kind: { type: String, enum: ['', 'off', 'bonus'], default: '' },
     coupon_value: { type: Number, default: 0 },
     bonus_coins: { type: Number, default: 0 },
+    shop_item_id: { type: Schema.Types.ObjectId, ref: 'ShopItem' },
+    idempotencyKey: { type: String },
   },
   { timestamps: true }
 );
+
+depositHistorySchema.index({ transaction_id: 1 }, { unique: true });
+depositHistorySchema.index({ idempotencyKey: 1 }, { unique: true, sparse: true });
 
 export const DepositHistory = mongoose.model<IDepositHistory>('DepositHistory', depositHistorySchema);
