@@ -56,3 +56,8 @@ export function writeCookieConsent(choice: CookieConsentChoice) {
 export function allowsAnalytics() {
   return readCookieConsent() === 'all';
 }
+
+export function openCookiePreferences() {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent('ba-cookie-consent-open'));
+}

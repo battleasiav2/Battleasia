@@ -31,6 +31,7 @@ import { useI18n } from '../lib/i18n';
 import { captureReferral } from '../lib/ref';
 import { LANDING_LANG, landingFaq, landingText, readLandingLocale, type LandingLocale } from './landing5173-text';
 import { FALLBACK_SITE_SOCIALS, fetchSiteSocialLinks, type SiteSocialLink } from '../lib/siteSocials';
+import { CookiePreferencesButton } from '../components/CookiePreferencesButton';
 
 type Locale = LandingLocale;
 
@@ -1367,7 +1368,7 @@ export function Landing5173({ chat = false }: { chat?: boolean }) {
                 <a href={socialHref(socialLinks, 'youtube')} target="_blank" rel="noopener noreferrer" aria-label="YouTube"><span>▶</span></a>
               </div></div>
             <div className="footer-col"><h4>Support</h4><div className="footer-links"><a href="mailto:support@battleasia.gg">Contact support</a><a href="#rules" onClick={(e)=>{e.preventDefault();anchor('rules')}}>FAQ</a><a href="#rules" onClick={(e)=>{e.preventDefault();anchor('rules')}}>Fair play policy</a></div></div>
-            <div className="footer-col"><h4>Legal</h4><div className="footer-links"><Link to="/terms-and-conditions">Terms of service</Link><Link to="/privacy-policy">Privacy policy</Link></div></div>
+            <div className="footer-col"><h4>Legal</h4><div className="footer-links"><Link to="/terms-and-conditions">Terms of service</Link><Link to="/privacy-policy">Privacy policy</Link><CookiePreferencesButton className="cookie-pref-btn" /></div></div>
             <div className="footer-col"><h4>Explore</h4><div className="footer-links"><a href="#play" onClick={(e)=>{e.preventDefault();anchor('play')}}>Games</a><a href="#how-to-play" onClick={(e)=>{e.preventDefault();anchor('how-to-play')}}>Tournament modes</a><a href="#home" onClick={(e)=>{e.preventDefault();anchor('home')}}>Back to top ↑</a></div></div>
           </div>
           <div className="payment-strip"><span>Payment methods</span><span className="pay-badge">bKash</span><span className="pay-badge">Nagad</span><span className="pay-badge">USDT</span></div>

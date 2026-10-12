@@ -11,6 +11,7 @@ import { focusFirstError, httpCopy, readRememberedEmail, sanitizeLine, writeReme
 import { registerPushToken } from '../../lib/push';
 import { captureReferral } from '../../lib/ref';
 import { useI18n } from '../../lib/i18n';
+import { CookiePreferencesButton } from '../../components/CookiePreferencesButton';
 
 export function SignInPage() {
   const { t } = useI18n();
@@ -157,6 +158,9 @@ export function SignInPage() {
           </button>
           <SocialLogin returnTo={safeReturnTo(params.get('returnTo'))} />
           <AuthTrustRow />
+          <p className="auth-switch">
+            <CookiePreferencesButton />
+          </p>
         </form>
       </section>
       </div>

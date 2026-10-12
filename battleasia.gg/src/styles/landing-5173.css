@@ -90,7 +90,7 @@ html[lang="bn"] .ba5173{
 @keyframes auth-arrow-nudge{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
 @keyframes auth-arrow-trail{0%,100%{opacity:.35;transform:scaleX(.7)}50%{opacity:1;transform:scaleX(1)}}
 .ba5173 .nav-links{display:flex;gap:32px;align-items:center}
-.ba5173 .nav-links a,.ba5173 .nav-links button,.ba5173 .footer-links a{color:#a5a7ae;text-decoration:none;font-size:13px;transition:color .2s;background:none;border:0;padding:0;cursor:pointer;font-family:inherit}
+.ba5173 .nav-links a,.ba5173 .nav-links button,.ba5173 .footer-links a,.ba5173 .footer-links button{color:#a5a7ae;text-decoration:none;font-size:13px;transition:color .2s;background:none;border:0;padding:0;cursor:pointer;font-family:inherit}
 .ba5173 .nav-links a:hover,.ba5173 .nav-links button:hover,.ba5173 .nav-links a.active{color:#fff}
 .ba5173 .nav-actions{display:flex;gap:10px;align-items:center}
 .ba5173 .btn{min-height:46px;padding:0 18px;border-radius:7px;border:1px solid transparent;display:inline-flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.015em;transition:transform .2s,background .2s,color .2s,border-color .2s}

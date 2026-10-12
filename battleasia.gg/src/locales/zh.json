@@ -956,7 +956,7 @@
   "legal.privacy.social": "Feed, stories & support",
   "legal.privacy.socialBody": "Posts, likes, comments, stories, DMs, mute words, and support tickets stay on our servers so social and help features work. Support may keep screenshots you attach to a dispute.",
   "legal.privacy.cookies": "Cookie 与可选分析",
-  "legal.privacy.cookiesBody": "必要 Cookie 与本地存储用于登录、语言及 battleasia.gg 与 shop.battleasia.gg 之间的会话，使用站点时始终生效。首次访问会询问是否允许可选崩溃/错误分析（Sentry）；若选择“仅必要”，则不会加载该分析。选择会在浏览器中保存约一年。日后可在应用提供偏好设置前，通过清除 BattleAsia 站点数据来更改。",
+  "legal.privacy.cookiesBody": "必要 Cookie 与本地存储用于登录、语言及 battleasia.gg 与 shop.battleasia.gg 之间的会话，使用站点时始终生效。首次访问会询问是否允许可选崩溃/错误分析（Sentry）；若选择“仅必要”，则不会加载该分析。选择会在浏览器中保存约一年。可随时通过站点页脚或本页的 Cookie 偏好进行更改。",
   "legal.privacy.sharing": "What we do not do",
   "legal.privacy.sharingBody": "We do not sell player lists. Staff and systems access data only to run tournaments, stop abuse, and pay out BAC. Public profiles show what you choose to publish.",
   "legal.privacy.requests": "Your requests",
@@ -987,5 +987,6 @@
   "cookies.lead": "我们使用必要 Cookie 用于登录与安全。可选分析帮助我们修复错误。",
   "cookies.privacy": "隐私政策",
   "cookies.acceptAll": "全部接受",
-  "cookies.essentialOnly": "仅必要"
+  "cookies.essentialOnly": "仅必要",
+  "cookies.preferences": "Cookie 偏好"
 }

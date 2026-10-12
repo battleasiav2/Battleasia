@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useI18n } from '../lib/i18n';
 import { FALLBACK_SITE_SOCIALS, fetchSiteSocialLinks, type SiteSocialLink } from '../lib/siteSocials';
 import { safeHref } from '../lib/safeHref';
+import { CookiePreferencesButton } from './CookiePreferencesButton';
 
 const FW_LOGO = '/assets/fw/logo-battleasia.png';
 
@@ -84,6 +85,9 @@ export function SiteFooter() {
               </li>
               <li>
                 <Link className="link-btn" to="/privacy-policy">{t('footer.privacy')}</Link>
+              </li>
+              <li>
+                <CookiePreferencesButton />
               </li>
             </ul>
           </div>

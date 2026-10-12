@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { LocaleSelect } from '../components/LocaleSelect';
 import { ASSETS } from '../lib/assets';
 import { useI18n } from '../lib/i18n';
+import { CookiePreferencesButton } from '../components/CookiePreferencesButton';
 
 export function LegalPage({ kind }: { kind: 'privacy' | 'terms' | 'notFound' }) {
   const { t } = useI18n();
@@ -28,6 +29,7 @@ export function LegalPage({ kind }: { kind: 'privacy' | 'terms' | 'notFound' }) 
           <>
             <h2>{t('legal.privacy.cookies')}</h2>
             <p>{t('legal.privacy.cookiesBody')}</p>
+            <CookiePreferencesButton />
           </>
         ) : null}
       </article>

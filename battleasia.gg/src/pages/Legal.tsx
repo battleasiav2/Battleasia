@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { useI18n } from '../lib/i18n';
+import { CookiePreferencesButton } from '../components/CookiePreferencesButton';
 import '../styles/landing-5173.css';
 
 const SECTIONS: Record<'privacy' | 'terms' | 'notFound', string[]> = {
@@ -33,14 +34,21 @@ export function LegalPage({ kind }: { kind: 'privacy' | 'terms' | 'notFound' }) 
           <p className="legal-lead">{t(`legal.${kind}Body`)}</p>
           {kind !== 'notFound' ? <p className="legal-intro">{t(`legal.${kind}Intro`)}</p> : null}
           {sections.length ? (
-            <div className="legal-cards">
-              {sections.map((id) => (
-                <section className="legal-card" key={id}>
-                  <h2>{t(`legal.${kind}.${id}`)}</h2>
-                  <p>{t(`legal.${kind}.${id}Body`)}</p>
-                </section>
-              ))}
-            </div>
+            <>
+              <div className="legal-cards">
+                {sections.map((id) => (
+                  <section className="legal-card" key={id}>
+                    <h2>{t(`legal.${kind}.${id}`)}</h2>
+                    <p>{t(`legal.${kind}.${id}Body`)}</p>
+                  </section>
+                ))}
+              </div>
+              {kind === 'privacy' ? (
+                <p className="legal-cookie-pref">
+                  <CookiePreferencesButton className="link-btn cookie-pref-btn" />
+                </p>
+              ) : null}
+            </>
           ) : (
             <div className="legal-cards">
               <section className="legal-card">

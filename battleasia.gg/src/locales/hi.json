@@ -956,7 +956,7 @@
   "legal.privacy.social": "Feed, stories & support",
   "legal.privacy.socialBody": "Posts, likes, comments, stories, DMs, mute words, and support tickets stay on our servers so social and help features work. Support may keep screenshots you attach to a dispute.",
   "legal.privacy.cookies": "Cookies aur optional analytics",
-  "legal.privacy.cookiesBody": "Zaroori cookies aur local storage sign-in, language aur battleasia.gg / shop.battleasia.gg par session ke liye hain — site use karte hi yeh lagte hain. Pehli visit par optional crash/error analytics (Sentry) ki ijazat poochte hain; Essential only par analytics load nahi hota. Choice lagbhag ek saal browser mein rehti hai. Baad mein badalne ke liye BattleAsia site data clear karein jab tak app mein preferences control na ho.",
+  "legal.privacy.cookiesBody": "Zaroori cookies aur local storage sign-in, language aur battleasia.gg / shop.battleasia.gg par session ke liye hain — site use karte hi yeh lagte hain. Pehli visit par optional crash/error analytics (Sentry) ki ijazat poochte hain; Essential only par analytics load nahi hota. Choice lagbhag ek saal browser mein rehti hai. Kabhi bhi site footer ya is page par Cookie preferences se badal sakte hain.",
   "legal.privacy.sharing": "What we do not do",
   "legal.privacy.sharingBody": "We do not sell player lists. Staff and systems access data only to run tournaments, stop abuse, and pay out BAC. Public profiles show what you choose to publish.",
   "legal.privacy.requests": "Your requests",
@@ -987,5 +987,6 @@
   "cookies.lead": "Sign-in aur security ke liye zaroori cookies use karte hain. Optional analytics errors fix karne mein madad karte hain.",
   "cookies.privacy": "Privacy policy",
   "cookies.acceptAll": "Sab accept karein",
-  "cookies.essentialOnly": "Sirf zaroori"
+  "cookies.essentialOnly": "Sirf zaroori",
+  "cookies.preferences": "Cookie preferences"
 }

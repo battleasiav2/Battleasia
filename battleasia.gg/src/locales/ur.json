@@ -956,7 +956,7 @@
   "legal.privacy.social": "Feed, stories & support",
   "legal.privacy.socialBody": "Posts, likes, comments, stories, DMs, mute words, and support tickets stay on our servers so social and help features work. Support may keep screenshots you attach to a dispute.",
   "legal.privacy.cookies": "کوکیز اور اختیاری تجزیات",
-  "legal.privacy.cookiesBody": "ضروری کوکیز اور local storage سائن ان، زبان اور battleasia.gg / shop.battleasia.gg پر سیشن کے لیے ہیں — سائٹ استعمال کرتے ہی یہ لاگو ہوتے ہیں۔ پہلی وزٹ پر optional crash/error analytics (Sentry) کی اجازت پوچھتے ہیں؛ Essential only پر analytics لوڈ نہیں ہوتا۔ انتخاب تقریباً ایک سال براؤزر میں رہتا ہے۔ بعد میں بدلنے کے لیے BattleAsia site data صاف کریں جب تک app میں preferences control نہ ہو۔",
+  "legal.privacy.cookiesBody": "ضروری کوکیز اور local storage سائن ان، زبان اور battleasia.gg / shop.battleasia.gg پر سیشن کے لیے ہیں — سائٹ استعمال کرتے ہی یہ لاگو ہوتے ہیں۔ پہلی وزٹ پر optional crash/error analytics (Sentry) کی اجازت پوچھتے ہیں؛ Essential only پر analytics لوڈ نہیں ہوتا۔ انتخاب تقریباً ایک سال براؤزر میں رہتا ہے۔ کسی بھی وقت site footer یا اس صفحے پر Cookie preferences سے بدل سکتے ہیں۔",
   "legal.privacy.sharing": "What we do not do",
   "legal.privacy.sharingBody": "We do not sell player lists. Staff and systems access data only to run tournaments, stop abuse, and pay out BAC. Public profiles show what you choose to publish.",
   "legal.privacy.requests": "Your requests",
@@ -987,5 +987,6 @@
   "cookies.lead": "سائن ان اور سیکیورٹی کے لیے ضروری کوکیز استعمال کرتے ہیں۔ اختیاری تجزیات غلطیوں کو ٹھیک کرنے میں مدد کرتے ہیں۔",
   "cookies.privacy": "پرائیویسی پالیسی",
   "cookies.acceptAll": "سب قبول کریں",
-  "cookies.essentialOnly": "صرف ضروری"
+  "cookies.essentialOnly": "صرف ضروری",
+  "cookies.preferences": "کوکی ترجیحات"
 }

@@ -18,8 +18,15 @@ export function CookieConsent() {
       if (next === 'all') bootSentry();
       setOpen(false);
     }
+    function onOpen() {
+      setOpen(true);
+    }
     window.addEventListener('ba-cookie-consent', onConsent);
-    return () => window.removeEventListener('ba-cookie-consent', onConsent);
+    window.addEventListener('ba-cookie-consent-open', onOpen);
+    return () => {
+      window.removeEventListener('ba-cookie-consent', onConsent);
+      window.removeEventListener('ba-cookie-consent-open', onOpen);
+    };
   }, []);
 
   function pick(choice: CookieConsentChoice) {
@@ -28,7 +35,7 @@ export function CookieConsent() {
     setOpen(false);
   }
 
-  if (!open || readCookieConsent()) return null;
+  if (!open) return null;
 
   return (
     <div className="cookie-consent" role="dialog" aria-labelledby="cookie-consent-title" aria-live="polite">
