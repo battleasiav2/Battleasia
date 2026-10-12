@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { requireAuth } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import { EngagementBadge } from '../../../models/EngagementBadge.js';
 import {
   buildSearchFilter,
@@ -36,7 +37,7 @@ function normalizeBadgeBody(body: Record<string, unknown>) {
   };
 }
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requirePermission('engagement.view'), async (req, res) => {
   try {
     const { skip, limit, search } = parsePagination(req);
     const filter = buildSearchFilter(search, ['key', 'title', 'description']);
@@ -53,7 +54,7 @@ router.get('/', requireAuth, async (req, res) => {
   }
 });
 
-router.get('/:id', requireAuth, async (req, res) => {
+router.get('/:id', requireAuth, requirePermission('engagement.view'), async (req, res) => {
   try {
     const badge = await EngagementBadge.findById(req.params.id);
     if (!badge) {
@@ -66,7 +67,7 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requirePermission('engagement.edit'), async (req, res) => {
   try {
     const payload = normalizeBadgeBody(req.body || {});
     if (!payload.key || !payload.title) {
@@ -84,7 +85,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/:id', requireAuth, async (req, res) => {
+router.put('/:id', requireAuth, requirePermission('engagement.edit'), async (req, res) => {
   try {
     const badge = await EngagementBadge.findById(req.params.id);
     if (!badge) {
@@ -121,7 +122,7 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, requirePermission('engagement.edit'), async (req, res) => {
   try {
     const badge = await EngagementBadge.findById(req.params.id);
     if (!badge) {

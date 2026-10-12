@@ -1,11 +1,12 @@
 import { Router } from 'express';
 import { ALL_PERMISSIONS } from '../../../constants/permissions.js';
 import { requireAuth } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import { safeQueryString } from '../../../utils/query-filter.js';
 
 const router = Router();
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requirePermission('users.view'), async (req, res) => {
   const category = safeQueryString(req.query.category);
   const permissions = category
     ? ALL_PERMISSIONS.filter((p) => p.category === category)

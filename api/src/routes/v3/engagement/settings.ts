@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { requireAuth } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import {
   getAppSettings,
   normalizeEngagementSettings,
@@ -8,7 +9,7 @@ import { serializeEngagementSettings } from '../../../utils/engagement-serialize
 
 const router = Router();
 
-router.get('/', requireAuth, async (_req, res) => {
+router.get('/', requireAuth, requirePermission('engagement.edit'), async (_req, res) => {
   try {
     const settings = await getAppSettings();
     return res.json({
@@ -21,7 +22,7 @@ router.get('/', requireAuth, async (_req, res) => {
   }
 });
 
-router.put('/', requireAuth, async (req, res) => {
+router.put('/', requireAuth, requirePermission('engagement.edit'), async (req, res) => {
   try {
     const settings = await getAppSettings();
     const current = normalizeEngagementSettings(settings.engagement);

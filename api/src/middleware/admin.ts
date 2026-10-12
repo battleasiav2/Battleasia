@@ -31,3 +31,20 @@ export async function requireAdmin(req: AuthedRequest, res: Response, next: Next
   req.userId = payload.userId;
   return next();
 }
+
+/** Official and agent must hold one of the existing permission keys. Admin type bypasses. */
+export function requirePermission(...keys: string[]) {
+  return async (req: AuthedRequest, res: Response, next: NextFunction) => {
+    if (!req.userId) {
+      return res.status(401).json({ status: false, message: 'Unauthorized' });
+    }
+    const user = await User.findById(req.userId).select('role status');
+    if (!user || !user.status || !isAdminRole(user)) {
+      return res.status(403).json({ status: false, message: 'Admin access required' });
+    }
+    if (user.role?.type === 'admin' || keys.some((key) => (user.role?.permissions || []).includes(key))) {
+      return next();
+    }
+    return res.status(403).json({ status: false, message: 'Permission denied' });
+  };
+}

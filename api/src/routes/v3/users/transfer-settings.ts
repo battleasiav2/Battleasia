@@ -7,6 +7,7 @@ import {
 import { AuditLog, writeAudit } from '../../../models/AuditLog.js';
 import { User } from '../../../models/User.js';
 import type { AuthedRequest } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 
 async function lastSettingsAudit(action: string) {
   const row = await AuditLog.findOne({ action }).sort({ createdAt: -1 });
@@ -20,7 +21,7 @@ async function lastSettingsAudit(action: string) {
 
 const router = Router();
 
-router.get('/details', async (_req, res) => {
+router.get('/details', requirePermission('users.edit'), async (_req, res) => {
   try {
     const settings = await getAppSettings();
     const transferSettings = normalizeTransferSettings(settings.transferSettings);
@@ -35,7 +36,7 @@ router.get('/details', async (_req, res) => {
   }
 });
 
-router.put('/update', async (req: AuthedRequest, res) => {
+router.put('/update', requirePermission('users.edit'), async (req: AuthedRequest, res) => {
   try {
     const body = req.body as Partial<TransferSettings>;
     const settings = await getAppSettings();

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { ReferralHistory } from '../../../models/ReferralHistory.js';
 import { User } from '../../../models/User.js';
 import { requireAuth } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import {
   buildSearchFilter,
   parsePagination,
@@ -9,7 +10,7 @@ import {
 
 const router = Router();
 
-router.get('/stats', requireAuth, async (_req, res) => {
+router.get('/stats', requireAuth, requirePermission('users.view'), async (_req, res) => {
   try {
     const [totalPaid, totalTransactions, usersWithReferrals] = await Promise.all([
       ReferralHistory.aggregate([
@@ -30,7 +31,7 @@ router.get('/stats', requireAuth, async (_req, res) => {
   }
 });
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requirePermission('users.view'), async (req, res) => {
   try {
     const { skip, limit, search } = parsePagination(req);
     const histories = await ReferralHistory.find()

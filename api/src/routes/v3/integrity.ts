@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { User } from '../../models/User.js';
 import { SupportConversation } from '../../models/SupportConversation.js';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
-import { requireAdmin } from '../../middleware/admin.js';
+import { requireAdmin, requirePermission } from '../../middleware/admin.js';
 import { paginatedWithTotal, parsePagination } from '../../utils/pagination.js';
 import { getAppSettings } from '../../models/AppSettings.js';
 import { LoginHistory } from '../../models/LoginHistory.js';
@@ -32,11 +32,11 @@ const router = Router();
 
 router.use(requireAuth, requireAdmin);
 
-router.get('/ops', async (_req, res) => {
+router.get('/ops', requirePermission('payments.view', 'payments.manage'), async (_req, res) => {
   return res.json({ status: true, data: await getOpsStatus() });
 });
 
-router.get('/kyc', async (req, res) => {
+router.get('/kyc', requirePermission('users.view'), async (req, res) => {
   const { skip, limit } = parsePagination(req);
   const filter: Record<string, unknown> = { status: { $in: ['pending', 'approved', 'rejected'] } };
   if (req.query.status) filter.status = String(req.query.status);
@@ -85,7 +85,7 @@ router.get('/kyc', async (req, res) => {
   );
 });
 
-router.patch('/kyc/:id', async (req: AuthedRequest, res) => {
+router.patch('/kyc/:id', requirePermission('users.view'), async (req: AuthedRequest, res) => {
   const status = String(req.body?.status || '').trim();
   if (!['pending', 'approved', 'rejected', 'none'].includes(status)) {
     return res.status(400).json({ status: false, message: 'Invalid KYC status' });
@@ -125,7 +125,7 @@ router.patch('/kyc/:id', async (req: AuthedRequest, res) => {
   });
 });
 
-router.get('/fingerprints', async (req, res) => {
+router.get('/fingerprints', requirePermission('users.view'), async (req, res) => {
   const { skip, limit } = parsePagination(req);
   const grouped = await DeviceFingerprint.aggregate<{ _id: string; users: unknown[]; count: number; lastAt: Date; ip: string }>([
     { $group: { _id: '$hash', users: { $addToSet: '$userId' }, count: { $sum: 1 }, lastAt: { $max: '$lastSeen' }, ip: { $last: '$ip' } } },
@@ -187,7 +187,7 @@ router.get('/fingerprints', async (req, res) => {
   );
 });
 
-router.get('/ledger', async (_req, res) => {
+router.get('/ledger', requirePermission('payments.view'), async (_req, res) => {
   const users = await User.aggregate([{ $group: { _id: null, total: { $sum: '$balance' }, count: { $sum: 1 } } }]);
   const settings = await getAppSettings();
   const [pendingDeposits, pendingWithdrawals] = await Promise.all([
@@ -222,7 +222,7 @@ router.get('/ledger', async (_req, res) => {
   });
 });
 
-router.put('/reserve', async (req: AuthedRequest, res) => {
+router.put('/reserve', requirePermission('payments.view'), async (req: AuthedRequest, res) => {
   const n = Number(req.body?.reserveBac);
   if (!Number.isFinite(n) || n < 0) {
     return res.status(400).json({ status: false, message: 'reserveBac must be a non-negative number' });
@@ -241,7 +241,7 @@ router.put('/reserve', async (req: AuthedRequest, res) => {
   return res.json({ status: true, data: { reserveBac: settings.reserveBac } });
 });
 
-router.put('/high-value', async (req: AuthedRequest, res) => {
+router.put('/high-value', requirePermission('payments.view'), async (req: AuthedRequest, res) => {
   const n = Number(req.body?.highValueWithdrawBac);
   if (!Number.isFinite(n) || n <= 0) {
     return res.status(400).json({ status: false, message: 'highValueWithdrawBac must be a positive number' });
@@ -260,7 +260,7 @@ router.put('/high-value', async (req: AuthedRequest, res) => {
   return res.json({ status: true, data: { highValueWithdrawBac: settings.highValueWithdrawBac } });
 });
 
-router.get('/fraud-holds', async (req, res) => {
+router.get('/fraud-holds', requirePermission('payments.view'), async (req, res) => {
   const { skip, limit } = parsePagination(req);
   const filter: Record<string, unknown> = {};
   if (req.query.status) filter.status = String(req.query.status);
@@ -283,7 +283,7 @@ router.get('/fraud-holds', async (req, res) => {
   );
 });
 
-router.patch('/fraud-holds/:id', async (req: AuthedRequest, res) => {
+router.patch('/fraud-holds/:id', requirePermission('payments.view'), async (req: AuthedRequest, res) => {
   const hold = await FraudHold.findById(req.params.id);
   if (!hold) return res.status(404).json({ status: false, message: 'Hold not found' });
   hold.status = String(req.body?.status || 'released') === 'open' ? 'open' : 'released';
@@ -299,7 +299,7 @@ router.patch('/fraud-holds/:id', async (req: AuthedRequest, res) => {
   return res.json({ status: true, data: { id: hold._id.toString(), status: hold.status } });
 });
 
-router.get('/match-reports', async (req, res) => {
+router.get('/match-reports', requirePermission('matches.view'), async (req, res) => {
   const { skip, limit } = parsePagination(req);
   const filter: Record<string, unknown> = {};
   if (req.query.status) filter.status = String(req.query.status);
@@ -324,7 +324,7 @@ router.get('/match-reports', async (req, res) => {
   );
 });
 
-router.patch('/match-reports/:id', async (req: AuthedRequest, res) => {
+router.patch('/match-reports/:id', requirePermission('matches.view'), async (req: AuthedRequest, res) => {
   const status = String(req.body?.status || '').trim();
   if (!['open', 'reviewed', 'dismissed'].includes(status)) {
     return res.status(400).json({ status: false, message: 'Invalid report status' });
@@ -341,7 +341,7 @@ router.patch('/match-reports/:id', async (req: AuthedRequest, res) => {
   return res.json({ status: true, data: { id: row._id.toString(), status: row.status } });
 });
 
-router.get('/disputes', async (req, res) => {
+router.get('/disputes', requirePermission('customer-support.view'), async (req, res) => {
   const { skip, limit } = parsePagination(req);
   const filter: Record<string, unknown> = {};
   if (req.query.status) filter.status = String(req.query.status);
@@ -382,7 +382,7 @@ router.get('/disputes', async (req, res) => {
   );
 });
 
-router.patch('/disputes/:id', async (req: AuthedRequest, res) => {
+router.patch('/disputes/:id', requirePermission('customer-support.view'), async (req: AuthedRequest, res) => {
   const status = String(req.body?.status || '').trim();
   if (!['open', 'reviewing', 'resolved', 'rejected'].includes(status)) {
     return res.status(400).json({ status: false, message: 'Invalid dispute status' });
@@ -414,7 +414,7 @@ router.patch('/disputes/:id', async (req: AuthedRequest, res) => {
   return res.json({ status: true, data: { id: row._id.toString(), status: row.status } });
 });
 
-router.get('/ocr', async (req, res) => {
+router.get('/ocr', requirePermission('matches.view'), async (req, res) => {
   const { skip, limit } = parsePagination(req);
   const [rows, total] = await Promise.all([
     LabEntity.find({ kind: 'ocr' }).sort({ createdAt: -1 }).skip(skip).limit(limit),
@@ -435,7 +435,7 @@ router.get('/ocr', async (req, res) => {
   );
 });
 
-router.patch('/ocr/:id', async (req: AuthedRequest, res) => {
+router.patch('/ocr/:id', requirePermission('matches.view'), async (req: AuthedRequest, res) => {
   const status = String(req.body?.status || '') === 'rejected' ? 'rejected' : 'accepted';
   const row = await LabEntity.findOne({ _id: req.params.id, kind: 'ocr' });
   if (!row) return res.status(404).json({ status: false, message: 'OCR ticket not found' });

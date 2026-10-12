@@ -4,6 +4,7 @@ import { Feed } from '../../../models/Feed.js';
 import { FeedCategory } from '../../../models/FeedCategory.js';
 import { User } from '../../../models/User.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import {
   buildSearchFilter,
   paginatedWithTotal,
@@ -21,7 +22,7 @@ function getSortOption(sortBy?: string): Record<string, SortOrder> {
   return { createdAt: -1 };
 }
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requirePermission('feed.view'), async (req, res) => {
   try {
     const { skip, limit, search } = parsePagination(req);
     const filter: Record<string, unknown> = {
@@ -51,7 +52,7 @@ router.get('/', requireAuth, async (req, res) => {
   }
 });
 
-router.patch('/bulk', requireAuth, async (req: AuthedRequest, res) => {
+router.patch('/bulk', requireAuth, requirePermission('feed.edit'), async (req: AuthedRequest, res) => {
   try {
     const ids = Array.isArray(req.body?.ids) ? req.body.ids.map((id: unknown) => String(id)).filter(Boolean) : [];
     const next = String(req.body?.status || 'draft');
@@ -79,7 +80,7 @@ router.patch('/bulk', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.get('/:id', requireAuth, async (req, res) => {
+router.get('/:id', requireAuth, requirePermission('feed.view'), async (req, res) => {
   try {
     const feed = await Feed.findById(req.params.id);
     if (!feed) {
@@ -93,7 +94,7 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/', requireAuth, async (req: AuthedRequest, res) => {
+router.post('/', requireAuth, requirePermission('feed.create'), async (req: AuthedRequest, res) => {
   try {
     const { categoryId, title, description = '', coverUrl = '', status = 'draft', premiumOnly = false } = req.body;
     if (!categoryId || !title) {
@@ -125,7 +126,7 @@ router.post('/', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.put('/:id', requireAuth, async (req, res) => {
+router.put('/:id', requireAuth, requirePermission('feed.edit'), async (req, res) => {
   try {
     const feed = await Feed.findById(req.params.id);
     if (!feed) {
@@ -149,7 +150,7 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, requirePermission('feed.delete'), async (req, res) => {
   try {
     const feed = await Feed.findById(req.params.id);
     if (!feed) {
@@ -163,7 +164,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/:id/view', requireAuth, async (req, res) => {
+router.post('/:id/view', requireAuth, requirePermission('feed.view'), async (req, res) => {
   try {
     const feed = await Feed.findByIdAndUpdate(
       req.params.id,

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useOutletContext } from 'react-router-dom';
+import { Navigate, useLocation, useOutletContext } from 'react-router-dom';
 import { ReceiptLightbox } from '../components/ReceiptLightbox';
 import { api, newIdempotencyKey, unwrapData, unwrapList, explainError } from '../lib/api';
 import { cell, downloadCsv, downloadExcel, pick, rangeFor, rowId, toCsv } from '../lib/format';
+import { can } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
@@ -95,6 +96,8 @@ export function PaymentsPage() {
   }
 
   const cols = COLS[kind];
+
+  if (!can('payments.manage')) return <Navigate to="/403" replace />;
 
   return (
     <main className="admin-body">

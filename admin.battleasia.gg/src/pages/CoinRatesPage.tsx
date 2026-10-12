@@ -74,11 +74,13 @@ export function CoinRatesPage() {
     void load();
   }, [load]);
 
-  if (!can('shop.view') && !can('shop.edit')) {
+  if (!can('shop.view') && !can('shop.create') && !can('shop.edit') && !can('shop.delete')) {
     return <Navigate to="/403" replace />;
   }
 
-  const canEdit = can('shop.edit') || can('shop.view');
+  const canEdit = can('shop.edit');
+  const canCreate = can('shop.create');
+  const canDelete = can('shop.delete');
 
   async function saveRow(id: string) {
     const edit = edits[id];
@@ -181,7 +183,7 @@ export function CoinRatesPage() {
             <input
               value={draft.region}
               placeholder="nepal"
-              disabled={!canEdit || creating}
+              disabled={!canCreate || creating}
               onChange={(e) => setDraft((d) => ({ ...d, region: e.target.value }))}
             />
           </label>
@@ -190,7 +192,7 @@ export function CoinRatesPage() {
             <input
               value={draft.currency}
               placeholder="NPR"
-              disabled={!canEdit || creating}
+              disabled={!canCreate || creating}
               onChange={(e) => setDraft((d) => ({ ...d, currency: e.target.value.toUpperCase() }))}
             />
           </label>
@@ -201,7 +203,7 @@ export function CoinRatesPage() {
               step="any"
               min="0"
               value={draft.currency.toUpperCase() === 'BDT' ? '1' : draft.rate}
-              disabled={!canEdit || creating || draft.currency.toUpperCase() === 'BDT'}
+              disabled={!canCreate || creating || draft.currency.toUpperCase() === 'BDT'}
               onChange={(e) => setDraft((d) => ({ ...d, rate: e.target.value }))}
             />
           </label>
@@ -209,13 +211,13 @@ export function CoinRatesPage() {
             <input
               type="checkbox"
               checked={draft.isActive}
-              disabled={!canEdit || creating}
+              disabled={!canCreate || creating}
               onChange={(e) => setDraft((d) => ({ ...d, isActive: e.target.checked }))}
             />
             {t('rates.active')}
           </label>
           <div className="form-actions span-all">
-            <button className="btn btn-primary" type="button" disabled={!canEdit || creating} onClick={() => void createRow()}>
+            <button className="btn btn-primary" type="button" disabled={!canCreate || creating} onClick={() => void createRow()}>
               {creating ? t('rates.saving') : t('rates.add')}
             </button>
           </div>
@@ -294,7 +296,7 @@ export function CoinRatesPage() {
                         <button
                           className="btn btn-ghost"
                           type="button"
-                          disabled={!canEdit || busyId === row.id}
+                          disabled={!canDelete || busyId === row.id}
                           onClick={() => void removeRow(row.id, row.currency)}
                         >
                           {t('rates.delete')}

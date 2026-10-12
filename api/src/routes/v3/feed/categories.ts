@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { FeedCategory } from '../../../models/FeedCategory.js';
 import { requireAuth } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import {
   buildSearchFilter,
   paginatedWithTotal,
@@ -10,7 +11,7 @@ import { serializeFeedCategory } from '../../../utils/feed-serialize.js';
 
 const router = Router();
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requirePermission('feed.view'), async (req, res) => {
   try {
     const { skip, limit, search } = parsePagination(req);
     const filter = buildSearchFilter(search, ['name', 'slug']);
@@ -27,7 +28,7 @@ router.get('/', requireAuth, async (req, res) => {
   }
 });
 
-router.get('/:id', requireAuth, async (req, res) => {
+router.get('/:id', requireAuth, requirePermission('feed.view'), async (req, res) => {
   try {
     const category = await FeedCategory.findById(req.params.id);
     if (!category) {
@@ -40,7 +41,7 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requirePermission('feed.edit'), async (req, res) => {
   try {
     const { name, slug } = req.body;
     if (!name || !slug) {
@@ -58,7 +59,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/:id', requireAuth, async (req, res) => {
+router.put('/:id', requireAuth, requirePermission('feed.edit'), async (req, res) => {
   try {
     const category = await FeedCategory.findById(req.params.id);
     if (!category) {
@@ -77,7 +78,7 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, requirePermission('feed.edit'), async (req, res) => {
   try {
     const category = await FeedCategory.findById(req.params.id);
     if (!category) {

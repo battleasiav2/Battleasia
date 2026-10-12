@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { Role } from '../../../models/Role.js';
-import { requireAuth } from '../../../middleware/auth.js';
+import { User } from '../../../models/User.js';
+import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import {
   buildSearchFilter,
   paginatedResults,
@@ -18,7 +20,7 @@ async function getParentMap(roles: InstanceType<typeof Role>[]) {
   return new Map(parents.map((p) => [p._id.toString(), p]));
 }
 
-router.get('/available-parents', requireAuth, async (req, res) => {
+router.get('/available-parents', requireAuth, requirePermission('users.view'), async (req, res) => {
   try {
     const excludeId = req.query.exclude as string | undefined;
     const filter: Record<string, unknown> = {};
@@ -39,7 +41,7 @@ router.get('/available-parents', requireAuth, async (req, res) => {
   }
 });
 
-router.get('/available-children', requireAuth, async (_req, res) => {
+router.get('/available-children', requireAuth, requirePermission('users.view'), async (_req, res) => {
   try {
     const roles = await Role.find({ type: { $ne: 'admin' } }).sort({ level: 1, name: 1 });
     const results = roles.map((role) => ({
@@ -55,7 +57,7 @@ router.get('/available-children', requireAuth, async (_req, res) => {
   }
 });
 
-router.get('/:id', requireAuth, async (req, res) => {
+router.get('/:id', requireAuth, requirePermission('users.view'), async (req, res) => {
   try {
     const role = await Role.findById(req.params.id);
     if (!role) return res.status(404).json({ status: false, message: 'Role not found' });
@@ -67,7 +69,7 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requirePermission('users.view'), async (req, res) => {
   try {
     const { skip, limit, search } = parsePagination(req);
     const filter = buildSearchFilter(search, ['name', 'description']);
@@ -89,9 +91,18 @@ router.get('/', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/', requireAuth, async (req, res) => {
+async function rejectAdminType(req: AuthedRequest, type: unknown, res: import('express').Response) {
+  if (type !== 'admin') return false;
+  const actor = await User.findById(req.userId);
+  if (actor?.role?.type === 'admin') return false;
+  res.status(403).json({ status: false, message: 'Permission denied' });
+  return true;
+}
+
+router.post('/', requireAuth, requirePermission('users.edit'), async (req: AuthedRequest, res) => {
   try {
     const { name, description = '', parent = null, permissions = [], type = 'player' } = req.body;
+    if (await rejectAdminType(req, type, res)) return;
     if (!name) {
       return res.status(400).json({ status: false, message: 'Role name is required' });
     }
@@ -119,7 +130,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/:id', requireAuth, async (req, res) => {
+router.put('/:id', requireAuth, requirePermission('users.edit'), async (req: AuthedRequest, res) => {
   try {
     const role = await Role.findById(req.params.id);
     if (!role) {
@@ -127,6 +138,7 @@ router.put('/:id', requireAuth, async (req, res) => {
     }
 
     const { name, description, parent, permissions, type } = req.body;
+    if (await rejectAdminType(req, type, res)) return;
     if (name) role.name = name;
     if (typeof description === 'string') role.description = description;
     if (Array.isArray(permissions)) role.permissions = permissions;
@@ -146,6 +158,16 @@ router.put('/:id', requireAuth, async (req, res) => {
     }
 
     await role.save();
+    await User.updateMany(
+      { roleRef: role._id },
+      {
+        $set: {
+          'role.type': role.type,
+          'role.name': role.name,
+          'role.permissions': role.permissions || [],
+        },
+      },
+    );
     return res.json({ status: true, data: serializeRole(role, parentDoc) });
   } catch (error) {
     console.error('update role error:', error);
@@ -153,7 +175,7 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, requirePermission('users.edit'), async (req, res) => {
   try {
     const role = await Role.findById(req.params.id);
     if (!role) {

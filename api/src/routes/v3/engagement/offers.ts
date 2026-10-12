@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { requireAuth } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import { EngagementClaimOffer } from '../../../models/EngagementClaimOffer.js';
 import { UserClaimOffer } from '../../../models/UserClaimOffer.js';
 
@@ -63,7 +64,7 @@ function serialize(row: {
   };
 }
 
-router.get('/', requireAuth, async (_req, res) => {
+router.get('/', requireAuth, requirePermission('engagement.edit'), async (_req, res) => {
   try {
     const rows = await EngagementClaimOffer.find().sort({ startsAt: -1, createdAt: -1 }).limit(100);
     const ids = rows.map((row) => row._id);
@@ -82,7 +83,7 @@ router.get('/', requireAuth, async (_req, res) => {
   }
 });
 
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requirePermission('engagement.edit'), async (req, res) => {
   try {
     const parsed = parseOfferBody(req.body && typeof req.body === 'object' ? req.body : {});
     if ('error' in parsed) return res.status(400).json({ status: false, message: parsed.error });
@@ -94,7 +95,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/:id', requireAuth, async (req, res) => {
+router.put('/:id', requireAuth, requirePermission('engagement.edit'), async (req, res) => {
   try {
     const parsed = parseOfferBody(req.body && typeof req.body === 'object' ? req.body : {});
     if ('error' in parsed) return res.status(400).json({ status: false, message: parsed.error });
@@ -108,7 +109,7 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, requirePermission('engagement.edit'), async (req, res) => {
   try {
     const row = await EngagementClaimOffer.findByIdAndDelete(req.params.id);
     if (!row) return res.status(404).json({ status: false, message: 'Offer not found' });

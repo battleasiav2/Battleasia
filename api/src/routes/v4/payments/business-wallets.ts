@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { BusinessWallet } from '../../../models/BusinessWallet.js';
 import { PaymentChannel } from '../../../models/PaymentChannel.js';
 import { requireAuth } from '../../../middleware/auth.js';
-import { requireAdmin } from '../../../middleware/admin.js';
+import { requireAdmin, requirePermission } from '../../../middleware/admin.js';
 import { paginatedResults, parsePagination } from '../../../utils/pagination.js';
 import { sanitizeUploadAttachment } from '../../../utils/safe-url.js';
 
@@ -29,7 +29,7 @@ function serializeWallet(wallet: InstanceType<typeof BusinessWallet>) {
   };
 }
 
-router.get('/', requireAdmin, async (req, res) => {
+router.get('/', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
   try {
     const { skip, limit } = parsePagination(req);
     const filter: Record<string, unknown> = {};
@@ -77,7 +77,7 @@ router.get('/public', requireAuth, async (req, res) => {
   }
 });
 
-router.get('/:id', requireAdmin, async (req, res) => {
+router.get('/:id', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
   try {
     const wallet = await BusinessWallet.findById(req.params.id).populate('channel_id');
     if (!wallet) {
@@ -90,7 +90,7 @@ router.get('/:id', requireAdmin, async (req, res) => {
   }
 });
 
-router.post('/', requireAdmin, async (req, res) => {
+router.post('/', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
   try {
     const { channel_id, wallet_address, currency_type } = req.body;
     if (!channel_id || !wallet_address || !currency_type) {
@@ -111,7 +111,7 @@ router.post('/', requireAdmin, async (req, res) => {
   }
 });
 
-router.put('/:id', requireAdmin, async (req, res) => {
+router.put('/:id', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
   try {
     const wallet = await BusinessWallet.findById(req.params.id);
     if (!wallet) {
@@ -145,7 +145,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
   }
 });
 
-router.patch('/:id/toggle', requireAdmin, async (req, res) => {
+router.patch('/:id/toggle', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
   try {
     const wallet = await BusinessWallet.findById(req.params.id);
     if (!wallet) {
@@ -160,7 +160,7 @@ router.patch('/:id/toggle', requireAdmin, async (req, res) => {
   }
 });
 
-router.delete('/:id', requireAdmin, async (req, res) => {
+router.delete('/:id', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
   try {
     const wallet = await BusinessWallet.findById(req.params.id);
     if (!wallet) {

@@ -93,11 +93,13 @@ export function BacShopPage() {
     void load();
   }, [load]);
 
-  if (!can('shop.view') && !can('shop.edit')) {
+  if (!can('shop.view') && !can('shop.create') && !can('shop.edit') && !can('shop.delete')) {
     return <Navigate to="/403" replace />;
   }
 
-  const canEdit = can('shop.edit') || can('shop.view');
+  const canEdit = can('shop.edit');
+  const canCreate = can('shop.create');
+  const canDelete = can('shop.delete');
 
   async function uploadImage(file: File, target: 'draft' | string) {
     setUploading(target);
@@ -221,7 +223,7 @@ export function BacShopPage() {
               step="1"
               value={draft.amount}
               placeholder="100"
-              disabled={!canEdit || creating}
+              disabled={!canCreate || creating}
               onChange={(e) => setDraft((d) => ({ ...d, amount: e.target.value }))}
             />
           </label>
@@ -234,7 +236,7 @@ export function BacShopPage() {
               step="0.1"
               value={draft.discount}
               placeholder="10"
-              disabled={!canEdit || creating}
+              disabled={!canCreate || creating}
               onChange={(e) => setDraft((d) => ({ ...d, discount: e.target.value }))}
             />
           </label>
@@ -243,7 +245,7 @@ export function BacShopPage() {
             <input
               type="file"
               accept="image/png,image/jpeg,image/webp,image/gif"
-              disabled={!canEdit || creating || uploading === 'draft'}
+              disabled={!canCreate || creating || uploading === 'draft'}
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) void uploadImage(file, 'draft');
@@ -255,7 +257,7 @@ export function BacShopPage() {
             <input
               type="checkbox"
               checked={draft.isActive}
-              disabled={!canEdit || creating}
+              disabled={!canCreate || creating}
               onChange={(e) => setDraft((d) => ({ ...d, isActive: e.target.checked }))}
             />
             {t('bacShop.active')}
@@ -269,7 +271,7 @@ export function BacShopPage() {
                 ? `${t('bacShop.pay')} ${money(preview.price)} · ${t('bacShop.list')} ${money(preview.original)}`
                 : t('bacShop.priceHint')}
             </p>
-            <button className="btn btn-primary" type="button" disabled={!canEdit || creating || uploading === 'draft'} onClick={() => void createPack()}>
+            <button className="btn btn-primary" type="button" disabled={!canCreate || creating || uploading === 'draft'} onClick={() => void createPack()}>
               {creating ? t('bacShop.saving') : t('bacShop.create')}
             </button>
             {uploading === 'draft' ? (
@@ -392,7 +394,7 @@ export function BacShopPage() {
                           <button
                             className="btn btn-ghost"
                             type="button"
-                            disabled={!canEdit || busyId === row.id}
+                            disabled={!canDelete || busyId === row.id}
                             onClick={() => void removeRow(row.id)}
                           >
                             {t('bacShop.delete')}

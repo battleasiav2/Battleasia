@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { BalanceHistory } from '../../../models/BalanceHistory.js';
 import { requireAuth } from '../../../middleware/auth.js';
-import { requireAdmin } from '../../../middleware/admin.js';
+import { requireAdmin, requirePermission } from '../../../middleware/admin.js';
 import {
   buildSearchFilter,
   paginatedResults,
@@ -11,7 +11,7 @@ import { serializeBalanceHistory } from '../../../utils/balance-history.js';
 
 const router = Router();
 
-router.get('/', requireAdmin, async (req, res) => {
+router.get('/', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
   try {
     const { skip, limit, search, startDate, endDate } = parsePagination(req);
     const filter: Record<string, unknown> = {

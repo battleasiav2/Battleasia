@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { Session } from '../../../models/Session.js';
 import { User } from '../../../models/User.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import { writeAudit } from '../../../models/AuditLog.js';
 import {
   buildSearchFilter,
@@ -11,7 +12,7 @@ import {
 
 const router = Router();
 
-router.get('/', requireAuth, async (req: AuthedRequest, res) => {
+router.get('/', requireAuth, requirePermission('users.view'), async (req: AuthedRequest, res) => {
   try {
     const { skip, limit, search } = parsePagination(req);
     const now = new Date();
@@ -52,7 +53,7 @@ router.get('/', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.delete('/all', requireAuth, async (_req, res) => {
+router.delete('/all', requireAuth, requirePermission('users.edit'), async (_req, res) => {
   try {
     const ids = await Session.distinct('userId');
     if (ids.length) {
@@ -66,7 +67,7 @@ router.delete('/all', requireAuth, async (_req, res) => {
   }
 });
 
-router.delete('/user/:userId', requireAuth, async (req: AuthedRequest, res) => {
+router.delete('/user/:userId', requireAuth, requirePermission('users.edit'), async (req: AuthedRequest, res) => {
   try {
     const result = await Session.deleteMany({ userId: req.params.userId });
     await User.updateOne({ _id: req.params.userId }, { $inc: { tokenVersion: 1 } });
@@ -83,7 +84,7 @@ router.delete('/user/:userId', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.delete('/:sessionId', requireAuth, async (req: AuthedRequest, res) => {
+router.delete('/:sessionId', requireAuth, requirePermission('users.edit'), async (req: AuthedRequest, res) => {
   try {
     const row = await Session.findById(req.params.sessionId);
     if (!row) return res.status(404).json({ status: false, message: 'Session not found' });

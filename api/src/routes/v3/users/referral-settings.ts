@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { getAppSettings } from '../../../models/AppSettings.js';
 import { AuditLog, writeAudit } from '../../../models/AuditLog.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import { User } from '../../../models/User.js';
 
 async function lastSettingsAudit(action: string) {
@@ -16,7 +17,7 @@ async function lastSettingsAudit(action: string) {
 
 const router = Router();
 
-router.get('/details', requireAuth, async (_req, res) => {
+router.get('/details', requireAuth, requirePermission('users.edit'), async (_req, res) => {
   try {
     const settings = await getAppSettings();
     return res.json({
@@ -32,7 +33,7 @@ router.get('/details', requireAuth, async (_req, res) => {
   }
 });
 
-router.put('/update', requireAuth, async (req: AuthedRequest, res) => {
+router.put('/update', requireAuth, requirePermission('users.edit'), async (req: AuthedRequest, res) => {
   try {
     const { commissionRate } = req.body;
     const settings = await getAppSettings();

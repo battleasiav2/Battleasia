@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { CoinRate } from '../../../models/CoinRate.js';
 import { requireAuth } from '../../../middleware/auth.js';
-import { requireAdmin } from '../../../middleware/admin.js';
+import { requireAdmin, requirePermission } from '../../../middleware/admin.js';
 import { serializeCoinRate } from '../../../utils/payment-serialize.js';
 
 const router = Router();
@@ -28,7 +28,7 @@ router.get('/public', requireAuth, async (_req, res) => {
   }
 });
 
-router.post('/', requireAdmin, async (req, res) => {
+router.post('/', requireAdmin, requirePermission('shop.create'), async (req, res) => {
   try {
     const { region, currency, rate, isActive = true } = req.body;
     if (!region || !currency || rate == null) {
@@ -60,7 +60,7 @@ router.post('/', requireAdmin, async (req, res) => {
   }
 });
 
-router.put('/:id', requireAdmin, async (req, res) => {
+router.put('/:id', requireAdmin, requirePermission('shop.edit'), async (req, res) => {
   try {
     const coinRate = await CoinRate.findById(req.params.id);
     if (!coinRate) {
@@ -88,7 +88,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
   }
 });
 
-router.delete('/:id', requireAdmin, async (req, res) => {
+router.delete('/:id', requireAdmin, requirePermission('shop.delete'), async (req, res) => {
   try {
     const coinRate = await CoinRate.findById(req.params.id);
     if (!coinRate) {

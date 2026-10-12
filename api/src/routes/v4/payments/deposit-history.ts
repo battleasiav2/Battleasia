@@ -4,7 +4,7 @@ import { DepositHistory } from '../../../models/DepositHistory.js';
 import { PaymentChannel } from '../../../models/PaymentChannel.js';
 import { User } from '../../../models/User.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
-import { requireAdmin } from '../../../middleware/admin.js';
+import { requireAdmin, requirePermission } from '../../../middleware/admin.js';
 import { paginatedResults, parsePagination } from '../../../utils/pagination.js';
 import { approveDepositMoney, MoneyError, rejectDepositMoney } from '../../../utils/money.js';
 import { serializeDeposit } from '../../../utils/payment-serialize.js';
@@ -48,7 +48,7 @@ async function loadDeposits(filter: Record<string, unknown>, limit?: number) {
   return deposits.map((d) => serializeDeposit(d, channelMap.get(d.payment_channel.toString())));
 }
 
-router.get('/statistics', requireAdmin, async (_req, res) => {
+router.get('/statistics', requireAdmin, requirePermission('payments.manage'), async (_req, res) => {
   try {
     const [pending, approved, rejected] = await Promise.all([
       DepositHistory.countDocuments({ status: 'pending' }),
@@ -62,7 +62,7 @@ router.get('/statistics', requireAdmin, async (_req, res) => {
   }
 });
 
-router.get('/pending', requireAdmin, async (_req, res) => {
+router.get('/pending', requireAdmin, requirePermission('payments.manage'), async (_req, res) => {
   try {
     const results = await loadDeposits({ status: 'pending' }, 1000);
     return res.json({ status: true, data: { results, count: results.length } });
@@ -72,7 +72,7 @@ router.get('/pending', requireAdmin, async (_req, res) => {
   }
 });
 
-router.get('/', requireAdmin, async (req, res) => {
+router.get('/', requireAdmin, requirePermission('payments.manage'), async (req, res) => {
   try {
     const { skip, limit } = parsePagination(req);
     const filter: Record<string, unknown> = {};
@@ -210,7 +210,7 @@ router.get('/my-history', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
+router.patch('/:id/approve', requireAdmin, requirePermission('payments.manage'), async (req: AuthedRequest, res) => {
   try {
     const id = String(req.params.id);
     if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -288,7 +288,7 @@ router.get('/:id', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.patch('/:id/reject', requireAdmin, async (req: AuthedRequest, res) => {
+router.patch('/:id/reject', requireAdmin, requirePermission('payments.manage'), async (req: AuthedRequest, res) => {
   try {
     const id = String(req.params.id);
     if (!mongoose.Types.ObjectId.isValid(id)) {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { api, unwrapData, explainError } from '../lib/api';
+import { can } from '../lib/auth';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
@@ -49,6 +50,8 @@ export function GameFormPage() {
       })
       .catch((err) => setError(explainError(err, 'Game missing')));
   }, [id]);
+
+  if (id ? !can('matches.edit') : !can('matches.create')) return <Navigate to="/403" replace />;
 
   return (
     <main className="admin-body">

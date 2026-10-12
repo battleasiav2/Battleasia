@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { ShopOrder } from '../../../models/ShopOrder.js';
-import { requireAdmin } from '../../../middleware/admin.js';
+import { requireAdmin, requirePermission } from '../../../middleware/admin.js';
 import { paginatedResults, parsePagination } from '../../../utils/pagination.js';
 import { safeQueryStatus, ORDER_STATUSES } from '../../../utils/query-filter.js';
 
 const router = Router();
 
-router.get('/', requireAdmin, async (req, res) => {
+router.get('/', requireAdmin, requirePermission('shop.view'), async (req, res) => {
   try {
     const { skip, limit } = parsePagination(req);
     const filter: Record<string, unknown> = {};

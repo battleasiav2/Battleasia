@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { Match } from '../../../models/Match.js';
 import { MatchParticipant } from '../../../models/MatchParticipant.js';
 import { requireAuth } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import {
   buildSearchFilter,
   paginatedResults,
@@ -10,7 +11,7 @@ import {
 
 const router = Router();
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requirePermission('matches.view'), async (req, res) => {
   try {
     const { skip, limit, search, startDate, endDate } = parsePagination(req);
     const filter: Record<string, unknown> = {

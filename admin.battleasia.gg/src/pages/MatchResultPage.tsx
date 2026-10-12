@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useOutletContext, useParams } from 'react-router-dom';
+import { Link, Navigate, useOutletContext, useParams } from 'react-router-dom';
 import { api, unwrapData, explainError } from '../lib/api';
+import { can } from '../lib/auth';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
@@ -318,6 +319,8 @@ export function MatchResultPage() {
       setBusy(false);
     }
   }
+
+  if (!can('matches.result')) return <Navigate to="/403" replace />;
 
   if (error) {
     return (

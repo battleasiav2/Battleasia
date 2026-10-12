@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { Game } from '../../../models/Game.js';
 import { requireAuth } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import {
   buildSearchFilter,
   paginatedResults,
@@ -10,7 +11,7 @@ import { serializeGame } from '../../../utils/serialize.js';
 
 const router = Router();
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requirePermission('matches.view'), async (req, res) => {
   try {
     const { skip, limit, search } = parsePagination(req);
     const filter = buildSearchFilter(search, ['name', 'packageName', 'idPrefix']);
@@ -27,7 +28,7 @@ router.get('/', requireAuth, async (req, res) => {
   }
 });
 
-router.get('/:id', requireAuth, async (req, res) => {
+router.get('/:id', requireAuth, requirePermission('matches.view', 'matches.edit', 'matches.create'), async (req, res) => {
   try {
     const game = await Game.findById(req.params.id);
     if (!game) {
@@ -40,7 +41,7 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requirePermission('matches.create'), async (req, res) => {
   try {
     const {
       name,
@@ -77,7 +78,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/:id', requireAuth, async (req, res) => {
+router.put('/:id', requireAuth, requirePermission('matches.edit'), async (req, res) => {
   try {
     const game = await Game.findById(req.params.id);
     if (!game) {
@@ -107,7 +108,7 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, requirePermission('matches.delete'), async (req, res) => {
   try {
     const game = await Game.findById(req.params.id);
     if (!game) {

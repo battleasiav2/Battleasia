@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { LoginHistory } from '../../../models/LoginHistory.js';
 import { requireAuth } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import {
   buildSearchFilter,
   paginatedResults,
@@ -9,7 +10,7 @@ import {
 
 const router = Router();
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requirePermission('users.view'), async (req, res) => {
   try {
     const { skip, limit, search, startDate, endDate } = parsePagination(req);
     const filter: Record<string, unknown> = {

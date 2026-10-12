@@ -193,15 +193,15 @@ export const SETTINGS: Record<string, SettingsSpec> = {
   },
 };
 
-export const INTEGRITY: Record<string, { title: string; api: string }> = {
-  '/integrity/ledger': { title: 'nav.integrityLedger', api: '/api/v3/integrity/ledger' },
-  '/integrity/fraud-holds': { title: 'nav.fraudHolds', api: '/api/v3/integrity/fraud-holds' },
-  '/integrity/kyc': { title: 'page.kyc', api: '/api/v3/integrity/kyc' },
-  '/integrity/fingerprints': { title: 'nav.fingerprints', api: '/api/v3/integrity/fingerprints' },
-  '/integrity/ocr': { title: 'nav.ocr', api: '/api/v3/integrity/ocr' },
-  '/integrity/match-reports': { title: 'nav.matchReports', api: '/api/v3/integrity/match-reports' },
-  '/integrity/disputes': { title: 'nav.disputes', api: '/api/v3/integrity/disputes' },
-  '/integrity/audit': { title: 'nav.audit', api: '/api/v3/integrity/audit' },
+export const INTEGRITY: Record<string, { title: string; api: string; perm?: string | null }> = {
+  '/integrity/ledger': { title: 'nav.integrityLedger', api: '/api/v3/integrity/ledger', perm: 'payments.view' },
+  '/integrity/fraud-holds': { title: 'nav.fraudHolds', api: '/api/v3/integrity/fraud-holds', perm: 'payments.view' },
+  '/integrity/kyc': { title: 'page.kyc', api: '/api/v3/integrity/kyc', perm: 'users.view' },
+  '/integrity/fingerprints': { title: 'nav.fingerprints', api: '/api/v3/integrity/fingerprints', perm: 'users.view' },
+  '/integrity/ocr': { title: 'nav.ocr', api: '/api/v3/integrity/ocr', perm: 'matches.view' },
+  '/integrity/match-reports': { title: 'nav.matchReports', api: '/api/v3/integrity/match-reports', perm: 'matches.view' },
+  '/integrity/disputes': { title: 'nav.disputes', api: '/api/v3/integrity/disputes', perm: 'customer-support.view' },
+  '/integrity/audit': { title: 'nav.audit', api: '/api/v3/integrity/audit', perm: null },
 };
 
 export function paletteItems() {

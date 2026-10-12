@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { getAppSettings } from '../../../models/AppSettings.js';
 import { requireAuth } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 
 const router = Router();
 
-router.get('/details', requireAuth, async (_req, res) => {
+router.get('/details', requireAuth, requirePermission('users.view'), async (_req, res) => {
   try {
     const settings = await getAppSettings();
     return res.json({
@@ -19,7 +20,7 @@ router.get('/details', requireAuth, async (_req, res) => {
   }
 });
 
-router.put('/update', requireAuth, async (req, res) => {
+router.put('/update', requireAuth, requirePermission('users.edit'), async (req, res) => {
   try {
     const { premiumDuration, premiumPrice } = req.body;
     const settings = await getAppSettings();

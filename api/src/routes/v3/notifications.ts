@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { Notification } from '../../models/Notification.js';
 import { User } from '../../models/User.js';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
+import { requirePermission } from '../../middleware/admin.js';
 import {
   buildSearchFilter,
   paginatedWithTotal,
@@ -12,7 +13,7 @@ import { emitUserNotification } from '../../utils/socket.js';
 
 const router = Router();
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requirePermission('notifications.send'), async (req, res) => {
   try {
     const { skip, limit, search } = parsePagination(req);
     const filter = buildSearchFilter(search, ['title', 'message', 'category', 'type']);
@@ -29,7 +30,7 @@ router.get('/', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/', requireAuth, async (req: AuthedRequest, res) => {
+router.post('/', requireAuth, requirePermission('notifications.send'), async (req: AuthedRequest, res) => {
   try {
     const {
       title,

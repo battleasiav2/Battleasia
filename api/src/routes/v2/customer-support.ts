@@ -4,10 +4,10 @@ import type { SupportTicketCategory } from '../../models/SupportConversation.js'
 import { SupportMessage } from '../../models/SupportMessage.js';
 import { User } from '../../models/User.js';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
-import { requireAdmin } from '../../middleware/admin.js';
+import { requireAdmin, requirePermission } from '../../middleware/admin.js';
+import { isAdminRole, hasAdminPermission } from '../../utils/admin-role.js';
 import { paginatedWithTotal, parsePagination } from '../../utils/pagination.js';
 import { safeQueryStatus, CONVERSATION_STATUSES } from '../../utils/query-filter.js';
-import { isAdminRole } from '../../utils/admin-role.js';
 import {
   serializeConversation,
   serializeSupportMessage,
@@ -55,7 +55,13 @@ async function canAccessConversation(userId: string, conversationId: string): Pr
     SupportConversation.findById(conversationId),
   ]);
   if (!conversation) return false;
-  if (isAdminRole(user)) return true;
+  if (isAdminRole(user)) {
+    return (
+      hasAdminPermission(user, 'customer-support.view') ||
+      hasAdminPermission(user, 'customer-support.reply') ||
+      hasAdminPermission(user, 'customer-support.close')
+    );
+  }
   return conversation.userId.toString() === userId;
 }
 
@@ -225,7 +231,7 @@ router.get('/conversations/mine', requireAuth, async (req: AuthedRequest, res) =
   }
 });
 
-router.get('/conversations/unread-count', requireAuth, requireAdmin, async (_req, res) => {
+router.get('/conversations/unread-count', requireAuth, requireAdmin, requirePermission('customer-support.view'), async (_req, res) => {
   try {
     const count = await countOpenSupportUnread();
     return res.json({ status: true, data: { count } });
@@ -274,7 +280,7 @@ router.patch('/conversation/:conversationId/mark-read', requireAuth, async (req:
   }
 });
 
-router.get('/conversations', requireAuth, requireAdmin, async (req, res) => {
+router.get('/conversations', requireAuth, requireAdmin, requirePermission('customer-support.view'), async (req, res) => {
   try {
     const { skip, limit } = parsePagination(req);
     const filter: Record<string, unknown> = {};
@@ -351,6 +357,9 @@ router.post('/message', requireAuth, async (req: AuthedRequest, res) => {
     }
 
     const isAdmin = isAdminRole(sender);
+    if (isAdmin && !hasAdminPermission(sender, 'customer-support.reply')) {
+      return res.status(403).json({ status: false, message: 'Permission denied' });
+    }
 
     const message = await SupportMessage.create({
       conversationId,
@@ -403,6 +412,11 @@ router.patch('/conversation/:conversationId/close', requireAuth, async (req: Aut
     const conversation = await SupportConversation.findById(conversationId);
     if (!conversation) {
       return res.status(404).json({ status: false, message: 'Conversation not found' });
+    }
+
+    const actor = await User.findById(req.userId);
+    if (isAdminRole(actor) && !hasAdminPermission(actor, 'customer-support.close')) {
+      return res.status(403).json({ status: false, message: 'Permission denied' });
     }
 
     const deleteMessages = Boolean(req.body.deleteMessages);

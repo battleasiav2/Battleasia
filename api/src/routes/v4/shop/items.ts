@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { ShopItem } from '../../../models/ShopItem.js';
 import { requireAuth } from '../../../middleware/auth.js';
-import { requireAdmin } from '../../../middleware/admin.js';
+import { requireAdmin, requirePermission } from '../../../middleware/admin.js';
 import {
   buildSearchFilter,
   paginatedResults,
@@ -90,7 +90,7 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/', requireAdmin, async (req, res) => {
+router.post('/', requireAdmin, requirePermission('shop.create'), async (req, res) => {
   try {
     const amount = readAmount(req.body?.amount);
     const discountPercent = readDiscount(req.body?.discountPercent);
@@ -126,7 +126,7 @@ router.post('/', requireAdmin, async (req, res) => {
   }
 });
 
-router.put('/:id', requireAdmin, async (req, res) => {
+router.put('/:id', requireAdmin, requirePermission('shop.edit'), async (req, res) => {
   try {
     const item = await ShopItem.findById(req.params.id);
     if (!item) {
@@ -166,7 +166,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
   }
 });
 
-router.delete('/:id', requireAdmin, async (req, res) => {
+router.delete('/:id', requireAdmin, requirePermission('shop.delete'), async (req, res) => {
   try {
     const item = await ShopItem.findById(req.params.id);
     if (!item) {

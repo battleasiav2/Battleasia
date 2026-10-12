@@ -3,6 +3,8 @@ import bcrypt from 'bcryptjs';
 import { User } from '../../../models/User.js';
 import { Role } from '../../../models/Role.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
+import { hasAdminPermission } from '../../../utils/admin-role.js';
 import {
   buildSearchFilter,
   paginatedResults,
@@ -20,6 +22,21 @@ import { writeAudit } from '../../../models/AuditLog.js';
 
 const router = Router();
 
+async function rejectRoleAssignment(req: AuthedRequest, roleId: unknown, res: import('express').Response) {
+  if (roleId == null || roleId === '') return false;
+  const actor = await User.findById(req.userId);
+  if (!actor || !hasAdminPermission(actor, 'users.edit')) {
+    res.status(403).json({ status: false, message: 'Permission denied' });
+    return true;
+  }
+  const role = await Role.findById(String(roleId));
+  if (role?.type === 'admin' && actor.role?.type !== 'admin') {
+    res.status(403).json({ status: false, message: 'Permission denied' });
+    return true;
+  }
+  return false;
+}
+
 async function applyRoleToUser(user: InstanceType<typeof User>, roleId?: string | null) {
   if (!roleId) return;
   const role = await Role.findById(roleId);
@@ -32,7 +49,7 @@ async function applyRoleToUser(user: InstanceType<typeof User>, roleId?: string 
   };
 }
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requirePermission('users.view'), async (req, res) => {
   try {
     const { skip, limit, search, startDate, endDate } = parsePagination(req);
     const filter: Record<string, unknown> = {
@@ -58,7 +75,7 @@ router.get('/', requireAuth, async (req, res) => {
   }
 });
 
-router.patch('/bulk/status', requireAuth, async (req: AuthedRequest, res) => {
+router.patch('/bulk/status', requireAuth, requirePermission('users.edit'), async (req: AuthedRequest, res) => {
   try {
     const ids = Array.isArray(req.body?.ids) ? req.body.ids.map((id: unknown) => String(id)).filter(Boolean) : [];
     const status = Boolean(req.body?.status);
@@ -86,7 +103,7 @@ router.patch('/bulk/status', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.delete('/bulk/all', requireAuth, async (_req, res) => {
+router.delete('/bulk/all', requireAuth, requirePermission('users.delete'), async (_req, res) => {
   try {
     const result = await User.deleteMany({ 'role.type': { $ne: 'admin' } });
     return res.json({ status: true, message: `Deleted ${result.deletedCount} users` });
@@ -96,7 +113,7 @@ router.delete('/bulk/all', requireAuth, async (_req, res) => {
   }
 });
 
-router.get('/:id', requireAuth, async (req, res) => {
+router.get('/:id', requireAuth, requirePermission('users.view'), async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -110,7 +127,7 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requirePermission('users.create'), async (req: AuthedRequest, res) => {
   try {
     const {
       username,
@@ -153,6 +170,7 @@ router.post('/', requireAuth, async (req, res) => {
       role: { type: 'player', name: 'Player', permissions: [] },
     });
 
+    if (await rejectRoleAssignment(req, role, res)) return;
     await applyRoleToUser(user, role);
     await user.save();
 
@@ -164,7 +182,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/:id', requireAuth, async (req: AuthedRequest, res) => {
+router.put('/:id', requireAuth, requirePermission('users.edit'), async (req: AuthedRequest, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -200,7 +218,10 @@ router.put('/:id', requireAuth, async (req: AuthedRequest, res) => {
     if (typeof gameServer === 'string') user.gameServer = gameServer;
     if (typeof referralCode === 'string') user.referralCode = referralCode;
     if (password) user.password = await bcrypt.hash(password, 10);
-    if (role !== undefined) await applyRoleToUser(user, role);
+    if (role !== undefined) {
+      if (await rejectRoleAssignment(req, role, res)) return;
+      await applyRoleToUser(user, role);
+    }
 
     await user.save();
     const roleDoc = user.roleRef ? await Role.findById(user.roleRef) : null;
@@ -217,7 +238,7 @@ router.put('/:id', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.patch('/:id/status', requireAuth, async (req: AuthedRequest, res) => {
+router.patch('/:id/status', requireAuth, requirePermission('users.edit'), async (req: AuthedRequest, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -246,7 +267,7 @@ router.patch('/:id/status', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.patch('/:id/balance', requireAuth, async (req: AuthedRequest, res) => {
+router.patch('/:id/balance', requireAuth, requirePermission('users.edit'), async (req: AuthedRequest, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -329,7 +350,7 @@ router.patch('/:id/balance', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.delete('/:id', requireAuth, async (req: AuthedRequest, res) => {
+router.delete('/:id', requireAuth, requirePermission('users.delete'), async (req: AuthedRequest, res) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {

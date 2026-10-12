@@ -8,7 +8,7 @@ import { DirectMessage } from '../../models/DirectMessage.js';
 import { Feed } from '../../models/Feed.js';
 import { SocialReport } from '../../models/SocialReport.js';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
-import { requireAdmin } from '../../middleware/admin.js';
+import { requireAdmin, requirePermission } from '../../middleware/admin.js';
 import { Follow } from '../../models/Follow.js';
 import { getAppSettings, normalizeMessagingSettings, normalizeProfileSocialSettings } from '../../models/AppSettings.js';
 import { normalizeP1Flags } from '../../utils/p1-flags.js';
@@ -372,7 +372,7 @@ router.post('/reels/:id/view', requireAuth, async (req, res) => {
   }
 });
 
-router.get('/reels/admin', requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+router.get('/reels/admin', requireAuth, requireAdmin, requirePermission('feed.view'), async (req: AuthedRequest, res) => {
   try {
     const { skip, limit } = parsePagination(req);
     const [reels, total] = await Promise.all([
@@ -399,7 +399,7 @@ router.get('/reels/admin', requireAuth, requireAdmin, async (req: AuthedRequest,
   }
 });
 
-router.delete('/reels/:id', requireAuth, requireAdmin, async (req, res) => {
+router.delete('/reels/:id', requireAuth, requireAdmin, requirePermission('feed.edit'), async (req, res) => {
   try {
     const reel = await Reel.findByIdAndDelete(req.params.id);
     if (!reel) return res.status(404).json({ status: false, message: 'Reel not found' });
@@ -461,7 +461,7 @@ router.post('/reports', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.get('/reports', requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+router.get('/reports', requireAuth, requireAdmin, requirePermission('feed.view'), async (req: AuthedRequest, res) => {
   try {
     const { skip, limit } = parsePagination(req);
     const status = typeof req.query.status === 'string' ? req.query.status : undefined;
@@ -496,7 +496,7 @@ router.get('/reports', requireAuth, requireAdmin, async (req: AuthedRequest, res
   }
 });
 
-router.patch('/reports/:id', requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+router.patch('/reports/:id', requireAuth, requireAdmin, requirePermission('feed.edit'), async (req: AuthedRequest, res) => {
   try {
     const { status, adminNote } = req.body as { status?: string; adminNote?: string };
     const report = await SocialReport.findById(req.params.id);
@@ -838,7 +838,7 @@ router.get('/messaging-settings', async (_req, res) => {
   }
 });
 
-router.put('/messaging-settings', requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+router.put('/messaging-settings', requireAuth, requireAdmin, requirePermission('customer-support.view'), async (req: AuthedRequest, res) => {
   try {
     const settings = await getAppSettings();
     settings.messaging = normalizeMessagingSettings(req.body || {});
@@ -867,7 +867,7 @@ router.get('/profile-social-settings', async (_req, res) => {
   }
 });
 
-router.put('/profile-social-settings', requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+router.put('/profile-social-settings', requireAuth, requireAdmin, requirePermission('feed.edit'), async (req: AuthedRequest, res) => {
   try {
     const settings = await getAppSettings();
     settings.profileSocial = normalizeProfileSocialSettings(req.body || {});

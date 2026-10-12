@@ -3,7 +3,7 @@ import type express from 'express';
 import multer from 'multer';
 import fs from 'fs';
 import { requireAuth } from '../../middleware/auth.js';
-import { requireAdmin } from '../../middleware/admin.js';
+import { requireAdmin, requirePermission } from '../../middleware/admin.js';
 import {
   getAppSettings,
   normalizeAppDownloadSettings,
@@ -299,7 +299,7 @@ router.get('/site-notice', async (_req, res) => {
   }
 });
 
-router.put('/site-notice', requireAuth, requireAdmin, async (req, res) => {
+router.put('/site-notice', requireAuth, requireAdmin, requirePermission('notifications.send', 'users.edit'), async (req, res) => {
   try {
     const settings = await getAppSettings();
     const body = req.body as Partial<SiteNoticeSettings> & { bumpVersion?: boolean; sendEmail?: boolean };
@@ -417,7 +417,7 @@ router.get('/p1', requireAuth, async (_req, res) => {
   }
 });
 
-router.put('/p1', requireAuth, requireAdmin, async (req, res) => {
+router.put('/p1', requireAuth, requireAdmin, requirePermission('engagement.edit'), async (req, res) => {
   try {
     const settings = await getAppSettings();
     settings.p1 = normalizeP1Flags({ ...normalizeP1Flags(settings.p1), ...(req.body || {}) });
@@ -439,7 +439,7 @@ router.get('/p2', requireAuth, async (_req, res) => {
   }
 });
 
-router.put('/p2', requireAuth, requireAdmin, async (req, res) => {
+router.put('/p2', requireAuth, requireAdmin, requirePermission('engagement.edit'), async (req, res) => {
   try {
     const settings = await getAppSettings();
     settings.p2 = normalizeP2Flags({ ...normalizeP2Flags(settings.p2), ...(req.body || {}) });

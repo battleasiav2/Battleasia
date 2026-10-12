@@ -4,6 +4,7 @@ import { Game } from '../../../models/Game.js';
 import { Match, type IMatchResultEntry } from '../../../models/Match.js';
 import { MatchParticipant } from '../../../models/MatchParticipant.js';
 import { requireAuth } from '../../../middleware/auth.js';
+import { requirePermission } from '../../../middleware/admin.js';
 import {
   buildSearchFilter,
   paginatedResults,
@@ -33,7 +34,7 @@ async function getGameNameMap(gameIds: string[]) {
   return new Map(games.map((g) => [g._id.toString(), g.name]));
 }
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', requireAuth, requirePermission('matches.view'), async (req, res) => {
   try {
     const { skip, limit, search } = parsePagination(req);
     const filter: Record<string, unknown> = {
@@ -66,7 +67,7 @@ router.get('/', requireAuth, async (req, res) => {
   }
 });
 
-router.get('/:id/participants', requireAuth, async (req, res) => {
+router.get('/:id/participants', requireAuth, requirePermission('matches.view', 'matches.result'), async (req, res) => {
   try {
     const { skip, limit, search } = parsePagination(req);
     const filter: Record<string, unknown> = { matchId: req.params.id };
@@ -96,7 +97,7 @@ router.get('/:id/participants', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/:id/results', requireAuth, async (req, res) => {
+router.put('/:id/results', requireAuth, requirePermission('matches.result'), async (req, res) => {
   try {
     const match = await Match.findById(req.params.id);
     if (!match) {
@@ -117,7 +118,7 @@ router.put('/:id/results', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/:id/entries', requireAuth, async (req, res) => {
+router.put('/:id/entries', requireAuth, requirePermission('matches.result'), async (req, res) => {
   try {
     const match = await Match.findById(req.params.id);
     if (!match) {
@@ -162,7 +163,7 @@ router.put('/:id/entries', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/:id/distribute-winnings', requireAuth, async (req, res) => {
+router.post('/:id/distribute-winnings', requireAuth, requirePermission('matches.result'), async (req, res) => {
   try {
     const match = await Match.findById(req.params.id);
     if (!match) {
@@ -212,7 +213,7 @@ router.post('/:id/distribute-winnings', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/:id/refund', requireAuth, async (req, res) => {
+router.post('/:id/refund', requireAuth, requirePermission('matches.result'), async (req, res) => {
   try {
     const match = await Match.findById(req.params.id);
     if (!match) {
@@ -250,7 +251,7 @@ router.post('/:id/refund', requireAuth, async (req, res) => {
   }
 });
 
-router.get('/:id', requireAuth, async (req, res) => {
+router.get('/:id', requireAuth, requirePermission('matches.view', 'matches.result'), async (req, res) => {
   try {
     const match = await Match.findById(req.params.id);
     if (!match) {
@@ -264,7 +265,7 @@ router.get('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', requireAuth, requirePermission('matches.create'), async (req, res) => {
   try {
     const body = req.body;
     if (!body.gameId || !body.matchName) {
@@ -313,7 +314,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-router.put('/:id', requireAuth, async (req, res) => {
+router.put('/:id', requireAuth, requirePermission('matches.edit'), async (req, res) => {
   try {
     const match = await Match.findById(req.params.id);
     if (!match) {
@@ -368,7 +369,7 @@ router.put('/:id', requireAuth, async (req, res) => {
   }
 });
 
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', requireAuth, requirePermission('matches.delete'), async (req, res) => {
   try {
     const match = await Match.findById(req.params.id);
     if (!match) {

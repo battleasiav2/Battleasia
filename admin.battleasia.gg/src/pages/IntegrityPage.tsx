@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useOutletContext } from 'react-router-dom';
+import { Navigate, useLocation, useOutletContext } from 'react-router-dom';
 import { api, explainError, unwrapData, unwrapList } from '../lib/api';
+import { can } from '../lib/auth';
 import { INTEGRITY } from '../lib/catalog';
 import { cell, downloadCsv, downloadExcel, pick, rowId, toCsv } from '../lib/format';
 import { useI18n } from '../lib/i18n';
@@ -64,6 +65,7 @@ export function IntegrityPage() {
       </main>
     );
   }
+  if (spec.perm && !can(spec.perm)) return <Navigate to="/403" replace />;
 
   const cols = rows[0]
     ? Object.keys(rows[0])

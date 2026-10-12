@@ -226,14 +226,14 @@ export function ListPage() {
           </p>
         ) : null}
       </header>
-      {location.pathname === '/games/matches' ? (
+      {location.pathname === '/games/matches' && can('matches.create') ? (
         <p>
           <Link className="btn btn-primary" to="/games/matches/new">
             {t('list.newMatch')}
           </Link>
         </p>
       ) : null}
-      {location.pathname === '/games/list' ? (
+      {location.pathname === '/games/list' && can('matches.create') ? (
         <p>
           <Link className="btn btn-primary" to="/games/list/new">
             {t('list.newGame')}
@@ -385,7 +385,11 @@ export function ListPage() {
                       if (col === 'name' && location.pathname === '/games/list' && id) {
                         return (
                           <td key={col}>
-                            <Link to={`/games/list/${id}/edit`}>{cell(pick(row, col))}</Link>
+                            {can('matches.edit') ? (
+                              <Link to={`/games/list/${id}/edit`}>{cell(pick(row, col))}</Link>
+                            ) : (
+                              cell(pick(row, col))
+                            )}
                           </td>
                         );
                       }
@@ -394,7 +398,11 @@ export function ListPage() {
                         if (matchId) {
                           return (
                             <td key={col}>
-                              <Link to={`/games/matches/${matchId}/edit`}>{cell(pick(row, col)) || '—'}</Link>
+                              {can('matches.edit') ? (
+                                <Link to={`/games/matches/${matchId}/edit`}>{cell(pick(row, col)) || '—'}</Link>
+                              ) : (
+                                cell(pick(row, col)) || '—'
+                              )}
                             </td>
                           );
                         }
@@ -406,17 +414,17 @@ export function ListPage() {
                     })}
                     {location.pathname === '/games/matches' && id ? (
                       <td>
-                        <Link to={`/games/matches/${id}/edit`}>{t('list.edit')}</Link>
-                        {' · '}
-                        <Link to={`/games/matches/${id}/result`}>{t('list.result')}</Link>
+                        {can('matches.edit') ? <Link to={`/games/matches/${id}/edit`}>{t('list.edit')}</Link> : null}
+                        {can('matches.edit') && can('matches.result') ? ' · ' : null}
+                        {can('matches.result') ? <Link to={`/games/matches/${id}/result`}>{t('list.result')}</Link> : null}
                       </td>
                     ) : null}
                     {location.pathname === '/games/list' && id ? (
                       <td>
-                        <Link to={`/games/list/${id}/edit`}>{t('list.edit')}</Link>
+                        {can('matches.edit') ? <Link to={`/games/list/${id}/edit`}>{t('list.edit')}</Link> : null}
                       </td>
                     ) : null}
-                    {location.pathname === '/games/participants-history' && row.matchId ? (
+                    {location.pathname === '/games/participants-history' && row.matchId && can('matches.result') ? (
                       <td>
                         <Link to={`/games/matches/${String(row.matchId)}/result`}>{t('list.result')}</Link>
                       </td>

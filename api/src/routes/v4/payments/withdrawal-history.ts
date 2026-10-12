@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { WithdrawalHistory } from '../../../models/WithdrawalHistory.js';
 import { User } from '../../../models/User.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
-import { requireAdmin } from '../../../middleware/admin.js';
+import { requireAdmin, requirePermission } from '../../../middleware/admin.js';
 import { paginatedResults, parsePagination } from '../../../utils/pagination.js';
 import { recordBalanceHistory } from '../../../utils/balance-history.js';
 import {
@@ -42,7 +42,7 @@ type WithdrawalSubmitBody = {
   notes?: string;
 };
 
-router.get('/stats', requireAdmin, async (_req, res) => {
+router.get('/stats', requireAdmin, requirePermission('payments.manage'), async (_req, res) => {
   try {
     const [pending, approved, completed, rejected] = await Promise.all([
       WithdrawalHistory.countDocuments({ status: 'pending' }),
@@ -57,7 +57,7 @@ router.get('/stats', requireAdmin, async (_req, res) => {
   }
 });
 
-router.get('/', requireAdmin, async (req, res) => {
+router.get('/', requireAdmin, requirePermission('payments.manage'), async (req, res) => {
   try {
     const { skip, limit } = parsePagination(req);
     const filter: Record<string, unknown> = {};
@@ -262,7 +262,7 @@ router.get('/:id', requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
+router.patch('/:id/approve', requireAdmin, requirePermission('payments.manage'), async (req: AuthedRequest, res) => {
   try {
     const existing = await WithdrawalHistory.findById(req.params.id);
     if (!existing) return res.status(404).json({ status: false, message: 'Withdrawal not found' });
@@ -303,7 +303,7 @@ router.patch('/:id/approve', requireAdmin, async (req: AuthedRequest, res) => {
   }
 });
 
-router.patch('/:id/complete', requireAdmin, async (req: AuthedRequest, res) => {
+router.patch('/:id/complete', requireAdmin, requirePermission('payments.manage'), async (req: AuthedRequest, res) => {
   try {
     const existing = await WithdrawalHistory.findById(req.params.id);
     if (!existing) return res.status(404).json({ status: false, message: 'Withdrawal not found' });
@@ -337,7 +337,7 @@ router.patch('/:id/complete', requireAdmin, async (req: AuthedRequest, res) => {
   }
 });
 
-router.patch('/:id/reject', requireAdmin, async (req: AuthedRequest, res) => {
+router.patch('/:id/reject', requireAdmin, requirePermission('payments.manage'), async (req: AuthedRequest, res) => {
   try {
     const withdrawal = await WithdrawalHistory.findById(req.params.id);
     if (!withdrawal) {

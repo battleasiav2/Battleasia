@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { PaymentChannel } from '../../../models/PaymentChannel.js';
 import { requireAuth } from '../../../middleware/auth.js';
-import { requireAdmin } from '../../../middleware/admin.js';
+import { requireAdmin, requirePermission } from '../../../middleware/admin.js';
 import {
   buildSearchFilter,
   paginatedResults,
@@ -10,7 +10,7 @@ import {
 
 const router = Router();
 
-router.get('/', requireAdmin, async (req, res) => {
+router.get('/', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
   try {
     const { skip, limit, search } = parsePagination(req);
     const filter = buildSearchFilter(search, ['channel_name', 'description']);
@@ -64,7 +64,7 @@ router.get('/public', requireAuth, async (req, res) => {
   }
 });
 
-router.get('/:id', requireAdmin, async (req, res) => {
+router.get('/:id', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
   try {
     const channel = await PaymentChannel.findById(req.params.id);
     if (!channel) {
@@ -86,7 +86,7 @@ router.get('/:id', requireAdmin, async (req, res) => {
   }
 });
 
-router.post('/', requireAdmin, async (req, res) => {
+router.post('/', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
   try {
     const { channel_name, description = '', icon = '' } = req.body;
     if (!channel_name) {
@@ -104,7 +104,7 @@ router.post('/', requireAdmin, async (req, res) => {
   }
 });
 
-router.put('/:id', requireAdmin, async (req, res) => {
+router.put('/:id', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
   try {
     const channel = await PaymentChannel.findById(req.params.id);
     if (!channel) {
@@ -125,7 +125,7 @@ router.put('/:id', requireAdmin, async (req, res) => {
   }
 });
 
-router.patch('/:id/toggle', requireAdmin, async (req, res) => {
+router.patch('/:id/toggle', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
   try {
     const channel = await PaymentChannel.findById(req.params.id);
     if (!channel) {
@@ -140,7 +140,7 @@ router.patch('/:id/toggle', requireAdmin, async (req, res) => {
   }
 });
 
-router.delete('/:id', requireAdmin, async (req, res) => {
+router.delete('/:id', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
   try {
     const channel = await PaymentChannel.findById(req.params.id);
     if (!channel) {
