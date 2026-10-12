@@ -129,6 +129,11 @@ export async function joinPaidMatch(input: {
   const { assertClearOfVelocity } = await import('./velocity.js');
   await assertClearOfVelocity(input.userId, 'join');
   return runMoney(async (session) => {
+    const match = await Match.findById(input.matchId).session(session);
+    if (!match) throw new MoneyError('Match not found', 404);
+    // Lobby only. start, complete, cancel, and deactive are not joinable.
+    if (match.status !== 'active') throw new MoneyError('Match is not joinable');
+
     if (input.idempotencyKey) {
       const replay = await LedgerEntry.findOne({ idempotencyKey: input.idempotencyKey }).session(session);
       if (replay) {
@@ -137,10 +142,6 @@ export async function joinPaidMatch(input: {
         return { balance: user?.balance ?? 0, participantId: part?._id.toString() || '', replayed: true };
       }
     }
-
-    const match = await Match.findById(input.matchId).session(session);
-    if (!match) throw new MoneyError('Match not found', 404);
-    if (match.status !== 'active' && match.status !== 'start') throw new MoneyError('Match is not joinable');
 
     const user = await User.findById(input.userId).session(session);
     if (!user) throw new MoneyError('Unauthorized', 401);

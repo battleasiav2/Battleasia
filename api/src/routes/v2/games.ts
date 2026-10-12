@@ -214,7 +214,7 @@ router.post('/matches/:id/check-join', requireAuth, async (req: AuthedRequest, r
     const issues: string[] = [];
     if (!user.pubgId) issues.push('PUBG ID is required');
     if (existing) issues.push('Already joined');
-    if (match.status !== 'active' && match.status !== 'start') issues.push('Match is not joinable');
+    if (match.status !== 'active') issues.push('Match is not joinable');
     if (participantCount >= match.totalPlayer) issues.push('Match is full');
     if (match.entryFee > (user.balance ?? 0) && !existing) issues.push('Insufficient balance');
     if (match.premiumOnly && user && !isUserPremium(user)) issues.push('Premium required');
@@ -293,7 +293,7 @@ router.post('/matches/:id/join', requireAuth, async (req: AuthedRequest, res) =>
       return res.status(404).json({ status: false, message: 'Match not found' });
     }
 
-    if (match.status !== 'active' && match.status !== 'start') {
+    if (match.status !== 'active') {
       return res.status(400).json({ status: false, message: 'Match is not joinable' });
     }
 

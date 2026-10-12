@@ -156,6 +156,83 @@ describe('§2.9 money engine', () => {
     assert.equal(count, 1);
   });
 
+  it('joins only an active match and leaves balance, participants, and the ledger unchanged otherwise', async () => {
+    const opener = await makeUser(40, 100);
+    const open = await makeMatch({ entryFee: 20, totalPlayer: 4 });
+    const joined = await joinPaidMatch({
+      userId: String(opener._id),
+      matchId: String(open._id),
+      idempotencyKey: 'join-still-active',
+    });
+    assert.equal(joined.replayed, false);
+    assert.equal(joined.balance, 80);
+    const replay = await joinPaidMatch({
+      userId: String(opener._id),
+      matchId: String(open._id),
+      idempotencyKey: 'join-still-active',
+    });
+    assert.equal(replay.replayed, true);
+    assert.equal(replay.balance, 80);
+
+    const blocked = ['start', 'complete', 'cancel', 'deactive'] as const;
+    for (let i = 0; i < blocked.length; i += 1) {
+      const status = blocked[i];
+      const user = await makeUser(41 + i, 50);
+      const match = await makeMatch({ entryFee: 15, totalPlayer: 4, status });
+      const key = `join-blocked-${status}`;
+      const beforeLedger = await LedgerEntry.countDocuments({ userId: user._id });
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        await assert.rejects(
+          () => joinPaidMatch({ userId: String(user._id), matchId: String(match._id), idempotencyKey: key }),
+          (err: unknown) => {
+            assert.ok(err instanceof MoneyError);
+            assert.equal(err.message, 'Match is not joinable');
+            return true;
+          },
+        );
+      }
+      const after = await User.findById(user._id);
+      assert.equal(after?.balance, 50);
+      assert.equal(await MatchParticipant.countDocuments({ matchId: match._id }), 0);
+      assert.equal(await LedgerEntry.countDocuments({ userId: user._id }), beforeLedger);
+      assert.equal(await LedgerEntry.countDocuments({ idempotencyKey: key }), 0);
+    }
+
+    const held = await makeUser(46, 100);
+    const first = await makeMatch({ entryFee: 10, totalPlayer: 4 });
+    await joinPaidMatch({ userId: String(held._id), matchId: String(first._id), idempotencyKey: 'join-then-start' });
+    first.status = 'start';
+    await first.save();
+    await assert.rejects(
+      () => joinPaidMatch({ userId: String(held._id), matchId: String(first._id), idempotencyKey: 'join-then-start' }),
+      (err: unknown) => {
+        assert.ok(err instanceof MoneyError);
+        assert.equal(err.message, 'Match is not joinable');
+        return true;
+      },
+    );
+    const heldAfter = await User.findById(held._id);
+    assert.equal(heldAfter?.balance, 90);
+    assert.equal(await MatchParticipant.countDocuments({ matchId: first._id, userId: held._id }), 1);
+    assert.equal(await LedgerEntry.countDocuments({ refType: 'match_join', refId: String(first._id) }), 1);
+
+    first.status = 'complete';
+    await first.save();
+    const started = await makeMatch({ entryFee: 10, totalPlayer: 4, status: 'start' });
+    await assert.rejects(
+      () => joinPaidMatch({ userId: String(held._id), matchId: String(started._id), idempotencyKey: 'join-then-start' }),
+      (err: unknown) => {
+        assert.ok(err instanceof MoneyError);
+        assert.equal(err.message, 'Match is not joinable');
+        return true;
+      },
+    );
+    const stillHeld = await User.findById(held._id);
+    assert.equal(stillHeld?.balance, 90);
+    assert.equal(await MatchParticipant.countDocuments({ matchId: started._id }), 0);
+    assert.equal(await LedgerEntry.countDocuments({ refId: String(started._id) }), 0);
+  });
+
   it('refunds leave before start and refuses leave after start', async () => {
     const user = await makeUser(6, 40);
     const match = await makeMatch({ entryFee: 10, totalPlayer: 4 });
