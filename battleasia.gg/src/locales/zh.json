@@ -955,6 +955,8 @@
   "legal.privacy.paymentsBody": "BAC balances, deposits, withdrawals, transfers, shop orders, and TrxID proofs are ledger rows reviewed by admin. We do not store bank card numbers. Payment screenshots you upload are used only for approval.",
   "legal.privacy.social": "Feed, stories & support",
   "legal.privacy.socialBody": "Posts, likes, comments, stories, DMs, mute words, and support tickets stay on our servers so social and help features work. Support may keep screenshots you attach to a dispute.",
+  "legal.privacy.cookies": "Cookie 与可选分析",
+  "legal.privacy.cookiesBody": "必要 Cookie 与本地存储用于登录、语言及 battleasia.gg 与 shop.battleasia.gg 之间的会话，使用站点时始终生效。首次访问会询问是否允许可选崩溃/错误分析（Sentry）；若选择“仅必要”，则不会加载该分析。选择会在浏览器中保存约一年。日后可在应用提供偏好设置前，通过清除 BattleAsia 站点数据来更改。",
   "legal.privacy.sharing": "What we do not do",
   "legal.privacy.sharingBody": "We do not sell player lists. Staff and systems access data only to run tournaments, stop abuse, and pay out BAC. Public profiles show what you choose to publish.",
   "legal.privacy.requests": "Your requests",

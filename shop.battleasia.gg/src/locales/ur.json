@@ -303,6 +303,8 @@
   "legal.back": "واپس",
   "legal.privacyTitle": "پرائیویسی پالیسی",
   "legal.privacyBody": "BattleAsia ٹورنامنٹ چلانے کے لیے اکاؤنٹ، میچ اور ادائیگی ریکارڈ رکھتا ہے۔ ہم پلیئر ڈیٹا نہیں بیچتے۔ درخواست کے لیے support@battleasia.gg۔",
+  "legal.privacy.cookies": "کوکیز اور اختیاری تجزیات",
+  "legal.privacy.cookiesBody": "ضروری کوکیز اور local storage سائن ان، زبان اور battleasia.gg / shop.battleasia.gg پر سیشن کے لیے ہیں — سائٹ استعمال کرتے ہی یہ لاگو ہوتے ہیں۔ پہلی وزٹ پر optional crash/error analytics (Sentry) کی اجازت پوچھتے ہیں؛ Essential only پر analytics لوڈ نہیں ہوتا۔ انتخاب تقریباً ایک سال براؤزر میں رہتا ہے۔ بعد میں بدلنے کے لیے BattleAsia site data صاف کریں جب تک app میں preferences control نہ ہو۔",
   "legal.termsTitle": "شرائط و ضوابط",
   "legal.termsBody": "اکاؤنٹ بنا کر آپ فیئر پلے، پیڈ میچ انٹری اور BAC ان ایپ کرنسی مانتے ہیں۔ میچ نتائج اور ادائیگی پر ایڈمن حتمی ہے۔",
   "legal.notFoundTitle": "نہیں ملا",

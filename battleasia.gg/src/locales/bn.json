@@ -1228,6 +1228,8 @@
   "legal.privacy.paymentsBody": "ব্যালেন্স, ডিপোজিট, উইথড্র, ট্রান্সফার, শপ অর্ডার ও TrxID লেজার — অ্যাডমিন রিভিউ করে। কার্ড নম্বর রাখি না। আপলোড করা প্রুফ শুধু অ্যাপ্রুভের জন্য।",
   "legal.privacy.social": "ফিড, স্টোরি ও সাপোর্ট",
   "legal.privacy.socialBody": "পোস্ট, লাইক, কমেন্ট, স্টোরি, ডিএম, মিউট ওয়ার্ড ও টিকেট সার্ভারে থাকে। ডিসপিউটে অ্যাটাচ স্ক্রিনশট সাপোর্ট রাখতে পারে।",
+  "legal.privacy.cookies": "কুকি ও ঐচ্ছিক অ্যানালিটিক্স",
+  "legal.privacy.cookiesBody": "প্রয়োজনীয় কুকি ও local storage দিয়ে সাইন-ইন, ভাষা পছন্দ ও battleasia.gg–shop.battleasia.gg-এ সেশন চলে — সাইট ব্যবহার করলে এগুলো সবসময় থাকে। প্রথম ভিজিটে জিজ্ঞেস করি optional crash/error analytics (Sentry) চালু করবেন কিনা; Essential only বেছে নিলে analytics লোড হয় না। পছন্দ প্রায় এক বছর ব্রাউজারে থাকে। পরে বদলাতে BattleAsia-র site data clear করুন — অ্যাপে preferences control আসলে সেখান থেকেও বদলানো যাবে।",
   "legal.privacy.sharing": "যা করি না",
   "legal.privacy.sharingBody": "প্লেয়ার লিস্ট বিক্রি করি না। স্টাফ/সিস্টেম শুধু টুর্নামেন্ট, অ্যাবিউজ রোধ ও পেআউটের জন্য ডাটা দেখে। পাবলিক প্রোফাইলে যা প্রকাশ করেন তাই দেখায়।",
   "legal.privacy.requests": "আপনার অনুরোধ",

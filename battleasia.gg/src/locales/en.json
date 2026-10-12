@@ -1330,6 +1330,8 @@
   "legal.privacy.matchesBody": "Join history, ready state, lobby chat, room credentials after start, placements, and reports are kept for integrity and payouts. Room IDs stay hidden until start so only paid participants see them.",
   "legal.privacy.social": "Feed, stories & support",
   "legal.privacy.socialBody": "Posts, likes, comments, stories, DMs, mute words, and support tickets stay on our servers so social and help features work. Support may keep screenshots you attach to a dispute.",
+  "legal.privacy.cookies": "Cookies & optional analytics",
+  "legal.privacy.cookiesBody": "Essential cookies and local storage keep you signed in, remember language, and share your session across battleasia.gg and shop.battleasia.gg. They always apply when you use our sites. On first visit we ask whether to allow optional crash/error analytics (Sentry) so we can fix bugs; if you choose Essential only, we do not load that analytics. Your choice is stored in your browser for about one year. To change it later, clear BattleAsia site data in your browser until we offer a preferences control in the app.",
   "legal.privacy.sharing": "What we do not do",
   "legal.privacy.sharingBody": "We do not sell player lists. Staff and systems access data only to run tournaments, stop abuse, and pay out BAC. Public profiles show what you choose to publish.",
   "legal.termsIntro": "BattleAsia hosts competitive mobile tournaments. You play under each game publisher’s rules plus our arena rules. BAC is in-app credit for this platform — not a bank deposit or investment product.",

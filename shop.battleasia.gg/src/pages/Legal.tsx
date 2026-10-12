@@ -24,6 +24,12 @@ export function LegalPage({ kind }: { kind: 'privacy' | 'terms' | 'notFound' }) 
       <article className="legal-body">
         <h1>{t(`legal.${kind}Title`)}</h1>
         <p>{t(`legal.${kind}Body`)}</p>
+        {kind === 'privacy' ? (
+          <>
+            <h2>{t('legal.privacy.cookies')}</h2>
+            <p>{t('legal.privacy.cookiesBody')}</p>
+          </>
+        ) : null}
       </article>
     </div>
   );

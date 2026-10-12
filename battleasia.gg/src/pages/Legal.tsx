@@ -4,7 +4,7 @@ import { useI18n } from '../lib/i18n';
 import '../styles/landing-5173.css';
 
 const SECTIONS: Record<'privacy' | 'terms' | 'notFound', string[]> = {
-  privacy: ['who', 'accounts', 'matches', 'payments', 'social', 'sharing', 'requests'],
+  privacy: ['who', 'accounts', 'matches', 'payments', 'social', 'cookies', 'sharing', 'requests'],
   terms: ['who', 'play', 'rooms', 'bac', 'earn', 'results', 'referral', 'eligibility'],
   notFound: [],
 };
