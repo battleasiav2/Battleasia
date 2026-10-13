@@ -21,6 +21,7 @@ import { signAccessToken } from './utils/jwt.js';
 import {
   approveWithdrawMoney,
   completeWithdrawMoney,
+  MoneyError,
   refundWithdrawMoney,
 } from './utils/money.js';
 import { setSocketServer } from './utils/socket.js';
@@ -667,5 +668,157 @@ describe('phase 1 withdrawal safety', () => {
     const zeroBody = (await withZero.json()) as { data: { currency_amount: number } };
     assert.equal(zeroBody.data.currency_amount, 8);
     assert.equal((await User.findById(zeroed._id))?.balance, 72);
+  });
+
+  it('replays the same completion and rejects a key that belongs to another operation', async () => {
+    const user = await makeUser(30, 100, 100);
+    const response = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(user._id), 'hold-key-18'),
+      body: JSON.stringify({
+        coin_amount: 20,
+        wallet_address: '01700000018',
+        wallet_type: 'bkash',
+        currency_type: 'BDT',
+      }),
+    });
+    assert.equal(response.status, 200);
+    const body = (await response.json()) as { data: { _id: string } };
+    await approveWithdrawMoney({ withdrawalId: body.data._id });
+    assert.equal((await User.findById(user._id))?.balance, 80);
+    await LedgerEntry.create({
+      debitAccount: 'reserve:pending-withdraw',
+      creditAccount: 'platform:payout',
+      amount: 20,
+      userId: user._id,
+      refType: 'withdraw_complete',
+      refId: body.data._id,
+      idempotencyKey: 'complete-key-18',
+    });
+
+    const completed = await completeWithdrawMoney({
+      withdrawalId: body.data._id,
+      transactionHash: 'same-op',
+      idempotencyKey: 'complete-key-18',
+    });
+    assert.equal(completed.balance, 80);
+    await assert.rejects(
+      () => completeWithdrawMoney({ withdrawalId: body.data._id, idempotencyKey: 'complete-key-18' }),
+      (error: unknown) => {
+        assert.ok(error instanceof MoneyError);
+        assert.equal(error.message, 'Withdrawal is not processing');
+        return true;
+      },
+    );
+    assert.equal((await User.findById(user._id))?.balance, 80);
+    assert.equal(await LedgerEntry.countDocuments({ refType: 'withdraw_complete', refId: body.data._id }), 1);
+    assert.equal((await WithdrawalHistory.findById(body.data._id))?.status, 'completed');
+
+    const other = await makeUser(31, 90, 100);
+    const second = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(other._id), 'hold-key-19'),
+      body: JSON.stringify({
+        coin_amount: 15,
+        wallet_address: '01700000019',
+        wallet_type: 'bkash',
+        currency_type: 'BDT',
+      }),
+    });
+    assert.equal(second.status, 200);
+    const secondBody = (await second.json()) as { data: { _id: string } };
+    await approveWithdrawMoney({ withdrawalId: secondBody.data._id });
+    await assert.rejects(
+      () => completeWithdrawMoney({ withdrawalId: secondBody.data._id, idempotencyKey: 'hold-key-19' }),
+      (error: unknown) => {
+        assert.ok(error instanceof MoneyError);
+        assert.equal(error.message, 'Idempotency key already used for a different operation');
+        return true;
+      },
+    );
+    assert.equal((await WithdrawalHistory.findById(secondBody.data._id))?.status, 'processing');
+    assert.equal((await User.findById(other._id))?.balance, 75);
+    assert.equal(await LedgerEntry.countDocuments({ refType: 'withdraw_complete', refId: secondBody.data._id }), 0);
+    assert.equal(await LedgerEntry.countDocuments({ refType: 'withdraw_hold', refId: secondBody.data._id }), 1);
+  });
+
+  it('refuses to refund a completed withdrawal', async () => {
+    const user = await makeUser(32, 100, 100);
+    const response = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(user._id), 'done-refund'),
+      body: JSON.stringify({
+        coin_amount: 25,
+        wallet_address: '01700000020',
+        wallet_type: 'bkash',
+        currency_type: 'BDT',
+      }),
+    });
+    assert.equal(response.status, 200);
+    const body = (await response.json()) as { data: { _id: string } };
+    await approveWithdrawMoney({ withdrawalId: body.data._id });
+    await completeWithdrawMoney({ withdrawalId: body.data._id, idempotencyKey: 'done-refund-complete' });
+    await assert.rejects(
+      () => refundWithdrawMoney({ withdrawalId: body.data._id, idempotencyKey: 'done-refund-again' }),
+      (error: unknown) => {
+        assert.ok(error instanceof MoneyError);
+        assert.equal(error.message, 'Withdrawal cannot be refunded');
+        return true;
+      },
+    );
+    assert.equal((await WithdrawalHistory.findById(body.data._id))?.status, 'completed');
+    assert.equal((await User.findById(user._id))?.balance, 75);
+  });
+
+  it('lets only one concurrent approval or refund move the balance', async () => {
+    const approver = await makeUser(33, 100, 100);
+    const submitted = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(approver._id), 'race-approve'),
+      body: JSON.stringify({
+        coin_amount: 30,
+        wallet_address: '01700000021',
+        wallet_type: 'bkash',
+        currency_type: 'BDT',
+      }),
+    });
+    assert.equal(submitted.status, 200);
+    const submittedBody = (await submitted.json()) as { data: { _id: string } };
+    const approvals = await Promise.allSettled([
+      approveWithdrawMoney({ withdrawalId: submittedBody.data._id, idempotencyKey: 'race-approve-a' }),
+      approveWithdrawMoney({ withdrawalId: submittedBody.data._id, idempotencyKey: 'race-approve-b' }),
+    ]);
+    assert.equal(approvals.filter((result) => result.status === 'fulfilled').length, 1);
+    assert.equal(approvals.filter((result) => result.status === 'rejected').length, 1);
+    assert.equal((await User.findById(approver._id))?.balance, 70);
+    assert.equal(await LedgerEntry.countDocuments({ refType: 'withdraw_hold', refId: submittedBody.data._id }), 1);
+    assert.equal(await LedgerEntry.countDocuments({ refType: 'withdraw_approve', refId: submittedBody.data._id }), 0);
+    assert.equal((await WithdrawalHistory.findById(submittedBody.data._id))?.status, 'processing');
+
+    const legacy = await makeUser(34, 80, 0);
+    const bare = await WithdrawalHistory.create({
+      userId: legacy._id,
+      user_email: legacy.email,
+      username: legacy.username,
+      coin_amount: 20,
+      wallet_address: '01700000022',
+      status: 'pending',
+    });
+    const legacyApprovals = await Promise.allSettled([
+      approveWithdrawMoney({ withdrawalId: String(bare._id), idempotencyKey: 'race-legacy-a' }),
+      approveWithdrawMoney({ withdrawalId: String(bare._id), idempotencyKey: 'race-legacy-b' }),
+    ]);
+    assert.equal(legacyApprovals.filter((result) => result.status === 'fulfilled').length, 1);
+    assert.equal((await User.findById(legacy._id))?.balance, 60);
+    assert.equal(await LedgerEntry.countDocuments({ refType: 'withdraw_approve', refId: String(bare._id) }), 1);
+
+    const refunds = await Promise.allSettled([
+      refundWithdrawMoney({ withdrawalId: submittedBody.data._id, idempotencyKey: 'race-refund-a' }),
+      refundWithdrawMoney({ withdrawalId: submittedBody.data._id, idempotencyKey: 'race-refund-b' }),
+    ]);
+    assert.ok(refunds.some((result) => result.status === 'fulfilled'));
+    assert.equal((await User.findById(approver._id))?.balance, 100);
+    assert.equal((await WithdrawalHistory.findById(submittedBody.data._id))?.status, 'rejected');
+    assert.equal(await LedgerEntry.countDocuments({ refType: 'withdraw_hold_reversal', refId: submittedBody.data._id }), 1);
   });
 });

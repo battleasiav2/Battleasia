@@ -38,6 +38,21 @@ export async function runMoney<T>(fn: (session: mongoose.ClientSession) => Promi
   }
 }
 
+async function matchingLedgerReplay(
+  session: mongoose.ClientSession,
+  idempotencyKey: string | undefined,
+  refType: string,
+  refId: string,
+) {
+  if (!idempotencyKey) return null;
+  const existing = await LedgerEntry.findOne({ idempotencyKey }).session(session);
+  if (!existing) return null;
+  if (existing.refType !== refType || existing.refId !== refId) {
+    throw new MoneyError('Idempotency key already used for a different operation');
+  }
+  return existing;
+}
+
 async function postPair(
   session: mongoose.ClientSession,
   input: {
@@ -53,10 +68,8 @@ async function postPair(
 ) {
   const amount = roundMoney(input.amount);
   if (amount < 0) throw new MoneyError('Ledger amount cannot be negative');
-  if (input.idempotencyKey) {
-    const existing = await LedgerEntry.findOne({ idempotencyKey: input.idempotencyKey }).session(session);
-    if (existing) return existing;
-  }
+  const replay = await matchingLedgerReplay(session, input.idempotencyKey, input.refType, input.refId);
+  if (replay) return replay;
   const rows = await LedgerEntry.create(
     [
       {
@@ -134,13 +147,11 @@ export async function joinPaidMatch(input: {
     // Lobby only. start, complete, cancel, and deactive are not joinable.
     if (match.status !== 'active') throw new MoneyError('Match is not joinable');
 
-    if (input.idempotencyKey) {
-      const replay = await LedgerEntry.findOne({ idempotencyKey: input.idempotencyKey }).session(session);
-      if (replay) {
-        const user = await User.findById(input.userId).session(session);
-        const part = await MatchParticipant.findOne({ matchId: input.matchId, userId: input.userId }).session(session);
-        return { balance: user?.balance ?? 0, participantId: part?._id.toString() || '', replayed: true };
-      }
+    const replay = await matchingLedgerReplay(session, input.idempotencyKey, 'match_join', match._id.toString());
+    if (replay) {
+      const user = await User.findById(input.userId).session(session);
+      const part = await MatchParticipant.findOne({ matchId: input.matchId, userId: input.userId }).session(session);
+      return { balance: user?.balance ?? 0, participantId: part?._id.toString() || '', replayed: true };
     }
 
     const user = await User.findById(input.userId).session(session);
@@ -331,11 +342,14 @@ async function releaseWithdrawHold(
   user: IUser,
   idempotencyKey?: string,
 ) {
+  const refId = withdrawal._id.toString();
+  const replay = await matchingLedgerReplay(session, idempotencyKey, 'withdraw_hold_reversal', refId);
   const hold = await LedgerEntry.findOne({
     refType: 'withdraw_hold',
-    refId: withdrawal._id.toString(),
+    refId,
   }).session(session);
   if (!hold) return false;
+  if (replay) return true;
   const amount = roundMoney(withdrawal.coin_amount);
   const balanceBefore = user.balance ?? 0;
   const updated = await User.findByIdAndUpdate(user._id, { $inc: { balance: amount } }, { new: true, session });
@@ -486,10 +500,17 @@ export async function cancelWithdrawByUser(input: {
     if (!user) throw new MoneyError('User not found', 404);
 
     await releaseWithdrawHold(session, withdrawal, user, input.idempotencyKey);
-    withdrawal.status = 'rejected';
-    withdrawal.rejection_reason = 'Cancelled by user';
-    withdrawal.processed_at = new Date();
-    await withdrawal.save({ session });
+    const claimed = await WithdrawalHistory.updateOne(
+      { _id: withdrawal._id, status: 'pending' },
+      {
+        $set: {
+          status: 'rejected',
+          rejection_reason: 'Cancelled by user',
+          processed_at: new Date(),
+        },
+      },
+    ).session(session);
+    if (claimed.modifiedCount !== 1) throw new MoneyError('Withdrawal cannot be cancelled');
     await releaseOpenWithdrawalSlot(session, withdrawal._id);
     return { balance: user.balance ?? 0 };
   });
@@ -504,48 +525,52 @@ export async function approveWithdrawMoney(input: { withdrawalId: string; idempo
     if (!user) throw new MoneyError('User not found', 404);
     const amount = roundMoney(withdrawal.coin_amount);
 
+    const refId = withdrawal._id.toString();
     const hold = await LedgerEntry.findOne({
       refType: 'withdraw_hold',
-      refId: withdrawal._id.toString(),
+      refId,
     }).session(session);
 
-    if (hold) {
-      withdrawal.status = 'processing';
-      withdrawal.processed_at = new Date();
-      await withdrawal.save({ session });
-      await writeHistory(session, user, amount, 'withdraw', user.balance ?? 0, user.balance ?? 0, {
-        reason: 'withdrawal_approved',
-        withdrawal_id: withdrawal._id.toString(),
-      });
-      return { balance: user.balance ?? 0 };
+    if (!hold) {
+      const approveReplay = await matchingLedgerReplay(session, input.idempotencyKey, 'withdraw_approve', refId);
+      if (!approveReplay) {
+        const balanceBefore = user.balance ?? 0;
+        if (balanceBefore < amount) throw new MoneyError('Insufficient user balance');
+        const updated = await User.findOneAndUpdate(
+          { _id: user._id, balance: { $gte: amount } },
+          { $inc: { balance: -amount } },
+          { new: true, session },
+        );
+        if (!updated) throw new MoneyError('Insufficient user balance');
+        user.balance = updated.balance;
+        await postPair(session, {
+          debitAccount: walletAccount(user._id.toString()),
+          creditAccount: 'reserve:pending-withdraw',
+          amount,
+          userId: user._id,
+          refType: 'withdraw_approve',
+          refId,
+          idempotencyKey: input.idempotencyKey,
+        });
+        await writeHistory(session, user, amount, 'withdraw', balanceBefore, updated.balance ?? 0, {
+          reason: 'withdrawal_approved',
+          withdrawal_id: refId,
+        });
+      }
     }
 
-    const balanceBefore = user.balance ?? 0;
-    if (balanceBefore < amount) throw new MoneyError('Insufficient user balance');
-    const updated = await User.findOneAndUpdate(
-      { _id: user._id, balance: { $gte: amount } },
-      { $inc: { balance: -amount } },
-      { new: true, session },
-    );
-    if (!updated) throw new MoneyError('Insufficient user balance');
-    user.balance = updated.balance;
-    withdrawal.status = 'processing';
-    withdrawal.processed_at = new Date();
-    await withdrawal.save({ session });
-    await postPair(session, {
-      debitAccount: walletAccount(user._id.toString()),
-      creditAccount: 'reserve:pending-withdraw',
-      amount,
-      userId: user._id,
-      refType: 'withdraw_approve',
-      refId: withdrawal._id.toString(),
-      idempotencyKey: input.idempotencyKey,
-    });
-    await writeHistory(session, user, amount, 'withdraw', balanceBefore, updated.balance ?? 0, {
-      reason: 'withdrawal_approved',
-      withdrawal_id: withdrawal._id.toString(),
-    });
-    return { balance: updated.balance ?? 0 };
+    const claimed = await WithdrawalHistory.updateOne(
+      { _id: withdrawal._id, status: 'pending' },
+      { $set: { status: 'processing', processed_at: new Date() } },
+    ).session(session);
+    if (claimed.modifiedCount !== 1) throw new MoneyError('Withdrawal is not pending');
+    if (hold) {
+      await writeHistory(session, user, amount, 'withdraw', user.balance ?? 0, user.balance ?? 0, {
+        reason: 'withdrawal_approved',
+        withdrawal_id: refId,
+      });
+    }
+    return { balance: user.balance ?? 0 };
   });
 }
 
@@ -553,32 +578,47 @@ export async function refundWithdrawMoney(input: { withdrawalId: string; idempot
   return runMoney(async (session) => {
     const withdrawal = await WithdrawalHistory.findById(input.withdrawalId).session(session);
     if (!withdrawal) throw new MoneyError('Withdrawal not found', 404);
+    if (withdrawal.status === 'completed') throw new MoneyError('Withdrawal cannot be refunded');
+    if (withdrawal.status === 'rejected') {
+      const current = await User.findById(withdrawal.userId).session(session);
+      return { balance: current?.balance ?? 0 };
+    }
+    if (withdrawal.status !== 'pending' && withdrawal.status !== 'processing') {
+      throw new MoneyError('Withdrawal cannot be refunded');
+    }
     const user = await User.findById(withdrawal.userId).session(session);
     if (!user) throw new MoneyError('User not found', 404);
     const amount = roundMoney(withdrawal.coin_amount);
-    if (withdrawal.status === 'pending') {
+    const refId = withdrawal._id.toString();
+    const fromStatus = withdrawal.status;
+    if (fromStatus === 'pending') {
       await releaseWithdrawHold(session, withdrawal, user, input.idempotencyKey);
-    } else if (withdrawal.status === 'processing') {
+    } else {
       const original = await LedgerEntry.findOne({
         refType: 'withdraw_approve',
-        refId: withdrawal._id.toString(),
+        refId,
       }).session(session);
       if (original) {
-        const balanceBefore = user.balance ?? 0;
-        const updated = await User.findByIdAndUpdate(user._id, { $inc: { balance: amount } }, { new: true, session });
-        user.balance = updated?.balance ?? balanceBefore + amount;
-        await reverseEntry(session, original._id, input.idempotencyKey);
-        await writeHistory(session, user, amount, 'deposit', balanceBefore, user.balance ?? 0, {
-          reason: 'withdrawal_rejected_refund',
-          withdrawal_id: withdrawal._id.toString(),
-        });
+        const replay = await matchingLedgerReplay(session, input.idempotencyKey, 'withdraw_approve_reversal', refId);
+        if (!replay) {
+          const balanceBefore = user.balance ?? 0;
+          const updated = await User.findByIdAndUpdate(user._id, { $inc: { balance: amount } }, { new: true, session });
+          user.balance = updated?.balance ?? balanceBefore + amount;
+          await reverseEntry(session, original._id, input.idempotencyKey);
+          await writeHistory(session, user, amount, 'deposit', balanceBefore, user.balance ?? 0, {
+            reason: 'withdrawal_rejected_refund',
+            withdrawal_id: refId,
+          });
+        }
       } else {
         await releaseWithdrawHold(session, withdrawal, user, input.idempotencyKey);
       }
     }
-    withdrawal.status = 'rejected';
-    withdrawal.processed_at = new Date();
-    await withdrawal.save({ session });
+    const claimed = await WithdrawalHistory.updateOne(
+      { _id: withdrawal._id, status: fromStatus },
+      { $set: { status: 'rejected', processed_at: new Date() } },
+    ).session(session);
+    if (claimed.modifiedCount !== 1) throw new MoneyError('Withdrawal cannot be refunded');
     await releaseOpenWithdrawalSlot(session, withdrawal._id);
     return { balance: user.balance ?? 0 };
   });
@@ -590,19 +630,27 @@ export async function completeWithdrawMoney(input: { withdrawalId: string; trans
     if (!withdrawal) throw new MoneyError('Withdrawal not found', 404);
     if (withdrawal.status !== 'processing') throw new MoneyError('Withdrawal is not processing');
     const amount = roundMoney(withdrawal.coin_amount);
+    const refId = withdrawal._id.toString();
     await postPair(session, {
       debitAccount: 'reserve:pending-withdraw',
       creditAccount: 'platform:payout',
       amount,
       userId: withdrawal.userId,
       refType: 'withdraw_complete',
-      refId: withdrawal._id.toString(),
+      refId,
       idempotencyKey: input.idempotencyKey,
     });
-    withdrawal.status = 'completed';
-    withdrawal.transaction_hash = input.transactionHash || withdrawal.transaction_hash || '';
-    withdrawal.processed_at = new Date();
-    await withdrawal.save({ session });
+    const claimed = await WithdrawalHistory.updateOne(
+      { _id: withdrawal._id, status: 'processing' },
+      {
+        $set: {
+          status: 'completed',
+          transaction_hash: input.transactionHash || withdrawal.transaction_hash || '',
+          processed_at: new Date(),
+        },
+      },
+    ).session(session);
+    if (claimed.modifiedCount !== 1) throw new MoneyError('Withdrawal is not processing');
     await releaseOpenWithdrawalSlot(session, withdrawal._id);
     const user = await User.findById(withdrawal.userId).session(session);
     return { balance: user?.balance ?? 0 };
@@ -634,19 +682,21 @@ export async function transferMoney(input: {
     if (input.idempotencyKey) {
       const replay = await LedgerEntry.findOne({ idempotencyKey: input.idempotencyKey }).session(session);
       if (replay) {
-        const existing = await UserTransferHistory.findById(replay.refId).session(session);
-        if (existing) {
-          const sender = await User.findById(input.senderId).session(session);
-          const recipient = await User.findById(existing.recipientId).session(session);
-          return {
-            transfer: serializeUserTransferHistory(existing, input.senderId),
-            replayed: true,
-            senderBalance: sender?.balance ?? 0,
-            senderBefore: sender?.balance ?? 0,
-            recipientBalance: recipient?.balance ?? 0,
-            recipientBefore: recipient?.balance ?? 0,
-          };
+        if (replay.refType !== 'p2p_transfer') {
+          throw new MoneyError('Idempotency key already used for a different operation');
         }
+        const existing = await UserTransferHistory.findById(replay.refId).session(session);
+        if (!existing) throw new MoneyError('Idempotency key already used for a different operation');
+        const sender = await User.findById(input.senderId).session(session);
+        const recipient = await User.findById(existing.recipientId).session(session);
+        return {
+          transfer: serializeUserTransferHistory(existing, input.senderId),
+          replayed: true,
+          senderBalance: sender?.balance ?? 0,
+          senderBefore: sender?.balance ?? 0,
+          recipientBalance: recipient?.balance ?? 0,
+          recipientBefore: recipient?.balance ?? 0,
+        };
       }
     }
 
@@ -858,13 +908,11 @@ export async function moveWallet(input: {
   return runMoney(async (session) => {
     const amount = roundMoney(input.amount);
     if (amount <= 0) throw new MoneyError('Amount must be greater than zero');
-    if (input.idempotencyKey) {
-      const replay = await LedgerEntry.findOne({ idempotencyKey: input.idempotencyKey }).session(session);
-      if (replay) {
-        const user = await User.findById(input.userId).session(session);
-        const balance = user?.balance ?? 0;
-        return { balance, before: balance, replayed: true };
-      }
+    const replay = await matchingLedgerReplay(session, input.idempotencyKey, input.refType, input.refId);
+    if (replay) {
+      const user = await User.findById(input.userId).session(session);
+      const balance = user?.balance ?? 0;
+      return { balance, before: balance, replayed: true };
     }
     const user = await User.findById(input.userId).session(session);
     if (!user) throw new MoneyError('Unauthorized', 401);
