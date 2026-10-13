@@ -217,6 +217,7 @@ describe('phase 1 withdrawal safety', () => {
     const poorFresh = await User.findById(poor._id);
     assert.equal(poorFresh?.balance, 10);
     assert.equal(await WithdrawalHistory.countDocuments({ userId: poor._id }), 0);
+    assert.equal(await LedgerEntry.countDocuments({ userId: poor._id, refType: 'withdraw_hold' }), 0);
   });
 
   it('does not hold BAC when automated payout or collection is requested', async () => {
@@ -521,6 +522,7 @@ describe('phase 1 withdrawal safety', () => {
       assert.equal((await User.findOne({ _id: user._id }))?.balance, 100);
       assert.equal(await WithdrawalHistory.countDocuments({ userId: user._id }), 0);
       assert.equal(await LedgerEntry.countDocuments({ userId: user._id, refType: 'withdraw_hold' }), 0);
+      assert.equal(await BalanceHistory.countDocuments({ userId: user._id, 'detail.reason': 'withdrawal_requested' }), 0);
     } finally {
       find.mock.restore();
     }

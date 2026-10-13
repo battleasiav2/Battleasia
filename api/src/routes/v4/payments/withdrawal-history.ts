@@ -11,8 +11,8 @@ import {
   approveWithdrawMoney,
   cancelWithdrawByUser,
   completeWithdrawMoney,
-  holdWithdrawOnSubmit,
   refundWithdrawMoney,
+  submitWithdrawalAndHold,
   MoneyError,
   roundMoney,
 } from '../../../utils/money.js';
@@ -185,56 +185,40 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
     const { recordFingerprint } = await import('../../../utils/fingerprint.js');
     void recordFingerprint(req, user._id.toString());
 
-    const withdrawal = await WithdrawalHistory.create({
-      userId: user._id,
-      user_email: user.email,
+    const submitted = await submitWithdrawalAndHold({
+      userId: user._id.toString(),
+      userEmail: user.email,
       username: user.username,
-      coin_amount: coinAmount,
-      wallet_type: walletType,
-      wallet_address: walletAddress,
-      currency_type: currencyType,
-      currency_amount: currencyAmount,
+      coinAmount,
+      walletType,
+      walletAddress,
+      currencyType,
+      currencyAmount,
       description: body.description?.trim() || '',
       notes: body.notes?.trim() || '',
-      status: 'pending',
-      openSlot: user._id,
-      ...(idemKey ? { idempotencyKey: idemKey } : {}),
+      idempotencyKey: idemKey || undefined,
     });
 
-    let heldBalance = user.balance ?? 0;
-    try {
-      const held = await holdWithdrawOnSubmit({
-        withdrawalId: withdrawal._id.toString(),
-        userId: user._id.toString(),
-        idempotencyKey: idemKey || undefined,
-      });
-      heldBalance = held.balance;
-    } catch (holdError) {
-      await WithdrawalHistory.findByIdAndDelete(withdrawal._id);
-      if (holdError instanceof MoneyError) {
-        return res.status(holdError.status).json({ status: false, message: holdError.message });
+    if (!submitted.replayed) {
+      try {
+        await notifyBalanceChange(user._id.toString(), submitted.balance, user.balance ?? 0);
+        await emitPendingPaymentCounts();
+        emitNewWithdrawal(serializeWithdrawal(submitted.withdrawal));
+        await notifyWithdrawalSubmitted({
+          userId: user._id.toString(),
+          amount: coinAmount,
+          withdrawalId: submitted.withdrawal._id.toString(),
+        });
+      } catch (sideError) {
+        const label = sideError instanceof Error ? sideError.name : 'Error';
+        console.error('withdrawal submit side-effect failed:', label);
       }
-      throw holdError;
-    }
-
-    try {
-      await notifyBalanceChange(user._id.toString(), heldBalance, user.balance ?? 0);
-      await emitPendingPaymentCounts();
-      emitNewWithdrawal(serializeWithdrawal(withdrawal));
-      await notifyWithdrawalSubmitted({
-        userId: user._id.toString(),
-        amount: coinAmount,
-        withdrawalId: withdrawal._id.toString(),
-      });
-    } catch (sideError) {
-      const label = sideError instanceof Error ? sideError.name : 'Error';
-      console.error('withdrawal submit side-effect failed:', label);
     }
 
     return res.status(200).json({
       status: true,
       message: 'Withdrawal request submitted successfully',
-      data: serializeWithdrawal(withdrawal),
+      data: serializeWithdrawal(submitted.withdrawal),
     });
   } catch (error) {
     const duplicate = duplicateWithdrawalField(error);
