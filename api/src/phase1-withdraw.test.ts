@@ -8,6 +8,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import { BalanceHistory } from './models/BalanceHistory.js';
+import { CoinRate } from './models/CoinRate.js';
 import { CoingoTransaction } from './models/CoingoTransaction.js';
 import { LedgerEntry } from './models/LedgerEntry.js';
 import { Notification } from './models/Notification.js';
@@ -111,6 +112,10 @@ describe('phase 1 withdrawal safety', () => {
     });
     await mongoose.connect(replset.getUri());
     await WithdrawalHistory.syncIndexes();
+    await CoinRate.create([
+      { region: 'bangladesh', currency: 'BDT', rate: 1, isActive: true },
+      { region: 'global', currency: 'USD', rate: 0.05, isActive: true },
+    ]);
 
     const app = express();
     app.use(express.json());
@@ -519,5 +524,146 @@ describe('phase 1 withdrawal safety', () => {
     } finally {
       find.mock.restore();
     }
+  });
+
+  it('stores the authenticated account when the client sends another identity', async () => {
+    const user = await makeUser(12, 100, 200);
+    const response = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(user._id), 'identity-spoof'),
+      body: JSON.stringify({
+        user_email: 'other-person@example.com',
+        username: 'other-person',
+        coin_amount: 15,
+        wallet_address: '01700000012',
+        wallet_type: 'bkash',
+        currency_type: 'BDT',
+      }),
+    });
+    assert.equal(response.status, 200);
+    const body = (await response.json()) as { status: boolean; data: { _id: string; user_email: string; username: string } };
+    assert.equal(body.status, true);
+    assert.equal(body.data.user_email, user.email);
+    assert.equal(body.data.username, user.username);
+    const saved = await WithdrawalHistory.findById(body.data._id);
+    assert.equal(saved?.userId.toString(), user._id.toString());
+    assert.equal(saved?.user_email, user.email);
+    assert.equal(saved?.username, user.username);
+  });
+
+  it('stores the server rate instead of a client fiat amount and rejects an unknown currency', async () => {
+    const user = await makeUser(13, 100, 200);
+    const tampered = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(user._id), 'fiat-tamper'),
+      body: JSON.stringify({
+        coin_amount: 20,
+        wallet_address: '01700000013',
+        wallet_type: 'bkash',
+        currency_type: 'BDT',
+        currency_amount: -999,
+      }),
+    });
+    assert.equal(tampered.status, 200);
+    const tamperedBody = (await tampered.json()) as { data: { _id: string; currency_amount: number } };
+    assert.equal(tamperedBody.data.currency_amount, 20);
+    const saved = await WithdrawalHistory.findById(tamperedBody.data._id);
+    assert.equal(saved?.currency_amount, 20);
+
+    const stranger = await makeUser(18, 50, 100);
+    const unknown = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(stranger._id), 'fiat-unknown'),
+      body: JSON.stringify({
+        coin_amount: 5,
+        wallet_address: '01700000018',
+        wallet_type: 'bkash',
+        currency_type: 'ZZZ',
+        currency_amount: 5000,
+      }),
+    });
+    const unknownBody = (await unknown.json()) as { status: boolean; message: string };
+    assert.equal(unknown.status, 400);
+    assert.equal(unknownBody.status, false);
+    assert.equal(unknownBody.message, 'Unsupported currency');
+    assert.equal(await WithdrawalHistory.countDocuments({ userId: stranger._id }), 0);
+    assert.equal((await User.findById(stranger._id))?.balance, 50);
+  });
+
+  it('normalizes a fractional coin amount before the withdrawable check and hold', async () => {
+    const bounded = await makeUser(14, 10, 100);
+    const accepted = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(bounded._id), 'round-fit'),
+      body: JSON.stringify({
+        coin_amount: 10.004,
+        wallet_address: '01700000014',
+        wallet_type: 'bkash',
+        currency_type: 'BDT',
+      }),
+    });
+    assert.equal(accepted.status, 200);
+    const acceptedBody = (await accepted.json()) as { data: { _id: string; coin_amount: number } };
+    assert.equal(acceptedBody.data.coin_amount, 10);
+    const acceptedRow = await WithdrawalHistory.findById(acceptedBody.data._id);
+    assert.equal(acceptedRow?.coin_amount, 10);
+    assert.equal((await User.findById(bounded._id))?.balance, 0);
+    const acceptedHold = await LedgerEntry.findOne({ refType: 'withdraw_hold', refId: acceptedBody.data._id });
+    assert.equal(acceptedHold?.amount, 10);
+
+    const wide = await makeUser(15, 100, 200);
+    const raised = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(wide._id), 'round-up'),
+      body: JSON.stringify({
+        coin_amount: 10.006,
+        wallet_address: '01700000015',
+        wallet_type: 'bkash',
+        currency_type: 'BDT',
+      }),
+    });
+    assert.equal(raised.status, 200);
+    const raisedBody = (await raised.json()) as { data: { _id: string; coin_amount: number } };
+    assert.equal(raisedBody.data.coin_amount, 10.01);
+    const raisedRow = await WithdrawalHistory.findById(raisedBody.data._id);
+    assert.equal(raisedRow?.coin_amount, 10.01);
+    assert.equal((await User.findById(wide._id))?.balance, 89.99);
+    const raisedHold = await LedgerEntry.findOne({ refType: 'withdraw_hold', refId: raisedBody.data._id });
+    assert.equal(raisedHold?.amount, raisedRow?.coin_amount);
+  });
+
+  it('accepts a supported currency when the client omits fiat or sends zero', async () => {
+    const omitted = await makeUser(16, 80, 200);
+    const withoutFiat = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(omitted._id), 'fiat-omit'),
+      body: JSON.stringify({
+        coin_amount: 12,
+        wallet_address: '01700000016',
+        wallet_type: 'bkash',
+        currency_type: 'BDT',
+      }),
+    });
+    assert.equal(withoutFiat.status, 200);
+    const withoutBody = (await withoutFiat.json()) as { data: { currency_amount: number; coin_amount: number } };
+    assert.equal(withoutBody.data.coin_amount, 12);
+    assert.equal(withoutBody.data.currency_amount, 12);
+
+    const zeroed = await makeUser(17, 80, 200);
+    const withZero = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+      method: 'POST',
+      headers: authHeaders(String(zeroed._id), 'fiat-zero'),
+      body: JSON.stringify({
+        coin_amount: 8,
+        wallet_address: '01700000017',
+        wallet_type: 'bkash',
+        currency_type: 'BDT',
+        currency_amount: 0,
+      }),
+    });
+    assert.equal(withZero.status, 200);
+    const zeroBody = (await withZero.json()) as { data: { currency_amount: number } };
+    assert.equal(zeroBody.data.currency_amount, 8);
+    assert.equal((await User.findById(zeroed._id))?.balance, 72);
   });
 });

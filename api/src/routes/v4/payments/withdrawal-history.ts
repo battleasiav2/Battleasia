@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import mongoose from 'mongoose';
 import { WithdrawalHistory } from '../../../models/WithdrawalHistory.js';
+import { CoinRate } from '../../../models/CoinRate.js';
 import { User } from '../../../models/User.js';
 import { requireAuth, type AuthedRequest } from '../../../middleware/auth.js';
 import { requireAdmin, requirePermission } from '../../../middleware/admin.js';
@@ -13,6 +14,7 @@ import {
   holdWithdrawOnSubmit,
   refundWithdrawMoney,
   MoneyError,
+  roundMoney,
 } from '../../../utils/money.js';
 import { assertHighValuePassword, HighValueError } from '../../../utils/high-value.js';
 import { writeAudit } from '../../../models/AuditLog.js';
@@ -29,6 +31,15 @@ import {
 import { safeQueryStatus, WITHDRAWAL_STATUSES } from '../../../utils/query-filter.js';
 
 const router = Router();
+
+/** Active CoinRate rows are fiat units per 1 BAC. Conflicting rates are not guessed. */
+async function authoritativeCoinRate(currency: string) {
+  const rows = await CoinRate.find({ currency, isActive: true, rate: { $gt: 0 } }).select('rate');
+  if (rows.length === 0) return null;
+  const rate = rows[0].rate;
+  if (rows.some((row) => row.rate !== rate)) return null;
+  return rate;
+}
 
 function duplicateWithdrawalField(error: unknown) {
   if (!error || typeof error !== 'object' || (error as { code?: number }).code !== 11000) return '';
@@ -88,7 +99,7 @@ router.get('/', requireAdmin, requirePermission('payments.manage'), async (req, 
 router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const body = req.body as WithdrawalSubmitBody;
-    const coinAmount = Number(body.coin_amount);
+    const rawCoinAmount = Number(body.coin_amount);
     const walletAddress = body.wallet_address?.trim();
     const walletType = body.wallet_type?.trim();
 
@@ -98,6 +109,10 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
     if (!walletType) {
       return res.status(400).json({ status: false, message: 'Wallet type is required' });
     }
+    if (!Number.isFinite(rawCoinAmount) || rawCoinAmount <= 0) {
+      return res.status(400).json({ status: false, message: 'Coin amount must be greater than zero' });
+    }
+    const coinAmount = roundMoney(rawCoinAmount);
     if (!Number.isFinite(coinAmount) || coinAmount <= 0) {
       return res.status(400).json({ status: false, message: 'Coin amount must be greater than zero' });
     }
@@ -157,18 +172,28 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
       });
     }
 
+    const currencyType = body.currency_type?.trim().toUpperCase() || 'USDT';
+    const rate = await authoritativeCoinRate(currencyType);
+    if (rate == null) {
+      return res.status(400).json({ status: false, message: 'Unsupported currency' });
+    }
+    const currencyAmount = roundMoney(coinAmount * rate);
+    if (!Number.isFinite(currencyAmount) || currencyAmount < 0) {
+      return res.status(400).json({ status: false, message: 'Unsupported currency' });
+    }
+
     const { recordFingerprint } = await import('../../../utils/fingerprint.js');
     void recordFingerprint(req, user._id.toString());
 
     const withdrawal = await WithdrawalHistory.create({
       userId: user._id,
-      user_email: body.user_email?.trim() || user.email,
-      username: body.username?.trim() || user.username,
+      user_email: user.email,
+      username: user.username,
       coin_amount: coinAmount,
       wallet_type: walletType,
       wallet_address: walletAddress,
-      currency_type: body.currency_type?.trim().toUpperCase() || 'USDT',
-      currency_amount: Number(body.currency_amount) || 0,
+      currency_type: currencyType,
+      currency_amount: currencyAmount,
       description: body.description?.trim() || '',
       notes: body.notes?.trim() || '',
       status: 'pending',
