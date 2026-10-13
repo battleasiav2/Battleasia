@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { Navigate, useOutletContext } from 'react-router-dom';
 import { api, unwrapData, explainError } from '../lib/api';
+import { isFullAdmin } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
@@ -96,6 +97,8 @@ export function OAuthSettingsPage() {
   const origin = form.redirectBase.replace(/\/$/, '');
   const googleCallback = origin ? `${origin}/api/v2/users/oauth/google/callback` : form.googleCallback;
   const discordCallback = origin ? `${origin}/api/v2/users/oauth/discord/callback` : form.discordCallback;
+
+  if (!isFullAdmin()) return <Navigate to="/403" replace />;
 
   return (
     <main className="admin-body">

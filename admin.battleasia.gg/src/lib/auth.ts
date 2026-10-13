@@ -51,6 +51,10 @@ export function can(perm?: string | null) {
   return perms.includes(perm);
 }
 
+export function isFullAdmin() {
+  return readAdminUser()?.role?.type === 'admin';
+}
+
 export function stashOtpPassword(password: string) {
   otpPasswordMemory = password;
 }

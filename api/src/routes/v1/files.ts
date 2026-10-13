@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
-import { requireAdmin } from '../../middleware/admin.js';
+import { requireAdmin, requireFullAdmin } from '../../middleware/admin.js';
 import { uploadsRoot } from '../../utils/uploads-path.js';
 
 const router = Router();
@@ -41,6 +41,19 @@ function ensureDir(dir: string) {
 
 function sanitizeFolder(folder: string) {
   return (folder || 'support').replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 40) || 'support';
+}
+
+/** Accept only a file inside the uploads directory. Rejects traversal and sibling prefixes. */
+export function resolveUploadTarget(url: string): string | null {
+  const raw = String(url || '');
+  if (!raw.startsWith('/uploads/')) return null;
+  const relative = raw.slice('/uploads/'.length);
+  if (!relative || relative.includes('\0') || relative.includes('\\')) return null;
+  const root = path.resolve(uploadsRoot);
+  const resolved = path.resolve(root, relative);
+  const rel = path.relative(root, resolved);
+  if (!rel || rel.startsWith('..') || path.isAbsolute(rel)) return null;
+  return resolved;
 }
 
 function buildStorage(folder: string) {
@@ -199,21 +212,22 @@ router.post('/upload/:folder/multi', requireAuth, (req: AuthedRequest, res) => {
   });
 });
 
-router.delete('/', requireAuth, requireAdmin, async (req, res) => {
+router.delete('/', requireAuth, requireAdmin, requireFullAdmin, async (req, res) => {
   try {
     const { url } = req.body as { url?: string };
     if (!url?.startsWith('/uploads/')) {
       return res.status(400).json({ status: false, message: 'Invalid file url' });
     }
 
-    const relative = url.replace(/^\/uploads\//, '');
-    const filePath = path.join(uploadsRoot, relative);
-    const resolved = path.resolve(filePath);
-    if (!resolved.startsWith(path.resolve(uploadsRoot))) {
+    const resolved = resolveUploadTarget(url);
+    if (!resolved) {
       return res.status(400).json({ status: false, message: 'Invalid file path' });
     }
 
     if (fs.existsSync(resolved)) {
+      if (!fs.statSync(resolved).isFile()) {
+        return res.status(400).json({ status: false, message: 'Invalid file path' });
+      }
       fs.unlinkSync(resolved);
     }
 

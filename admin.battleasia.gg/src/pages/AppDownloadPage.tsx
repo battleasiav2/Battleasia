@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useOutletContext } from 'react-router-dom';
+import { Navigate, useOutletContext } from 'react-router-dom';
 import { api, unwrapData, explainError, uploadMultipart, readApiMessage } from '../lib/api';
+import { isFullAdmin } from '../lib/auth';
 import { useI18n } from '../lib/i18n';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
@@ -139,6 +140,8 @@ export function AppDownloadPage() {
       if (fileRef.current) fileRef.current.value = '';
     }
   }
+
+  if (!isFullAdmin()) return <Navigate to="/403" replace />;
 
   return (
     <main className="admin-body">

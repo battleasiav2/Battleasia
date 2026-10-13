@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ASSETS } from '../lib/assets';
-import { adminLogout, can, fetchAdminMe, readAdminUser } from '../lib/auth';
+import { adminLogout, can, fetchAdminMe, isFullAdmin, readAdminUser } from '../lib/auth';
 import { api, isApiError, unwrapData } from '../lib/api';
 import { NAV, paletteItems } from '../lib/catalog';
 import { NavGlyph } from '../lib/nav-icons';
@@ -252,6 +252,7 @@ export function AdminShell() {
 
   const items = useMemo(() => {
     const all = paletteItems().filter((i) => {
+      if (i.fullAdmin && !isFullAdmin()) return false;
       if (!can(i.perm)) return false;
       const group = NAV.find((g) => g.items.some((it) => it.to === i.to))?.label;
       if (!group) return true;
@@ -339,7 +340,7 @@ export function AdminShell() {
         </div>
         <nav>
           {navGroups.map((group) => {
-            const visible = group.items.filter((i) => can(i.perm));
+            const visible = group.items.filter((i) => (!i.fullAdmin || isFullAdmin()) && can(i.perm));
             if (!visible.length) return null;
             const expanded = rail || open.includes(group.label);
             return (

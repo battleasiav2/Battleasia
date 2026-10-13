@@ -3,7 +3,7 @@ import type express from 'express';
 import multer from 'multer';
 import fs from 'fs';
 import { requireAuth } from '../../middleware/auth.js';
-import { requireAdmin, requirePermission } from '../../middleware/admin.js';
+import { requireAdmin, requireFullAdmin, requirePermission } from '../../middleware/admin.js';
 import {
   getAppSettings,
   normalizeAppDownloadSettings,
@@ -74,7 +74,7 @@ function handleApkUpload(req: express.Request, res: express.Response, next: expr
   });
 }
 
-router.get('/mail-settings', requireAuth, requireAdmin, async (_req, res) => {
+router.get('/mail-settings', requireAuth, requireAdmin, requireFullAdmin, async (_req, res) => {
   try {
     const settings = await getAppSettings();
     return res.json({
@@ -87,7 +87,7 @@ router.get('/mail-settings', requireAuth, requireAdmin, async (_req, res) => {
   }
 });
 
-router.put('/mail-settings', requireAuth, requireAdmin, async (req, res) => {
+router.put('/mail-settings', requireAuth, requireAdmin, requireFullAdmin, async (req, res) => {
   try {
     const settings = await getAppSettings();
     const current = normalizeMailSettings(settings.mail);
@@ -119,7 +119,7 @@ router.put('/mail-settings', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-router.post('/mail-settings/test', requireAuth, requireAdmin, async (req, res) => {
+router.post('/mail-settings/test', requireAuth, requireAdmin, requireFullAdmin, async (req, res) => {
   try {
     const { to } = req.body as { to?: string };
     if (!to || !to.includes('@')) {
@@ -167,7 +167,7 @@ router.get('/oauth-public', async (_req, res) => {
   }
 });
 
-router.get('/oauth-settings', requireAuth, requireAdmin, async (_req, res) => {
+router.get('/oauth-settings', requireAuth, requireAdmin, requireFullAdmin, async (_req, res) => {
   try {
     const settings = await getAppSettings();
     const oauth = serializeOAuthSettingsForAdmin(settings.oauth);
@@ -186,7 +186,7 @@ router.get('/oauth-settings', requireAuth, requireAdmin, async (_req, res) => {
   }
 });
 
-router.put('/oauth-settings', requireAuth, requireAdmin, async (req, res) => {
+router.put('/oauth-settings', requireAuth, requireAdmin, requireFullAdmin, async (req, res) => {
   try {
     const settings = await getAppSettings();
     const current = normalizeOAuthSettings(settings.oauth);
@@ -258,7 +258,7 @@ router.get('/app-download', async (_req, res) => {
   }
 });
 
-router.put('/app-download', requireAuth, requireAdmin, async (req, res) => {
+router.put('/app-download', requireAuth, requireAdmin, requireFullAdmin, async (req, res) => {
   try {
     const settings = await getAppSettings();
     const body = req.body as Partial<AppDownloadSettings>;
@@ -369,7 +369,7 @@ router.put('/site-notice', requireAuth, requireAdmin, requirePermission('notific
   }
 });
 
-router.post('/app-download/upload', requireAuth, requireAdmin, handleApkUpload, async (req, res) => {
+router.post('/app-download/upload', requireAuth, requireAdmin, requireFullAdmin, handleApkUpload, async (req, res) => {
   try {
     const file = req.file;
     if (!file) {
@@ -451,7 +451,7 @@ router.put('/p2', requireAuth, requireAdmin, requirePermission('engagement.edit'
   }
 });
 
-router.get('/velocity', requireAuth, requireAdmin, async (_req, res) => {
+router.get('/velocity', requireAuth, requireAdmin, requirePermission('engagement.edit'), async (_req, res) => {
   try {
     const settings = await getAppSettings();
     return res.json({ status: true, data: normalizeVelocitySettings(settings.velocitySettings) });
@@ -461,7 +461,7 @@ router.get('/velocity', requireAuth, requireAdmin, async (_req, res) => {
   }
 });
 
-router.put('/velocity', requireAuth, requireAdmin, async (req, res) => {
+router.put('/velocity', requireAuth, requireAdmin, requirePermission('engagement.edit'), async (req, res) => {
   try {
     const settings = await getAppSettings();
     settings.velocitySettings = normalizeVelocitySettings({

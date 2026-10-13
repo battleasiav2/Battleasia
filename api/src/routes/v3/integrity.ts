@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { User } from '../../models/User.js';
 import { SupportConversation } from '../../models/SupportConversation.js';
 import { requireAuth, type AuthedRequest } from '../../middleware/auth.js';
-import { requireAdmin, requirePermission } from '../../middleware/admin.js';
+import { requireAdmin, requireFullAdmin, requirePermission } from '../../middleware/admin.js';
 import { paginatedWithTotal, parsePagination } from '../../utils/pagination.js';
 import { getAppSettings } from '../../models/AppSettings.js';
 import { LoginHistory } from '../../models/LoginHistory.js';
@@ -450,7 +450,7 @@ router.patch('/ocr/:id', requirePermission('matches.view'), async (req: AuthedRe
   return res.json({ status: true, data: { id: row._id.toString(), status: row.status } });
 });
 
-router.get('/audit', async (req, res) => {
+router.get('/audit', requireFullAdmin, async (req, res) => {
   const { skip, limit } = parsePagination(req);
   const [written, logins] = await Promise.all([
     AuditLog.find().sort({ createdAt: -1 }).limit(200),

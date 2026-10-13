@@ -2,6 +2,8 @@ export type NavItem = {
   to: string;
   label: string;
   perm?: string | null;
+  /** No permission key exists. Only role type admin may open these. */
+  fullAdmin?: boolean;
   icon?: string;
   badge?: 'deposits' | 'withdrawals' | 'support';
 };
@@ -34,6 +36,7 @@ export type SettingsSpec = {
   wrap?: string;
   form?: SettingsFormId;
   perm?: string | null;
+  fullAdmin?: boolean;
   testPath?: string;
 };
 
@@ -99,9 +102,9 @@ export const NAV: NavGroup[] = [
   {
     label: 'nav.system',
     items: [
-      { to: '/system/mail-settings', label: 'nav.mail', perm: null, icon: 'mail' },
-      { to: '/system/oauth-login', label: 'nav.oauth', perm: null, icon: 'social' },
-      { to: '/system/app-download', label: 'nav.appDownload', perm: null, icon: 'download' },
+      { to: '/system/mail-settings', label: 'nav.mail', perm: null, fullAdmin: true, icon: 'mail' },
+      { to: '/system/oauth-login', label: 'nav.oauth', perm: null, fullAdmin: true, icon: 'social' },
+      { to: '/system/app-download', label: 'nav.appDownload', perm: null, fullAdmin: true, icon: 'download' },
       { to: '/integrity/ledger', label: 'nav.integrityLedger', perm: 'payments.view', icon: 'scale' },
       { to: '/integrity/fraud-holds', label: 'nav.fraudHolds', perm: 'payments.view', icon: 'hold' },
       { to: '/integrity/kyc', label: 'nav.kyc', perm: 'users.view', icon: 'kyc' },
@@ -109,7 +112,7 @@ export const NAV: NavGroup[] = [
       { to: '/integrity/ocr', label: 'nav.ocr', perm: 'matches.view', icon: 'scan' },
       { to: '/integrity/match-reports', label: 'nav.matchReports', perm: 'matches.view', icon: 'report' },
       { to: '/integrity/disputes', label: 'nav.disputes', perm: 'customer-support.view', icon: 'gavel' },
-      { to: '/integrity/audit', label: 'nav.audit', perm: null, icon: 'audit' },
+      { to: '/integrity/audit', label: 'nav.audit', perm: null, fullAdmin: true, icon: 'audit' },
       { to: '/profile', label: 'nav.profile', perm: null, icon: 'profile' },
     ],
   },
@@ -184,16 +187,18 @@ export const SETTINGS: Record<string, SettingsSpec> = {
     put: '/api/v2/app-settings/mail-settings',
     testPath: '/api/v2/app-settings/mail-settings/test',
     perm: null,
+    fullAdmin: true,
   },
   '/system/app-download': {
     title: 'nav.appDownload',
     get: '/api/v2/app-settings/app-download',
     put: '/api/v2/app-settings/app-download',
     perm: null,
+    fullAdmin: true,
   },
 };
 
-export const INTEGRITY: Record<string, { title: string; api: string; perm?: string | null }> = {
+export const INTEGRITY: Record<string, { title: string; api: string; perm?: string | null; fullAdmin?: boolean }> = {
   '/integrity/ledger': { title: 'nav.integrityLedger', api: '/api/v3/integrity/ledger', perm: 'payments.view' },
   '/integrity/fraud-holds': { title: 'nav.fraudHolds', api: '/api/v3/integrity/fraud-holds', perm: 'payments.view' },
   '/integrity/kyc': { title: 'page.kyc', api: '/api/v3/integrity/kyc', perm: 'users.view' },
@@ -201,7 +206,7 @@ export const INTEGRITY: Record<string, { title: string; api: string; perm?: stri
   '/integrity/ocr': { title: 'nav.ocr', api: '/api/v3/integrity/ocr', perm: 'matches.view' },
   '/integrity/match-reports': { title: 'nav.matchReports', api: '/api/v3/integrity/match-reports', perm: 'matches.view' },
   '/integrity/disputes': { title: 'nav.disputes', api: '/api/v3/integrity/disputes', perm: 'customer-support.view' },
-  '/integrity/audit': { title: 'nav.audit', api: '/api/v3/integrity/audit', perm: null },
+  '/integrity/audit': { title: 'nav.audit', api: '/api/v3/integrity/audit', perm: null, fullAdmin: true },
 };
 
 export function paletteItems() {

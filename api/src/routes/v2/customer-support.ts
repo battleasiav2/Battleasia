@@ -421,6 +421,9 @@ router.patch('/conversation/:conversationId/close', requireAuth, async (req: Aut
 
     const deleteMessages = Boolean(req.body.deleteMessages);
     if (deleteMessages) {
+      if (!actor || !isAdminRole(actor) || !hasAdminPermission(actor, 'customer-support.close')) {
+        return res.status(403).json({ status: false, message: 'Permission denied' });
+      }
       await SupportMessage.deleteMany({ conversationId: conversation._id });
     }
 
@@ -451,7 +454,7 @@ router.get('/live-chat-settings', async (_req, res) => {
   }
 });
 
-router.put('/live-chat-settings', requireAuth, requireAdmin, async (req: AuthedRequest, res) => {
+router.put('/live-chat-settings', requireAuth, requireAdmin, requirePermission('customer-support.view'), async (req: AuthedRequest, res) => {
   try {
     const settings = await getAppSettings();
     settings.liveChat = normalizeLiveChatSettings(req.body || {});
