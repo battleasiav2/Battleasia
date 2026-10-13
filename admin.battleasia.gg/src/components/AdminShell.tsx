@@ -3,7 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ASSETS } from '../lib/assets';
 import { adminLogout, can, fetchAdminMe, isFullAdmin, readAdminUser } from '../lib/auth';
 import { api, isApiError, unwrapData } from '../lib/api';
-import { NAV, paletteItems } from '../lib/catalog';
+import { NAV, paletteItems, type NavItem } from '../lib/catalog';
 import { NavGlyph } from '../lib/nav-icons';
 import { disconnectAdminSocket, getAdminSocket } from '../lib/socket';
 import { useI18n } from '../lib/i18n';
@@ -56,6 +56,12 @@ function groupForPath(path: string) {
 function itemActive(path: string, to: string) {
   if (to === '/dashboard') return path === '/dashboard';
   return path === to || path.startsWith(`${to}/`);
+}
+
+function showNavItem(item: NavItem) {
+  if (item.fullAdmin && !isFullAdmin()) return false;
+  if (can(item.perm)) return true;
+  return Boolean(item.action && can(item.action));
 }
 
 export function AdminShell() {
@@ -252,8 +258,7 @@ export function AdminShell() {
 
   const items = useMemo(() => {
     const all = paletteItems().filter((i) => {
-      if (i.fullAdmin && !isFullAdmin()) return false;
-      if (!can(i.perm)) return false;
+      if (!showNavItem(i)) return false;
       const group = NAV.find((g) => g.items.some((it) => it.to === i.to))?.label;
       if (!group) return true;
       const scope = GROUP_MODE[group] || 'both';
@@ -340,7 +345,7 @@ export function AdminShell() {
         </div>
         <nav>
           {navGroups.map((group) => {
-            const visible = group.items.filter((i) => (!i.fullAdmin || isFullAdmin()) && can(i.perm));
+            const visible = group.items.filter((i) => showNavItem(i));
             if (!visible.length) return null;
             const expanded = rail || open.includes(group.label);
             return (

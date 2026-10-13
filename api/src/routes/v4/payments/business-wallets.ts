@@ -90,7 +90,7 @@ router.get('/:id', requireAdmin, requirePermission('payments.view', 'payments.ma
   }
 });
 
-router.post('/', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
+router.post('/', requireAdmin, requirePermission('payments.manage'), async (req, res) => {
   try {
     const { channel_id, wallet_address, currency_type } = req.body;
     if (!channel_id || !wallet_address || !currency_type) {
@@ -111,7 +111,7 @@ router.post('/', requireAdmin, requirePermission('payments.view', 'payments.mana
   }
 });
 
-router.put('/:id', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
+router.put('/:id', requireAdmin, requirePermission('payments.manage'), async (req, res) => {
   try {
     const wallet = await BusinessWallet.findById(req.params.id);
     if (!wallet) {
@@ -145,7 +145,7 @@ router.put('/:id', requireAdmin, requirePermission('payments.view', 'payments.ma
   }
 });
 
-router.patch('/:id/toggle', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
+router.patch('/:id/toggle', requireAdmin, requirePermission('payments.manage'), async (req, res) => {
   try {
     const wallet = await BusinessWallet.findById(req.params.id);
     if (!wallet) {
@@ -160,7 +160,7 @@ router.patch('/:id/toggle', requireAdmin, requirePermission('payments.view', 'pa
   }
 });
 
-router.delete('/:id', requireAdmin, requirePermission('payments.view', 'payments.manage'), async (req, res) => {
+router.delete('/:id', requireAdmin, requirePermission('payments.manage'), async (req, res) => {
   try {
     const wallet = await BusinessWallet.findById(req.params.id);
     if (!wallet) {

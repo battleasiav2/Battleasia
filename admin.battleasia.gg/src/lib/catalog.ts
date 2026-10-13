@@ -2,6 +2,8 @@ export type NavItem = {
   to: string;
   label: string;
   perm?: string | null;
+  /** Staff with this key may open the page even without the view key. */
+  action?: string;
   /** No permission key exists. Only role type admin may open these. */
   fullAdmin?: boolean;
   icon?: string;
@@ -67,7 +69,7 @@ export const NAV: NavGroup[] = [
     label: 'nav.money',
     items: [
       { to: '/balance/balance-histories', label: 'nav.ledger', perm: 'payments.view', icon: 'ledger' },
-      { to: '/payments/wallet', label: 'nav.wallets', perm: 'payments.view', icon: 'wallet' },
+      { to: '/payments/wallet', label: 'nav.wallets', perm: 'payments.view', action: 'payments.manage', icon: 'wallet' },
       { to: '/payments/deposit', label: 'nav.deposits', perm: 'payments.manage', icon: 'deposit', badge: 'deposits' },
       { to: '/payments/withdrawal', label: 'nav.withdrawals', perm: 'payments.manage', icon: 'withdraw', badge: 'withdrawals' },
       { to: '/shop/bac', label: 'nav.bacShop', perm: 'shop.view', icon: 'pack' },
@@ -105,13 +107,13 @@ export const NAV: NavGroup[] = [
       { to: '/system/mail-settings', label: 'nav.mail', perm: null, fullAdmin: true, icon: 'mail' },
       { to: '/system/oauth-login', label: 'nav.oauth', perm: null, fullAdmin: true, icon: 'social' },
       { to: '/system/app-download', label: 'nav.appDownload', perm: null, fullAdmin: true, icon: 'download' },
-      { to: '/integrity/ledger', label: 'nav.integrityLedger', perm: 'payments.view', icon: 'scale' },
-      { to: '/integrity/fraud-holds', label: 'nav.fraudHolds', perm: 'payments.view', icon: 'hold' },
-      { to: '/integrity/kyc', label: 'nav.kyc', perm: 'users.view', icon: 'kyc' },
+      { to: '/integrity/ledger', label: 'nav.integrityLedger', perm: 'payments.view', action: 'payments.manage', icon: 'scale' },
+      { to: '/integrity/fraud-holds', label: 'nav.fraudHolds', perm: 'payments.view', action: 'payments.manage', icon: 'hold' },
+      { to: '/integrity/kyc', label: 'nav.kyc', perm: 'users.view', action: 'users.edit', icon: 'kyc' },
       { to: '/integrity/fingerprints', label: 'nav.fingerprints', perm: 'users.view', icon: 'print' },
-      { to: '/integrity/ocr', label: 'nav.ocr', perm: 'matches.view', icon: 'scan' },
-      { to: '/integrity/match-reports', label: 'nav.matchReports', perm: 'matches.view', icon: 'report' },
-      { to: '/integrity/disputes', label: 'nav.disputes', perm: 'customer-support.view', icon: 'gavel' },
+      { to: '/integrity/ocr', label: 'nav.ocr', perm: 'matches.view', action: 'matches.edit', icon: 'scan' },
+      { to: '/integrity/match-reports', label: 'nav.matchReports', perm: 'matches.view', action: 'matches.edit', icon: 'report' },
+      { to: '/integrity/disputes', label: 'nav.disputes', perm: 'customer-support.view', action: 'customer-support.close', icon: 'gavel' },
       { to: '/integrity/audit', label: 'nav.audit', perm: null, fullAdmin: true, icon: 'audit' },
       { to: '/profile', label: 'nav.profile', perm: null, icon: 'profile' },
     ],
@@ -198,14 +200,14 @@ export const SETTINGS: Record<string, SettingsSpec> = {
   },
 };
 
-export const INTEGRITY: Record<string, { title: string; api: string; perm?: string | null; fullAdmin?: boolean }> = {
-  '/integrity/ledger': { title: 'nav.integrityLedger', api: '/api/v3/integrity/ledger', perm: 'payments.view' },
-  '/integrity/fraud-holds': { title: 'nav.fraudHolds', api: '/api/v3/integrity/fraud-holds', perm: 'payments.view' },
-  '/integrity/kyc': { title: 'page.kyc', api: '/api/v3/integrity/kyc', perm: 'users.view' },
+export const INTEGRITY: Record<string, { title: string; api: string; perm?: string | null; action?: string; fullAdmin?: boolean }> = {
+  '/integrity/ledger': { title: 'nav.integrityLedger', api: '/api/v3/integrity/ledger', perm: 'payments.view', action: 'payments.manage' },
+  '/integrity/fraud-holds': { title: 'nav.fraudHolds', api: '/api/v3/integrity/fraud-holds', perm: 'payments.view', action: 'payments.manage' },
+  '/integrity/kyc': { title: 'page.kyc', api: '/api/v3/integrity/kyc', perm: 'users.view', action: 'users.edit' },
   '/integrity/fingerprints': { title: 'nav.fingerprints', api: '/api/v3/integrity/fingerprints', perm: 'users.view' },
-  '/integrity/ocr': { title: 'nav.ocr', api: '/api/v3/integrity/ocr', perm: 'matches.view' },
-  '/integrity/match-reports': { title: 'nav.matchReports', api: '/api/v3/integrity/match-reports', perm: 'matches.view' },
-  '/integrity/disputes': { title: 'nav.disputes', api: '/api/v3/integrity/disputes', perm: 'customer-support.view' },
+  '/integrity/ocr': { title: 'nav.ocr', api: '/api/v3/integrity/ocr', perm: 'matches.view', action: 'matches.edit' },
+  '/integrity/match-reports': { title: 'nav.matchReports', api: '/api/v3/integrity/match-reports', perm: 'matches.view', action: 'matches.edit' },
+  '/integrity/disputes': { title: 'nav.disputes', api: '/api/v3/integrity/disputes', perm: 'customer-support.view', action: 'customer-support.close' },
   '/integrity/audit': { title: 'nav.audit', api: '/api/v3/integrity/audit', perm: null, fullAdmin: true },
 };
 

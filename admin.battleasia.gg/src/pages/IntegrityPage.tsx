@@ -66,7 +66,9 @@ export function IntegrityPage() {
     );
   }
   if (spec.fullAdmin && !isFullAdmin()) return <Navigate to="/403" replace />;
-  if (spec.perm && !can(spec.perm)) return <Navigate to="/403" replace />;
+  const canRead = !spec.perm || can(spec.perm) || (spec.action ? can(spec.action) : false);
+  if (!canRead) return <Navigate to="/403" replace />;
+  const canAct = spec.action ? can(spec.action) : false;
 
   const cols = rows[0]
     ? Object.keys(rows[0])
@@ -87,7 +89,7 @@ export function IntegrityPage() {
         <button type="button" className="btn btn-ghost" onClick={() => downloadExcel(`${t(spec.title)}.xls`, rows, cols)}>
           Excel
         </button>
-        {spec.api.includes('/ledger') ? (
+        {spec.api.includes('/ledger') && canAct ? (
           <>
             <input value={reserve} onChange={(e) => setReserve(e.target.value)} placeholder="Reserve BAC" />
             <button
@@ -152,11 +154,11 @@ export function IntegrityPage() {
                 {cols.map((c) => (
                   <th key={c}>{c.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())}</th>
                 ))}
-                {spec.api.includes('/kyc') ? <th>{t('integrity.action')}</th> : null}
-                {spec.api.includes('/fraud-holds') ? <th>{t('integrity.action')}</th> : null}
-                {spec.api.includes('/match-reports') ? <th>{t('integrity.action')}</th> : null}
-                {spec.api.includes('/disputes') ? <th>{t('integrity.action')}</th> : null}
-                {spec.api.includes('/ocr') ? <th>{t('integrity.action')}</th> : null}
+                {canAct && spec.api.includes('/kyc') ? <th>{t('integrity.action')}</th> : null}
+                {canAct && spec.api.includes('/fraud-holds') ? <th>{t('integrity.action')}</th> : null}
+                {canAct && spec.api.includes('/match-reports') ? <th>{t('integrity.action')}</th> : null}
+                {canAct && spec.api.includes('/disputes') ? <th>{t('integrity.action')}</th> : null}
+                {canAct && spec.api.includes('/ocr') ? <th>{t('integrity.action')}</th> : null}
               </tr>
             </thead>
             <tbody>
@@ -165,7 +167,7 @@ export function IntegrityPage() {
                   {cols.map((c) => (
                     <td key={c}>{cell(pick(row, c))}</td>
                   ))}
-                  {spec.api.includes('/kyc') ? (
+                  {canAct && spec.api.includes('/kyc') ? (
                     <td>
                       <button
                         type="button"
@@ -187,7 +189,7 @@ export function IntegrityPage() {
                       </button>
                     </td>
                   ) : null}
-                  {spec.api.includes('/fraud-holds') ? (
+                  {canAct && spec.api.includes('/fraud-holds') ? (
                     <td>
                       <button
                         type="button"
@@ -206,7 +208,7 @@ export function IntegrityPage() {
                       </button>
                     </td>
                   ) : null}
-                  {spec.api.includes('/match-reports') ? (
+                  {canAct && spec.api.includes('/match-reports') ? (
                     <td>
                       <button
                         type="button"
@@ -240,7 +242,7 @@ export function IntegrityPage() {
                       </button>
                     </td>
                   ) : null}
-                  {spec.api.includes('/disputes') ? (
+                  {canAct && spec.api.includes('/disputes') ? (
                     <td>
                       <button
                         type="button"
@@ -274,7 +276,7 @@ export function IntegrityPage() {
                       </button>
                     </td>
                   ) : null}
-                  {spec.api.includes('/ocr') ? (
+                  {canAct && spec.api.includes('/ocr') ? (
                     <td>
                       <button
                         type="button"

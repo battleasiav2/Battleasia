@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
+import { Navigate, useOutletContext } from 'react-router-dom';
 import { api, unwrapData, unwrapList, explainError, uploadMultipart } from '../lib/api';
+import { can } from '../lib/auth';
 import { cell, pick, rowId } from '../lib/format';
 import { useI18n } from '../lib/i18n';
 import { mediaUrl } from '../lib/media';
-import { useOutletContext } from 'react-router-dom';
 
 type Ctx = { toast: (m: string, kind?: 'ok' | 'err') => void };
 
@@ -48,6 +49,7 @@ export function WalletOpsPage() {
   }, [t]);
 
   async function uploadQr(id: string, file: File) {
+    if (!can('payments.manage')) return;
     setUploading(id);
     setUploadPct(0);
     setError('');
@@ -73,6 +75,9 @@ export function WalletOpsPage() {
       setUploadPct(0);
     }
   }
+
+  const canManagePayments = can('payments.manage');
+  if (!can('payments.view') && !canManagePayments) return <Navigate to="/403" replace />;
 
   const cryptoWallets = (wallets || []).filter(isCryptoWallet);
 
@@ -107,16 +112,18 @@ export function WalletOpsPage() {
                   <div>
                     <strong>{String(row.currency_type || 'USDT')}</strong>
                     <p className="admin-lead" style={{ margin: '4px 0 8px' }}>{String(row.wallet_address || '')}</p>
-                    <input
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp"
-                      disabled={uploading === id}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file && id) void uploadQr(id, file);
-                        e.target.value = '';
-                      }}
-                    />
+                    {canManagePayments ? (
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp"
+                        disabled={uploading === id}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file && id) void uploadQr(id, file);
+                          e.target.value = '';
+                        }}
+                      />
+                    ) : null}
                     {uploading === id ? (
                       <p className="field-hint" role="status">
                         {t('notice.uploading')} {uploadPct}%
