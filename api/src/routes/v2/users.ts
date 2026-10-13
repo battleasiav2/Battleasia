@@ -188,7 +188,7 @@ router.get('/check-email', async (req, res) => {
   }
 });
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', codeAttemptLimiter, async (req, res) => {
   try {
     const {
       email,

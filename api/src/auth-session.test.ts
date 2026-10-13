@@ -18,6 +18,7 @@ import usersListRoutes from './routes/v3/users/list.js';
 import usersRoutes from './routes/v2/users.js';
 import { findOrCreateSocialUser, providerEmailIsVerified, publicOrigin } from './utils/social-login.js';
 import { issuePair } from './utils/token-session.js';
+import { logAuthCode } from './utils/auth-log.js';
 import { storeVerificationCode } from './utils/verification-code.js';
 import type { OAuthSettings } from './models/AppSettings.js';
 import type { Request } from 'express';
@@ -360,5 +361,115 @@ describe('authentication session security', () => {
       emailVerified: true,
     });
     assert.equal(linked.discordId, 'discord-verified');
+  });
+
+  it('rejects an expired signup code and does not leave it usable', async () => {
+    const user = await createUser({
+      email: 'otp-expired@example.com',
+      username: 'otpexpired',
+      emailVerified: false,
+      status: false,
+    });
+    await VerificationCode.create({
+      email: user.email,
+      code: '191919',
+      type: 'signup',
+      attempts: 0,
+      expiresAt: new Date(Date.now() - 60_000),
+    });
+
+    const first = await fetch(`${base}/api/v2/users/verify-email-signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email, code: '191919' }),
+    });
+    assert.equal(first.status, 400);
+    assert.equal(await VerificationCode.countDocuments({ email: user.email, type: 'signup' }), 0);
+    const stillPending = await User.findById(user._id);
+    assert.equal(stillPending?.emailVerified, false);
+
+    const replay = await fetch(`${base}/api/v2/users/verify-email-signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email, code: '191919' }),
+    });
+    assert.notEqual(replay.status, 200);
+    const afterReplay = await User.findById(user._id);
+    assert.equal(afterReplay?.emailVerified, false);
+  });
+
+  it('rejects a signup code after it has already been used', async () => {
+    const user = await createUser({
+      email: 'otp-replay@example.com',
+      username: 'otpreplay',
+      emailVerified: false,
+      status: false,
+    });
+    await storeVerificationCode(user.email, 'signup', '282828', new Date(Date.now() + 10 * 60 * 1000));
+
+    const first = await fetch(`${base}/api/v2/users/verify-email-signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email, code: '282828' }),
+    });
+    assert.equal(first.status, 200);
+    assert.equal(await VerificationCode.countDocuments({ email: user.email, type: 'signup' }), 0);
+
+    const second = await fetch(`${base}/api/v2/users/verify-email-signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user.email, code: '282828' }),
+    });
+    assert.notEqual(second.status, 200);
+    const verified = await User.findById(user._id);
+    assert.equal(verified?.emailVerified, true);
+  });
+
+  it('does not write the OTP when auth-code logging is enabled', () => {
+    const previous = env.logAuthCodes;
+    const lines: string[] = [];
+    const original = console.log;
+    console.log = (...args: unknown[]) => {
+      lines.push(args.map((part) => String(part)).join(' '));
+    };
+    const secret = '918273';
+    try {
+      env.logAuthCodes = true;
+      logAuthCode('signup verification code', 'log-check@example.com', secret);
+      const output = lines.join('\n');
+      assert.equal(output.includes(secret), false);
+      assert.match(output, /log-check@example.com/);
+    } finally {
+      console.log = original;
+      env.logAuthCodes = previous;
+    }
+  });
+
+  it('limits repeated signup requests from the same IP before creating an account', async () => {
+    const usersBefore = await User.countDocuments();
+    const codesBefore = await VerificationCode.countDocuments();
+    let reachedHandler = false;
+    let limited = false;
+
+    for (let attempt = 0; attempt < 31; attempt += 1) {
+      const response = await fetch(`${base}/api/v2/users/signup`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      });
+      if (response.status === 400) reachedHandler = true;
+      if (response.status === 429) {
+        limited = true;
+        const body = (await response.json()) as { status?: boolean; message?: string };
+        assert.equal(body.status, false);
+        assert.match(body.message || '', /too many attempts/i);
+        break;
+      }
+    }
+
+    assert.equal(reachedHandler, true);
+    assert.equal(limited, true);
+    assert.equal(await User.countDocuments(), usersBefore);
+    assert.equal(await VerificationCode.countDocuments(), codesBefore);
   });
 });
