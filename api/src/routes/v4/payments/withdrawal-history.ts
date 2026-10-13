@@ -176,13 +176,14 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
       ...(idemKey ? { idempotencyKey: idemKey } : {}),
     });
 
+    let heldBalance = user.balance ?? 0;
     try {
       const held = await holdWithdrawOnSubmit({
         withdrawalId: withdrawal._id.toString(),
         userId: user._id.toString(),
         idempotencyKey: idemKey || undefined,
       });
-      await notifyBalanceChange(user._id.toString(), held.balance, (user.balance ?? 0));
+      heldBalance = held.balance;
     } catch (holdError) {
       await WithdrawalHistory.findByIdAndDelete(withdrawal._id);
       if (holdError instanceof MoneyError) {
@@ -191,13 +192,19 @@ router.post('/submit', requireAuth, async (req: AuthedRequest, res) => {
       throw holdError;
     }
 
-    await emitPendingPaymentCounts();
-    emitNewWithdrawal(serializeWithdrawal(withdrawal));
-    await notifyWithdrawalSubmitted({
-      userId: user._id.toString(),
-      amount: coinAmount,
-      withdrawalId: withdrawal._id.toString(),
-    });
+    try {
+      await notifyBalanceChange(user._id.toString(), heldBalance, user.balance ?? 0);
+      await emitPendingPaymentCounts();
+      emitNewWithdrawal(serializeWithdrawal(withdrawal));
+      await notifyWithdrawalSubmitted({
+        userId: user._id.toString(),
+        amount: coinAmount,
+        withdrawalId: withdrawal._id.toString(),
+      });
+    } catch (sideError) {
+      const label = sideError instanceof Error ? sideError.name : 'Error';
+      console.error('withdrawal submit side-effect failed:', label);
+    }
 
     return res.status(200).json({
       status: true,

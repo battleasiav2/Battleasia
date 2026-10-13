@@ -3,13 +3,14 @@ import { mkdirSync, readFileSync, statfsSync } from 'node:fs';
 import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
-import { after, before, describe, it } from 'node:test';
+import { after, before, describe, it, mock } from 'node:test';
 import express from 'express';
 import mongoose from 'mongoose';
 import { MongoMemoryReplSet } from 'mongodb-memory-server';
 import { BalanceHistory } from './models/BalanceHistory.js';
 import { CoingoTransaction } from './models/CoingoTransaction.js';
 import { LedgerEntry } from './models/LedgerEntry.js';
+import { Notification } from './models/Notification.js';
 import { User } from './models/User.js';
 import { WithdrawalHistory } from './models/WithdrawalHistory.js';
 import coingoRoutes from './routes/v4/payments/coingo.js';
@@ -21,6 +22,7 @@ import {
   completeWithdrawMoney,
   refundWithdrawMoney,
 } from './utils/money.js';
+import { setSocketServer } from './utils/socket.js';
 
 const repoRoot = path.resolve(process.cwd(), '..');
 
@@ -399,5 +401,123 @@ describe('phase 1 withdrawal safety', () => {
     assert.equal((await User.findById(user._id))?.balance, 85);
     assert.equal(await WithdrawalHistory.countDocuments({ userId: user._id }), 1);
     assert.equal(await LedgerEntry.countDocuments({ userId: user._id, refType: 'withdraw_hold' }), 1);
+  });
+
+  it('returns the created withdrawal when the submit notice fails after the hold', async () => {
+    const user = await makeUser(9, 100, 200);
+    const create = mock.method(Notification, 'create', async () => {
+      throw new Error('notification failed');
+    });
+    try {
+      const response = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+        method: 'POST',
+        headers: authHeaders(String(user._id), 'side-notice'),
+        body: JSON.stringify({
+          coin_amount: 20,
+          wallet_address: '01700000009',
+          wallet_type: 'bkash',
+          currency_type: 'BDT',
+        }),
+      });
+      const body = (await response.json()) as { status: boolean; message: string; data: { status: string; _id: string } };
+      assert.equal(response.status, 200);
+      assert.equal(body.status, true);
+      assert.equal(body.message, 'Withdrawal request submitted successfully');
+      assert.equal(body.data.status, 'pending');
+      assert.equal((await User.findById(user._id))?.balance, 80);
+      assert.equal(await WithdrawalHistory.countDocuments({ userId: user._id }), 1);
+      assert.equal(await LedgerEntry.countDocuments({ userId: user._id, refType: 'withdraw_hold' }), 1);
+
+      const again = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+        method: 'POST',
+        headers: authHeaders(String(user._id), 'side-notice-again'),
+        body: JSON.stringify({
+          coin_amount: 20,
+          wallet_address: '01700000009',
+          wallet_type: 'bkash',
+          currency_type: 'BDT',
+        }),
+      });
+      assert.equal(again.status, 400);
+      assert.equal((await User.findById(user._id))?.balance, 80);
+      assert.equal(await WithdrawalHistory.countDocuments({ userId: user._id }), 1);
+      assert.equal(await LedgerEntry.countDocuments({ userId: user._id, refType: 'withdraw_hold' }), 1);
+    } finally {
+      create.mock.restore();
+    }
+  });
+
+  it('returns the created withdrawal when the socket emit fails after the hold', async () => {
+    const user = await makeUser(10, 100, 200);
+    setSocketServer({
+      to() {
+        return {
+          emit() {
+            throw new Error('socket failed');
+          },
+        };
+      },
+    } as never);
+    try {
+      const response = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+        method: 'POST',
+        headers: authHeaders(String(user._id), 'side-socket'),
+        body: JSON.stringify({
+          coin_amount: 15,
+          wallet_address: '01700000010',
+          wallet_type: 'nagad',
+          currency_type: 'BDT',
+        }),
+      });
+      const body = (await response.json()) as { status: boolean; data: { status: string } };
+      assert.equal(response.status, 200);
+      assert.equal(body.status, true);
+      assert.equal(body.data.status, 'pending');
+      assert.equal((await User.findById(user._id))?.balance, 85);
+      assert.equal(await WithdrawalHistory.countDocuments({ userId: user._id }), 1);
+      assert.equal(await LedgerEntry.countDocuments({ userId: user._id, refType: 'withdraw_hold' }), 1);
+    } finally {
+      setSocketServer(null as never);
+    }
+  });
+
+  it('does not report success when the hold transaction fails', async () => {
+    const user = await makeUser(11, 100, 200);
+    const originalFind = User.findById.bind(User);
+    let calls = 0;
+    const find = mock.method(User, 'findById', function (...args: Parameters<typeof User.findById>) {
+      calls += 1;
+      const query = originalFind(...args);
+      if (calls < 3) return query;
+      return {
+        session(session: mongoose.ClientSession | null) {
+          return query.session(session).then(async (doc) => {
+            if (doc) doc.balance = 0;
+            return doc;
+          });
+        },
+      };
+    });
+    try {
+      const response = await fetch(`${base}/api/v4/payments/withdrawal-history/submit`, {
+        method: 'POST',
+        headers: authHeaders(String(user._id), 'hold-fails'),
+        body: JSON.stringify({
+          coin_amount: 20,
+          wallet_address: '01700000011',
+          wallet_type: 'bkash',
+          currency_type: 'BDT',
+        }),
+      });
+      const body = (await response.json()) as { status: boolean; message: string };
+      assert.equal(response.status, 400);
+      assert.equal(body.status, false);
+      assert.equal(body.message, 'Insufficient user balance');
+      assert.equal((await User.findOne({ _id: user._id }))?.balance, 100);
+      assert.equal(await WithdrawalHistory.countDocuments({ userId: user._id }), 0);
+      assert.equal(await LedgerEntry.countDocuments({ userId: user._id, refType: 'withdraw_hold' }), 0);
+    } finally {
+      find.mock.restore();
+    }
   });
 });
