@@ -30,7 +30,7 @@ import {
   getSuggestedFollows,
   serializeFollowUsers,
 } from '../../utils/profile-social.js';
-import { recordBalanceHistory } from '../../utils/balance-history.js';
+import { moveWallet, MoneyError, roundMoney, runMoney } from '../../utils/money.js';
 import { classifyBalanceRow } from '../../utils/balance-classify.js';
 import { notifyBalanceChange } from '../../utils/balance-notify.js';
 import { syncDailyStreak } from '../../utils/engagement-streak.js';
@@ -747,6 +747,27 @@ router.get('/premium/details', requireAuth, async (_req, res) => {
   }
 });
 
+async function grantPremium(userId: string, durationDays: number, session: mongoose.ClientSession) {
+  const current = await User.findById(userId).session(session);
+  if (!current) throw new MoneyError('Unauthorized', 401);
+  const now = new Date();
+  const base =
+    current.premiumExpiresAt && current.premiumExpiresAt.getTime() > now.getTime()
+      ? current.premiumExpiresAt
+      : now;
+  await User.updateOne(
+    { _id: current._id },
+    {
+      $set: {
+        isPremium: true,
+        premiumExpiresAt: new Date(base.getTime() + durationDays * 24 * 60 * 60 * 1000),
+        ...(current.premiumSince ? {} : { premiumSince: now }),
+      },
+    },
+    { session },
+  );
+}
+
 router.post('/premium/activate', requireAuth, async (req: AuthedRequest, res) => {
   try {
     const user = await User.findById(req.userId);
@@ -755,42 +776,49 @@ router.post('/premium/activate', requireAuth, async (req: AuthedRequest, res) =>
     }
 
     const settings = await getAppSettings();
-    const price = settings.premiumPrice;
-    const balanceBefore = user.balance ?? 0;
-
-    if (balanceBefore < price) {
-      return res.status(400).json({ status: false, message: 'Insufficient balance for premium' });
+    const price = roundMoney(Number(settings.premiumPrice));
+    const durationDays = Number(settings.premiumDuration);
+    if (!Number.isFinite(price) || price < 0 || !Number.isFinite(durationDays) || durationDays < 0) {
+      return res.status(400).json({ status: false, message: 'Premium is not available' });
     }
 
-    user.balance = balanceBefore - price;
-    const now = new Date();
-    const base =
-      user.premiumExpiresAt && user.premiumExpiresAt.getTime() > now.getTime()
-        ? user.premiumExpiresAt
-        : now;
-    user.premiumExpiresAt = new Date(base.getTime() + settings.premiumDuration * 24 * 60 * 60 * 1000);
-    user.isPremium = true;
-    if (!user.premiumSince) user.premiumSince = now;
-    await user.save();
+    const idempotencyKey = String(req.header('Idempotency-Key') || '').trim() || undefined;
+    if (price === 0) {
+      await runMoney(async (session) => {
+        await grantPremium(user._id.toString(), durationDays, session);
+      });
+    } else {
+      const paid = await moveWallet({
+        userId: user._id.toString(),
+        amount: price,
+        direction: 'debit',
+        otherAccount: 'platform:reserve',
+        refType: 'premium_activation',
+        refId: idempotencyKey || new mongoose.Types.ObjectId().toString(),
+        reason: 'premium_activation',
+        idempotencyKey,
+        detail: { days: durationDays },
+        alongside: (session) => grantPremium(user._id.toString(), durationDays, session),
+      });
+      if (!paid.replayed) {
+        await notifyBalanceChange(user._id.toString(), paid.balance, paid.before);
+        await notifyPremiumActivated({
+          userId: user._id.toString(),
+          days: durationDays,
+        });
+      }
+    }
 
-    await recordBalanceHistory({
-      user,
-      amount: price,
-      type: 'withdraw',
-      balanceBefore,
-      balanceAfter: user.balance,
-      performedBy: req.userId,
-      detail: { reason: 'premium_activation', days: settings.premiumDuration },
-    });
-
-    await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
-    await notifyPremiumActivated({
-      userId: user._id.toString(),
-      days: settings.premiumDuration,
-    });
-
-    return res.json({ status: true, user: serializeUser(user) });
+    const fresh = await User.findById(user._id);
+    if (!fresh) {
+      return res.status(401).json({ status: false, message: 'Unauthorized' });
+    }
+    return res.json({ status: true, user: serializeUser(fresh) });
   } catch (error) {
+    if (error instanceof MoneyError) {
+      const message = error.message === 'Insufficient balance' ? 'Insufficient balance for premium' : error.message;
+      return res.status(error.status).json({ status: false, message });
+    }
     console.error('premium activate error:', error);
     return res.status(500).json({ status: false, message: 'Failed to activate premium' });
   }

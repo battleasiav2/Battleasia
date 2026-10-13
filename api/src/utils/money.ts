@@ -778,6 +778,9 @@ export async function moveWallet(input: {
   refId: string;
   reason: string;
   idempotencyKey?: string;
+  detail?: Record<string, unknown>;
+  /** Runs in the same transaction as the balance change and ledger row. */
+  alongside?: (session: mongoose.ClientSession) => Promise<void>;
 }) {
   return runMoney(async (session) => {
     const amount = roundMoney(input.amount);
@@ -786,12 +789,14 @@ export async function moveWallet(input: {
       const replay = await LedgerEntry.findOne({ idempotencyKey: input.idempotencyKey }).session(session);
       if (replay) {
         const user = await User.findById(input.userId).session(session);
-        return { balance: user?.balance ?? 0, replayed: true };
+        const balance = user?.balance ?? 0;
+        return { balance, before: balance, replayed: true };
       }
     }
     const user = await User.findById(input.userId).session(session);
     if (!user) throw new MoneyError('Unauthorized', 401);
     const before = user.balance ?? 0;
+    const historyDetail = { ...(input.detail || {}), reason: input.reason };
     if (input.direction === 'debit') {
       if (before < amount) throw new MoneyError('Insufficient balance');
       const updated = await User.findOneAndUpdate(
@@ -801,6 +806,7 @@ export async function moveWallet(input: {
       );
       if (!updated) throw new MoneyError('Insufficient balance');
       user.balance = updated.balance;
+      if (input.alongside) await input.alongside(session);
       await postPair(session, {
         debitAccount: walletAccount(user._id.toString()),
         creditAccount: input.otherAccount,
@@ -810,11 +816,13 @@ export async function moveWallet(input: {
         refId: input.refId,
         idempotencyKey: input.idempotencyKey,
       });
-      await writeHistory(session, user, amount, 'withdraw', before, updated.balance ?? 0, { reason: input.reason });
-      return { balance: updated.balance ?? 0, replayed: false };
+      await writeHistory(session, user, amount, 'withdraw', before, updated.balance ?? 0, historyDetail);
+      return { balance: updated.balance ?? 0, before, replayed: false };
     }
     const updated = await User.findByIdAndUpdate(user._id, { $inc: { balance: amount } }, { new: true, session });
-    user.balance = updated?.balance ?? before + amount;
+    if (!updated) throw new MoneyError('User not found', 404);
+    user.balance = updated.balance;
+    if (input.alongside) await input.alongside(session);
     await postPair(session, {
       debitAccount: input.otherAccount,
       creditAccount: walletAccount(user._id.toString()),
@@ -824,8 +832,8 @@ export async function moveWallet(input: {
       refId: input.refId,
       idempotencyKey: input.idempotencyKey,
     });
-    await writeHistory(session, user, amount, 'deposit', before, user.balance ?? 0, { reason: input.reason });
-    return { balance: user.balance ?? 0, replayed: false };
+    await writeHistory(session, user, amount, 'deposit', before, user.balance ?? 0, historyDetail);
+    return { balance: user.balance ?? 0, before, replayed: false };
   });
 }
 

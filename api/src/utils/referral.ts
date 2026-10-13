@@ -2,9 +2,9 @@ import mongoose, { type Types } from 'mongoose';
 import { User, type IUser } from '../models/User.js';
 import { ReferralHistory } from '../models/ReferralHistory.js';
 import { getAppSettings } from '../models/AppSettings.js';
-import { recordBalanceHistory } from './balance-history.js';
 import { notifyBalanceChange } from './balance-notify.js';
 import { notifyReferralCommission } from './payment-notifications.js';
+import { moveWallet, roundMoney } from './money.js';
 
 export type ReferralDepositSource = 'manual' | 'admin' | 'coingo';
 
@@ -29,8 +29,8 @@ export async function resolveReferrerId(referredBy: string): Promise<Types.Objec
   return byUsername?._id ?? null;
 }
 
-function roundMoney(value: number) {
-  return Math.round(value * 100) / 100;
+function duplicateKey(error: unknown) {
+  return Boolean(error && typeof error === 'object' && (error as { code?: number }).code === 11000);
 }
 
 export async function processReferralCommission(input: {
@@ -52,47 +52,67 @@ export async function processReferralCommission(input: {
   const commissionAmount = roundMoney((depositAmount * commissionRate) / 100);
   if (commissionAmount <= 0) return null;
 
-  const balanceBefore = referrer.balance ?? 0;
-  referrer.balance = balanceBefore + commissionAmount;
-  await referrer.save();
-
-  const history = await ReferralHistory.create({
-    referrerId: referrer._id,
-    referredUserId: depositor._id,
-    depositAmount,
-    commissionRate,
-    commissionAmount,
-    depositId: depositId ? new mongoose.Types.ObjectId(String(depositId)) : undefined,
-    depositSource,
-    referredUsername: depositor.username,
-    referredEmail: depositor.email,
-    status: 'paid',
-  });
-
-  await recordBalanceHistory({
-    user: referrer,
-    amount: commissionAmount,
-    type: 'deposit',
-    balanceBefore,
-    balanceAfter: referrer.balance,
-    detail: {
+  const historyId = new mongoose.Types.ObjectId();
+  const eventId = depositId ? String(depositId) : historyId.toString();
+  const idempotencyKey = depositId ? `referral:${depositSource}:${eventId}` : undefined;
+  let moved;
+  try {
+    moved = await moveWallet({
+      userId: referrer._id.toString(),
+      amount: commissionAmount,
+      direction: 'credit',
+      otherAccount: 'platform:reserve',
+      refType: 'referral_commission',
+      refId: eventId,
       reason: 'referral_commission',
-      referralHistoryId: history._id.toString(),
-      referredUserId: depositor._id.toString(),
-      referredUsername: depositor.username,
-      depositAmount,
-      commissionRate,
-      depositSource,
-      depositId: depositId ? String(depositId) : undefined,
-    },
-  });
+      idempotencyKey,
+      detail: {
+        referralHistoryId: historyId.toString(),
+        referredUserId: depositor._id.toString(),
+        referredUsername: depositor.username,
+        depositAmount,
+        commissionRate,
+        depositSource,
+        depositId: depositId ? String(depositId) : undefined,
+      },
+      alongside: async (session) => {
+        await ReferralHistory.create(
+          [
+            {
+              _id: historyId,
+              referrerId: referrer._id,
+              referredUserId: depositor._id,
+              depositAmount,
+              commissionRate,
+              commissionAmount,
+              depositId: depositId ? new mongoose.Types.ObjectId(String(depositId)) : undefined,
+              depositSource,
+              referredUsername: depositor.username,
+              referredEmail: depositor.email,
+              status: 'paid',
+            },
+          ],
+          { session },
+        );
+      },
+    });
+  } catch (error) {
+    if (idempotencyKey && duplicateKey(error)) {
+      return { commissionAmount, commissionRate, historyId: '', replayed: true as const };
+    }
+    throw error;
+  }
 
-  await notifyBalanceChange(referrer._id.toString(), referrer.balance, balanceBefore);
+  if (moved.replayed) {
+    return { commissionAmount, commissionRate, historyId: '', replayed: true as const };
+  }
+
+  await notifyBalanceChange(referrer._id.toString(), moved.balance, moved.before);
   await notifyReferralCommission({
     userId: referrer._id.toString(),
     amount: commissionAmount,
     fromUsername: depositor.username,
   });
 
-  return { commissionAmount, commissionRate, historyId: history._id.toString() };
+  return { commissionAmount, commissionRate, historyId: historyId.toString(), replayed: false as const };
 }

@@ -3,8 +3,8 @@ import type { IUser } from '../models/User.js';
 import { getAppSettings, normalizeEngagementSettings, type DepositBonusDaysSettings } from '../models/AppSettings.js';
 import { normalizeP1Flags } from './p1-flags.js';
 import { isMissionInSchedule } from './engagement-period.js';
-import { recordBalanceHistory } from './balance-history.js';
 import { notifyBalanceChange } from './balance-notify.js';
+import { moveWallet, roundMoney } from './money.js';
 
 function parseDate(value: string | null | undefined): Date | null {
   if (!value) return null;
@@ -80,33 +80,37 @@ export async function applyDepositBonusOnApproval(params: {
     return { applied: false as const, bonusAmount: 0 };
   }
 
-  const bonusAmount = calculateDepositBonusAmount(params.depositAmount, config);
+  const bonusAmount = roundMoney(calculateDepositBonusAmount(params.depositAmount, config));
   if (bonusAmount <= 0) {
     return { applied: false as const, bonusAmount: 0 };
   }
 
-  const balanceBefore = params.user.balance ?? 0;
-  const balanceAfter = balanceBefore + bonusAmount;
-  params.user.balance = balanceAfter;
-  await params.user.save();
-
-  await recordBalanceHistory({
-    user: params.user,
+  const moved = await moveWallet({
+    userId: params.user._id.toString(),
     amount: bonusAmount,
-    type: 'deposit',
-    balanceBefore,
-    balanceAfter,
-    performedBy: params.performedBy || undefined,
+    direction: 'credit',
+    otherAccount: 'platform:reserve',
+    refType: 'engagement_deposit_bonus',
+    refId: params.depositId,
+    reason: 'engagement_deposit_bonus',
+    idempotencyKey: `deposit-bonus:${params.depositId}`,
     detail: {
-      reason: 'engagement_deposit_bonus',
       deposit_id: params.depositId,
       percent: config.percent,
       baseAmount: params.depositAmount,
       bonusTitle: config.title,
+      performedBy: params.performedBy ? String(params.performedBy) : undefined,
     },
   });
 
-  notifyBalanceChange(params.user._id.toString(), balanceAfter, balanceBefore);
+  if (!moved.replayed) {
+    notifyBalanceChange(params.user._id.toString(), moved.balance, moved.before);
+  }
 
-  return { applied: true as const, bonusAmount, balanceAfter };
+  return {
+    applied: !moved.replayed,
+    bonusAmount: moved.replayed ? 0 : bonusAmount,
+    balanceAfter: moved.balance,
+    replayed: moved.replayed,
+  };
 }

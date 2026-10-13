@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
 import { User } from '../../../models/User.js';
 import { Role } from '../../../models/Role.js';
 import { Session } from '../../../models/Session.js';
@@ -12,8 +13,8 @@ import {
   parsePagination,
 } from '../../../utils/pagination.js';
 import { generateReferralCode, serializeUser } from '../../../utils/serialize.js';
-import { recordBalanceHistory } from '../../../utils/balance-history.js';
 import { notifyBalanceChange } from '../../../utils/balance-notify.js';
+import { MoneyError, moveWallet, roundMoney } from '../../../utils/money.js';
 import {
   notifyAdminBalanceCredit,
   notifyAdminBalanceDebit,
@@ -296,7 +297,8 @@ router.patch('/:id/balance', requireAuth, requirePermission('users.edit'), async
       type?: 'deposit' | 'withdraw';
       note?: string;
     };
-    if (!amount || amount <= 0 || !type) {
+    const normalized = roundMoney(Number(amount));
+    if (!Number.isFinite(normalized) || normalized <= 0 || (type !== 'deposit' && type !== 'withdraw')) {
       return res.status(400).json({ status: false, message: 'Valid amount and type are required' });
     }
     if (user.role?.type === 'admin' && type === 'withdraw') {
@@ -305,63 +307,63 @@ router.patch('/:id/balance', requireAuth, requirePermission('users.edit'), async
 
     const admin = req.userId ? await User.findById(req.userId) : null;
     const adminNote = String(note || '').trim();
-    const balanceBefore = user.balance ?? 0;
-
-    if (type === 'deposit') {
-      user.balance = balanceBefore + amount;
-    } else {
-      if (balanceBefore < amount) {
-        return res.status(400).json({ status: false, message: 'Insufficient balance' });
-      }
-      user.balance = balanceBefore - amount;
-    }
-
-    await user.save();
-
-    await recordBalanceHistory({
-      user,
-      amount,
-      type,
-      balanceBefore,
-      balanceAfter: user.balance,
-      performedBy: req.userId,
+    const idempotencyKey = String(req.header('Idempotency-Key') || '').trim() || undefined;
+    const moved = await moveWallet({
+      userId: user._id.toString(),
+      amount: normalized,
+      direction: type === 'deposit' ? 'credit' : 'debit',
+      otherAccount: 'platform:reserve',
+      refType: 'admin_adjustment',
+      refId: idempotencyKey || new mongoose.Types.ObjectId().toString(),
+      reason: 'admin_adjustment',
+      idempotencyKey,
       detail: {
-        reason: 'admin_adjustment',
         adminName: admin?.username || 'Admin',
         note: adminNote || undefined,
+        performedBy: req.userId,
       },
     });
 
-    await writeAudit({
-      actorId: req.userId,
-      action: 'users.balance',
-      target: user._id.toString(),
-      detail: `${type} ${amount}${adminNote ? ` · ${adminNote}` : ''}`,
-    });
-
-    await notifyBalanceChange(user._id.toString(), user.balance, balanceBefore);
-
-    if (type === 'deposit') {
-      await notifyAdminBalanceCredit({
-        userId: user._id.toString(),
-        amount,
-        adminName: admin?.username || 'Admin',
-      });
-      await processReferralCommission({
-        depositor: user,
-        depositAmount: amount,
-        depositSource: 'admin',
-      });
-    } else {
-      await notifyAdminBalanceDebit({
-        userId: user._id.toString(),
-        amount,
-        adminName: admin?.username || 'Admin',
-      });
+    const fresh = await User.findById(user._id);
+    if (!fresh) {
+      return res.status(404).json({ status: false, message: 'User not found' });
     }
 
-    return res.json({ status: true, data: serializeUser(user) });
+    if (!moved.replayed) {
+      await writeAudit({
+        actorId: req.userId,
+        action: 'users.balance',
+        target: user._id.toString(),
+        detail: `${type} ${normalized}${adminNote ? ` · ${adminNote}` : ''}`,
+      });
+
+      await notifyBalanceChange(fresh._id.toString(), moved.balance, moved.before);
+
+      if (type === 'deposit') {
+        await notifyAdminBalanceCredit({
+          userId: fresh._id.toString(),
+          amount: normalized,
+          adminName: admin?.username || 'Admin',
+        });
+        await processReferralCommission({
+          depositor: fresh,
+          depositAmount: normalized,
+          depositSource: 'admin',
+        });
+      } else {
+        await notifyAdminBalanceDebit({
+          userId: fresh._id.toString(),
+          amount: normalized,
+          adminName: admin?.username || 'Admin',
+        });
+      }
+    }
+
+    return res.json({ status: true, data: serializeUser(fresh) });
   } catch (error) {
+    if (error instanceof MoneyError) {
+      return res.status(error.status).json({ status: false, message: error.message });
+    }
     console.error('balance update error:', error);
     return res.status(500).json({ status: false, message: 'Failed to update balance' });
   }
